@@ -10,7 +10,6 @@
 #include "abc_test/utility/io/file/file_name.h"
 #include "abc_test/gen_data/file.h"
 #include "abc_test/gen_data/random/base.h"
-#include "abc_test/gen_data/random/specialization_base.h"
 #include "abc_test/gen_data/random_data_description.h"
 #include "abc_test/utility/str/rw_info.h"
 

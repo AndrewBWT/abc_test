@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/gen_data/random/specialization_base.h"
+#include "abc_test/gen_data/random/base.h"
 #include "concepts"
 
 _BEGIN_ABC_NS

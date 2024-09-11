@@ -4,6 +4,7 @@
 #include "abc_test/gen_data/enumerable/min_value.h"
 #include "abc_test/gen_data/enumerable/max_value.h"
 #include <variant>
+#include <functional>
 
 #include "abc_test/core/errors/test_library_exception.h"
 

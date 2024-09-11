@@ -73,7 +73,6 @@ set(LIBRARY_FILES
   include/abc_test/gen_data/finite_enumeration.h
   # Subfolder contains logic specifically to do with random data generation.
   include/abc_test/gen_data/random/base.h
-  include/abc_test/gen_data/random/specialization_base.h
   include/abc_test/gen_data/random/using_functions.h
   include/abc_test/gen_data/random/specializations.h
   # Folder containing random data specializations for std types.
@@ -90,7 +89,7 @@ set(LIBRARY_FILES
   include/abc_test/gen_data/enumerable/max_value.h
   include/abc_test/gen_data/enumerable/specializations.h
   # Folder containing random data specializations for std types.
-#  include/abc_test/gen_data/enumerable/specializations/fundamental_types.h
+  include/abc_test/gen_data/enumerable/specializations/fundamental_types.h
   include/abc_test/gen_data/enumerable/specializations/enum.h
   include/abc_test/gen_data/enumerable/specializations/array.h
   include/abc_test/gen_data/enumerable/specializations/vector.h
