@@ -1,1 +1,1 @@
-# abc-test
+abc-test is a testing library written in C++. 

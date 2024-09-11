@@ -1,0 +1,16 @@
+#pragma once
+
+#include "abc_test/matchers/generic_matcher.h"
+
+_BEGIN_ABC_MATCHER_NS
+	using precedence_t = std::size_t;
+	struct operator_based_matcher_t : public generic_matcher_t
+	{
+	public:
+		virtual constexpr
+			precedence_t
+			get_precedence(
+			) const noexcept = 0;
+	};
+	_END_ABC_NS
+		_END_NS
