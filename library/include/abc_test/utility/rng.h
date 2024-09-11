@@ -82,5 +82,4 @@ _BEGIN_ABC_UTILITY_NS
 		utility::seed_t _m_seed;
 		size_t _m_calls;
 	};
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_NS

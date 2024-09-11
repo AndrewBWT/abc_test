@@ -33,7 +33,7 @@
 
 namespace abi
 {
-	struct special_bool_t : abc::gd::random_generator_t<bool>
+	struct special_bool_t : abc::random_generator_t<bool>
 	{
 
 	};
@@ -62,7 +62,6 @@ namespace abi
 _TEST_CASE("Basic numerical tests", "abcs::numeric")
 {
 	using namespace abc;
-	using namespace matchers;
 	_CHECK(neq(1, 2));
 	int x = 1348567;
 //	auto _l_1 = cmp::neq(1, 2);
@@ -97,7 +96,6 @@ _TEST_CASE("Basic numerical tests3", "abcs::numeric")
 _TEST_CASE("Basic numerical tests2", "abcs::numeric")
 {
 	using namespace abc;
-	using namespace matchers;
 	_CHECK(neq(1, 2));
 	_CHECK(neq(1, 2));
 	_CHECK(lt(3, 2));
@@ -112,7 +110,6 @@ _TEST_CASE("Static generator", "abcs::static")
 	using namespace abc::utility::io;
 	using namespace abc::utility;
 	using namespace abc::utility::str;
-	using namespace gd;
 	_CHECK_EXPR("3" == to_string(2));
 	using unit_test = tuple<int, str_t>;
 	using btest = bool;
@@ -213,7 +210,6 @@ _TEST_CASE("Static generator", "abcs::static")
 	using namespace std;
 	using namespace abc::utility;
 	using namespace abc::utility::str;
-	using namespace gd;
 	_CHECK_EXPR("3" == to_string(2));//1
 	using unit_test = tuple<int, str_t>;
 	str_t _l_x = "";
@@ -303,7 +299,7 @@ namespace typed
 	>
 	void mf1()
 	{
-		using namespace abc::gd;
+		using namespace abc;
 		manual_for_loop_t _l_mfl;
 		RUN(_l_mfl,(mf3<T, int>()));
 		RUN(_l_mfl, (mf3<T, char>()));
@@ -334,9 +330,9 @@ _TEST_CASE(
 	"Types in the void",""
 )
 {
-	using namespace typed;
-	using namespace abc::gd;
+	using namespace abc;
 	{
+		using namespace typed;
 		manual_for_loop_t _l_mfl;
 		RUN(_l_mfl, mf1<int>());
 		RUN(_l_mfl, mf1<char>());
@@ -370,13 +366,13 @@ namespace x2
 template<
 >
 __constexpr_imp
-abc::gd::enum_list_t<x2::X2> abc::gd::get_enum_list() noexcept
+abc::enum_list_t<x2::X2> abc::get_enum_list() noexcept
 {
 	using enum x2::X2;
 	return { A,B,C,D,F,G,I,J };
 }
 
-//_BEGIN_ABC_GD_NS
+//_BEGIN_ABC_NS
 /*namespace abc
 {
 	inline namespace v0
@@ -517,7 +513,6 @@ _TEST_CASE(
 {
 	using namespace abc;
 	using namespace typed;
-	using namespace abc::gd;
 	std::cout << std::boolalpha;
 	bool _l_print_results = true;
 	{
@@ -595,16 +590,11 @@ TEST_CASE("Basic test script", "abc")
 	using namespace abc;
 	using namespace std;
 	using namespace reporters;
-	int _l_x{ 0 };
-	do
-	{
-		_l_x += 100;
-	} while (_l_x < std::numeric_limits<int>::max());
 	ds::test_list_t _l_tl = { 
 		//Establish40, 
 		//Establish68, 
 		//Establish74, 
-		Establish108, 
+		Establish106, 
 		//Establish151
 	//	Establish168,
 	//	Establish307,
@@ -646,22 +636,6 @@ TEST_CASE("Basic test script", "abc")
 	);
 	_l_test_main.add_test_list(&_l_tl);
 	_l_test_main.run_tests();
-
-	/*******************************
-	IDEAS
-	* A warning when a file is opened more than once in some for-loop tower. As in, for loop A contains b.
-	* Both A and B use a specific file that can be added to. 
-	* Combinatorics generator. For writing combinators.
-	* - Combinatorics of finite structures object.
-	* - All of the above should be able to be randomly probed (or called in order) so we will need:
-	* - An unbounded number type which can be probed.
-	* - A way of enumerating based on the previous element.
-	* - A way of indexing through the set. Storing results as (potentially) very large numbers.
-	* File that changes the state based on how it was last ran; failures will mean that failures will
-	* continue to be ran until they have all been solved. 
-	* Temporary changing of test_options_t for specific tests. Or augmentation of the test_options_t.
-	* e.g. doubling the number of random elemnets that will be generated. 
-	********************************/
 }
 
 namespace typed
@@ -672,43 +646,9 @@ namespace typed
 	};
 }
 
-namespace abc
-{
-	/*template<>
-	struct enumerable_t<typed::X3>
-	{
-		__constexpr_imp
-			enumerable_t(
-				const int _a_difference_1,
-				const int _a_difference_2
-			) noexcept
-		{
-
-		}
-		__constexpr_imp
-			virtual
-			bool
-			increment(
-				typed::X3& _a_element
-			)
-		{
-
-		}
-		__constexpr_imp
-			virtual
-			bool
-			decrement(
-				typed::X3& _a_element
-			)
-		{
-
-		}
-	};*/
-}
-
 namespace typed
 {
-	struct int_enumerate_t : public abc::gd::enumerable_t<X3>
+	struct int_enumerate_t : public abc::enumerable_t<X3>
 	{
 		__constexpr_imp
 			bool
@@ -771,7 +711,7 @@ namespace typed
 		run_comparison_enum_and_printer(
 			std::function<void(const std::string&)> _a_print_f,
 			bool _a_print_results,
-			std::vector<abc::gd::enumerate_t<T>>& _a_enumeration_tests
+			std::vector<abc::enumerate_t<T>>& _a_enumeration_tests
 		)
 	{
 		using namespace abc;
@@ -1927,7 +1867,6 @@ namespace typed
 		using namespace abc;
 		using namespace typed;
 		using namespace std;
-		using namespace abc::gd;
 		//std::cout <<
 		//	fmt::format("enumerate_data<{0}>(all_values<{0}>()", typeid(T).name()) << std::endl;
 		//for (const T& _l_int : gen_data_collection_t<T>(
@@ -1978,7 +1917,7 @@ namespace typed
 		enumeration_test_3(
 		)
 	{
-		using namespace abc::gd;
+		using namespace abc;
 		using namespace typed;
 		for (auto&& _l_int : gen_data_collection_t<X3>(
 		//	enumerate_data(from_m_to_n(X3{}, X3{}, new typed::int_enumerate_t(2, 1)))
@@ -2013,7 +1952,7 @@ namespace typed
 		collections(
 		) noexcept
 	{
-		using namespace abc::gd;
+		using namespace abc;
 		using T = std::array<uint8_t,2>;
 		std::vector<T> _l_inits;
 		std::cout << "Enumerating all values" << std::endl;

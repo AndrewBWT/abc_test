@@ -97,8 +97,7 @@ _BEGIN_ABC_DS_NS
 			const test_options_t& _a_options,
 			const std::size_t _a_depth
 		) noexcept;
-_END_ABC_NS
-_END_NS
+	_END_ABC_DS_NS
 
 template
 <
@@ -285,8 +284,7 @@ _BEGIN_ABC_DS_NS
 		}
 		return _l_end;
 	}
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_DS_NS
 
 
 __constexpr_imp

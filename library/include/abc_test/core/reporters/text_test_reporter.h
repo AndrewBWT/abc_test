@@ -130,8 +130,7 @@ _BEGIN_ABC_REPORTERS_NS
 		const char* _c_no_rtd{ "<post_setup_test_data_t has no valid registered_test_data_t member variable>" };
 		const char* _l_has_sl{ "<registered_test_data_t has no valid source_location variable>" };
 	}
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_REPORTERS_NS
 
 _BEGIN_ABC_REPORTERS_NS
 	__no_constexpr_imp
@@ -507,5 +506,4 @@ _BEGIN_ABC_REPORTERS_NS
 					) };
 		}
 	}
-	_END_ABC_NS
-		_END_NS
+_END_ABC_REPORTERS_NS

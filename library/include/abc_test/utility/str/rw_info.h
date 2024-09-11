@@ -34,8 +34,7 @@ _BEGIN_ABC_UTILITY_STR_NS
 		str::parser_t<T> _m_parser;
 		str::printer_t<T> _m_printer;
 	};
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_STR_NS
 
 _BEGIN_ABC_UTILITY_STR_NS
 	template<
@@ -93,5 +92,4 @@ _BEGIN_ABC_UTILITY_STR_NS
 	{
 		return _m_printer;
 	}
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_STR_NS

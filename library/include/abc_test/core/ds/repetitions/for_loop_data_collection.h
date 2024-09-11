@@ -95,8 +95,7 @@ _BEGIN_ABC_DS_NS
 		std::vector<for_loop_data_t> _m_for_loop_data_collection;
 		std::size_t _m_current_for_loop_index;
 	};
-_END_ABC_NS
-_END_NS
+_END_ABC_DS_NS
 
 template
 <
@@ -219,8 +218,7 @@ _BEGIN_ABC_DS_NS
 	{
 		return _m_current_for_loop_index;
 	}
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_DS_NS
 
 __constexpr_imp
 auto

@@ -2,7 +2,7 @@
 #include "abc_test/matcherS/generic_matcher.h"
 #include "abc_test/core/errors/test_library_exception.h"
 
-_BEGIN_ABC_MATCHER_NS
+_BEGIN_ABC_NS
 	using matcher_internal_ptr_t = std::shared_ptr<generic_matcher_t>;
 	using matcher_internal_ptr_const_ref_t = const matcher_internal_ptr_t&;
 	struct matcher_t : public generic_matcher_t
@@ -30,9 +30,8 @@ _BEGIN_ABC_MATCHER_NS
 			) override;
 	};
 	_END_ABC_NS
-		_END_NS
 
-		_BEGIN_ABC_MATCHER_NS
+		_BEGIN_ABC_NS
 	__constexpr_imp
 		matcher_result_t
 		matcher_t::run(
@@ -75,4 +74,3 @@ _BEGIN_ABC_MATCHER_NS
 		return _m_matcher_internal;
 	}
 _END_ABC_NS
-_END_NS

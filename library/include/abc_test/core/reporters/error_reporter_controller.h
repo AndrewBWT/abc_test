@@ -108,8 +108,7 @@ _BEGIN_ABC_REPORTERS_NS
 			exit_no_lock(
 			) noexcept;
 	};
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_REPORTERS_NS
 
 _BEGIN_ABC_REPORTERS_NS
 	__constexpr_imp
@@ -261,5 +260,4 @@ _BEGIN_ABC_REPORTERS_NS
 			_l_reporter_ptr->exit();
 		}
 	}
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_REPORTERS_NS

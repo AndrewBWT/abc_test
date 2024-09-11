@@ -31,7 +31,7 @@ _BEGIN_ABC_NS
 	__constexpr
 		void
 		create_assertion(
-			matchers::generic_matcher_t& _a_matcher,
+			generic_matcher_t& _a_matcher,
 			const std::string_view _a_str_representation_of_line,
 			const std::source_location& _a_source_location,
 			test_runner_t& _a_test_runner,
@@ -40,7 +40,7 @@ _BEGIN_ABC_NS
 	__constexpr
 		void
 		create_assertion(
-			matchers::generic_matcher_t&& _a_matcher,
+			generic_matcher_t&& _a_matcher,
 			const std::string_view _a_str_representation_of_line,
 			const std::source_location& _a_source_location,
 			test_runner_t& _a_test_runner,
@@ -75,14 +75,13 @@ _BEGIN_ABC_NS
 	__constexpr_imp
 		void
 		create_assertion(
-			matchers::generic_matcher_t& _a_matcher,
+			generic_matcher_t& _a_matcher,
 			const std::string_view _a_str_representation_of_line,
 			const std::source_location& _a_source_location,
 			test_runner_t& _a_test_runner,
 			const bool _a_terminate_function_on_failure
 		)
 	{
-	using namespace matchers;
 		create_assertion_internal<generic_matcher_t&>(_a_matcher,
 			_a_str_representation_of_line, _a_source_location,_a_test_runner,
 			_a_terminate_function_on_failure);
@@ -90,14 +89,13 @@ _BEGIN_ABC_NS
 	__constexpr_imp
 		void
 		create_assertion(
-			matchers::generic_matcher_t&& _a_matcher,
+			generic_matcher_t&& _a_matcher,
 			const std::string_view _a_str_representation_of_line,
 			const std::source_location& _a_source_location,
 			test_runner_t& _a_test_runner,
 			const bool _a_terminate_function_on_failure
 		)
 	{
-		using namespace matchers;
 		create_assertion_internal<generic_matcher_t&&>(std::move(_a_matcher),
 			_a_str_representation_of_line, _a_source_location,_a_test_runner,
 			_a_terminate_function_on_failure);

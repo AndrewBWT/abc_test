@@ -3,7 +3,7 @@
 #include "abc_test/gen_data/enumeration.h"
 #include <array>
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	template<
 		typename T
 	>
@@ -301,4 +301,3 @@ _BEGIN_ABC_GD_NS
 		}
 	};
 	_END_ABC_NS
-		_END_NS

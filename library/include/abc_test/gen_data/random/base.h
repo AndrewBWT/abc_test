@@ -2,7 +2,7 @@
 
 #include "abc_test/utility/rng.h"
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	template<
 		typename T
 	>
@@ -65,4 +65,3 @@ _BEGIN_ABC_GD_NS
 		return nullptr;
 	}
 	_END_ABC_NS
-		_END_NS

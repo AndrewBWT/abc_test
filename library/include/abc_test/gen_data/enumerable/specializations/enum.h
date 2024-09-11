@@ -3,7 +3,7 @@
 #include "abc_test/gen_data/enumerable.h"
 #include <map>
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	template<
 		typename T
 	>
@@ -161,9 +161,8 @@ _BEGIN_ABC_GD_NS
 		std::size_t _m_difference;
 	};
 	_END_ABC_NS
-		_END_NS
 
-		_BEGIN_ABC_GD_NS
+		_BEGIN_ABC_NS
 	template<
 		typename T
 	>
@@ -350,4 +349,3 @@ _BEGIN_ABC_GD_NS
 		return get_thread_local_enumerate_enum_helper<T>().decrement(_a_element);
 	}*/
 	_END_ABC_NS
-		_END_NS

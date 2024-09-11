@@ -15,7 +15,7 @@
 #include "abc_test/core/ds/repetitions/repetition_data.h"
 #include "abc_test/utility/io/file/file_rw.h"
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	/*!
 	* This type synonym refers to the function used when a test is failed;
 	* Under some circumstances, the failed repetition_data_t element used to
@@ -137,9 +137,8 @@ _BEGIN_ABC_GD_NS
 	>
 	using gen_data_ptr_t = std::shared_ptr<gen_data_base_t<T>>;
 _END_ABC_NS
-_END_NS
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	template<
 		typename T
 	>
@@ -423,4 +422,3 @@ _BEGIN_ABC_GD_NS
 			are_failed_values_written_to_files());
 	}
 _END_ABC_NS
-_END_NS

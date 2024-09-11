@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/utility/internal/macros.h"
 
-_BEGIN_ABC_MATCHER_NS
+_BEGIN_ABC_NS
 	struct placeholder_t
 	{
 	public:
@@ -27,9 +27,8 @@ _BEGIN_ABC_MATCHER_NS
 				) const = default;
 	};
 _END_ABC_NS
-_END_NS
 
-_BEGIN_ABC_MATCHER_NS
+_BEGIN_ABC_NS
 	__constexpr_imp
 		placeholder_t::placeholder_t(
 		) noexcept
@@ -44,4 +43,3 @@ _BEGIN_ABC_MATCHER_NS
 
 	}
 _END_ABC_NS
-_END_NS

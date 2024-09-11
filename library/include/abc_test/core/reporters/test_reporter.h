@@ -35,8 +35,7 @@ _BEGIN_ABC_REPORTERS_NS
 			) noexcept;
 	};
 	using test_reporters_t = std::vector<utility::shared_and_raw_ptr<test_reporter_t>>;
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_REPORTERS_NS
 
 _BEGIN_ABC_REPORTERS_NS
 	__constexpr_imp
@@ -46,5 +45,4 @@ _BEGIN_ABC_REPORTERS_NS
 	{
 
 	}
-_END_ABC_NS
-_END_NS
+	_END_ABC_REPORTERS_NS

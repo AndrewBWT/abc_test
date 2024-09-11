@@ -4,7 +4,7 @@
 #include "abc_test/matchers/matcher.h"
 #include "abc_test/matchers/comparison/wrapper.h"
 
-_BEGIN_ABC_MATCHER_NS
+_BEGIN_ABC_NS
 	/*!
 	* Named constructor for making an equality matcher.
 	*/
@@ -98,9 +98,8 @@ _BEGIN_ABC_MATCHER_NS
 			) noexcept;
 	}
 _END_ABC_NS
-_END_NS
 
-_BEGIN_ABC_MATCHER_NS
+_BEGIN_ABC_NS
 	template<
 		typename T1,
 		typename T2
@@ -210,4 +209,3 @@ _BEGIN_ABC_MATCHER_NS
 		}
 	}
 _END_ABC_NS
-_END_NS

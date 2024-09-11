@@ -120,7 +120,6 @@ set(TEST_FILES
   include/abc_test_test/test_utilities/example_matcher.h
   include/abc_test_test/test_utilities/placeholder_combinatorics.h
   include/abc_test_test/test_utilities/basic_example_test_script.h
-  include/main.h
       src/main.cpp
 )
 

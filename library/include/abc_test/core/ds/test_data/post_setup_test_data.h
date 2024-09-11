@@ -119,8 +119,7 @@ _BEGIN_ABC_DS_NS
 				const size_t _a_thread_resourses_required
 			) noexcept;
 	};
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_DS_NS
 
 /*!
 * formatter for post_setup_test_ata object.
@@ -262,8 +261,7 @@ _BEGIN_ABC_DS_NS
 	{
 
 	}
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_DS_NS
 
 __constexpr_imp
 	auto 

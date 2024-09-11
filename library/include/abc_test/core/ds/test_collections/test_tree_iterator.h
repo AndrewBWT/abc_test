@@ -58,8 +58,7 @@ _BEGIN_ABC_DS_NS
             find_next_test(
             ) noexcept;
     };
-_END_ABC_NS
-_END_NS
+_END_ABC_DS_NS
 
 _BEGIN_ABC_DS_NS
     __constexpr_imp
@@ -189,5 +188,4 @@ _BEGIN_ABC_DS_NS
         }
         return _m_stack.top()->_m_nodes_tests[_m_test_index];
     }
-    _END_ABC_NS
-        _END_NS
+    _END_ABC_DS_NS

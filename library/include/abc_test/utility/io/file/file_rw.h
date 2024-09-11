@@ -75,8 +75,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 		typename T
 	>
 	using opt_file_rw_t = std::optional<file_rw_t<T>>;
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_IO_NS
 
 _BEGIN_ABC_UTILITY_IO_NS
 	template<
@@ -229,5 +228,4 @@ _BEGIN_ABC_UTILITY_IO_NS
 		++_m_elements_read;
 		_m_element = _m_parser.run_parser_with_exception(_m_reader.current_line());
 	}
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_IO_NS

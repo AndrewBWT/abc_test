@@ -1,9 +1,8 @@
 # Current CMake version. We have not tested with other versions.
 cmake_minimum_required(VERSION 3.30)
+
 #FetchContent needed to get fmt, scn and Catch2.
 include(FetchContent)
-
-# Rolling our own fmt library
  
 #Fetch and make fmt available
 FetchContent_Declare(
@@ -12,6 +11,7 @@ FetchContent_Declare(
   GIT_TAG 			master
 )
 FetchContent_MakeAvailable(fmt)
+
 #Fetch and make scn available
 FetchContent_Declare(
   scn
@@ -19,10 +19,6 @@ FetchContent_Declare(
   GIT_TAG        	master
 )
 FetchContent_MakeAvailable(scn)
-
-# This line turns back on debug symbols. We believe this is turned off my fmt.
-# This needs to be addressed as it cannot be turned off.
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zi")
 
 # Set up the project information
 project(
@@ -74,11 +70,12 @@ if(TOP_LEVEL_PROJECT)
     # Add documentation folder.
     add_subdirectory(docs)
   else()
-    # Else, ell the developer that we could not load the documentation.
+    # Else, tell the developer that we could not load the documentation.
     message(STATUS "Doxygen not found, not building docs")
   endif()
 endif()
 
+# If top level project, build the examples.
 if (TOP_LEVEL_PROJECT)
   add_subdirectory(examples)
 endif()

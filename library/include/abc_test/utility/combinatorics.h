@@ -735,7 +735,7 @@ _BEGIN_ABC_UTILITY_NS
 				const R&
 			) noexcept;
 	}
-}
+_END_ABC_UTILITY_NS
 
 _BEGIN_ABC_UTILITY_NS
 	template<
@@ -1079,5 +1079,4 @@ _BEGIN_ABC_UTILITY_NS
 			}
 		}
 	}
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_NS

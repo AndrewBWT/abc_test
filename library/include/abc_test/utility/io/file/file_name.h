@@ -39,8 +39,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 				const std::filesystem::path& _a_file_path
 			) noexcept;
 	};
-_END_ABC_NS
-_END_NS
+_END_ABC_UTILITY_IO_NS
 
 /*!
 * formatter for post_setup_test_ata object.
@@ -108,8 +107,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 	{
 
 	}
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_IO_NS
 
 
 

@@ -89,8 +89,7 @@ _BEGIN_ABC_UTILITY_STR_NS
 			(_a_current_pos == string::npos || _a_str[_a_current_pos] == _c_end_or_comma[1]) ? numeric_limits<size_t>::max() :
 			_a_mode_if_comma_found;
 	}
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_STR_NS
 
 _BEGIN_ABC_UTILITY_STR_NS
 	constexpr
@@ -147,5 +146,4 @@ _BEGIN_ABC_UTILITY_STR_NS
 			_a_current_pos == string::npos ? numeric_limits<size_t>::max() :
 			(_a_str[_a_current_pos - 1] == _c_backslash) ? _a_mode : _a_finish_string_mode;
 	}
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_STR_NS

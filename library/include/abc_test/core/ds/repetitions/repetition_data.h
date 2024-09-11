@@ -109,8 +109,7 @@ _BEGIN_ABC_DS_NS
 		std::string _m_additional_data;
 	};
 	using repetition_data_sequence_t = std::vector<repetition_data_t>;
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_DS_NS
 
 template
 <
@@ -239,8 +238,7 @@ struct fmt::formatter<abc::ds::repetition_data_t> : formatter<string_view>
 	{
 		_m_additional_data = _a_str;
 	}
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_DS_NS
 
 __constexpr_imp
 auto

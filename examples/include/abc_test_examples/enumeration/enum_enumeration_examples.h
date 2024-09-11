@@ -15,7 +15,7 @@ namespace examples
 // This is all that is required to create an enumerable enum using the machinery we have created.
 // IF WE USED THE INLINE NAMESPACE, WE WOULD NOT BE ABLE TO DEFINE THIS FUNCTION WITHIN THIS NAMESPACE - ATLEAST
 // IN VISUAL STUDIO. An alternative way of writing this function is commented out below this function.
-namespace abc::gd
+namespace abc
 {
 	template<>
 	auto get_enum_list() -> enum_list_t<examples::X2>
@@ -86,7 +86,7 @@ struct fmt::formatter<examples::X2> : formatter<string_view>
 
 _TEST_CASE("Enumerating an enum for fun!", "examples::enumeration")
 {
-	using namespace abc::gd;
+	using namespace abc;
 	using namespace examples;
 	using enum X2;
 	fmt::println("Enumerating from F to max. "

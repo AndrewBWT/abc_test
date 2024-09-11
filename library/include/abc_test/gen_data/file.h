@@ -18,7 +18,7 @@
 
 #include "abc_test/global.h"
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	/*!
 	* Object describing data taken from a file
 	*/
@@ -115,9 +115,8 @@ _BEGIN_ABC_GD_NS
 		file_data_extension(
 		) noexcept;
 	_END_ABC_NS
-		_END_NS
 
-		_BEGIN_ABC_GD_NS
+		_BEGIN_ABC_NS
 	template<
 		typename T
 	>
@@ -221,4 +220,3 @@ _BEGIN_ABC_GD_NS
 		return global::get_global_test_options()._m_file_data_extension;
 	}
 	_END_ABC_NS
-		_END_NS

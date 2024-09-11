@@ -74,8 +74,7 @@ _BEGIN_ABC_ERRORS_NS
 			) noexcept;
 	};
 	using opt_setup_error_t = std::optional<setup_error_t>;
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_ERRORS_NS
 
 		_BEGIN_ABC_ERRORS_NS
 	__constexpr_imp
@@ -157,5 +156,4 @@ _BEGIN_ABC_ERRORS_NS
 	{
 
 	}
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_ERRORS_NS

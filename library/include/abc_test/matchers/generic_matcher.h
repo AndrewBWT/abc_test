@@ -4,7 +4,7 @@
 
 #include "abc_test/core/test_runner.h"
 
-_BEGIN_ABC_MATCHER_NS
+_BEGIN_ABC_NS
 	/*!
 	* Type synonym for the message contained in a matcher object.
 	*/
@@ -68,9 +68,8 @@ _BEGIN_ABC_MATCHER_NS
 			) = 0;
 	};
 _END_ABC_NS
-_END_NS
 
-_BEGIN_ABC_MATCHER_NS
+_BEGIN_ABC_NS
 	__constexpr_imp
 		generic_matcher_t::generic_matcher_t(
 		) noexcept
@@ -108,4 +107,3 @@ _BEGIN_ABC_MATCHER_NS
 		return _m_test_result;
 	}
 	_END_ABC_NS
-		_END_NS

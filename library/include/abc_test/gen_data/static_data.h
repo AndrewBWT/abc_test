@@ -5,7 +5,7 @@
 #include "abc_test/core/test_runner.h"
 #include "abc_test/gen_data/collection.h"
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	template<
 		typename T
 	>
@@ -102,9 +102,8 @@ _BEGIN_ABC_GD_NS
 			R&& _a_init_list
 		);
 _END_ABC_NS
-_END_NS
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	template<
 		typename T
 	>
@@ -248,4 +247,3 @@ _BEGIN_ABC_GD_NS
 		return unary_collection<T>(new static_data_t<T>(forward<R>(_a_init_list)));
 	}
 _END_ABC_NS
-_END_NS

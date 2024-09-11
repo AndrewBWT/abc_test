@@ -24,9 +24,7 @@ _BEGIN_ABC_UTILITY_NS
     auto format_as(abc::utility::str_t _a_val) {
         return _a_val._m_str;
     }
-_END_ABC_NS
-_END_NS
-
+    _END_ABC_UTILITY_NS
 constexpr
 bool
 operator==(const abc::utility::str_t& _a_lhs, const abc::utility::str_t& _a_rhs)

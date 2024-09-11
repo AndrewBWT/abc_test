@@ -14,7 +14,7 @@
 #include "abc_test/gen_data/random_data_description.h"
 #include "abc_test/utility/str/rw_info.h"
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	/*!
 	* Object which contains randomly generated data. Also contains the mechanisms for
 	* writing failed cases to a file.
@@ -155,9 +155,8 @@ _BEGIN_ABC_GD_NS
 		random_data_extension(
 		) noexcept;
 	_END_ABC_NS
-		_END_NS
 
-		_BEGIN_ABC_GD_NS
+		_BEGIN_ABC_NS
 	template<
 		typename T
 	>
@@ -335,4 +334,3 @@ _BEGIN_ABC_GD_NS
 		return global::get_global_test_options()._m_random_data_extension;
 	}
 	_END_ABC_NS
-		_END_NS

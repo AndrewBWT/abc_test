@@ -3,7 +3,7 @@
 #include "abc_test/matchers/comparison/wrapper.h"
 #include "abc_test/matchers/comparison/placeholder.h"
 
-_BEGIN_ABC_MATCHER_NS
+_BEGIN_ABC_NS
 	/*!
 	* Operator overload for equality comparison of a wrapper of type T1 and an element of T2.
 	*/
@@ -98,9 +98,8 @@ _BEGIN_ABC_MATCHER_NS
 			T&& _a_wrapper
 			) noexcept;
 _END_ABC_NS
-_END_NS
 
-_BEGIN_ABC_MATCHER_NS
+_BEGIN_ABC_NS
 	template<
 		typename T1,
 		typename T2
@@ -199,4 +198,3 @@ _BEGIN_ABC_MATCHER_NS
 		return wrapper<T>(forward<T>(_a_t));
 	}
 _END_ABC_NS
-_END_NS

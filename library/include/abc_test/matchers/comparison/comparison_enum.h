@@ -2,7 +2,7 @@
 
 #include "abc_test/utility/internal/macros.h"
 
-_BEGIN_ABC_MATCHER_NS
+_BEGIN_ABC_NS
 	enum class comparison_enum_t
 	{
 		EQ,
@@ -48,10 +48,9 @@ _BEGIN_ABC_MATCHER_NS
 		str(
 		) noexcept;
 _END_ABC_NS
-_END_NS
 
 
-_BEGIN_ABC_MATCHER_NS
+_BEGIN_ABC_NS
 	template<
 		comparison_enum_t Comparison_Enum
 	>
@@ -166,4 +165,3 @@ _BEGIN_ABC_MATCHER_NS
 		}
 	}
 _END_ABC_NS
-_END_NS

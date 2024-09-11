@@ -17,8 +17,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 			exists(
 			) const noexcept;
 	};
-_END_ABC_NS
-_END_NS
+_END_ABC_UTILITY_IO_NS
 /*!
 * formatter for post_setup_test_ata object.
 */
@@ -64,8 +63,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 	{
 		return std::filesystem::exists(_m_file_path);
 	}
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_IO_NS
 
 __constexpr_imp
 auto

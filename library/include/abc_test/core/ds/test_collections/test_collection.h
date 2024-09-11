@@ -50,8 +50,7 @@ _BEGIN_ABC_DS_NS
 		unique_id_t _m_test_discovery_id;
 		const test_options_t& _m_options;
 	};
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_DS_NS
 
 _BEGIN_ABC_DS_NS
 	__constexpr_imp
@@ -113,5 +112,4 @@ _BEGIN_ABC_DS_NS
 	{
 		return std::end(_m_test_tree);
 	}
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_DS_NS

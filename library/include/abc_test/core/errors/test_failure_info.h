@@ -120,8 +120,7 @@ _BEGIN_ABC_ERRORS_NS
 				const std::string_view _a_type_id
 			) noexcept;
 	};
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_ERRORS_NS
 
 		_BEGIN_ABC_ERRORS_NS
 	__constexpr_imp
@@ -268,5 +267,4 @@ _BEGIN_ABC_ERRORS_NS
 	{
 
 	}
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_ERRORS_NS

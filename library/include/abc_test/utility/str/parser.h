@@ -67,8 +67,7 @@ _BEGIN_ABC_UTILITY_STR_NS
 			default_parser(
 			) noexcept;
 	}
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_STR_NS
 
 _BEGIN_ABC_UTILITY_STR_NS
 	template<
@@ -216,5 +215,4 @@ _BEGIN_ABC_UTILITY_STR_NS
 			};
 		}
 	}
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_STR_NS

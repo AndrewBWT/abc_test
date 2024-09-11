@@ -40,8 +40,7 @@ _BEGIN_ABC_UTILITY_NS
 		using mask_t = std::vector<size_t>;
 		mask_t _m_mask;
 	};
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_UTILITY_NS
 
 		_BEGIN_ABC_UTILITY_NS
 	template<
@@ -128,5 +127,4 @@ _BEGIN_ABC_UTILITY_NS
 		std::ranges::fill(_m_mask, 0);
 		ranges::copy(this->_m_elements, std::begin(this->_m_current_result));
 	}
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_UTILITY_NS

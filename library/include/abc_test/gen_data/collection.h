@@ -4,7 +4,7 @@
 #include "abc_test/gen_data/gen_data_base.h"
 #include <cstdarg>
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	//Forward declaration
 	template<
 		typename T
@@ -173,9 +173,8 @@ _BEGIN_ABC_GD_NS
 			) noexcept;
 	}
 _END_ABC_NS
-_END_NS
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	template<
 		typename T
 	>
@@ -400,4 +399,3 @@ _BEGIN_ABC_GD_NS
 		}
 	}
 	_END_ABC_NS
-		_END_NS

@@ -31,5 +31,4 @@ _BEGIN_ABC_REPORTERS_NS
 			exit(
 			) noexcept = 0;
 	};
-_END_ABC_NS
-_END_NS
+_END_ABC_REPORTERS_NS

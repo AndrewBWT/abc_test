@@ -48,8 +48,7 @@ _BEGIN_ABC_UTILITY_NS
 		get_ptr(
 			const const_shared_and_raw_ptr<T>& _a_ptr
 		) noexcept;
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_NS
 
 _BEGIN_ABC_UTILITY_NS
 	template<
@@ -108,5 +107,4 @@ _BEGIN_ABC_UTILITY_NS
 			get<shared_ptr<const T>>(_a_ptr).get() :
 			get<const T*>(_a_ptr);
 	}
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_NS

@@ -7,7 +7,7 @@
 
 #include "abc_test/core/errors/test_library_exception.h"
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	using enumerate_index_t = std::size_t;
 	template<
 		typename T
@@ -66,9 +66,8 @@ _BEGIN_ABC_GD_NS
 			);
 	};
 	_END_ABC_NS
-		_END_NS
 
-		_BEGIN_ABC_GD_NS
+		_BEGIN_ABC_NS
 	template<
 		typename T
 	>
@@ -96,4 +95,3 @@ _BEGIN_ABC_GD_NS
 		return _m_decrement_func(_a_element, _a_n_times_to_increment, _a_max_value);
 	}
 	_END_ABC_NS
-	_END_NS

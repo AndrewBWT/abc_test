@@ -24,8 +24,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 	protected:
 		std::osyncstream _m_output_stream;
 	};
-_END_ABC_NS
-_END_NS
+_END_ABC_UTILITY_IO_NS
 
 _BEGIN_ABC_UTILITY_IO_NS
 	__constexpr_imp
@@ -47,5 +46,4 @@ _BEGIN_ABC_UTILITY_IO_NS
 		_m_output_stream.flush();
 		_m_output_stream.emit();
 	}
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_IO_NS

@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/utility/internal/macros.h"
 
-_BEGIN_ABC_MATCHER_NS
+_BEGIN_ABC_NS
 	template<
 		typename T
 	>
@@ -23,9 +23,8 @@ _BEGIN_ABC_MATCHER_NS
 		T _m_obj;
 	};
 _END_ABC_NS
-_END_NS
 
-_BEGIN_ABC_MATCHER_NS
+_BEGIN_ABC_NS
 	template<
 		typename T
 	>
@@ -58,4 +57,3 @@ _BEGIN_ABC_MATCHER_NS
 		return _m_obj;
 	}
 _END_ABC_NS
-_END_NS

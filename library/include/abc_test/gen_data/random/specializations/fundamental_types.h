@@ -3,7 +3,7 @@
 #include "abc_test/gen_data/random/specialization_base.h"
 #include "concepts"
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	template<>
 	struct random_generator_t<bool>
 	{
@@ -56,4 +56,3 @@ _BEGIN_ABC_GD_NS
 		}
 	};
 	_END_ABC_NS
-		_END_NS

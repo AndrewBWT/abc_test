@@ -11,5 +11,4 @@ _BEGIN_ABC_ERRORS_NS
 	class test_assertion_exception_t
 	{
 	};
-	_END_ABC_NS
-		_END_NS
+_END_ABC_ERRORS_NS

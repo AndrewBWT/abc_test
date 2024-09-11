@@ -3,7 +3,7 @@
 #include "abc_test/utility/internal/macros.h"
 #include <concepts>
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	template<
 		typename T
 	>
@@ -22,9 +22,8 @@ _BEGIN_ABC_GD_NS
 		{ _l_mvt.min_value() } -> std::same_as<T>;
 	};
 	_END_ABC_NS
-		_END_NS
 
-		_BEGIN_ABC_GD_NS
+		_BEGIN_ABC_NS
 	template<
 		typename T
 	>
@@ -36,4 +35,3 @@ _BEGIN_ABC_GD_NS
 		static_assert(false, "Function requires a specialization of the function min_value_t<T>::min_value.");
 	}
 	_END_ABC_NS
-		_END_NS

@@ -35,8 +35,7 @@ _BEGIN_ABC_ERRORS_NS
 	private:
 		std::vector<test_failure_info_t> _m_test_failures;
 	};
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_ERRORS_NS
 
 		_BEGIN_ABC_ERRORS_NS
 	__constexpr_imp
@@ -82,5 +81,4 @@ _BEGIN_ABC_ERRORS_NS
 	{
 		return _m_test_failures.size();
 	}
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_ERRORS_NS

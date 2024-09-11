@@ -15,7 +15,7 @@
 
 
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	struct manual_for_loop_t
 	{
 	public:
@@ -58,9 +58,8 @@ _BEGIN_ABC_GD_NS
 		ds::repetition_data_t _m_repetition_data;
 	};
 _END_ABC_NS
-_END_NS
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	__constexpr_imp
 		manual_for_loop_t::manual_for_loop_t(
 		) noexcept
@@ -126,4 +125,3 @@ _BEGIN_ABC_GD_NS
 		return _l_cpy;
 	}
 	_END_ABC_NS
-		_END_NS

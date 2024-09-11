@@ -79,8 +79,7 @@ _BEGIN_ABC_DS_NS
 	};
 	using test_tree_ref_t = test_tree_t&;
 	using test_tree_const_ptr_t = const test_tree_t*;
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_DS_NS
 
 _BEGIN_ABC_DS_NS
 	__constexpr_imp
@@ -215,5 +214,4 @@ _BEGIN_ABC_DS_NS
 	{
 		return _m_nodes_tests.size() > 0;
 	}
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_DS_NS

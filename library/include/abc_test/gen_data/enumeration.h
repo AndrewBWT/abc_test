@@ -4,7 +4,7 @@
 #include "abc_test/gen_data/gen_data_base.h"
 #include "abc_test/gen_data/collection.h"
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	struct elements_t
 	{
 	public:
@@ -280,9 +280,8 @@ _BEGIN_ABC_GD_NS
 			enumerable_t<T>* _a_enumerable = new enumerable_t<T>()
 		) noexcept;
 _END_ABC_NS
-_END_NS
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	template<
 		typename T
 	>
@@ -668,4 +667,3 @@ _BEGIN_ABC_GD_NS
 		return from_m_to_n(max_value_t<T>().max_value(), min_value_t<T>().min_value(), _a_enumerable);
 	}
 _END_ABC_NS
-_END_NS

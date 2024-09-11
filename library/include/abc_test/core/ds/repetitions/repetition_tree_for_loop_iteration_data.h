@@ -133,8 +133,7 @@ _BEGIN_ABC_DS_NS
 			const std::string_view _a_str,
 			const std::size_t _a_depth
 		) noexcept;
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_DS_NS
 
 _BEGIN_ABC_DS_NS
 	__constexpr_imp
@@ -223,5 +222,4 @@ _BEGIN_ABC_DS_NS
 	{
 		return _m_mode;
 	}
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_DS_NS

@@ -29,8 +29,7 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 		bool _m_repetition_info_on;
 		bool _m_main_info_on;
 	};
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_INTERNAL_NS
 
 _BEGIN_ABC_UTILITY_INTERNAL_NS
 	__constexpr_imp
@@ -66,5 +65,4 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 			return false;
 		}
 	}
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_INTERNAL_NS

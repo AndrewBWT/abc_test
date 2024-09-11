@@ -1,11 +1,9 @@
-#include "main.h"
+#include <catch2/catch_session.hpp>
+#include "abc_test_test/core/errors/test_assertion_exception.h"
+#include "abc_test_test/test_utilities/basic_example_test_script.h"
 #include <iostream>
-//#include <scn/all.h>
 
 int main(int argc, char* argv[]) {
-    // your setup ...
-    fmt::println("hello");
     int result = Catch::Session().run(argc, argv);
-    // your clean-up...
     return result;
 }

@@ -105,8 +105,7 @@ _BEGIN_ABC_DS_NS
 			const std::string_view _a_str,
 			const std::size_t _a_depth
 		) noexcept;
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_DS_NS
 
 
 template
@@ -474,8 +473,7 @@ struct fmt::formatter<abc::ds::repetition_tree_for_loop_index_data_t> : formatte
 		}
 		return _l_rv;
 	}
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_DS_NS
 
 
 __constexpr_imp

@@ -79,8 +79,7 @@ _BEGIN_ABC_DS_NS
 		std::function<repetition_data_t()> _m_on_failure_function;
 		repetition_data_t* _m_repetition_data;
 	};
-_END_NS
-_END_ABC_NS
+_END_ABC_DS_NS
 
 template
 <
@@ -155,8 +154,7 @@ _BEGIN_ABC_DS_NS
 	{
 		return _m_on_failure_function();
 	}
-_END_NS
-_END_ABC_NS
+	_END_ABC_DS_NS
 
 __constexpr_imp
 auto

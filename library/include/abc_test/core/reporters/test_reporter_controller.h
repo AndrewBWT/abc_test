@@ -48,8 +48,7 @@ _BEGIN_ABC_REPORTERS_NS
 		std::mutex _m_reporters_mutex;
 		const test_options_t& _m_test_options;
 	};
-_END_ABC_NS
-_END_NS
+_END_ABC_REPORTERS_NS
 
 
 _BEGIN_ABC_REPORTERS_NS
@@ -94,5 +93,4 @@ _BEGIN_ABC_REPORTERS_NS
 	{
 		_m_reporters.insert(_m_reporters.end(), _a_new_test_reporters.begin(), _a_new_test_reporters.end());
 	}
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_REPORTERS_NS

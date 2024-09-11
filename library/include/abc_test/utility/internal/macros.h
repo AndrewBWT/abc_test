@@ -88,15 +88,31 @@ namespace utility::io {
 #define _BEGIN_ABC_UTILITY_STR_NS \
 _BEGIN_ABC_NS \
 namespace utility::str {
-#define _BEGIN_ABC_GD_NS \
-_BEGIN_ABC_NS \
-namespace gd {
-#define _BEGIN_ABC_MATCHER_NS \
-_BEGIN_ABC_NS \
-namespace matchers {
 #define _BEGIN_ABC_GLOBAL_NS \
 _BEGIN_ABC_NS \
 namespace global {
 
-#define _END_NS }
-
+#define _END_ABC_DS_NS \
+_END_ABC_NS \
+}
+#define _END_ABC_ERRORS_NS \
+_END_ABC_NS \
+}
+#define _END_ABC_REPORTERS_NS \
+_END_ABC_NS \
+}
+#define _END_ABC_UTILITY_NS \
+_END_ABC_NS \
+}
+#define _END_ABC_UTILITY_INTERNAL_NS \
+_END_ABC_NS \
+}
+#define _END_ABC_UTILITY_IO_NS \
+_END_ABC_NS \
+}
+#define _END_ABC_UTILITY_STR_NS \
+_END_ABC_NS \
+}
+#define _END_ABC_GLOBAL_NS \
+_END_ABC_NS \
+}

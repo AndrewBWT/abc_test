@@ -53,8 +53,7 @@ _BEGIN_ABC_ERRORS_NS
 			const std::size_t _a_mode,
 			const std::initializer_list<std::size_t>& _a_supported_elements
 		);
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_ERRORS_NS
 
 		_BEGIN_ABC_ERRORS_NS
 	__constexpr_imp
@@ -104,5 +103,4 @@ _BEGIN_ABC_ERRORS_NS
 			)
 		);
 	}
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_ERRORS_NS

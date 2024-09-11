@@ -30,8 +30,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 		file_name_with_extension_t _m_file_name;
 		const test_options_t* _m_test_options;
 	};
-_END_ABC_NS
-_END_NS
+_END_ABC_UTILITY_IO_NS
 
 _BEGIN_ABC_UTILITY_IO_NS
 	__constexpr_imp
@@ -96,5 +95,4 @@ _BEGIN_ABC_UTILITY_IO_NS
 		ofstream& _l_out{ *_m_file_handler.get() };
 		_l_out << _a_str_to_write << std::endl;
 	}
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_IO_NS

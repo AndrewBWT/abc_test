@@ -34,8 +34,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 		typename T
 	>
 	using opt_file_rw_info_t = std::optional<file_rw_info_t<T>>;
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_IO_NS
 
 _BEGIN_ABC_UTILITY_IO_NS
 	template<
@@ -81,5 +80,4 @@ _BEGIN_ABC_UTILITY_IO_NS
 	{
 		return _m_rw_info.printer();
 	}
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_IO_NS

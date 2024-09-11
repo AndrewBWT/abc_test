@@ -4,7 +4,7 @@
 #include <variant>
 #include "abc_test/utility/rng.h"
 
-_BEGIN_ABC_GD_NS
+_BEGIN_ABC_NS
 	/*!
 	* Type synonym for a function which creates a T value from a random generator.
 	*/
@@ -100,7 +100,7 @@ _BEGIN_ABC_GD_NS
 	_END_ABC_NS
 		_END_NS
 
-		_BEGIN_ABC_GD_NS
+		_BEGIN_ABC_NS
 	template<
 		typename T
 	>
@@ -161,4 +161,3 @@ _BEGIN_ABC_GD_NS
 		}
 	}
 	_END_ABC_NS
-		_END_NS

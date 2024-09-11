@@ -54,8 +54,7 @@ _BEGIN_ABC_REPORTERS_NS
 			exit(
 			) noexcept;
 	};
-_END_ABC_NS
-_END_NS
+_END_ABC_REPORTERS_NS
 
 _BEGIN_ABC_REPORTERS_NS
 	__no_constexpr_imp
@@ -112,5 +111,4 @@ _BEGIN_ABC_REPORTERS_NS
 	{
 		write("Preparing to exit...");
 	}
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_REPORTERS_NS

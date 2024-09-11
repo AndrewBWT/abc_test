@@ -22,5 +22,4 @@ _BEGIN_ABC_UTILITY_NS
                 const combinatorics<T>& _a_combinatorics
             ) noexcept;
 	};
-_END_ABC_NS
-_END_NS
+    _END_ABC_UTILITY_NS

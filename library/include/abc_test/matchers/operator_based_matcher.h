@@ -2,7 +2,7 @@
 
 #include "abc_test/matchers/generic_matcher.h"
 
-_BEGIN_ABC_MATCHER_NS
+_BEGIN_ABC_NS
 	using precedence_t = std::size_t;
 	struct operator_based_matcher_t : public generic_matcher_t
 	{
@@ -13,4 +13,3 @@ _BEGIN_ABC_MATCHER_NS
 			) const noexcept = 0;
 	};
 	_END_ABC_NS
-		_END_NS

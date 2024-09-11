@@ -22,8 +22,7 @@ _BEGIN_ABC_UTILITY_STR_NS
 			const std::string_view _a_str,
 			const std::string_view delimiter
 		) noexcept;
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_STR_NS
 
 _BEGIN_ABC_UTILITY_STR_NS
 	__constexpr_imp
@@ -64,5 +63,4 @@ _BEGIN_ABC_UTILITY_STR_NS
 		res.push_back(string(_a_str.substr(pos_start)));
 		return res;
 	}
-_END_ABC_NS
-_END_NS
+	_END_ABC_UTILITY_STR_NS

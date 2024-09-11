@@ -55,8 +55,7 @@ _BEGIN_ABC_DS_NS
 				R&& _a_tc
 			) noexcept;
 	};
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_DS_NS
 
 _BEGIN_ABC_DS_NS
 	__constexpr_imp
@@ -117,5 +116,4 @@ _BEGIN_ABC_DS_NS
 		}
 		_m_itt = _m_tests.begin();
 	}
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_DS_NS

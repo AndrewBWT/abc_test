@@ -91,8 +91,7 @@ _BEGIN_ABC_DS_NS
 		*/
 		size_t _m_thread_resourses_required;
 	};
-	_END_ABC_NS
-		_END_NS
+	_END_ABC_DS_NS
 
 /*!
 * formatter for registered_test_data_t
@@ -156,8 +155,7 @@ _BEGIN_ABC_DS_NS
 		}
 		return true;
 	}
-_END_ABC_NS
-_END_NS
+	_END_ABC_DS_NS
 
 __constexpr_imp
 	auto 

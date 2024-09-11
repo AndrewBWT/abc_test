@@ -3,11 +3,9 @@
 #include "abc_test/gen_data/gen_data_base.h"
 #include "abc_test/gen_data/collection.h"
 
+
 _BEGIN_ABC_NS
 struct test_runner_t;
-_END_ABC_NS
-
-_BEGIN_ABC_GD_NS
 	//Forward declarations
 	template<
 		typename T
@@ -102,9 +100,8 @@ _BEGIN_ABC_GD_NS
 		test_runner_t* _m_test_runner;
 	};
 	_END_ABC_NS
-		_END_NS
 
-		_BEGIN_ABC_GD_NS
+		_BEGIN_ABC_NS
 	template<
 		typename T
 	>
@@ -334,4 +331,3 @@ _BEGIN_ABC_GD_NS
 		}
 	}
 	_END_ABC_NS
-		_END_NS
