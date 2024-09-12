@@ -63,17 +63,15 @@ set(LIBRARY_FILES
   include/abc_test/matchers/comparison/wrapper.h
   # gen_data subfolder. Contains the logic that allow the gen_data for loops to work.
   include/abc_test/gen_data/gen_data_base.h
+  include/abc_test/gen_data/gen_data_with_repetition_type.h
   include/abc_test/gen_data/manual_for_loop.h
-  include/abc_test/gen_data/gen_data_with_file_writer.h
   include/abc_test/gen_data/file.h
   include/abc_test/gen_data/collection.h
   include/abc_test/gen_data/collection_iterator.h
   include/abc_test/gen_data/random_data.h
   include/abc_test/gen_data/random_data_description.h
-  include/abc_test/gen_data/finite_enumeration.h
   # Subfolder contains logic specifically to do with random data generation.
   include/abc_test/gen_data/random/base.h
-  include/abc_test/gen_data/random/using_functions.h
   include/abc_test/gen_data/random/specializations.h
   # Folder containing random data specializations for std types.
   include/abc_test/gen_data/random/specializations/fundamental_types.h
@@ -93,8 +91,6 @@ set(LIBRARY_FILES
   include/abc_test/gen_data/enumerable/specializations/enum.h
   include/abc_test/gen_data/enumerable/specializations/array.h
   include/abc_test/gen_data/enumerable/specializations/vector.h
-  # Combinatorics file
-  include/abc_test/gen_data/combinatorics.h
   # utility subfolder. Contains auxillery helper classes and functions not necessary
   # related to the core testing framework.
   include/abc_test/utility/ptr_utility.h
@@ -116,9 +112,6 @@ set(LIBRARY_FILES
   # Combinatorics files. Currently these are unused, however we plan to re-engineer them
   # and make them compatible with gen_data.
   include/abc_test/utility/combinatorics.h
-  include/abc_test/utility/combinatorics/iterator.h
-  include/abc_test/utility/combinatorics/permutations.h
-  include/abc_test/utility/combinatorics/combinations.h
   # Internal subfolder. Contains functions used for either internal debugging or
   # internal macros. These shouldn't really be used by the user, used for development.
   include/abc_test/utility/internal/log/enum.h
@@ -128,7 +121,6 @@ set(LIBRARY_FILES
   # Utility io functions and objects.
   include/abc_test/utility/io/threaded_text_output_reporter.h
   include/abc_test/utility/io/threaded_ostream_output_reporter.h
-  include/abc_test/utility/io/path_utility.h
   # Utility file functions and objects.
   include/abc_test/utility/io/file/file_name.h
   include/abc_test/utility/io/file/file_name_with_extension.h

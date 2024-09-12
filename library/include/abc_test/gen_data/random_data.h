@@ -8,7 +8,7 @@
 #include "abc_test/utility/io/file/file_reader.h"
 #include "abc_test/utility/io/file/file_writer.h"
 #include "abc_test/utility/io/file/file_name.h"
-#include "abc_test/gen_data/file.h"
+#include "abc_test/gen_data/gen_data_with_repetition_type.h"
 #include "abc_test/gen_data/random/base.h"
 #include "abc_test/gen_data/random_data_description.h"
 #include "abc_test/utility/str/rw_info.h"
@@ -21,7 +21,7 @@ _BEGIN_ABC_NS
 	template<
 		typename T
 	>
-	struct random_data_t : public gen_data_base_t<T>
+	struct random_data_t : public gen_data_with_repetition_type_t<T>
 	{
 	public:
 		/*!
@@ -149,10 +149,6 @@ _BEGIN_ABC_NS
 			random_generator_t<T>* _a_rnd_base,
 			const std::optional<utility::io::file_rw_info_t<T>>& _a_opt_tfrw
 		);
-	__constexpr
-		const std::string_view
-		random_data_extension(
-		) noexcept;
 	_END_ABC_NS
 
 		_BEGIN_ABC_NS
@@ -269,8 +265,7 @@ _BEGIN_ABC_NS
 			const utility::io::opt_file_rw_info_t<T>& _a_templated_file_rw
 		) noexcept
 		: gen_data_base_t<T>(0,
-			_a_templated_file_rw,
-			random_data_extension(),std::vector<T>())
+			_a_templated_file_rw,std::vector<T>())
 		, _m_random_generator(_a_random_generator)
 		, _m_elemnets_to_randomly_generate(
 			this->_m_test_options->_m_default_numb_random_elements_to_generate)
@@ -324,12 +319,5 @@ _BEGIN_ABC_NS
 		)
 	{
 		return unary_collection<T>(new random_data_t<T>(_a_rnd_base, _a_tfrwi));
-	}
-	__constexpr_imp
-		const std::string_view
-		random_data_extension(
-		) noexcept
-	{
-		return global::get_global_test_options()._m_random_data_extension;
 	}
 	_END_ABC_NS

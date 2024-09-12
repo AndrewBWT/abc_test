@@ -11,20 +11,44 @@ _BEGIN_ABC_UTILITY_IO_NS
 		/*!
 		* Default deleted.
 		*/
-		__constexpr
-			file_rw_t(
-			) = delete;
+		//__constexpr
+		//	file_rw_t(
+		//	);
 		/*!
 		* Setup with object which has a range of elements to be written to the file
 		*/
+		__constexpr_imp
+			file_rw_t(
+				const file_rw_info_t<T>& _a_tfrwi
+			)
+		{
+
+		}
 		template<
-			typename R
+			typename R = std::vector<T>
 		>
 		__constexpr
 			file_rw_t(
 				const file_rw_info_t<T>& _a_tfrwi,
 				const std::string_view _a_extension,
 				const test_options_t* _a_test_options,
+				R&& _a_elements = {}
+			);
+		template<
+			typename R
+		>
+		__constexpr
+			file_rw_t(
+				const file_rw_info_t<T>& _a_tfrwi,
+				R&& _a_elements = {}
+			);
+		template<
+			typename R
+		>
+		__constexpr
+			file_rw_t(
+				const file_rw_info_t<T>& _a_tfrwi,
+				const test_options_t* _a_test_options_ptr,
 				R&& _a_elements = {}
 			);
 		__constexpr
@@ -121,6 +145,36 @@ _BEGIN_ABC_UTILITY_IO_NS
 		{
 			setup_writer();
 		}
+	}
+	template<
+		typename T
+	>
+	template<
+		typename R
+	>
+	__constexpr_imp
+		file_rw_t<T>::file_rw_t(
+			const file_rw_info_t<T>& _a_tfrwi,
+			R&& _a_elements
+		)
+		: file_rw_t(_a_tfrwi,global::get_global_test_options_ptr(),_a_elements)
+	{
+
+	}
+	template<
+		typename T
+	>
+	template<
+		typename R
+	>
+	__constexpr_imp
+		file_rw_t<T>::file_rw_t(
+			const file_rw_info_t<T>& _a_tfrwi,
+			const test_options_t* _a_test_options_ptr,
+			R&& _a_elements
+		)
+		: file_rw_t<T>(_a_tfrwi, _a_test_options_ptr->_m_general_data_extension, _a_test_options_ptr,_a_elements)
+	{
 	}
 	template<
 		typename T

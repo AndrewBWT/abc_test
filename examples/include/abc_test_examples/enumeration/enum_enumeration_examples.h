@@ -49,7 +49,6 @@ struct fmt::formatter<examples::X2> : formatter<string_view>
 		) const
 		->format_context::iterator
 	{
-		//A, B, C, D, F, G, I = 100, J = 7 };
 		using enum examples::X2;
 		using namespace std;
 		string _l_str{};
@@ -88,24 +87,35 @@ _TEST_CASE("Enumerating an enum for fun!", "examples::enumeration")
 {
 	using namespace abc;
 	using namespace examples;
+//	using namespace abc::utility::io;
 	using enum X2;
-	fmt::println("Enumerating from F to max. "
+	fmt::print("Enumerating from F to max. "
 		"Note enumerate_data and from_val_to_max don't require type arguments. "
 		"from_val_to_max's can be inferred from the argument, and enumerate_data's "
-		"can be inferred from the return type of from_val_to_max.");
+		"can be inferred from the return type of from_val_to_max. Results: [");
 	for (auto& _l_enum : enumerate_data(from_val_to_max(F)))
 	{
-		fmt::println("{}", _l_enum);
+		fmt::print("{} ", _l_enum);
 	}
-	fmt::println("Enumerating from F to min, enumerating backwards. ");
+	fmt::println("]");
+	fmt::print("Enumerating from F to min, enumerating backwards. Results [");
 	for (auto& _l_enum : enumerate_data(from_val_to_min(F)))
 	{
-		fmt::println("{}", _l_enum);
+		fmt::print("{} ", _l_enum);
 	}
-	fmt::println("Enumerating over all X2 values. Note that all_values does require a type argument, as its type "
+	fmt::println("]");
+	fmt::print("Enumerating over all X2 values. Note that all_values does require a type argument, as its type "
 		"cannot be inferred automatically. ");
 	for (auto& _l_enum : enumerate_data(all_values<X2>()))
 	{
-		fmt::println("{}", _l_enum);
+		fmt::print("{} ", _l_enum);
 	}
+	fmt::println("]");
+	fmt::print("Enumerating a range of X2 values. Note that the range is going backwards "
+		"Any tests which fail are written to the file \"fail_data\". Results = [");
+	for (auto& _l_enum : enumerate_data_using_file_type_2(from_m_to_n(G,A),"fail_data"))
+	{
+		fmt::print("{} ", _l_enum);
+	}
+	fmt::println("]");
 }

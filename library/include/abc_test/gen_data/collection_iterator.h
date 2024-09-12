@@ -143,7 +143,7 @@ struct test_runner_t;
 			{
 				auto& _l_this_iterator_ref{ *_m_this_iterator };
 				_l_current_test.for_loop_data_collection().increment(
-					_l_this_iterator_ref->get_test_failure_function(),
+					_l_this_iterator_ref->create_test_failure_function(),
 					std::distance(_m_begin_iterator, _m_this_iterator),
 					_l_this_iterator_ref->repetition_data_ptr());
 			}
@@ -211,7 +211,7 @@ struct test_runner_t;
 			if (_m_this_iterator != _m_end_iterator)
 			{
 				auto& _l_this_iterator_ref{ *_m_this_iterator };
-				_l_current_test.for_loop_data_collection().update(_l_this_iterator_ref->get_test_failure_function(),
+				_l_current_test.for_loop_data_collection().update(_l_this_iterator_ref->create_test_failure_function(),
 					std::distance(_m_begin_iterator, _m_this_iterator),
 					_l_this_iterator_ref->repetition_data_ptr());
 					//_l_this_iterator_ref->infer_correct_mode(),
@@ -321,9 +321,8 @@ struct test_runner_t;
 				++_m_this_iterator;
 			}
 			auto& _l_this_iterator_ref{ *_m_this_iterator };
-			_l_this_iterator_ref->increment_using_additional_data(
-				_a_opt_repetition_data.value().mode(),
-				_a_opt_repetition_data.value().additional_data());
+			_l_this_iterator_ref->set_data_using_mode_and_string_representing_repetition_data(
+				_l_rd.mode(),_l_rd.additional_data());
 		}
 		else
 		{

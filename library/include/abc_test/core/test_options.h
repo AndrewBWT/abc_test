@@ -69,12 +69,10 @@ _BEGIN_ABC_NS
 		size_t _m_default_numb_random_elements_to_generate;
 		//! How many elements to take from the global seed to initiailse per-test random generators.
 		size_t _m_numb_elements_used_to_seed_random_generators;
-		//! The file data extension used
-		std::string _m_file_data_extension;
+		//! The general file data extension used for reading and writing data in the system.
+		std::string _m_general_data_extension;
 		//! The string used to signify comments in the random data files.
 		std::string _m_comment_str;
-		//! The extension used for random data files
-		std::string _m_random_data_extension;
 		//! Whether to write random data to associated files. 
 		bool _m_write_random_data_to_file;
 		//! The number of threads allocated to the test.
@@ -102,6 +100,8 @@ _BEGIN_ABC_NS
 		bool _m_allow_empty_error_reporters_to_be_used;
 
 		bool _m_internal_logging;
+
+		std::string _m_enumerate_data_file_type;
 	private:
 		std::map<size_t, ds::repetition_tree_t> _m_test_repetition_configurations;
 		__constexpr
@@ -131,9 +131,7 @@ _BEGIN_ABC_NS
 		, _m_seed_values({})
 		, _m_default_numb_random_elements_to_generate(5)
 		, _m_numb_elements_used_to_seed_random_generators(1)
-		, _m_file_data_extension("file_data")
 		, _m_comment_str("#")
-		, _m_random_data_extension("random_data")
 		, _m_write_random_data_to_file(false)
 		, _m_console_line_length(120)
 		, _m_threads(0)
@@ -146,6 +144,7 @@ _BEGIN_ABC_NS
 		, _m_allow_empty_error_reporters_to_be_used(false)
 		, _m_allow_empty_test_reporters_to_be_used(false)
 		, _m_internal_logging(false)
+	, _m_enumerate_data_file_type("ed")
 	{
 
 	}

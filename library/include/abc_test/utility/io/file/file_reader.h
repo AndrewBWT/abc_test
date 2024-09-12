@@ -120,6 +120,8 @@ _BEGIN_ABC_UTILITY_IO_NS
 			const bool _l_error_reading_file{ _l_file_hander.fail() || _l_file_hander.bad() };
 			if (_l_file_hander.eof())
 			{
+				_m_current_line = "";
+				_m_current_line_idx = 0;
 				return false;
 			}
 			else if (_l_error_reading_file)

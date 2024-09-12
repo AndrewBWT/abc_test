@@ -39,6 +39,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 				const std::filesystem::path& _a_file_path
 			) noexcept;
 	};
+using opt_file_name_t = std::optional<file_name_t>;
 _END_ABC_UTILITY_IO_NS
 
 /*!

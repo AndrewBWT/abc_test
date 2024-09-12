@@ -33,6 +33,10 @@ _BEGIN_ABC_DS_NS
 				const std::size_t _a_mode,
 				const std::string_view _a_additional_data
 			) noexcept;
+		__constexpr
+			repetition_data_t(
+				const std::size_t _a_mode
+			) noexcept;
 		/*!
 		* Equality function.
 		*/
@@ -147,6 +151,14 @@ struct fmt::formatter<abc::ds::repetition_data_t> : formatter<string_view>
 		, _m_generation_collection_index(_a_generation_collection_index)
 		, _m_mode(_a_mode)
 		, _m_additional_data(_a_additional_data)
+	{
+
+	}
+	__constexpr_imp
+		repetition_data_t::repetition_data_t(
+			const std::size_t _a_mode
+			) noexcept
+		: repetition_data_t(0,0,_a_mode,"")
 	{
 
 	}

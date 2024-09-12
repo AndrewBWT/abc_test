@@ -39,7 +39,7 @@ _BEGIN_ABC_UTILITY_STR_NS
 			std::string
 			run_printer(
 				const T& _a_str
-			) noexcept;
+			) const noexcept;
 	private:
 		using inner_variant = std::variant<printer_fp_t<T>, printer_fo_t<T>>;
 		__constexpr
@@ -100,7 +100,7 @@ _BEGIN_ABC_UTILITY_STR_NS
 		std::string
 		printer_t<T>::run_printer(
 			const T& _a_obj
-		) noexcept
+		) const noexcept
 	{
 		using namespace std;
 		if (holds_alternative<printer_fp_t<T>>(_m_func))

@@ -26,6 +26,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 			const str::printer_t<T>&
 			printer(
 			) const noexcept;
+
 	private:
 		str::rw_info_t<T> _m_rw_info;
 		file_name_t _m_file_name;
