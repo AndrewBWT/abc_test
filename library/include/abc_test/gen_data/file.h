@@ -19,13 +19,14 @@
 #include "abc_test/global.h"
 
 _BEGIN_ABC_NS
-	/*!
-	* Object describing data taken from a file
-	*/
+using file_type_rep_data_t = char;
+/*!
+* Object describing data taken from a file
+*/
 	template<
 		typename T
 	>
-	struct file_data_t : public gen_data_base_t<T>
+	struct file_data_t : public gen_data_with_repetition_type_t<T, file_type_rep_data_t>
 	{
 	public:
 		/*!
@@ -46,6 +47,14 @@ _BEGIN_ABC_NS
 				const utility::io::file_rw_info_t<T>& _a_templated_file_rw,
 				R&& _a_initial_values = {}
 			);
+		__constexpr
+			virtual
+			void
+			subclass_reset_data(
+			) noexcept final
+		{
+
+		}
 		/*!
 		* Determines whether the object has a current element. As this is a file streaming object,
 		* there are no additional modes assocated with it. therefore, it always returns false.
@@ -53,7 +62,7 @@ _BEGIN_ABC_NS
 		__constexpr
 			virtual
 			bool
-			has_current_element_(
+			subclass_has_current_element(
 			) const noexcept;
 		/*!
 		* Returns the current object. In this case, it will always return a default constructed T object.
@@ -61,7 +70,7 @@ _BEGIN_ABC_NS
 		__constexpr
 			virtual
 			const T&
-			current_element_(
+			subclass_current_element(
 			) const noexcept;
 		/*!
 		* Generates the next element. Will alwyas return false.
@@ -69,14 +78,14 @@ _BEGIN_ABC_NS
 		__constexpr
 			virtual
 			bool
-			generate_next_(
+			subclass_generate_next(
 			);
 		__constexpr
 			virtual
 			void
-			increment_using_additional_data_(
+			subclass_set_data_using_mode_and_repetition_data(
 				const std::size_t _a_mode,
-				const std::string_view _a_additional_data
+				const file_type_rep_data_t _a_rep_type
 			);
 		__constexpr
 			virtual
@@ -85,12 +94,13 @@ _BEGIN_ABC_NS
 			) const noexcept;
 		__constexpr
 			virtual
-			std::string
-			get_additional_string_data_(
+			file_type_rep_data_t
+			subclass_get_repetition_data(
 			) const noexcept
 		{
-			return "";
+			return file_type_rep_data_t();
 		}
+		T _m_elemmotn;
 	};
 	template<
 		typename T
@@ -128,9 +138,10 @@ _BEGIN_ABC_NS
 			const utility::io::file_rw_info_t<T>& _a_templated_file_rw,
 			R&& _a_initial_values
 		)
-		: gen_data_base_t<T>(0, std::optional<utility::io::file_rw_info_t<T>>(_a_templated_file_rw), 
-			file_data_extension(),
-			_a_initial_values)
+		: gen_data_with_repetition_type_t<T, file_type_rep_data_t>(0, _a_templated_file_rw, _a_initial_values)
+	//	: gen_data_base_t<T>(0, std::optional<utility::io::file_rw_info_t<T>>(_a_templated_file_rw), 
+	//		file_data_extension(),
+	//		_a_initial_values)
 	{
 	}
 	template<
@@ -138,7 +149,7 @@ _BEGIN_ABC_NS
 	>
 	__constexpr_imp
 		bool
-		file_data_t<T>::has_current_element_(
+		file_data_t<T>::subclass_has_current_element(
 		) const noexcept 
 	{
 		return false;
@@ -148,17 +159,18 @@ _BEGIN_ABC_NS
 	>
 	__constexpr_imp
 		const T&
-		file_data_t<T>::current_element_(
+		file_data_t<T>::subclass_current_element(
 		) const noexcept
 	{
-		return this->_m_associated_file.value().current_element();
+		return _m_elemmotn;
+	//	return this->_m_associated_file.value().current_element();
 	}
 	template<
 		typename T
 	>
 	__constexpr_imp
 		bool
-		file_data_t<T>::generate_next_(
+		file_data_t<T>::subclass_generate_next(
 		)
 	{
 		return false;
@@ -168,9 +180,9 @@ _BEGIN_ABC_NS
 	>
 	__constexpr_imp
 		void
-		file_data_t<T>::increment_using_additional_data_(
+		file_data_t<T>::subclass_set_data_using_mode_and_repetition_data(
 			const std::size_t _a_mode,
-			const std::string_view _a_additional_data
+			const file_type_rep_data_t _a_rep_type
 		) {
 
 	}
@@ -217,6 +229,6 @@ _BEGIN_ABC_NS
 		file_data_extension(
 		) noexcept
 	{
-		return global::get_global_test_options()._m_file_data_extension;
+		return global::get_global_test_options()._m_random_data_file_type;
 	}
 	_END_ABC_NS

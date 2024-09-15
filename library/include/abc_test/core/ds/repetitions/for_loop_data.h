@@ -3,6 +3,7 @@
 #include <functional>
 #include "abc_test/core/ds/repetitions/repetition_data.h"
 #include "fmt/base.h"
+#include "abc_test/core/ds/types.h"
 
 _BEGIN_ABC_DS_NS
 	/*!
@@ -23,7 +24,7 @@ _BEGIN_ABC_DS_NS
 		__constexpr
 			for_loop_data_t(
 				const std::size_t _a_for_loop_index,
-				const std::function<repetition_data_t()> _a_on_error_function,
+				const test_failure_func_t _a_on_error_function,
 				const size_t _a_generation_collection_index,
 				repetition_data_t* _a_repetition_data
 			) noexcept;
@@ -60,7 +61,7 @@ _BEGIN_ABC_DS_NS
 		__constexpr
 			void
 			update(
-				const std::function<repetition_data_t()> _a_on_error_function,
+				const test_failure_func_t _a_on_error_function,
 				const std::size_t _a_generation_collection_index,
 				repetition_data_t* _a_repetition_data
 			) noexcept;
@@ -76,7 +77,7 @@ _BEGIN_ABC_DS_NS
 			) const noexcept;
 	private:
 		std::size_t _m_for_loop_index;
-		std::function<repetition_data_t()> _m_on_failure_function;
+		test_failure_func_t _m_on_failure_function;
 		repetition_data_t* _m_repetition_data;
 	};
 _END_ABC_DS_NS
@@ -109,7 +110,7 @@ _BEGIN_ABC_DS_NS
 	__constexpr_imp
 		for_loop_data_t::for_loop_data_t(
 			const std::size_t _a_for_loop_index,
-			const std::function<repetition_data_t()> _a_on_error_function,
+			const test_failure_func_t _a_on_error_function,
 			const size_t _a_generation_collection_index,
 			repetition_data_t* _a_repetition_data
 		) noexcept
@@ -136,7 +137,7 @@ _BEGIN_ABC_DS_NS
 	__constexpr_imp
 		void
 		for_loop_data_t::update(
-			const std::function<repetition_data_t()> _a_on_error_function,
+			const test_failure_func_t _a_on_error_function,
 			const std::size_t _a_generation_collection_index,
 			repetition_data_t* _a_repetition_data
 		) noexcept

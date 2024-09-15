@@ -2,3 +2,4 @@
 build/*
 commit_msg.txt
 commit_msg_base.txt
+test_data/*

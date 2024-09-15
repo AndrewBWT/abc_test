@@ -35,6 +35,7 @@ set(LIBRARY_FILES
   include/abc_test/core/ds/test_collections/test_tree.h
       src/abc_test/core/ds/test_collections/test_tree.cpp
   include/abc_test/core/ds/test_collections/test_tree_iterator.h
+  include/abc_test/core/ds/types.h
   # Contains objects and functions pertaining to recoverable and unrecoverable errors,
   # as well as errors encountered when evaluating tests.
   include/abc_test/core/errors/test_library_exception.h
@@ -128,6 +129,7 @@ set(LIBRARY_FILES
   include/abc_test/utility/io/file/file_writer.h
   include/abc_test/utility/io/file/file_rw_info.h
   include/abc_test/utility/io/file/file_rw.h
+  include/abc_test/utility/io/file/opt_file_rw.h
   # Utility functions and objects for strings including parsing and printing.
   include/abc_test/utility/str/parser.h
   include/abc_test/utility/str/printer.h

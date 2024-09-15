@@ -3,13 +3,15 @@
 #include <initializer_list>
 #include <vector>
 #include "abc_test/core/test_runner.h"
+#include "abc_test/gen_data/gen_data_with_repetition_type.h"
 #include "abc_test/gen_data/collection.h"
 
 _BEGIN_ABC_NS
+using static_rep_data_t = std::size_t;
 	template<
 		typename T
 	>
-	struct static_data_t : public gen_data_base_t<T>
+	struct static_data_t : public gen_data_with_repetition_type_t<T, static_rep_data_t>
 	{
 	public:
 		/*!
@@ -41,8 +43,8 @@ _BEGIN_ABC_NS
 		*/
 		__constexpr
 			virtual
-			std::string
-			get_additional_string_data_(
+			static_rep_data_t
+			subclass_get_repetition_data(
 			) const noexcept;
 		/*!
 		* Determines whether there is a current element in the collection.
@@ -50,7 +52,7 @@ _BEGIN_ABC_NS
 		__constexpr
 			virtual
 			bool
-			has_current_element_(
+			subclass_has_current_element(
 			) const noexcept;
 		/*!
 		* Returns a const reference to the current element.
@@ -58,7 +60,7 @@ _BEGIN_ABC_NS
 		__constexpr
 			virtual
 			const T&
-			current_element_(
+			subclass_current_element(
 			) const noexcept;
 		/*!
 		* Increments the object, getting the next element in the internal collection.
@@ -66,7 +68,7 @@ _BEGIN_ABC_NS
 		__constexpr
 			virtual
 			bool
-			generate_next_(
+			subclass_generate_next(
 			);
 		/*!
 		* Increments the internal mechanisms using a string to represent additinoal data.
@@ -74,9 +76,9 @@ _BEGIN_ABC_NS
 		__constexpr
 			virtual
 			void
-			increment_using_additional_data_(
+			subclass_set_data_using_mode_and_repetition_data(
 				const std::size_t _a_mode,
-				const std::string_view _a_additional_data
+				const static_rep_data_t _a_rep_data
 			);
 		/*!
 		* Determines whether failed values can be written to a file. For this class, they cannot.
@@ -86,6 +88,14 @@ _BEGIN_ABC_NS
 			bool
 			are_failed_values_written_to_files(
 			) const noexcept;
+		__constexpr
+			virtual
+			void
+			subclass_reset_data(
+			) noexcept final
+		{
+
+		}
 	private:
 		T* _m_elements;
 		std::size_t _m_elements_size;
@@ -127,11 +137,12 @@ _BEGIN_ABC_NS
 		static_data_t<T>::static_data_t(
 			R&& _a_init_list
 		) noexcept
-		: gen_data_base_t<T>(0, std::optional<utility::io::file_rw_info_t<T>>{}, "", std::vector<T>())
-		, _m_elements(std::ranges::size(_a_init_list) == 0 ?
-			nullptr : 
-			new T[std::ranges::size(_a_init_list)])
-		, _m_elements_size(_a_init_list.size())
+		: gen_data_with_repetition_type_t<T, static_rep_data_t>(0)
+	//	: gen_data_base_t<T>(0, std::optional<utility::io::file_rw_info_t<T>>{}, "", std::vector<T>())
+	//	, _m_elements(std::ranges::size(_a_init_list) == 0 ?
+	//		nullptr : 
+	//		new T[std::ranges::size(_a_init_list)])
+	//	, _m_elements_size(_a_init_list.size())
 	{
 		for (std::size_t _l_idx{ 0 }; auto&& _l_element : _a_init_list)
 		{
@@ -154,19 +165,19 @@ _BEGIN_ABC_NS
 		typename T
 	>
 	__constexpr_imp
-		std::string
-		static_data_t<T>::get_additional_string_data_(
+		static_rep_data_t
+		static_data_t<T>::subclass_get_repetition_data(
 		) const noexcept
 	{
 		using namespace std;
-		return to_string(this->_m_elements_generated);
+		return this->_m_elements_generated;
 	}
 	template<
 		typename T
 	>
 	__constexpr_imp
 		bool
-		static_data_t<T>::has_current_element_(
+		static_data_t<T>::subclass_has_current_element(
 		) const noexcept
 	{
 		return this->_m_elements_generated < _m_elements_size;
@@ -176,7 +187,7 @@ _BEGIN_ABC_NS
 	>
 	__constexpr_imp
 		const T&
-		static_data_t<T>::current_element_(
+		static_data_t<T>::subclass_current_element(
 		) const noexcept
 	{
 		return _m_elements[this->_m_elements_generated];
@@ -186,25 +197,26 @@ _BEGIN_ABC_NS
 	>
 	__constexpr_imp
 		bool
-		static_data_t<T>::generate_next_(
+		static_data_t<T>::subclass_generate_next(
 		)
 	{
 		this->_m_elements_generated++;
-		return has_current_element_();
+		return subclass_has_current_element();
 	}
 	template<
 		typename T
 	>
 	__constexpr_imp
 		void
-		static_data_t<T>::increment_using_additional_data_(
+		static_data_t<T>::subclass_set_data_using_mode_and_repetition_data(
 			const std::size_t _a_mode,
-			const std::string_view _a_additional_data
+			const static_rep_data_t _a_rep_data
 		)
 	{
 		using namespace utility::str;
 		using namespace errors;
 		using namespace std;
+		string _a_additional_data;
 		if (_a_mode == 1)
 		{
 			this->_m_elements_generated = parser_t<size_t>().run_parser_with_exception(_a_additional_data);

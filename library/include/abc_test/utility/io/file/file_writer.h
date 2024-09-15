@@ -49,7 +49,8 @@ _BEGIN_ABC_UTILITY_IO_NS
 		if (_m_file_name.is_valid())
 		{
 			const path _l_file_path{ _m_file_name.file_path() };
-			_m_file_handler = std::unique_ptr<ofstream>(new ofstream(_l_file_path));
+			_m_file_handler = std::unique_ptr<ofstream>(new ofstream(_l_file_path, 
+				std::ios_base::app));
 			if (not _m_file_handler.get()->is_open())
 			{
 				throw test_library_exception_t(

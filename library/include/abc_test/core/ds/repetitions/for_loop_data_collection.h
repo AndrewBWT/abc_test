@@ -36,7 +36,7 @@ _BEGIN_ABC_DS_NS
 		__constexpr
 			void
 			increment(
-				const std::function<repetition_data_t()> _a_on_error_function,
+				const test_failure_func_t _a_on_error_function,
 				const size_t _a_generation_collection_index,
 				repetition_data_t* _a_repetition_data
 			) noexcept;
@@ -53,7 +53,7 @@ _BEGIN_ABC_DS_NS
 		__constexpr
 			void
 			update(
-				const std::function<repetition_data_t()> _a_on_error_function,
+				const test_failure_func_t _a_on_error_function,
 				const size_t _a_generation_collection_index,
 				repetition_data_t* _a_repetition_data
 			);
@@ -126,7 +126,7 @@ _BEGIN_ABC_DS_NS
 	__constexpr_imp
 		void
 		for_loop_data_collection_t::increment(
-			const std::function<repetition_data_t()> _a_on_error_function,
+			const test_failure_func_t _a_on_error_function,
 			const size_t _a_generation_collection_index,
 			repetition_data_t* _a_repetition_data
 		) noexcept
@@ -156,7 +156,7 @@ _BEGIN_ABC_DS_NS
 	__constexpr_imp
 		void
 		for_loop_data_collection_t::update(
-			const std::function<repetition_data_t()> _a_on_error_function,
+			const test_failure_func_t _a_on_error_function,
 			const size_t _a_generation_collection_index,
 			repetition_data_t* _a_repetition_data
 		//	const std::size_t _a_mode,

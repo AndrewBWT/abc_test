@@ -100,7 +100,8 @@ public:
 		enumerate_data_t(
 			const enumerate_t<T>& _a_enumerate,
 			const utility::io::opt_file_rw_info_t<T>& _a_templated_file_rw,
-			const utility::io::opt_file_name_t& _a_enumerate_data_file_name
+			const utility::io::opt_file_name_t& _a_enumerate_data_file_name,
+			const test_options_t* _a_test_options = global::get_global_test_options_ptr()
 		) noexcept;
 	__constexpr
 		bool
@@ -113,20 +114,22 @@ public:
 	__constexpr
 		bool
 		are_failed_values_written_to_files(
-		) const noexcept override;
+		) const noexcept;
 	__constexpr_imp
 		void
-		set_data_using_mode_and_parsed_repetition_data(
+		subclass_set_data_using_mode_and_repetition_data(
 			const std::size_t _a_idx,
 			const enumerate_data_id_type_t _a_data
 		)
 	{
-
+		auto _l_data{ _a_data };
+		_m_has_current_element = _m_enumerable.move_forward(_m_current_element, _l_data);
+	//	_m_enumerable.move_forward(_a_data);
 	}
 	__constexpr
 		enumerate_data_id_type_t
-		subclass_get_ret_data(
-		)
+		subclass_get_repetition_data(
+		) const noexcept
 	{
 		return enumerate_data_id_type_t();
 	}
@@ -137,12 +140,20 @@ public:
 	//		const std::string_view _a_additional_data
 	//	) override;
 	__constexpr
+		virtual
+		void
+		subclass_reset_data(
+		) noexcept final
+	{
+
+	}
+	__constexpr
 		const T&
 		subclass_current_element(
 		) const noexcept override;
 	__constexpr
 		bool
-		subclass_generated_next(
+		subclass_generate_next(
 		) override;
 private:
 	enumerate_t<T> _m_enumerable;
@@ -191,15 +202,7 @@ template<
 __constexpr
 	gen_data_collection_t<T>
 	randomly_probe_enumerated_data(
-		enumerate_t<T>& _a_enumerate
-	) noexcept;
-template<
-	typename T
->
-__constexpr
-	gen_data_collection_t<T>
-	randomly_probe_enumerated_data(
-		enumerate_t<T>&& _a_enumerate
+		const enumerate_t<T>& _a_enumerate
 	) noexcept;
 template<
 	typename T
@@ -409,7 +412,7 @@ __constexpr_imp
 		enumerate_index_t& _a_times_called
 	) const noexcept
 {
-	return next_element(_a_element, _a_times_called, _m_end_value);
+	return next_element(_a_element, _a_times_called);
 }
 template<
 	typename T
@@ -432,10 +435,11 @@ __constexpr_imp
 	enumerate_data_t<T>::enumerate_data_t(
 		const enumerate_t<T>& _a_enumerate,
 		const utility::io::opt_file_rw_info_t<T>& _a_templated_file_rw,
-		const utility::io::opt_file_name_t& _a_enumerate_opt_data_file_name
+		const utility::io::opt_file_name_t& _a_enumerate_opt_data_file_name,
+		const test_options_t* _a_test_options
 	) noexcept
-	: gen_data_with_repetition_type_t<T, enumerate_data_id_type_t>(0, _a_templated_file_rw,{}, 
-		_a_enumerate_opt_data_file_name,enumerate_data_file_type())
+	: gen_data_with_repetition_type_t<T, enumerate_data_id_type_t>(0, _a_templated_file_rw,
+		{},_a_test_options->_m_enumerate_data_file_type, _a_enumerate_opt_data_file_name, _a_test_options)
 	, _m_enumerable(_a_enumerate)
 	, _m_current_element(_a_enumerate.min())
 	, _m_has_current_element(true)
@@ -499,7 +503,7 @@ template<
 >
 __constexpr_imp
 	bool
-	enumerate_data_t<T>::subclass_generated_next(
+	enumerate_data_t<T>::subclass_generate_next(
 	)
 {
 	if (_m_has_current_element)
@@ -572,23 +576,13 @@ template<
 __constexpr_imp
 	gen_data_collection_t<T>
 	randomly_probe_enumerated_data(
-		enumerate_t<T>& _a_enumerate
+		const enumerate_t<T>& _a_enumerate
 	) noexcept
 {
 	using namespace std;
-	return unary_collection<T>(new enumerate_data_t<T>(_a_enumerate));
-}
-template<
-	typename T
->
-__constexpr_imp
-	gen_data_collection_t<T>
-	randomly_probe_enumerated_data(
-		enumerate_t<T>&& _a_enumerate
-	) noexcept
-{
-	using namespace std;
-	return unary_collection<T>(new enumerate_data_t<T>(_a_enumerate));
+	using namespace utility::io;
+	return unary_collection<T>(new enumerate_data_t<T>(_a_enumerate,
+		opt_file_rw_info_t<T>{}, opt_file_name_t{}));
 }
 template<
 	typename T

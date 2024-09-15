@@ -127,7 +127,9 @@ _TEST_CASE("Static generator", "abcs::static")
 	std::function<unit_test(abc::test_runner_t&)> _l_rand_func;
 //	std::vector<std::unique_ptr<gen_data<unit_test>>> _l_lsts;
 	//_REQUIRE(EXPR(1 == 2));
-	std::function<bool(utility::rng&)> _l_f1;
+	std::function<bool(utility::rng&)> _l_f1 = [](auto&) {
+		return true;
+		};
 	parser_fp_t<bool> _l_parser = nullptr;
 	printer_fo_t<bool> _l_printer;
 	for (auto&& _l_bool : gen_data_collection_t<bool>(
@@ -136,14 +138,14 @@ _TEST_CASE("Static generator", "abcs::static")
 	//	file_data<unit_test>(file_name("file_data3"), _l_inits)
 		//random_data(rnd_func(abi::gen), tempalted_file_rw_info<unit_test>("file_data_4"))
 		random_data<bool>()
-		, random_data<bool>(using_function(abi::gen2))
-		, random_data<bool>(using_function(_l_f1))
-		, random_data<bool>(new abi::special_bool_t())
-		, random_data<bool>("hello")
-		, random_data<bool>(new abi::special_bool_t(),file_name_t("hello2"))
-		, random_data<bool>(new abi::special_bool_t(), rw_info_t<bool>(_l_parser))
-		, random_data<bool>(new abi::special_bool_t(), rw_info_t<bool>(_l_printer))
-		, random_data<bool>(new abi::special_bool_t(), rw_info_t<bool>(_l_parser,_l_printer))
+		//, random_data<bool>(using_function(abi::gen2))
+		//, random_data<bool>(using_function(_l_f1))
+		//, random_data<bool>(new abi::special_bool_t())
+		//, random_data<bool>("hello")
+		//, random_data<bool>(new abi::special_bool_t(),file_name_t("hello2"))
+		//, random_data<bool>(new abi::special_bool_t(), rw_info_t<bool>(_l_parser))
+		//, random_data<bool>(new abi::special_bool_t(), rw_info_t<bool>(_l_printer))
+		//, random_data<bool>(new abi::special_bool_t(), rw_info_t<bool>(_l_parser,_l_printer))
 		//, random_data<bool>(new bool_random_data())
 		//, random_data<bool>(new bool_random_data(), file_name_t("hello2")) //Same as above but hello2
 		//, random_data<bool>(file_name_t("hello","hello\goodbye")) //Will read/write using hello\goodbye\hello.txt
@@ -623,7 +625,8 @@ TEST_CASE("Basic test script", "abc")
 		_l_to._m_write_random_data_to_file = false;
 	}
 	//_l_to._m_test_data_root_path = "awheipvuch34r";
-	_l_to._m_test_data_root_path = "G:\\MyProjects\\cpp\\test\\ab_test\\test_dir1";
+	std::cout << std::filesystem::current_path() << std::endl;
+	_l_to._m_test_data_root_path = "..\\..\\test_data\\test_dir1";
 	_l_to._m_create_test_folders_if_dont_exist = true;
 	_l_to._m_internal_logging = true;
 	test_main_t _l_test_main;

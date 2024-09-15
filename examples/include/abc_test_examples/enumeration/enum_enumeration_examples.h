@@ -5,6 +5,8 @@
 #include "abc_test/gen_data/enumeration.h"
 #include "abc_test/gen_data/collection.h"
 #include "abc_test/gen_data/collection_iterator.h"
+#include "abc_test/matchers/matcher.h"
+#include "abc_test/matchers/comparison.h"
 
 // Define an enum
 namespace examples
@@ -111,11 +113,14 @@ _TEST_CASE("Enumerating an enum for fun!", "examples::enumeration")
 		fmt::print("{} ", _l_enum);
 	}
 	fmt::println("]");
-	fmt::print("Enumerating a range of X2 values. Note that the range is going backwards "
+	std::string _l_output;
+	_l_output += fmt::format("Enumerating a range of X2 values. Note that the range is going backwards "
 		"Any tests which fail are written to the file \"fail_data\". Results = [");
 	for (auto& _l_enum : enumerate_data_using_file_type_2(from_m_to_n(G,A),"fail_data"))
 	{
-		fmt::print("{} ", _l_enum);
+		_l_output += fmt::format("{} ", _l_enum);
+		_CHECK(EXPR(_l_enum == G));
 	}
-	fmt::println("]");
+	_l_output += fmt::format("]");
+	std::cout << _l_output << std::endl;
 }

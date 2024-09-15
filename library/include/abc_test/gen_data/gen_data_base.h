@@ -13,6 +13,7 @@
 #include "abc_test/utility/io/file/file_writer.h"
 #include "abc_test/core/ds/repetitions/repetition_data.h"
 #include "abc_test/utility/io/file/file_rw.h"
+#include "abc_test/core/ds/types.h"
 
 _BEGIN_ABC_NS
 /*!
@@ -22,13 +23,56 @@ _BEGIN_ABC_NS
 * for example when failures are written to a file, to repeat that test
 * the file must be navigated.
 */
-using test_failure_func_t = std::function<ds::repetition_data_t()>;
 template<
 	typename T
 >
 struct gen_data_base_t
 {
 public:
+	__constexpr
+		ds::repetition_data_t*
+		repetition_data_ptr(
+		) noexcept;
+	__constexpr
+		std::size_t
+		mode(
+		) const noexcept;
+	__constexpr
+		virtual
+		bool
+		has_current_element(
+		) const noexcept = 0;
+	__constexpr
+		virtual
+		const T&
+		current_element(
+		) const noexcept = 0;
+	__constexpr
+		virtual
+		bool
+		generate_next(
+		) = 0;
+	//__constexpr
+	//	virtual
+	//	std::string
+	//	get_repetition_data_as_string(
+	//	) const noexcept = 0;
+	__constexpr
+		virtual
+		void
+		set_data_using_mode_and_string_representing_repetition_data(
+			const std::size_t _a_mode,
+			const std::string_view _a_additional_data
+		) = 0;
+	__constexpr
+		virtual
+		ds::test_failure_func_t
+		create_test_failure_function(
+		) noexcept = 0;
+protected:
+	mutable ds::repetition_data_t _m_repetition_data;
+};
+/*public:
 	template<
 		typename R = std::vector<T>
 	>
@@ -40,39 +84,39 @@ public:
 		) noexcept;
 	__constexpr
 		bool
-		has_current_element(
+		has_current_element_l1(
 		) const noexcept;
 	__constexpr
 		virtual
 		bool
-		subclass_has_current_element(
+		has_current_element_l2(
 		) const noexcept = 0;
 	__constexpr
 		const T&
-		current_element(
+		current_element_l1(
 		) const noexcept;
 	__constexpr
 		virtual
 		const T&
-		subclass_current_element(
+		current_element_l2(
 		) const noexcept = 0;
 	__constexpr
 		bool
-		generate_next(
+		generate_next_l1(
 		);
 	__constexpr
 		virtual
 		bool
-		subclass_generated_next(
+		generate_next_l2(
 		) = 0;
 	__constexpr
 		std::string
-		get_repetition_data_as_string(
+		get_repetition_data_as_string_l1(
 		) const noexcept;
 	__constexpr
 		virtual
 		std::string
-		subclass_get_repetition_data_as_string(
+		get_repetition_data_as_string_l2(
 		) const noexcept = 0;
 	//__constexpr
 	//	virtual
@@ -80,9 +124,15 @@ public:
 	//	infer_correct_mode(
 	//	) const noexcept;
 	__constexpr
+		void
+		set_data_using_mode_and_string_representing_repetition_data_l1(
+			const std::size_t _a_mode,
+			const std::string_view _a_additional_data
+		);
+	__constexpr
 		virtual
 		void
-		subclass_set_data_using_mode_and_string_representing_repetition_data(
+		set_data_using_mode_and_string_representing_repetition_data_l2(
 			const std::size_t _a_mode,
 			const std::string_view _a_additional_data
 		) = 0;
@@ -91,19 +141,13 @@ public:
 		repetition_data_ptr(
 		) noexcept;
 	__constexpr
-		void
-		set_data_using_mode_and_string_representing_repetition_data(
-			const std::size_t _a_mode,
-			const std::string_view _a_additional_data
-		);
-	__constexpr
 		ds::repetition_data_t
-		write_failed_value_to_file_and_return_repetition_data(
+		write_failed_value_to_file_and_return_repetition_data_l1(
 		) noexcept;
 	__constexpr
 		virtual
 		ds::repetition_data_t
-		subclass_write_failed_value_to_file_and_return_repetition_data(
+		write_failed_value_to_file_and_return_repetition_data_l2(
 		) noexcept = 0;
 	__constexpr
 		virtual
@@ -127,7 +171,7 @@ protected:
 	__constexpr
 		virtual
 		void
-		subclass_set_next_mode(
+		set_next_mode_l1(
 		) noexcept = 0;
 	__constexpr
 		bool
@@ -154,7 +198,7 @@ private:
 		std::string
 		repetition_data_as_string(
 		) const noexcept;
-};
+};*/
 template<
 	typename T
 >
@@ -163,6 +207,26 @@ _END_ABC_NS
 
 _BEGIN_ABC_NS
 template<
+	typename T
+>
+__constexpr_imp
+	ds::repetition_data_t*
+	gen_data_base_t<T>::repetition_data_ptr(
+	) noexcept
+{
+	return &_m_repetition_data;
+}
+template<
+	typename T
+>
+__constexpr_imp
+	std::size_t
+	gen_data_base_t<T>::mode(
+	) const noexcept
+{
+	return _m_repetition_data.mode();
+}
+/*template<
 	typename T
 >
 template<
@@ -184,35 +248,35 @@ template<
 >
 __constexpr_imp
 	bool
-	gen_data_base_t<T>::has_current_element(
+	gen_data_base_t<T>::has_current_element_l1(
 	) const noexcept
 {
 	//If the mode is zero, there is an associated file element and that associated
 	//file element has a value
 	return (associated_file_has_current_element()) ?
 		_m_associated_file.value().has_current_element() :
-		subclass_has_current_element();
+		has_current_element_l2();
 }
 template<
 	typename T
 >
 __constexpr_imp
 	const T&
-	gen_data_base_t<T>::current_element(
+	gen_data_base_t<T>::current_element_l1(
 	) const noexcept
 {
 	//Set the current element repetition data. Probably not necessary.
 	_m_repetition_data.set_string(get_repetition_data_as_string());
 	return (associated_file_has_current_element()) ?
 		_m_associated_file.value().current_element() :
-		subclass_current_element();
+		current_element_l2();
 }
 template<
 	typename T
 >
 __constexpr_imp
 	bool
-	gen_data_base_t<T>::generate_next(
+	gen_data_base_t<T>::generate_next_l1(
 	)
 {
 	bool _l_result{ false };
@@ -233,12 +297,12 @@ __constexpr_imp
 			//This will always be already set up, so we've just gotta get
 			//the bool saying whether its got a current element.
 			subclass_set_next_mode();
-			_l_result = subclass_has_current_element();
+			_l_result = has_current_element_l2();
 		}
 	}
 	else
 	{
-		_l_result = subclass_generated_next();
+		_l_result = generate_next_l2();
 	}
 	if (_l_result)
 	{
@@ -251,14 +315,14 @@ template<
 >
 __constexpr_imp
 	std::string
-	gen_data_base_t<T>::get_repetition_data_as_string(
+	gen_data_base_t<T>::get_repetition_data_as_string_l1(
 	) const noexcept 
 {
 	using namespace std;
 	return associated_file_has_current_element() ?
 		repetition_data_as_string() :
-		subclass_get_repetition_data_as_string();
-}
+		get_repetition_data_as_string_l2();
+}*/
 	/*template<
 		typename T
 	>
@@ -277,7 +341,7 @@ __constexpr_imp
 			return _m_repetition_data.mode();
 		}
 	}*/
-template<
+/*template<
 	typename T
 >
 __constexpr_imp
@@ -292,7 +356,7 @@ template<
 >
 __constexpr_imp
 	void
-	gen_data_base_t<T>::set_data_using_mode_and_string_representing_repetition_data(
+	gen_data_base_t<T>::set_data_using_mode_and_string_representing_repetition_data_l1(
 		const std::size_t _a_mode,
 		const std::string_view _a_additional_data
 	)
@@ -358,7 +422,7 @@ __constexpr_imp
 	else
 	{
 		//Call the subclass 
-		subclass_set_data_using_mode_and_string_representing_repetition_data(_a_mode, _a_additional_data);
+		set_data_using_mode_and_string_representing_repetition_data_l2(_a_mode, _a_additional_data);
 	}
 	_m_repetition_data.set_mode(_a_mode);
 	_m_repetition_data.set_string(get_repetition_data_as_string());
@@ -369,7 +433,7 @@ template<
 >
 __constexpr_imp
 	ds::repetition_data_t
-	gen_data_base_t<T>::write_failed_value_to_file_and_return_repetition_data(
+	gen_data_base_t<T>::write_failed_value_to_file_and_return_repetition_data_l1(
 	) noexcept
 {
 	using namespace ds;
@@ -384,7 +448,7 @@ __constexpr_imp
 		}
 		//Call subclass variant incase data also needs to be written to a folder in the subclass,
 		// however we always return the element from the top file if it writes to more than one file.
-		subclass_write_failed_value_to_file_and_return_repetition_data();
+		write_failed_value_to_file_and_return_repetition_data_l2();
 		//Create new repetition_data which points to the entry in the file.
 		return repetition_data_t(_m_repetition_data.for_loop_index(), 
 			_m_repetition_data.generation_collection_index(),
@@ -392,7 +456,7 @@ __constexpr_imp
 	}
 	else
 	{
-		return subclass_write_failed_value_to_file_and_return_repetition_data();
+		return write_failed_value_to_file_and_return_repetition_data_l2();
 	}
 }
 template<
@@ -407,7 +471,7 @@ __constexpr_imp
 	{
 		return (*this).write_failed_value_to_file_and_return_repetition_data();
 	};
-}
+}*/
 	/*template<
 		typename T
 	>
@@ -419,7 +483,7 @@ __constexpr_imp
 		_m_repetition_data.set_mode(1);
 		return has_current_element_();
 	}*/
-template<
+/*template<
 	typename T
 >
 __constexpr_imp
@@ -478,5 +542,5 @@ __constexpr_imp
 	) const noexcept
 {
 	return _m_rw_info.printer().run_printer(_m_associated_file.value().elements_read());
-}
+}*/
 _END_ABC_NS
