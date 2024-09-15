@@ -37,6 +37,7 @@ private:
 	std::shared_ptr<std::ifstream> _m_file_handler;
 	file_name_with_extension_t _m_file_name;
 	const test_options_t* _m_test_options;
+	bool _m_finished_reading;
 };
 _END_ABC_UTILITY_IO_NS
 
@@ -51,6 +52,7 @@ __constexpr_imp
 	, _m_file_handler(std::unique_ptr<std::ifstream>())
 	, _m_file_name(_a_file_name)
 	, _m_test_options(_a_test_options)
+	, _m_finished_reading(false)
 {
 	using namespace std;
 	using namespace std::filesystem;
@@ -91,6 +93,7 @@ __constexpr_imp
 	, _m_file_handler(std::unique_ptr<std::ifstream>())
 	, _m_file_name(file_name_with_extension_t{})
 	, _m_test_options(nullptr)
+	, _m_finished_reading(true)
 {
 
 }
@@ -115,22 +118,33 @@ __constexpr_imp
 {
 	using namespace errors;
 	using namespace std;
+	bool _l_exit{ true };
+	if (_m_finished_reading)
+	{
+		return false;
+	}
 	ifstream& _l_file_hander{ *_m_file_handler.get() };
 	do
 	{
 		++_m_current_line_idx;
 		std::getline(_l_file_hander, _m_current_line);
 		const bool _l_error_reading_file{ _l_file_hander.fail() || _l_file_hander.bad() };
-		if (_l_file_hander.eof())
+		bool _l_eof_found{ _l_file_hander.eof() };
+		if (_l_eof_found)
 		{
-			_m_current_line = "";
-			_m_current_line_idx = 0;
-			return false;
+			_m_finished_reading = true;
+		}
+		if (_m_finished_reading == true && _m_current_line == "")
+		{
+			//eof found, empty line.
+			break;
 		}
 		else if (_l_error_reading_file)
 		{
+			//Some other reading error.
 			_m_current_line = "";
 			_m_current_line_idx = 0;
+			_m_finished_reading = true;
 			throw test_library_exception_t(
 				fmt::format("Error encountered reading line {0} in file \"{1}\". "
 					"The fail bit of the file was set to {2} and the bad_bit of the file was set to {3}",
@@ -142,13 +156,22 @@ __constexpr_imp
 		else if (_m_test_options != nullptr &&
 			_m_current_line.starts_with(_m_test_options->_m_comment_str))
 		{
-			continue;
+			if (_m_finished_reading)
+			{
+				break;
+			}
+			else
+			{
+				continue;
+			}
 		}
 		else
 		{
 			return true;
 		}
-	} while (true);
+	} while (_l_exit);
+	_m_current_line_idx = 0;
+	_m_current_line = "";
 	return false;
 }
 _END_ABC_UTILITY_IO_NS

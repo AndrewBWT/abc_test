@@ -65,6 +65,7 @@ set(LIBRARY_FILES
   # gen_data subfolder. Contains the logic that allow the gen_data for loops to work.
   include/abc_test/gen_data/gen_data_base.h
   include/abc_test/gen_data/gen_data_with_repetition_type.h
+  include/abc_test/gen_data/gen_data_with_repetition_type_and_element.h
   include/abc_test/gen_data/manual_for_loop.h
   include/abc_test/gen_data/file.h
   include/abc_test/gen_data/collection.h

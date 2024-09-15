@@ -8,7 +8,7 @@
 #include "abc_test/utility/io/file/file_reader.h"
 #include "abc_test/utility/io/file/file_writer.h"
 #include "abc_test/utility/io/file/file_name.h"
-#include "abc_test/gen_data/gen_data_with_repetition_type.h"
+#include "abc_test/gen_data/gen_data_with_repetition_type_and_element.h"
 #include "abc_test/gen_data/random/base.h"
 #include "abc_test/gen_data/random_data_description.h"
 #include "abc_test/utility/str/rw_info.h"
@@ -22,7 +22,7 @@ using rep_data_t = std::pair<std::size_t, std::size_t>;
 template<
 	typename T
 >
-struct random_data_t : public gen_data_with_repetition_type_t<T, rep_data_t>
+struct random_data_t : public gen_data_with_repetition_type_and_element_t<T, rep_data_t>
 {
 public:
 	/*!
@@ -31,8 +31,10 @@ public:
 	*/
 	__constexpr
 		random_data_t(
-			random_generator_t<T>* _a_rnd_base = new random_generator_t<T>(),
-			const utility::io::opt_file_rw_info_t<T>& _a_templated_file_rw = utility::io::opt_file_rw_info_t<T>{}
+			random_generator_t<T>* _a_random_generator,
+			const utility::io::opt_file_rw_info_t<T>& _a_templated_file_rw = utility::io::opt_file_rw_info_t<T>(),
+			const utility::io::opt_file_name_t& _a_enumerate_opt_data_file_name = utility::io::opt_file_name_t(),
+			const test_options_t* _a_test_options = global::get_global_test_options_ptr()
 		) noexcept;
 	/*
 	* Checks if there is a current element.
@@ -42,14 +44,6 @@ public:
 		bool
 		subclass_has_current_element(
 		) const noexcept;
-	/*!
-	* Returns the current element.
-	*/
-	__constexpr
-		virtual
-		const T&
-		subclass_current_element(
-		) const noexcept override;
 	/*!
 	* Generates the next element in the series.
 	*/
@@ -95,7 +89,6 @@ public:
 private:
 	random_generator_t<T>* _m_random_generator;
 	size_t _m_elemnets_to_randomly_generate;
-	T _m_element;
 	//! The number of times the generator has been called before the current element was created
 	std::size_t _m_random_gen_calls_before;
 	//! The number of times the generator has been called after the element was created.
@@ -177,16 +170,6 @@ template<
 	typename T
 >
 __constexpr_imp
-	const T&
-	random_data_t<T>::subclass_current_element(
-	) const noexcept
-{
-	return _m_element;
-}
-template<
-	typename T
->
-__constexpr_imp
 	bool
 	random_data_t<T>::subclass_generate_next(
 	)
@@ -236,7 +219,7 @@ __constexpr_imp
 				rng& _m_rndgen{ this->_m_test_runner->current_test().get_random_generator() };
 				_m_rndgen.progress(_l_calls_before);
 				_m_random_gen_calls_before = _l_calls_before;
-				_m_element = _m_random_generator->operator()(_m_rndgen);
+				this->_m_element = _m_random_generator->operator()(_m_rndgen);
 				_m_random_gen_calls_after = _l_calls_after;
 			}
 		}
@@ -269,10 +252,12 @@ template<
 __constexpr_imp
 	random_data_t<T>::random_data_t(
 		random_generator_t<T>* _a_random_generator,
-		const utility::io::opt_file_rw_info_t<T>& _a_templated_file_rw
+		const utility::io::opt_file_rw_info_t<T>& _a_templated_file_rw,
+		const utility::io::opt_file_name_t& _a_enumerate_opt_data_file_name,
+		const test_options_t* _a_test_options
 	) noexcept
-	: gen_data_with_repetition_type_t<T, rep_data_t>(0, _a_templated_file_rw, {},
-		{})
+	: gen_data_with_repetition_type_and_element_t<T, rep_data_t>(0, _a_templated_file_rw, {},
+		_a_test_options->_m_random_data_file_type, {}, T{})
 	//: gen_data_base_t<T>(0,
 	//	_a_templated_file_rw,std::vector<T>())
 	//, _m_random_generator(_a_random_generator)
@@ -281,6 +266,16 @@ __constexpr_imp
 	//, _m_element(T{})
 	//, _m_random_gen_calls_before(0)
 	//, _m_random_gen_calls_after(0)
+	/*
+				const size_t _a_elements_generated,
+			const utility::io::opt_file_rw_info_t<T>& _a_core_data_rw_info,
+			R&& _a_elements,
+			const std::string_view _a_rep_data_file_extension,
+			const utility::io::opt_file_rw_info_t<Rep_Data>& _a_rep_data_rw_info,
+			const T& _a_element,
+			const test_options_t* _a_test_options = global::get_global_test_options_ptr()
+		) noexcept;
+	*/
 {
 	generate_data();
 }
@@ -301,7 +296,7 @@ __constexpr_imp
 	{
 		utility::rng& _m_rndgen{ this->_m_test_runner->current_test().get_random_generator() };
 		_m_random_gen_calls_before = _m_rndgen.calls();
-		_m_element = _m_random_generator->operator()(_m_rndgen);
+		this->_m_element = _m_random_generator->operator()(_m_rndgen);
 		_m_random_gen_calls_after = _m_rndgen.calls();
 		return true;
 	}

@@ -26,7 +26,7 @@ public:
 			const std::string_view _a_rep_data_file_extension,
 			const utility::io::opt_file_rw_info_t<Rep_Data>& _a_rep_data_rw_info,
 			const test_options_t* _a_test_options = global::get_global_test_options_ptr()
-		) noexcept;
+		);
 	__constexpr
 		gen_data_with_repetition_type_t(
 			const size_t _a_elements_generated,
@@ -81,11 +81,6 @@ public:
 		bool
 		subclass_generate_next(
 		) = 0;
-	//__constexpr
-	//	virtual
-	//	std::string
-	//	get_repetition_data_as_string(
-	//	) const noexcept final;
 	__constexpr
 		virtual
 		Rep_Data
@@ -114,7 +109,22 @@ public:
 		virtual
 		void
 		subclass_reset_data(
-		) noexcept = 0;
+		) noexcept  = 0;
+	__constexpr
+		std::string
+		virtual
+		get_rep_string(
+		)const override final;
+	__constexpr
+		std::size_t
+		virtual 
+		determine_mode(
+		)const noexcept override final;
+	__constexpr
+		virtual
+		void
+		finish_setup(
+		) noexcept final;
 private:
 	//! Contains the core data reader/writer.
 	utility::io::opt_file_rw_t<T,0> _m_core_data_rw_file;
@@ -330,7 +340,7 @@ __constexpr_imp
 		const std::string_view _a_rep_data_file_extension,
 		const utility::io::opt_file_rw_info_t<Rep_Data>& _a_rep_data_rw_info,
 		const test_options_t* _a_test_options
-	) noexcept
+	) 
 	: gen_data_base_t<T>()
 	, _m_core_data_rw_file(utility::io::opt_file_rw_t<T, 0>(_a_core_data_rw_info, 
 		_a_test_options->_m_general_data_extension, std::forward<R>(_a_elements)))
@@ -339,7 +349,18 @@ __constexpr_imp
 	, _m_rep_data_rw_info(utility::str::rw_info_t<Rep_Data>())
 	, _m_has_current_element_been_written_to_file(false)
 {
-
+	/*if (_m_core_data_rw_file.has_current_element())
+	{
+		this->_m_repetition_data.set_mode(0);
+	}
+	else if (_m_rep_data_rw_file.has_current_element())
+	{
+		this->_m_repetition_data.set_mode(1);
+	}
+	else
+	{
+		this->_m_repetition_data.set_mode(2);
+	}*/
 }
 template<
 	typename T,
@@ -398,6 +419,7 @@ __constexpr_imp
 	gen_data_with_repetition_type_t<T, Rep_Data>::has_current_element(
 	) const noexcept
 {
+	auto _l_rp{ this->_m_repetition_data };
 	if (_m_core_data_rw_file.has_current_element(this->mode()))
 	{
 		return true;
@@ -449,26 +471,12 @@ __constexpr_imp
 		const size_t _l_mode{ _l_result.value() };
 		_m_has_current_element_been_written_to_file = false;
 		this->_m_repetition_data.set_mode(_l_mode);
-		switch (_l_mode)
+		this->_m_repetition_data.set_string(get_rep_string());
+		if (_l_mode == 1)
 		{
-		case 0:
-			this->_m_repetition_data.set_string(
-				_m_line_reader_writer.printer().run_printer(_m_core_data_rw_file.elements_read()));
-			break;
-		case 1:
 			subclass_set_data_using_mode_and_repetition_data(this->mode(),
 				_m_rep_data_rw_file.current_element());
-			this->_m_repetition_data.set_string(
-				_m_line_reader_writer.printer().run_printer(_m_rep_data_rw_file.elements_read()));
-			break;
-		case 2:
-			this->_m_repetition_data.set_string(
-				_m_rep_data_rw_info.printer().run_printer(subclass_get_repetition_data()));
-			break;
-		default:
-			throw errors::test_library_exception_t("Could not find data mode");
 		}
-		
 	}
 	return _l_result.has_value();
 }
@@ -510,24 +518,24 @@ __constexpr_imp
 {
 
 	return [this]()
+	{
+		using namespace std;
+		using namespace ds;
+		if (optional<repetition_data_t> _l_res{ _m_core_data_rw_file.log_failure_and_return_rep_data(
+			_m_has_current_element_been_written_to_file, this->_m_repetition_data) }; _l_res.has_value())
 		{
-			using namespace std;
-			using namespace ds;
-			if (optional<repetition_data_t> _l_res{ _m_core_data_rw_file.log_failure_and_return_rep_data(
-				_m_has_current_element_been_written_to_file, this->_m_repetition_data) }; _l_res.has_value())
-			{
-				return _l_res.value();
-			}
-			else if (optional<repetition_data_t> _l_res{ _m_rep_data_rw_file.log_failure_and_return_rep_data(
-				_m_has_current_element_been_written_to_file, this->_m_repetition_data) }; _l_res.has_value())
-			{
-				return _l_res.value();
-			}
-			else
-			{
-				return this->_m_repetition_data;
-			}
-		};
+			return _l_res.value();
+		}
+		else if (optional<repetition_data_t> _l_res{ _m_rep_data_rw_file.log_failure_and_return_rep_data(
+			_m_has_current_element_been_written_to_file, this->_m_repetition_data) }; _l_res.has_value())
+		{
+			return _l_res.value();
+		}
+		else
+		{
+			return this->_m_repetition_data;
+		}
+	};
 }
 template<
 	typename T,
@@ -570,11 +578,82 @@ __constexpr_imp
 	//Basicallys ame logic, but one level down. Does the rep data currently have an element.
 	else if (_m_rep_data_rw_file.has_current_element(this->mode()))
 	{
+		subclass_reset_data();
 		return _m_rep_data_rw_file.generate_next(this->mode()) ? std::size_t{ 1 } : initialise_subclass_level();
 	}
 	else
 	{
 		return subclass_generate_next() ? std::size_t{ 2 } : generate_next_return_type_t{};
+	}
+}
+
+template<
+	typename T,
+	typename Rep_Data
+>
+__constexpr_imp
+	std::string
+	gen_data_with_repetition_type_t<T, Rep_Data>::get_rep_string(
+	) const
+{
+	using namespace errors;
+	switch (this->mode())
+	{
+	case 0:
+		return _m_line_reader_writer.printer().run_printer(_m_core_data_rw_file.elements_read());
+	case 1:
+		return _m_line_reader_writer.printer().run_printer(_m_rep_data_rw_file.elements_read());
+	case 2:
+		return _m_rep_data_rw_info.printer().run_printer(subclass_get_repetition_data());
+		break;
+	default:
+		throw test_library_exception_t(fmt::format(
+			"Invalid mode {0}. Must be between 0 and 2 (inclusive)", this->mode()));
+//		throw errors::test_library_exception_t("Could not find data mode");
+	}
+}
+template<
+	typename T,
+	typename Rep_Data
+>
+__constexpr_imp
+	std::size_t
+	gen_data_with_repetition_type_t<T, Rep_Data>::determine_mode(
+	)const noexcept
+{
+	if (_m_core_data_rw_file.has_current_element(this->mode()))
+	{
+		return 0;
+	}
+	else if (_m_rep_data_rw_file.has_current_element(this->mode()))
+	{
+	//	if (_l_mode == 1)
+		{
+
+		}
+		return 1;
+	}
+	else
+	{
+		return 2;
+	}
+}
+template<
+	typename T,
+	typename Rep_Data
+>
+__constexpr_imp
+	void
+	gen_data_with_repetition_type_t<T, Rep_Data>::finish_setup(
+	)noexcept
+{
+	gen_data_base_t<T>::finish_setup();
+	if (this->mode() == 1)
+	{
+		subclass_set_data_using_mode_and_repetition_data(this->mode(),
+			_m_rep_data_rw_file.current_element());
+		//	subclass_set_data_using_mode_and_repetition_data(this->mode(),
+		//		_m_rep_data_rw_file.current_element());
 	}
 }
 _END_ABC_NS

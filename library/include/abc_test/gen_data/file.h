@@ -11,7 +11,7 @@
 #include <scn/ranges.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
-#include "abc_test/gen_data/static_data.h"
+#include "abc_test/gen_data/gen_data_with_repetition_type_and_element.h"
 
 #include "abc_test/utility/io/file/file_reader.h"
 #include "abc_test/utility/io/file/file_writer.h"
@@ -26,7 +26,7 @@ using file_type_rep_data_t = char;
 	template<
 		typename T
 	>
-	struct file_data_t : public gen_data_with_repetition_type_t<T, file_type_rep_data_t>
+	struct file_data_t : public gen_data_with_repetition_type_and_element_t<T, file_type_rep_data_t>
 	{
 	public:
 		/*!
@@ -65,14 +65,6 @@ using file_type_rep_data_t = char;
 			subclass_has_current_element(
 			) const noexcept;
 		/*!
-		* Returns the current object. In this case, it will always return a default constructed T object.
-		*/
-		__constexpr
-			virtual
-			const T&
-			subclass_current_element(
-			) const noexcept;
-		/*!
 		* Generates the next element. Will alwyas return false.
 		*/
 		__constexpr
@@ -100,30 +92,17 @@ using file_type_rep_data_t = char;
 		{
 			return file_type_rep_data_t();
 		}
-		T _m_elemmotn;
 	};
-	template<
-		typename T
-	>
-	__constexpr
-		gen_data_ptr_t<T>
-		file_data(
-			const utility::io::file_name_t _a_filename
-		);
 	template<
 		typename T,
 		typename R
 	>
 	__constexpr
-		gen_data_ptr_t<T>
+		gen_data_collection_t<T>
 		file_data(
-			const utility::io::file_name_t _a_filename,
+			const utility::io::file_name_t& _a_filename,
 			R&& _a_init_elements
 		);
-	__constexpr
-		const std::string_view
-		file_data_extension(
-		) noexcept;
 	_END_ABC_NS
 
 		_BEGIN_ABC_NS
@@ -138,10 +117,10 @@ using file_type_rep_data_t = char;
 			const utility::io::file_rw_info_t<T>& _a_templated_file_rw,
 			R&& _a_initial_values
 		)
-		: gen_data_with_repetition_type_t<T, file_type_rep_data_t>(0, _a_templated_file_rw, _a_initial_values)
-	//	: gen_data_base_t<T>(0, std::optional<utility::io::file_rw_info_t<T>>(_a_templated_file_rw), 
-	//		file_data_extension(),
-	//		_a_initial_values)
+		: gen_data_with_repetition_type_and_element_t<T, file_type_rep_data_t>(0, _a_templated_file_rw,
+			std::forward<R>(_a_initial_values), "", 
+			utility::io::opt_file_rw_info_t<file_type_rep_data_t>{}, T{},
+			global::get_global_test_options_ptr())
 	{
 	}
 	template<
@@ -153,17 +132,6 @@ using file_type_rep_data_t = char;
 		) const noexcept 
 	{
 		return false;
-	}
-	template<
-		typename T
-	>
-	__constexpr_imp
-		const T&
-		file_data_t<T>::subclass_current_element(
-		) const noexcept
-	{
-		return _m_elemmotn;
-	//	return this->_m_associated_file.value().current_element();
 	}
 	template<
 		typename T
@@ -196,39 +164,20 @@ using file_type_rep_data_t = char;
 	{
 		return false;
 	}
-	template<
-		typename T
-	>
-	__constexpr_imp
-		gen_data_ptr_t<T>
-		file_data(
-			const utility::io::file_name_t _a_filename
-		)
-	{
-		using namespace std;
-		return gen_data_ptr_t<T>(new file_data_t<T>(_a_filename));
-	}
 
 	template<
 		typename T,
 		typename R
 	>
 	__constexpr_imp
-		gen_data_ptr_t<T>
+		gen_data_collection_t<T>
 		file_data(
-			const utility::io::file_name_t _a_filename,
-			R&& _a_init_elements
+			const utility::io::file_name_t& _a_filename,
+			R&& _a_init_elements = R{}
 		)
 	{
 		using namespace std;
-		return gen_data_ptr_t<T>(new file_data_t<T>(
+		return unary_collection(new file_data_t<T>(
 			utility::io::file_rw_info_t<T>(_a_filename), forward<R>(_a_init_elements)));
-	}
-	__constexpr_imp
-		const std::string_view
-		file_data_extension(
-		) noexcept
-	{
-		return global::get_global_test_options()._m_random_data_file_type;
 	}
 	_END_ABC_NS

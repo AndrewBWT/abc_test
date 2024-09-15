@@ -311,6 +311,7 @@ _BEGIN_ABC_NS
 		) noexcept
 	{
 		using namespace std;
+		_a_pointer->finish_setup();
 		return gen_data_collection_t<T>(gen_data_ptr_t<T>(_a_pointer));
 	}
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "abc_test/gen_data/enumerable.h"
-#include "abc_test/gen_data/gen_data_with_repetition_type.h"
+#include "abc_test/gen_data/gen_data_with_repetition_type_and_element.h"
 #include "abc_test/gen_data/collection.h"
 
 _BEGIN_ABC_NS
@@ -93,7 +93,7 @@ using enumerate_data_id_type_t = std::size_t;
 template<
 	typename T
 >
-class enumerate_data_t : public gen_data_with_repetition_type_t<T,enumerate_data_id_type_t>
+class enumerate_data_t : public gen_data_with_repetition_type_and_element_t<T,enumerate_data_id_type_t>
 {
 public:
 	__constexpr
@@ -117,14 +117,14 @@ public:
 		) const noexcept;
 	__constexpr_imp
 		void
+		virtual
 		subclass_set_data_using_mode_and_repetition_data(
 			const std::size_t _a_idx,
 			const enumerate_data_id_type_t _a_data
-		)
+		) override final
 	{
 		auto _l_data{ _a_data };
-		_m_has_current_element = _m_enumerable.move_forward(_m_current_element, _l_data);
-	//	_m_enumerable.move_forward(_a_data);
+		_m_has_current_element = _m_enumerable.move_forward(this->_m_element, _l_data);
 	}
 	__constexpr
 		enumerate_data_id_type_t
@@ -145,12 +145,9 @@ public:
 		subclass_reset_data(
 		) noexcept final
 	{
-
+		_m_has_current_element = true;
+		this->_m_element = _m_enumerable.min();
 	}
-	__constexpr
-		const T&
-		subclass_current_element(
-		) const noexcept override;
 	__constexpr
 		bool
 		subclass_generate_next(
@@ -158,7 +155,6 @@ public:
 private:
 	enumerate_t<T> _m_enumerable;
 	bool _m_has_current_element;
-	T _m_current_element;
 };
 template<
 	typename T
@@ -438,10 +434,10 @@ __constexpr_imp
 		const utility::io::opt_file_name_t& _a_enumerate_opt_data_file_name,
 		const test_options_t* _a_test_options
 	) noexcept
-	: gen_data_with_repetition_type_t<T, enumerate_data_id_type_t>(0, _a_templated_file_rw,
-		{},_a_test_options->_m_enumerate_data_file_type, _a_enumerate_opt_data_file_name, _a_test_options)
+	: gen_data_with_repetition_type_and_element_t<T, enumerate_data_id_type_t>(0, 
+		_a_templated_file_rw, {},_a_test_options->_m_enumerate_data_file_type, 
+		_a_enumerate_opt_data_file_name, _a_enumerate.min(), _a_test_options)
 	, _m_enumerable(_a_enumerate)
-	, _m_current_element(_a_enumerate.min())
 	, _m_has_current_element(true)
 {
 
@@ -477,27 +473,6 @@ __constexpr_imp
 {
 	return true;
 }
-/*template<
-	typename T
->
-__constexpr_imp
-	void
-	enumerate_data_t<T>::increment_using_additional_data_(
-		const std::size_t _a_idx,
-		const std::string_view _a_additional_data
-	)
-{
-}*/
-template<
-	typename T
->
-__constexpr_imp
-	const T&
-	enumerate_data_t<T>::subclass_current_element(
-	) const noexcept
-{
-	return _m_current_element;
-}
 template<
 	typename T
 >
@@ -510,7 +485,7 @@ __constexpr_imp
 	{
 		this->_m_elements_generated++;
 		enumerate_index_t _l_adx{ 1 };
-		_m_has_current_element = _m_enumerable.next_element(_m_current_element, _l_adx);
+		_m_has_current_element = _m_enumerable.next_element(this->_m_element, _l_adx);
 	}
 	return _m_has_current_element;
 }

@@ -91,7 +91,7 @@ _TEST_CASE("Enumerating an enum for fun!", "examples::enumeration")
 	using namespace examples;
 //	using namespace abc::utility::io;
 	using enum X2;
-	fmt::print("Enumerating from F to max. "
+	/*fmt::print("Enumerating from F to max. "
 		"Note enumerate_data and from_val_to_max don't require type arguments. "
 		"from_val_to_max's can be inferred from the argument, and enumerate_data's "
 		"can be inferred from the return type of from_val_to_max. Results: [");
@@ -112,7 +112,7 @@ _TEST_CASE("Enumerating an enum for fun!", "examples::enumeration")
 	{
 		fmt::print("{} ", _l_enum);
 	}
-	fmt::println("]");
+	fmt::println("]");*/
 	std::string _l_output;
 	_l_output += fmt::format("Enumerating a range of X2 values. Note that the range is going backwards "
 		"Any tests which fail are written to the file \"fail_data\". Results = [");

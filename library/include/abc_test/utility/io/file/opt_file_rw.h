@@ -82,7 +82,7 @@ __constexpr_imp
 {
 	return (
 		_m_file_rw.has_value() &&
-		Mode == _a_mode &&
+		//Mode == _a_mode &&
 		_m_file_rw.value().has_current_element()
 		);
 }
