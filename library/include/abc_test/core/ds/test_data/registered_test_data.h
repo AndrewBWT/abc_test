@@ -12,6 +12,8 @@
 
 #include "fmt/format.h"
 
+#include "abc_test/core/ds/test_collections/test_list.h"
+
 /*! Inner macro which declares a test, registers a test, and then provides that test's
 * definition.
 @param Description The test description
@@ -26,6 +28,9 @@ static void Function_Name()
 
 #define _TEST_CASE(Description, Path) _TEST_CASE_1(Description,Path,NAMED_COUNTER(Test_Case),1)
 #define _TEST_CASE_THREADED(Description, Path, Threads) _TEST_CASE_1(Description,Path,NAMED_COUNTER(Test_Case),Threads)
+
+#define _NAMED_TEST_CASE(Name, Description, Path) _TEST_CASE_1(Description, Path, Name, 1)
+#define _NAMED_TEST_CASE_THREADED(Name, Description, Path, Threads) _TEST_CASE_1(Description, Path, Name, Threads)
 
 _BEGIN_ABC_DS_NS
 	using test_function_t = void (*)();
@@ -91,7 +96,15 @@ _BEGIN_ABC_DS_NS
 		*/
 		size_t _m_thread_resourses_required;
 	};
-	_END_ABC_DS_NS
+	__constexpr_imp
+		void
+		register_test(
+			const registered_test_data_t& _a_rtd
+		) noexcept
+	{
+		
+	}
+_END_ABC_DS_NS
 
 /*!
 * formatter for registered_test_data_t
@@ -133,7 +146,7 @@ _BEGIN_ABC_DS_NS
 		, _m_test_function(_a_test_function)
 		, _m_thread_resourses_required(_a_thread_resourses_required)
 	{
-
+		abc::ds::add_test(*this);
 	}
 	__constexpr_imp
 		bool

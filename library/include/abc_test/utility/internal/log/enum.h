@@ -12,7 +12,8 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 		PARSING_SEED,
 		TEST_INFO,
 		REPETITION_INFO,
-		MAIN_INFO
+		MAIN_INFO,
+		THREAD_MAPPING
 	};
 	/*!
 	* Converts the given enum to a string representation.
@@ -44,6 +45,8 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 			return "REPETITION_INFO";
 		case MAIN_INFO:
 			return "MAIN_INFO";
+		case THREAD_MAPPING:
+			return "THREAD_MAPPING";
 		default:
 			return "UNKNOWN";
 		}

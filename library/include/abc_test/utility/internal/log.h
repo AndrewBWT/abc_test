@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "abc_test/utility/internal/log/params.h"
+#include <map>
 
 
 #ifndef __LOGGING_ON
@@ -60,6 +61,11 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 			) noexcept;
 	private:
 		internal_log_params_t _m_internal_logger_params;
+		std::map<std::size_t, std::size_t> _m_thread_map;
+		__constexpr
+			std::size_t
+			get_thread_id(
+			) noexcept;
 	};
 	/*!
 	* The global function used to log data. This calls the global internal_log_t object.
@@ -120,12 +126,37 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 		using namespace std;
 		if (_m_internal_logger_params.is_set(_a_internal_logger_enum))
 		{
-			threaded_ostream_output_reporter_t::write("ILOG| " +
-				to_string(hash<thread::id>{}(this_thread::get_id())) +
-				" | " +
-				to_str(_a_internal_logger_enum) + " |: " +
+			threaded_ostream_output_reporter_t::write("LOG: " +
+				to_string(get_thread_id()) + 
+			//	to_string(hash<thread::id>{}(this_thread::get_id())) +
+				" : " +
+				to_str(_a_internal_logger_enum) + " - " +
 				string(_a_str));
 		}
+	}
+	__constexpr_imp
+		std::size_t
+		internal_log_t::get_thread_id(
+		) noexcept
+	{
+		using namespace std;
+		using enum internal_log_enum_t;
+		const size_t _l_hashed_thread_id{ hash<thread::id>{}(this_thread::get_id()) };
+		if (not _m_thread_map.contains(_l_hashed_thread_id))
+		{
+			const size_t _l_new_thread_id{ _m_thread_map.size() };
+			threaded_ostream_output_reporter_t::write("LOG: " +
+				to_string(_l_new_thread_id) +
+				//	to_string(hash<thread::id>{}(this_thread::get_id())) +
+				" : " +
+				to_str(THREAD_MAPPING) + " - " +
+				fmt::format("Mapping new thread ID (hash = {0}) to {1}",
+					to_string(hash<thread::id>{}(this_thread::get_id())),
+					_l_new_thread_id
+					));
+			_m_thread_map.insert({ _l_hashed_thread_id,_l_new_thread_id });
+		}
+		return _m_thread_map.at(_l_hashed_thread_id);
 	}
 	__constexpr_imp
 		void
@@ -157,4 +188,5 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 			return _s_il;
 		}
 	}
+
 	_END_ABC_UTILITY_INTERNAL_NS

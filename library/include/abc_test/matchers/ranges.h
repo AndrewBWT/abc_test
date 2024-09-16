@@ -1,0 +1,59 @@
+#pragma once
+
+#include "abc_test/matchers/matcher.h"
+#include <ranges>
+#include "abc_test/matchers/function_wrapper.h"
+
+_BEGIN_ABC_NS
+
+template<
+	typename T,
+	typename R
+>
+requires std::same_as<std::ranges::range_value_t<R>,T>
+__constexpr
+	matcher_t
+	contains(
+		R&& _a_range,
+		const T& _a_value
+	) noexcept;
+_END_ABC_NS
+
+_BEGIN_ABC_NS
+
+template<
+	typename T,
+	typename R
+>
+requires std::same_as<std::ranges::range_value_t<R>, T>
+__constexpr
+	matcher_t
+	contains(
+		R&& _a_range,
+		const T& _a_value
+	) noexcept
+{
+	using namespace std;
+	return matcher_t(matcher_internal_ptr_t(new function_wrapper_matcher_t(
+		[&]() 
+		{
+			if ((std::ranges::find(_a_range, _a_value) != _a_range.end()))
+			{
+				return matcher_result_t{};
+			}
+			else
+			{
+				return matcher_result_t{ fmt::format(
+					"{0} does not contain {1}",
+					_a_range,
+					_a_value) };
+			}
+			/*return (std::ranges::find(_a_range, _a_value) == _a_range.end()) ?
+				matcher_result_t{} :
+				matcher_result_t{ fmt::format(
+					"{0} does not contain {1}",
+					_a_range,
+					_a_value)};*/
+		})));
+}
+_END_ABC_NS

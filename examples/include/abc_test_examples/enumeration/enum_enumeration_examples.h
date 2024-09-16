@@ -27,10 +27,17 @@ namespace abc
 	}
 }
 /*
+* This commented code is what would have to be used if we were to use an inline
+* namespace with our library. For now, we are going to stick to what we have been using,
+* allowing us to write code as above. 
+* 
+* It is unknown if this is an error with Visual Studio, whether this is intended as part of the
+* standard, or if we are missing an easy fix to this issue.
+* 
 template<
 >
 __constexpr_imp
-abc::gd::enum_list_t<examples::X2> abc::gd::get_enum_list() noexcept
+abc::enum_list_t<examples::X2> abc::gd::get_enum_list() noexcept
 {
 	using enum examples::X2;
 	return { A,B,C,D,F,G,I,J };
@@ -91,7 +98,7 @@ _TEST_CASE("Enumerating an enum for fun!", "examples::enumeration")
 	using namespace examples;
 //	using namespace abc::utility::io;
 	using enum X2;
-	/*fmt::print("Enumerating from F to max. "
+	fmt::print("Enumerating from F to max. "
 		"Note enumerate_data and from_val_to_max don't require type arguments. "
 		"from_val_to_max's can be inferred from the argument, and enumerate_data's "
 		"can be inferred from the return type of from_val_to_max. Results: [");
@@ -112,14 +119,21 @@ _TEST_CASE("Enumerating an enum for fun!", "examples::enumeration")
 	{
 		fmt::print("{} ", _l_enum);
 	}
-	fmt::println("]");*/
+	fmt::println("]");
 	std::string _l_output;
 	_l_output += fmt::format("Enumerating a range of X2 values. Note that the range is going backwards "
-		"Any tests which fail are written to the file \"fail_data\". Results = [");
+		"Any tests which fail are written to the file \"fail_data\". "
+		"Currently in \"fail_data\" we have the integer 3, which corresponds to running the third element first. "
+		" This means the output should begin with C, then the range from G to A. "
+		"Results = [");
 	for (auto& _l_enum : enumerate_data_using_file_type_2(from_m_to_n(G,A),"fail_data"))
 	{
 		_l_output += fmt::format("{} ", _l_enum);
 		_CHECK(EXPR(_l_enum == G));
+		if (not _CHECK(EXPR(_l_enum == G)))
+		{
+			_CHECK(EXPR(_l_enum == F));
+		}
 	}
 	_l_output += fmt::format("]");
 	std::cout << _l_output << std::endl;

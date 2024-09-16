@@ -16,8 +16,6 @@ std::source_location::current(),abc::global::get_this_threads_test_runner_ref(),
 #define _FAIL_AND_TERMINATE(string_to_print) abc::create_blank_assertion(abc::utility::str::create_string({"_FAIL_AND_TERMINATE(\"",string_to_print, "\")"}), \
 std::source_location::current(),abc::global::get_this_threads_test_runner_ref(),true)
 
-
-
 _BEGIN_ABC_NS
 /*!
 * Function which runs the actual assertions.
@@ -29,7 +27,7 @@ _BEGIN_ABC_NS
 	
 */
 	__constexpr
-		void
+		bool
 		create_assertion(
 			generic_matcher_t& _a_matcher,
 			const std::string_view _a_str_representation_of_line,
@@ -38,7 +36,7 @@ _BEGIN_ABC_NS
 			const bool _a_terminate_function_on_failure
 		);
 	__constexpr
-		void
+		bool
 		create_assertion(
 			generic_matcher_t&& _a_matcher,
 			const std::string_view _a_str_representation_of_line,
@@ -47,7 +45,7 @@ _BEGIN_ABC_NS
 			const bool _a_terminate_function_on_failure
 		);
 	__constexpr
-		void
+		bool
 		create_blank_assertion(
 			const std::string_view _a_str_representation_of_line,
 			const std::source_location& _a_source_location,
@@ -60,7 +58,7 @@ _BEGIN_ABC_NS
 			typename T
 		>
 		__constexpr
-			void
+			bool
 			create_assertion_internal(
 				T _a_matcher,
 				const std::string_view _a_str_representation_of_line,
@@ -73,7 +71,7 @@ _END_ABC_NS
 
 _BEGIN_ABC_NS
 	__constexpr_imp
-		void
+		bool
 		create_assertion(
 			generic_matcher_t& _a_matcher,
 			const std::string_view _a_str_representation_of_line,
@@ -82,12 +80,12 @@ _BEGIN_ABC_NS
 			const bool _a_terminate_function_on_failure
 		)
 	{
-		create_assertion_internal<generic_matcher_t&>(_a_matcher,
+		return create_assertion_internal<generic_matcher_t&>(_a_matcher,
 			_a_str_representation_of_line, _a_source_location,_a_test_runner,
 			_a_terminate_function_on_failure);
 	}
 	__constexpr_imp
-		void
+		bool
 		create_assertion(
 			generic_matcher_t&& _a_matcher,
 			const std::string_view _a_str_representation_of_line,
@@ -96,12 +94,12 @@ _BEGIN_ABC_NS
 			const bool _a_terminate_function_on_failure
 		)
 	{
-		create_assertion_internal<generic_matcher_t&&>(std::move(_a_matcher),
+		return create_assertion_internal<generic_matcher_t&&>(std::move(_a_matcher),
 			_a_str_representation_of_line, _a_source_location,_a_test_runner,
 			_a_terminate_function_on_failure);
 	}
 	__constexpr_imp
-		void
+		bool
 		create_blank_assertion(
 			const std::string_view _a_str_representation_of_line,
 			const std::source_location& _a_source_location,
@@ -115,6 +113,7 @@ _BEGIN_ABC_NS
 			_a_str_representation_of_line,
 			_a_source_location,
 			_a_test_runner.get_log_infos(false), _a_early_termination));
+		return false;
 	}
 	namespace
 	{
@@ -122,7 +121,7 @@ _BEGIN_ABC_NS
 			typename T
 		>
 		__constexpr_imp
-			void
+			bool
 			create_assertion_internal(
 				T _a_matcher,
 				const std::string_view _a_str_representation_of_line,
@@ -149,6 +148,7 @@ _BEGIN_ABC_NS
 					throw test_assertion_exception_t();
 				}
 			}
+			return _a_matcher.passed();
 		}
 	}
 _END_ABC_NS

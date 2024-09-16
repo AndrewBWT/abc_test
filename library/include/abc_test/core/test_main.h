@@ -57,8 +57,8 @@ _BEGIN_ABC_NS
 		*/
 		__constexpr
 			void
-			add_test_list(
-				const std::shared_ptr< const ds::test_list_t>& _a_test_list
+			add_test_list_owned_by_class(
+				const ds::test_list_t* _a_test_list
 			) noexcept;
 		/*!
 		* Adds a test list using a regular pointer. test_main_t does not take ownership of the pointer,
@@ -66,7 +66,7 @@ _BEGIN_ABC_NS
 		*/
 		__constexpr
 			void
-			add_test_list(
+			add_test_list_not_owned_by_class(
 				const ds::test_list_t * _a_test_list
 			) noexcept;
 		/*!
@@ -76,7 +76,7 @@ _BEGIN_ABC_NS
 		*/
 		__constexpr
 			void
-			add_test_list(
+			add_test_list_not_owned_by_class(
 				const ds::test_list_t& _a_test_list
 			) noexcept;
 		/*!
@@ -84,8 +84,8 @@ _BEGIN_ABC_NS
 		*/
 		__constexpr
 			void
-			add_test_reporter(
-				const std::shared_ptr < reporters::test_reporter_t > & _a_test_reporter
+			add_test_reporter_owned_by_class(
+				reporters::test_reporter_t* _a_test_reporter
 			) noexcept;
 		/*!
 		* Adds a test_reporter_t using a regular pointer. test_main_t does not take ownership of the pointer,
@@ -93,7 +93,7 @@ _BEGIN_ABC_NS
 		*/
 		__constexpr
 			void
-			add_test_reporter(
+			add_test_reporter_not_owned_by_class(
 				reporters::test_reporter_t* _a_test_reporter
 			) noexcept;
 		/*!
@@ -103,7 +103,7 @@ _BEGIN_ABC_NS
 		*/
 		__constexpr
 			void
-			add_test_reporter(
+			add_test_reporter_not_owned_by_class(
 				reporters::test_reporter_t& _a_test_reporter
 			) noexcept;
 		/*!
@@ -111,8 +111,8 @@ _BEGIN_ABC_NS
 		*/
 		__constexpr
 			void
-			add_error_reporter(
-				const std::shared_ptr<reporters::error_reporter_t>& _a_error_reporter
+			add_error_reporter_owned_by_class(
+				reporters::error_reporter_t* _a_error_reporter
 			) noexcept;
 		/*!
 		* Adds a error_reporter_t using a regular pointer. test_main_t does not take ownership of the pointer,
@@ -120,7 +120,7 @@ _BEGIN_ABC_NS
 		*/
 		__constexpr
 			void
-			add_error_reporter(
+			add_error_reporter_not_owned_by_class(
 				reporters::error_reporter_t* _a_error_reporter
 			) noexcept;
 		/*!
@@ -130,7 +130,7 @@ _BEGIN_ABC_NS
 		*/
 		__constexpr
 			void
-			add_error_reporter(
+			add_error_reporter_not_owned_by_class(
 				reporters::error_reporter_t& _a_error_reporter
 			) noexcept;
 		/*!
@@ -204,19 +204,21 @@ _BEGIN_ABC_NS
 		test_main_t::add_global_test_list(
 		) noexcept
 	{
-		add_test_list(ds::get_global_test_list());
+		add_test_list_not_owned_by_class(ds::get_global_test_list());
 	}
 	__constexpr_imp
 		void
-		test_main_t::add_test_list(
-			const std::shared_ptr< const ds::test_list_t>& _a_test_list
+		test_main_t::add_test_list_owned_by_class(
+			const ds::test_list_t* _a_test_list
 		) noexcept
 	{
-		_m_test_list_collection.push_back(_a_test_list);
+		using namespace std;
+		using namespace ds;
+		_m_test_list_collection.push_back(shared_ptr<const test_list_t>(_a_test_list));
 	}
 	__constexpr_imp
 		void
-		test_main_t::add_test_list(
+		test_main_t::add_test_list_not_owned_by_class(
 			const ds::test_list_t * _a_test_list
 		) noexcept
 	{
@@ -224,23 +226,25 @@ _BEGIN_ABC_NS
 	}
 	__constexpr_imp
 		void
-		test_main_t::add_test_list(
+		test_main_t::add_test_list_not_owned_by_class(
 			const ds::test_list_t& _a_test_list
 		) noexcept
 	{
-		add_test_list(&_a_test_list);
+		add_test_list_not_owned_by_class(&_a_test_list);
 	}
 	__constexpr_imp
 		void
-		test_main_t::add_test_reporter(
-			const std::shared_ptr<reporters::test_reporter_t>& _a_test_reporter
+		test_main_t::add_test_reporter_owned_by_class(
+			reporters::test_reporter_t* _a_test_reporter
 		) noexcept
 	{
-		_m_test_reporters.push_back(_a_test_reporter);
+		using namespace std;
+		using namespace reporters;
+		_m_test_reporters.push_back(shared_ptr<test_reporter_t>(_a_test_reporter));
 	}
 	__constexpr_imp
 		void
-		test_main_t::add_test_reporter(
+		test_main_t::add_test_reporter_not_owned_by_class(
 			reporters::test_reporter_t* _a_test_reporter
 		) noexcept
 	{
@@ -248,23 +252,25 @@ _BEGIN_ABC_NS
 	}
 	__constexpr_imp
 		void
-		test_main_t::add_test_reporter(
+		test_main_t::add_test_reporter_not_owned_by_class(
 			reporters::test_reporter_t& _a_test_reporter
 		) noexcept
 	{
-		add_test_reporter(&_a_test_reporter);
+		add_test_reporter_not_owned_by_class(&_a_test_reporter);
 	}
 	__constexpr_imp
 		void
-		test_main_t::add_error_reporter(
-			const std::shared_ptr<reporters::error_reporter_t>& _a_error_reporter
+		test_main_t::add_error_reporter_owned_by_class(
+			reporters::error_reporter_t* _a_error_reporter
 		) noexcept
 	{
-		_m_error_reporters.push_back(_a_error_reporter);
+		using namespace std;
+		using namespace reporters;
+		_m_error_reporters.push_back(shared_ptr<error_reporter_t>(_a_error_reporter));
 	}
 	__constexpr_imp
 		void
-		test_main_t::add_error_reporter(
+		test_main_t::add_error_reporter_not_owned_by_class(
 			reporters::error_reporter_t* _a_error_reporter
 		) noexcept
 	{
@@ -272,11 +278,11 @@ _BEGIN_ABC_NS
 	}
 	__constexpr_imp
 		void
-		test_main_t::add_error_reporter(
+		test_main_t::add_error_reporter_not_owned_by_class(
 			reporters::error_reporter_t& _a_error_reporter
 		) noexcept
 	{
-		add_error_reporter(&_a_error_reporter);
+		add_error_reporter_not_owned_by_class(&_a_error_reporter);
 	}
 	__constexpr_imp
 		void
@@ -418,6 +424,7 @@ _BEGIN_ABC_NS
 			reporters::error_reporter_controller_t& _l_erc{ global::get_global_error_reporter_controller() };
 			_l_erc.report_error(setup_error_t(_l_the.error(), true, _l_the.stacktrace()));
 		}
+		_LIBRARY_LOG(MAIN_INFO, "Test finished.");
 		unique_lock _l_thread_lock(_m_threads_mutex);
 		_LIBRARY_LOG(MAIN_INFO, "Freeing thread resourses.");
 		_m_threads_free.insert(_a_thread_idx);

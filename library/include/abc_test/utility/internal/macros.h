@@ -52,7 +52,7 @@ return false;\
 
 #define INTERNAL_NAMED_COUNTER_2(Name, Counter) Name##Counter
 #define INTERNAL_NAMED_COUNTER(Name, Counter) INTERNAL_NAMED_COUNTER_2(Name, Counter)
-#define NAMED_COUNTER(Name) INTERNAL_NAMED_COUNTER(Name, __LINE__ )
+#define NAMED_COUNTER(Name) INTERNAL_NAMED_COUNTER(Name, __COUNTER__ )
 
 /*!
 * Macros for namespace
