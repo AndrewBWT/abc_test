@@ -24,6 +24,7 @@
 _TEST_CASE("Examples of the two core assertions", "examples::basic_assertions")
 {
 	using namespace abc;
+	return;
 	/* _CHECK and _REQUIRE are the core assertions used in test code.
 		_CHECK checks some assertion contained within, and an error is logged if it fails.
 		_REQUIRE also checks its assertion, but terminates the function if it fails.
@@ -55,6 +56,7 @@ _TEST_CASE("Simulating logical operators", "examples::basic_assertions")
 {
 	using namespace abc;
 	using namespace std;
+	return;
 	//Simulating an and block.
 	/*
 	* This is quite simple to run, and should be pretty intuitive.

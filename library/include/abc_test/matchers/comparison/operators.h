@@ -1,6 +1,5 @@
 #pragma once
 #include "abc_test/matchers/comparison/constructors.h"
-#include "abc_test/matchers/comparison/wrapper.h"
 #include "abc_test/matchers/comparison/placeholder.h"
 
 _BEGIN_ABC_NS

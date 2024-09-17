@@ -98,6 +98,7 @@ _TEST_CASE("Enumerating an enum for fun!", "examples::enumeration")
 	using namespace examples;
 //	using namespace abc::utility::io;
 	using enum X2;
+	_CHECK(EXPR(1 == 2) && EXPR(2 == 3));
 	fmt::print("Enumerating from F to max. "
 		"Note enumerate_data and from_val_to_max don't require type arguments. "
 		"from_val_to_max's can be inferred from the argument, and enumerate_data's "
@@ -130,7 +131,7 @@ _TEST_CASE("Enumerating an enum for fun!", "examples::enumeration")
 	{
 		_l_output += fmt::format("{} ", _l_enum);
 		_CHECK(EXPR(_l_enum == G));
-		if (not _CHECK(EXPR(_l_enum == G)))
+		//if (not _CHECK(EXPR(_l_enum == G)))
 		{
 			_CHECK(EXPR(_l_enum == F));
 		}

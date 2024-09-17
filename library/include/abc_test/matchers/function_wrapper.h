@@ -1,6 +1,5 @@
 #pragma once
 
-#include "abc_test/matchers/matcher.h"
 #include <functional>
 
 _BEGIN_ABC_NS
@@ -15,14 +14,14 @@ public:
 		function_wrapper_matcher_t(
 			function_wrapper_internal_t _a_function
 		) noexcept;
-private:
-	function_wrapper_internal_t _m_function;
 	__constexpr
 		virtual
 		matcher_result_t
 		run(
 			test_runner_ref_t
 		) override;
+private:
+	function_wrapper_internal_t _m_function;
 };
 _END_ABC_NS
 

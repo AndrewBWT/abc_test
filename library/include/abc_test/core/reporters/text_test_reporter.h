@@ -97,7 +97,7 @@ _BEGIN_ABC_REPORTERS_NS
 		const char* _c_strs_identifiers[_c_strs_identifiers_size] = { "Function","Location","Seed used" };
 		const char* _c_test_failure_str{ "TEST_FAILURE" };
 		const char* _c_alt_seed_str{ "To repeat test, use seed" };
-		const char* _c_normalised_line_str_prefix_1{ "ab::test::cmp::placeholder(" };
+		const char* _c_normalised_line_str_prefix_1{ "(abc::placeholder_t(" };
 		const char* _c_normalised_line_str_prefix_2{ ") < " };
 		const char _c_quote_char{ '"' };
 		const char* _c_lbracket{ "(" };
@@ -429,36 +429,43 @@ _BEGIN_ABC_REPORTERS_NS
 			//Put the string view into a string
 			string _l_rv{ _a_str };
 			//Find the position of the first prefix
-			size_t _l_pos{ _l_rv.find(_c_normalised_line_str_prefix_1) };
-			//If the prefix exists, we have to remove it...
-			if (_l_pos != std::string::npos)
+			while (true)
 			{
-				//Erase the first part of the prefix.
-				_l_rv.erase(_l_pos, std::strlen(_c_normalised_line_str_prefix_1));
-				//If the next part is a ")", there is no string to replace it with
-				if (_l_rv[_l_pos] == _c_normalised_line_str_prefix_2[0])
+				size_t _l_pos{ _l_rv.find(_c_normalised_line_str_prefix_1) };
+				//If the prefix exists, we have to remove it...
+				if (_l_pos != std::string::npos)
 				{
-					//Remove the second prefix.
-					const size_t _l_pos_second{ _l_rv.find(_c_normalised_line_str_prefix_2) };
-					_l_rv.erase(_l_pos_second, std::strlen(_c_normalised_line_str_prefix_2));
+					//Erase the first part of the prefix.
+					_l_rv.erase(_l_pos, std::strlen(_c_normalised_line_str_prefix_1));
+					//If the next part is a ")", there is no string to replace it with
+					if (_l_rv[_l_pos] == _c_normalised_line_str_prefix_2[0])
+					{
+						//Remove the second prefix.
+						const size_t _l_pos_second{ _l_rv.find(_c_normalised_line_str_prefix_2) };
+						_l_rv.erase(_l_pos_second, std::strlen(_c_normalised_line_str_prefix_2));
+					}
+					//Else there is a string to replace it with
+					else if (_l_rv[_l_pos] == _c_quote_char)
+					{
+						//Find the position of the first quote
+						const size_t _l_quotation_pos_one{ _l_rv.find(_c_quote_char,_l_pos) };
+						//Remove it.
+						_l_rv.erase(_l_quotation_pos_one, 1);
+						//Find the second quote, remove it
+						const size_t _l_quotation_pos_two{ _l_rv.find(_c_quote_char,_l_quotation_pos_one) };
+						_l_rv.erase(_l_quotation_pos_two, 1);
+						//Insert brackets after the string contained in the quotes
+						_l_rv.insert(_l_quotation_pos_two, _c_lbracket);
+						//Finally erase the second prefix.
+						const size_t _l_pos_second{ _l_rv.find(_c_normalised_line_str_prefix_2) };
+						_l_rv.erase(_l_pos_second, std::strlen(_c_normalised_line_str_prefix_2));
+						//Insert a bracket
+					//	_l_rv.insert(_l_rv.size(), _c_rbracket);
+					}
 				}
-				//Else there is a string to replace it with
-				else if (_l_rv[_l_pos] == _c_quote_char)
+				else
 				{
-					//Find the position of the first quote
-					const size_t _l_quotation_pos_one{ _l_rv.find(_c_quote_char,_l_pos) };
-					//Remove it.
-					_l_rv.erase(_l_quotation_pos_one, 1);
-					//Find the second quote, remove it
-					const size_t _l_quotation_pos_two{ _l_rv.find(_c_quote_char,_l_quotation_pos_one) };
-					_l_rv.erase(_l_quotation_pos_two, 1);
-					//Insert brackets after the string contained in the quotes
-					_l_rv.insert(_l_quotation_pos_two, _c_lbracket);
-					//Finally erase the second prefix.
-					const size_t _l_pos_second{ _l_rv.find(_c_normalised_line_str_prefix_2) };
-					_l_rv.erase(_l_pos_second, std::strlen(_c_normalised_line_str_prefix_2));
-					//Insert a bracket
-					_l_rv.insert(_l_rv.size(), _c_rbracket);
+					break;
 				}
 			}
 			return _l_rv;

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "abc_test/matchers/matcher.h"
 #include <ranges>
 #include "abc_test/matchers/function_wrapper.h"
 
@@ -37,23 +36,14 @@ __constexpr
 	return matcher_t(matcher_internal_ptr_t(new function_wrapper_matcher_t(
 		[&]() 
 		{
-			if ((std::ranges::find(_a_range, _a_value) != _a_range.end()))
-			{
-				return matcher_result_t{};
-			}
-			else
-			{
-				return matcher_result_t{ fmt::format(
+			return matcher_result_t(
+				true,
+				(std::ranges::find(_a_range, _a_value) != _a_range.end()),
+				fmt::format(
 					"{0} does not contain {1}",
 					_a_range,
-					_a_value) };
-			}
-			/*return (std::ranges::find(_a_range, _a_value) == _a_range.end()) ?
-				matcher_result_t{} :
-				matcher_result_t{ fmt::format(
-					"{0} does not contain {1}",
-					_a_range,
-					_a_value)};*/
+					_a_value)
+			);
 		})));
 }
 _END_ABC_NS

@@ -28,7 +28,6 @@ _BEGIN_ABC_NS
 			precedence_t
 			get_precedence(
 			) const noexcept;
-	private:
 		__constexpr
 			virtual
 			matcher_result_t
@@ -81,12 +80,13 @@ _BEGIN_ABC_NS
 		) noexcept
 	{
 		using namespace std;
-		return cmp<T1, T2, Cmp>(forward<T1>(_m_l), forward<T2>(_m_r)) ?
-			matcher_result_t{} :
-			matcher_result_t{ fmt::format(
+		return matcher_result_t(true,
+			cmp<T1, T2, Cmp>(forward<T1>(_m_l), forward<T2>(_m_r)),
+			fmt::format(
 				"{0} {1} {2}",
 				_m_l,
 				str<Cmp>(),
-				_m_r) };
+				_m_r)
+		);
 	}
 _END_ABC_NS

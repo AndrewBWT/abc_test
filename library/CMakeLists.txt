@@ -56,12 +56,14 @@ set(LIBRARY_FILES
   include/abc_test/matchers/generic_matcher.h
   include/abc_test/matchers/operator_based_matcher.h
   include/abc_test/matchers/comparison.h
+  include/abc_test/matchers/matcher_result.h
   include/abc_test/matchers/comparison/comparison_matcher.h
   include/abc_test/matchers/comparison/comparison_enum.h
   include/abc_test/matchers/comparison/constructors.h
   include/abc_test/matchers/comparison/operators.h
   include/abc_test/matchers/comparison/placeholder.h
   include/abc_test/matchers/comparison/wrapper.h
+  include/abc_test/matchers/logic/logic_matcher.h
   include/abc_test/matchers/ranges.h
   include/abc_test/matchers/function_wrapper.h
   # gen_data subfolder. Contains the logic that allow the gen_data for loops to work.

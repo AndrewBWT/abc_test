@@ -633,11 +633,8 @@ TEST_CASE("Basic test script", "abc")
 	_l_to._m_threads = 1;
 	_l_test_main.set_options(_l_to);
 	reporters::text_test_reporter_t _l_i;
-	_l_test_main.add_test_reporter(
-		//Owned
-		std::shared_ptr<text_test_reporter_t>(new text_test_reporter_t())
-	);
-	_l_test_main.add_test_list(&_l_tl);
+	_l_test_main.add_test_reporter_owned_by_class(new text_test_reporter_t());
+	_l_test_main.add_global_test_list();
 	_l_test_main.run_tests();
 }
 
