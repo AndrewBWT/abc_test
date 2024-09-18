@@ -73,12 +73,6 @@ _BEGIN_ABC_REPORTERS_NS
 			normalise_line_str_rep(
 				const std::string_view _a_str
 			) noexcept;
-
-		__no_constexpr
-			std::string
-			location_string(
-				const std::source_location& _a_sl
-			) noexcept;
 		__constexpr
 			std::string
 			create_padded_space(
@@ -159,6 +153,7 @@ _BEGIN_ABC_REPORTERS_NS
 		using namespace std;
 		using namespace ds;
 		using namespace errors;
+		using namespace utility::str;
 		//Return value
 		string _l_rv;
 		//Gather references to requried things
@@ -295,6 +290,7 @@ _BEGIN_ABC_REPORTERS_NS
 	{
 		using namespace std;
 		using namespace errors;
+		using namespace utility::str;
 		using enum test_failure_info_enum_t;
 		const fmt::text_style& _l_slight_highlight_ts{ _a_options._m_slight_highlight_style };
 		const fmt::text_style& _l_highlighted_info{ _a_options._m_highlighted_info_style };
@@ -357,6 +353,36 @@ _BEGIN_ABC_REPORTERS_NS
 				_c_exception_strs[1]
 			)
 		};
+		//We may need some additional lines containing information pertaining to other 
+		//parts of lines which we retain information for
+		const matcher_source_map_t& _l_msm{ _a_error_info.source_map() };
+		string _l_additional_sc_info{};
+		if (_l_msm.size() > 0)
+		{
+			_l_additional_sc_info = fmt::format(
+				"{0}{1}\n",
+				_a_line_prefix, "Expression on multiple lines. Additional relevant expressions:"
+			);
+			for (const pair<string, vector<string>>& _l_sc_info : _l_msm.map())
+			{
+				_l_additional_sc_info.append(fmt::format(
+					"{0}{1}{2}\n",
+					_a_line_prefix, _l_location_identifier,
+					style_string(_l_sc_info.first, _l_highlighted_info)
+				));
+				for (const string& _l_str : _l_sc_info.second)
+				{
+					_l_additional_sc_info.append(fmt::format(
+						"{0}{0}{1}\n",
+						_a_line_prefix, 
+						style_string(_l_str, _l_slight_highlight_ts)
+					));
+				}
+			}
+			//"Additional parts of assertion:"
+			//   Location: ... h.
+			//     No source representation. Consider using the _MATCHER macro to log this.
+		}
 		//Fourth line contains either matcher info, exception's what() info, or no info
 		const string _l_error_info_line_three{
 			 (_a_error_info.test_failure_info_enum() == TEST_FAILURE) ?
@@ -381,10 +407,12 @@ _BEGIN_ABC_REPORTERS_NS
 			"{0}\n"
 			"{1}\n"
 			"{2}\n"
-			"{3}",
+			"{3}"
+			"{4}",
 			_l_error_info_line_zero,
 			_l_error_info_line_one,
 			_l_error_info_line_two,
+			_l_additional_sc_info,
 			_l_error_info_line_three
 		));
 		//Logging info line
@@ -469,20 +497,6 @@ _BEGIN_ABC_REPORTERS_NS
 				}
 			}
 			return _l_rv;
-		}
-		__no_constexpr_imp
-			std::string
-			location_string(
-				const std::source_location& _a_sl
-			) noexcept
-		{
-			using namespace std;
-			//A formalised way of showing a location
-			return string{ fmt::format(
-				"{0}:{1}",
-				_a_sl.file_name(),
-				_a_sl.line()
-			) };
 		}
 		//Pad a string based on a maximum size and the string which will be used currently
 		__constexpr_imp

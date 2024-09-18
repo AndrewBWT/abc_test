@@ -7,18 +7,20 @@
 
 //Macros
 
-#define _INTERNAL_ASSERT(test_to_run, throw_exception, expected_result, macro_name) abc::create_assertion(test_to_run, abc::utility::str::create_string({macro_name, "(", #test_to_run, ")"}), \
-std::source_location::current(),global::get_this_threads_test_runner_ref(), throw_exception, expected_result)
-#define _CHECK(test_to_run) _INTERNAL_ASSERT(test_to_run, false, true, "_CHECK")
-#define _REQUIRE(test_to_run) _INTERNAL_ASSERT(test_to_run, true, true, "_REQUIRE")
+#define _INTERNAL_ASSERT(test_to_run, throw_exception, macro_name) abc::create_assertion(test_to_run, abc::utility::str::create_string({macro_name, "(", #test_to_run, ")"}), \
+std::source_location::current(),abc::global::get_this_threads_test_runner_ref(), throw_exception)
+#define _CHECK(test_to_run) _INTERNAL_ASSERT(test_to_run, false, "_CHECK")
+#define _REQUIRE(test_to_run) _INTERNAL_ASSERT(test_to_run, true, "_REQUIRE")
 #define _FAIL(string_to_print) abc::create_blank_assertion(abc::utility::str::create_string({"FAIL(\"",string_to_print, "\")"}), \
 std::source_location::current(),abc::global::get_this_threads_test_runner_ref(),false)
 #define _FAIL_AND_TERMINATE(string_to_print) abc::create_blank_assertion(abc::utility::str::create_string({"_FAIL_AND_TERMINATE(\"",string_to_print, "\")"}), \
 std::source_location::current(),abc::global::get_this_threads_test_runner_ref(),true)
 
+#define _MATCHER(Code) abc::matcher_t(Code, #Code)
+
 //! Not macros
-#define _CHECK_NOT(test_to_run) _INTERNAL_ASSERT(test_to_run, false, false, "_CHECK_NOT")
-#define _REQUIRE_NOT(test_to_run) _INTERNAL_ASSERT(test_to_run, true, false, "_REQUIRE_NOT")
+//#define _CHECK_NOT(test_to_run) _INTERNAL_ASSERT(test_to_run, false, "_CHECK_NOT")
+//#define _REQUIRE_NOT(test_to_run) _INTERNAL_ASSERT(test_to_run, true, "_REQUIRE_NOT")
 
 #define _MAKE_FUNC(Code) std::function<void()>_l_tut{[]() { Code;};};
 
@@ -39,8 +41,7 @@ __constexpr
 		const std::string_view _a_str_representation_of_line,
 		const std::source_location& _a_source_location,
 		test_runner_t& _a_test_runner,
-		const bool _a_terminate_function_on_failure,
-		const bool _a_expected_result_of_test
+		const bool _a_terminate_function_on_failure
 	);
 __constexpr
 	bool
@@ -49,8 +50,7 @@ __constexpr
 		const std::string_view _a_str_representation_of_line,
 		const std::source_location& _a_source_location,
 		test_runner_t& _a_test_runner,
-		const bool _a_terminate_function_on_failure,
-		const bool _a_expected_result_of_test
+		const bool _a_terminate_function_on_failure
 	);
 __constexpr
 	bool
@@ -72,8 +72,7 @@ namespace
 			const std::string_view _a_str_representation_of_line,
 			const std::source_location& _a_source_location,
 			test_runner_t& _a_test_runner,
-			const bool _a_terminate_function_on_failure,
-			const bool _a_expected_result_of_test
+			const bool _a_terminate_function_on_failure
 		);
 }
 _END_ABC_NS
@@ -86,13 +85,12 @@ __constexpr_imp
 		const std::string_view _a_str_representation_of_line,
 		const std::source_location& _a_source_location,
 		test_runner_t& _a_test_runner,
-		const bool _a_terminate_function_on_failure,
-		const bool _a_expected_result_of_test
+		const bool _a_terminate_function_on_failure
 	)
 {
 	return create_assertion_internal<generic_matcher_t&>(_a_matcher,
 		_a_str_representation_of_line, _a_source_location,_a_test_runner,
-		_a_terminate_function_on_failure, _a_expected_result_of_test
+		_a_terminate_function_on_failure
 	);
 }
 __constexpr_imp
@@ -102,13 +100,12 @@ __constexpr_imp
 		const std::string_view _a_str_representation_of_line,
 		const std::source_location& _a_source_location,
 		test_runner_t& _a_test_runner,
-		const bool _a_terminate_function_on_failure,
-		const bool _a_expected_result_of_test
+		const bool _a_terminate_function_on_failure
 	)
 {
 	return create_assertion_internal<generic_matcher_t&&>(std::move(_a_matcher),
 		_a_str_representation_of_line, _a_source_location,_a_test_runner,
-		_a_terminate_function_on_failure, _a_expected_result_of_test);
+		_a_terminate_function_on_failure);
 }
 __constexpr_imp
 	bool
@@ -139,30 +136,32 @@ namespace
 			const std::string_view _a_str_representation_of_line,
 			const std::source_location& _a_source_location,
 			test_runner_t& _a_test_runner,
-			const bool _a_terminate_function_on_failure,
-			const bool _a_expected_result_of_test
+			const bool _a_terminate_function_on_failure
 		)
 	{
 		using namespace std;
 		using namespace errors;
-		_a_matcher.run_test(_a_test_runner);
+		const matcher_result_t& _l_mr{ _a_matcher.run_test(_a_test_runner) };
 		_a_test_runner.register_tests_most_recent_source(_a_source_location);
-		const bool _l_test_passed{ _a_matcher.passed() != _a_expected_result_of_test };
-		if (_l_test_passed)
+		if (not _l_mr.passed())
 		{
-			string _l_fail_msg{ _a_matcher.get_failure_msg() };
 			_a_test_runner.add_error(test_failure_info_t(
 				_a_str_representation_of_line,
 				_a_source_location,
-				_l_fail_msg,
+				&_a_matcher,
+				_l_mr.str(),
 				_a_test_runner.get_log_infos(false), _a_terminate_function_on_failure)
 			);
 			if (_a_terminate_function_on_failure)
 			{
 				throw test_assertion_exception_t();
 			}
+			return false;
 		}
-		return _l_test_passed;
+		else
+		{
+			return true;
+		}
 	}
 }
 _END_ABC_NS

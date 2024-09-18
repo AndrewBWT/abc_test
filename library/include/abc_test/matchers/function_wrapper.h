@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include "abc_test/matchers/generic_matcher.h"
 
 _BEGIN_ABC_NS
 using function_wrapper_internal_t = std::function<matcher_result_t()>;
@@ -14,14 +15,14 @@ public:
 		function_wrapper_matcher_t(
 			function_wrapper_internal_t _a_function
 		) noexcept;
+private:
+	function_wrapper_internal_t _m_function;
 	__constexpr
 		virtual
 		matcher_result_t
 		run(
-			test_runner_ref_t
-		) override;
-private:
-	function_wrapper_internal_t _m_function;
+			test_runner_t&
+		) override final;
 };
 _END_ABC_NS
 
@@ -37,7 +38,7 @@ __constexpr_imp
 __constexpr_imp
 	matcher_result_t
 	function_wrapper_matcher_t::run(
-		test_runner_ref_t
+		test_runner_t&
 )
 {
 	return _m_function();

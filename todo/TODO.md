@@ -10,7 +10,6 @@
 
 **These issues should be addressed before the repository is open publicly**
 
-- Ensure that the code is re-buildable using the CMake file.
 - Make tutorials and examples. While this may seem like low-hanging fruit, we have found these very useful in directing the design of the library. Much of this code is confusing and commented out in places. We should build an examples folder, which we can also use to test the output, to ensure it is correct.
 - Make a simple README.md which tells the reader what this library is for.
 
@@ -46,3 +45,8 @@
 - Consider readding back inline namespace containing the version. We removed this because instantiating specialised templates/structs for some of the derived gen_data classes, when using this keyword, wouldn't allow us to create them in named namespaces; we had to define them in a format similar to how fmt does it (see commented out example in examples/include/abc_test_examples/enumeration/enum_enumeration_examples.h. This may be something only done in visual studio, or may be part of the standard. We should investigate further to find the reasoning. Then decide whether including the versioned namespace is worth the trade off, or if there are any workarounds.
 - In abc_test/gen_data/enumeration/specializations/fundamental_types.h, there are several specializations which cannot have separate definitions and implementations (as in, we cannot separate them without an error being encountered). We believe this to be an error with Visual Studio, however we will need to investigate further.
 - We need to decide on the nomenclature for gen_data classes supported by file IO - at the moment the functions corresponding to these just use different numbers, however if we had a name for the different types of file IO, it would allow us to name the functions more appropriately. 
+- See if we are able to get source location information in constructors for matcher_t. Currently it defaults to the copy constructor, which means we cannot use a default parameter to insert the source location.
+- Try adding factory methods for matcher_t, as we need to manually set the matchers.
+- Consider a new hierarchy; matcher_t for exposed variable. matcher_holder_t for elements constructed from generic_matcher pointers. We would need to overload matcher_t or/and/not statements with matcher_holder_t and vice versa. This would remove our issue above, regarding not having the source code location for specific. 
+- Ensure that data is checked when a matcher source list is being processed. Currently it is possible we will report the end-assertion twice, if we use a _MATCHER in it.
+- Error seen on print out for _CHECK_EXPR and _REQUIRE_EXPR. Need to check.

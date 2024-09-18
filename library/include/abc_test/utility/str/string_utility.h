@@ -22,6 +22,11 @@ __constexpr
 		const std::string_view _a_str,
 		const std::string_view delimiter
 	) noexcept;
+__no_constexpr
+	std::string
+	location_string(
+		const std::source_location& _a_sl
+	) noexcept;
 _END_ABC_UTILITY_STR_NS
 
 _BEGIN_ABC_UTILITY_STR_NS
@@ -62,5 +67,19 @@ __constexpr_imp
 	}
 	res.push_back(string(_a_str.substr(pos_start)));
 	return res;
+}
+__no_constexpr_imp
+	std::string
+	location_string(
+		const std::source_location& _a_sl
+	) noexcept
+{
+	using namespace std;
+	//A formalised way of showing a location
+	return string{ fmt::format(
+		"{0}:{1}",
+		_a_sl.file_name(),
+		_a_sl.line()
+	) };
 }
 _END_ABC_UTILITY_STR_NS

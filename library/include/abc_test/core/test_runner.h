@@ -121,7 +121,7 @@ struct log_test_msg_t;
 		std::source_location _m_tests_most_recent_source;
 	};
 
-	using test_runner_ref_t = test_runner_t&;
+//	using test_runner_ref_t = test_runner_t&;
 _END_ABC_NS
 
 _BEGIN_ABC_NS

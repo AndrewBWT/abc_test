@@ -5,18 +5,18 @@
 #include "abc_test/utility/internal/log.h"
 
 _BEGIN_ABC_NS
-	__no_constexpr_or_inline_imp
-		void
-		test_runner_t::run_test(
-			const ds::post_setup_test_data_t& _a_post_setup_test_data
-		)
-	{
-		using namespace std;
-		using namespace errors;
-		using namespace utility;
-		using namespace ds;
-		using enum utility::internal::internal_log_enum_t;
-		_LIBRARY_LOG(TEST_INFO, fmt::format(
+__no_constexpr_or_inline_imp
+	void
+	test_runner_t::run_test(
+		const ds::post_setup_test_data_t& _a_post_setup_test_data
+	)
+{
+	using namespace std;
+	using namespace errors;
+	using namespace utility;
+	using namespace ds;
+	using enum utility::internal::internal_log_enum_t;
+	_LIBRARY_LOG(TEST_INFO, fmt::format(
 			"About to run the following test: {0}",
 			_a_post_setup_test_data
 		));

@@ -23,6 +23,10 @@ public:
 		const std::string_view
 		str(
 		) const noexcept;
+	__constexpr
+		bool
+		ran(
+		) const noexcept;
 private:
 	bool _m_ran;
 	bool _m_passed;
@@ -64,5 +68,12 @@ __constexpr_imp
 	) const noexcept
 {
 	return _m_str;
+}
+__constexpr_imp
+	bool
+	matcher_result_t::ran(
+	) const noexcept
+{
+	return _m_ran;
 }
 _END_ABC_NS

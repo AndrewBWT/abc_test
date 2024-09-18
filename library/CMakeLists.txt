@@ -64,7 +64,9 @@ set(LIBRARY_FILES
   include/abc_test/matchers/comparison/placeholder.h
   include/abc_test/matchers/comparison/wrapper.h
   include/abc_test/matchers/logic/logic_matcher.h
+  include/abc_test/matchers/logic/logic_enum.h
   include/abc_test/matchers/ranges.h
+  include/abc_test/matchers/source_map.h
   include/abc_test/matchers/function_wrapper.h
   # gen_data subfolder. Contains the logic that allow the gen_data for loops to work.
   include/abc_test/gen_data/gen_data_base.h

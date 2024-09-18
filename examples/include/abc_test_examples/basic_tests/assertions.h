@@ -66,13 +66,16 @@ _TEST_CASE("Simulating logical operators", "examples::basic_assertions")
 	// Simulating an OR block
 	vector<int> _l_vect(1000);
 	std::ranges::iota(_l_vect, 0);
-	bool _l_result;
+	bool _l_result{ false };
 	if (_l_result |= _CHECK(eq(1, 2)))
 	{
 		/*!
 		* This code is more computationally expensive to run, and should never be hit.
 		* 
 		* We use the function abc::matchers::contains from matchers/ranges to run this code.
+		* 
+		* See abc_test_examples/basic_tests/logical_operators.h for examples using the built-in
+		* machinery for using boolean logic with the the testing framework.
 		*/
 		_l_result |= _CHECK(abc::contains(_l_vect, 1000));
 	}
@@ -80,7 +83,6 @@ _TEST_CASE("Simulating logical operators", "examples::basic_assertions")
 	* Simulating a not statement.
 	*/
 	_CHECK(abc::contains(_l_vect, 1001));
-	//_MAKE_FUNC(_CHECK(abc::neq(1, 2)));
 }
 
 _TEST_CASE("Some less often used, but useful assertions", "examples::basic_assertions")
