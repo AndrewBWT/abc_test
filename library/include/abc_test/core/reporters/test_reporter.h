@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/core/errors/test_failures_info.h"
+#include "abc_test/core/reporters/after_execution_test_report.h"
 #include "abc_test/core/ds/test_data/invoked_test_data.h"
 
 _BEGIN_ABC_REPORTERS_NS
@@ -13,17 +13,25 @@ _BEGIN_ABC_REPORTERS_NS
 	struct test_reporter_t
 	{
 	public:
+		__constexpr
+			virtual
+			void
+			report_test(
+				const reporters::after_execution_test_report_t& _a_aetr,
+				const ds::repetition_tree_t& _a_test_repeittion_tree,
+				const test_options_t& _a_test_options
+			) noexcept = 0;
 		/*!
 		* Used to report individual tests
 		*/
-		__constexpr
+		/*__constexpr
 			virtual
 			void
 			report_test(
 				const ds::invoked_test_info_t& _a_iti,
 				const errors::test_failures_info_t& _a_error_info,
 				const test_options_t& _a_test_options
-			) noexcept = 0;
+			) noexcept = 0;*/
 		/*!
 		* Used to provide information when all tests have been run regarding information about the
 		* entire test run.

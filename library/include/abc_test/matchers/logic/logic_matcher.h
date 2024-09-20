@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "abc_test/matchers/logic/logic_enum.h"
+#include "abc_test/global.h"
 
 _BEGIN_ABC_NS
 template<
@@ -144,10 +145,17 @@ __constexpr_imp
 	using enum logic_enum_t;
 	if constexpr (Logic_Enum == NOT)
 	{
-		const matcher_result_t& _l_child_res{ _m_matcher_l->run_test(_a_test_runner)};
-		return matcher_result_t(true, not _l_child_res.passed(),
+		string _l_child_str{ "<false>" };
+		bool _l_child_passed{ false };
+		if (_m_matcher_l != nullptr)
+		{
+			const matcher_result_t& _l_child_res{ _m_matcher_l->run_test(_a_test_runner) };
+			_l_child_str = _l_child_res.str();
+			_l_child_passed = not _l_child_res.passed();
+		}
+		return matcher_result_t(true, _l_child_passed,
 			fmt::format("{0}{1}",
-				logic_str<Logic_Enum>(), make_str<Logic_Enum>(_m_matcher_l, _l_child_res.str())));
+				logic_str<Logic_Enum>(), make_str<Logic_Enum>(_m_matcher_l, _l_child_str)));
 	}
 	else if constexpr (Logic_Enum == OR)
 	{
@@ -173,7 +181,10 @@ void
 ) const noexcept
 {
 	generic_matcher_t::gather_map_source(_a_matcher_source_map);
-	_m_matcher_l->gather_map_source(_a_matcher_source_map);
+	if (_m_matcher_l != nullptr)
+	{
+		_m_matcher_l->gather_map_source(_a_matcher_source_map);
+	}
 	if (_m_matcher_r != nullptr)
 	{
 		_m_matcher_r->gather_map_source(_a_matcher_source_map);
@@ -192,30 +203,56 @@ __constexpr_imp
 	)
 {
 	using namespace std;
-	const matcher_result_t& _l_child_res_l{ _m_matcher_l->run_test(_a_test_runner)};
-	bool _l_passed{ true };
+	string _l_left_str{ "<false>" };
 	string _l_right_str{ "<unevaluated>" };
-	if (_l_child_res_l.passed() == Result_On_First_Mathcer_To_Move_Into_If)
+	bool _l_left_passed{ Result_On_First_Mathcer_To_Move_Into_If };
+	bool _l_right_passed{ false };
+	if (_m_matcher_l == nullptr)
 	{
-		if (_m_matcher_r.get() == nullptr)
+		matcher_source_map_t _l_msm{};
+		this->gather_map_source(_l_msm);
+		reporters::error_reporter_controller_t& _l_erc{ global::get_global_error_reporter_controller() };
+		_l_erc.report_information(fmt::format(
+			"logical_matcher_t expected left-child in binary expression, but has none. "
+			"Degrading expression to {0} {1} right-child. The following source locations and "
+			"source code representation's were associated with this error:{2}",
+			_l_left_passed,
+			logic_str<Logic_Enum>(), _l_msm.gather_list_of_sources_and_representations()));
+	}
+	else
+	{
+		const matcher_result_t& _l_child_res_l{ _m_matcher_l->run_test(_a_test_runner) };
+		_l_left_str = _l_child_res_l.str();
+		_l_left_passed = _l_child_res_l.passed();
+	}
+	if (_l_left_passed == Result_On_First_Mathcer_To_Move_Into_If)
+	{
+		if (_m_matcher_r == nullptr)
 		{
-			throw errors::test_library_exception_t(
-				fmt::format("right matcher in binary expression has no value, when one "
-					" is required.")
-			);
+			matcher_source_map_t _l_msm{};
+			this->gather_map_source(_l_msm);
+			reporters::error_reporter_controller_t& _l_erc{ global::get_global_error_reporter_controller() };
+			_l_erc.report_information(fmt::format(
+				"logical_matcher_t expected right-child in binary expression, but has none. "
+				"Degrading expression to left-child {0} {1}. The following source locations and "
+				"source code representation's were associated with this error:{2}",
+				logic_str<Logic_Enum>(), _l_right_passed, _l_msm.gather_list_of_sources_and_representations()));
+			_l_right_passed = false;
+			_l_right_str = "<false>";
 		}
 		else
 		{
 			_m_matcher_r->run_test(_a_test_runner);
 			const matcher_result_t& _l_child_res_r{ _m_matcher_r->run_test(_a_test_runner) };
-			_l_passed = _l_child_res_r.passed();
+			_l_right_passed = _l_child_res_r.passed();
 			_l_right_str = make_str<Logic_Enum>(_m_matcher_r, _l_child_res_r.str());
 		}
 	}
-	return matcher_result_t(true, _l_passed,
+	return matcher_result_t(true, 
+		compute_logic_result<Logic_Enum>(_l_left_passed, _l_right_passed),
 		fmt::format("{0} {1} {2}",
-			make_str<Logic_Enum>(_m_matcher_l, _l_child_res_l.str()),
-			logic_str<Logic_Enum>(), _l_right_str));
+			make_str<Logic_Enum>(_m_matcher_l, _l_left_str),
+			logic_str<Logic_Enum>(), make_str<Logic_Enum>(_m_matcher_r,_l_right_str)));
 }
 namespace
 {

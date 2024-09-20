@@ -7,7 +7,7 @@
 
 
 #ifndef __LOGGING_ON
-#define __LOGGING_ON 1
+#define __LOGGING_ON 0
 #endif
 
 #if __LOGGING_ON == 0

@@ -10,6 +10,10 @@
 #include <ranges>
 #include <numeric>
 
+#include "abc_test/matchers/comparison/constructors.h"
+
+#include "abc_test/matchers/comparison.h"
+
 namespace testing
 {
 	struct Test
@@ -43,23 +47,27 @@ struct fmt::formatter<testing::Test2> : formatter<string_view>
 	}
 };
 
-_TEST_CASE("Examples using the logical operators", "examples::basic_assertions")
+_TEST_CASE("Examples using the comparative operators.", "examples::basic_assertions")
 {
 	using namespace abc;
 	//This will pass.
 	_CHECK(EXPR(1 == 1));
 	//All of these will fail.
 	_CHECK(EXPR(1 == 2));
-
 	_CHECK(EXPR(1 > 2));
-
 	_CHECK(EXPR(2 < 1));
-
 	_CHECK(EXPR(1 >= 2));
-
 	_CHECK(EXPR(1 <= 2));
-
 	_CHECK(EXPR(1 != 1));
+	//We also include named constructors in matchers/comparison/constructros.h
+	_CHECK(abc::eq(1,1));
+	_CHECK(eq(1,2));
+	_CHECK(gt(1, 2));
+	_CHECK(lt(2, 1));
+	_CHECK(geq(1, 2));
+	_CHECK(leq(2, 1));
+	_CHECK(neq(1, 1));
+
 	//How it works.
 	/*!
 	* The EXPR(A CMP B) (where A and B are elements to compare, and CMP is the comparison operator)
@@ -124,4 +132,17 @@ _TEST_CASE("Examples using user-defined type", "examples::basic_assertions")
 	_CHECK_EXPR(_l_t3 != _l_t4);
 	_CHECK_EXPR(_l_t3 < _l_t4);
 	_CHECK_EXPR(_l_t3 > _l_t4);
+}
+
+_TEST_CASE("Examples using named constructors", "examples::basic_assertions")
+{
+	using namespace abc;
+	//We also include named constructors in matchers/comparison/constructros.h
+	_CHECK(abc::eq(1, 1));
+	_CHECK(eq(1, 2));
+	_CHECK(gt(1, 2));
+	_CHECK(lt(2, 1));
+	_CHECK(geq(1, 2));
+	_CHECK(leq(2, 1));
+	_CHECK(neq(1, 1));
 }

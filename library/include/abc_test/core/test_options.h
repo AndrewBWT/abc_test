@@ -89,6 +89,8 @@ public:
 	fmt::text_style _m_highlighted_info_style;
 	//! The (slight) style used when highlighting information in text output.
 	fmt::text_style _m_slight_highlight_style;
+	//! The style used when highlighting good information in the text output
+	fmt::text_style _m_pass_text_style;
 	//! How big of an indentation to use in text output
 	std::size_t _m_indent_size;
 	//! Whether to exist on recoverable errors when setting up tests. 
@@ -137,6 +139,7 @@ __constexpr_imp
 	, _m_console_line_length(120)
 	, _m_threads(0)
 	, _m_separator_chars{ '=' }
+	, _m_pass_text_style(fmt::fg(fmt::color::green))
 	, _m_failure_text_style(fmt::fg(fmt::color::red))
 	, _m_highlighted_info_style(fmt::fg(fmt::color::teal))
 	, _m_slight_highlight_style(fmt::fg(fmt::color::gray))

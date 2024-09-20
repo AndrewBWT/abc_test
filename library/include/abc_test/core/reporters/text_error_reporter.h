@@ -102,7 +102,7 @@ _BEGIN_ABC_REPORTERS_NS
 			const std::string_view _a_str
 		) noexcept
 	{
-		write(std::string(_a_str));
+		write("WARNING: " + std::string(_a_str));
 	}
 	__constexpr_imp
 		void

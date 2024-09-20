@@ -48,6 +48,10 @@ public:
 			test_runner_t& _a_test_runner
 		);
 	__constexpr
+		const matcher_result_t&
+		matcher_result(
+		) const noexcept;
+	__constexpr
 		virtual
 		void
 		gather_map_source(
@@ -136,6 +140,13 @@ __constexpr_imp
 	{
 		_m_test_result = run(_a_test_runner);
 	}
+	return _m_test_result;
+}
+__constexpr_imp
+	const matcher_result_t&
+	generic_matcher_t::matcher_result(
+	) const noexcept
+{
 	return _m_test_result;
 }
 __constexpr_imp

@@ -1,4 +1,4 @@
-# To-do List for abc-test
+# To-do List for abc-test #
 
 **This document should be revisited when some of the higher priority tasks have been completed**
 
@@ -10,7 +10,7 @@
 
 **These issues should be addressed before the repository is open publicly**
 
-- Make tutorials and examples. While this may seem like low-hanging fruit, we have found these very useful in directing the design of the library. Much of this code is confusing and commented out in places. We should build an examples folder, which we can also use to test the output, to ensure it is correct.
+- Finish off examples.
 - Make a simple README.md which tells the reader what this library is for.
 
 ## High Priority
@@ -30,7 +30,6 @@
 
 - Add functionality allowing global options object to be changed on a per-test basis.
 - Add functionality allowing gen_data_collection<T> objects to have their data filtered.
-- Revisit how data is stored in files. For random_data_t and enumerate_data_t it is not necessary to store the failed data using parsers and printers. We still want to allow the user to use this functionality if they want to, however we also want to be able to store data which won't require the user to make fmt/scn specialised structs. 
 - Investigate adding functionality for an "always on" file. This would automatically store the failed data from a test, and automatically re-run it when the program is ran again. 
 - Augment main CMakeLists.txt file so that the examples subproject is only built when specified - that is, include a new option to allow it to be built.
 
@@ -50,3 +49,4 @@
 - Consider a new hierarchy; matcher_t for exposed variable. matcher_holder_t for elements constructed from generic_matcher pointers. We would need to overload matcher_t or/and/not statements with matcher_holder_t and vice versa. This would remove our issue above, regarding not having the source code location for specific. 
 - Ensure that data is checked when a matcher source list is being processed. Currently it is possible we will report the end-assertion twice, if we use a _MATCHER in it.
 - Error seen on print out for _CHECK_EXPR and _REQUIRE_EXPR. Need to check.
+- Write excpetion macros.

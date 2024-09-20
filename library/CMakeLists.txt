@@ -51,6 +51,14 @@ set(LIBRARY_FILES
   include/abc_test/core/reporters/test_reporter.h
   include/abc_test/core/reporters/text_test_reporter.h
   include/abc_test/core/reporters/test_reporter_controller.h
+  include/abc_test/core/reporters/after_execution_test_report.h
+  include/abc_test/core/reporters/mid_execution_test_report.h
+  include/abc_test/core/reporters/mid_execution_test_report/test_assertion_result.h
+  include/abc_test/core/reporters/mid_execution_test_report/manual_failure.h
+  include/abc_test/core/reporters/mid_execution_test_report/unhandled_exception.h
+  include/abc_test/core/reporters/mid_execution_test_report/unhandled_exception_not_derived_from_std_exception.h
+  include/abc_test/core/reporters/mid_execution_test_warning.h
+  include/abc_test/core/reporters/mid_execution_test_warning/malformed_matcher_warning.h
   # Matcher subfolder. Code contains logic for writing individual assertions.
   include/abc_test/matchers/matcher.h
   include/abc_test/matchers/generic_matcher.h
@@ -67,6 +75,7 @@ set(LIBRARY_FILES
   include/abc_test/matchers/logic/logic_enum.h
   include/abc_test/matchers/ranges.h
   include/abc_test/matchers/source_map.h
+      src/abc_test/matchers/source_map.cpp
   include/abc_test/matchers/function_wrapper.h
   # gen_data subfolder. Contains the logic that allow the gen_data for loops to work.
   include/abc_test/gen_data/gen_data_base.h

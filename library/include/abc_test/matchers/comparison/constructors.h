@@ -205,8 +205,7 @@ namespace
 		) noexcept
 	{
 		using namespace std;
-		return matcher_t(matcher_internal_ptr_t(new comparison_matcher_t<T1, T2, Cmp_Enum>(forward<T1>(_a_left_arg.object()), forward<T2>(_a_right_arg))),
-			std::optional<std::source_location>());
+		return matcher_t(matcher_internal_ptr_t(new comparison_matcher_t<T1, T2, Cmp_Enum>(forward<T1>(_a_left_arg.object()), forward<T2>(_a_right_arg))));
 	}
 }
 _END_ABC_NS

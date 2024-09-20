@@ -1,6 +1,7 @@
 #pragma once
 
 #include "abc_test/core/reporters/test_reporter.h"
+#include "abc_test/core/reporters/after_execution_test_report.h"
 
 _BEGIN_ABC_REPORTERS_NS
 	/*!
@@ -29,12 +30,18 @@ _BEGIN_ABC_REPORTERS_NS
 		/*!
 		* Function which reports a single test to each reporter
 		*/
-		__no_constexpr
+		__constexpr
+			void
+			report_test(
+				const reporters::after_execution_test_report_t& _a_aetr,
+				const ds::repetition_tree_t& _a_test_repeittion_tree
+			) noexcept;
+		/*__no_constexpr
 			void
 			report_test(
 				const ds::invoked_test_info_t& _a_iti,
-				const errors::test_failures_info_t& _a_error_info
-			) noexcept;
+				const reporters::test_failures_info_t& _a_error_info
+			) noexcept;*/
 		/*!
 		* Adds a set of reporters to this object
 		*/
@@ -71,7 +78,21 @@ _BEGIN_ABC_REPORTERS_NS
 			_l_reporter_ptr->final_report();
 		}
 	}
-	__no_constexpr_imp
+	__constexpr_imp
+		void
+		test_reporter_controller_t::report_test(
+			const reporters::after_execution_test_report_t& _a_aetr,
+			const ds::repetition_tree_t& _a_test_repeittion_tree
+		) noexcept
+	{
+		std::unique_lock _l_report_test_unique_lokc(_m_reporters_mutex);
+		for (utility::shared_and_raw_ptr<test_reporter_t>& _l_reporter : _m_reporters)
+		{
+			test_reporter_t* _l_reporter_ptr{ utility::get_ptr(_l_reporter) };
+			_l_reporter_ptr->report_test(_a_aetr, _a_test_repeittion_tree,_m_test_options);
+		}
+	}
+	/*__no_constexpr_imp
 		void
 		test_reporter_controller_t::report_test(
 			const ds::invoked_test_info_t& _a_iti,
@@ -84,7 +105,7 @@ _BEGIN_ABC_REPORTERS_NS
 			test_reporter_t* _l_reporter_ptr{ utility::get_ptr(_l_reporter) };
 			_l_reporter_ptr->report_test(_a_iti, _a_error_info, _m_test_options);
 		}
-	}
+	}*/
 	__constexpr_imp
 		void
 		test_reporter_controller_t::add_reporters(

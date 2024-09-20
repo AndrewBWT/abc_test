@@ -7,21 +7,15 @@
 _BEGIN_ABC_NS
 using matcher_internal_ptr_t = std::shared_ptr<generic_matcher_t>;
 using matcher_internal_ptr_const_ref_t = const matcher_internal_ptr_t&;
-struct matcher_t : public generic_matcher_t
+struct matcher_t
 {
 public:
 	__constexpr
 		matcher_t(
 		) noexcept;
-	/*__constexpr
-		matcher_t(
-			matcher_internal_ptr_t _a_matcher_internal
-		) noexcept;*/
 	__constexpr
 		matcher_t(
-			matcher_internal_ptr_t _a_matcher_internal,
-			const std::optional<std::source_location>& _a_source_location = 
-			std::optional<std::source_location>(std::source_location::current())
+			matcher_internal_ptr_t _a_matcher_internal
 		) noexcept;
 	__constexpr
 		matcher_t(
@@ -36,6 +30,13 @@ public:
 	__constexpr
 		bool
 		or_statement(
+			test_runner_t& _a_test_runner = abc::global::get_this_threads_test_runner_ref(),
+			const std::source_location& _a_source_location = std::source_location::current()
+		) noexcept;
+	__constexpr
+		bool
+		and_statement(
+			test_runner_t& _a_test_runner = abc::global::get_this_threads_test_runner_ref(),
 			const std::source_location& _a_source_location = std::source_location::current()
 		) noexcept;
 	__constexpr
@@ -49,43 +50,20 @@ public:
 			) const noexcept
 	{
 		return matcher_t(matcher_internal_ptr_t(
-			new logic_matcher_t<NOT>(this->internal_matcher())),
-			std::optional<std::source_location>());
+			new logic_matcher_t<NOT>(this->internal_matcher())));
 	}
 	__constexpr
 		matcher_t
 		operator&&(
 			const matcher_t& _a_matcher
-			) const noexcept
-	{
-		return matcher_t(matcher_internal_ptr_t(
-			new logic_matcher_t<AND>(this->internal_matcher(),
-				_a_matcher.internal_matcher())));
-	}
+			) const noexcept;
 	__constexpr
 		matcher_t
 		operator||(
 			const matcher_t& _a_matcher
-			) const noexcept
-	{
-		return matcher_t(matcher_internal_ptr_t(
-			new logic_matcher_t<OR>(this->internal_matcher(),
-				_a_matcher.internal_matcher())));
-	}
-	__constexpr
-		virtual
-		void
-		gather_map_source(
-			matcher_source_map_t& _a_matcher_source_map
-		) const noexcept override final;
+			) const noexcept;
 private:
 	matcher_internal_ptr_t _m_matcher_internal;
-	__constexpr
-		virtual
-		matcher_result_t
-		run(
-			test_runner_t&
-		) override;
 	template<
 		logic_enum_t Logic_Enum
 	>
@@ -95,57 +73,25 @@ private:
 			const matcher_t& _a_matcher
 		) noexcept;
 };
+__constexpr
+	matcher_t
+	matcher(
+		generic_matcher_t* _a_generic_matcher_ptr
+	) noexcept;
 _END_ABC_NS
 
 _BEGIN_ABC_NS
 __constexpr_imp
-	matcher_result_t
-	matcher_t::run(
-		test_runner_t& _a_test_runner
-	)
-{
-	using namespace std;
-	using namespace errors;
-	if (_m_matcher_internal.get() != nullptr)
-	{
-		return _m_matcher_internal->run_test(_a_test_runner);
-	//	return _m_matcher_internal->test_result();
-	}
-	else
-	{
-		throw test_library_exception_t(
-			"_m_matcher_internal contains a nullptr, meaning that it contains no internal matcher. "
-			"Therefore, the test cannot be run as it is invalid."
-		);
-	}
-}
-__constexpr_imp
 	matcher_t::matcher_t(
 	) noexcept
-	: generic_matcher_t()
-	, _m_matcher_internal(matcher_internal_ptr_t(nullptr))
+	: _m_matcher_internal(matcher_internal_ptr_t(nullptr))
 {}
-/*__constexpr_imp
+__constexpr_imp
 	matcher_t::matcher_t(
 		matcher_internal_ptr_t _a_matcher_internal
 	) noexcept
-	: generic_matcher_t()
-	, _m_matcher_internal(_a_matcher_internal)
+	: _m_matcher_internal(_a_matcher_internal)
 {
-
-}*/
-__constexpr_imp
-	matcher_t::matcher_t(
-		matcher_internal_ptr_t _a_matcher_internal,
-		const std::optional<std::source_location>& _a_source_location
-	) noexcept
-	: generic_matcher_t()
-	, _m_matcher_internal(_a_matcher_internal)
-{
-	if (_a_source_location.has_value())
-	{
-		_m_matcher_internal->add_source_info(_a_source_location.value());
-	}
 }
 __constexpr_imp
 	matcher_t::matcher_t(
@@ -153,8 +99,7 @@ __constexpr_imp
 		const std::string_view _a_str_representation,
 		const std::source_location& _a_source_location
 	) noexcept
-	: generic_matcher_t()
-	, _m_matcher_internal(_a_matcher_internal.internal_matcher())
+	: _m_matcher_internal(_a_matcher_internal.internal_matcher())
 {
 	_m_matcher_internal->add_source_info(_a_str_representation, _a_source_location);
 }
@@ -168,14 +113,28 @@ __constexpr_imp
 __constexpr_imp
 	bool
 	matcher_t::or_statement(
+		test_runner_t& _a_test_runner,
 		const std::source_location& _a_source_location
 	) noexcept
 {
-	*this = matcher_t(matcher_internal_ptr_t(
-		new logic_matcher_t<OR>(this->internal_matcher(),
-			std::shared_ptr<generic_matcher_t>())), "or_statement()",
-		_a_source_location);
-	return this->internal_matcher().get();
+	const bool _l_result{ _m_matcher_internal->run_test(_a_test_runner).passed() };
+	*this = matcher(new logic_matcher_t<OR>(this->internal_matcher(),
+		std::shared_ptr<generic_matcher_t>()));
+	_m_matcher_internal->add_source_info("or_statement", _a_source_location);
+	return not _l_result;
+}
+__constexpr_imp
+	bool
+	matcher_t::and_statement(
+		test_runner_t& _a_test_runner,
+		const std::source_location& _a_source_location
+	) noexcept
+{
+	const bool _l_result{ _m_matcher_internal->run_test(_a_test_runner).passed() };
+	*this = matcher(new logic_matcher_t<AND>(this->internal_matcher(),
+		std::shared_ptr<generic_matcher_t>()));
+	_m_matcher_internal->add_source_info("and_statement", _a_source_location);
+	return _l_result;
 }
 __constexpr_imp
 	void
@@ -186,19 +145,29 @@ __constexpr_imp
 	using enum logic_enum_t;
 	if (not (process_<OR>(_a_matcher) || process_<AND>(_a_matcher)))
 	{
+	//	std::cout << "where" << std::endl;
 		throw errors::test_library_exception_t(
 			fmt::format("Could not run process; the parent node we are trying to add an OR or AND "
 				"node to is not a logic_matcher_t. Please check your code, or contact the developer."));
 	}
 }
 __constexpr_imp
-	void
-	matcher_t::gather_map_source(
-		matcher_source_map_t& _a_matcher_source_map
-	) const noexcept 
+	matcher_t
+	matcher_t::operator&&(
+		const matcher_t& _a_matcher
+	) const noexcept
 {
-	generic_matcher_t::gather_map_source(_a_matcher_source_map);
-	this->internal_matcher()->gather_map_source(_a_matcher_source_map);
+	return matcher(new logic_matcher_t<AND>(this->internal_matcher(),
+		_a_matcher.internal_matcher()));
+}
+__constexpr_imp
+	matcher_t
+	matcher_t::operator||(
+		const matcher_t& _a_matcher
+	) const noexcept
+{
+	return matcher(new logic_matcher_t<OR>(this->internal_matcher(),
+			_a_matcher.internal_matcher()));
 }
 template<
 	logic_enum_t Logic_Enum
@@ -220,5 +189,13 @@ matcher_t::process_(
 	{
 		return false;
 	}
+}
+__constexpr_imp
+	matcher_t
+	matcher(
+		generic_matcher_t* _a_generic_matcher_ptr
+	) noexcept
+{
+	return matcher_t(matcher_internal_ptr_t(_a_generic_matcher_ptr));
 }
 _END_ABC_NS

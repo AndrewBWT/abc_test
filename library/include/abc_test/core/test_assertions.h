@@ -1,9 +1,12 @@
 #pragma once
 
-#include "abc_test/matchers/generic_matcher.h"
+#include "abc_test/matchers/matcher.h"
 #include "abc_test/core/errors/test_assertion_exception.h"
 
 #include "abc_test/utility/str/string_utility.h"
+#include "abc_test/core/reporters/mid_execution_test_report/test_assertion_result.h"
+#include "abc_test/core/reporters/mid_execution_test_report/manual_failure.h"
+#include "abc_test/core/reporters/mid_execution_test_warning/malformed_matcher_warning.h"
 
 //Macros
 
@@ -37,7 +40,7 @@ _BEGIN_ABC_NS
 __constexpr
 	bool
 	create_assertion(
-		generic_matcher_t& _a_matcher,
+		matcher_t& _a_matcher,
 		const std::string_view _a_str_representation_of_line,
 		const std::source_location& _a_source_location,
 		test_runner_t& _a_test_runner,
@@ -46,7 +49,7 @@ __constexpr
 __constexpr
 	bool
 	create_assertion(
-		generic_matcher_t&& _a_matcher,
+		matcher_t&& _a_matcher,
 		const std::string_view _a_str_representation_of_line,
 		const std::source_location& _a_source_location,
 		test_runner_t& _a_test_runner,
@@ -74,6 +77,7 @@ namespace
 			test_runner_t& _a_test_runner,
 			const bool _a_terminate_function_on_failure
 		);
+	const char* _c_string_failure{ "<false>" };
 }
 _END_ABC_NS
 
@@ -81,14 +85,14 @@ _BEGIN_ABC_NS
 __constexpr_imp
 	bool
 	create_assertion(
-		generic_matcher_t& _a_matcher,
+		matcher_t& _a_matcher,
 		const std::string_view _a_str_representation_of_line,
 		const std::source_location& _a_source_location,
 		test_runner_t& _a_test_runner,
 		const bool _a_terminate_function_on_failure
 	)
 {
-	return create_assertion_internal<generic_matcher_t&>(_a_matcher,
+	return create_assertion_internal<matcher_t&>(_a_matcher,
 		_a_str_representation_of_line, _a_source_location,_a_test_runner,
 		_a_terminate_function_on_failure
 	);
@@ -96,14 +100,14 @@ __constexpr_imp
 __constexpr_imp
 	bool
 	create_assertion(
-		generic_matcher_t&& _a_matcher,
+		matcher_t&& _a_matcher,
 		const std::string_view _a_str_representation_of_line,
 		const std::source_location& _a_source_location,
 		test_runner_t& _a_test_runner,
 		const bool _a_terminate_function_on_failure
 	)
 {
-	return create_assertion_internal<generic_matcher_t&&>(std::move(_a_matcher),
+	return create_assertion_internal<matcher_t&&>(std::move(_a_matcher),
 		_a_str_representation_of_line, _a_source_location,_a_test_runner,
 		_a_terminate_function_on_failure);
 }
@@ -117,11 +121,19 @@ __constexpr_imp
 	)
 {
 	using namespace std;
+	using namespace reporters;
 	using namespace errors;
-	_a_test_runner.add_error(test_failure_info_t(
-		_a_str_representation_of_line,
-		_a_source_location,
-		_a_test_runner.get_log_infos(false), _a_early_termination));
+	_a_test_runner.add_mid_execution_test_report(
+		new manual_failure_t(
+			_a_str_representation_of_line,
+			_a_source_location,
+			_a_test_runner.get_log_infos(false), _a_early_termination
+		)
+	);
+	if (_a_early_termination)
+	{
+		throw test_assertion_exception_t();
+	}
 	return false;
 }
 namespace
@@ -141,27 +153,45 @@ namespace
 	{
 		using namespace std;
 		using namespace errors;
-		const matcher_result_t& _l_mr{ _a_matcher.run_test(_a_test_runner) };
-		_a_test_runner.register_tests_most_recent_source(_a_source_location);
-		if (not _l_mr.passed())
+		using namespace reporters;
+		generic_matcher_t* _l_ptr{ _a_matcher.internal_matcher().get()};
+		matcher_source_map_t _l_msm;
+		if (_l_ptr != nullptr)
 		{
-			_a_test_runner.add_error(test_failure_info_t(
-				_a_str_representation_of_line,
-				_a_source_location,
-				&_a_matcher,
-				_l_mr.str(),
-				_a_test_runner.get_log_infos(false), _a_terminate_function_on_failure)
-			);
-			if (_a_terminate_function_on_failure)
-			{
-				throw test_assertion_exception_t();
-			}
-			return false;
+			const matcher_result_t& _l_mr{ _l_ptr->run_test(_a_test_runner) };
+			_l_ptr->gather_map_source(_l_msm);
 		}
 		else
 		{
-			return true;
+			_a_test_runner.add_mid_execution_test_warning(
+				new malformed_matcher_warning_t(
+					_a_str_representation_of_line,
+					_a_source_location
+				));
 		}
+		const bool _l_passed{ _l_ptr != nullptr ? _l_ptr->matcher_result().passed() : false };
+		const optional<string_view> _l_matcher_str{ _l_ptr != nullptr ? 
+			optional<string_view>(_l_ptr->matcher_result().str()) : 
+			optional<string_view>()};
+
+		//Has to be like this otherwise we have to remove the constness from the string_view.
+		_a_test_runner.register_tests_most_recent_source(_a_source_location);
+		_a_test_runner.add_mid_execution_test_report(
+			new test_assertion_result_t(
+				_l_passed,
+				_a_str_representation_of_line,
+				_a_source_location,
+				_l_msm,
+				_a_test_runner.get_log_infos(false),
+				_a_terminate_function_on_failure,
+				_l_matcher_str
+			)
+		);
+		if (not _l_passed && _a_terminate_function_on_failure)
+		{
+			throw test_assertion_exception_t();
+		}
+		return _l_passed;
 	}
 }
 _END_ABC_NS

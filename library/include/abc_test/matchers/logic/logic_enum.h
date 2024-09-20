@@ -25,6 +25,15 @@ __constexpr
 	const char*
 	logic_str(
 	) noexcept;
+template<
+	logic_enum_t Logic_Enum
+>
+__constexpr
+	bool
+	compute_logic_result(
+		const bool _a_left_result,
+		const bool _a_right_result
+	) noexcept;
 _END_ABC_NS
 
 _BEGIN_ABC_NS
@@ -79,6 +88,36 @@ __constexpr_imp
 	else
 	{
 		static_assert(false, "str function does not have value for given template type.");
+		return "";
+	}
+}
+template<
+	logic_enum_t Logic_Enum
+>
+__constexpr_imp
+	bool
+	compute_logic_result(
+		const bool _a_left_result,
+		const bool _a_right_result
+	) noexcept
+{
+	using enum logic_enum_t;
+	if constexpr (Logic_Enum == NOT)
+	{
+		return false;
+	}
+	else if constexpr (Logic_Enum == OR)
+	{
+		return (_a_left_result || _a_right_result);
+	}
+	else if constexpr (Logic_Enum == AND)
+	{
+		return (_a_left_result && _a_right_result);
+	}
+	else
+	{
+		static_assert(false, "compute_logic_result function does not have value for given "
+			"template type.");
 		return "";
 	}
 }

@@ -3,6 +3,8 @@
 #include "abc_test/core/log_test_msg.h"
 #include "abc_test/core/errors/test_library_exception.h"
 #include "abc_test/utility/internal/log.h"
+#include "abc_test/core/reporters/mid_execution_test_report/unhandled_exception.h"
+#include "abc_test/core/reporters/mid_execution_test_report/unhandled_exception_not_derived_from_std_exception.h"
 
 _BEGIN_ABC_NS
 __no_constexpr_or_inline_imp
@@ -15,12 +17,14 @@ __no_constexpr_or_inline_imp
 	using namespace errors;
 	using namespace utility;
 	using namespace ds;
+	using namespace reporters;
 	using enum utility::internal::internal_log_enum_t;
 	_LIBRARY_LOG(TEST_INFO, fmt::format(
 			"About to run the following test: {0}",
 			_a_post_setup_test_data
 		));
 		_m_current_test = invoked_test_info_t(generate_random_seeds(), _a_post_setup_test_data, _m_tests_ran, _m_test_options);
+		_m_after_execution_test_report = after_execution_test_report_t(_m_current_test, &_m_test_options);
 		//const post_setup_test_data_t& _l_pstd{ _m_current_test.post_setup_test_data() };
 		const registered_test_data_t& _l_rtd{ _m_current_test.post_setup_test_data().registered_test_data() };
 		if (not _l_rtd._m_source_location.has_value())
@@ -46,15 +50,18 @@ __no_constexpr_or_inline_imp
 			}
 			catch (std::exception& _l_exception)
 			{
-				add_error(test_failure_info_t(_m_tests_most_recent_source, _l_exception.what(), get_log_infos(true), typeid(_l_exception).name()));
+				add_mid_execution_test_report(
+					new unhandled_exception_t(_m_tests_most_recent_source, _l_exception.what(), 
+						get_log_infos(true), typeid(_l_exception).name()));
 			}
 			catch (...)
 			{
-				add_error(test_failure_info_t(_m_tests_most_recent_source, get_log_infos(true)));
+				add_mid_execution_test_report(
+					new unhandled_exception_not_derived_from_std_exception_t(
+						_m_tests_most_recent_source, get_log_infos(true)));
 			}
-			_m_trc->report_test(_m_current_test, _m_error_infos);
+			_m_trc->report_test(_m_after_execution_test_report, _m_current_test.repetition_tree());
 			_m_current_error_log_msgs.clear();
-			_m_error_infos.reset();
 			++_m_tests_ran;
 		}
 	}

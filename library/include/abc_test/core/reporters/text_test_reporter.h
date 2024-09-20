@@ -3,128 +3,190 @@
 #include <iostream>
 #include <stacktrace>
 #include "fmt/color.h"
+
+#include <fmt/std.h>
 #include <array>
 #include "abc_test/utility/io/threaded_text_output_reporter.h"
 
 #include "abc_test/core/ds/test_data/invoked_test_data.h"
 
 #include "abc_test/core/errors/test_failures_info.h"
+#include "abc_test/core/reporters/mid_execution_test_report/manual_failure.h"
+#include "abc_test/core/reporters/mid_execution_test_report/test_assertion_result.h"
+#include "abc_test/core/reporters/mid_execution_test_report/unhandled_exception.h"
+#include "abc_test/core/reporters/mid_execution_test_report/unhandled_exception_not_derived_from_std_exception.h"
 
 
 _BEGIN_ABC_REPORTERS_NS
+/*!
+* Object used to print data about tests to some text output - either the console or a file
+*/
+struct text_test_reporter_t :
+	public test_reporter_t,
+	public utility::io::threated_text_output_reporter_t
+{
+public:
 	/*!
-	* Object used to print data about tests to some text output - either the console or a file
+	Constructor for std::cout to be where the output is posted.
 	*/
-	struct text_test_reporter_t :
-		public test_reporter_t,
-		public utility::io::threated_text_output_reporter_t
-	{
-	public:
-		/*!
-		Constructor for std::cout to be where the output is posted.
-		*/
-		__constexpr
-			text_test_reporter_t(
-			) noexcept;
-		/*!
-		Constructor whcih allows a file to be where the output is posted.
-		*/
-		__constexpr
-			text_test_reporter_t(
-				const utility::io::file_name_t& _a_file_output
-			) noexcept;
-		/*!
-		Function called to report a test.
-		*/
-		__no_constexpr
-			virtual
-			void
-			report_test(
-				const ds::invoked_test_info_t& _a_iti,
-				const errors::test_failures_info_t& _a_error_infos,
-				const test_options_t& _a_test_options
-			) noexcept;
-	private:
-		__constexpr
-			std::string
-			style_string(
-				const std::string_view _a_str,
-				const fmt::text_style& _a_style
-			) const noexcept;
-		__no_constexpr
-			std::string
-			print_error_info(
-				const errors::test_failure_info_t& _a_error_info,
-				const std::string_view _a_line_prefix,
-				const size_t _a_line_prefix_size,
-				const size_t _a_idx,
-				const test_options_t& _a_test_options
-			) noexcept;
+	__constexpr
+		text_test_reporter_t(
+		) noexcept;
+	/*!
+	Constructor whcih allows a file to be where the output is posted.
+	*/
+	__constexpr
+		text_test_reporter_t(
+			const utility::io::file_name_t& _a_file_output
+		) noexcept;
+	/*!
+	Function called to report a test.
+	*/
+	/*__no_constexpr
+		virtual
+		void
+		report_test(
+			const ds::invoked_test_info_t& _a_iti,
+			const errors::test_failures_info_t& _a_error_infos,
+			const test_options_t& _a_test_options
+		) noexcept;*/
+	__no_constexpr
+		virtual
+		void
+		report_test(
+			const reporters::after_execution_test_report_t& _a_aetr,
+			const ds::repetition_tree_t& _a_test_repeittion_tree,
+			const test_options_t& _a_test_options
+		) noexcept override;
+private:
+	bool _m_print_successes;
+	__constexpr
+		std::string
+		style_string(
+			const std::string_view _a_str,
+			const fmt::text_style& _a_style
+		) const noexcept;
+	__no_constexpr
+		std::string
+		print_error_info(
+			const errors::test_failure_info_t& _a_error_info,
+			const std::string_view _a_line_prefix,
+			const size_t _a_line_prefix_size,
+			const size_t _a_idx,
+			const test_options_t& _a_test_options
+		) noexcept;
+	__constexpr
+		virtual
+		std::string
+		format_warning(
+			const std::shared_ptr<reporters::mid_execution_test_warning_t>& _a_warning
+		) const noexcept;
+	__constexpr
+		virtual
+		std::string
+		format_report(
+			const std::shared_ptr<reporters::mid_execution_test_report_t>& _a_report
+		) const noexcept;
+	__no_constexpr
+		std::string
+		format_manual_failure(
+			const manual_failure_t& _a_mf
+		) const noexcept;
+	__constexpr
+		std::string
+		format_test_assertion_result(
+			const test_assertion_result_t& _a_mf
+		) const noexcept;
+	__constexpr
+		std::string
+		format_unhandled_exception(
+			const unhandled_exception_t& _a_mf
+		) const noexcept;
+	__constexpr
+		std::string
+		format_unhandled_exception_not_derived_from_std_exception(
+			const unhandled_exception_not_derived_from_std_exception_t& _a_mf
+		) const noexcept;
+};
+
+namespace
+{
+	/*!
+	* Takes a string created by a CHECK_EXPR macro and ensures that it looks identical to what the
+	* user wrote - as in, removing the placeholder dummy object.
+	*/
+	__constexpr
+		std::string
+		normalise_line_str_rep(
+			const std::string_view _a_str
+		) noexcept;
+	__constexpr
+		std::string
+		create_padded_space(
+			const size_t _a_largest_string,
+			const std::string_view _a_string_to_help_pad
+		) noexcept;
+	__no_constexpr
+		std::string
+		make_aligned_line(
+			const char* _a_identifier,
+			const std::size_t _a_largest_identifer_size,
+			const std::string_view _a_element_to_print
+		) noexcept;
+
+	//Const char*s
+	const char* _c_unknown{ "<unknown>" };
+	const char* _c_no_seed_used{ "No seed used" };
+	const std::size_t _c_test_result_str_size{ 2 };
+	const char* _c_test_result_str[_c_test_result_str_size] = {
+		"TEST PASSED",
+		"TEST FAILED"
+	};
+	const std::size_t _c_terminated_early_size{ 2 };
+	const char* _c_terminated_early[_c_terminated_early_size] = {
+		"Yes",
+		"No"
 	};
 
-	namespace
-	{
-		/*!
-		* Takes a string created by a CHECK_EXPR macro and ensures that it looks identical to what the
-		* user wrote - as in, removing the placeholder dummy object.
-		*/
-		__constexpr
-			std::string
-			normalise_line_str_rep(
-				const std::string_view _a_str
-			) noexcept;
-		__constexpr
-			std::string
-			create_padded_space(
-				const size_t _a_largest_string,
-				const std::string_view _a_string_to_help_pad
-			) noexcept;
-		__no_constexpr
-			std::string
-			make_aligned_line(
-				const char* _a_identifier,
-				const std::size_t _a_largest_identifer_size,
-				const std::string_view _a_element_to_print
-			) noexcept;
-		//Const char*s
-		const std::size_t _c_strs_identifiers_size{ 3 };
-		const char* _c_strs_identifiers[_c_strs_identifiers_size] = { "Function","Location","Seed used" };
-		const char* _c_test_failure_str{ "TEST_FAILURE" };
-		const char* _c_alt_seed_str{ "To repeat test, use seed" };
-		const char* _c_normalised_line_str_prefix_1{ "(abc::placeholder_t(" };
-		const char* _c_normalised_line_str_prefix_2{ ") < " };
-		const char _c_quote_char{ '"' };
-		const char* _c_lbracket{ "(" };
-		const char* _c_rbracket{ ")" };
-		const std::size_t _c_error_strs_size{ 3 };
-		const char* _c_error_strs[_c_error_strs_size] = {
-			"Test assertion failure",
-			"Manual test failure encountered",
-			"Unexpected exception encountered"
-		};
-		const char* _c_error_str_terminated{ ", function terminated" };
-		const std::size_t _c_location_strs_size{ 2 };
-		const char* _c_location_strs[_c_location_strs_size] = { "Location: ", "Most recent test invokation, assertion or log occoured on line: " };
-		const std::size_t _c_failed_expr_strs_size{ 2 };
-		const char* _c_failed_expr_strs[_c_failed_expr_strs_size] = { "Failed expression:","Matcher's output:" };
-		const std::size_t _c_exception_strs_size{ 3 };
-		const char* _c_exception_strs[_c_exception_strs_size] = {
-			"Exception's type: ",
-			"Exception was not derived from std::exception, therefore we have no additional information pertaining to it",
-			"Exception's what() function returned:" };
-		const std::size_t _c_logged_strs_size{ 2 };
-		const char* _c_logged_strs[_c_logged_strs_size] = {
-			"Logged info",
-			"Logged info (cached, may be inaccurate)"
-		};
-		const char* _c_internal_error_string{ "The following internal failures found:" };
-		const char* _c_no_rtd_description{ "<No valid test name, internal error>" };
-		const char* _c_no_sl{ "<No valid source location, internal error>" };
-		const char* _c_no_pstd{ "<invoked_test_info_t has no post_setup_test_data_t member variable>" };
-		const char* _c_no_rtd{ "<post_setup_test_data_t has no valid registered_test_data_t member variable>" };
-		const char* _l_has_sl{ "<registered_test_data_t has no valid source_location variable>" };
-	}
-	_END_ABC_REPORTERS_NS
+
+	const std::size_t _c_strs_identifiers_size{ 3 };
+	const char* _c_strs_identifiers[_c_strs_identifiers_size] = { "Function","Location","Seed used" };
+	const char* _c_test_failure_str{ "TEST_FAILURE" };
+	const char* _c_alt_seed_str{ "To repeat test, use seed" };
+	const char* _c_normalised_line_str_prefix_1{ "(abc::placeholder_t(" };
+	const char* _c_normalised_line_str_prefix_2{ ") < " };
+	const char _c_quote_char{ '"' };
+	const char* _c_lbracket{ "(" };
+	const char* _c_rbracket{ ")" };
+	const std::size_t _c_error_strs_size{ 3 };
+	const char* _c_error_strs[_c_error_strs_size] = {
+		"Test assertion failure",
+		"Manual test failure encountered",
+		"Unexpected exception encountered"
+	};
+	const char* _c_error_str_terminated{ ", function terminated" };
+	const std::size_t _c_location_strs_size{ 2 };
+	const char* _c_location_strs[_c_location_strs_size] = { "Location: ", "Most recent test invokation, assertion or log occoured on line: " };
+	const std::size_t _c_failed_expr_strs_size{ 2 };
+	const char* _c_failed_expr_strs[_c_failed_expr_strs_size] = { "Failed expression:","Matcher's output:" };
+	const std::size_t _c_exception_strs_size{ 3 };
+	const char* _c_exception_strs[_c_exception_strs_size] = {
+		"Exception's type: ",
+		"Exception was not derived from std::exception, therefore we have no additional information pertaining to it",
+		"Exception's what() function returned:" };
+	const std::size_t _c_logged_strs_size{ 2 };
+	const char* _c_logged_strs[_c_logged_strs_size] = {
+		"Logged info",
+		"Logged info (cached, may be inaccurate)"
+	};
+	const char* _c_internal_error_string{ "The following internal failures found:" };
+	const char* _c_no_rtd_description{ "<No valid test name, internal error>" };
+	const char* _c_no_sl{ "<No valid source location, internal error>" };
+	const char* _c_no_pstd{ "<invoked_test_info_t has no post_setup_test_data_t member variable>" };
+	const char* _c_no_rtd{ "<post_setup_test_data_t has no valid registered_test_data_t member variable>" };
+	const char* _l_has_sl{ "<registered_test_data_t has no valid source_location variable>" };
+}
+_END_ABC_REPORTERS_NS
 
 _BEGIN_ABC_REPORTERS_NS
 	__no_constexpr_imp
@@ -143,6 +205,114 @@ _BEGIN_ABC_REPORTERS_NS
 
 	}
 	__no_constexpr_imp
+		void
+		text_test_reporter_t::report_test(
+			const reporters::after_execution_test_report_t& _a_aetr,
+			const ds::repetition_tree_t& _a_test_repeittion_tree,
+			const test_options_t& _a_test_options
+		) noexcept 
+	{
+		using namespace std;
+		using namespace ds;
+		using namespace errors;
+		using namespace utility::str;
+		//Return value
+		string _l_rv;
+		//Gather references to requried things
+		//If the test has not passed, print the error.
+		if (_m_print_successes || not _a_aetr.passed())
+		{
+			//Get references to some things used a few times.
+			const fmt::text_style& _l_failure_ts{ _a_test_options._m_failure_text_style };
+			const fmt::text_style& _l_pass_ts{ _a_test_options._m_pass_text_style };
+			const fmt::text_style& _l_highlighted_info{ _a_test_options._m_highlighted_info_style };
+			//Define information break-line.
+			const size_t _l_line_len{ _a_test_options._m_console_line_length };
+			const char _l_pretty_char{ _a_test_options._m_separator_chars[0] };
+			const string _l_line_break(_l_line_len, _l_pretty_char);
+			//Define the info lines
+			const string _l_info_lines{ fmt::format(
+				"TEST REPORT: {0}\n"
+				"Test Name: {1}\n"
+				"Location: {2}\n"
+				"Test Path: {3}\n"
+				"Seed Used: {4}\n"
+				"Seed Used (hex): {5}\n"
+				"Seed to re-run test: {6}\n"
+				"Seed to re-run test (hex): {7}\n"
+				"Test Assertions Ran: {8}\n"
+				"Passed: {9}\n"
+				"Failed: {10}\n"
+				"Warnings: {11}\n"
+				"Terminated Early: {12}",
+				_a_aetr.passed() ?
+					style_string(_c_test_result_str[0], _l_pass_ts) :
+					style_string(_c_test_result_str[1], _l_failure_ts),
+				_a_aetr.name().has_value() ?
+					style_string(_a_aetr.name().value(),_l_highlighted_info) :
+					style_string(_c_unknown,_l_failure_ts),
+				_a_aetr.location().has_value() ?
+					style_string(location_string(_a_aetr.location().value()),_l_highlighted_info) :
+					style_string(_c_unknown,_l_failure_ts),
+				_a_aetr.test_path() != "" ?
+					style_string(_a_aetr.test_path(),_l_highlighted_info) :
+					style_string(_c_unknown,_l_failure_ts),
+				_a_aetr.seed_used() != "" ?
+					_a_aetr.seed_used() :
+					_c_no_seed_used,
+				_a_aetr.seed_used_in_hex() != "" ?
+					_a_aetr.seed_used_in_hex() :
+					_c_no_seed_used,
+				_a_test_repeittion_tree.print_repetition_tree() != "" ?
+					_a_test_repeittion_tree.print_repetition_tree() :
+					_c_no_seed_used,
+				_a_test_repeittion_tree.print_repetition_tree(_a_test_options) != "" ?
+					_a_test_repeittion_tree.print_repetition_tree(_a_test_options) :
+					_c_no_seed_used,
+				_a_aetr.test_reports_recieved(),
+				_a_aetr.test_reports_passed(),
+				_a_aetr.test_reports_failed(),
+				_a_aetr.test_warnings_recieved(),
+				_a_aetr.terminated_early() ? 
+					style_string(_c_terminated_early[0], _l_failure_ts) :
+					style_string(_c_terminated_early[1], _l_pass_ts)
+
+			)};
+			//Print the output
+			string _l_rv{
+				fmt::format(
+					"{0}\n"
+					"{1}\n"
+					"{0}\n",
+					_l_line_break,
+					_l_info_lines
+				)
+			};
+			if (_a_aetr.test_warnings_recieved() > 0)
+			{
+				string _l_warning_str;
+				//for (const std::shared_ptr<mid_execution_test_warning_t>& _l_warning : _a_aetr.warnings())
+				//{
+				//	_l_warning_str.append(fmt::format("{0}\n", format_warning(_l_warning)));
+				//}
+				_l_rv.append(fmt::format("{1}{0}", _l_line_break, _l_warning_str));
+			}
+			if (_a_aetr.test_reports_recieved() > 0)
+			{
+				string _l_report_str;
+				for (const std::shared_ptr<mid_execution_test_report_t>& _l_report : _a_aetr.reports())
+				{
+					if (not _l_report.get()->passed() || _m_print_successes)
+					{
+						_l_report_str.append(fmt::format("{0}\n", format_report(_l_report)));
+					}
+				}
+				_l_rv.append(fmt::format("{0}{1}", _l_report_str, _l_line_break));
+			}
+			write(_l_rv);
+		}
+	}
+	/*__no_constexpr_imp
 		void
 		text_test_reporter_t::report_test(
 			const ds::invoked_test_info_t& _a_iti,
@@ -265,7 +435,7 @@ _BEGIN_ABC_REPORTERS_NS
 			//Print the output
 			write(_l_rv);
 		}
-	}
+	}*/
 	__constexpr_imp
 		std::string
 		text_test_reporter_t::style_string(
@@ -444,7 +614,110 @@ _BEGIN_ABC_REPORTERS_NS
 		}
 		return _l_rv;
 	}
+	__constexpr_imp
+		std::string
+		text_test_reporter_t::format_warning(
+			const std::shared_ptr<reporters::mid_execution_test_warning_t>& _a_warning
+		) const noexcept
+	{
+		return "warning!";
+	}
+	__constexpr_imp
+		std::string
+		text_test_reporter_t::format_report(
+			const std::shared_ptr<reporters::mid_execution_test_report_t>& _a_report
+		) const noexcept
+	{
+		using namespace reporters;
+		mid_execution_test_report_t* _l_ptr{ _a_report.get() };
+		if (_l_ptr == nullptr)
+		{
+			return fmt::format("{0} contains a nullptr",
+				typeid(_a_report));
+		}
+		manual_failure_t* _l_mf{ dynamic_cast<manual_failure_t*>(_l_ptr) };
+		if (_l_mf != nullptr)
+		{
+			return format_manual_failure(*_l_mf);
+		}
+		test_assertion_result_t* _l_tar{ dynamic_cast<test_assertion_result_t*>(_l_ptr) };
+		if (_l_tar != nullptr)
+		{
+			return format_test_assertion_result(*_l_tar);
+		}
+		unhandled_exception_t* _l_ue{ dynamic_cast<unhandled_exception_t*>(_l_ptr) };
+		if (_l_ue != nullptr)
+		{
+			return format_unhandled_exception(*_l_ue);
+		}
+		unhandled_exception_not_derived_from_std_exception_t* _l_uendfse{
+			dynamic_cast<unhandled_exception_not_derived_from_std_exception_t*>(_l_ptr) };
+		if (_l_uendfse != nullptr)
+		{
+			return format_unhandled_exception_not_derived_from_std_exception(*_l_uendfse);
+		}
+		else
+		{
+			return _l_ptr->unformatted_string();
+		}
+	}
+	__no_constexpr_imp
+		std::string
+		text_test_reporter_t::format_manual_failure(
+			const manual_failure_t& _a_mf
+		) const noexcept
+	{
+		return fmt::format(
+			"{0}\n"
+			"{1}\n"
+			"{2}\n"
+			"{3}\n"
+			"{4}\n",
+			"Manual failure",
+			_a_mf.source_code_representation(),
+			_a_mf.early_termination(),
+			_a_mf.passed(),
+			_a_mf.source_location());
+	}
+	__constexpr_imp
+		std::string
+		text_test_reporter_t::format_test_assertion_result(
+			const test_assertion_result_t& _a_mf
+		) const noexcept
+	{
+		return  fmt::format(
+			"{0}\n"
+			"{1}{2}\n"
+			"{3}\n",
+			(
 
+				_a_mf.passed() ?
+				(_a_mf.early_termination() ?
+					"Test assertion passed, test terminated" :
+					"Test assertion passed") :
+				(_a_mf.early_termination() ?
+					"Test assertion failed, test terminated" :
+					"Test assertion failed")
+				),
+			"Location: ", _a_mf.source_code_representation(),
+			_a_mf.source_location());
+	}
+	__constexpr_imp
+		std::string
+		text_test_reporter_t::format_unhandled_exception(
+			const unhandled_exception_t& _a_mf
+		) const noexcept
+	{
+		return "";
+	}
+	__constexpr_imp
+		std::string
+		text_test_reporter_t::format_unhandled_exception_not_derived_from_std_exception(
+			const unhandled_exception_not_derived_from_std_exception_t& _a_mf
+		) const noexcept
+	{
+		return "";
+	}
 	namespace
 	{
 		__constexpr_imp
