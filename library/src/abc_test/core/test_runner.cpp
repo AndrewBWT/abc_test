@@ -60,7 +60,8 @@ __no_constexpr_or_inline_imp
 					new unhandled_exception_not_derived_from_std_exception_t(
 						_m_tests_most_recent_source, get_log_infos(true)));
 			}
-			_m_trc->report_test(_m_after_execution_test_report, _m_current_test.repetition_tree());
+			_m_after_execution_test_report.add_repetition_tree(_m_current_test.repetition_tree(),&_m_test_options);
+			_m_trc->report_test(_m_after_execution_test_report);
 			_m_current_error_log_msgs.clear();
 			++_m_tests_ran;
 		}

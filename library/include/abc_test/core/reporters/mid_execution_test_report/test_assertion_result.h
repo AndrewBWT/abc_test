@@ -32,6 +32,10 @@ public:
 		std::string
 		unformatted_string(
 		) const noexcept override;
+	__constexpr
+		const matcher_source_map_t&
+		matcher_source_map(
+		) const noexcept;
 private:
 	matcher_source_map_t _m_matcher_source_map;
 	std::string _m_scr;
@@ -87,5 +91,12 @@ __constexpr_imp
 		"_m_scr", _m_scr,
 		"_m_matcher_str", _m_matcher_str
 	);
+}
+__constexpr_imp
+	const matcher_source_map_t&
+	test_assertion_result_t::matcher_source_map(
+	) const noexcept
+{
+	return _m_matcher_source_map;
 }
 _END_ABC_REPORTERS_NS

@@ -33,6 +33,12 @@ public:
 			reporters::mid_execution_test_warning_t* _a_metr
 		) noexcept;
 	__constexpr
+		void
+		add_repetition_tree(
+			const ds::repetition_tree_t& _a_repetition_tree,
+			const test_options_t* _a_test_options
+		) noexcept;
+	__constexpr
 		const mid_execution_test_reporters_t&
 		reports(
 		) const noexcept;
@@ -55,6 +61,14 @@ public:
 	__constexpr
 		const std::string_view
 		seed_used_in_hex(
+		) const noexcept;
+	__constexpr
+		const std::string_view
+		seed_to_use_to_re_run_text(
+		) const noexcept;
+	__constexpr
+		const std::string_view
+		seed_to_use_to_re_run_text_in_hex(
 		) const noexcept;
 	__constexpr
 		std::size_t
@@ -84,11 +98,14 @@ private:
 	std::string _m_test_path;
 	std::string _m_seed;
 	std::string _m_seed_in_hex;
+	std::string _m_seed_to_use_to_re_run_test;
+	std::string _m_seed_to_use_to_re_run_test_in_hex;
 	bool _m_passed;
 	bool _m_terminated_early;
 	std::size_t _m_total_test_reports_recieved;
 	std::size_t _m_total_test_reports_passed;
 	std::size_t _m_total_test_reports_failed;
+	//ds::repetition_tree_t _m_repetition_tree_if_repeating_test;
 	__constexpr
 		after_execution_test_report_t(
 			const mid_execution_test_reporters_t& _a_mid_execution_reports,
@@ -187,6 +204,18 @@ __constexpr_imp
 	_m_mid_execution_warnings.push_back(mid_execution_test_warning_ptr_t(_a_metr));
 }
 __constexpr_imp
+	void
+	after_execution_test_report_t::add_repetition_tree(
+		const ds::repetition_tree_t& _a_repetition_tree,
+		const test_options_t* _a_test_options
+	) noexcept
+{
+	_m_seed_to_use_to_re_run_test = 
+		_a_repetition_tree.print_repetition_tree();
+	_m_seed_to_use_to_re_run_test_in_hex =
+		_a_repetition_tree.print_repetition_tree(*_a_test_options);
+}
+__constexpr_imp
 	const mid_execution_test_reporters_t&
 	after_execution_test_report_t::reports(
 	) const noexcept
@@ -227,6 +256,20 @@ __constexpr_imp
 	) const noexcept
 {
 	return _m_seed_in_hex;
+}
+__constexpr_imp
+	const std::string_view
+	after_execution_test_report_t::seed_to_use_to_re_run_text(
+	) const noexcept
+{
+	return _m_seed_to_use_to_re_run_test;
+}
+__constexpr_imp
+	const std::string_view
+	after_execution_test_report_t::seed_to_use_to_re_run_text_in_hex(
+	) const noexcept
+{
+	return _m_seed_to_use_to_re_run_test_in_hex;
 }
 __constexpr_imp
 	std::size_t

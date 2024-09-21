@@ -33,8 +33,7 @@ _BEGIN_ABC_REPORTERS_NS
 		__constexpr
 			void
 			report_test(
-				const reporters::after_execution_test_report_t& _a_aetr,
-				const ds::repetition_tree_t& _a_test_repeittion_tree
+				const reporters::after_execution_test_report_t& _a_aetr
 			) noexcept;
 		/*__no_constexpr
 			void
@@ -81,15 +80,14 @@ _BEGIN_ABC_REPORTERS_NS
 	__constexpr_imp
 		void
 		test_reporter_controller_t::report_test(
-			const reporters::after_execution_test_report_t& _a_aetr,
-			const ds::repetition_tree_t& _a_test_repeittion_tree
+			const reporters::after_execution_test_report_t& _a_aetr
 		) noexcept
 	{
 		std::unique_lock _l_report_test_unique_lokc(_m_reporters_mutex);
 		for (utility::shared_and_raw_ptr<test_reporter_t>& _l_reporter : _m_reporters)
 		{
 			test_reporter_t* _l_reporter_ptr{ utility::get_ptr(_l_reporter) };
-			_l_reporter_ptr->report_test(_a_aetr, _a_test_repeittion_tree,_m_test_options);
+			_l_reporter_ptr->report_test(_a_aetr,_m_test_options);
 		}
 	}
 	/*__no_constexpr_imp

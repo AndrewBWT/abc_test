@@ -33,6 +33,10 @@ public:
 		std::string
 		unformatted_string(
 		) const noexcept = 0;
+	__constexpr
+		const str_collection_t&
+		log_infos(
+		) const noexcept;
 protected:
 	bool _m_passed;
 	std::source_location _m_source_location;
@@ -82,6 +86,13 @@ __constexpr_imp
 	) const noexcept
 {
 	return _m_early_termination;
+}
+__constexpr_imp
+	const str_collection_t&
+	mid_execution_test_report_t::log_infos(
+) const noexcept
+{
+	return _m_log_infos;
 }
 __constexpr_imp
 	std::string

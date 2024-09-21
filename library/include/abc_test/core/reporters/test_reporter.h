@@ -18,7 +18,6 @@ _BEGIN_ABC_REPORTERS_NS
 			void
 			report_test(
 				const reporters::after_execution_test_report_t& _a_aetr,
-				const ds::repetition_tree_t& _a_test_repeittion_tree,
 				const test_options_t& _a_test_options
 			) noexcept = 0;
 		/*!

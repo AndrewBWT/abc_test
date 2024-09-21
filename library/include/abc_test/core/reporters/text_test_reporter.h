@@ -18,6 +18,49 @@
 
 
 _BEGIN_ABC_REPORTERS_NS
+
+enum class enum_info_data_to_print_t
+{
+	TITLE,
+	NAME,
+	LOCATION,
+	TEST_PATH,
+	SEED_USED,
+	SEED_USED_HEX,
+	SEED_TO_USE_TO_RE_RUN_TEST,
+	SEED_TO_USE_TO_RE_RUN_TEST_HEX,
+	TOTAL_ASSERTIONS_RAN,
+	TOTAL_ASSERTIONS_PASSED,
+	TOTAL_ASSERTIONS_FAILED,
+	CONDENSED_ASSERTIONS_PASSED_INFO,
+	TOTAL_WARNINGS,
+	TERMINATED_EARLY
+};
+enum class enum_test_report_data_t
+{
+	PASSED,
+	SOURCE_LOCATION,
+	EARLY_TERMINATION,
+	LOG_INFOS
+};
+enum class enum_manual_failure_t
+{
+	SOURCE_CODE_REPRESENTATION,
+	STR_REPRESENTATION
+};
+enum class enum_test_assertion_t
+{
+	STR_REPRESENTATION,
+	MATCHER_SOURCE_MAP,
+	SOURCE_CODE_REPRESENTATION,
+	MATCHER_STRING
+};
+using combined_enum_manual_failure_t = std::variant<enum_test_report_data_t, enum_manual_failure_t>;
+using combined_enum_test_assertion_t = std::variant<enum_test_report_data_t, enum_test_assertion_t>;
+using enum_manual_failure_collection_t = std::vector<std::pair<combined_enum_manual_failure_t,bool>>;
+using enum_test_assertion_collection_t = std::vector<std::pair<combined_enum_test_assertion_t, bool>>;
+using enum_info_data_to_print_collection_t = std::vector<std::pair<enum_info_data_to_print_t,bool>>;
+using string_table_t = std::vector<std::vector<std::string>>;
 /*!
 * Object used to print data about tests to some text output - either the console or a file
 */
@@ -39,42 +82,40 @@ public:
 		text_test_reporter_t(
 			const utility::io::file_name_t& _a_file_output
 		) noexcept;
-	/*!
-	Function called to report a test.
-	*/
-	/*__no_constexpr
-		virtual
-		void
-		report_test(
-			const ds::invoked_test_info_t& _a_iti,
-			const errors::test_failures_info_t& _a_error_infos,
-			const test_options_t& _a_test_options
-		) noexcept;*/
 	__no_constexpr
 		virtual
 		void
 		report_test(
 			const reporters::after_execution_test_report_t& _a_aetr,
-			const ds::repetition_tree_t& _a_test_repeittion_tree,
 			const test_options_t& _a_test_options
 		) noexcept override;
 private:
+	std::size_t _m_indent = 3;
 	bool _m_print_successes;
+	bool _m_has_colour_output;
+	enum_info_data_to_print_collection_t _m_data_to_print_collection;
+	enum_manual_failure_collection_t _m_mid_exception_test_report_collection;
+	enum_test_assertion_collection_t _m_test_assertion_collection;
+	std::string _m_info_line_padding;
+	std::size_t _m_report_element_indent_size;
+	__constexpr
+		std::size_t
+		get_largest_info_identifier(
+			const reporters::after_execution_test_report_t& _a_aetr
+		) const noexcept;
+	__constexpr
+		std::string
+		get_info_data_from_test_report(
+			const enum_info_data_to_print_t _a_enum_info_data,
+			const reporters::after_execution_test_report_t& _a_aetr,
+			const test_options_t& _a_test_options
+		) const;
 	__constexpr
 		std::string
 		style_string(
 			const std::string_view _a_str,
 			const fmt::text_style& _a_style
 		) const noexcept;
-	__no_constexpr
-		std::string
-		print_error_info(
-			const errors::test_failure_info_t& _a_error_info,
-			const std::string_view _a_line_prefix,
-			const size_t _a_line_prefix_size,
-			const size_t _a_idx,
-			const test_options_t& _a_test_options
-		) noexcept;
 	__constexpr
 		virtual
 		std::string
@@ -85,17 +126,86 @@ private:
 		virtual
 		std::string
 		format_report(
-			const std::shared_ptr<reporters::mid_execution_test_report_t>& _a_report
+			const std::shared_ptr<reporters::mid_execution_test_report_t>& _a_report,
+			const test_options_t* _a_test_options,
+			const std::size_t _a_idx,
+			const std::size_t _a_maximum_idx_str_size
+		) const noexcept;
+	__constexpr
+		void
+		append_indented_line(
+			std::string& _a_str,
+			const string_table_t& _a_print_vector,
+			const std::string_view _a_indented_str
 		) const noexcept;
 	__no_constexpr
 		std::string
 		format_manual_failure(
+			const manual_failure_t& _a_mf,
+			const std::size_t _a_idx,
+			const std::size_t _a_largest_idx,
+			const test_options_t* _a_test_options
+		) const noexcept;
+	__constexpr
+		bool
+		check_if_execution_test_report_data_to_be_included(
+			const enum_test_report_data_t _a_etrd,
+			const mid_execution_test_report_t* _a_metr
+		) const;
+	__constexpr
+		bool
+		check_if_manual_data_to_be_included(
+			const combined_enum_manual_failure_t _a_cemf,
 			const manual_failure_t& _a_mf
+		) const;
+	__constexpr
+		bool
+		check_if_test_assertion_data_to_be_included(
+			const combined_enum_test_assertion_t _a_ceta,
+			const test_assertion_result_t& _a_tar
+		) const;
+	__constexpr
+		std::string
+		prepare_indexed_table(
+			const string_table_t& _a_str_table
 		) const noexcept;
 	__constexpr
 		std::string
+		indent(
+			const std::string_view _a_str
+		) const noexcept;
+	__constexpr
+		void
+		get_execution_test_report_data_as_table(
+			string_table_t& _a_str_table,
+			const enum_test_report_data_t _a_etrd,
+			const mid_execution_test_report_t& _a_metr,
+			const test_options_t* _a_test_options,
+			const std::string_view _a_other_initial_cells
+		) const;
+	__constexpr
+		string_table_t
+		get_manual_data_as_table(
+			const combined_enum_manual_failure_t _a_cemf,
+			const manual_failure_t& _a_mf,
+			const test_options_t* _a_test_options,
+			const std::string_view _a_other_initial_cells
+		) const;
+	__constexpr
+		string_table_t
+		get_test_assertion_data_as_table(
+			const combined_enum_test_assertion_t _a_cemf,
+			const test_assertion_result_t& _a_mf,
+			const test_options_t* _a_test_options,
+			const std::string_view _a_other_initial_cells
+		) const;
+	__constexpr
+		std::string
 		format_test_assertion_result(
-			const test_assertion_result_t& _a_mf
+			const test_assertion_result_t& _a_mf,
+			const std::size_t _a_idx,
+			const std::size_t _a_maximum_idx_str_size,
+			const test_options_t* _a_test_options
 		) const noexcept;
 	__constexpr
 		std::string
@@ -111,6 +221,17 @@ private:
 
 namespace
 {
+	__constexpr
+		const char*
+		get_info_data_enum_text_data(
+			const enum_info_data_to_print_t _a_enum_info_data
+		);
+	__constexpr
+		bool
+		check_if_info_data_to_be_included(
+			const enum_info_data_to_print_t _a_enum_info_data,
+			const reporters::after_execution_test_report_t& _a_aetr
+		);
 	/*!
 	* Takes a string created by a CHECK_EXPR macro and ensures that it looks identical to what the
 	* user wrote - as in, removing the placeholder dummy object.
@@ -120,24 +241,12 @@ namespace
 		normalise_line_str_rep(
 			const std::string_view _a_str
 		) noexcept;
-	__constexpr
-		std::string
-		create_padded_space(
-			const size_t _a_largest_string,
-			const std::string_view _a_string_to_help_pad
-		) noexcept;
-	__no_constexpr
-		std::string
-		make_aligned_line(
-			const char* _a_identifier,
-			const std::size_t _a_largest_identifer_size,
-			const std::string_view _a_element_to_print
-		) noexcept;
 
 	//Const char*s
 	const char* _c_unknown{ "<unknown>" };
 	const char* _c_no_seed_used{ "No seed used" };
 	const std::size_t _c_test_result_str_size{ 2 };
+	const char* _c_test_info{ "TEST RESULT" };
 	const char* _c_test_result_str[_c_test_result_str_size] = {
 		"TEST PASSED",
 		"TEST FAILED"
@@ -146,6 +255,10 @@ namespace
 	const char* _c_terminated_early[_c_terminated_early_size] = {
 		"Yes",
 		"No"
+	};
+	const char* _c_condensed_assertions_passed
+	{
+		"all assertions passed."
 	};
 
 
@@ -194,6 +307,47 @@ _BEGIN_ABC_REPORTERS_NS
 		) noexcept
 		: threated_text_output_reporter_t(std::cout)
 	{
+		{
+			using enum enum_info_data_to_print_t;
+			_m_data_to_print_collection.push_back({ TITLE,true });
+			_m_data_to_print_collection.push_back({ NAME,true });
+			_m_data_to_print_collection.push_back({ LOCATION,true });
+			_m_data_to_print_collection.push_back({ TEST_PATH,true });
+			_m_data_to_print_collection.push_back({ SEED_USED,false });
+			//_m_data_to_print_collection.push_back({ SEED_USED_HEX,true });
+			//_m_data_to_print_collection.push_back({ SEED_TO_USE_TO_RE_RUN_TEST,true });
+			_m_data_to_print_collection.push_back({ SEED_TO_USE_TO_RE_RUN_TEST_HEX,false });
+			//_m_data_to_print_collection.push_back({ TOTAL_ASSERTIONS_RAN,true });
+			//_m_data_to_print_collection.push_back({ TOTAL_ASSERTIONS_PASSED,true });
+			//_m_data_to_print_collection.push_back({ TOTAL_ASSERTIONS_FAILED,true });
+			_m_data_to_print_collection.push_back({ CONDENSED_ASSERTIONS_PASSED_INFO,true });
+			_m_data_to_print_collection.push_back({ TOTAL_WARNINGS,true });
+			_m_data_to_print_collection.push_back({ TERMINATED_EARLY,true });
+		}
+	{
+		using enum enum_test_report_data_t;
+		using enum enum_manual_failure_t;
+		_m_mid_exception_test_report_collection.push_back({ STR_REPRESENTATION, false });
+		//_m_mid_exception_test_report_collection.push_back({ PASSED, false });
+		_m_mid_exception_test_report_collection.push_back({ SOURCE_LOCATION, false });
+		_m_mid_exception_test_report_collection.push_back({ SOURCE_CODE_REPRESENTATION, false });
+		//_m_mid_exception_test_report_collection.push_back({ EARLY_TERMINATION, false });
+		_m_mid_exception_test_report_collection.push_back({ LOG_INFOS, false });
+		//_m_mid_exception_test_report_collection.push_back({ STR_REPRESENTATION, false });
+	}
+	{
+		using enum enum_test_report_data_t;
+		using enum enum_test_assertion_t;
+		_m_test_assertion_collection.push_back({ STR_REPRESENTATION, false });
+		//_m_mid_exception_test_report_collection.push_back({ PASSED, false });
+		_m_test_assertion_collection.push_back({ MATCHER_SOURCE_MAP, false });
+		_m_test_assertion_collection.push_back({ SOURCE_CODE_REPRESENTATION, false });
+		//_m_mid_exception_test_report_collection.push_back({ EARLY_TERMINATION, false });
+		_m_test_assertion_collection.push_back({ MATCHER_STRING, false });
+		_m_test_assertion_collection.push_back({ SOURCE_LOCATION, false });
+		_m_test_assertion_collection.push_back({ LOG_INFOS, false });
+		//_m_mid_exception_test_report_collection.push_back({ STR_REPRESENTATION, false });
+	}
 
 	}
 	__constexpr_imp
@@ -202,13 +356,26 @@ _BEGIN_ABC_REPORTERS_NS
 		) noexcept
 		: threated_text_output_reporter_t(_a_file_output)
 	{
-
+		using enum enum_info_data_to_print_t;
+		_m_data_to_print_collection.push_back({ TITLE,true });
+		_m_data_to_print_collection.push_back({ NAME,true });
+		_m_data_to_print_collection.push_back({ LOCATION,true });
+		_m_data_to_print_collection.push_back({ TEST_PATH,true });
+		_m_data_to_print_collection.push_back({ SEED_USED,true });
+		_m_data_to_print_collection.push_back({ SEED_USED_HEX,true });
+		_m_data_to_print_collection.push_back({ SEED_TO_USE_TO_RE_RUN_TEST,true });
+		_m_data_to_print_collection.push_back({ SEED_TO_USE_TO_RE_RUN_TEST_HEX,true });
+		_m_data_to_print_collection.push_back({ TOTAL_ASSERTIONS_RAN,true });
+		_m_data_to_print_collection.push_back({ TOTAL_ASSERTIONS_PASSED,true });
+		_m_data_to_print_collection.push_back({ TOTAL_ASSERTIONS_FAILED,true });
+		_m_data_to_print_collection.push_back({ CONDENSED_ASSERTIONS_PASSED_INFO,true });
+		_m_data_to_print_collection.push_back({ TOTAL_WARNINGS,true });
+		_m_data_to_print_collection.push_back({ TERMINATED_EARLY,true });
 	}
 	__no_constexpr_imp
 		void
 		text_test_reporter_t::report_test(
 			const reporters::after_execution_test_report_t& _a_aetr,
-			const ds::repetition_tree_t& _a_test_repeittion_tree,
 			const test_options_t& _a_test_options
 		) noexcept 
 	{
@@ -229,65 +396,29 @@ _BEGIN_ABC_REPORTERS_NS
 			//Define information break-line.
 			const size_t _l_line_len{ _a_test_options._m_console_line_length };
 			const char _l_pretty_char{ _a_test_options._m_separator_chars[0] };
-			const string _l_line_break(_l_line_len, _l_pretty_char);
+			const string _l_line_break{
+				fmt::format("{0}\n",
+					string(
+				_l_line_len, _l_pretty_char)) };
 			//Define the info lines
-			const string _l_info_lines{ fmt::format(
-				"TEST REPORT: {0}\n"
-				"Test Name: {1}\n"
-				"Location: {2}\n"
-				"Test Path: {3}\n"
-				"Seed Used: {4}\n"
-				"Seed Used (hex): {5}\n"
-				"Seed to re-run test: {6}\n"
-				"Seed to re-run test (hex): {7}\n"
-				"Test Assertions Ran: {8}\n"
-				"Passed: {9}\n"
-				"Failed: {10}\n"
-				"Warnings: {11}\n"
-				"Terminated Early: {12}",
-				_a_aetr.passed() ?
-					style_string(_c_test_result_str[0], _l_pass_ts) :
-					style_string(_c_test_result_str[1], _l_failure_ts),
-				_a_aetr.name().has_value() ?
-					style_string(_a_aetr.name().value(),_l_highlighted_info) :
-					style_string(_c_unknown,_l_failure_ts),
-				_a_aetr.location().has_value() ?
-					style_string(location_string(_a_aetr.location().value()),_l_highlighted_info) :
-					style_string(_c_unknown,_l_failure_ts),
-				_a_aetr.test_path() != "" ?
-					style_string(_a_aetr.test_path(),_l_highlighted_info) :
-					style_string(_c_unknown,_l_failure_ts),
-				_a_aetr.seed_used() != "" ?
-					_a_aetr.seed_used() :
-					_c_no_seed_used,
-				_a_aetr.seed_used_in_hex() != "" ?
-					_a_aetr.seed_used_in_hex() :
-					_c_no_seed_used,
-				_a_test_repeittion_tree.print_repetition_tree() != "" ?
-					_a_test_repeittion_tree.print_repetition_tree() :
-					_c_no_seed_used,
-				_a_test_repeittion_tree.print_repetition_tree(_a_test_options) != "" ?
-					_a_test_repeittion_tree.print_repetition_tree(_a_test_options) :
-					_c_no_seed_used,
-				_a_aetr.test_reports_recieved(),
-				_a_aetr.test_reports_passed(),
-				_a_aetr.test_reports_failed(),
-				_a_aetr.test_warnings_recieved(),
-				_a_aetr.terminated_early() ? 
-					style_string(_c_terminated_early[0], _l_failure_ts) :
-					style_string(_c_terminated_early[1], _l_pass_ts)
-
-			)};
+			string _l_info_lines;
+			const std::size_t _l_info_line_padding { get_largest_info_identifier(_a_aetr) };
+			for (const pair<enum_info_data_to_print_t,bool> _l_eidto : _m_data_to_print_collection)
+			{
+				if (_l_eidto.second || check_if_info_data_to_be_included(_l_eidto.first, _a_aetr))
+				{
+					const string _l_identifier{ get_info_data_enum_text_data(_l_eidto.first) };
+					const string _l_padding{ string(_l_info_line_padding - _l_identifier.size(),' ')};
+					_l_info_lines.append(fmt::format("{0}: {1}{2}\n",
+						_l_identifier,
+						_l_padding,
+						get_info_data_from_test_report(_l_eidto.first, _a_aetr, _a_test_options)));
+				}
+			}
 			//Print the output
-			string _l_rv{
-				fmt::format(
-					"{0}\n"
-					"{1}\n"
-					"{0}\n",
-					_l_line_break,
-					_l_info_lines
-				)
-			};
+			string _l_rv{ fmt::format("{0}{1}{0}"
+				,_l_line_break
+				,_l_info_lines) };
 			if (_a_aetr.test_warnings_recieved() > 0)
 			{
 				string _l_warning_str;
@@ -300,142 +431,121 @@ _BEGIN_ABC_REPORTERS_NS
 			if (_a_aetr.test_reports_recieved() > 0)
 			{
 				string _l_report_str;
+				size_t _l_idx{ 1 };
+				size_t _l_maximum_idx_str_size{ to_string(_a_aetr.reports().size()).size()};
 				for (const std::shared_ptr<mid_execution_test_report_t>& _l_report : _a_aetr.reports())
 				{
-					if (not _l_report.get()->passed() || _m_print_successes)
-					{
-						_l_report_str.append(fmt::format("{0}\n", format_report(_l_report)));
-					}
+					_l_report_str.append(fmt::format("{0}", format_report(_l_report,&_a_test_options, _l_idx, _l_maximum_idx_str_size)));
+					++_l_idx;
 				}
 				_l_rv.append(fmt::format("{0}{1}", _l_report_str, _l_line_break));
 			}
 			write(_l_rv);
 		}
 	}
-	/*__no_constexpr_imp
-		void
-		text_test_reporter_t::report_test(
-			const ds::invoked_test_info_t& _a_iti,
-			const errors::test_failures_info_t& _a_error_infos,
-			const test_options_t& _a_test_options
-		) noexcept
+	__constexpr
+		std::size_t
+		text_test_reporter_t::get_largest_info_identifier(
+			const reporters::after_execution_test_report_t& _a_aetr
+		) const noexcept
 	{
 		using namespace std;
-		using namespace ds;
-		using namespace errors;
-		using namespace utility::str;
-		//Return value
-		string _l_rv;
-		//Gather references to requried things
-		//If the test has not passed, print the error.
-		if (not _a_error_infos.passed())
+		size_t _l_largest_identifier{ 0 };
+		for (const pair<enum_info_data_to_print_t, bool> _l_eidto : _m_data_to_print_collection)
 		{
-			string _l_internal_errors_string{};
-			const source_location _l_default_sl;
-			const registered_test_data_t _l_default_rtd;
-			const post_setup_test_data_t _l_default_pstd;
-			const bool _l_has_pstd{ _a_iti.has_post_setup_test_data() };
-			_l_internal_errors_string.append(_l_has_pstd ? "" :
-				fmt::format(
-					"{0}\n",
-					_c_no_pstd
-				));
-			const post_setup_test_data_t& _l_pstd{ _l_has_pstd ? _a_iti.post_setup_test_data() : _l_default_pstd };
-			const bool _l_has_rtd{ _l_has_pstd && _l_pstd.has_registered_test_data() };
-			_l_internal_errors_string.append(_l_has_pstd ? "" :
-				fmt::format(
-					"{0}\n",
-					_c_no_rtd
-				));
-			const registered_test_data_t& _l_rtd{ _l_has_rtd ? _l_pstd.registered_test_data() : _l_default_rtd };
-			const bool _l_has_sl{ _l_has_rtd && _l_rtd._m_source_location.has_value() };
-			_l_internal_errors_string.append(_l_has_sl ? "" :
-				fmt::format(
-					"{0}\n",
-					_c_no_sl
-				));
-			const source_location& _l_sl{ _l_has_rtd ? _l_rtd._m_source_location.value() : _l_default_sl };
-			const size_t _l_line_len{ _a_test_options._m_console_line_length };
-			const char _l_pretty_char{ _a_test_options._m_separator_chars[0] };
-			const fmt::text_style& _l_failure_ts{ _a_test_options._m_failure_text_style };
-			const fmt::text_style& _l_highlighted_info{ _a_test_options._m_highlighted_info_style };
-			//	const array<string, 3> _l_strs_identifiers{ "Function","Location","Seed used"};
-			const size_t _l_largest_identifier_size{ std::strlen(*((std::max_element(_c_strs_identifiers, _c_strs_identifiers + _c_strs_identifiers_size, [](const auto& s1, const auto& s2) {
-				return std::strlen(s1) < std::strlen(s2);
-				})))) };
-			const string _l_line_indent(_a_test_options._m_indent_size, ' ');
-			//Define each line
-			//Pretty printed line
-			const string _l_line_zero(_l_line_len, _l_pretty_char);
-			//Line saying the test has failed, together with the name of the function
-			const string _l_line_one{
-				fmt::format(
-					"{0}",
-					style_string(_c_test_failure_str, _l_failure_ts)) };
-			const string _l_line_two{
-				_l_internal_errors_string.size() > 0 ?
-				fmt::format(
-					"{0}{1}\n{2}",
-					_l_line_indent,
-					style_string(_c_internal_error_string, _l_failure_ts),
-					style_string(_l_internal_errors_string, _l_failure_ts)
-					) :
-				""
-			};
-			//Line presenting function name of test
-			const string _l_line_three{
-				make_aligned_line(_c_strs_identifiers[0], _l_largest_identifier_size,
-					_l_has_rtd ?
-					style_string(_l_rtd._m_description, _l_highlighted_info) :
-					style_string(_c_no_rtd_description, _l_failure_ts)) };
-			//Line presenting location of beginning of test
-			const string _l_line_four{
-				make_aligned_line(_c_strs_identifiers[1], _l_largest_identifier_size,
-					fmt::format("{0}",
-						_l_has_sl ? style_string(location_string(_l_sl), _l_highlighted_info) :
-						style_string(_c_no_sl, _l_failure_ts))) };
-			//Line repreesnting seed data about test
-			const string _l_line_five{
-				_l_pstd.has_repetition_data() ?
-				make_aligned_line(_c_strs_identifiers[2], _l_largest_identifier_size,
-					_l_pstd.repetition_data().print_repetition_tree(_a_test_options))
-				:
-				fmt::format(
-					"{0}: \"{1}\"",
-					_c_alt_seed_str,
-					_a_iti.repetition_tree().print_repetition_tree(_a_test_options))
-			};
-			//Put together the output
-			_l_rv.append(fmt::format(
-				"{0}\n"
-				"{1}\n"
-				"{2}" //doesn't have return as this line isn't awlays used.
-				"{3}\n"
-				"{4}\n"
-				"{5}\n"
-				"{0}\n",
-				_l_line_zero,
-				_l_line_one,
-				_l_line_two,
-				_l_line_three,
-				_l_line_four,
-				_l_line_five
-			));
-			//The index used for the errors themsevles
-			size_t _l_idx{ 1 };
-			//The largest numerical identifer of the failed test
-			const size_t _l_prefix_spaces_size{ std::to_string(_a_error_infos.size()).size() };
-			//A string which contains the size of the largest test, for pretty printing
-			const string _l_line_prefix(_l_prefix_spaces_size + 2, ' ');
-			//Go through each error and print it
-			for (const test_failure_info_t& _l_error_info : _a_error_infos)
+			if (_l_eidto.second || check_if_info_data_to_be_included(_l_eidto.first, _a_aetr))
 			{
-				_l_rv.append(print_error_info(_l_error_info, _l_line_prefix, _l_prefix_spaces_size, _l_idx++, _a_test_options));
+				const string _l_identifier{ get_info_data_enum_text_data(_l_eidto.first) };
+				_l_largest_identifier = std::max(_l_largest_identifier,
+					_l_identifier.size());
 			}
-			//Print the output
-			write(_l_rv);
 		}
-	}*/
+		return _l_largest_identifier;
+	}
+	__constexpr_imp
+		std::string
+		text_test_reporter_t::get_info_data_from_test_report(
+			const enum_info_data_to_print_t _a_enum_info_data,
+			const reporters::after_execution_test_report_t& _a_aetr,
+			const test_options_t& _a_test_options
+		) const
+	{
+		using enum enum_info_data_to_print_t;
+		switch (_a_enum_info_data)
+		{
+		case TITLE:
+			return fmt::format("{0}",
+				style_string(_a_aetr.passed() ? _c_test_result_str[0] : _c_test_result_str[1],
+					_a_aetr.passed() ? _a_test_options._m_pass_text_style : _a_test_options._m_failure_text_style));
+			break;
+		case NAME:
+			return fmt::format("{0}",
+				style_string(_a_aetr.name().has_value() ? _a_aetr.name().value() : _c_unknown,
+					_a_test_options._m_highlighted_info_style));
+		case LOCATION:
+			return fmt::format("{0}",
+				style_string(
+					_a_aetr.location().has_value() ? 
+					utility::str::location_string(_a_aetr.location().value()) : _c_unknown,
+					_a_test_options._m_highlighted_info_style));
+		case TEST_PATH:
+			return fmt::format("{0}",
+				style_string(_a_aetr.test_path(),
+					_a_test_options._m_highlighted_info_style));
+		case SEED_USED:
+			return fmt::format("{0}",
+				style_string(
+					_a_aetr.seed_used() == "" ? "None" :
+					_a_aetr.seed_used(), _a_test_options._m_slight_highlight_style));
+		case SEED_USED_HEX:
+			return fmt::format("{0}",
+				style_string(fmt::format("\"{0}\"",_a_aetr.seed_used_in_hex()), _a_test_options._m_slight_highlight_style));
+		case SEED_TO_USE_TO_RE_RUN_TEST:
+			return fmt::format("{0}",
+				style_string(_a_aetr.seed_to_use_to_re_run_text(), _a_test_options._m_slight_highlight_style));
+		case SEED_TO_USE_TO_RE_RUN_TEST_HEX:
+			return fmt::format("{0}",
+				style_string(fmt::format("\"{0}\"", _a_aetr.seed_to_use_to_re_run_text_in_hex()), _a_test_options._m_slight_highlight_style));
+		case TOTAL_ASSERTIONS_RAN:
+			return fmt::format("{0}", _a_aetr.test_reports_recieved());
+		case TOTAL_ASSERTIONS_PASSED:
+			return fmt::format("{0}", 
+				style_string(std::to_string(_a_aetr.test_reports_passed()),
+					_a_test_options._m_pass_text_style));
+		case TOTAL_ASSERTIONS_FAILED:
+			return fmt::format("{0}",
+				style_string(std::to_string(_a_aetr.test_reports_failed()),
+					_a_test_options._m_failure_text_style));
+		case TOTAL_WARNINGS:
+			return fmt::format("{0}",
+				style_string(std::to_string(_a_aetr.test_warnings_recieved()),
+					_a_aetr.test_warnings_recieved() == 0 ?
+					_a_test_options._m_pass_text_style :
+				_a_test_options._m_failure_text_style));
+		case TERMINATED_EARLY:
+			return fmt::format("{0}",
+				style_string(_a_aetr.terminated_early() ? _c_terminated_early[0] :
+					_c_terminated_early[1],
+					_a_aetr.terminated_early() ?
+					_a_test_options._m_failure_text_style :
+					_a_test_options._m_pass_text_style));
+		case CONDENSED_ASSERTIONS_PASSED_INFO:
+			return fmt::format("{0}",
+				_a_aetr.test_reports_recieved() == _a_aetr.test_reports_passed() ?
+				style_string(
+					fmt::format("{0} / {1}, {2}",
+						_a_aetr.test_reports_passed(), _a_aetr.test_reports_recieved(),
+						_c_condensed_assertions_passed)
+					, _a_test_options._m_pass_text_style) :
+				style_string(
+					fmt::format("{0} / {1}, ({2} tests failed)",
+						_a_aetr.test_reports_passed(), _a_aetr.test_reports_recieved(),
+						_a_aetr.test_reports_failed())
+					, _a_test_options._m_failure_text_style));
+		default:
+			throw errors::unaccounted_for_enum_exception(_a_enum_info_data);
+		}
+	}
 	__constexpr_imp
 		std::string
 		text_test_reporter_t::style_string(
@@ -446,173 +556,6 @@ _BEGIN_ABC_REPORTERS_NS
 		return this->_m_file_name.has_value() ?
 			fmt::format("{0}", _a_str) :
 			fmt::format("{0}", fmt::styled(_a_str, _a_style));
-	}
-
-	__no_constexpr_imp
-		std::string
-		text_test_reporter_t::print_error_info(
-			const errors::test_failure_info_t& _a_error_info,
-			const std::string_view _a_line_prefix,
-			const size_t _a_line_prefix_size,
-			const size_t _a_idx,
-			const test_options_t& _a_options
-		) noexcept
-	{
-		using namespace std;
-		using namespace errors;
-		using namespace utility::str;
-		using enum test_failure_info_enum_t;
-		const fmt::text_style& _l_slight_highlight_ts{ _a_options._m_slight_highlight_style };
-		const fmt::text_style& _l_highlighted_info{ _a_options._m_highlighted_info_style };
-		//Const strings used
-		const string _l_str_idx{ to_string(_a_idx) };
-		const string _l_normalised_line_str_rep{
-			normalise_line_str_rep(_a_error_info.line_str_representation())
-		};
-		const string _l_line_indent(_a_options._m_indent_size, ' ');
-		//First line containing description of error
-		const string _l_error_str{
-			(
-				_a_error_info.test_failure_info_enum() == TEST_FAILURE ? _c_error_strs[0] :
-				_a_error_info.test_failure_info_enum() == MANUAL_FAILURE ? _c_error_strs[1] :
-				_c_error_strs[2]
-			) + std::string(_a_error_info.early_termination() ? _c_error_str_terminated : "")
-		};
-		const string _l_prefix_str_for_use_with_number{ string((_a_line_prefix_size - _l_str_idx.size()) + 1, ' ') };
-		const string _l_error_info_line_zero{
-			fmt::format(
-			"{0}){1}{2}",
-			_a_idx,
-			_l_prefix_str_for_use_with_number,
-			_l_error_str)
-		};
-		//Second line. Contains location info
-		const string _l_location_identifier{
-			(
-				_a_error_info.test_failure_info_enum() == TEST_FAILURE ||
-				_a_error_info.test_failure_info_enum() == MANUAL_FAILURE
-			) ?
-				_c_location_strs[0] : _c_location_strs[1]
-		};
-		const string _l_error_info_line_one{
-			fmt::format(
-				"{0}{1}{2}",
-				_a_line_prefix,
-				_l_location_identifier,
-				style_string(location_string(_a_error_info.source_location()), _l_highlighted_info)) };
-		//Third line contains the expression information
-		const string _l_error_info_line_two{
-		(
-			_a_error_info.test_failure_info_enum() == TEST_FAILURE ||
-			_a_error_info.test_failure_info_enum() == MANUAL_FAILURE
-		) ?
-		fmt::format(
-			"{0}{1}\n"
-			"{0}{2}{3}",
-			_a_line_prefix,
-			_c_failed_expr_strs[0],
-			_l_line_indent,
-			style_string(_l_normalised_line_str_rep, _l_slight_highlight_ts))
-		:
-			(_a_error_info.test_failure_info_enum() == UNHANDLED_EXCEPTION) ?
-			fmt::format("{0}{1}{2}",_a_line_prefix,_c_exception_strs[0],
-				style_string(_a_error_info.type_id(), _l_highlighted_info)) :
-			fmt::format(
-				"{0}{1}",
-				_a_line_prefix,
-				_c_exception_strs[1]
-			)
-		};
-		//We may need some additional lines containing information pertaining to other 
-		//parts of lines which we retain information for
-		const matcher_source_map_t& _l_msm{ _a_error_info.source_map() };
-		string _l_additional_sc_info{};
-		if (_l_msm.size() > 0)
-		{
-			_l_additional_sc_info = fmt::format(
-				"{0}{1}\n",
-				_a_line_prefix, "Expression on multiple lines. Additional relevant expressions:"
-			);
-			for (const pair<string, vector<string>>& _l_sc_info : _l_msm.map())
-			{
-				_l_additional_sc_info.append(fmt::format(
-					"{0}{1}{2}\n",
-					_a_line_prefix, _l_location_identifier,
-					style_string(_l_sc_info.first, _l_highlighted_info)
-				));
-				for (const string& _l_str : _l_sc_info.second)
-				{
-					_l_additional_sc_info.append(fmt::format(
-						"{0}{0}{1}\n",
-						_a_line_prefix, 
-						style_string(_l_str, _l_slight_highlight_ts)
-					));
-				}
-			}
-			//"Additional parts of assertion:"
-			//   Location: ... h.
-			//     No source representation. Consider using the _MATCHER macro to log this.
-		}
-		//Fourth line contains either matcher info, exception's what() info, or no info
-		const string _l_error_info_line_three{
-			 (_a_error_info.test_failure_info_enum() == TEST_FAILURE) ?
-			 fmt::format(
-				 "{0}{1}\n"
-				 "{0}{2}{3}\n",
-				 _l_line_indent,
-				 _c_failed_expr_strs[1],
-				_a_line_prefix,
-				 style_string(_a_error_info.error_msg(), _l_slight_highlight_ts)) :
-			(_a_error_info.test_failure_info_enum() == UNHANDLED_EXCEPTION) ?
-			fmt::format(
-				"{0}{1}\n"
-				"{0}{2}{4}{3}{4}\n",
-				_l_line_indent,
-				_c_exception_strs[2],
-				_a_line_prefix,
-				style_string(_a_error_info.error_msg(), _l_slight_highlight_ts),
-				style_string("\"", _l_slight_highlight_ts)) : "" };
-		string _l_rv;
-		_l_rv.append(fmt::format(
-			"{0}\n"
-			"{1}\n"
-			"{2}\n"
-			"{3}"
-			"{4}",
-			_l_error_info_line_zero,
-			_l_error_info_line_one,
-			_l_error_info_line_two,
-			_l_additional_sc_info,
-			_l_error_info_line_three
-		));
-		//Logging info line
-		const string _l_log_description{
-			(
-				_a_error_info.test_failure_info_enum() == TEST_FAILURE ||
-				_a_error_info.test_failure_info_enum() == MANUAL_FAILURE
-			) ?
-				_c_logged_strs[0] :
-				_c_logged_strs[1]
-		};
-		if (_a_error_info.log_info().size() > 0)
-		{
-			_l_rv.append(fmt::format(
-				"{0}{1}:\n",
-				_a_line_prefix,
-				_l_log_description
-			));
-		}
-		//Show all the log info
-		for (const string& _l_log_info : _a_error_info.log_info())
-		{
-			_l_rv.append(fmt::format(
-				"{0}{1}{2}\n",
-				_l_line_indent,
-				_a_line_prefix,
-				style_string(_l_log_info, _l_slight_highlight_ts)
-			));
-		}
-		return _l_rv;
 	}
 	__constexpr_imp
 		std::string
@@ -625,25 +568,30 @@ _BEGIN_ABC_REPORTERS_NS
 	__constexpr_imp
 		std::string
 		text_test_reporter_t::format_report(
-			const std::shared_ptr<reporters::mid_execution_test_report_t>& _a_report
+			const std::shared_ptr<reporters::mid_execution_test_report_t>& _a_report,
+			const test_options_t* _a_test_options,
+			const std::size_t _a_idx,
+			const std::size_t _a_maximum_idx_str_size
 		) const noexcept
 	{
 		using namespace reporters;
 		mid_execution_test_report_t* _l_ptr{ _a_report.get() };
 		if (_l_ptr == nullptr)
 		{
-			return fmt::format("{0} contains a nullptr",
-				typeid(_a_report));
+			return
+				style_string(fmt::format("Unable to read test. {0} element "
+					"contains a nullptr. ", typeid(_a_report)),
+					_a_test_options->_m_failure_text_style);
 		}
 		manual_failure_t* _l_mf{ dynamic_cast<manual_failure_t*>(_l_ptr) };
 		if (_l_mf != nullptr)
 		{
-			return format_manual_failure(*_l_mf);
+			return format_manual_failure(*_l_mf, _a_idx, _a_maximum_idx_str_size,_a_test_options);
 		}
 		test_assertion_result_t* _l_tar{ dynamic_cast<test_assertion_result_t*>(_l_ptr) };
 		if (_l_tar != nullptr)
 		{
-			return format_test_assertion_result(*_l_tar);
+			return format_test_assertion_result(*_l_tar, _a_idx, _a_maximum_idx_str_size, _a_test_options);
 		}
 		unhandled_exception_t* _l_ue{ dynamic_cast<unhandled_exception_t*>(_l_ptr) };
 		if (_l_ue != nullptr)
@@ -661,46 +609,423 @@ _BEGIN_ABC_REPORTERS_NS
 			return _l_ptr->unformatted_string();
 		}
 	}
+	__constexpr_imp
+		void
+		text_test_reporter_t::append_indented_line(
+			std::string& _a_str,
+			const string_table_t& _a_print_vector,
+			const std::string_view _a_indented_str
+		) const noexcept
+	{
+		using namespace std;
+		_a_str.append(_a_indented_str);
+		for (const vector<string>& _l_line : _a_print_vector)
+		{
+			for (const string& _l_str : _l_line)
+			{
+				_a_str.append(_l_str);
+			}
+			_a_str.append("\n");
+		}
+	}
 	__no_constexpr_imp
 		std::string
 		text_test_reporter_t::format_manual_failure(
-			const manual_failure_t& _a_mf
+			const manual_failure_t& _a_mf,
+			const std::size_t _a_idx,
+			const std::size_t _a_maximum_idx_str_size,
+			const test_options_t* _a_test_options
 		) const noexcept
 	{
-		return fmt::format(
-			"{0}\n"
-			"{1}\n"
-			"{2}\n"
-			"{3}\n"
-			"{4}\n",
-			"Manual failure",
-			_a_mf.source_code_representation(),
-			_a_mf.early_termination(),
-			_a_mf.passed(),
-			_a_mf.source_location());
+		using namespace std;
+		string _l_rv;
+		std::size_t _l_additional = 3;
+		const string _l_idx_as_str{ to_string(_a_idx) };
+		const string _l_id_identifier_cell{ fmt::format("{0}){1}{2}",
+			_l_idx_as_str,
+			string(_a_maximum_idx_str_size - _l_idx_as_str.size(), ' '),
+			string(_l_additional, ' ')
+		) };
+		const string _l_other_cells(_l_id_identifier_cell.size(), ' ');
+		size_t _l_data_idx{ 0 };
+		for (const pair<combined_enum_manual_failure_t,bool> _l_eidto : _m_mid_exception_test_report_collection)
+		{
+			if (_l_eidto.second || check_if_manual_data_to_be_included(_l_eidto.first, _a_mf))
+			{
+				_l_rv.append(prepare_indexed_table(
+					get_manual_data_as_table(
+						_l_eidto.first, _a_mf, _a_test_options,
+						_l_data_idx == 0 ? _l_id_identifier_cell : _l_other_cells
+					)
+				));
+				++_l_data_idx;
+			}
+		}
+		return _l_rv;
+	}
+	__constexpr
+		bool
+		text_test_reporter_t::check_if_execution_test_report_data_to_be_included(
+			const enum_test_report_data_t _a_etrd,
+			const mid_execution_test_report_t* _a_metr
+		) const
+	{
+		using enum enum_test_report_data_t;
+		if (_a_metr == nullptr)
+		{
+			throw errors::unaccounted_for_nullptr(_a_metr);
+		}
+		switch (_a_etrd)
+		{
+		case PASSED:
+		case SOURCE_LOCATION:
+		case EARLY_TERMINATION:
+			return true;
+		case LOG_INFOS:
+			return (_a_metr->log_infos().size() > 0);
+		default:
+			throw errors::unaccounted_for_enum_exception(_a_etrd);
+		}
+	}
+	__constexpr_imp
+		bool
+		text_test_reporter_t::check_if_manual_data_to_be_included(
+			const combined_enum_manual_failure_t _a_cemf,
+			const manual_failure_t& _a_mf
+		) const
+	{
+		using namespace std;
+		if (holds_alternative< enum_test_report_data_t>(_a_cemf))
+		{
+			enum_test_report_data_t _l_enum{ get< enum_test_report_data_t>(_a_cemf) };
+			const mid_execution_test_report_t* _l_base_class{ static_cast<const mid_execution_test_report_t*>(&_a_mf) };
+			return check_if_execution_test_report_data_to_be_included(_l_enum, _l_base_class);
+		}
+		else if (holds_alternative< enum_manual_failure_t>(_a_cemf))
+		{
+			using enum enum_manual_failure_t;
+			enum_manual_failure_t _l_emf{ get< enum_manual_failure_t>(_a_cemf) };
+			switch (_l_emf)
+			{
+			case SOURCE_CODE_REPRESENTATION:
+			case STR_REPRESENTATION:
+				return true;
+			default:
+				throw errors::unaccounted_for_enum_exception(_l_emf);
+			}
+		}
+		else
+		{
+			throw errors::unaccounted_for_variant_exception(_a_cemf);
+		}
+	}
+	__constexpr
+		bool
+		text_test_reporter_t::check_if_test_assertion_data_to_be_included(
+			const combined_enum_test_assertion_t _a_ceta,
+			const test_assertion_result_t& _a_tar
+		) const
+	{
+		using namespace std;
+		if (holds_alternative< enum_test_report_data_t>(_a_ceta))
+		{
+			enum_test_report_data_t _l_enum{ get< enum_test_report_data_t>(_a_ceta) };
+			const mid_execution_test_report_t* _l_base_class{ static_cast<const mid_execution_test_report_t*>(&_a_tar) };
+			return check_if_execution_test_report_data_to_be_included(_l_enum, _l_base_class);
+		}
+		else if (holds_alternative< enum_test_assertion_t>(_a_ceta))
+		{
+			using enum enum_test_assertion_t;
+			enum_test_assertion_t _l_emf{ get< enum_test_assertion_t>(_a_ceta) };
+			switch (_l_emf)
+			{
+			case SOURCE_CODE_REPRESENTATION:
+			case STR_REPRESENTATION:
+			case MATCHER_STRING:
+				return true;
+			case MATCHER_SOURCE_MAP:
+				return _a_tar.matcher_source_map().size() > 0;
+			default:
+				throw errors::unaccounted_for_enum_exception(_l_emf);
+			}
+		}
+		else
+		{
+			throw errors::unaccounted_for_variant_exception(_a_ceta);
+		}
+	}
+	__constexpr 
+		std::string 
+		text_test_reporter_t::prepare_indexed_table(
+			const string_table_t& _a_str_table
+		) const noexcept
+	{
+		using namespace std;
+		string _l_rv{};
+		for (auto& _l_row : _a_str_table)
+		{
+			for (auto& _l_table_element : _l_row)
+			{
+				_l_rv.append(_l_table_element);
+			}
+			_l_rv.append("\n");
+		}
+		return _l_rv;
+	}
+	__constexpr_imp
+		std::string
+		text_test_reporter_t::indent(
+			const std::string_view _a_str
+		) const noexcept
+	{
+		using namespace std;
+		return (string(_m_indent, ' ') + string(_a_str));
+	}
+	__constexpr_imp
+		void
+		text_test_reporter_t::get_execution_test_report_data_as_table(
+			string_table_t& _a_str_table,
+			const enum_test_report_data_t _a_etrd,
+			const mid_execution_test_report_t& _a_metr,
+			const test_options_t* _a_test_options,
+			const std::string_view _a_other_initial_cells
+		) const
+	{
+		using namespace std;
+		using enum enum_test_report_data_t;
+		switch (_a_etrd)
+		{
+		case PASSED:
+			_a_str_table[0].push_back("Passed: ");
+			_a_str_table[0].push_back(
+				style_string(_a_metr.passed() ? "Yes" : "No",
+					_a_metr.passed() ? _a_test_options->_m_pass_text_style :
+					_a_test_options->_m_failure_text_style));
+			break;
+		case SOURCE_LOCATION:
+			_a_str_table[0].push_back("Location: ");
+			_a_str_table.push_back(std::vector<std::string>());
+			_a_str_table[1].push_back(string(_a_other_initial_cells));
+			_a_str_table[1].push_back(
+				indent(style_string(utility::str::location_string(_a_metr.source_location()),
+					_a_test_options->_m_highlighted_info_style)));
+			break;
+		case EARLY_TERMINATION:
+			_a_str_table[0].push_back("Early Termination: ");
+			_a_str_table[0].push_back(
+				style_string(_a_metr.early_termination() ? "Yes" : "No",
+					_a_metr.early_termination() ? _a_test_options->_m_pass_text_style :
+					_a_test_options->_m_failure_text_style));
+			break;
+		case LOG_INFOS:
+			_a_str_table[0].push_back("Associated Log Messages:");
+			for (const std::string& _l_element : _a_metr.log_infos())
+			{
+				_a_str_table.push_back(std::vector<std::string>());
+				_a_str_table.back().push_back(string(_a_other_initial_cells));
+				_a_str_table.back().push_back(indent(style_string(_l_element,
+					_a_test_options->_m_slight_highlight_style)));
+			}
+			break;
+		default:
+			throw errors::unaccounted_for_enum_exception(_a_etrd);
+		}
+	}
+	__constexpr_imp
+		string_table_t
+		text_test_reporter_t::get_manual_data_as_table(
+			const combined_enum_manual_failure_t _a_cemf,
+			const manual_failure_t& _a_mf,
+			const test_options_t* _a_test_options,
+			const std::string_view _a_other_initial_cells
+		) const
+	{
+		size_t _l_additional = 2;
+		using namespace std;
+		string_table_t _l_st(1,std::vector<std::string>());
+		_l_st[0].push_back(string(_a_other_initial_cells));
+		if (holds_alternative< enum_test_report_data_t>(_a_cemf))
+		{
+			enum_test_report_data_t _l_enum{ get< enum_test_report_data_t>(_a_cemf) };
+			const mid_execution_test_report_t* _l_base_class{ static_cast<const mid_execution_test_report_t*>(&_a_mf) };
+			if (_l_base_class == nullptr)
+			{
+				
+			}
+			else
+			{
+				get_execution_test_report_data_as_table(_l_st, _l_enum, *_l_base_class, _a_test_options, _a_other_initial_cells);
+			}
+		}
+		else if (holds_alternative< enum_manual_failure_t>(_a_cemf))
+		{
+			using enum enum_manual_failure_t;
+			enum_manual_failure_t _l_emf{ get< enum_manual_failure_t>(_a_cemf) };
+			switch (_l_emf)
+			{
+			case STR_REPRESENTATION:
+				_l_st[0].push_back(
+					_a_mf.passed() && _a_mf.early_termination() ?
+					style_string("Manual test passed, function terminated early.",
+						_a_test_options->_m_pass_text_style) :
+					(_a_mf.passed() && not _a_mf.early_termination()) ?
+					style_string("Manual test passed.",
+						_a_test_options->_m_pass_text_style) :
+					(not _a_mf.passed() && _a_mf.early_termination()) ?
+					style_string("Manual test failed, function terminated early.",
+						_a_test_options->_m_failure_text_style) :
+					style_string("Manual test failed.",
+						_a_test_options->_m_failure_text_style));
+				break;
+			case SOURCE_CODE_REPRESENTATION:
+				_l_st[0].push_back("Source:");
+				_l_st.push_back(std::vector<std::string>());
+				_l_st[1].push_back(string(_a_other_initial_cells));
+				_l_st[1].push_back(
+					indent(style_string(_a_mf.source_code_representation(),
+						_a_test_options->_m_slight_highlight_style)));
+				break;
+			default:
+				throw errors::unaccounted_for_enum_exception(_l_emf);
+			}
+		}
+		else
+		{
+			throw errors::unaccounted_for_variant_exception(_a_cemf);
+		}
+		return _l_st;
+	}
+	__constexpr_imp
+		string_table_t
+		text_test_reporter_t::get_test_assertion_data_as_table(
+			const combined_enum_test_assertion_t _a_cemf,
+			const test_assertion_result_t& _a_mf,
+			const test_options_t* _a_test_options,
+			const std::string_view _a_other_initial_cells
+		) const
+	{
+		size_t _l_additional = 2;
+		using namespace std;
+		string_table_t _l_st(1, std::vector<std::string>());
+		_l_st[0].push_back(string(_a_other_initial_cells));
+		if (holds_alternative< enum_test_report_data_t>(_a_cemf))
+		{
+			enum_test_report_data_t _l_enum{ get< enum_test_report_data_t>(_a_cemf) };
+			const mid_execution_test_report_t* _l_base_class{ static_cast<const mid_execution_test_report_t*>(&_a_mf) };
+			if (_l_base_class == nullptr)
+			{
+
+			}
+			else
+			{
+				get_execution_test_report_data_as_table(_l_st, _l_enum, *_l_base_class, _a_test_options, _a_other_initial_cells);
+			}
+		}
+		else if (holds_alternative< enum_test_assertion_t>(_a_cemf))
+		{
+			/*
+	MATCHER_STRING
+			*/
+			using enum enum_test_assertion_t;
+			enum_test_assertion_t _l_emf{ get< enum_test_assertion_t>(_a_cemf) };
+			switch (_l_emf)
+			{
+			case STR_REPRESENTATION:
+				_l_st[0].push_back(
+					_a_mf.passed() && _a_mf.early_termination() ?
+					style_string("Assertion passed, function terminated early.",
+						_a_test_options->_m_pass_text_style) :
+					(_a_mf.passed() && not _a_mf.early_termination()) ?
+					style_string("Assertion passed.",
+						_a_test_options->_m_pass_text_style) :
+					(not _a_mf.passed() && _a_mf.early_termination()) ?
+					style_string("Assertion failed, function terminated early.",
+						_a_test_options->_m_failure_text_style) :
+					style_string("Assertion failed.",
+						_a_test_options->_m_failure_text_style));
+				break;
+			case SOURCE_CODE_REPRESENTATION:
+				_l_st[0].push_back("Source:");
+				_l_st.push_back(std::vector<std::string>());
+				_l_st[1].push_back(string(_a_other_initial_cells));
+				_l_st[1].push_back(
+					indent(style_string(_a_mf.source_code_representation(),
+						_a_test_options->_m_slight_highlight_style)));
+				break;
+			case MATCHER_SOURCE_MAP:
+				_l_st[0].push_back("Additional relevant sources:");
+				for (const pair<string, vector<string>>& _l_m : _a_mf.matcher_source_map().map())
+				{
+					_l_st.push_back(std::vector<std::string>());
+					_l_st.back().push_back(string(_a_other_initial_cells));
+					_l_st.back().push_back(indent("Location:"));
+					_l_st.back().push_back(indent(indent(style_string(_l_m.first, _a_test_options->_m_highlighted_info_style))));
+					if (_l_m.second.size() > 0)
+					{
+						_l_st.push_back(std::vector<std::string>());
+						_l_st.back().push_back(string(_a_other_initial_cells));
+						_l_st.back().push_back(indent("Sources:"));
+						for (const string& _a_str : _l_m.second)
+						{
+							_l_st.back().push_back(indent(indent(style_string(_a_str, _a_test_options->_m_slight_highlight_style))));
+						}
+					}
+				}
+				break;
+			case MATCHER_STRING:
+				_l_st.back().push_back("Matcher's output:");
+				if (_a_mf.matcher_str().has_value())
+				{
+					_l_st.push_back(std::vector<std::string>());
+					_l_st.back().push_back(string(_a_other_initial_cells));
+					_l_st.back().push_back(style_string(_a_mf.matcher_str().has_value() ? _a_mf.matcher_str().value() : "<no output>",
+						_a_test_options->_m_slight_highlight_style));
+				}
+				break;
+			default:
+				throw errors::unaccounted_for_enum_exception(_l_emf);
+			}
+		}
+		else
+		{
+			throw errors::unaccounted_for_variant_exception(_a_cemf);
+		}
+		return _l_st;
 	}
 	__constexpr_imp
 		std::string
 		text_test_reporter_t::format_test_assertion_result(
-			const test_assertion_result_t& _a_mf
+			const test_assertion_result_t& _a_mf,
+			const std::size_t _a_idx,
+			const std::size_t _a_maximum_idx_str_size,
+			const test_options_t* _a_test_options
 		) const noexcept
 	{
-		return  fmt::format(
-			"{0}\n"
-			"{1}{2}\n"
-			"{3}\n",
-			(
-
-				_a_mf.passed() ?
-				(_a_mf.early_termination() ?
-					"Test assertion passed, test terminated" :
-					"Test assertion passed") :
-				(_a_mf.early_termination() ?
-					"Test assertion failed, test terminated" :
-					"Test assertion failed")
-				),
-			"Location: ", _a_mf.source_code_representation(),
-			_a_mf.source_location());
+		using namespace std;
+		string _l_rv;
+		std::size_t _l_additional = 3;
+		const string _l_idx_as_str{ to_string(_a_idx) };
+		const string _l_id_identifier_cell{ fmt::format("{0}){1}{2}",
+			_l_idx_as_str,
+			string(_a_maximum_idx_str_size - _l_idx_as_str.size(), ' '),
+			string(_l_additional, ' ')
+		) };
+		const string _l_other_cells(_l_id_identifier_cell.size(), ' ');
+		size_t _l_data_idx{ 0 };
+		for (const pair<combined_enum_test_assertion_t, bool> _l_eidto : _m_test_assertion_collection)
+		{
+			if (_l_eidto.second || check_if_test_assertion_data_to_be_included(_l_eidto.first, _a_mf))
+			{
+				_l_rv.append(prepare_indexed_table(
+					get_test_assertion_data_as_table(
+						_l_eidto.first, _a_mf, _a_test_options,
+						_l_data_idx == 0 ? _l_id_identifier_cell : _l_other_cells
+					)
+				));
+				++_l_data_idx;
+			}
+		}
+		return _l_rv;
 	}
 	__constexpr_imp
 		std::string
@@ -720,6 +1045,82 @@ _BEGIN_ABC_REPORTERS_NS
 	}
 	namespace
 	{
+		__constexpr_imp
+			const char*
+			get_info_data_enum_text_data(
+				const enum_info_data_to_print_t _a_enum_info_data
+			)
+		{
+			using enum enum_info_data_to_print_t;
+			switch (_a_enum_info_data)
+			{
+			case TITLE:
+				return "TEST_INFO";
+			case NAME:
+				return "Test Name";
+			case LOCATION:
+				return "Location";
+			case TEST_PATH:
+				return "Test Path";
+			case SEED_USED:
+				return "Seed Used";
+			case SEED_USED_HEX:
+				return "Seed Used (hex)";
+			case SEED_TO_USE_TO_RE_RUN_TEST:
+				return "Seed to re-run test";
+			case SEED_TO_USE_TO_RE_RUN_TEST_HEX:
+				return "Seed to re-run test (hex)";
+			case TOTAL_ASSERTIONS_RAN:
+				return "Total Assertions Ran";
+			case TOTAL_ASSERTIONS_PASSED:
+				return "Total Assertions Passed";
+			case TOTAL_ASSERTIONS_FAILED:
+				return "Total Assertions Failed";
+			case CONDENSED_ASSERTIONS_PASSED_INFO:
+				return "Assertions";
+			case TOTAL_WARNINGS:
+				return "Total Warnings Issued";
+			case TERMINATED_EARLY:
+				return "Terminated Early";
+			default:
+				throw errors::unaccounted_for_enum_exception(_a_enum_info_data);
+			}
+		}
+		__constexpr_imp
+			bool
+			check_if_info_data_to_be_included(
+				const enum_info_data_to_print_t _a_enum_info_data,
+				const reporters::after_execution_test_report_t& _a_aetr
+			)
+		{
+			using enum enum_info_data_to_print_t;
+			switch (_a_enum_info_data)
+			{
+			case TITLE:
+			case NAME:
+			case LOCATION:
+			case TEST_PATH:
+			case TOTAL_ASSERTIONS_RAN:
+			case TOTAL_ASSERTIONS_PASSED:
+			case TOTAL_ASSERTIONS_FAILED:
+			case CONDENSED_ASSERTIONS_PASSED_INFO:
+				return true;
+			case SEED_USED:
+				return _a_aetr.seed_used() != "";
+			case SEED_USED_HEX:
+				return _a_aetr.seed_used() != "";
+			case SEED_TO_USE_TO_RE_RUN_TEST:
+				return _a_aetr.seed_used() == "";
+			case SEED_TO_USE_TO_RE_RUN_TEST_HEX:
+				return _a_aetr.seed_used() == "";
+			case TOTAL_WARNINGS:
+				return _a_aetr.test_warnings_recieved() > 0;
+			case TERMINATED_EARLY:
+				return _a_aetr.terminated_early();
+			default:
+				throw errors::unaccounted_for_enum_exception(_a_enum_info_data);
+			}
+		}
 		__constexpr_imp
 			std::string
 			normalise_line_str_rep(
@@ -770,34 +1171,6 @@ _BEGIN_ABC_REPORTERS_NS
 				}
 			}
 			return _l_rv;
-		}
-		//Pad a string based on a maximum size and the string which will be used currently
-		__constexpr_imp
-			std::string
-			create_padded_space(
-				const size_t _a_largest_string,
-				const std::string_view _a_string_to_help_pad
-			) noexcept
-		{
-			using namespace std;
-			return string(_a_largest_string - _a_string_to_help_pad.size(), ' ');
-		}
-		__no_constexpr_imp
-			std::string
-			make_aligned_line(
-				const char* _a_identifier,
-				const std::size_t _a_largest_identifer_size,
-				const std::string_view _a_element_to_print
-			) noexcept
-		{
-			using namespace std;
-			return string{
-					fmt::format(
-						"{0}: {1}{2}",
-						_a_identifier,
-						create_padded_space(_a_largest_identifer_size,_a_identifier),
-						_a_element_to_print
-					) };
 		}
 	}
 _END_ABC_REPORTERS_NS
