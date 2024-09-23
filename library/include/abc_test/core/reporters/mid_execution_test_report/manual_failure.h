@@ -8,15 +8,16 @@
 #include <vector>
 
 _BEGIN_ABC_REPORTERS_NS
-class manual_failure_t : public mid_execution_test_report_t
+class manual_assertion_t : public mid_execution_test_report_t
 {
 public:
 	__constexpr
-		manual_failure_t(
+		manual_assertion_t(
 			const std::string_view _a_root_source_code_representation,
 			const std::source_location& _a_source_location,
 			const str_collection_t& _a_log_info,
-			const bool _a_early_termination
+			const bool _a_early_termination,
+			const bool _a_passed
 		) noexcept;
 	__constexpr
 		const std::string_view
@@ -33,13 +34,14 @@ private:
 _END_ABC_REPORTERS_NS
 _BEGIN_ABC_REPORTERS_NS
 __constexpr_imp
-	manual_failure_t::manual_failure_t(
+	manual_assertion_t::manual_assertion_t(
 		const std::string_view _a_root_source_code_representation,
 		const std::source_location& _a_source_location,
 		const str_collection_t& _a_log_info,
-		const bool _a_early_termination
+		const bool _a_early_termination,
+		const bool _a_passed
 	) noexcept
-	: mid_execution_test_report_t(false, _a_source_location, _a_early_termination,
+	: mid_execution_test_report_t(_a_passed, _a_source_location, _a_early_termination,
 		_a_log_info)
 	, _m_scr(_a_root_source_code_representation)
 {
@@ -47,14 +49,14 @@ __constexpr_imp
 }
 __constexpr_imp
 	const std::string_view
-	manual_failure_t::source_code_representation(
+	manual_assertion_t::source_code_representation(
 	) const noexcept
 {
 	return _m_scr;
 }
 __constexpr_imp
 	std::string
-	manual_failure_t::unformatted_string(
+	manual_assertion_t::unformatted_string(
 ) const noexcept
 {
 	return fmt::format(

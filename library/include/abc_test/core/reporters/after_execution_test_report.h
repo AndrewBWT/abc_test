@@ -105,6 +105,7 @@ private:
 	std::size_t _m_total_test_reports_recieved;
 	std::size_t _m_total_test_reports_passed;
 	std::size_t _m_total_test_reports_failed;
+	const test_options_t* _m_opts;
 	//ds::repetition_tree_t _m_repetition_tree_if_repeating_test;
 	__constexpr
 		after_execution_test_report_t(
@@ -118,7 +119,8 @@ private:
 			const bool _a_terminated_early,
 			const std::size_t _a_total_test_reports_recieved,
 			const std::size_t _a_total_test_reports_passed,
-			const std::size_t _a_total_test_reports_failed
+			const std::size_t _a_total_test_reports_failed,
+			const test_options_t* _a_test_options
 		) noexcept;
 };
 _END_ABC_REPORTERS_NS
@@ -132,7 +134,7 @@ __constexpr_imp
 		std::optional<std::string>(),
 		std::optional<std::source_location>(),
 		"",
-		"","",false,false,0,0,0
+		"","",false,false,0,0,0,nullptr
 	)
 {
 
@@ -161,7 +163,7 @@ __constexpr_imp
 		_a_iti.has_post_setup_test_data() &&
 		_a_iti.post_setup_test_data().has_repetition_data() ?
 		_a_iti.post_setup_test_data().repetition_data().print_repetition_tree(*_a_test_options) : "",
-		true,false,0,0,0
+		true,false,0,0,0, _a_test_options
 	)
 {
 
@@ -189,11 +191,14 @@ __constexpr_imp
 		++_m_total_test_reports_failed;
 		_m_passed = false;
 	}
-	if (_a_metr->early_termination())
+	if (_a_metr->early_termination() && not _a_metr->passed())
 	{
 		_m_terminated_early = true;
 	}
-	_m_mid_execution_reports.push_back(mid_execution_test_report_ptr_t(_a_metr));
+	if (_m_opts->_m_store_passed_test_assertions || not _a_metr->passed())
+	{
+		_m_mid_execution_reports.push_back(mid_execution_test_report_ptr_t(_a_metr));
+	}
 }
 __constexpr_imp
 	void
@@ -318,7 +323,8 @@ __constexpr_imp
 		const bool _a_terminated_early,
 		const std::size_t _a_total_test_reports_recieved,
 		const std::size_t _a_total_test_reports_passed,
-		const std::size_t _a_total_test_reports_failed
+		const std::size_t _a_total_test_reports_failed,
+		const test_options_t* _a_opts
 	) noexcept
 	: _m_mid_execution_reports(_a_mid_execution_reports)
 	, _m_name(_a_name)
@@ -331,6 +337,7 @@ __constexpr_imp
 	, _m_total_test_reports_recieved(_a_total_test_reports_recieved)
 	, _m_total_test_reports_passed(_a_total_test_reports_passed)
 	, _m_total_test_reports_failed(_a_total_test_reports_failed)
+	, _m_opts(_a_opts)
 
 {
 

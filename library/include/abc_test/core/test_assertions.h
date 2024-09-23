@@ -15,9 +15,9 @@ std::source_location::current(),abc::global::get_this_threads_test_runner_ref(),
 #define _CHECK(test_to_run) _INTERNAL_ASSERT(test_to_run, false, "_CHECK")
 #define _REQUIRE(test_to_run) _INTERNAL_ASSERT(test_to_run, true, "_REQUIRE")
 #define _FAIL(string_to_print) abc::create_blank_assertion(abc::utility::str::create_string({"FAIL(\"",string_to_print, "\")"}), \
-std::source_location::current(),abc::global::get_this_threads_test_runner_ref(),false)
+std::source_location::current(),abc::global::get_this_threads_test_runner_ref(),false,false)
 #define _FAIL_AND_TERMINATE(string_to_print) abc::create_blank_assertion(abc::utility::str::create_string({"_FAIL_AND_TERMINATE(\"",string_to_print, "\")"}), \
-std::source_location::current(),abc::global::get_this_threads_test_runner_ref(),true)
+std::source_location::current(),abc::global::get_this_threads_test_runner_ref(),true,false)
 
 #define _MATCHER(Code) abc::matcher_t(Code, #Code)
 
@@ -61,7 +61,8 @@ __constexpr
 		const std::string_view _a_str_representation_of_line,
 		const std::source_location& _a_source_location,
 		test_runner_t& _a_test_runner,
-		const bool _a_early_termination
+		const bool _a_early_termination,
+		const bool _a_passed
 	);
 namespace
 {
@@ -117,17 +118,18 @@ __constexpr_imp
 		const std::string_view _a_str_representation_of_line,
 		const std::source_location& _a_source_location,
 		test_runner_t& _a_test_runner,
-		const bool _a_early_termination
+		const bool _a_early_termination,
+		const bool _a_passed
 	)
 {
 	using namespace std;
 	using namespace reporters;
 	using namespace errors;
 	_a_test_runner.add_mid_execution_test_report(
-		new manual_failure_t(
+		new manual_assertion_t(
 			_a_str_representation_of_line,
 			_a_source_location,
-			_a_test_runner.get_log_infos(false), _a_early_termination
+			_a_test_runner.get_log_infos(false), _a_early_termination, _a_passed
 		)
 	);
 	if (_a_early_termination)
@@ -177,7 +179,7 @@ namespace
 		//Has to be like this otherwise we have to remove the constness from the string_view.
 		_a_test_runner.register_tests_most_recent_source(_a_source_location);
 		_a_test_runner.add_mid_execution_test_report(
-			new test_assertion_result_t(
+			new user_defined_assertion_t(
 				_l_passed,
 				_a_str_representation_of_line,
 				_a_source_location,

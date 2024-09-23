@@ -40,9 +40,6 @@ set(LIBRARY_FILES
   # as well as errors encountered when evaluating tests.
   include/abc_test/core/errors/test_library_exception.h
   include/abc_test/core/errors/test_library_setup_error.h
-  include/abc_test/core/errors/test_failure_info.h
-  include/abc_test/core/errors/test_failures_info.h
-  include/abc_test/core/errors/test_failure_info_enum.h
   include/abc_test/core/errors/test_assertion_exception.h
   # Contains code for reporting errors and test results to the user.
   include/abc_test/core/reporters/error_reporter.h
@@ -50,6 +47,22 @@ set(LIBRARY_FILES
   include/abc_test/core/reporters/text_error_reporter.h
   include/abc_test/core/reporters/test_reporter.h
   include/abc_test/core/reporters/text_test_reporter.h
+  include/abc_test/core/reporters/text_test_reporter/enum_print_data.h
+  include/abc_test/core/reporters/text_test_reporter/colour_palette.h
+  include/abc_test/core/reporters/text_test_reporter/test_overview_printer_config.h
+  include/abc_test/core/reporters/text_test_reporter/enum_test_overview_data.h
+  include/abc_test/core/reporters/text_test_reporter/text_test_options.h
+  include/abc_test/core/reporters/text_test_reporter/test_report_printer_config.h
+  include/abc_test/core/reporters/text_test_reporter/enum_test_report_data.h
+  include/abc_test/core/reporters/text_test_reporter/enum_manual_failure_data.h
+  include/abc_test/core/reporters/text_test_reporter/manual_assertion_printer_config.h
+  include/abc_test/core/reporters/text_test_reporter/enum_user_defined_assertion_print_fields.h
+  include/abc_test/core/reporters/text_test_reporter/enum_non_derived_unhandled_exception_print_fields.h
+  include/abc_test/core/reporters/text_test_reporter/enum_derived_unhandled_exception_print_fields.h
+  include/abc_test/core/reporters/text_test_reporter/user_defined_assertion_printer_config.h
+  include/abc_test/core/reporters/text_test_reporter/non_derived_unhandled_exception_printer_config.h
+  include/abc_test/core/reporters/text_test_reporter/derived_unhandled_exception_printer_config.h
+  include/abc_test/core/reporters/text_test_reporter/list_formattable.h
   include/abc_test/core/reporters/test_reporter_controller.h
   include/abc_test/core/reporters/after_execution_test_report.h
   include/abc_test/core/reporters/mid_execution_test_report.h
@@ -151,6 +164,7 @@ set(LIBRARY_FILES
   include/abc_test/utility/str/printer.h
   include/abc_test/utility/str/parser_utility.h
   include/abc_test/utility/str/string_utility.h
+  include/abc_test/utility/str/string_table.h
   include/abc_test/utility/str.h
   include/abc_test/utility/str/rw_info.h
   # Global file

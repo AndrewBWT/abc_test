@@ -19,7 +19,7 @@ _BEGIN_ABC_REPORTERS_NS
 			report_test(
 				const reporters::after_execution_test_report_t& _a_aetr,
 				const test_options_t& _a_test_options
-			) noexcept = 0;
+			) = 0;
 		/*!
 		* Used to report individual tests
 		*/

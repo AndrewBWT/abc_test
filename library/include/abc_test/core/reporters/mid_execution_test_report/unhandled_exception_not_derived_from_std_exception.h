@@ -16,13 +16,20 @@ public:
 	__constexpr
 		unhandled_exception_not_derived_from_std_exception_t(
 			const std::source_location& _a_source_location,
-			const str_collection_t& _a_log_info
+			const str_collection_t& _a_log_info,
+			const std::source_location& _m_last_source_location_logged
 		) noexcept;
 	__constexpr
 		virtual
 		std::string
 		unformatted_string(
 		) const noexcept override;
+	__constexpr
+		const std::source_location&
+		last_source_location_logged(
+		) const noexcept;
+private:
+	std::source_location _m_last_source_location_logged;
 };
 
 _END_ABC_REPORTERS_NS
@@ -32,9 +39,11 @@ __constexpr_imp
 	unhandled_exception_not_derived_from_std_exception_t::
 	unhandled_exception_not_derived_from_std_exception_t(
 		const std::source_location& _a_source_location,
-		const str_collection_t& _a_log_info
+		const str_collection_t& _a_log_info,
+		const std::source_location& _m_last_source_location_logged
 	) noexcept
 	: mid_execution_test_report_t(false, _a_source_location, true,_a_log_info)
+	, _m_last_source_location_logged(_m_last_source_location_logged)
 {
 
 }
@@ -48,5 +57,12 @@ __constexpr_imp
 		typeid(*this),
 		unformatted_base_string()
 	);
+}
+__constexpr_imp
+	const std::source_location&
+	unhandled_exception_not_derived_from_std_exception_t::last_source_location_logged(
+	) const noexcept
+{
+	return _m_last_source_location_logged;
 }
 _END_ABC_REPORTERS_NS

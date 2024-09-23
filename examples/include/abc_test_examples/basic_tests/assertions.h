@@ -10,6 +10,17 @@
 #include <ranges>
 #include <numeric>
 
+_TEST_CASE("Simple test case ,no assertions", "examples::basic_assertions")
+{
+
+}
+
+_TEST_CASE("Simple test case ,no assertions", "examples::basic_assertions")
+{
+	using namespace abc;
+	_CHECK(abc::eq(1, 1));
+}
+
 // This is the core macro used to define tests.
 /*!
 * Internall the macro declares a uniquely named test T, then created an object of type 

@@ -105,6 +105,8 @@ public:
 
 	std::string _m_enumerate_data_file_type;
 	std::string _m_random_data_file_type;
+
+	bool _m_store_passed_test_assertions;
 private:
 	std::map<size_t, ds::repetition_tree_t> _m_test_repetition_configurations;
 	__constexpr
@@ -151,6 +153,7 @@ __constexpr_imp
 	, _m_enumerate_data_file_type("ed")
 	, _m_random_data_file_type("rd")
 	, _m_general_data_extension("gd")
+	, _m_store_passed_test_assertions(true)
 {
 }
 __constexpr_imp

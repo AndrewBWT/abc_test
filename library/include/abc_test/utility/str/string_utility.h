@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "abc_test/utility/internal/macros.h"
+#include <fmt/base.h>
 
 _BEGIN_ABC_UTILITY_STR_NS
 /*!
@@ -26,6 +27,17 @@ __no_constexpr
 	std::string
 	location_string(
 		const std::source_location& _a_sl
+	) noexcept;
+__constexpr
+	std::string
+	quote(
+		const std::string_view _a_str
+	) noexcept;
+__constexpr
+	std::string
+	indent(
+		const std::size_t _a_size,
+		const std::string_view _a_str
 	) noexcept;
 _END_ABC_UTILITY_STR_NS
 
@@ -81,5 +93,23 @@ __no_constexpr_imp
 		_a_sl.file_name(),
 		_a_sl.line()
 	) };
+}
+__constexpr_imp
+	std::string
+	quote(
+		const std::string_view _a_str
+	) noexcept
+{
+	return fmt::format("\"{0}\"", _a_str);
+}
+__constexpr_imp
+	std::string
+	indent(
+		const std::size_t _a_size,
+		const std::string_view _a_str
+	) noexcept
+{
+	using namespace std;
+	return fmt::format("{0}{1}", string(_a_size, ' '), _a_str);
 }
 _END_ABC_UTILITY_STR_NS
