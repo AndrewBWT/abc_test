@@ -62,4 +62,13 @@ _TEST_CASE("Example showing _CHECK_NO_EXCEPTION_BEGIN and END", "examples::basic
 _TEST_CASE("Example showing what happens when a non-exception entity is thrown", "examples::basic_assertions")
 {
 	using namespace abc;
+	throw int(2);
+}
+
+
+_TEST_CASE("Example showing what happens when an exception entity is thrown", "examples::basic_assertions")
+{
+	using namespace abc;
+	_CHECK(eq(1, 2));
+	throw std::runtime_error("runtime error");
 }

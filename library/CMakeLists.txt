@@ -64,6 +64,12 @@ set(LIBRARY_FILES
   include/abc_test/core/reporters/text_test_reporter/enum_fields/static_assertion.h
   include/abc_test/core/reporters/text_test_reporter/list_formatter/after_execution_test_report.h
   include/abc_test/core/reporters/text_test_reporter/enum_fields/after_execution_test_report.h
+  include/abc_test/core/reporters/text_test_reporter/list_formatter/unexpected_report.h
+  include/abc_test/core/reporters/text_test_reporter/enum_fields/unexpected_report.h
+  include/abc_test/core/reporters/text_test_reporter/list_formatter/unexpected_thrown_non_descript_entity.h
+  include/abc_test/core/reporters/text_test_reporter/enum_fields/unexpected_thrown_non_descript_entity.h
+  include/abc_test/core/reporters/text_test_reporter/list_formatter/unexpected_thrown_exception.h
+  include/abc_test/core/reporters/text_test_reporter/enum_fields/unexpected_thrown_exception.h
   include/abc_test/core/reporters/test_reporter_controller.h
   include/abc_test/core/reporters/after_execution_test_report.h
   include/abc_test/core/reporters/mid_execution_test_report.h

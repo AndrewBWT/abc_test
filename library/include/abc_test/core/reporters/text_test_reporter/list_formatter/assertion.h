@@ -111,10 +111,9 @@ assertion_list_formatter_t<Assertion_Status>::get_data(
 				_l_rv.push_back(_a_pc.indent(_a_pc.colon(_a_pc.source_location_str())));
 				_l_rv.push_back(_a_pc.indent(_a_pc.source_location(_l_element.first), 2));
 				_l_rv.push_back(_a_pc.indent(_a_pc.colon(_a_pc.source_code_str())));
-//				_l_rv.push_back(_a_pc.indent(_a_pc.colon(_a_pc.source_code_str()));
 				for (const string_view _l_str : _l_element.second)
 				{
-					_l_rv.push_back(_a_pc.indent(_a_pc.colon(_a_pc.source_representation(_l_str)),2));
+					_l_rv.push_back(_a_pc.indent(_a_pc.source_representation(_l_str),2));
 				}
 			}
 			return _l_rv;
@@ -140,9 +139,9 @@ assertion_list_formatter_t<Assertion_Status>::get_str_representation(
 {
 	using namespace std;
 	using namespace reports;
-	return fmt::format("Matcher assertion {0}.{1}",
+	return fmt::format("Matcher-based assertion {0}.{1}",
 		_a_element.get_pass_status() ? "passed" : "failed",
 		(same_as<Assertion_Status, pass_or_terminate_t> ?
-			"Assertion terminated function." : ""));
+			" Assertion terminated function." : ""));
 }
 _END_ABC_REPORTERS_NS

@@ -4,17 +4,26 @@
 #include "abc_test/global.h"
 
 #include <exception>
+#include "abc_test/core/test_reports/mid_test_invokation_report/single_source.h"
 
 #include "abc_test/utility/internal/macros.h"
 
-
-#define _INTERNAL_LOG(string_to_log,delete_after_use) abc::log_test_msg_t NAMED_COUNTER(log_var)(string_to_log,delete_after_use, std::source_location::current())
-#define _TLOG(string_to_log) _INTERNAL_LOG(string_to_log,false)
-#define _TLOG_(string_to_log) _INTERNAL_LOG(string_to_log,true)
-#define _INTERNAL_VLOG(variable,delete_after_use) _INTERNAL_LOG(fmt::format("{0} = {1}", #variable,variable),delete_after_use)
-#define _TVLOG(variable) _INTERNAL_VLOG(variable,false)
-#define _TVLOG_(variable) _INTERNAL_VLOG(variable,true)
-
+#define _INTERNAL_LOG_VAR_NAME _l_log_var
+#define _INTERNAL_LOG(_a_string_to_log,_a_delete_after_use, _a_str_representation)\
+	abc::log_test_msg_t NAMED_COUNTER(_INTERNAL_LOG_VAR_NAME)(\
+		abc::reports::single_source_t(_a_str_representation,std::source_location::current()),\
+		_a_string_to_log,\
+		_a_delete_after_use)
+#define _TLOG(_a_str_to_log) _INTERNAL_LOG(_a_str_to_log,false,abc::utility::str::create_string({"_TLOG(",#_a_str_to_log,")"}))
+#define _TLOG_(_a_str_to_log) _INTERNAL_LOG(_a_str_to_log,true,abc::utility::str::create_string({"_TLOG_(",#_a_str_to_log,")"}))
+#define _INTERNAL_VLOG(_a_variable,_a_delete_after_use) \
+		_INTERNAL_LOG(\
+			fmt::format("{0} = {1}", #_a_variable,_a_variable),\
+		_a_delete_after_use\
+		)
+#define _TVLOG(_a_var) _INTERNAL_VLOG(_a_var,false,abc::utility::str::create_string({"_TVLOG(",#_a_var,")"}))
+#define _TVLOG_(_a_var) _INTERNAL_VLOG(_a_var,true,abc::utility::str::create_string({"_TVLOG_(",#_a_var,")"}))
+		
 //Logs are going to be able to be attached to an object!
 
 _BEGIN_ABC_NS
@@ -23,9 +32,9 @@ struct log_test_msg_t
 public:
 	__constexpr
 		log_test_msg_t(
+			const reports::single_source_t& _a_single_source,
 			const std::string_view _a_str,
-			const bool _a_delete_after_use,
-			const std::source_location& _a_source_location
+			const bool _a_delete_after_use
 		) noexcept;
 	__constexpr
 		~log_test_msg_t(
@@ -50,16 +59,16 @@ _BEGIN_ABC_NS
 
 __constexpr_imp
 	log_test_msg_t::log_test_msg_t(
+		const reports::single_source_t& _a_single_source,
 		const std::string_view _a_str,
-		const bool _a_delete_after_use,
-		const std::source_location& _a_source_location
+		const bool _a_delete_after_use
 	) noexcept
 	: _m_str(_a_str)
 	, _m_iterator(global::get_this_threads_test_runner_ref().add_error_info(this))
 	, _m_delete_after_use(_a_delete_after_use)
 {
 	using namespace global;
-	//get_this_threads_test_runner_ref().register_tests_most_recent_source(_a_source_location);
+	get_this_threads_test_runner_ref().register_tests_most_recent_source(_a_single_source);
 }
 __constexpr_imp
 	log_test_msg_t::~log_test_msg_t(

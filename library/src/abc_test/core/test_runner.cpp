@@ -3,6 +3,7 @@
 #include "abc_test/core/log_test_msg.h"
 #include "abc_test/core/errors/test_library_exception.h"
 #include "abc_test/utility/internal/log.h"
+#include "abc_test/core/test_reports/mid_test_invokation_report/unexpected_thrown_exception.h"
 
 _BEGIN_ABC_NS
 __no_constexpr_or_inline_imp
@@ -16,6 +17,7 @@ __no_constexpr_or_inline_imp
 	using namespace utility;
 	using namespace ds;
 	using namespace reporters;
+	using namespace reports;
 	using enum utility::internal::internal_log_enum_t;
 	_LIBRARY_LOG(TEST_INFO, fmt::format(
 			"About to run the following test: {0}",
@@ -48,15 +50,14 @@ __no_constexpr_or_inline_imp
 			}
 			catch (std::exception& _l_exception)
 			{
-				//add_function_report(
-				//	new unhandled_exception_t(_m_tests_most_recent_source,
-				//		typeid(_l_exception).name(), _l_exception.what(),
-				//		get_log_infos(true)));
+				_m_after_execution_test_report.set_unexpected_termination(
+					new unexpected_thrown_exception_t(most_recent_source(),
+						typeid(_l_exception).name(),_l_exception.what()));
 			}
 			catch (...)
 			{
-				//new unhandled_exception_non_descript_thrown_entity_t(_m_tests_most_recent_source,
-				//	get_log_infos(true));
+				_m_after_execution_test_report.set_unexpected_termination(
+					new unexpected_thrown_non_descript_entity_t(most_recent_source()));
 			}
 			_m_after_execution_test_report.add_repetition_tree(_m_current_test.repetition_tree(),&_m_test_options);
 			_m_trc->report_test(_m_after_execution_test_report);

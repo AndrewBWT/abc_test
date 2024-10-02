@@ -22,6 +22,11 @@
 #include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass.h"
 #include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/terminate.h"
 #include "abc_test/core/reporters/text_test_reporter/print_config.h"
+#include "abc_test/core/test_reports/mid_test_invokation_report/unexpected_thrown_exception.h"
+#include "abc_test/core/test_reports/mid_test_invokation_report/unexpected_thrown_non_descript_entity.h"
+#include "abc_test/core/reporters/text_test_reporter/list_formatter/unexpected_thrown_exception.h"
+#include "abc_test/core/reporters/text_test_reporter/list_formatter/unexpected_thrown_non_descript_entity.h"
+
 _BEGIN_ABC_REPORTERS_NS
 /*!
 * Object used to print data about tests to some text output - either the console or a file
@@ -48,12 +53,17 @@ public:
 		virtual
 		void
 		report_test(
-			const reporters::after_execution_test_report_t& _a_aetr,
+			const after_execution_test_report_t& _a_aetr,
 			const test_options_t& _a_test_options
 		) override;
 private:
 	bool _m_has_colour_output;
-	reporters::print_config_t _m_print_config;
+	print_config_t _m_print_config;
+	__constexpr
+		std::vector<std::string>
+		process_termination(
+			const reports::unexpected_report_t<true>* _a_unexpected_report
+		) const;
 	__constexpr
 		std::vector<std::string>
 		process_assertion(
@@ -81,7 +91,7 @@ _BEGIN_ABC_REPORTERS_NS
 	__no_constexpr_imp
 		void
 		text_test_reporter_t::report_test(
-			const reporters::after_execution_test_report_t& _a_aetr,
+			const after_execution_test_report_t& _a_aetr,
 			const test_options_t& _a_test_options
 		) 
 	{
@@ -108,11 +118,22 @@ _BEGIN_ABC_REPORTERS_NS
 			_l_st.new_line();
 		}
 		//Print the output
-		string _l_rv{ fmt::format("{0}{1}{0}",_l_line_break,_l_st()) };
+		string _l_rv{ fmt::format("{0}{1}{0}{2}{0}",_l_line_break,"TEST INFO\n",_l_st())};
+		_l_st = string_table_t({ 0 });
+		if (_a_aetr.unexpected_termination().has_value())
+		{
+			const vector<string> _l_strs = process_termination(_a_aetr.unexpected_termination().value().get());
+			for (const string_view _l_str : _l_strs)
+			{
+				_l_st.push_back(_l_str);
+				_l_st.new_line();
+			}
+			_l_rv.append(fmt::format("{2}{1}{0}{1}", _l_st(), _l_line_break, "UNEXPECTED TERMINATION INFORMATION\n"));
+		}
 		if (_a_aetr.test_warnings_recieved() > 0)
 		{
 			string _l_warning_str;
-			_l_rv.append(fmt::format("{1}{0}", _l_line_break, _l_warning_str));
+			_l_rv.append(fmt::format("{2}{0}{1}{0}", _l_line_break, _l_warning_str, "WARNINGS\n"));
 		}
 		if (_a_aetr.assertions_recieved() > 0)
 		{
@@ -149,10 +170,38 @@ _BEGIN_ABC_REPORTERS_NS
 				}
 				_l_idx++;
 			}*/
-			_l_rv.append(fmt::format("{0}{1}", _l_st(), _l_line_break));
+			_l_rv.append(fmt::format("{2}{1}{0}{1}", _l_st(), _l_line_break, "ASSERTION INFO\n"));
 		}
 		write(_l_rv);
 	}
+__constexpr
+	std::vector<std::string>
+	text_test_reporter_t::process_termination(
+		const reports::unexpected_report_t<true>* _a_unexpected_report
+	) const
+{
+	using namespace reports;
+	if (auto _l_ptr{ dynamic_cast<const unexpected_thrown_exception_t*>(_a_unexpected_report) };
+		_l_ptr != nullptr)
+	{
+		return get_all_data(_m_print_config.unexpected_thrown_exception_fields(), *_l_ptr,
+			_m_print_config, unexpected_thrown_exception_list_formatter_t());
+	}
+	else if (auto _l_ptr{ dynamic_cast<const unexpected_thrown_non_descript_entity_t*>(_a_unexpected_report) };
+		_l_ptr != nullptr)
+	{
+		return get_all_data(_m_print_config.unexpected_thrown_non_descript_entity_fields(), *_l_ptr,
+			_m_print_config, unexpected_thrown_non_descript_entity_list_formatter_t());
+	}
+	else
+	{
+		throw errors::test_library_exception_t(fmt::format(
+			"Could not find function to format item of abstract class {0}. ",
+			typeid(*_a_unexpected_report).name()
+		));
+	}
+	return {};
+}
 __constexpr_imp
 	std::vector<std::string>
 	text_test_reporter_t::process_assertion(

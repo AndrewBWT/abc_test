@@ -3,7 +3,8 @@
 #include "abc_test/core/reporters/text_test_reporter/enum_fields/manual_assertion.h"
 #include "abc_test/core/reporters/text_test_reporter/enum_fields/assertion.h"
 #include "abc_test/core/reporters/text_test_reporter/enum_fields/after_execution_test_report.h"
-
+#include "abc_test/core/reporters/text_test_reporter/enum_fields/unexpected_thrown_exception.h"
+#include "abc_test/core/reporters/text_test_reporter/enum_fields/unexpected_thrown_non_descript_entity.h"
 #include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/fail.h"
 #include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass.h"
 #include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/terminate.h"
@@ -177,8 +178,26 @@ public:
 		static_assertion_fields(
 		) const noexcept;
 	__constexpr
+		enum_print_pair_collection_t< combined_enum_unexpected_thrown_non_descript_entity_fields_t>
+		unexpected_thrown_non_descript_entity_fields(
+		) const noexcept;
+	__constexpr
+		enum_print_pair_collection_t< combined_enum_unexpected_exception_fields_t>
+		unexpected_thrown_exception_fields(
+		) const noexcept;
+	__constexpr
 		const std::string_view
 		source_location_str(
+		) const noexcept;
+	__constexpr
+		const std::string_view
+		potential_source_str(
+			const bool _a_exact_source
+		) const noexcept;
+	__constexpr
+		const std::string_view
+		potential_code_str(
+			const bool _a_exact_source
 		) const noexcept;
 	__constexpr
 		const std::string_view
@@ -199,7 +218,7 @@ public:
 		log_info_str(
 		) const noexcept;
 	__constexpr
-		const std::string_view
+		std::string
 		log_info(
 			const std::string_view _a_str
 		) const noexcept;
@@ -228,6 +247,8 @@ public:
 	enum_print_pair_collection_t< combined_enum_assertion_fields_t> _m_assertion_fields;
 	enum_print_pair_collection_t< combined_enum_generic_assertion_fields_t> _m_manual_assertion_fields;
 	enum_print_pair_collection_t< combined_enum_generic_assertion_fields_t> _m_static_assertion_fields;
+	enum_print_pair_collection_t< combined_enum_unexpected_thrown_non_descript_entity_fields_t> _m_unexpected_thrown_non_descript_entity_fields;
+	enum_print_pair_collection_t< combined_enum_unexpected_exception_fields_t> _m_thrown_exception_fields;
 	bool _m_colours_enabled = true;
 	//! The failure style used when highlighting information in text output.
 	fmt::text_style _m_failure_style = fmt::fg(fmt::color::red);
@@ -287,6 +308,24 @@ public:
 			const std::size_t _a_n_indent = 1
 		) const noexcept;
 	__constexpr
+		const std::string_view
+		exception_type_str(
+		) const noexcept;
+	__constexpr
+		std::string
+		exception_type(
+			const std::string_view _a_str
+		) const noexcept;
+	__constexpr
+		const std::string_view
+		exception_message_str(
+		) const noexcept;
+	__constexpr
+		std::string
+		exception_message(
+			const std::string_view _a_str
+		) const noexcept;
+	__constexpr
 		std::string
 		style(
 			const std::string_view _a_str,
@@ -310,6 +349,8 @@ print_config_t::print_config_t(
 	, _m_static_assertion_fields(default_static_fields())
 	, _m_after_execution_test_report_fields_t(default_after_execution_test_report_fields())
 	, _m_colours_enabled(_a_colours_enabled)
+	, _m_unexpected_thrown_non_descript_entity_fields(default_unexpected_thrown_non_descript_entity_fields())
+	, _m_thrown_exception_fields(default_unexpected_exception_fields())
 {
 
 }
@@ -325,7 +366,7 @@ const std::string_view
 print_config_t::matcher_source_map_str(
 ) const noexcept
 {
-	return "Matcher's associated sources";
+	return "Matcher's other sources";
 }
 __constexpr_imp
 std::string
@@ -517,7 +558,7 @@ print_config_t::termination_status(
 	case ASSERTION_TERMINATION:
 		return highlight_fail("Function terminated due to a failed assertion.");
 	case UNEXPECTED_TERMINATION:
-		return highlight_fail("Function terminated due to an unexpected termination.");
+		return highlight_fail("Function terminated due to an unexpected thrown entity.");
 	default:
 		throw errors::unaccounted_for_enum_exception(_a_termination_type);
 	}
@@ -599,6 +640,20 @@ print_config_t::static_assertion_fields(
 	return _m_static_assertion_fields;
 }
 __constexpr_imp
+enum_print_pair_collection_t< combined_enum_unexpected_thrown_non_descript_entity_fields_t>
+print_config_t::unexpected_thrown_non_descript_entity_fields(
+) const noexcept
+{
+	return _m_unexpected_thrown_non_descript_entity_fields;
+}
+__constexpr_imp
+enum_print_pair_collection_t< combined_enum_unexpected_exception_fields_t>
+print_config_t::unexpected_thrown_exception_fields(
+) const noexcept
+{
+	return _m_thrown_exception_fields;
+}
+__constexpr_imp
 const std::string_view
 print_config_t::source_location_str(
 ) const noexcept
@@ -607,10 +662,40 @@ print_config_t::source_location_str(
 }
 __constexpr_imp
 const std::string_view
+print_config_t::potential_source_str(
+	const bool _a_exact_source
+) const noexcept
+{
+	if (_a_exact_source)
+	{
+		return source_location_str();
+	}
+	else
+	{
+		return "Exact source unable to be verified. Most recently registered source location is";
+	}
+}
+__constexpr_imp
+const std::string_view
+print_config_t::potential_code_str(
+	const bool _a_exact_source
+) const noexcept
+{
+	if (_a_exact_source)
+	{
+		return source_code_str();
+	}
+	else
+	{
+		return "Most recently registered source code representation";
+	}
+}
+__constexpr_imp
+const std::string_view
 print_config_t::source_code_str(
 ) const noexcept
 {
-	return "Source";
+	return "Source code representation";
 }
 __constexpr_imp
 std::string
@@ -637,7 +722,7 @@ print_config_t::log_info_str(
 	return "Logged information";
 }
 __constexpr_imp
-const std::string_view
+std::string
 print_config_t::log_info(
 	const std::string_view _a_str
 ) const noexcept
@@ -676,12 +761,12 @@ print_config_t::status(
 	}
 	else if constexpr (same_as < T, pass_or_fail_t>)
 	{
-		return fmt::format("Assertion will either pass or fail. Currently it {0}.",
+		return fmt::format("Assertion will either pass or fail. This assertion {0}.",
 			_a_status.pass() ? "passes" : "fails");
 	}
 	else if constexpr (same_as<T, pass_or_terminate_t>)
 	{
-		return fmt::format("Assertion will either pass or terminate. Currently it {0}.",
+		return fmt::format("Assertion will either pass or terminate. This assertion {0}.",
 			_a_status.pass() ? "passes" : "terminates");
 	}
 	else
@@ -694,7 +779,7 @@ const std::string_view
 print_config_t::message_str(
 ) const noexcept
 {
-	return "Message";
+	return "With message";
 }
 __constexpr_imp
 std::string
@@ -782,5 +867,35 @@ print_config_t::indent(
 {
 	using namespace std;
 	return string(_a_n_indents* _m_indent_size, ' ').append(_a_str);
+}
+__constexpr
+const std::string_view
+print_config_t::exception_type_str(
+) const noexcept
+{
+	return "Exception type";
+}
+__constexpr
+std::string
+print_config_t::exception_type(
+	const std::string_view _a_str
+) const noexcept
+{
+	return slight_highlight(_a_str);
+}
+__constexpr
+const std::string_view
+print_config_t::exception_message_str(
+) const noexcept
+{
+	return "Exception's what() function returned:";
+}
+__constexpr
+std::string
+print_config_t::exception_message(
+	const std::string_view _a_str
+) const noexcept
+{
+	return slight_highlight(quote(_a_str));
 }
 _END_ABC_REPORTERS_NS

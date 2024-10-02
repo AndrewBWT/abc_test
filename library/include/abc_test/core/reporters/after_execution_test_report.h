@@ -72,6 +72,10 @@ public:
 		test_warnings_recieved(
 		) const noexcept;
 	__constexpr
+		reports::opt_unexpected_report_t
+		unexpected_termination(
+		) const noexcept;
+	__constexpr
 		std::size_t
 		assertions_recieved(
 		) const noexcept;
@@ -95,6 +99,11 @@ public:
 		void
 		add_assertion(
 			const reports::generic_assertion_t<Single_Source, Assertion_Status>* _a_gur
+		) noexcept;
+	__constexpr
+		void
+		set_unexpected_termination(
+			const reports::unexpected_report_t<true>* _a_ur
 		) noexcept;
 	__constexpr
 		void
@@ -266,6 +275,13 @@ __constexpr_imp
 	return 0;
 }
 __constexpr_imp
+reports::opt_unexpected_report_t
+after_execution_test_report_t::unexpected_termination(
+) const noexcept
+{
+	return _m_termination_report;
+}
+__constexpr_imp
 	std::size_t
 	after_execution_test_report_t::assertions_recieved(
 	) const noexcept
@@ -319,6 +335,17 @@ after_execution_test_report_t::add_assertion(
 		_m_termination_type = enum_termination_type_t::ASSERTION_TERMINATION;
 	}
 	_m_assertions.push_back(generic_user_report_ptr_t(_a_gur));
+}
+__constexpr_imp
+void
+after_execution_test_report_t::set_unexpected_termination(
+	const reports::unexpected_report_t<true>* _a_ur
+) noexcept
+{
+	using namespace reports;
+	_m_termination_report = opt_unexpected_report_t(_a_ur);
+	_m_termination_type = enum_termination_type_t::UNEXPECTED_TERMINATION;
+	_m_passed = false;
 }
 __constexpr_imp
 void

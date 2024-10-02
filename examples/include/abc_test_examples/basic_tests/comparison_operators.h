@@ -14,6 +14,8 @@
 
 #include "abc_test/matchers/comparison.h"
 
+#include "abc_test/core/log_test_msg.h"
+
 namespace testing
 {
 	struct Test
@@ -61,12 +63,13 @@ _TEST_CASE("Examples using the comparative operators.", "examples::basic_asserti
 	_CHECK(EXPR(1 != 1));
 	//We also include named constructors in matchers/comparison/constructros.h
 	_CHECK(abc::eq(1,1));
+	_TLOG("LOGGING");
 	_CHECK(eq(1,2));
 	_CHECK(gt(1, 2));
 	_CHECK(lt(2, 1));
 	_CHECK(geq(1, 2));
 	_CHECK(leq(2, 1));
-	_CHECK(neq(1, 1));
+	_CHECK_WITH_MSG(neq(1, 1),"These two numbers aren't equal!");
 
 	//How it works.
 	/*!
