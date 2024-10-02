@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 	using namespace abc::ds;
 	test_options_t _l_to;
 	test_main_t _l_test_main;
-	_l_to._m_threads = 24;
+	_l_to._m_threads = 1;
 	_l_test_main.set_options(_l_to);
 	_l_test_main.add_test_reporter_owned_by_class(new text_test_reporter_t());
 	_l_test_main.add_global_test_list();

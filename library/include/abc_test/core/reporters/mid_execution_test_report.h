@@ -1,5 +1,5 @@
 #pragma once
-
+/*
 #include "abc_test/utility/internal/macros.h"
 #include <vector>
 #include <string>
@@ -110,4 +110,4 @@ __constexpr_imp
 		"_m_log_infos", _m_log_infos
 	);
 }
-_END_ABC_REPORTERS_NS
+_END_ABC_REPORTERS_NS*/

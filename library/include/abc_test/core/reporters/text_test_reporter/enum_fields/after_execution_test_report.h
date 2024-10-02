@@ -1,0 +1,57 @@
+#pragma once
+#include "abc_test/utility/internal/macros.h"
+_BEGIN_ABC_REPORTERS_NS
+enum class enum_after_execution_test_report_fields_t
+{
+	STR_STATUS,
+	PASSED,
+	NAME,
+	SOURCE_LOCATION,
+	SOURCE_REPRESENTATION,
+	TEST_PATH,
+	SEED_USED,
+	SEED_USED_HEX,
+	SEED_TO_USE_TO_RE_RUN_TEST,
+	SEED_TO_USE_TO_RE_RUN_TEST_IN_HEX,
+	TEST_WARNINGS_RECIEVED,
+	ASSERTIONS_RECIEVED,
+	ASSERTIONS_PASSED,
+	ASSERTIONS_FAILED,
+	COMPACT_ASSERTION_DATA,
+	TERMINATION_STATUS
+};
+__constexpr
+enum_print_pair_collection_t< enum_after_execution_test_report_fields_t>
+default_after_execution_test_report_fields(
+) noexcept;
+_END_ABC_REPORTERS_NS
+
+_BEGIN_ABC_REPORTERS_NS
+__constexpr_imp
+enum_print_pair_collection_t< enum_after_execution_test_report_fields_t>
+default_after_execution_test_report_fields(
+) noexcept
+{
+	using enum enum_after_execution_test_report_fields_t;
+	using enum reporters::enum_print_data_t;
+	return
+	{
+		{STR_STATUS,CONTEXTUAL_PRINT},
+		{PASSED, CONTEXTUAL_PRINT},
+		{NAME,CONTEXTUAL_PRINT},
+		{SOURCE_LOCATION, CONTEXTUAL_PRINT},
+		{SOURCE_REPRESENTATION,CONTEXTUAL_PRINT},
+		{TEST_PATH,CONTEXTUAL_PRINT},
+		{SEED_USED, CONTEXTUAL_PRINT},
+		{SEED_USED_HEX,CONTEXTUAL_PRINT},
+		{SEED_TO_USE_TO_RE_RUN_TEST, CONTEXTUAL_PRINT},
+		{SEED_TO_USE_TO_RE_RUN_TEST_IN_HEX,CONTEXTUAL_PRINT},
+		{TEST_WARNINGS_RECIEVED,CONTEXTUAL_PRINT},
+		{ASSERTIONS_RECIEVED, CONTEXTUAL_PRINT},
+		{ASSERTIONS_PASSED,CONTEXTUAL_PRINT},
+		{ASSERTIONS_FAILED, CONTEXTUAL_PRINT},
+		{COMPACT_ASSERTION_DATA,CONTEXTUAL_PRINT},
+		{TERMINATION_STATUS,CONTEXTUAL_PRINT},
+	};
+}
+_END_ABC_REPORTERS_NS

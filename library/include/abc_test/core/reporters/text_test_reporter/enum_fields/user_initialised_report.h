@@ -1,13 +1,9 @@
 #pragma once
 #include "abc_test/utility/internal/macros.h"
-
 _BEGIN_ABC_REPORTERS_NS
-enum class enum_test_report_data_t
+enum class enum_user_initialised_report_fields_t
 {
-	PASSED,
-	SOURCE_LOCATION,
-	EARLY_TERMINATION,
+	SOURCE,
 	LOG_INFOS,
-	STR_REPRESENTATION
 };
 _END_ABC_REPORTERS_NS

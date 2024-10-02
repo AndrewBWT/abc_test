@@ -6,8 +6,9 @@
 #include "abc_test/core/test_order_enum.h"
 
 #include "abc_test/core/reporters/after_execution_test_report.h"
-#include "abc_test/core/reporters/mid_execution_test_report.h"
-#include "abc_test/core/reporters/mid_execution_test_warning.h"
+#include "abc_test/core/test_reports/mid_test_invokation_report/single_source.h"
+
+#include "abc_test/core/test_reports/mid_test_invokation_report/generic_assertion.h"
 
 
 _BEGIN_ABC_NS
@@ -34,19 +35,8 @@ public:
 	__constexpr
 		void
 		register_tests_most_recent_source(
-			const std::source_location& _a_source_location
+			const reports::single_source_t& _a_source_location
 		) noexcept;
-	/*!
-	* When a test failure is encountered, this function is used to add that error to a list of current errors.
-	*/
-	//__constexpr
-	//	void
-	//	add_error(
-	//		const errors::test_failure_info_t& _a_str
-	//	) noexcept;
-	/*!
-	* Used to log information to the test_runner. Returned is an iterator pointiong to the element added.
-	*/
 	__constexpr
 		std::list<const log_test_msg_t*>::iterator
 		add_error_info(
@@ -113,18 +103,27 @@ public:
 		generate_random_seeds(
 		) noexcept;
 	__constexpr
-		const std::source_location&
+		const reports::single_source_t&
 		most_recent_source(
 		) const noexcept;
+	template<
+		bool Single_Source,
+		typename Assertion_Status
+	>
 	__constexpr
 		void
-		add_mid_execution_test_report(
-			reporters::mid_execution_test_report_t* _a_metr
+		add_assertion(
+			const reports::generic_assertion_t<Single_Source,Assertion_Status>* _a_fr
 		) noexcept;
+	template<
+		bool Single_Source,
+		typename Assertion_Status
+	>
 	__constexpr
 		void
-		add_mid_execution_test_warning(
-			reporters::mid_execution_test_warning_t* _a_metr
+		add_assertion_and_warning(
+			const reports::generic_assertion_t<Single_Source, Assertion_Status>* _a_fr,
+			const std::string_view _a_warning
 		) noexcept;
 private:
 	std::list<const log_test_msg_t*> _m_current_error_log_msgs;
@@ -137,7 +136,17 @@ private:
 	utility::rng _m_random_generator;
 	test_order_enum_t _m_test_order;
 	const test_options_t& _m_test_options;
-	std::source_location _m_tests_most_recent_source;
+	reports::single_source_t _m_tests_most_recent_source;
+	template<
+		bool Single_Source,
+		typename Assertion_Status
+	>
+	__constexpr
+		void
+		add_assertion_and_optional_warning(
+			const reports::generic_assertion_t<Single_Source, Assertion_Status>* _a_fr,
+			const std::optional<std::string_view>& _a_optional_warning
+		) noexcept;
 };
 _END_ABC_NS
 
@@ -154,6 +163,7 @@ _BEGIN_ABC_NS
 		, _m_random_generator(utility::rng(_a_test_options._m_seed_values))
 		, _m_test_order(test_order_enum_t::IN_ORDER)
 		, _m_test_options(_a_test_options)
+	, _m_tests_most_recent_source(reports::single_source_t())
 	{
 
 	}
@@ -161,7 +171,7 @@ _BEGIN_ABC_NS
 	__constexpr_imp
 		void
 		test_runner_t::register_tests_most_recent_source(
-			const std::source_location& _a_source_location
+			const reports::single_source_t& _a_source_location
 		) noexcept
 	{
 		_m_tests_most_recent_source = _a_source_location;
@@ -218,30 +228,58 @@ _BEGIN_ABC_NS
 		return _l_seed;
 	}
 __constexpr_imp
-	const std::source_location&
+	const reports::single_source_t&
 	test_runner_t::most_recent_source(
 	) const noexcept
 {
 	return _m_tests_most_recent_source;
 }
+template<
+	bool Single_Source,
+	typename Assertion_Status
+>
 __constexpr_imp
-	void
-	test_runner_t::add_mid_execution_test_report(
-		reporters::mid_execution_test_report_t* _a_metr
-	) noexcept
+void
+test_runner_t::add_assertion(
+	const reports::generic_assertion_t<Single_Source, Assertion_Status>* _a_uir
+) noexcept
 {
 	using namespace std;
-	using namespace ds;
-	vector<repetition_data_t> _l_rds{ _m_current_test.for_loop_data_collection().inform_test_generators_of_failure() };
-	_m_current_test.update_repetition_tree(_l_rds);
-	_m_after_execution_test_report.add_mid_execution_test_report(_a_metr);
+	add_assertion_and_optional_warning(_a_uir, optional<string_view>{});
 }
+template<
+	bool Single_Source,
+	typename Assertion_Status
+>
 __constexpr_imp
-	void
-	test_runner_t::add_mid_execution_test_warning(
-		reporters::mid_execution_test_warning_t* _a_metr
-	) noexcept
+void
+test_runner_t::add_assertion_and_warning(
+	const reports::generic_assertion_t<Single_Source, Assertion_Status>* _a_fr,
+	const std::string_view _a_warning
+) noexcept
 {
-	_m_after_execution_test_report.add_mid_execution_warning(_a_metr);
+	using namespace std;
+	add_assertion_and_optional_warning(_a_fr, optional<string_view>{_a_warning});
+}
+template<
+	bool Single_Source,
+	typename Assertion_Status
+>
+__constexpr_imp
+void
+test_runner_t::add_assertion_and_optional_warning(
+	const reports::generic_assertion_t<Single_Source, Assertion_Status>* _a_uir,
+	const std::optional<std::string_view>& _a_optional_warning
+) noexcept
+{
+	using namespace reports;
+	register_tests_most_recent_source(_a_uir->source());
+	_m_after_execution_test_report.add_assertion(_a_uir);
+	if (_a_optional_warning.has_value())
+	{
+		_m_after_execution_test_report.add_warning(
+			new unexpected_report_t<false>(_a_uir->source(), true)
+		);
+	}
 }
 _END_ABC_NS

@@ -15,22 +15,14 @@ __no_constexpr_or_inline_imp
 				"be in the form <false>. However, through logic operators this could be made to pass "
 				"some overarching test). The last reported source code location was \"{0}\"."
 				"We suggest checking the control flow of the program after this point. ",
-				location_string(global::get_this_threads_test_runner_ptr()->most_recent_source()))
+				"location str")
+				//location_string(global::get_this_threads_test_runner_ptr()->most_recent_source()))
 			;
 	}
 	else
 	{
 		using namespace std;
 		string _l_rv{};
-		for (const pair<string, vector<string>>& _l_element : _m_internal_map)
-		{
-			string _l_rv_element{ fmt::format("\n  Location: {}",_l_element.first) };
-			for (const string& _l_str : _l_element.second)
-			{
-				_l_rv_element.append("\n    Expression: " + _l_str);
-			}
-			_l_rv.append(_l_rv_element);
-		}
 		return _l_rv;
 	}
 }

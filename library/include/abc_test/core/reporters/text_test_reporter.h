@@ -10,24 +10,18 @@
 
 #include "abc_test/core/ds/test_data/invoked_test_data.h"
 
-#include "abc_test/core/reporters/mid_execution_test_report/manual_failure.h"
-#include "abc_test/core/reporters/mid_execution_test_report/test_assertion_result.h"
-#include "abc_test/core/reporters/mid_execution_test_report/unhandled_exception.h"
-#include "abc_test/core/reporters/mid_execution_test_report/unhandled_exception_not_derived_from_std_exception.h"
-
 #include "abc_test/utility/str/string_table.h"
 
-#include "abc_test/core/reporters/text_test_reporter/test_overview_printer_config.h"
-#include "abc_test/core/reporters/text_test_reporter/derived_unhandled_exception_printer_config.h"
-#include "abc_test/core/reporters/text_test_reporter/non_derived_unhandled_exception_printer_config.h"
-#include "abc_test/core/reporters/text_test_reporter/user_defined_assertion_printer_config.h"
-
-#include "abc_test/core/reporters/text_test_reporter/text_test_options.h"
-
-#include "abc_test/core/reporters/text_test_reporter/test_overview_printer_config.h"
-
-#include "abc_test/core/reporters/text_test_reporter/manual_assertion_printer_config.h"
-
+#include "abc_test/core/reporters/text_test_reporter/list_formatter/assertion.h"
+#include "abc_test/core/reporters/text_test_reporter/list_formatter/manual_assertion.h"
+#include "abc_test/core/reporters/text_test_reporter/list_formatter/static_assertion.h"
+#include "abc_test/core/reporters/text_test_reporter/list_formatter/after_execution_test_report.h"
+#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_fail.h"
+#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_terminate.h"
+#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/fail.h"
+#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass.h"
+#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/terminate.h"
+#include "abc_test/core/reporters/text_test_reporter/print_config.h"
 _BEGIN_ABC_REPORTERS_NS
 /*!
 * Object used to print data about tests to some text output - either the console or a file
@@ -58,14 +52,13 @@ public:
 			const test_options_t& _a_test_options
 		) override;
 private:
-	text_test_options_t _m_tex_test_options;
-	test_overview_printer_config_t _m_test_overview_printer_config;
-	colour_palette_t _m_colour_palette;
-	manual_assertion_printer_config_t _m_manual_assertion_printer_config;
-	non_derived_unhandlded_exception_printer_config_t _m_non_derived_unhandled_exception_printer_config;
-	user_defined_printer_config_t _m_user_defined_printer_config;
-	derived_unhandled_exception_printer_config_t _m_derived_unhandlded_exception_printer_config;
 	bool _m_has_colour_output;
+	reporters::print_config_t _m_print_config;
+	__constexpr
+		std::vector<std::string>
+		process_assertion(
+			const reports::generic_assertion_type_t* _a_gur
+		) const;
 };
 _END_ABC_REPORTERS_NS
 
@@ -74,6 +67,7 @@ _BEGIN_ABC_REPORTERS_NS
 		text_test_reporter_t::text_test_reporter_t(
 		) noexcept
 		: threated_text_output_reporter_t(std::cout)
+	, _m_print_config(print_config_t(true))
 	{
 	}
 	__constexpr_imp
@@ -81,6 +75,7 @@ _BEGIN_ABC_REPORTERS_NS
 			const utility::io::file_name_t& _a_file_output
 		) noexcept
 		: threated_text_output_reporter_t(_a_file_output)
+		, _m_print_config(print_config_t(false))
 	{
 	}
 	__no_constexpr_imp
@@ -94,20 +89,23 @@ _BEGIN_ABC_REPORTERS_NS
 		using namespace ds;
 		using namespace errors;
 		using namespace utility::str;
-		//Define information break-line.
+		using namespace reporters;
+		using namespace reports;
+		//list_formattable_t<int, char> _l_y;
 		const size_t _l_line_len{ _a_test_options._m_console_line_length };
 		const char _l_pretty_char{ _a_test_options._m_separator_chars[0] };
 		const string _l_line_break{fmt::format("{0}\n",string(
 			_l_line_len, _l_pretty_char)) };
 		string_table_t _l_st({ 0 });
-		for (const test_info_element_t& _a_option : _m_tex_test_options.test_info_list())
+		const vector<vector<string>> _l_strs = get_all_data<false>(_m_print_config.after_execution_test_report_fields(),
+			_a_aetr, _m_print_config, test_report_list_formatter());
+		for (const vector<string>& _l_row : _l_strs)
 		{
-			if (_m_test_overview_printer_config.check_data(_a_option, _a_aetr))
+			for (const string& _l_cell : _l_row)
 			{
-				_l_st.push_back(string(_m_test_overview_printer_config.info_id(_a_option.first)).append(": "));
-				_l_st.push_back(_m_test_overview_printer_config.get_data(_a_option.first, _m_colour_palette, _a_aetr));
-				_l_st.new_line();
+				_l_st.push_back(_l_cell);
 			}
+			_l_st.new_line();
 		}
 		//Print the output
 		string _l_rv{ fmt::format("{0}{1}{0}",_l_line_break,_l_st()) };
@@ -116,65 +114,14 @@ _BEGIN_ABC_REPORTERS_NS
 			string _l_warning_str;
 			_l_rv.append(fmt::format("{1}{0}", _l_line_break, _l_warning_str));
 		}
-		if (_a_aetr.test_reports_recieved() > 0)
+		if (_a_aetr.assertions_recieved() > 0)
 		{
 			string_table_t _l_st({ 0 });
 			size_t _l_idx{ 1 };
-			const mid_execution_test_reporters_t& _l_reports{ _a_aetr.reports() };
-			for (const mid_execution_test_report_ptr_t& _l_report : _l_reports)
+			const generic_user_report_collection_t& _l_reports{ _a_aetr.assertions() };
+			for (const generic_user_report_ptr_t& _l_report : _l_reports)
 			{
-				vector<string> _l_strs;
-				const manual_assertion_t* _l_ma{ dynamic_cast<manual_assertion_t*>(_l_report.get()) };
-				const user_defined_assertion_t* _l_uda{ dynamic_cast<user_defined_assertion_t*>(_l_report.get()) };
-				const unhandled_exception_t* _l_ue{ dynamic_cast<unhandled_exception_t*>(_l_report.get()) };
-				const unhandled_exception_not_derived_from_std_exception_t* _l_uend{
-					dynamic_cast<unhandled_exception_not_derived_from_std_exception_t*>(_l_report.get()) };
-				//Ordering here is important!
-				//Hierarchy is like so:
-				/*
-				* + mid_execution_test_report (abstract)
-				* |+ manual_assertion_t
-				* ||- user_defined_assertion_t
-				* |+ unhandled_exception_not_derived_from_std_exception_t
-				*  |- unhandled_exception_t
-				* 
-				* So checks must be leaf before parent node.
-				*/
-				if (_l_ue != nullptr)
-				{
-					_l_strs = _m_derived_unhandlded_exception_printer_config.get_all_data(
-						_m_tex_test_options.derived_exception_info_list(),
-						_m_colour_palette,
-						*_l_ue, _m_tex_test_options.indent());
-				}
-				else if (_l_uend != nullptr)
-				{
-					_l_strs = _m_non_derived_unhandled_exception_printer_config.get_all_data(
-						_m_tex_test_options.non_derived_exception_info_list(),
-						_m_colour_palette,
-						*_l_uend,_m_tex_test_options.indent());
-				}
-				else if (_l_uda != nullptr)
-				{
-					_l_strs = _m_user_defined_printer_config.get_all_data(
-						_m_tex_test_options.user_defined_assertion_info_list(),
-						_m_colour_palette,
-						*_l_uda, _m_tex_test_options.indent());
-				}
-				else if (_l_ma != nullptr)
-				{
-					_l_strs = _m_manual_assertion_printer_config.get_all_data(
-						_m_tex_test_options.manual_assertion_info_list(),
-						_m_colour_palette,
-						*_l_ma, _m_tex_test_options.indent());
-				}
-				else
-				{
-					throw errors::test_library_exception_t(fmt::format(
-						"Unable to find non-abstract subclass of {0}. ",
-						typeid(mid_execution_test_report_t).name()
-					));
-				}
+				const vector<string> _l_strs = process_assertion(_l_report.get());
 				size_t _l_data_idx{ 0 };
 				for (const string_view _l_str : _l_strs)
 				{
@@ -187,8 +134,81 @@ _BEGIN_ABC_REPORTERS_NS
 				}
 				_l_idx++;
 			}
+			/*for (const function_report_ptr_t& _l_report : _l_reports)
+			{
+				const vector<string> _l_strs = _m_text_test_options.process_function_report(_l_report.get());
+				size_t _l_data_idx{ 0 };
+				for (const string_view _l_str : _l_strs)
+				{
+					_l_st.push_back(
+						_l_data_idx++ == 0 ?
+						fmt::format(" {0})  ", _l_idx) :
+						"");
+					_l_st.push_back(_l_str);
+					_l_st.new_line();
+				}
+				_l_idx++;
+			}*/
 			_l_rv.append(fmt::format("{0}{1}", _l_st(), _l_line_break));
 		}
 		write(_l_rv);
 	}
+__constexpr_imp
+	std::vector<std::string>
+	text_test_reporter_t::process_assertion(
+		const reports::generic_assertion_type_t* _a_gur
+	) const
+{
+	using namespace reports;
+	if (auto _l_ptr{ dynamic_cast<const assertion_t<pass_or_fail_t>*>(_a_gur) };
+		_l_ptr != nullptr)
+	{
+		return get_all_data(_m_print_config.assertion_fields(), *_l_ptr,
+			_m_print_config, assertion_list_formatter_t<pass_or_fail_t>());
+	}
+	else if(auto _l_ptr{ dynamic_cast<const assertion_t<pass_or_terminate_t>*>(_a_gur) };
+			_l_ptr != nullptr)
+	{
+		return get_all_data(_m_print_config.assertion_fields(), *_l_ptr,
+			_m_print_config, assertion_list_formatter_t<pass_or_terminate_t>());
+	}
+	else if (auto _l_ptr{ dynamic_cast<const manual_assertion_t<pass_or_terminate_t>*>(_a_gur) };
+		_l_ptr != nullptr)
+	{
+		return get_all_data(_m_print_config.manual_assertion_fields(), *_l_ptr,
+			_m_print_config, manual_assertion_list_formatter_t<pass_or_terminate_t>());
+	}
+	else if (auto _l_ptr{ dynamic_cast<const manual_assertion_t<pass_or_fail_t>*>(_a_gur) };
+		_l_ptr != nullptr)
+	{
+		return get_all_data(_m_print_config.manual_assertion_fields(), *_l_ptr,
+			_m_print_config, manual_assertion_list_formatter_t<pass_or_fail_t>());
+	}
+	else if (auto _l_ptr{ dynamic_cast<const static_assertion_t<pass_t>*>(_a_gur) };
+		_l_ptr != nullptr)
+	{
+		return get_all_data(_m_print_config.static_assertion_fields(), *_l_ptr,
+			_m_print_config, static_assertion_list_formatter_t<pass_t>());
+	}
+	else if (auto _l_ptr{ dynamic_cast<const static_assertion_t<fail_t>*>(_a_gur) };
+		_l_ptr != nullptr)
+	{
+		return get_all_data(_m_print_config.static_assertion_fields(), *_l_ptr,
+			_m_print_config, static_assertion_list_formatter_t<fail_t>());
+	}
+	else if (auto _l_ptr{ dynamic_cast<const static_assertion_t<terminate_t>*>(_a_gur) };
+		_l_ptr != nullptr)
+	{
+		return get_all_data(_m_print_config.static_assertion_fields(), *_l_ptr,
+			_m_print_config, static_assertion_list_formatter_t<terminate_t>());
+	}
+	else
+	{
+		throw errors::test_library_exception_t(fmt::format(
+			"Could not find function to format item of abstract class {0}. ",
+			typeid(*_a_gur).name()
+		));
+	}
+	return {};
+}
 _END_ABC_REPORTERS_NS

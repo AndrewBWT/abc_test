@@ -46,32 +46,49 @@ set(LIBRARY_FILES
   include/abc_test/core/reporters/error_reporter_controller.h
   include/abc_test/core/reporters/text_error_reporter.h
   include/abc_test/core/reporters/test_reporter.h
+  # This is the reporter included with the library. It is designed to be extendable for the user. The files
+  # below are all to allow this functionality. It also mirrors the hierarchy of the assertion structures.
   include/abc_test/core/reporters/text_test_reporter.h
+  include/abc_test/core/reporters/text_test_reporter/list_formatter.h
+  include/abc_test/core/reporters/text_test_reporter/print_config.h
   include/abc_test/core/reporters/text_test_reporter/enum_print_data.h
-  include/abc_test/core/reporters/text_test_reporter/colour_palette.h
-  include/abc_test/core/reporters/text_test_reporter/test_overview_printer_config.h
-  include/abc_test/core/reporters/text_test_reporter/enum_test_overview_data.h
-  include/abc_test/core/reporters/text_test_reporter/text_test_options.h
-  include/abc_test/core/reporters/text_test_reporter/test_report_printer_config.h
-  include/abc_test/core/reporters/text_test_reporter/enum_test_report_data.h
-  include/abc_test/core/reporters/text_test_reporter/enum_manual_failure_data.h
-  include/abc_test/core/reporters/text_test_reporter/manual_assertion_printer_config.h
-  include/abc_test/core/reporters/text_test_reporter/enum_user_defined_assertion_print_fields.h
-  include/abc_test/core/reporters/text_test_reporter/enum_non_derived_unhandled_exception_print_fields.h
-  include/abc_test/core/reporters/text_test_reporter/enum_derived_unhandled_exception_print_fields.h
-  include/abc_test/core/reporters/text_test_reporter/user_defined_assertion_printer_config.h
-  include/abc_test/core/reporters/text_test_reporter/non_derived_unhandled_exception_printer_config.h
-  include/abc_test/core/reporters/text_test_reporter/derived_unhandled_exception_printer_config.h
-  include/abc_test/core/reporters/text_test_reporter/list_formattable.h
+  include/abc_test/core/reporters/text_test_reporter/list_formatter/user_initialised_report.h
+  include/abc_test/core/reporters/text_test_reporter/enum_fields/user_initialised_report.h
+  include/abc_test/core/reporters/text_test_reporter/list_formatter/generic_assertion.h
+  include/abc_test/core/reporters/text_test_reporter/enum_fields/generic_assertion.h
+  include/abc_test/core/reporters/text_test_reporter/list_formatter/assertion.h
+  include/abc_test/core/reporters/text_test_reporter/enum_fields/assertion.h
+  include/abc_test/core/reporters/text_test_reporter/list_formatter/manual_assertion.h
+  include/abc_test/core/reporters/text_test_reporter/enum_fields/manual_assertion.h
+  include/abc_test/core/reporters/text_test_reporter/list_formatter/static_assertion.h
+  include/abc_test/core/reporters/text_test_reporter/enum_fields/static_assertion.h
+  include/abc_test/core/reporters/text_test_reporter/list_formatter/after_execution_test_report.h
+  include/abc_test/core/reporters/text_test_reporter/enum_fields/after_execution_test_report.h
   include/abc_test/core/reporters/test_reporter_controller.h
   include/abc_test/core/reporters/after_execution_test_report.h
   include/abc_test/core/reporters/mid_execution_test_report.h
-  include/abc_test/core/reporters/mid_execution_test_report/test_assertion_result.h
-  include/abc_test/core/reporters/mid_execution_test_report/manual_failure.h
-  include/abc_test/core/reporters/mid_execution_test_report/unhandled_exception.h
-  include/abc_test/core/reporters/mid_execution_test_report/unhandled_exception_not_derived_from_std_exception.h
-  include/abc_test/core/reporters/mid_execution_test_warning.h
-  include/abc_test/core/reporters/mid_execution_test_warning/malformed_matcher_warning.h
+  # Contains data structures representing things reported from a test. e.g. assertions, unexpected exceptions
+  include/abc_test/core/test_reports/mid_test_invokation_report/user_initialised_report.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/generic_assertion.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/assertion.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/static_assertion.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/manual_assertion.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/named_assertion.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/unexpected_report.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/unexpected_thrown_non_descript_entity.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/unexpected_thrown_exception.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/single_source.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/source_pair.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/assertion_status/assertion_status_base.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/assertion_status/dynamic_status.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/assertion_status/static_status.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/assertion_status/fail.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/assertion_status/terminate.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_fail.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_terminate.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/block_assertion_container.h
+  include/abc_test/core/test_reports/completed_test_report.h
   # Matcher subfolder. Code contains logic for writing individual assertions.
   include/abc_test/matchers/matcher.h
   include/abc_test/matchers/generic_matcher.h
@@ -121,7 +138,7 @@ set(LIBRARY_FILES
   include/abc_test/gen_data/enumerable/specializations/enum.h
   include/abc_test/gen_data/enumerable/specializations/array.h
   include/abc_test/gen_data/enumerable/specializations/vector.h
-  # utility subfolder. Contains auxillery helper classes and functions not necessary
+  # utility subfolder. Contains axillary helper classes and functions not necessary
   # related to the core testing framework.
   include/abc_test/utility/ptr_utility.h
   include/abc_test/utility/rng.h

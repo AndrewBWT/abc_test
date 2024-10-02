@@ -102,10 +102,10 @@ _TEST_CASE("Some less often used, but useful assertions", "examples::basic_asser
 	* appropriate matcher. 
 	
 	*/
-	_FAIL("The message associated with the failure");
+	_FAIL_WITH_MSG("The message associated with the failure");
 
 	/*!
 	* There is also _FAIL_TERMINATE, which terminates the test if it is hit.
 	*/
-	_FAIL_AND_TERMINATE("If this line is hit, then the program will terminate.");
+	_TERMINATE_WITH_MSG("If this line is hit, then the program will terminate.");
 }

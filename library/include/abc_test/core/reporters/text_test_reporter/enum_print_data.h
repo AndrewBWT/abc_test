@@ -25,7 +25,14 @@ __constexpr
 	dont_print(
 		const enum_print_data_t _a_enum_print_data
 	) noexcept;
-
+template<
+	typename T
+>
+using enum_print_pair_t = std::pair<T, enum_print_data_t>;
+template<
+	typename T
+>
+using enum_print_pair_collection_t = std::vector<enum_print_pair_t<T>>;
 _END_ABC_REPORTERS_NS
 
 _BEGIN_ABC_REPORTERS_NS

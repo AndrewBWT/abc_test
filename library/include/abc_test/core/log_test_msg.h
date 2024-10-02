@@ -15,6 +15,7 @@
 #define _TVLOG(variable) _INTERNAL_VLOG(variable,false)
 #define _TVLOG_(variable) _INTERNAL_VLOG(variable,true)
 
+//Logs are going to be able to be attached to an object!
 
 _BEGIN_ABC_NS
 struct log_test_msg_t
@@ -42,6 +43,7 @@ protected:
 	std::list<const log_test_msg_t*>::iterator _m_iterator;
 	bool _m_delete_after_use;
 };
+using log_infos_t = std::vector<std::string>;
 _END_ABC_NS
 
 _BEGIN_ABC_NS
@@ -57,7 +59,7 @@ __constexpr_imp
 	, _m_delete_after_use(_a_delete_after_use)
 {
 	using namespace global;
-	get_this_threads_test_runner_ref().register_tests_most_recent_source(_a_source_location);
+	//get_this_threads_test_runner_ref().register_tests_most_recent_source(_a_source_location);
 }
 __constexpr_imp
 	log_test_msg_t::~log_test_msg_t(

@@ -3,8 +3,6 @@
 #include "abc_test/core/log_test_msg.h"
 #include "abc_test/core/errors/test_library_exception.h"
 #include "abc_test/utility/internal/log.h"
-#include "abc_test/core/reporters/mid_execution_test_report/unhandled_exception.h"
-#include "abc_test/core/reporters/mid_execution_test_report/unhandled_exception_not_derived_from_std_exception.h"
 
 _BEGIN_ABC_NS
 __no_constexpr_or_inline_imp
@@ -27,7 +25,7 @@ __no_constexpr_or_inline_imp
 		_m_after_execution_test_report = after_execution_test_report_t(_m_current_test, &_m_test_options);
 		//const post_setup_test_data_t& _l_pstd{ _m_current_test.post_setup_test_data() };
 		const registered_test_data_t& _l_rtd{ _m_current_test.post_setup_test_data().registered_test_data() };
-		if (not _l_rtd._m_source_location.has_value())
+		if (false)//not _l_rtd._m_source_location.has_value())
 		{
 			throw test_library_exception_t(
 				fmt::format("registered_test_data_t does not have non-optional source_location. "
@@ -36,7 +34,7 @@ __no_constexpr_or_inline_imp
 		}
 		else
 		{
-			_m_tests_most_recent_source = _l_rtd._m_source_location.value();
+			_m_tests_most_recent_source = _l_rtd._m_source;
 			try
 			{
 				(_l_rtd._m_test_function)();
@@ -50,17 +48,15 @@ __no_constexpr_or_inline_imp
 			}
 			catch (std::exception& _l_exception)
 			{
-				add_mid_execution_test_report(
-					new unhandled_exception_t(_m_tests_most_recent_source, _l_exception.what(), 
-						get_log_infos(true), typeid(_l_exception).name(),
-						_m_tests_most_recent_source));
+				//add_function_report(
+				//	new unhandled_exception_t(_m_tests_most_recent_source,
+				//		typeid(_l_exception).name(), _l_exception.what(),
+				//		get_log_infos(true)));
 			}
 			catch (...)
 			{
-				add_mid_execution_test_report(
-					new unhandled_exception_not_derived_from_std_exception_t(
-						_m_tests_most_recent_source, get_log_infos(true),
-						_m_tests_most_recent_source));
+				//new unhandled_exception_non_descript_thrown_entity_t(_m_tests_most_recent_source,
+				//	get_log_infos(true));
 			}
 			_m_after_execution_test_report.add_repetition_tree(_m_current_test.repetition_tree(),&_m_test_options);
 			_m_trc->report_test(_m_after_execution_test_report);

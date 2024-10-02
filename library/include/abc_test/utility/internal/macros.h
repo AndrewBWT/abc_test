@@ -92,6 +92,11 @@ namespace utility::str {
 _BEGIN_ABC_NS \
 namespace global {
 
+#define _BEGIN_ABC_REPORTS_NS \
+_BEGIN_ABC_NS \
+namespace reports {
+
+
 #define _END_ABC_DS_NS \
 _END_ABC_NS \
 }
@@ -114,5 +119,8 @@ _END_ABC_NS \
 _END_ABC_NS \
 }
 #define _END_ABC_GLOBAL_NS \
+_END_ABC_NS \
+}
+#define _END_ABC_REPORTS_NS \
 _END_ABC_NS \
 }

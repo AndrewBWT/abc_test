@@ -5,8 +5,19 @@
 #include "abc_test/core/reporters/mid_execution_test_report.h"
 #include "abc_test/core/reporters/mid_execution_test_warning.h"
 #include <source_location>
+#include <memory>
+
+#include "abc_test/core/test_reports/mid_test_invokation_report/user_initialised_report.h"
+#include "abc_test/core/test_reports/mid_test_invokation_report/generic_assertion.h"
+#include "abc_test/core/test_reports/mid_test_invokation_report/unexpected_report.h"
 
 _BEGIN_ABC_REPORTERS_NS
+enum class enum_termination_type_t
+{
+	NO_TERMINATION,
+	ASSERTION_TERMINATION,
+	UNEXPECTED_TERMINATION
+};
 struct after_execution_test_report_t
 {
 public:
@@ -24,30 +35,16 @@ public:
 		) const noexcept;
 	__constexpr
 		void
-		add_mid_execution_test_report(
-			reporters::mid_execution_test_report_t* _a_metr
-		) noexcept;
-	__constexpr
-		void
-		add_mid_execution_warning(
-			reporters::mid_execution_test_warning_t* _a_metr
-		) noexcept;
-	__constexpr
-		void
 		add_repetition_tree(
 			const ds::repetition_tree_t& _a_repetition_tree,
 			const test_options_t* _a_test_options
 		) noexcept;
 	__constexpr
-		const mid_execution_test_reporters_t&
-		reports(
-		) const noexcept;
-	__constexpr
 		const std::optional<std::string>&
 		name(
 		) const noexcept;
 	__constexpr
-		const std::optional<std::source_location>&
+		const reports::single_source_t&
 		location(
 		) const noexcept;
 	__constexpr
@@ -76,47 +73,72 @@ public:
 		) const noexcept;
 	__constexpr
 		std::size_t
-		test_reports_recieved(
+		assertions_recieved(
 		) const noexcept;
 	__constexpr
 		std::size_t
-		test_reports_passed(
+		assertions_passed(
 		) const noexcept;
 	__constexpr
 		std::size_t
-		test_reports_failed(
+		assertions_failed(
 		) const noexcept;
 	__constexpr
-		bool
-		terminated_early(
+		enum_termination_type_t
+		terminated_type(
+		) const noexcept;
+	template<
+		bool Single_Source,
+		typename Assertion_Status
+	>
+	__constexpr
+		void
+		add_assertion(
+			const reports::generic_assertion_t<Single_Source, Assertion_Status>* _a_gur
+		) noexcept;
+	__constexpr
+		void
+		add_warning(
+			const reports::unexpected_report_t<false>* _a_warning
+		) noexcept;
+	__constexpr
+		const reports::generic_user_report_collection_t&
+		assertions(
 		) const noexcept;
 private:
-	mid_execution_test_reporters_t _m_mid_execution_reports;
-	mid_execution_test_warnings_t _m_mid_execution_warnings;
+	reports::generic_user_report_collection_t _m_assertions;
+	reports::opt_unexpected_report_t _m_termination_report;
+	reports::unexpected_non_terminating_report_collection_t _m_warnings;
+//	generic_assertions _m_function_reports;
 	std::optional<std::string> _m_name;
-	std::optional<std::source_location> _m_source_location;
+	reports::single_source_t _m_source_location;
 	std::string _m_test_path;
 	std::string _m_seed;
 	std::string _m_seed_in_hex;
 	std::string _m_seed_to_use_to_re_run_test;
 	std::string _m_seed_to_use_to_re_run_test_in_hex;
 	bool _m_passed;
-	bool _m_terminated_early;
+	enum_termination_type_t _m_termination_type;
+	// pass and no termination -> ok
+	// pass and terminate early -> ok
+	// pasa and unexpected termination -> fail
+	// fail and no termination -> fail
+	// fail and terminate early -> fail
+	// fail and unexpected termination -> fail
 	std::size_t _m_total_test_reports_recieved;
 	std::size_t _m_total_test_reports_passed;
 	std::size_t _m_total_test_reports_failed;
 	const test_options_t* _m_opts;
-	//ds::repetition_tree_t _m_repetition_tree_if_repeating_test;
 	__constexpr
 		after_execution_test_report_t(
-			const mid_execution_test_reporters_t& _a_mid_execution_reports,
+		//	const mid_execution_test_reporters_t& _a_mid_execution_reports,
 			const std::optional<std::string>& _a_name,
-			const std::optional<std::source_location>& _a_source_location,
+			const reports::single_source_t& _a_sl,
 			const std::string_view _a_test_path,
 			const std::string_view _a_seed,
 			const std::string_view _a_seed_in_hex,
 			const bool _a_passed,
-			const bool _a_terminated_early,
+			const enum_termination_type_t _a_termination_type,
 			const std::size_t _a_total_test_reports_recieved,
 			const std::size_t _a_total_test_reports_passed,
 			const std::size_t _a_total_test_reports_failed,
@@ -130,11 +152,11 @@ __constexpr_imp
 	after_execution_test_report_t::after_execution_test_report_t(
 	) noexcept
 	: after_execution_test_report_t(
-		mid_execution_test_reporters_t(),
+	//	mid_execution_test_reporters_t(),
 		std::optional<std::string>(),
-		std::optional<std::source_location>(),
+		reports::single_source_t(),
 		"",
-		"","",false,false,0,0,0,nullptr
+		"","",false,enum_termination_type_t::NO_TERMINATION,0,0,0,nullptr
 	)
 {
 
@@ -145,15 +167,15 @@ __constexpr_imp
 		const test_options_t* _a_test_options
 	) noexcept
 	: after_execution_test_report_t(
-		mid_execution_test_reporters_t(),
+	//	mid_execution_test_reporters_t(),
 		_a_iti.has_post_setup_test_data() && 
 		_a_iti.post_setup_test_data().has_registered_test_data() ?
 		std::optional<std::string>(_a_iti.post_setup_test_data().registered_test_data()._m_description) :
 		std::optional<std::string>(),
 		_a_iti.has_post_setup_test_data() &&
 		_a_iti.post_setup_test_data().has_registered_test_data() ?
-		_a_iti.post_setup_test_data().registered_test_data()._m_source_location :
-		std::optional<std::source_location>(),
+		_a_iti.post_setup_test_data().registered_test_data()._m_source :
+		reports::single_source_t(),
 		_a_iti.has_post_setup_test_data() &&
 		_a_iti.post_setup_test_data().has_registered_test_data() ?
 		_a_iti.post_setup_test_data().registered_test_data()._m_test_path : "",
@@ -163,7 +185,7 @@ __constexpr_imp
 		_a_iti.has_post_setup_test_data() &&
 		_a_iti.post_setup_test_data().has_repetition_data() ?
 		_a_iti.post_setup_test_data().repetition_data().print_repetition_tree(*_a_test_options) : "",
-		true,false,0,0,0, _a_test_options
+		true,enum_termination_type_t::NO_TERMINATION,0,0,0, _a_test_options
 	)
 {
 
@@ -174,39 +196,6 @@ __constexpr_imp
 	) const noexcept
 {
 	return _m_passed;
-}
-__constexpr_imp
-	void
-	after_execution_test_report_t::add_mid_execution_test_report(
-		reporters::mid_execution_test_report_t* _a_metr
-) noexcept
-{
-	++_m_total_test_reports_recieved;
-	if (_a_metr->passed())
-	{
-		++_m_total_test_reports_passed;
-	}
-	else
-	{
-		++_m_total_test_reports_failed;
-		_m_passed = false;
-	}
-	if (_a_metr->early_termination() && not _a_metr->passed())
-	{
-		_m_terminated_early = true;
-	}
-	if (_m_opts->_m_store_passed_test_assertions || not _a_metr->passed())
-	{
-		_m_mid_execution_reports.push_back(mid_execution_test_report_ptr_t(_a_metr));
-	}
-}
-__constexpr_imp
-	void
-	after_execution_test_report_t::add_mid_execution_warning(
-		reporters::mid_execution_test_warning_t* _a_metr
-	) noexcept
-{
-	_m_mid_execution_warnings.push_back(mid_execution_test_warning_ptr_t(_a_metr));
 }
 __constexpr_imp
 	void
@@ -221,13 +210,6 @@ __constexpr_imp
 		_a_repetition_tree.print_repetition_tree(*_a_test_options);
 }
 __constexpr_imp
-	const mid_execution_test_reporters_t&
-	after_execution_test_report_t::reports(
-	) const noexcept
-{
-	return _m_mid_execution_reports;
-}
-__constexpr_imp
 	const std::optional<std::string>&
 	after_execution_test_report_t::name(
 	) const noexcept
@@ -235,7 +217,7 @@ __constexpr_imp
 	return _m_name;
 }
 __constexpr_imp
-	const std::optional<std::source_location>&
+	const reports::single_source_t&
 	after_execution_test_report_t::location(
 	) const noexcept
 {
@@ -281,59 +263,102 @@ __constexpr_imp
 	after_execution_test_report_t::test_warnings_recieved(
 ) const noexcept
 {
-	return _m_mid_execution_warnings.size();
+	return 0;
 }
 __constexpr_imp
 	std::size_t
-	after_execution_test_report_t::test_reports_recieved(
+	after_execution_test_report_t::assertions_recieved(
 	) const noexcept
 {
 	return _m_total_test_reports_recieved;
 }
 __constexpr_imp
 	std::size_t
-	after_execution_test_report_t::test_reports_passed(
+	after_execution_test_report_t::assertions_passed(
 	) const noexcept
 {
 	return _m_total_test_reports_passed;
 }
 __constexpr_imp
 	std::size_t
-	after_execution_test_report_t::test_reports_failed(
+	after_execution_test_report_t::assertions_failed(
 ) const noexcept
 {
 	return _m_total_test_reports_failed;
 }
 __constexpr_imp
-	bool
-	after_execution_test_report_t::terminated_early(
+enum_termination_type_t
+	after_execution_test_report_t::terminated_type(
 ) const noexcept
 {
-	return _m_terminated_early;
+	return _m_termination_type;
+}
+template<
+	bool Single_Source,
+	typename Assertion_Status
+>
+__constexpr_imp
+void
+after_execution_test_report_t::add_assertion(
+	const reports::generic_assertion_t<Single_Source, Assertion_Status>* _a_gur
+) noexcept
+{
+	using namespace reports;
+	_m_total_test_reports_recieved++;
+	if (_a_gur->get_pass_status())
+	{
+		_m_total_test_reports_passed++;
+	}
+	else
+	{
+		_m_passed = false;
+		_m_total_test_reports_failed++;
+	}
+	if (_a_gur->terminated())
+	{
+		_m_termination_type = enum_termination_type_t::ASSERTION_TERMINATION;
+	}
+	_m_assertions.push_back(generic_user_report_ptr_t(_a_gur));
+}
+__constexpr_imp
+void
+after_execution_test_report_t::add_warning(
+	const reports::unexpected_report_t<false>* _a_warning
+) noexcept
+{
+	using namespace reports;
+	_m_warnings.push_back(unexpected_non_terminating_report_ptr_t(_a_warning));
+}
+__constexpr_imp
+const reports::generic_user_report_collection_t&
+after_execution_test_report_t::assertions(
+) const noexcept
+{
+	return _m_assertions;
 }
 __constexpr_imp
 	after_execution_test_report_t::after_execution_test_report_t(
-		const mid_execution_test_reporters_t& _a_mid_execution_reports,
+	//	const mid_execution_test_reporters_t& _a_mid_execution_reports,
 		const std::optional<std::string>& _a_name,
-		const std::optional<std::source_location>& _a_source_location,
+		const reports::single_source_t& _a_sl,
 		const std::string_view _a_test_path,
 		const std::string_view _a_seed,
 		const std::string_view _a_seed_in_hex,
 		const bool _a_passed,
-		const bool _a_terminated_early,
+		const enum_termination_type_t _a_termination_type,
 		const std::size_t _a_total_test_reports_recieved,
 		const std::size_t _a_total_test_reports_passed,
 		const std::size_t _a_total_test_reports_failed,
 		const test_options_t* _a_opts
 	) noexcept
-	: _m_mid_execution_reports(_a_mid_execution_reports)
-	, _m_name(_a_name)
-	, _m_source_location(_a_source_location)
+	//: _m_mid_execution_reports(_a_mid_execution_reports)
+	: _m_name(_a_name)
+	, _m_source_location(_a_sl)
 	, _m_test_path(_a_test_path)
 	, _m_seed(_a_seed)
 	, _m_seed_in_hex(_a_seed_in_hex)
 	, _m_passed(_a_passed)
-	, _m_terminated_early(_a_terminated_early)
+	, _m_termination_type(_a_termination_type)
 	, _m_total_test_reports_recieved(_a_total_test_reports_recieved)
 	, _m_total_test_reports_passed(_a_total_test_reports_passed)
 	, _m_total_test_reports_failed(_a_total_test_reports_failed)

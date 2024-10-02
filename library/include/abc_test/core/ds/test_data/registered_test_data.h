@@ -13,6 +13,7 @@
 #include "fmt/format.h"
 
 #include "abc_test/core/ds/test_collections/test_list.h"
+#include "abc_test/core/test_reports/mid_test_invokation_report/single_source.h"
 
 /*! Inner macro which declares a test, registers a test, and then provides that test's
 * definition.
@@ -20,17 +21,59 @@
 @param Path An identifier for the test, used for organisation.
 @param Function_Name The name of the function. When used with _TEST_CASE, this will have been auto-generated.
 */
-#define _TEST_CASE_1(Description,Path,Function_Name,Threads_Required)\
-static void Function_Name(); \
-abc::ds::registered_test_data_t NAMED_COUNTER(Establish)(Function_Name, \
-Description,Path,std::source_location::current(),Threads_Required);\
-static void Function_Name()
+#define FUNCTION_PREFIX _a_establish
 
-#define _TEST_CASE(Description, Path) _TEST_CASE_1(Description,Path,NAMED_COUNTER(Test_Case),1)
-#define _TEST_CASE_THREADED(Description, Path, Threads) _TEST_CASE_1(Description,Path,NAMED_COUNTER(Test_Case),Threads)
+#define _TEST_CASE_1(_a_description,_a_path,_a_function_name,_a_threads_required,\
+	 _a_str_representation)\
+	static void _a_function_name();\
+	abc::ds::registered_test_data_t NAMED_COUNTER(_a_establish)(\
+		_a_function_name,\
+		_a_description,\
+		_a_path,\
+		abc::reports::single_source_t(_a_str_representation,std::source_location::current()),\
+		_a_threads_required\
+	);\
+	static void _a_function_name()
 
-#define _NAMED_TEST_CASE(Name, Description, Path) _TEST_CASE_1(Description, Path, Name, 1)
-#define _NAMED_TEST_CASE_THREADED(Name, Description, Path, Threads) _TEST_CASE_1(Description, Path, Name, Threads)
+#define TEST_CASE_STR _l_test_case
+
+
+#define _TEST_CASE(_a_description, _a_path) \
+	_TEST_CASE_1(\
+		_a_description,\
+		_a_path,\
+		NAMED_COUNTER(TEST_CASE_STR),\
+		1,\
+		abc::utility::str::create_string({"_TEST_CASE(",#_a_description,",",#_a_path,")"})\
+	)
+
+
+#define _TEST_CASE_THREADED(_a_description, _a_path, _a_threads) \
+	_TEST_CASE_1(\
+		_a_description,\
+		_a_path,\
+		NAMED_COUNTER(TEST_CASE_STR),\
+		_a_threads,\
+		abc::utility::str::create_string({"_TEST_CASE_THREADED(",#_a_description,",",#_a_path,",",#_a_threads,")"})\
+	)
+
+#define _NAMED_TEST_CASE(_a_name, _a_description, _a_path) \
+	_TEST_CASE_1(\
+		_a_description,\
+		_a_path,\
+		_a_name,\
+		1,\
+		abc::utility::str::create_string({"_NAMED_TEST_CASE(",#_a_name,",", #_a_description,",",#_a_path,")"})\
+	)
+
+#define _NAMED_TEST_CASE_THREADED(_a_name, _a_description, _a_path, _a_threads) \
+	_TEST_CASE_1(\
+		_a_description,\
+		_a_path,\
+		_a_name,\
+		_a_threads,\
+		abc::utility::str::create_string({"_NAMED_TEST_CASE_THREADED(",#_a_name, ",",#_a_description,",",#_a_path,",",#_a_threads,")"})\
+	)
 
 _BEGIN_ABC_DS_NS
 	using test_function_t = void (*)();
@@ -63,8 +106,8 @@ _BEGIN_ABC_DS_NS
 				const test_function_t _a_test_function,
 				const test_description_ref_t _a_description,
 				const test_path_ref_t _a_test_path,
-				const opt_source_loc_t& _a_source_location,
-				const size_t _a_thread_resourses_required
+				const reports::single_source_t& _a_source,
+				const std::size_t _a_thread_resourses_required
 			) noexcept;
 		/*!
 		* Equals operator for checking equality.
@@ -90,11 +133,12 @@ _BEGIN_ABC_DS_NS
 		/*!
 		* The location of the test. This is an optional field.
 		*/
-		opt_source_loc_t _m_source_location;
+		reports::single_source_t _m_source;
+		//opt_source_loc_t _m_source_location;
 		/*!
 		* The number of thread resourses required by the test.
 		*/
-		size_t _m_thread_resourses_required;
+		std::size_t _m_thread_resourses_required;
 	};
 	__constexpr_imp
 		void
@@ -128,7 +172,7 @@ _BEGIN_ABC_DS_NS
 	__constexpr_imp
 		registered_test_data_t::registered_test_data_t(
 		) noexcept
-		: registered_test_data_t(test_function_t(), "", "", opt_source_loc_t{}, 1)
+		: registered_test_data_t(test_function_t(), "", "", reports::single_source_t{}, 1)
 	{
 
 	}
@@ -137,12 +181,12 @@ _BEGIN_ABC_DS_NS
 			const test_function_t _a_test_function,
 			const test_description_ref_t _a_description,
 			const test_path_ref_t _a_test_path,
-			const opt_source_loc_t& _a_source_location,
-			const size_t _a_thread_resourses_required
+			const reports::single_source_t& _a_source,
+			const std::size_t _a_thread_resourses_required
 		) noexcept
 		: _m_description(_a_description)
 		, _m_test_path(_a_test_path)
-		, _m_source_location(_a_source_location)
+		, _m_source(_a_source)
 		, _m_test_function(_a_test_function)
 		, _m_thread_resourses_required(_a_thread_resourses_required)
 	{
@@ -158,14 +202,7 @@ _BEGIN_ABC_DS_NS
 		__cmp_test(_m_description);
 		__cmp_test(_m_test_path);
 		__cmp_test(_m_thread_resourses_required);
-		__cmp_test(_m_source_location.has_value());
-		if (_m_source_location.has_value())
-		{
-			__cmp_test(_m_source_location.value().column());
-			__cmp_test(_m_source_location.value().file_name());
-			__cmp_test(_m_source_location.value().function_name());
-			__cmp_test(_m_source_location.value().line());
-		}
+		__cmp_test(_m_source);
 		return true;
 	}
 	_END_ABC_DS_NS
@@ -185,13 +222,13 @@ __constexpr_imp
 		"test_function_t = {0}, "
 		"_m_description = \"{1}\", "
 		"_m_test_path = \"{2}\", "
-		"_m_source_location = {3}, "
+		"_m_source = {3}, "
 		"_m_thread_resourses_required = {4}"
 		"}}",
 		_a_rtd._m_test_function != nullptr ? fmt::format("{0}", static_cast<void*>(_a_rtd._m_test_function)) : "nullptr",
 		_a_rtd._m_description,
 		_a_rtd._m_test_path,
-		_a_rtd._m_source_location,
+		_a_rtd._m_source,
 		_a_rtd._m_thread_resourses_required
 	) };
 	return formatter<string_view>::format(_l_rv, _a_ctx);

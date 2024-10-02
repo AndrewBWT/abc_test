@@ -6,7 +6,7 @@
 _BEGIN_ABC_ERRORS_NS
 /*!
 * Dummy exception object used when an assertion fails and the entire function should terminate;
-* this is thrown to be caught by the
+* this is thrown to be caught by the overarching test controller.
 */
 class test_assertion_exception_t
 {
