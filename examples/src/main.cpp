@@ -5,7 +5,7 @@
 
 // All tests
 //#include "abc_test_examples/enumeration.h"
-#include "abc_test_examples/basic_tests.h"
+#include "abc_test_examples/basic_examples.h"
 
 int main(int argc, char* argv[])
 {

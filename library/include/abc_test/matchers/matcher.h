@@ -1,8 +1,8 @@
 #pragma once
 #include "abc_test/core/errors/test_library_exception.h"
-
-#include "abc_test/matchers/generic_matcher.h"
 #include "abc_test/matchers/logic/logic_matcher.h"
+#include "abc_test/matchers/basic_matchers.h"
+#include "abc_test/global.h"
 
 _BEGIN_ABC_NS
 using matcher_internal_ptr_t = std::shared_ptr<generic_matcher_t>;
@@ -12,17 +12,23 @@ struct matcher_t
 public:
 	__constexpr
 		matcher_t(
+			const std::source_location& _a_source_location = std::source_location::current(),
+			const std::optional<std::string>& _a_str_representation =
+			global::get_this_threads_test_runner_ref().get_registered_source(std::source_location::current())
 		) noexcept;
 	__constexpr
 		matcher_t(
-			matcher_internal_ptr_t _a_matcher_internal
+			matcher_internal_ptr_t _a_matcher_internal,
+			const std::source_location& _a_source_location = std::source_location::current(),
+			const std::optional<std::string>& _a_str_representation =
+			global::get_this_threads_test_runner_ref().get_registered_source(std::source_location::current())
 		) noexcept;
-	__constexpr
+	/*__constexpr
 		matcher_t(
 			const matcher_t& _a_matcher_internal,
 			const std::string_view _a_str_representation,
 			const std::source_location& _a_source_location = std::source_location::current()
-		) noexcept;
+		) noexcept;*/
 	__constexpr
 		matcher_internal_ptr_const_ref_t
 		internal_matcher(
@@ -74,34 +80,38 @@ private:
 		) noexcept;
 };
 __constexpr
-	matcher_t
-	matcher(
-		generic_matcher_t* _a_generic_matcher_ptr
-	) noexcept;
+matcher_t
+matcher(
+	generic_matcher_t* _a_generic_matcher_ptr
+) noexcept;
+__constexpr
+matcher_t
+true_matcher(
+) noexcept;
+__constexpr
+matcher_t
+false_matcher(
+) noexcept;
 _END_ABC_NS
 
 _BEGIN_ABC_NS
 __constexpr_imp
 	matcher_t::matcher_t(
+		const std::source_location& _a_sl,
+		const std::optional<std::string>& _a_source
 	) noexcept
-	: _m_matcher_internal(matcher_internal_ptr_t(nullptr))
+	: matcher_t(matcher_internal_ptr_t(new true_matcher_t()),
+		_a_sl,_a_source)
 {}
 __constexpr_imp
 	matcher_t::matcher_t(
-		matcher_internal_ptr_t _a_matcher_internal
+		matcher_internal_ptr_t _a_matcher_internal,
+		const std::source_location& _a_sl,
+		const std::optional<std::string>& _a_source
 	) noexcept
 	: _m_matcher_internal(_a_matcher_internal)
 {
-}
-__constexpr_imp
-	matcher_t::matcher_t(
-		const matcher_t& _a_matcher_internal,
-		const std::string_view _a_str_representation,
-		const std::source_location& _a_source_location
-	) noexcept
-	: _m_matcher_internal(_a_matcher_internal.internal_matcher())
-{
-	_m_matcher_internal->add_source_info(_a_str_representation, _a_source_location);
+	_m_matcher_internal->add_source_info(_a_source, _a_sl);
 }
 __constexpr_imp
 	matcher_internal_ptr_const_ref_t
@@ -197,5 +207,19 @@ __constexpr_imp
 	) noexcept
 {
 	return matcher_t(matcher_internal_ptr_t(_a_generic_matcher_ptr));
+}
+__constexpr_imp
+matcher_t
+true_matcher(
+) noexcept
+{
+	return matcher(new true_matcher_t());
+}
+__constexpr_imp
+matcher_t
+false_matcher(
+) noexcept
+{
+	return matcher(new false_matcher_t());
 }
 _END_ABC_NS

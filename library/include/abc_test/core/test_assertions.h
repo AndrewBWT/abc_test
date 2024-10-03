@@ -46,7 +46,7 @@
 		abc::utility::str::create_string({"_REQUIRE(", #_a_matcher, ")"})\
 	)
 #define _REQUIRE_WITH_MSG(_a_matcher, _a_msg_on_failure) \
-	_INTERNAL_CREATE_ASSERTION_WITH_MSG(\
+	_INTERNAL_CREATE_ASSERTION(\
 		_a_matcher, \
 		abc::reports::pass_or_terminate_t,\
 		std::optional<std::string_view>(_a_msg_on_failure),\
@@ -61,6 +61,7 @@
 #define _FAIL()\
 	_INTERNAL_STATIC_MATCHER(\
 		abc::reports::fail_t,\
+		std::optional<std::string_view>(),\
 		"FAIL()"\
 	)
 #define _TERMINATE()\
@@ -93,7 +94,46 @@
 		std::optional<std::string_view>(_a_msg),\
 		abc::utility::str::create_string({ "_SUCCEED_WITH_MSG(", #_a_msg,")" })\
 	)
-#define _MATCHER(Code) abc::matcher_t(Code, #Code)
+#define _INTERNAL_MANUAL_MATCHER(_a_type,_a_bool,_a_msg,_a_str_representation)\
+	abc::create_manual_assertion<_a_type>(\
+		_a_bool,\
+		_a_msg,\
+		abc::reports::single_source_t(_a_str_representation, std::source_location::current()),\
+		abc::global::get_this_threads_test_runner_ref())
+#define _CHECK_BOOL(_a_bool)\
+	_INTERNAL_MANUAL_MATCHER(\
+		abc::reports::pass_or_fail_t,\
+		_a_bool,\
+		std::optional<std::string_view>{},\
+		abc::utility::str::create_string({"_CHECK_BOOL(",#_a_bool,")"})\
+	)
+#define _REQUIRE_BOOL(_a_bool)\
+	_INTERNAL_MANUAL_MATCHER(\
+		abc::reports::pass_or_terminate_t,\
+		_a_bool,\
+		std::optional<std::string_view>{},\
+		abc::utility::str::create_string({"_REQUIRE_BOOL(",#_a_bool,")"})\
+	)
+#define _CHECK_BOOL_WITH_MSG(_a_bool, _a_msg)\
+	_INTERNAL_MANUAL_MATCHER(\
+		abc::reports::pass_or_fail_t,\
+		_a_bool,\
+		std::optional<std::string_view>{_a_msg},\
+		abc::utility::str::create_string({"_CHECK_BOOL_WITH_MSG(",#_a_bool,",", #_a_msg,")"})\
+	)
+#define _REQUIRE_BOOL_WITH_MSG(_a_bool, _a_msg)\
+	_INTERNAL_MANUAL_MATCHER(\
+		abc::reports::pass_or_terminate_t,\
+		_a_bool,\
+		std::optional<std::string_view>{_a_msg},\
+		abc::utility::str::create_string({"_REQUIRE_BOOL_WITH_MSG(",#_a_bool,",", #_a_msg,")"})\
+	)
+
+#define _SOURCE(_a_line) \
+	abc::global::get_this_threads_test_runner_ref().register_source(std::source_location::current(), #_a_line,#_a_line);\
+	_a_line
+
+//#define _MATCHER(Code) abc::matcher_t(Code, #Code)
 
 #define _BEGIN_MANUAL_ASSERTION_BLOCK(Name)
 
@@ -134,7 +174,7 @@ create_manual_assertion(
 	const std::optional<std::string_view>& _a_str_to_print,
 	const reports::single_source_t& _a_source,
 	test_runner_t& _a_test_runner
-) noexcept(std::same_as<reports::pass_or_fail_t>);
+) noexcept(std::same_as<T, reports::pass_or_fail_t>);
 template<
 	typename T
 >
@@ -146,7 +186,7 @@ create_manual_block_assertion(
 	const std::optional<std::string_view>& _a_str_to_print,
 	const reports::single_source_t& _a_source,
 	test_runner_t& _a_test_runner
-) noexcept(std::same_as<reports::pass_or_fail_t>);
+) noexcept(std::same_as<T, reports::pass_or_fail_t>);
 __constexpr
 void
 end_block_assertion(
@@ -260,7 +300,7 @@ create_manual_assertion(
 	const std::optional<std::string_view>& _a_str_to_print,
 	const reports::single_source_t& _a_source,
 	test_runner_t& _a_test_runner
-) noexcept(std::same_as<reports::pass_or_fail_t>)
+) noexcept(std::same_as<T,reports::pass_or_fail_t>)
 {
 	using namespace reports;
 	const generic_assertion_t<true, T>* _l_gur{
@@ -272,7 +312,7 @@ create_manual_assertion(
 			)
 	};
 	_a_test_runner.add_assertion(_l_gur);
-	return compute_result<T>(_a_pass);
+	return return_result<T>(_a_pass);
 }
 template<
 	typename T
@@ -285,7 +325,7 @@ create_manual_block_assertion(
 	const std::optional<std::string_view>& _a_str_to_print,
 	const reports::single_source_t& _a_source,
 	test_runner_t& _a_test_runner
-) noexcept(std::same_as<reports::pass_or_fail_t>)
+) noexcept(std::same_as<T, reports::pass_or_fail_t>)
 {
 	using namespace reports;
 	//const generic_user_report_t* _l_gur{ nullptr };

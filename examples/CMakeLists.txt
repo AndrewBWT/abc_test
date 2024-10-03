@@ -7,11 +7,13 @@ set(EXAMPLE_FILES
       src/main.cpp
   include/abc_test_examples/enumeration.h
   include/abc_test_examples/enumeration/enum_enumeration_examples.h
-  include/abc_test_examples/basic_tests.h
-  include/abc_test_examples/basic_tests/assertions.h
-  include/abc_test_examples/basic_tests/exceptions.h
-  include/abc_test_examples/basic_tests/comparison_operators.h
-  include/abc_test_examples/basic_tests/logical_operators.h
+  include/abc_test_examples/basic_examples.h
+  include/abc_test_examples/basic_examples/01-assertions.h
+  include/abc_test_examples/basic_examples/02-unhandled_exceptions.h
+  include/abc_test_examples/basic_examples/02_basic_matchers.h
+  include/abc_test_examples/basic_examples/exceptions.h
+  include/abc_test_examples/basic_examples/comparison_operators.h
+  include/abc_test_examples/basic_examples/logical_operators.h
 )
 
 # These are the libs required for the examples executable.

@@ -60,7 +60,7 @@ public:
 	__constexpr
 		void
 		add_source_info(
-			const std::string_view _a_str_representation,
+			const std::optional<std::string>& _a_str_representation,
 			const std::source_location& _a_source_location
 		) noexcept;
 	__constexpr
@@ -172,11 +172,14 @@ __constexpr_imp
 __constexpr_imp
 	void
 	generic_matcher_t::add_source_info(
-		const std::string_view _a_str_representation,
+		const std::optional<std::string>& _a_str_representation,
 		const std::source_location& _a_source_location
 	) noexcept
 {
-	_m_str_representation = _a_str_representation;
+	if (_a_str_representation.has_value())
+	{
+		_m_str_representation = _a_str_representation.value();
+	}
 	_m_source_location = _a_source_location;
 }
 __constexpr_imp

@@ -9,6 +9,7 @@
 #include "abc_test/core/test_reports/mid_test_invokation_report/single_source.h"
 
 #include "abc_test/core/test_reports/mid_test_invokation_report/generic_assertion.h"
+#include "abc_test/utility/source_location_utility.h"
 
 
 _BEGIN_ABC_NS
@@ -125,6 +126,18 @@ public:
 			const reports::generic_assertion_t<Single_Source, Assertion_Status>* _a_fr,
 			const std::string_view _a_warning
 		) noexcept;
+	__constexpr
+		void
+		register_source(
+			const std::source_location& _a_sl,
+			const std::string_view _a_str_representation,
+			const std::string_view _a_inner_str_representation
+		) noexcept;
+	__constexpr
+		std::optional<std::string>
+		get_registered_source(
+			const std::source_location& _a_sl
+		) noexcept;
 private:
 	std::list<const log_test_msg_t*> _m_current_error_log_msgs;
 	std::vector<std::string> _m_cached_log_msgs;
@@ -137,6 +150,7 @@ private:
 	test_order_enum_t _m_test_order;
 	const test_options_t& _m_test_options;
 	reports::single_source_t _m_tests_most_recent_source;
+	std::optional<reports::single_source_t> _m_registered_source;
 	template<
 		bool Single_Source,
 		typename Assertion_Status
@@ -260,6 +274,45 @@ test_runner_t::add_assertion_and_warning(
 {
 	using namespace std;
 	add_assertion_and_optional_warning(_a_fr, optional<string_view>{_a_warning});
+}
+__constexpr_imp
+void
+test_runner_t::register_source(
+	const std::source_location& _a_sl,
+	const std::string_view _a_str_representation,
+	const std::string_view _a_inner_str_representation
+) noexcept
+{
+	using namespace reports;
+	using namespace std;
+	register_tests_most_recent_source(single_source_t(_a_str_representation, _a_sl));
+	if (_m_registered_source.has_value())
+	{
+		//std::exit(-1999);
+	}
+	//else
+	{
+		_m_registered_source = optional<single_source_t>(single_source_t(_a_inner_str_representation, _a_sl));
+	}
+}
+__constexpr_imp
+std::optional<std::string>
+test_runner_t::get_registered_source(
+	const std::source_location& _a_sl
+) noexcept
+{
+	using namespace std;
+	using namespace reports;
+	if (_m_registered_source.has_value())
+	{
+		if (utility::equal_file_name_function_name_and_line(_m_registered_source.value().source_location(),_a_sl))
+		{
+			string _l_str{ _m_registered_source.value().str() };
+			//_m_registered_source = optional<single_source_t>();
+			return _l_str;
+		}
+	}
+	return optional<string>{};
 }
 template<
 	bool Single_Source,

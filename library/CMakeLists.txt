@@ -97,6 +97,7 @@ set(LIBRARY_FILES
   include/abc_test/core/test_reports/completed_test_report.h
   # Matcher subfolder. Code contains logic for writing individual assertions.
   include/abc_test/matchers/matcher.h
+  include/abc_test/matchers/basic_matchers.h
   include/abc_test/matchers/generic_matcher.h
   include/abc_test/matchers/operator_based_matcher.h
   include/abc_test/matchers/comparison.h
@@ -147,6 +148,7 @@ set(LIBRARY_FILES
   # utility subfolder. Contains axillary helper classes and functions not necessary
   # related to the core testing framework.
   include/abc_test/utility/ptr_utility.h
+  include/abc_test/utility/source_location_utility.h
   include/abc_test/utility/rng.h
   # BigInteger files. Currently we do not use these. We should determine whether we will
   # need these and, if not, remove them from the library.

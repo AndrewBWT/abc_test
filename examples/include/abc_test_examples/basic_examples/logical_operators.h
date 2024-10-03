@@ -50,7 +50,7 @@ _TEST_CASE("A multi-line assertion", "examples::basic_assertions")
 	* You can "register" the first line to the second, as shown below.
 	*/
 
-	matcher_t _l_m2{ _MATCHER(EXPR(1 == 2)) };
+	matcher_t _l_m2{ EXPR(1 == 2) };
 	_CHECK(!_l_m2);
 
 	/*!
@@ -61,7 +61,7 @@ _TEST_CASE("A multi-line assertion", "examples::basic_assertions")
 	* 
 	* Please note that, upon "or_statemenet" being called, the matcher _l_1 WILl be evaluated.
 	*/
-	matcher_t _l_1{ _MATCHER(EXPR(1 == 1)) };
+	matcher_t _l_1{EXPR(1 == 1) };
 	if (_l_1.or_statement())
 	{
 		// Computationally expensive statement.
@@ -72,7 +72,7 @@ _TEST_CASE("A multi-line assertion", "examples::basic_assertions")
 	*/
 	_CHECK(!_l_1);
 	//This also works with ands.
-	matcher_t _l_2{ _MATCHER(EXPR(1 == 1)) };
+	matcher_t _l_2{ EXPR(1 == 1) };
 	if (_l_2.and_statement())
 	{
 		// Computationally expensive statement.
@@ -86,7 +86,7 @@ _TEST_CASE("A multi-line assertion", "examples::basic_assertions")
 	//_REQUIRE(_l_2);
 
 	//Just as an aside, nothing different will happen when the following is done.
-	_CHECK(_MATCHER(EXPR(1 == 2)));
+	_CHECK(EXPR(1 == 2));
 }
 
 _TEST_CASE("Ill-formed multi-line assertions", "examples::basic_assertions")
@@ -100,7 +100,7 @@ _TEST_CASE("Ill-formed multi-line assertions", "examples::basic_assertions")
 	/*!
 	* Here is an or statement which doesn't have a right arm.
 	*/
-	matcher_t _l_1{ _MATCHER(EXPR(1 == 2)) };
+	matcher_t _l_1{ EXPR(1 == 2) };
 	if (_l_1.or_statement())
 	{
 
@@ -134,7 +134,7 @@ _TEST_CASE("Ill-formed multi-line assertions", "examples::basic_assertions")
 	* The same thing happens with an ill-formed and statement.
 	*/
 
-	matcher_t _l_2{ _MATCHER(EXPR(1 == 1)) };
+	matcher_t _l_2{ EXPR(1 == 1) };
 	if (_l_2.and_statement())
 	{
 	}
@@ -142,10 +142,10 @@ _TEST_CASE("Ill-formed multi-line assertions", "examples::basic_assertions")
 	/*!
 	* What about something more complicated - but also wrong.
 	*/
-	_l_2 = matcher_t{ _MATCHER(EXPR(1 == 1)) };
+	_l_2 = matcher_t{ EXPR(1 == 1) };
 	if (_l_2.and_statement())
 	{
-		matcher_t _l_3(_MATCHER(EXPR(2 == 3)));
+		matcher_t _l_3(EXPR(2 == 3));
 		_l_2 = _l_2 && _l_3;
 	}
 	/*!
@@ -175,7 +175,7 @@ _TEST_CASE("Ill-formed multi-line assertions", "examples::basic_assertions")
 	* 
 	* The following code will have no effect on _l1.
 	*/
-	matcher_t _l_4{ _MATCHER(EXPR(1 == 2)) };
-	_l_4.process(_MATCHER(EXPR(1 == 1)));
+	matcher_t _l_4{ EXPR(1 == 2) };
+	_l_4.process(EXPR(1 == 1));
 
 }
