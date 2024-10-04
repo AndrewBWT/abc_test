@@ -14,8 +14,13 @@ public:
 		matcher_t(
 		) noexcept;
 	__constexpr
+		explicit
 		matcher_t(
 			const bool _a_bool
+		) noexcept;
+	__constexpr
+		matcher_t(
+			generic_matcher_t* _a_matcher_internal
 		) noexcept;
 	__constexpr
 		matcher_t(
@@ -27,8 +32,16 @@ public:
 			const reports::single_source_t& _a_single_source
 		)
 		: _m_matcher_internal(_a_matcher.internal_matcher())
+		, _m_initialised_with_source(true)
 	{
-		_m_matcher_internal->add_source_info(_a_single_source);
+		if (not _a_matcher._m_initialised_with_source)
+		{
+			_m_matcher_internal->add_source_info(_a_single_source);
+		}
+		else
+		{
+			std::cout << "Issued warning" << std::endl;
+		}
 	}
 	__constexpr
 		matcher_internal_ptr_const_ref_t
@@ -72,6 +85,7 @@ public:
 			) const noexcept;
 private:
 	matcher_internal_ptr_t _m_matcher_internal;
+	bool _m_initialised_with_source;
 	template<
 		logic_enum_t Logic_Enum
 	>
@@ -116,9 +130,18 @@ matcher_t::matcher_t(
 }
 __constexpr_imp
 matcher_t::matcher_t(
+	generic_matcher_t* _a_matcher_internal
+) noexcept
+	: matcher_t(matcher_internal_ptr_t(_a_matcher_internal))
+{
+
+}
+__constexpr_imp
+matcher_t::matcher_t(
 	matcher_internal_ptr_t _a_matcher_internal
 ) noexcept
 	: _m_matcher_internal(_a_matcher_internal)
+	, _m_initialised_with_source(false)
 {
 
 }

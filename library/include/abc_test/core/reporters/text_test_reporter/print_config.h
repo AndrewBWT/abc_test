@@ -359,7 +359,7 @@ const std::string_view
 print_config_t::matcher_output_str(
 ) const noexcept
 {
-	return "Matcher output";
+	return "Matcher's output";
 }
 __constexpr_imp
 const std::string_view
@@ -374,7 +374,7 @@ print_config_t::matcher_output(
 	const std::string_view _a_str
 ) const noexcept
 {
-	return slight_highlight(_a_str);
+	return slight_highlight(quote(_a_str));
 }
 __constexpr_imp
 const std::string_view

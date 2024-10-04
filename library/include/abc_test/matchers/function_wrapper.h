@@ -3,6 +3,8 @@
 #include <functional>
 #include "abc_test/matchers/generic_matcher.h"
 
+#include "abc_test/matchers/matcher.h"
+
 _BEGIN_ABC_NS
 using function_wrapper_internal_t = std::function<matcher_result_t()>;
 struct function_wrapper_matcher_t : public generic_matcher_t
@@ -24,6 +26,11 @@ private:
 			test_runner_t&
 		) override final;
 };
+__constexpr
+matcher_t
+function_wrapper(
+	const function_wrapper_internal_t& _a_function
+) noexcept;
 _END_ABC_NS
 
 _BEGIN_ABC_NS
@@ -42,5 +49,13 @@ __constexpr_imp
 )
 {
 	return _m_function();
+}
+__constexpr
+matcher_t
+function_wrapper(
+	const function_wrapper_internal_t& _a_function
+) noexcept
+{
+	return matcher(new function_wrapper_matcher_t(_a_function));
 }
 _END_ABC_NS

@@ -88,4 +88,10 @@ _TEST_CASE("The _MATCHER macro", "examples::basic_examples::02_basic_matchers")
 	*/
 	l2 = _MATCHER(true_matcher());
 	_CHECK(l2);
+	/*!
+	* While the following are allowed, they will issue warnings to the user.
+	*/
+	l2 = _MATCHER(_MATCHER(true_matcher()));
+	_CHECK(l2);
+	_CHECK(_MATCHER(l2));
 }
