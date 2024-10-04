@@ -141,7 +141,8 @@ assertion_list_formatter_t<Assertion_Status>::get_str_representation(
 	using namespace reports;
 	return fmt::format("Matcher-based assertion {0}.{1}",
 		_a_element.get_pass_status() ? "passed" : "failed",
-		(same_as<Assertion_Status, pass_or_terminate_t> ?
-			" Assertion terminated function." : ""));
+		(not _a_element.get_pass_status() &&
+			same_as<Assertion_Status, pass_or_terminate_t>) ?
+			" Assertion terminated function." : "");
 }
 _END_ABC_REPORTERS_NS

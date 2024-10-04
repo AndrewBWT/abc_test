@@ -90,7 +90,7 @@
 	)
 #define _SUCCEED_WITH_MSG(_a_msg)\
 	_INTERNAL_STATIC_MATCHER(\
-		abc::reports::terminate_t,\
+		abc::reports::pass_t,\
 		std::optional<std::string_view>(_a_msg),\
 		abc::utility::str::create_string({ "_SUCCEED_WITH_MSG(", #_a_msg,")" })\
 	)
@@ -139,6 +139,23 @@
 			abc::utility::str::create_string({"_MATCHER(",#_a_matcher,")"}),\
 			std::source_location::current()))
 		
+#define _IF_OR_STATEMENT(_a_matcher)\
+	if (_a_matcher.or_statement(\
+	abc::reports::single_source_t(\
+		abc::utility::str::create_string({"_IF_OR_STATEMENT(",#_a_matcher,")"}),\
+		std::source_location::current())))
+
+#define _IF_AND_STATEMENT(_a_matcher)\
+	if (_a_matcher.and_statement(\
+	abc::reports::single_source_t(\
+		abc::utility::str::create_string({"_IF_OR_STATEMENT(",#_a_matcher,")"}),\
+		std::source_location::current())))
+
+#define _PROCESS(_a_matcher,_a_matcher_to_add_as_expression)\
+	_a_matcher.process(_a_matcher_to_add_as_expression,\
+		abc::reports::single_source_t(\
+		abc::utility::str::create_string({ "_PROCESS(",#_a_matcher,",",#_a_matcher_to_add_as_expression,")" }), \
+		std::source_location::current()));
 
 //#define _MATCHER(Code) abc::matcher_t(Code, #Code)
 

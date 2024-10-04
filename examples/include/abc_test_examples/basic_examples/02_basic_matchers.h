@@ -35,13 +35,25 @@ _TEST_CASE("Matchers, explained", "examples::basic_examples::02_basic_matchers")
 	* We include several matchers with the library. Two examples of basic matchers are
 	* true_matcher_t and false_matcher_t. These evaluate to true and false respectively.
 	*/
-	_l_1 = matcher(new true_matcher_t());
 	_l_1 = matcher(new false_matcher_t());
+	_l_1 = matcher(new true_matcher_t());
 	_REQUIRE(_l_1);
 	/*!
-	* Finally, the reader should note that the default matcher_t, used at the start of this
-	* test function, defaults to containing a true_matcher_t object.
+	* For the in-built matcher types shipped with this library, we include named
+	* constructors. For example we have
 	*/
+	_l_1 = true_matcher();
+	_l_1 = false_matcher();
+	_REQUIRE(_l_1);
+	/*!
+	* Finally, the reader should note that the default matcher_t object defaults to 
+	* contianing a true_matcher_t object. It also has a constructor which
+	* takes a boolean; true means initialsie with a true_matcher_t,
+	* false with a false_matcher_t.
+	*/
+	_l_1 = matcher_t(true);
+	_l_1 = matcher_t(false);
+	_REQUIRE(_l_1);
 
 }
 

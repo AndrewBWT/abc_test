@@ -78,7 +78,7 @@ public:
 		) const noexcept;*/
 protected:
 	matcher_result_t _m_test_result;
-	std::optional<reports::single_source_t> _m_source;
+	std::vector<reports::single_source_t> _m_sources;
 private:
 	__constexpr
 		virtual
@@ -98,7 +98,7 @@ _BEGIN_ABC_NS
 __constexpr_imp
 	generic_matcher_t::generic_matcher_t(
 	) noexcept
-	: _m_source(std::optional<reports::single_source_t>())
+	: _m_sources(std::vector<reports::single_source_t>())
 	//: generic_matcher_t(std::optional<std::string>(),
 	//	std::optional<std::source_location>())
 {
@@ -157,9 +157,10 @@ __constexpr_imp
 		matcher_source_map_t& _a_matcher_source_map
 	) const noexcept
 {
-	if (_m_source.has_value())
+	using namespace reports;
+	for (const single_source_t& _l_source : _m_sources)
 	{
-		_a_matcher_source_map.insert(_m_source.value());
+		_a_matcher_source_map.insert(_l_source);
 	}
 }
 __constexpr_imp
@@ -168,7 +169,7 @@ __constexpr_imp
 		const reports::single_source_t& _a_source
 	) noexcept
 {
-	_m_source = _a_source;
+	_m_sources.push_back(_a_source);
 }
 /*__constexpr_imp
 	bool

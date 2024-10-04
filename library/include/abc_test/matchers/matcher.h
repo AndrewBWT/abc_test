@@ -15,6 +15,10 @@ public:
 		) noexcept;
 	__constexpr
 		matcher_t(
+			const bool _a_bool
+		) noexcept;
+	__constexpr
+		matcher_t(
 			matcher_internal_ptr_t _a_matcher_internal
 		) noexcept;
 	__constexpr_imp
@@ -33,19 +37,20 @@ public:
 	__constexpr
 		bool
 		or_statement(
-			test_runner_t& _a_test_runner = abc::global::get_this_threads_test_runner_ref(),
-			const std::source_location& _a_source_location = std::source_location::current()
+			const reports::single_source_t& _a_single_source,
+			test_runner_t& _a_test_runner = abc::global::get_this_threads_test_runner_ref()
 		) noexcept;
 	__constexpr
 		bool
 		and_statement(
-			test_runner_t& _a_test_runner = abc::global::get_this_threads_test_runner_ref(),
-			const std::source_location& _a_source_location = std::source_location::current()
+			const reports::single_source_t& _a_single_source,
+			test_runner_t& _a_test_runner = abc::global::get_this_threads_test_runner_ref()
 		) noexcept;
 	__constexpr
 		void
 		process(
-			const matcher_t& _a_matcher
+			const matcher_t& _a_matcher,
+			const reports::single_source_t& _a_single_source
 		);
 	__constexpr
 		matcher_t
@@ -95,8 +100,19 @@ _BEGIN_ABC_NS
 __constexpr_imp
 matcher_t::matcher_t(
 ) noexcept
-	: matcher_t(matcher_internal_ptr_t(new true_matcher_t()))
+	: matcher_t(true)
 {
+}
+__constexpr_imp
+matcher_t::matcher_t(
+	const bool _a_bool
+) noexcept
+	: matcher_t(_a_bool ?
+		matcher_internal_ptr_t(new true_matcher_t()) :
+		matcher_internal_ptr_t(new false_matcher_t())
+	)
+{
+
 }
 __constexpr_imp
 matcher_t::matcher_t(
@@ -129,42 +145,46 @@ __constexpr_imp
 __constexpr_imp
 	bool
 	matcher_t::or_statement(
-		test_runner_t& _a_test_runner,
-		const std::source_location& _a_source_location
+		const reports::single_source_t& _a_single_source,
+		test_runner_t& _a_test_runner
 	) noexcept
 {
 	const bool _l_result{ _m_matcher_internal->run_test(_a_test_runner).passed() };
 	*this = matcher(new logic_matcher_t<OR>(this->internal_matcher(),
 		std::shared_ptr<generic_matcher_t>()));
-	//_m_matcher_internal->add_source_info("or_statement", _a_source_location);
+	_m_matcher_internal->add_source_info(_a_single_source);
 	return not _l_result;
 }
 __constexpr_imp
 	bool
 	matcher_t::and_statement(
-		test_runner_t& _a_test_runner,
-		const std::source_location& _a_source_location
+		const reports::single_source_t& _a_single_source,
+		test_runner_t& _a_test_runner
 	) noexcept
 {
 	const bool _l_result{ _m_matcher_internal->run_test(_a_test_runner).passed() };
 	*this = matcher(new logic_matcher_t<AND>(this->internal_matcher(),
 		std::shared_ptr<generic_matcher_t>()));
-	//_m_matcher_internal->add_source_info("and_statement", _a_source_location);
+	_m_matcher_internal->add_source_info(_a_single_source);
 	return _l_result;
 }
 __constexpr_imp
 	void
 	matcher_t::process(
-		const matcher_t& _a_matcher
+		const matcher_t& _a_matcher,
+		const reports::single_source_t& _a_single_source
 	)
 {
 	using enum logic_enum_t;
 	if (not (process_<OR>(_a_matcher) || process_<AND>(_a_matcher)))
 	{
-	//	std::cout << "where" << std::endl;
 		throw errors::test_library_exception_t(
 			fmt::format("Could not run process; the parent node we are trying to add an OR or AND "
 				"node to is not a logic_matcher_t. Please check your code, or contact the developer."));
+	}
+	else
+	{
+		this->_m_matcher_internal->add_source_info(_a_single_source);
 	}
 }
 __constexpr_imp

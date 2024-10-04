@@ -133,6 +133,10 @@ generic_assertion_t<Single_Source, Assertion_Status>::get_pass_status(
 	{
 		return _m_status.pass();
 	}
+	else
+	{
+		static_assert(false, "Cannot instantiate");
+	}
 }
 template<
 	bool Single_Source,
@@ -151,7 +155,7 @@ generic_assertion_t<Single_Source, Assertion_Status>::terminated(
 	}
 	else if constexpr (same_as<Assertion_Status, pass_or_terminate_t>)
 	{
-		return _m_status.pass();
+		return not _m_status.pass();
 	}
 	else
 	{

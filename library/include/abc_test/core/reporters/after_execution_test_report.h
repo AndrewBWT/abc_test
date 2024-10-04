@@ -329,10 +329,10 @@ after_execution_test_report_t::add_assertion(
 	{
 		_m_passed = false;
 		_m_total_test_reports_failed++;
-	}
-	if (_a_gur->terminated())
-	{
-		_m_termination_type = enum_termination_type_t::ASSERTION_TERMINATION;
+		if (_a_gur->terminated())
+		{
+			_m_termination_type = enum_termination_type_t::ASSERTION_TERMINATION;
+		}
 	}
 	_m_assertions.push_back(generic_user_report_ptr_t(_a_gur));
 }
