@@ -10,6 +10,8 @@
 
 #include "abc_test/utility/str/string_utility.h"
 
+#include "abc_test/core/test_reports/mid_test_invokation_report/single_source.h"
+
 _BEGIN_ABC_NS
 struct source_location_lt_t
 {
@@ -26,9 +28,8 @@ public:
 	__constexpr
 		void
 		insert(
-			const std::optional<std::source_location>& _a_source_location,
-			const std::optional<std::string>& _a_str
-		) noexcept;
+			const reports::single_source_t& _a_source
+		);
 	__constexpr
 		const std::map<std::source_location, std::vector<std::string>, source_location_lt_t>&
 		map(
@@ -43,6 +44,11 @@ public:
 		) const noexcept;
 private:
 	std::map<std::source_location, std::vector<std::string>, source_location_lt_t> _m_internal_map;
+	__constexpr
+		void
+		insert_source(
+			const std::source_location& _a_sl
+		) noexcept;
 };
 
 _END_ABC_NS
@@ -114,24 +120,13 @@ source_location_lt_t::operator()(
 __constexpr_imp
 	void
 	matcher_source_map_t::insert(
-		const std::optional<std::source_location>& _a_source_location,
-		const std::optional<std::string>& _a_str
-	) noexcept
+		const reports::single_source_t& _a_source
+	)
 {
 	using namespace std;
-	using namespace utility::str;
-	if (_a_source_location.has_value())
-	{
-		source_location _l_sl{_a_source_location.value() };
-		if (not _m_internal_map.contains(_l_sl))
-		{
-			_m_internal_map.insert({ _l_sl,{} });
-		}
-		if (_a_str.has_value())
-		{
-			_m_internal_map.at(_l_sl).push_back(_a_str.value());
-		}
-	}
+	using namespace reports;
+	insert_source(_a_source.source_location());
+	_m_internal_map.at(_a_source.source_location()).push_back(string(_a_source.str()));
 }
 __constexpr_imp
 	const std::map<std::source_location, std::vector<std::string>, source_location_lt_t>&
@@ -146,6 +141,17 @@ __constexpr_imp
 	) const noexcept
 {
 	return _m_internal_map.size();
+}
+__constexpr_imp
+void
+matcher_source_map_t::insert_source(
+	const std::source_location& _a_sl
+) noexcept
+{
+	if (not _m_internal_map.contains(_a_sl))
+	{
+		_m_internal_map.insert({ _a_sl,{} });
+	}
 }
 _END_ABC_NS
 

@@ -12,23 +12,20 @@ struct matcher_t
 public:
 	__constexpr
 		matcher_t(
-			const std::source_location& _a_source_location = std::source_location::current(),
-			const std::optional<std::string>& _a_str_representation =
-			global::get_this_threads_test_runner_ref().get_registered_source(std::source_location::current())
 		) noexcept;
 	__constexpr
 		matcher_t(
-			matcher_internal_ptr_t _a_matcher_internal,
-			const std::source_location& _a_source_location = std::source_location::current(),
-			const std::optional<std::string>& _a_str_representation =
-			global::get_this_threads_test_runner_ref().get_registered_source(std::source_location::current())
+			matcher_internal_ptr_t _a_matcher_internal
 		) noexcept;
-	/*__constexpr
+	__constexpr_imp
 		matcher_t(
-			const matcher_t& _a_matcher_internal,
-			const std::string_view _a_str_representation,
-			const std::source_location& _a_source_location = std::source_location::current()
-		) noexcept;*/
+			const matcher_t& _a_matcher,
+			const reports::single_source_t& _a_single_source
+		)
+		: _m_matcher_internal(_a_matcher.internal_matcher())
+	{
+		_m_matcher_internal->add_source_info(_a_single_source);
+	}
 	__constexpr
 		matcher_internal_ptr_const_ref_t
 		internal_matcher(
@@ -96,23 +93,32 @@ _END_ABC_NS
 
 _BEGIN_ABC_NS
 __constexpr_imp
-	matcher_t::matcher_t(
-		const std::source_location& _a_sl,
-		const std::optional<std::string>& _a_source
-	) noexcept
-	: matcher_t(matcher_internal_ptr_t(new true_matcher_t()),
-		_a_sl,_a_source)
-{}
+matcher_t::matcher_t(
+) noexcept
+	: matcher_t(matcher_internal_ptr_t(new true_matcher_t()))
+{
+}
 __constexpr_imp
+matcher_t::matcher_t(
+	matcher_internal_ptr_t _a_matcher_internal
+) noexcept
+	: _m_matcher_internal(_a_matcher_internal)
+{
+
+}
+/*__constexpr_imp
 	matcher_t::matcher_t(
 		matcher_internal_ptr_t _a_matcher_internal,
-		const std::source_location& _a_sl,
-		const std::optional<std::string>& _a_source
+		const std::optional<reports::single_source_t>& _a_source
 	) noexcept
 	: _m_matcher_internal(_a_matcher_internal)
 {
-	_m_matcher_internal->add_source_info(_a_source, _a_sl);
-}
+	_m_matcher_internal->add_source_info(_a_source);
+	//if (_a_source.has_value())
+	//{
+	//	_m_matcher_internal->add_source_info(_a_source.value());
+	//}
+}*/
 __constexpr_imp
 	matcher_internal_ptr_const_ref_t
 	matcher_t::internal_matcher(
@@ -130,7 +136,7 @@ __constexpr_imp
 	const bool _l_result{ _m_matcher_internal->run_test(_a_test_runner).passed() };
 	*this = matcher(new logic_matcher_t<OR>(this->internal_matcher(),
 		std::shared_ptr<generic_matcher_t>()));
-	_m_matcher_internal->add_source_info("or_statement", _a_source_location);
+	//_m_matcher_internal->add_source_info("or_statement", _a_source_location);
 	return not _l_result;
 }
 __constexpr_imp
@@ -143,7 +149,7 @@ __constexpr_imp
 	const bool _l_result{ _m_matcher_internal->run_test(_a_test_runner).passed() };
 	*this = matcher(new logic_matcher_t<AND>(this->internal_matcher(),
 		std::shared_ptr<generic_matcher_t>()));
-	_m_matcher_internal->add_source_info("and_statement", _a_source_location);
+	//_m_matcher_internal->add_source_info("and_statement", _a_source_location);
 	return _l_result;
 }
 __constexpr_imp

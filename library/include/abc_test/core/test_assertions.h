@@ -133,6 +133,13 @@
 	abc::global::get_this_threads_test_runner_ref().register_source(std::source_location::current(), #_a_line,#_a_line);\
 	_a_line
 
+#define _MATCHER(_a_matcher)\
+	abc::matcher_t(_a_matcher,\
+		abc::reports::single_source_t(\
+			abc::utility::str::create_string({"_MATCHER(",#_a_matcher,")"}),\
+			std::source_location::current()))
+		
+
 //#define _MATCHER(Code) abc::matcher_t(Code, #Code)
 
 #define _BEGIN_MANUAL_ASSERTION_BLOCK(Name)

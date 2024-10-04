@@ -148,7 +148,6 @@ set(LIBRARY_FILES
   # utility subfolder. Contains axillary helper classes and functions not necessary
   # related to the core testing framework.
   include/abc_test/utility/ptr_utility.h
-  include/abc_test/utility/source_location_utility.h
   include/abc_test/utility/rng.h
   # BigInteger files. Currently we do not use these. We should determine whether we will
   # need these and, if not, remove them from the library.

@@ -4,7 +4,6 @@
 
 //#include "abc_test/core/test_runner.h"
 #include "abc_test/matchers/matcher_result.h"
-#include <source_location>
 #include <map>
 
 #include "abc_test/matchers/source_map.h"
@@ -60,13 +59,7 @@ public:
 	__constexpr
 		void
 		add_source_info(
-			const std::optional<std::string>& _a_str_representation,
-			const std::source_location& _a_source_location
-		) noexcept;
-	__constexpr
-		void
-		add_source_info(
-			const std::source_location& _a_source_location
+			const reports::single_source_t& _a_source
 		) noexcept;
 	/*!
 	* Determines whether a test has passed or not.
@@ -85,8 +78,7 @@ public:
 		) const noexcept;*/
 protected:
 	matcher_result_t _m_test_result;
-	std::optional<std::string> _m_str_representation;
-	std::optional<std::source_location> _m_source_location;
+	std::optional<reports::single_source_t> _m_source;
 private:
 	__constexpr
 		virtual
@@ -106,12 +98,13 @@ _BEGIN_ABC_NS
 __constexpr_imp
 	generic_matcher_t::generic_matcher_t(
 	) noexcept
-	: generic_matcher_t(std::optional<std::string>(),
-		std::optional<std::source_location>())
+	: _m_source(std::optional<reports::single_source_t>())
+	//: generic_matcher_t(std::optional<std::string>(),
+	//	std::optional<std::source_location>())
 {
 
 }
-__constexpr_imp
+/*__constexpr_imp
 	generic_matcher_t::generic_matcher_t(
 		const std::source_location& _a_source_location
 	) noexcept
@@ -129,7 +122,7 @@ __constexpr_imp
 		std::optional<std::source_location>(_a_source_location))
 {
 
-}
+}*/
 __constexpr_imp
 	const matcher_result_t&
 	generic_matcher_t::run_test(
@@ -149,46 +142,33 @@ __constexpr_imp
 {
 	return _m_test_result;
 }
-__constexpr_imp
+/*__constexpr_imp
 	generic_matcher_t::generic_matcher_t(
 		const std::optional<std::string>& _a_str_representation,
 		const std::optional<std::source_location>& _a_source_location
 	) noexcept
-	: _m_str_representation(_a_str_representation)
-	, _m_source_location(_a_source_location)
-	, _m_test_result{ matcher_result_t{} }
+	: _m_test_result{ matcher_result_t{} }
 {
 
-}
+}*/
 __constexpr_imp
 	void
 	generic_matcher_t::gather_map_source(
 		matcher_source_map_t& _a_matcher_source_map
 	) const noexcept
 {
-	using namespace std;
-	_a_matcher_source_map.insert(_m_source_location, _m_str_representation);
-}
-__constexpr_imp
-	void
-	generic_matcher_t::add_source_info(
-		const std::optional<std::string>& _a_str_representation,
-		const std::source_location& _a_source_location
-	) noexcept
-{
-	if (_a_str_representation.has_value())
+	if (_m_source.has_value())
 	{
-		_m_str_representation = _a_str_representation.value();
+		_a_matcher_source_map.insert(_m_source.value());
 	}
-	_m_source_location = _a_source_location;
 }
 __constexpr_imp
 	void
 	generic_matcher_t::add_source_info(
-		const std::source_location& _a_source_location
+		const reports::single_source_t& _a_source
 	) noexcept
 {
-	_m_source_location = _a_source_location;
+	_m_source = _a_source;
 }
 /*__constexpr_imp
 	bool

@@ -35,8 +35,8 @@ _TEST_CASE("Matchers, explained", "examples::basic_examples::02_basic_matchers")
 	* We include several matchers with the library. Two examples of basic matchers are
 	* true_matcher_t and false_matcher_t. These evaluate to true and false respectively.
 	*/
-	_l_1 = matcher_t(matcher_internal_ptr_t(new true_matcher_t()));
-	_l_1 = matcher_t(matcher_internal_ptr_t(new false_matcher_t()));
+	_l_1 = matcher(new true_matcher_t());
+	_l_1 = matcher(new false_matcher_t());
 	_REQUIRE(_l_1);
 	/*!
 	* Finally, the reader should note that the default matcher_t, used at the start of this
@@ -45,7 +45,7 @@ _TEST_CASE("Matchers, explained", "examples::basic_examples::02_basic_matchers")
 
 }
 
-_TEST_CASE("The _SOURCE macro", "examples::basic_examples::02_basic_matchers")
+_TEST_CASE("The _MATCHER macro", "examples::basic_examples::02_basic_matchers")
 {
 	using namespace abc;
 	/*!
@@ -57,45 +57,23 @@ _TEST_CASE("The _SOURCE macro", "examples::basic_examples::02_basic_matchers")
 	matcher_t _l_1;
 	_CHECK(_l_1);
 	/*!
-	* However, the source location is still retained. This allows the user to see
-	* the other relevant lines. 
-	
-	* Internally, the constructors for matcher_t check to see whether there is a 
-	* source code representation associated with the same line. If there is, the matcher_t
-	* is linked to that source code line. 
-	*
-	* The macro _SOURCE(Code) takes Code and turns it into a string, registers
-	* the source line with that string, then runs Code. Due to how macros work,
-	* the string is registered with the same line as Code.
 	* 
-	* So now, if we do this:
+	* One of the fields in an matcher-based assertion is called the matcher source map.
+	* 
+	* This is a map of all relevant sources recorded by the testing facility, pertaining
+	* to the given matcher.
+	* 
+	* We point the user to a macro which records the source code, as well as the source
+	* position, of matchers. When they are declared over multiple lines, this macro
+	* can help in keeping track of all of the relevant lines of code, and points
+	* the user to them in the event that an assertion fails.
+	* 
 	*/
-	_SOURCE(matcher_t _l_2;);
-	_CHECK(_l_2);
+	matcher_t l2 = _MATCHER(matcher_t());
+	_CHECK(l2);
 	/*!
-	* We can see from the output that the source is attached to the _CHECK.
-	* 
-	* Specifically, in the "Matcher's other sources" subheading.
-	* 
-	* Please note that the _SOURCE does not include any semicolons after the line.
-	* 
-	* We always write semicolons after our macros in this library. In this instance
-	* what is in the _SOURCE macro is a line of code itself, hence we feel it 
-	* is appropriate to include it. It is of course not actually required.
-	* 
-	* Naturally, this can be abused. An example is through the following:
+	* We can also use it as follows
 	*/
-
-	_SOURCE(matcher_t _l_3; matcher_t _l_4);
-	_CHECK(_l_3);
-	_CHECK(_l_4);
-	/*!
-	* We can see that the source registers both statements to a single line. 
-	* 
-	* We hope in the future it is possible to get a stringified verison of a source
-	* code line without using macros. It would allow us to not rely on the user
-	* remembering to use _SOURCE to tag lines.
-	*/
-
-
+	l2 = _MATCHER(true_matcher());
+	_CHECK(l2);
 }
