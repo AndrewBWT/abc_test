@@ -7,16 +7,17 @@
 
 _BEGIN_ABC_REPORTS_NS
 template<
+	bool Single_Source,
 	typename Assertion_Status
 >
 	requires std::derived_from<Assertion_Status, dynamic_status_t>
-struct assertion_t
-	: public generic_assertion_t<true, Assertion_Status>
+struct generic_matcher_based_assertion_t
+	: public generic_assertion_t<Single_Source, Assertion_Status>
 {
 public:
 	__constexpr
-		assertion_t(
-			const user_initialised_report_t<true>::source_t& _a_source,
+		generic_matcher_based_assertion_t(
+			const user_initialised_report_t<Single_Source>::source_t& _a_source,
 			const log_infos_t& _a_log_infos,
 			const std::optional<std::string_view>& _a_msg,
 			const matcher_result_t& _a_matcher_result,
@@ -38,12 +39,13 @@ _END_ABC_REPORTS_NS
 
 _BEGIN_ABC_REPORTS_NS
 template<
+	bool Single_Source,
 	typename Assertion_Status
 >
 	requires std::derived_from<Assertion_Status, dynamic_status_t>
 __constexpr_imp
-assertion_t<Assertion_Status>::assertion_t(
-	const user_initialised_report_t<true>::source_t& _a_source,
+generic_matcher_based_assertion_t<Single_Source, Assertion_Status>::generic_matcher_based_assertion_t(
+	const user_initialised_report_t<Single_Source> ::source_t& _a_source,
 	const log_infos_t& _a_log_infos,
 	const std::optional<std::string_view>& _a_msg,
 	const matcher_result_t& _a_matcher_result,
@@ -59,23 +61,25 @@ assertion_t<Assertion_Status>::assertion_t(
 
 }
 template<
+	bool Single_Source,
 	typename Assertion_Status
 >
 	requires std::derived_from<Assertion_Status, dynamic_status_t>
 __constexpr_imp
 const matcher_result_t&
-assertion_t<Assertion_Status>::matcher_result(
+generic_matcher_based_assertion_t<Single_Source, Assertion_Status>::matcher_result(
 ) const noexcept
 {
 	return _m_matcher_result;
 }
 template<
+	bool Single_Source,
 	typename Assertion_Status
 >
 	requires std::derived_from<Assertion_Status, dynamic_status_t>
 __constexpr_imp
 const matcher_source_map_t&
-assertion_t<Assertion_Status>::source_map(
+generic_matcher_based_assertion_t<Single_Source, Assertion_Status>::source_map(
 ) const noexcept
 {
 	return _m_matcher_map;

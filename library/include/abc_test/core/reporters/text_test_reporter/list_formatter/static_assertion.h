@@ -2,6 +2,7 @@
 #include "abc_test/core/reporters/text_test_reporter/list_formatter/generic_assertion.h"
 #include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_terminate.h"
 #include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/terminate.h"
+#include "abc_test/core/test_reports/mid_test_invokation_report/static_assertion.h"
 _BEGIN_ABC_REPORTERS_NS
 template<
 	typename Assertion_Status

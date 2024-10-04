@@ -76,13 +76,24 @@ user_initialised_report_list_formatter_t<Single_Source>::get_data(
 	//		str_representation()
 	//	};
 	case SOURCE:
-		return
+		if constexpr (Single_Source)
 		{
-			_a_pc.colon(_a_pc.source_location_str()),
-			_a_pc.indent(_a_pc.source_location(_a_element.source().source_location())),
-			_a_pc.colon(_a_pc.source_code_str()),
-			_a_pc.indent(_a_pc.source_representation(_a_element.source().str()))
-		};
+			return
+			{
+				_a_pc.colon(_a_pc.source_location_str()),
+				_a_pc.indent(_a_pc.source_location(_a_element.source().source_location())),
+				_a_pc.colon(_a_pc.source_code_str()),
+				_a_pc.indent(_a_pc.source_representation(_a_element.source().str()))
+			};
+		}
+		else
+		{
+			return
+			{
+
+			};
+		}
+
 	case LOG_INFOS:
 	{
 		vector<string> _l_rv{ _a_pc.colon(_a_pc.log_info_str()) };

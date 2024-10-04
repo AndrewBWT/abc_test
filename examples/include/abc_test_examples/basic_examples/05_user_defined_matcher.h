@@ -91,7 +91,7 @@ namespace test
 	}
 }
 
-_TEST_CASE("User defined matcher", "examples::basic_examples::04_matchers_and_comparison_operators")
+_TEST_CASE("User defined matcher", "examples::basic_examples::05_user_defined_matcher")
 {
 	using namespace abc;
 	/*!
@@ -128,7 +128,7 @@ _TEST_CASE("User defined matcher", "examples::basic_examples::04_matchers_and_co
 	_CHECK(matcher_t(list_same_matcher(_l_x)));
 }
 
-_TEST_CASE("User-defined matcher using function_wrapper", "examples::basic_examples::04_matchers_and_comparison_operators")
+_TEST_CASE("User-defined matcher using function_wrapper", "examples::basic_examples::05_user_defined_matcher")
 {
 	using namespace abc;
 	/*!
@@ -198,7 +198,7 @@ namespace testing
 	}
 }
 
-_TEST_CASE("User-defined matcher using function_wrapper", "examples::basic_examples::04_matchers_and_comparison_operators")
+_TEST_CASE("User-defined matcher using function_wrapper", "examples::basic_examples::05_user_defined_matcher")
 {
 	using namespace abc;
 	/*!

@@ -38,6 +38,11 @@ public:
 			const reports::single_source_t& _a_source_location
 		) noexcept;
 	__constexpr
+		void
+		register_tests_most_recent_source(
+			const reports::source_pair_t& _a_source_locations
+		) noexcept;
+	__constexpr
 		std::list<const log_test_msg_t*>::iterator
 		add_error_info(
 			const log_test_msg_t* _a_log
@@ -192,6 +197,14 @@ _BEGIN_ABC_NS
 		) noexcept
 	{
 		_m_tests_most_recent_source = _a_source_location;
+	}
+	__constexpr_imp
+		void
+		test_runner_t::register_tests_most_recent_source(
+			const reports::source_pair_t& _a_source_locations
+		) noexcept
+	{
+		
 	}
 	/*__constexpr_imp
 		void

@@ -9,14 +9,6 @@
 
 #include "abc_test/core/errors/test_library_exception.h"
 
-#include "abc_test/core/test_reports/mid_test_invokation_report/user_initialised_report.h"
-
-#include "abc_test/core/test_reports/mid_test_invokation_report/generic_assertion.h"
-
-#include "abc_test/core/test_reports/mid_test_invokation_report/assertion.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/manual_assertion.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/static_assertion.h"
-
 _BEGIN_ABC_REPORTERS_NS
 template<
 	typename T,

@@ -1,7 +1,8 @@
 #pragma once
 #include "abc_test/core/reporters/text_test_reporter/enum_fields/static_assertion.h"
 #include "abc_test/core/reporters/text_test_reporter/enum_fields/manual_assertion.h"
-#include "abc_test/core/reporters/text_test_reporter/enum_fields/assertion.h"
+#include "abc_test/core/reporters/text_test_reporter/enum_fields/matcher_based_assertion.h"
+#include "abc_test/core/reporters/text_test_reporter/enum_fields/matcher_based_assertion_block.h"
 #include "abc_test/core/reporters/text_test_reporter/enum_fields/after_execution_test_report.h"
 #include "abc_test/core/reporters/text_test_reporter/enum_fields/unexpected_thrown_exception.h"
 #include "abc_test/core/reporters/text_test_reporter/enum_fields/unexpected_thrown_non_descript_entity.h"
@@ -10,6 +11,8 @@
 #include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/terminate.h"
 #include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_fail.h"
 #include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_terminate.h"
+#include "abc_test/core/reporters/text_test_reporter/enum_fields/manual_assertion_block.h"
+#include "abc_test/core/reporters/text_test_reporter/enum_fields/matcher_based_assertion_block.h"
 
 #include <fmt/color.h>
 _BEGIN_ABC_REPORTERS_NS
@@ -162,15 +165,23 @@ public:
 			const bool _a_passed
 		) const noexcept;
 	__constexpr
-		enum_print_pair_collection_t< combined_enum_assertion_fields_t>
-		assertion_fields(
+		enum_print_pair_collection_t< combined_enum_matcher_based_assertion_fields_t>
+		matcher_based_assertion_fields(
+		) const noexcept;
+	__constexpr
+		enum_print_pair_collection_t<combined_enum_manual_assertion_block_fields_t>
+		manual_assertion_block_fields(
+		) const noexcept;
+	__constexpr
+		enum_print_pair_collection_t< combined_enum_matcher_based_assertion_block_fields_t>
+		matcher_based_assertion_block_fields(
 		) const noexcept;
 	__constexpr
 		enum_print_pair_collection_t< enum_after_execution_test_report_fields_t>
 		after_execution_test_report_fields(
 		) const noexcept;
 	__constexpr
-		enum_print_pair_collection_t< combined_enum_generic_assertion_fields_t>
+		enum_print_pair_collection_t< combined_enum_manual_assertion_fields_t>
 		manual_assertion_fields(
 		) const noexcept;
 	__constexpr
@@ -244,8 +255,10 @@ public:
 			const std::optional<std::string>& _a_str
 		) const noexcept;
 	enum_print_pair_collection_t< enum_after_execution_test_report_fields_t> _m_after_execution_test_report_fields_t;
-	enum_print_pair_collection_t< combined_enum_assertion_fields_t> _m_assertion_fields;
-	enum_print_pair_collection_t< combined_enum_generic_assertion_fields_t> _m_manual_assertion_fields;
+	enum_print_pair_collection_t< combined_enum_matcher_based_assertion_fields_t> _m_matcher_assertion_fields;
+	enum_print_pair_collection_t<combined_enum_manual_assertion_block_fields_t> _m_manual_assertion_block_fields;
+	enum_print_pair_collection_t< combined_enum_matcher_based_assertion_block_fields_t> _m_matcher_assertion_block_fields;
+	enum_print_pair_collection_t< combined_enum_manual_assertion_fields_t> _m_manual_assertion_fields;
 	enum_print_pair_collection_t< combined_enum_generic_assertion_fields_t> _m_static_assertion_fields;
 	enum_print_pair_collection_t< combined_enum_unexpected_thrown_non_descript_entity_fields_t> _m_unexpected_thrown_non_descript_entity_fields;
 	enum_print_pair_collection_t< combined_enum_unexpected_exception_fields_t> _m_thrown_exception_fields;
@@ -344,8 +357,10 @@ __constexpr_imp
 print_config_t::print_config_t(
 	const bool _a_colours_enabled
 ) noexcept
-	: _m_assertion_fields(default_assertion_fields())
-	, _m_manual_assertion_fields(default_manual_fields())
+	: _m_matcher_assertion_fields(default_matcher_based_assertion_fields())
+	, _m_matcher_assertion_block_fields(default_matcher_based_assertion_block_fields())
+	, _m_manual_assertion_fields(default_manual_assertion_fields())
+	, _m_manual_assertion_block_fields(default_manual_assertion_block_fields())
 	, _m_static_assertion_fields(default_static_fields())
 	, _m_after_execution_test_report_fields_t(default_after_execution_test_report_fields())
 	, _m_colours_enabled(_a_colours_enabled)
@@ -612,11 +627,25 @@ print_config_t::str_status(
 		_a_passed ? "TEST PASSED" : "TEST FAILED");
 }
 __constexpr_imp
-enum_print_pair_collection_t< combined_enum_assertion_fields_t>
-print_config_t::assertion_fields(
+enum_print_pair_collection_t< combined_enum_matcher_based_assertion_fields_t>
+print_config_t::matcher_based_assertion_fields(
 ) const noexcept
 {
-	return _m_assertion_fields;
+	return _m_matcher_assertion_fields;
+}
+__constexpr_imp
+enum_print_pair_collection_t<combined_enum_manual_assertion_block_fields_t>
+print_config_t::manual_assertion_block_fields(
+) const noexcept
+{
+	return _m_manual_assertion_block_fields;
+}
+__constexpr_imp
+enum_print_pair_collection_t< combined_enum_matcher_based_assertion_block_fields_t>
+print_config_t::matcher_based_assertion_block_fields(
+) const noexcept
+{
+	return _m_matcher_assertion_block_fields;
 }
 __constexpr_imp
 enum_print_pair_collection_t< enum_after_execution_test_report_fields_t>
@@ -626,7 +655,7 @@ print_config_t::after_execution_test_report_fields(
 	return _m_after_execution_test_report_fields_t;
 }
 __constexpr_imp
-enum_print_pair_collection_t< combined_enum_generic_assertion_fields_t>
+enum_print_pair_collection_t< combined_enum_manual_assertion_fields_t>
 print_config_t::manual_assertion_fields(
 ) const noexcept
 {

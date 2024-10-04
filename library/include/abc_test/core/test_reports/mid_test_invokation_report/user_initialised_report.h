@@ -28,8 +28,9 @@ template<
 class user_initialised_report_t
 {
 public:
+	using source_t = std::conditional_t<Single_Source, single_source_t, source_pair_t>;
 	__constexpr
-		const single_source_t&
+		const source_t&
 		source(
 		) const noexcept;
 	__constexpr
@@ -37,7 +38,6 @@ public:
 		log_infos(
 		) const noexcept;
 protected:
-	using source_t = std::conditional_t<Single_Source, single_source_t, source_pair_t>;
 	__constexpr
 		user_initialised_report_t(
 		) noexcept = delete;
@@ -61,7 +61,7 @@ template<
 	bool Single_Source
 >
 __constexpr_imp
-const single_source_t&
+const user_initialised_report_t<Single_Source>::source_t&
 user_initialised_report_t<Single_Source>::source(
 ) const noexcept
 {

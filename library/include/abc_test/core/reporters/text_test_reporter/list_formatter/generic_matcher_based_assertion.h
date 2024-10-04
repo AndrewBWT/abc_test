@@ -1,64 +1,68 @@
 #pragma once
-#include "abc_test/core/reporters/text_test_reporter/enum_fields/assertion.h"
+#include "abc_test/core/reporters/text_test_reporter/enum_fields/generic_matcher_based_assertion.h"
 #include "abc_test/core/reporters/text_test_reporter/list_formatter/generic_assertion.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/assertion.h"
+#include "abc_test/core/test_reports/mid_test_invokation_report/generic_matcher_based_assertion.h"
 #include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_terminate.h"
+#include "abc_test/core/reporters/text_test_reporter/enum_fields/generic_matcher_based_assertion.h"
 _BEGIN_ABC_REPORTERS_NS
 template<
+	bool Single_Source,
 	typename Assertion_Status
 >
-struct assertion_list_formatter_t
-	: public list_formattable_t< reports::assertion_t<Assertion_Status>,
-	combined_enum_assertion_fields_t, print_config_t>,
-	public generic_assertion_list_formatter_t<true, Assertion_Status>
+struct generic_matcher_based_assertion_list_formatter_t
+	: public list_formattable_t< 
+	reports::generic_matcher_based_assertion_t<Single_Source, Assertion_Status>,
+	combined_enum_generic_matcher_based_assertion_fields_t, print_config_t>,
+	public generic_assertion_list_formatter_t<Single_Source, Assertion_Status>
 {
 public:
 	__constexpr
 		virtual
 		bool
 		check_data(
-			const combined_enum_assertion_fields_t& _a_fid,
-			const reports::assertion_t<Assertion_Status>& _a_element
+			const combined_enum_generic_matcher_based_assertion_fields_t& _a_fid,
+			const reports::generic_matcher_based_assertion_t<Single_Source, Assertion_Status>& _a_element
 		) const;
 	__constexpr
 		virtual
 		std::vector<std::string>
 		get_data(
-			const combined_enum_assertion_fields_t& _a_fid,
-			const reports::assertion_t<Assertion_Status>& _a_element,
+			const combined_enum_generic_matcher_based_assertion_fields_t& _a_fid,
+			const reports::generic_matcher_based_assertion_t<Single_Source, Assertion_Status>& _a_element,
 			const print_config_t& _a_pc
 		) const;
-	__constexpr
+	/*__constexpr
 		virtual
 		std::string
 		get_str_representation(
 			const reports::generic_assertion_t<true, Assertion_Status>& _a_element,
 			const print_config_t& _a_pc
-		) const override;
+		) const override;*/
 };
 _END_ABC_REPORTERS_NS
 
 _BEGIN_ABC_REPORTERS_NS
 template<
+	bool Single_Source,
 	typename Assertion_Status
 >
 __constexpr_imp
 bool
-assertion_list_formatter_t<Assertion_Status>::check_data(
-	const combined_enum_assertion_fields_t& _a_fid,
-	const reports::assertion_t<Assertion_Status>& _a_element
+generic_matcher_based_assertion_list_formatter_t<Single_Source,Assertion_Status>::check_data(
+	const combined_enum_generic_matcher_based_assertion_fields_t& _a_fid,
+	const reports::generic_matcher_based_assertion_t<Single_Source, Assertion_Status>& _a_element
 ) const
 {
 	using namespace std;
 	if (auto _l_ptr{ get_if< combined_enum_generic_assertion_fields_t>(&_a_fid) };
 		_l_ptr != nullptr)
 	{
-		return generic_assertion_list_formatter_t<true, Assertion_Status>::check_data(*_l_ptr, _a_element);
+		return generic_assertion_list_formatter_t<Single_Source, Assertion_Status>::check_data(*_l_ptr, _a_element);
 	}
-	else if (auto _l_ptr{ get_if< enum_assertion_fields_t>(&_a_fid) };
+	else if (auto _l_ptr{ get_if< enum_generic_matcher_based_assertion_fields_t>(&_a_fid) };
 		_l_ptr != nullptr)
 	{
-		using enum enum_assertion_fields_t;
+		using enum enum_generic_matcher_based_assertion_fields_t;
 		switch (*_l_ptr)
 		{
 		case MATCHER_OUTPUT:
@@ -75,13 +79,14 @@ assertion_list_formatter_t<Assertion_Status>::check_data(
 	}
 }
 template<
+	bool Single_Source,
 	typename Assertion_Status
 >
 __constexpr_imp
 std::vector<std::string>
-assertion_list_formatter_t<Assertion_Status>::get_data(
-	const combined_enum_assertion_fields_t& _a_fid,
-	const reports::assertion_t<Assertion_Status>& _a_element,
+generic_matcher_based_assertion_list_formatter_t<Single_Source, Assertion_Status>::get_data(
+	const combined_enum_generic_matcher_based_assertion_fields_t& _a_fid,
+	const reports::generic_matcher_based_assertion_t<Single_Source, Assertion_Status>& _a_element,
 	const print_config_t& _a_pc
 ) const
 {
@@ -89,12 +94,12 @@ assertion_list_formatter_t<Assertion_Status>::get_data(
 	if (auto _l_ptr{ get_if< combined_enum_generic_assertion_fields_t>(&_a_fid) };
 		_l_ptr != nullptr)
 	{
-		return generic_assertion_list_formatter_t<true, Assertion_Status>::get_data(*_l_ptr, _a_element, _a_pc);
+		return generic_assertion_list_formatter_t<Single_Source, Assertion_Status>::get_data(*_l_ptr, _a_element, _a_pc);
 	}
-	else if (auto _l_ptr{ get_if< enum_assertion_fields_t>(&_a_fid) };
+	else if (auto _l_ptr{ get_if< enum_generic_matcher_based_assertion_fields_t>(&_a_fid) };
 		_l_ptr != nullptr)
 	{
-		using enum enum_assertion_fields_t;
+		using enum enum_generic_matcher_based_assertion_fields_t;
 		switch (*_l_ptr)
 		{
 		case MATCHER_OUTPUT:
@@ -113,7 +118,7 @@ assertion_list_formatter_t<Assertion_Status>::get_data(
 				_l_rv.push_back(_a_pc.indent(_a_pc.colon(_a_pc.source_code_str())));
 				for (const string_view _l_str : _l_element.second)
 				{
-					_l_rv.push_back(_a_pc.indent(_a_pc.source_representation(_l_str),2));
+					_l_rv.push_back(_a_pc.indent(_a_pc.source_representation(_l_str), 2));
 				}
 			}
 			return _l_rv;
@@ -127,7 +132,7 @@ assertion_list_formatter_t<Assertion_Status>::get_data(
 		throw errors::unaccounted_for_variant_exception(_a_fid);
 	}
 }
-template<
+/*template<
 	typename Assertion_Status
 >
 __constexpr_imp
@@ -135,7 +140,7 @@ std::string
 assertion_list_formatter_t<Assertion_Status>::get_str_representation(
 	const reports::generic_assertion_t<true, Assertion_Status>& _a_element,
 	const print_config_t& _a_pc
-) const 
+) const
 {
 	using namespace std;
 	using namespace reports;
@@ -143,6 +148,6 @@ assertion_list_formatter_t<Assertion_Status>::get_str_representation(
 		_a_element.get_pass_status() ? "passed" : "failed",
 		(not _a_element.get_pass_status() &&
 			same_as<Assertion_Status, pass_or_terminate_t>) ?
-			" Assertion terminated function." : "");
-}
+		" Assertion terminated function." : "");
+}*/
 _END_ABC_REPORTERS_NS

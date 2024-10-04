@@ -15,6 +15,7 @@ set(LIBRARY_FILES
       src/abc_test/core/test_runner.cpp
   include/abc_test/core/log_test_msg.h
   include/abc_test/core/test_assertions.h
+  include/abc_test/core/test_assertions/test_block.h
   # Subfolder contains objects and functions pertaining to how repetition data is stored.
   include/abc_test/core/ds/repetitions/repetition_data.h
   include/abc_test/core/ds/repetitions/repetition_tree.h
@@ -56,10 +57,18 @@ set(LIBRARY_FILES
   include/abc_test/core/reporters/text_test_reporter/enum_fields/user_initialised_report.h
   include/abc_test/core/reporters/text_test_reporter/list_formatter/generic_assertion.h
   include/abc_test/core/reporters/text_test_reporter/enum_fields/generic_assertion.h
-  include/abc_test/core/reporters/text_test_reporter/list_formatter/assertion.h
-  include/abc_test/core/reporters/text_test_reporter/enum_fields/assertion.h
+  include/abc_test/core/reporters/text_test_reporter/list_formatter/matcher_based_assertion.h
+  include/abc_test/core/reporters/text_test_reporter/enum_fields/matcher_based_assertion.h
   include/abc_test/core/reporters/text_test_reporter/list_formatter/manual_assertion.h
   include/abc_test/core/reporters/text_test_reporter/enum_fields/manual_assertion.h
+  include/abc_test/core/reporters/text_test_reporter/list_formatter/generic_manual_assertion.h
+  include/abc_test/core/reporters/text_test_reporter/enum_fields/generic_manual_assertion.h
+  include/abc_test/core/reporters/text_test_reporter/list_formatter/generic_matcher_based_assertion.h
+  include/abc_test/core/reporters/text_test_reporter/enum_fields/generic_matcher_based_assertion.h
+  include/abc_test/core/reporters/text_test_reporter/list_formatter/manual_assertion_block.h
+  include/abc_test/core/reporters/text_test_reporter/enum_fields/manual_assertion_block.h
+  include/abc_test/core/reporters/text_test_reporter/list_formatter/matcher_based_assertion_block.h
+  include/abc_test/core/reporters/text_test_reporter/enum_fields/matcher_based_assertion_block.h
   include/abc_test/core/reporters/text_test_reporter/list_formatter/static_assertion.h
   include/abc_test/core/reporters/text_test_reporter/enum_fields/static_assertion.h
   include/abc_test/core/reporters/text_test_reporter/list_formatter/after_execution_test_report.h
@@ -76,7 +85,7 @@ set(LIBRARY_FILES
   # Contains data structures representing things reported from a test. e.g. assertions, unexpected exceptions
   include/abc_test/core/test_reports/mid_test_invokation_report/user_initialised_report.h
   include/abc_test/core/test_reports/mid_test_invokation_report/generic_assertion.h
-  include/abc_test/core/test_reports/mid_test_invokation_report/assertion.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/matcher_based_assertion.h
   include/abc_test/core/test_reports/mid_test_invokation_report/static_assertion.h
   include/abc_test/core/test_reports/mid_test_invokation_report/manual_assertion.h
   include/abc_test/core/test_reports/mid_test_invokation_report/named_assertion.h
@@ -93,7 +102,10 @@ set(LIBRARY_FILES
   include/abc_test/core/test_reports/mid_test_invokation_report/assertion_status/terminate.h
   include/abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_fail.h
   include/abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_terminate.h
-  include/abc_test/core/test_reports/mid_test_invokation_report/block_assertion_container.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/manual_assertion_block.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/matcher_based_assertion_block.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/generic_manual_assertion.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/generic_matcher_based_assertion.h
   include/abc_test/core/test_reports/completed_test_report.h
   # Matcher subfolder. Code contains logic for writing individual assertions.
   include/abc_test/matchers/matcher.h

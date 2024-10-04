@@ -23,6 +23,11 @@ public:
 			const bool _a_exact_source
 		) noexcept;
 	__constexpr
+		unexpected_report_t(
+			const source_pair_t& _a_sources,
+			const bool _a_exact_source
+		) noexcept;
+	__constexpr
 		virtual
 		~unexpected_report_t(
 		) noexcept;
@@ -54,6 +59,19 @@ unexpected_report_t<Terminate>::unexpected_report_t(
 ) noexcept
 	: _m_last_source(_a_source)
 	, _m_exact_source(_a_exact_source)
+{
+
+}
+template<
+	bool Terminate
+>
+__constexpr_imp
+unexpected_report_t<Terminate>::unexpected_report_t(
+	const source_pair_t& _a_sources,
+	const bool _a_exact_source
+) noexcept
+	//: _m_last_source(_a_source)
+	//, _m_exact_source(_a_exact_source)
 {
 
 }
