@@ -38,6 +38,17 @@ private:
 			test_runner_t&
 		) noexcept;
 };
+namespace
+{
+	template<
+		typename T
+	>
+	__constexpr
+		std::string
+		format_str(
+			const T& _a_element
+		) noexcept;
+}
 _END_ABC_NS
 
 _BEGIN_ABC_NS
@@ -80,16 +91,8 @@ __constexpr_imp
 	) noexcept
 {
 	using namespace std;
-	string _l_left_str{ "[?]" };
-	string _l_right_str{ "[?]" };
-	if constexpr (fmt::formattable<T1>)
-	{
-		_l_left_str = fmt::format("{}", _m_l);
-	}
-	if constexpr (fmt::formattable<T2>)
-	{
-		_l_right_str = fmt::format("{}", _m_r);
-	}
+	string _l_left_str{ format_str<T1>(_m_l) };
+	string _l_right_str{ format_str<T1>(_m_r) };
 	return matcher_result_t(true,
 		cmp<T1, T2, Cmp>(forward<T1>(_m_l), forward<T2>(_m_r)),
 		fmt::format(
@@ -98,5 +101,32 @@ __constexpr_imp
 			cmp_str<Cmp>(),
 			_l_right_str)
 	);
+}
+namespace
+{
+	template<
+		typename T
+	>
+	__constexpr_imp
+		std::string
+		format_str(
+			const T& _a_element
+		) noexcept
+	{
+		using namespace std;
+		string _l_rv{ "[?]" };
+		if constexpr (fmt::formattable<T>)
+		{
+			if constexpr (same_as<T, string>)
+			{
+				_l_rv = fmt::format("\"{}\"", _a_element);
+			}
+			else
+			{
+				_l_rv = fmt::format("{}", _a_element);
+			}
+		}
+		return _l_rv;
+	}
 }
 _END_ABC_NS

@@ -45,8 +45,6 @@
 - In abc_test/gen_data/enumeration/specializations/fundamental_types.h, there are several specializations which cannot have separate definitions and implementations (as in, we cannot separate them without an error being encountered). We believe this to be an error with Visual Studio, however we will need to investigate further.
 - We need to decide on the nomenclature for gen_data classes supported by file IO - at the moment the functions corresponding to these just use different numbers, however if we had a name for the different types of file IO, it would allow us to name the functions more appropriately. 
 - See if we are able to get source location information in constructors for matcher_t. Currently it defaults to the copy constructor, which means we cannot use a default parameter to insert the source location.
-- Try adding factory methods for matcher_t, as we need to manually set the matchers.
-- Consider a new hierarchy; matcher_t for exposed variable. matcher_holder_t for elements constructed from generic_matcher pointers. We would need to overload matcher_t or/and/not statements with matcher_holder_t and vice versa. This would remove our issue above, regarding not having the source code location for specific. 
-- Ensure that data is checked when a matcher source list is being processed. Currently it is possible we will report the end-assertion twice, if we use a _MATCHER in it.
-- Error seen on print out for _CHECK_EXPR and _REQUIRE_EXPR. Need to check.
-- Write excpetion macros.
+- Write exception macros.
+- When stringifying types in the comparison matcher, we need more checks for whether its a string, and then to include quotes.
+- Write logic to deal with nested _MATCHER's copying the same line.
