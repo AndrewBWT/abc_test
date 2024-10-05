@@ -202,6 +202,18 @@ public:
 		) const noexcept;
 	__constexpr
 		const std::string_view
+		source_location_pair_begin_str(
+		) const noexcept;
+	__constexpr
+		const std::string_view
+		source_location_pair_end_str(
+		) const noexcept;
+	__constexpr
+		const std::string_view
+		no_end_source(
+		) const noexcept;
+	__constexpr
+		const std::string_view
 		potential_source_str(
 			const bool _a_exact_source
 		) const noexcept;
@@ -688,6 +700,27 @@ print_config_t::source_location_str(
 ) const noexcept
 {
 	return "Source location";
+}
+__constexpr
+const std::string_view
+print_config_t::source_location_pair_begin_str(
+) const noexcept
+{
+	return "Source block begin";
+}
+__constexpr
+const std::string_view
+print_config_t::source_location_pair_end_str(
+) const noexcept
+{
+	return "Source block end";
+}
+__constexpr
+const std::string_view
+print_config_t::no_end_source(
+) const noexcept
+{
+	return "No end source";
 }
 __constexpr_imp
 const std::string_view

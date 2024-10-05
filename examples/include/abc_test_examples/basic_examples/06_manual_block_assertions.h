@@ -18,7 +18,7 @@
 #include <vector>
 #include "abc_test/matchers/function_wrapper.h"
 
-_TEST_CASE("User defined matcher", "examples::basic_examples::06_manual_block_assertion")
+_TEST_CASE("Assertion block", "examples::basic_examples::06_manual_block_assertion")
 {
 	using namespace abc;
 	/*!
@@ -82,8 +82,8 @@ _TEST_CASE("User defined matcher", "examples::basic_examples::06_manual_block_as
 	* Below we show some examples of the use of these.
 	*/ 
 	_BEGIN_MANUAL_REQUIRE_ASSERTION_BLOCK(_l_mn);
-	_l_mn.set_message("This will fail spectacularly");
-	_l_mn = false;
+	_l_mn.set_message("This could fail spectacularly");
+	_l_mn = true;
 	_END_MANUAL_REQUIRE_ASSERTION_BLOCK(_l_mn);
 
 	_BEGIN_CHECK_ASSERTION_BLOCK(_l_mn);
@@ -97,4 +97,89 @@ _TEST_CASE("User defined matcher", "examples::basic_examples::06_manual_block_as
 	_l_mn.set_message("This will fail spectacularly");
 	_l_mn = _MATCHER(matcher_t(false_matcher()));
 	_END_CHECK_ASSERTION_BLOCK(_l_mn);
+}
+
+namespace testing
+{
+	constexpr
+		int
+		test_function(
+			const int _l_id
+		)
+	{
+		if (_l_id == 0)
+		{
+			throw std::runtime_error("A runtime errorr");
+		}
+		else if (_l_id == 1)
+		{
+			throw std::exception("The exception type");
+		}
+		else if (_l_id == 2)
+		{
+			throw int(_l_id);
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	inline
+		void
+		test_handling_code(
+			const int _l_id
+		)
+	{
+		using namespace abc;
+		using namespace std;
+		_BEGIN_CHECK_ASSERTION_BLOCK(_l_test_exception_code);
+		try
+		{
+			int _l_rv = test_function(_l_id);
+			_l_test_exception_code = _MATCHER(_EXPR(0 == _l_rv));
+			_l_test_exception_code.set_message("No exception thrown");
+		}
+		catch (const std::runtime_error& _l_re)
+		{
+			_l_test_exception_code.set_message("Runtime error thrown");
+			_l_test_exception_code = _MATCHER(
+				(eq<string, string>(_l_re.what(),
+				"The runtime error")));
+		}
+		catch (const std::exception& _l_e)
+		{
+			_l_test_exception_code.set_message("std::exception type thrown");
+			_l_test_exception_code = _MATCHER(
+				(eq<string, string>(_l_e.what(),
+					"The exceptioniano type")));
+		}
+		catch (...)
+		{
+			_l_test_exception_code.set_message("Unkonwn exception type thrown");
+			_l_test_exception_code = _MATCHER(false_matcher());
+		}
+		_END_CHECK_ASSERTION_BLOCK(_l_test_exception_code);
+	}
+}
+
+_TEST_CASE("Example Using assertion blocks to deal with excetpions", 
+	"examples::basic_examples::06_manual_block_assertion")
+{
+	using namespace abc;
+	using namespace std;
+	using namespace testing;
+	/*!
+	* The examples above are very simple, and the user may be wondering why
+	* these are included. In the function above we show a more complicated
+	* example of what assertion blocks can do, and how they can be used to
+	* define fine-grained control over what outputs are given from portions of code
+	* whose control flow may not be usual.
+	* 
+	* Below we call that function with several arguments so the user can see
+	* what output is reported.
+	*/
+	test_handling_code(0);
+	test_handling_code(1);
+	test_handling_code(2);
+	test_handling_code(3);
 }

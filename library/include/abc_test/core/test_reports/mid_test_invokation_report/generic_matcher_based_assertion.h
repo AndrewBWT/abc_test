@@ -51,7 +51,7 @@ generic_matcher_based_assertion_t<Single_Source, Assertion_Status>::generic_matc
 	const matcher_result_t& _a_matcher_result,
 	const matcher_source_map_t& _a_matcher_source_map
 ) noexcept
-	: generic_assertion_t<true, Assertion_Status>(
+	: generic_assertion_t<Single_Source, Assertion_Status>(
 		Assertion_Status(_a_matcher_result.passed()),
 		_a_source,
 		_a_log_infos, _a_msg)

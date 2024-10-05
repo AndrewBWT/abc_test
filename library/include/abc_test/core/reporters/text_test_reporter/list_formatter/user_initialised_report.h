@@ -88,10 +88,31 @@ user_initialised_report_list_formatter_t<Single_Source>::get_data(
 		}
 		else
 		{
-			return
+			vector<string> _l_rv =
 			{
-
+				_a_pc.colon(_a_pc.source_location_pair_begin_str()),
+				_a_pc.indent(_a_pc.colon(_a_pc.source_location_str())),
+				_a_pc.indent(_a_pc.source_location(_a_element.source().begin_source().source_location()),2),
+				_a_pc.indent(_a_pc.colon(_a_pc.source_code_str())),
+				_a_pc.indent(_a_pc.source_representation(_a_element.source().begin_source().str()),2),
+				_a_pc.colon(_a_pc.source_location_pair_end_str()),
 			};
+			if (not _a_element.source().end_source().has_value())
+			{
+				_l_rv.push_back(_a_pc.indent(_a_pc.highlight_fail(std::string(_a_pc.no_end_source()))));
+			}
+			else
+			{
+				const reports::single_source_t _l_end{ _a_element.source().end_source().value()};
+				_l_rv.append_range(
+					std::vector<std::string>({
+					_a_pc.indent(_a_pc.colon(_a_pc.source_location_str())),
+					_a_pc.indent(_a_pc.source_location(_l_end.source_location()), 2),
+					_a_pc.indent(_a_pc.colon(_a_pc.source_code_str())),
+					_a_pc.indent(_a_pc.source_representation(_l_end.str()), 2)
+					}));
+			}
+			return _l_rv;
 		}
 
 	case LOG_INFOS:
