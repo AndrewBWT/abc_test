@@ -28,7 +28,12 @@ public:
 			) noexcept;
 	__constexpr_imp
 		void
-		set_message(
+		set_failure_message(
+			const std::string_view _a_message
+		) noexcept;
+	__constexpr_imp
+		void
+		set_pass_message(
 			const std::string_view _a_message
 		) noexcept;
 	__constexpr
@@ -37,7 +42,11 @@ public:
 		) const noexcept;
 	__constexpr
 		const std::optional<std::string>&
-		message(
+		fail_message(
+		) const noexcept;
+	__constexpr
+		const std::optional<std::string>&
+		pass_message(
 		) const noexcept;
 	__constexpr
 		void
@@ -50,7 +59,8 @@ public:
 		) const noexcept;
 private:
 	reports::source_pair_t _m_source;
-	std::optional<std::string> _m_message;
+	std::optional<std::string> _m_failure_message;
+	std::optional<std::string> _m_pass_message;
 	T _m_inner_element;
 	bool _m_processed;
 };
@@ -101,11 +111,23 @@ template<
 >
 __constexpr_imp
 void
-test_block_t<T, Assertion_Type>::set_message(
+test_block_t<T, Assertion_Type>::set_failure_message(
 	const std::string_view _a_message
 ) noexcept
 {
-	_m_message = _a_message;
+	_m_failure_message = _a_message;
+}
+template<
+	typename T,
+	typename Assertion_Type
+>
+__constexpr_imp
+void
+test_block_t<T, Assertion_Type>::set_pass_message(
+	const std::string_view _a_message
+) noexcept
+{
+	_m_pass_message = _a_message;
 }
 template<
 	typename T,
@@ -124,10 +146,21 @@ template<
 >
 __constexpr_imp
 const std::optional<std::string>&
-test_block_t<T, Assertion_Type>::message(
+test_block_t<T, Assertion_Type>::fail_message(
 ) const noexcept
 {
-	return _m_message;
+	return _m_failure_message;
+}
+template<
+	typename T,
+	typename Assertion_Type
+>
+__constexpr_imp
+const std::optional<std::string>&
+test_block_t<T, Assertion_Type>::pass_message(
+) const noexcept
+{
+	return _m_pass_message;
 }
 template<
 	typename T,

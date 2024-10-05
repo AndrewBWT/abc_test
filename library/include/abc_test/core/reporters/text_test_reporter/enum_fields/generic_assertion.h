@@ -6,7 +6,8 @@ _BEGIN_ABC_REPORTERS_NS
 enum class enum_generic_assertion_fields_t
 {
 	STATUS,
-	MESSAGE,
+	FAIL_MESSAGE,
+	PASS_MESSAGE,
 	STR_REPRESENTATION
 };
 using combined_enum_generic_assertion_fields_t =

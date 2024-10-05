@@ -15,7 +15,8 @@ public:
 		static_assertion_t(
 			const user_initialised_report_t<true>::source_t& _a_source,
 			const log_infos_t& _a_log_infos,
-			const std::optional<std::string_view>& _a_msg
+			const std::optional<std::string_view>& _a_fail_msg,
+			const std::optional<std::string_view>& _a_pass_msg
 		) noexcept;
 };
 
@@ -30,10 +31,11 @@ __constexpr_imp
 static_assertion_t<Assertion_Status>::static_assertion_t(
 	const user_initialised_report_t<true>::source_t& _a_source,
 	const log_infos_t& _a_log_infos,
-	const std::optional<std::string_view>& _a_msg
+	const std::optional<std::string_view>& _a_fail_msg,
+	const std::optional<std::string_view>& _a_pass_msg
 ) noexcept
 	: generic_assertion_t<true, Assertion_Status>(Assertion_Status(), _a_source,
-		_a_log_infos, _a_msg)
+		_a_log_infos, _a_fail_msg, _a_pass_msg)
 {
 
 }

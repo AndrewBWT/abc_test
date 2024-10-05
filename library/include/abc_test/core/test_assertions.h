@@ -305,6 +305,7 @@ create_assertion(
 		_l_gur = new matcher_based_assertion_t<T>(_a_source,
 			_a_test_runner.get_log_infos(false),
 			_a_str_to_print,
+			std::optional<std::string_view>(),
 			matcher_result_t(),
 			matcher_source_map_t()
 		);
@@ -320,6 +321,7 @@ create_assertion(
 		_l_gur = new matcher_based_assertion_t<T>(_a_source,
 			_a_test_runner.get_log_infos(false),
 			_a_str_to_print,
+			std::optional<std::string_view>(),
 			_l_mr,
 			_l_msm
 		);
@@ -345,7 +347,8 @@ create_static_assertion(
 	const generic_assertion_t<true, T>* _l_gur{
 		new static_assertion_t<T>(_a_source,
 			_a_test_runner.get_log_infos(false),
-			_a_str_to_print
+			_a_str_to_print,
+			std::optional<std::string_view>()
 			)
 	};
 	_a_test_runner.add_assertion(_l_gur);
@@ -385,7 +388,8 @@ create_manual_assertion(
 			_a_pass,
 			_a_source,
 			_a_test_runner.get_log_infos(false),
-			_a_str_to_print
+			_a_str_to_print,
+			std::optional<std::string_view>()
 			)
 	};
 	_a_test_runner.add_assertion(_l_gur);
@@ -408,7 +412,8 @@ create_assertion_block(
 			_a_test_block.inner_value(),
 			_a_test_block.source(),
 			_a_test_runner.get_log_infos(false),
-			_a_test_block.message()
+			_a_test_block.fail_message(),
+			_a_test_block.pass_message()
 			)
 	};
 	_a_test_runner.add_assertion(_l_gur);
@@ -432,7 +437,8 @@ create_assertion_block(
 	{
 		_l_gur = new matcher_based_assertion_block_t<T>(_a_test_block.source(),
 			_a_test_runner.get_log_infos(false),
-			_a_test_block.message(),
+			_a_test_block.fail_message(),
+			_a_test_block.pass_message(),
 			matcher_result_t(),
 			matcher_source_map_t()
 		);
@@ -447,7 +453,8 @@ create_assertion_block(
 		_l_passed = _l_mr.passed();
 		_l_gur = new matcher_based_assertion_block_t<T>(_a_test_block.source(),
 			_a_test_runner.get_log_infos(false),
-			_a_test_block.message(),
+			_a_test_block.fail_message(),
+			_a_test_block.pass_message(),
 			_l_mr,
 			_l_msm
 		);

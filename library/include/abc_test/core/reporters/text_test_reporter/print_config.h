@@ -259,7 +259,11 @@ public:
 		) const noexcept;
 	__constexpr
 		const std::string_view
-		message_str(
+		fail_message_str(
+		) const noexcept;
+	__constexpr
+		const std::string_view
+		pass_message_str(
 		) const noexcept;
 	__constexpr
 		std::string
@@ -838,10 +842,17 @@ print_config_t::status(
 }
 __constexpr_imp
 const std::string_view
-print_config_t::message_str(
+print_config_t::fail_message_str(
 ) const noexcept
 {
-	return "With message";
+	return "Fail message";
+}
+__constexpr_imp
+const std::string_view
+print_config_t::pass_message_str(
+) const noexcept
+{
+	return "Pass message";
 }
 __constexpr_imp
 std::string

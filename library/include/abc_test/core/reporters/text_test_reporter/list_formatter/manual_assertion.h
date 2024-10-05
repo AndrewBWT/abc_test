@@ -109,12 +109,6 @@ manual_assertion_list_formatter_t<Assertion_Status>::get_str_representation(
 	const print_config_t& _a_pc
 ) const 
 {
-	using namespace std;
-	using namespace reports;
-	return fmt::format("Manual assertion {0}.{1}",
-		_a_element.get_pass_status() ? "passed" : "failed",
-		(not _a_element.get_pass_status() &&
-			same_as<Assertion_Status, pass_or_terminate_t>) ?
-		" Assertion terminated function." : "");
+	return construct_str_representation(_a_element, "Manual assertion");
 }
 _END_ABC_REPORTERS_NS
