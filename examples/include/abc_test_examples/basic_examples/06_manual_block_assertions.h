@@ -36,7 +36,7 @@ _TEST_CASE("Assertion block", "examples::basic_examples::06_manual_block_asserti
 	* Each of these take an argument. The object which underpins these blocks is
 	* given this name. Below we show its basic use
 	*/
-	_BEGIN_MANUAL_CHECK_ASSERTION_BLOCK(_l_mn);
+	_BEGIN_MANUAL_CHECK_ASSERTION_BLOCK(_l_mn,"description");
 	int x = 5;
 	_END_MANUAL_CHECK_ASSERTION_BLOCK(_l_mn);
 	/*!
@@ -52,15 +52,14 @@ _TEST_CASE("Assertion block", "examples::basic_examples::06_manual_block_asserti
 	* 
 	* The example above succeeds. The example below fails.
 	*/
-	_BEGIN_MANUAL_CHECK_ASSERTION_BLOCK(_l_mn);
+	_BEGIN_MANUAL_CHECK_ASSERTION_BLOCK(_l_mn, "description");
 	_l_mn = false;
 	_END_MANUAL_CHECK_ASSERTION_BLOCK(_l_mn);
 	/*!
 	* We can also set the message associated with the assertion block, using the function
 	* "set_assertion", as shown below.
 	*/
-	_BEGIN_MANUAL_CHECK_ASSERTION_BLOCK(_l_mn);
-	_l_mn.set_failure_message("This is a set message");
+	_BEGIN_MANUAL_CHECK_ASSERTION_BLOCK(_l_mn, "description");
 	_l_mn = false;
 	_END_MANUAL_CHECK_ASSERTION_BLOCK(_l_mn);
 	/* 
@@ -81,20 +80,17 @@ _TEST_CASE("Assertion block", "examples::basic_examples::06_manual_block_asserti
 	* 
 	* Below we show some examples of the use of these.
 	*/ 
-	_BEGIN_MANUAL_REQUIRE_ASSERTION_BLOCK(_l_mn);
-	_l_mn.set_failure_message("This could fail spectacularly");
+	_BEGIN_MANUAL_REQUIRE_ASSERTION_BLOCK(_l_mn, "description");
 	_l_mn = true;
 	_END_MANUAL_REQUIRE_ASSERTION_BLOCK(_l_mn);
 
-	_BEGIN_CHECK_ASSERTION_BLOCK(_l_mn);
-	_l_mn.set_failure_message("This will fail spectacularly");
+	_BEGIN_CHECK_ASSERTION_BLOCK(_l_mn, "description");
 	_l_mn = matcher_t(false_matcher());
 	_END_CHECK_ASSERTION_BLOCK(_l_mn);
 	/*!
 	* Another example showing what happens when we use the _MATCHER macro
 	*/
-	_BEGIN_CHECK_ASSERTION_BLOCK(_l_mn);
-	_l_mn.set_failure_message("This will fail spectacularly");
+	_BEGIN_CHECK_ASSERTION_BLOCK(_l_mn, "description");
 	_l_mn = _MATCHER(matcher_t(false_matcher()));
 	_END_CHECK_ASSERTION_BLOCK(_l_mn);
 }
@@ -132,32 +128,26 @@ namespace testing
 	{
 		using namespace abc;
 		using namespace std;
-		_BEGIN_CHECK_ASSERTION_BLOCK(_l_test_exception_code);
+		_BEGIN_CHECK_ASSERTION_BLOCK(_l_test_exception_code, "description");
 		try
 		{
 			int _l_rv = test_function(_l_id);
 			_l_test_exception_code = _MATCHER(_EXPR(0 == _l_rv));
-			_l_test_exception_code.set_failure_message("Test returned normally, matcher failed");
-			_l_test_exception_code.set_pass_message("Test returned normally, matcher passed");
 		}
 		catch (const std::runtime_error& _l_re)
 		{
-			_l_test_exception_code.set_failure_message(
-				"Runtime error thrown, what() message not equal to \"The runtime error\"");
 			_l_test_exception_code = _MATCHER(
 				(eq<string, string>(_l_re.what(),
 				"The runtime error")));
 		}
 		catch (const std::exception& _l_e)
 		{
-			_l_test_exception_code.set_failure_message("std::exception type thrown");
 			_l_test_exception_code = _MATCHER(
 				(eq<string, string>(_l_e.what(),
 					"The exceptioniano type")));
 		}
 		catch (...)
 		{
-			_l_test_exception_code.set_failure_message("Unkonwn exception type thrown");
 			_l_test_exception_code = _MATCHER(false_matcher());
 		}
 		_END_CHECK_ASSERTION_BLOCK(_l_test_exception_code);

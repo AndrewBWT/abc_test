@@ -36,13 +36,17 @@ class generic_assertion_t :
 	public generic_assertion_type_t
 {
 public:
-	__constexpr
+	/*__constexpr
 		const std::optional<std::string>&
 		fail_message(
 		) const noexcept;
 	__constexpr
 		const std::optional<std::string>&
 		pass_message(
+		) const noexcept;*/
+	__constexpr
+		const std::optional<std::string>&
+		test_description(
 		) const noexcept;
 	__constexpr
 		Assertion_Status
@@ -71,26 +75,26 @@ protected:
 			const Assertion_Status& _a_status,
 			const user_initialised_report_t<Single_Source>::source_t& _a_source,
 			const log_infos_t& _a_log_infos,
-			const std::string_view _a_msg
+			const std::string_view _a_annotation
 		) noexcept;
 	__constexpr
 		generic_assertion_t(
 			const Assertion_Status& _a_status,
 			const user_initialised_report_t<Single_Source>::source_t& _a_source,
 			const log_infos_t& _a_log_infos,
-			const std::optional<std::string_view>& _a_fail_msg,
-			const std::optional<std::string_view>& _a_pass_msg
+			const std::optional<std::string_view>& _a_test_annotation
 		) noexcept;
 	Assertion_Status _m_status;
-	std::optional<std::string> _m_fail_message;
-	std::optional<std::string> _m_pass_message;
+	std::optional<std::string> _m_test_description;
+	//std::optional<std::string> _m_fail_message;
+	//std::optional<std::string> _m_pass_message;
 private:
 };
 
 _END_ABC_REPORTS_NS
 
 _BEGIN_ABC_REPORTS_NS
-template<
+/*template<
 	bool Single_Source,
 	typename Assertion_Status
 >
@@ -113,6 +117,18 @@ generic_assertion_t<Single_Source, Assertion_Status>::pass_message(
 ) const noexcept
 {
 	return _m_pass_message;
+}*/
+template<
+	bool Single_Source,
+	typename Assertion_Status
+>
+	requires std::derived_from<Assertion_Status, assertion_status_base_t>
+__constexpr_imp
+const std::optional<std::string>&
+generic_assertion_t<Single_Source, Assertion_Status>::test_description(
+) const noexcept
+{
+	return _m_test_description;
 }
 template<
 	bool Single_Source,
@@ -206,10 +222,10 @@ generic_assertion_t<Single_Source, Assertion_Status>::generic_assertion_t(
 	const Assertion_Status& _a_status,
 	const user_initialised_report_t<Single_Source>::source_t& _a_source,
 	const log_infos_t& _a_log_infos,
-	const std::string_view _a_str
+	const std::string_view _a_test_annotation
 ) noexcept
 	: generic_assertion_t<Single_Source, Assertion_Status>(
-		_a_status, _a_source, _a_log_infos, std::optional<std::string_view>{_a_str})
+		_a_status, _a_source, _a_log_infos, std::optional<std::string_view>{_a_test_annotation})
 {
 
 }
@@ -223,13 +239,11 @@ generic_assertion_t<Single_Source, Assertion_Status>::generic_assertion_t(
 	const Assertion_Status& _a_status,
 	const user_initialised_report_t<Single_Source>::source_t& _a_source,
 	const log_infos_t& _a_log_infos,
-	const std::optional<std::string_view>& _a_fail_msg,
-	const std::optional<std::string_view>& _a_pass_msg
+	const std::optional<std::string_view>& _a_test_annotation
 ) noexcept
 	: user_initialised_report_t<Single_Source>(_a_source,_a_log_infos)
 	, _m_status(_a_status)
-	, _m_fail_message(_a_fail_msg)
-	, _m_pass_message(_a_pass_msg)
+	, _m_test_description(_a_test_annotation)
 {
 
 }

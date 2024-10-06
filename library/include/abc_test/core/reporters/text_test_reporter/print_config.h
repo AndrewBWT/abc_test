@@ -202,6 +202,10 @@ public:
 		) const noexcept;
 	__constexpr
 		const std::string_view
+		matcher_annotation(
+		) const noexcept;
+	__constexpr
+		const std::string_view
 		source_location_pair_begin_str(
 		) const noexcept;
 	__constexpr
@@ -259,12 +263,16 @@ public:
 		) const noexcept;
 	__constexpr
 		const std::string_view
+		test_description_str(
+		) const noexcept;
+	/*__constexpr
+		const std::string_view
 		fail_message_str(
 		) const noexcept;
 	__constexpr
 		const std::string_view
 		pass_message_str(
-		) const noexcept;
+		) const noexcept;*/
 	__constexpr
 		std::string
 		message_str(
@@ -707,6 +715,13 @@ print_config_t::source_location_str(
 }
 __constexpr
 const std::string_view
+print_config_t::matcher_annotation(
+) const noexcept
+{
+	return "Matcher's annotation";
+}
+__constexpr
+const std::string_view
 print_config_t::source_location_pair_begin_str(
 ) const noexcept
 {
@@ -842,6 +857,13 @@ print_config_t::status(
 }
 __constexpr_imp
 const std::string_view
+print_config_t::test_description_str(
+) const noexcept
+{
+	return "Test description";
+}
+/*__constexpr_imp
+const std::string_view
 print_config_t::fail_message_str(
 ) const noexcept
 {
@@ -853,7 +875,7 @@ print_config_t::pass_message_str(
 ) const noexcept
 {
 	return "Pass message";
-}
+}*/
 __constexpr_imp
 std::string
 print_config_t::message_str(

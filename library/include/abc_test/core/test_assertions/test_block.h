@@ -16,6 +16,7 @@ public:
 		) noexcept = delete;
 	__constexpr
 		test_block_t(
+			const std::string_view _a_test_annotation,
 			const reports::single_source_t& _a_source
 		) noexcept;
 	__constexpr
@@ -26,27 +27,13 @@ public:
 		operator=(
 			const T& _a_element
 			) noexcept;
-	__constexpr_imp
-		void
-		set_failure_message(
-			const std::string_view _a_message
-		) noexcept;
-	__constexpr_imp
-		void
-		set_pass_message(
-			const std::string_view _a_message
-		) noexcept;
 	__constexpr
 		const T&
 		inner_value(
 		) const noexcept;
 	__constexpr
 		const std::optional<std::string>&
-		fail_message(
-		) const noexcept;
-	__constexpr
-		const std::optional<std::string>&
-		pass_message(
+		test_annotation(
 		) const noexcept;
 	__constexpr
 		void
@@ -59,8 +46,7 @@ public:
 		) const noexcept;
 private:
 	reports::source_pair_t _m_source;
-	std::optional<std::string> _m_failure_message;
-	std::optional<std::string> _m_pass_message;
+	std::optional<std::string> _m_test_annotation;
 	T _m_inner_element;
 	bool _m_processed;
 };
@@ -73,9 +59,11 @@ template<
 >
 __constexpr_imp
 test_block_t<T, Assertion_Type>::test_block_t(
+	const std::string_view _a_test_annotation,
 	const reports::single_source_t& _a_source
 ) noexcept
 	: _m_source(reports::source_pair_t(_a_source))
+	, _m_test_annotation(_a_test_annotation)
 {
 
 }
@@ -110,30 +98,6 @@ template<
 	typename Assertion_Type
 >
 __constexpr_imp
-void
-test_block_t<T, Assertion_Type>::set_failure_message(
-	const std::string_view _a_message
-) noexcept
-{
-	_m_failure_message = _a_message;
-}
-template<
-	typename T,
-	typename Assertion_Type
->
-__constexpr_imp
-void
-test_block_t<T, Assertion_Type>::set_pass_message(
-	const std::string_view _a_message
-) noexcept
-{
-	_m_pass_message = _a_message;
-}
-template<
-	typename T,
-	typename Assertion_Type
->
-__constexpr_imp
 const T&
 test_block_t<T, Assertion_Type>::inner_value(
 ) const noexcept
@@ -146,21 +110,10 @@ template<
 >
 __constexpr_imp
 const std::optional<std::string>&
-test_block_t<T, Assertion_Type>::fail_message(
+test_block_t<T, Assertion_Type>::test_annotation(
 ) const noexcept
 {
-	return _m_failure_message;
-}
-template<
-	typename T,
-	typename Assertion_Type
->
-__constexpr_imp
-const std::optional<std::string>&
-test_block_t<T, Assertion_Type>::pass_message(
-) const noexcept
-{
-	return _m_pass_message;
+	return _m_test_annotation;
 }
 template<
 	typename T,

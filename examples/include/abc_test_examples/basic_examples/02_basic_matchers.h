@@ -10,15 +10,21 @@
 #include <ranges>
 #include <numeric>
 
+#include "abc_test/matchers/annotation.h"
+
 _TEST_CASE("Matchers, explained", "examples::basic_examples::02_basic_matchers")
 {
 	using namespace abc;
 	/*!
 	* In 01_assertions.h, we showed the user the core assertions in abc_test. 
 	* 
-	* Two of these were _CHECK and _REQUIRE (and their MSG variants).
+	* Two of these were _CHECK and _REQUIRE.
 	* 
-	* Both of these macros require a matcher as their argument. A matcher is an abstract
+	* These macros call a function which takes either a matcher_t or an annotated_matcher_t. 
+	* 
+	* In this example we will concentrate on the matcher_t object.
+	* 
+	* A matcher is an abstract
 	* object which holds an expression which is evaluated to true or false. The matcher
 	* also prepares a pretty-printed string, and can store source code information
 	* allowing for easy to understand printing.
@@ -80,6 +86,47 @@ _TEST_CASE("The _MATCHER macro", "examples::basic_examples::02_basic_matchers")
 	* can help in keeping track of all of the relevant lines of code, and points
 	* the user to them in the event that an assertion fails.
 	* 
+	*/
+	matcher_t l2 = _MATCHER(matcher_t());
+	_CHECK(l2);
+	/*!
+	* We can also use it as follows
+	*/
+	l2 = _MATCHER(true_matcher());
+	_CHECK(l2);
+	/*!
+	* While the following are allowed, they will issue warnings to the user.
+	*/
+	l2 = _MATCHER(_MATCHER(true_matcher()));
+	_CHECK(l2);
+	_CHECK(_MATCHER(l2));
+}
+
+_TEST_CASE("Annotating", "examples::basic_examples::02_basic_matchers")
+{
+	using namespace abc;
+	/*!
+	* Annotating an assertion can provide clarity to the reader.
+	* 
+	* In our library, it is designed so that the user uses the "annotate" function on
+	* a matcher, before passing it to either _CHECK or _REQUIRE. 
+	*/
+	matcher_t _l_1;
+	_CHECK(annotate(_l_1, "Some test annotation"));
+	matcher_with_annotation_t _l_2(_l_1, "A very important test");
+	_CHECK(_l_2);
+	/*!
+	*
+	* It is our desire that those using this library use "annotate" before _CHECK and 
+	* _REQUIRE. By doing this, the source code is captured correctly. In the code
+	* directly above this, the line 
+	* 
+	* "
+	matcher_with_annotation_t _l_2(_l_1, "A very important test");" is not captured.
+	*
+	* 
+	* The _MATCHER macro can be used to alleviate this issue, in much the same way
+	* as it can with a regular matcher_t. 
 	*/
 	matcher_t l2 = _MATCHER(matcher_t());
 	_CHECK(l2);

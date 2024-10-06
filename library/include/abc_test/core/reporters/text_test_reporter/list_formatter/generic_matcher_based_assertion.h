@@ -69,6 +69,8 @@ generic_matcher_based_assertion_list_formatter_t<Single_Source,Assertion_Status>
 			return true;
 		case MATCHER_SOURCE_MAP:
 			return _a_element.source_map().size() > 0;
+		case MATCHER_ANNOTATION:
+			return _a_element.annotation().has_value();
 		default:
 			throw errors::unaccounted_for_enum_exception(*_l_ptr);
 		}
@@ -123,6 +125,12 @@ generic_matcher_based_assertion_list_formatter_t<Single_Source, Assertion_Status
 			}
 			return _l_rv;
 		}
+		case MATCHER_ANNOTATION:
+			return
+			{
+				_a_pc.colon(_a_pc.matcher_annotation()),
+				_a_pc.indent(_a_pc.message_str(_a_element.annotation()))
+			};
 		default:
 			throw errors::unaccounted_for_enum_exception(*_l_ptr);
 		}

@@ -74,12 +74,8 @@ generic_assertion_list_formatter_t<Single_Source, Assertion_Status>::check_data(
 		case STATUS:
 		case STR_REPRESENTATION:
 			return true;
-		case FAIL_MESSAGE:
-			return _a_element.fail_message().has_value() &&
-				not _a_element.get_pass_status();
-		case PASS_MESSAGE:
-			return _a_element.pass_message().has_value() &&
-				_a_element.get_pass_status();
+		case TEST_DESCRIPTION:
+			return _a_element.test_description().has_value();
 		default:
 			throw errors::unaccounted_for_enum_exception(*_l_ptr);
 		}
@@ -119,17 +115,11 @@ generic_assertion_list_formatter_t<Single_Source, Assertion_Status>::get_data(
 				_a_pc.colon(_a_pc.status_str()),
 				_a_pc.indent(_a_pc.status(_a_element.status()))
 			};
-		case FAIL_MESSAGE:
+		case TEST_DESCRIPTION:
 			return
 			{
-				_a_pc.colon(_a_pc.fail_message_str()),
-				_a_pc.indent(_a_pc.message_str(_a_element.fail_message()))
-			};
-		case PASS_MESSAGE:
-			return
-			{
-				_a_pc.colon(_a_pc.pass_message_str()),
-				_a_pc.indent(_a_pc.message_str(_a_element.pass_message()))
+				_a_pc.colon(_a_pc.test_description_str()),
+				_a_pc.indent(_a_pc.message_str(_a_element.test_description()))
 			};
 		case STR_REPRESENTATION:
 			return
@@ -161,21 +151,14 @@ construct_str_representation(
 	using namespace std;
 	using namespace reports;
 	const bool _l_passed{ _a_element.get_pass_status() };
-	const optional<string>& _l_fail_msg{ _a_element.fail_message() };
-	const optional<string>& _l_pass_msg{ _a_element.pass_message() };
-	const string _l_msg_info{ _l_fail_msg.has_value() && not _l_passed ?
-			fmt::format(" with message \"{0}\"", _l_fail_msg.value()) :
-		_l_pass_msg.has_value() && _l_passed ?
-		fmt::format(" with message \"{0}\"", _l_pass_msg.value()) : "" };
 	const string _l_terminate_function_str{ (not _l_passed &&
 			same_as<Assertion_Status, pass_or_terminate_t> ||
 			same_as<Assertion_Status,terminate_t>) ?
 		" Assertion terminated function." : "" };
 	const string _l_status_str{ _l_passed ? "passed" : "failed" };
-	return fmt::format("{0} {1}{2}.{3}",
+	return fmt::format("{0} {1}.{2}",
 		_a_str,
 		_l_status_str,
-		_l_msg_info,
 		_l_terminate_function_str);
 }
 _END_ABC_REPORTERS_NS

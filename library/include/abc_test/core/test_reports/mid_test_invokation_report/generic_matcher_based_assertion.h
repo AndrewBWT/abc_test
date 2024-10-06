@@ -19,10 +19,10 @@ public:
 		generic_matcher_based_assertion_t(
 			const user_initialised_report_t<Single_Source>::source_t& _a_source,
 			const log_infos_t& _a_log_infos,
-			const std::optional<std::string_view>& _a_fail_msg,
-			const std::optional<std::string_view>& _a_pass_msg,
+			const std::optional<std::string_view>& _a_test_annotation,
 			const matcher_result_t& _a_matcher_result,
-			const matcher_source_map_t& _a_matcher_source_map
+			const matcher_source_map_t& _a_matcher_source_map,
+			const std::optional<std::string_view>& _a_annotation
 		) noexcept;
 	__constexpr
 		const matcher_result_t&
@@ -32,9 +32,14 @@ public:
 		const matcher_source_map_t&
 		source_map(
 		) const noexcept;
+	__constexpr
+		const std::optional<std::string>&
+		annotation(
+		) const noexcept;
 protected:
 	matcher_result_t _m_matcher_result;
 	matcher_source_map_t _m_matcher_map;
+	std::optional<std::string> _m_annotation;
 };
 _END_ABC_REPORTS_NS
 
@@ -46,19 +51,20 @@ template<
 	requires std::derived_from<Assertion_Status, dynamic_status_t>
 __constexpr_imp
 generic_matcher_based_assertion_t<Single_Source, Assertion_Status>::generic_matcher_based_assertion_t(
-	const user_initialised_report_t<Single_Source> ::source_t& _a_source,
+	const user_initialised_report_t<Single_Source>::source_t& _a_source,
 	const log_infos_t& _a_log_infos,
-	const std::optional<std::string_view>& _a_fail_msg,
-	const std::optional<std::string_view>& _a_pass_msg,
+	const std::optional<std::string_view>& _a_test_annotation,
 	const matcher_result_t& _a_matcher_result,
-	const matcher_source_map_t& _a_matcher_source_map
+	const matcher_source_map_t& _a_matcher_source_map,
+	const std::optional<std::string_view>& _a_annotation
 ) noexcept
 	: generic_assertion_t<Single_Source, Assertion_Status>(
 		Assertion_Status(_a_matcher_result.passed()),
 		_a_source,
-		_a_log_infos, _a_fail_msg, _a_pass_msg)
+		_a_log_infos, _a_test_annotation)
 	, _m_matcher_result(_a_matcher_result)
 	, _m_matcher_map(_a_matcher_source_map)
+	, _m_annotation(_a_annotation)
 {
 
 }
@@ -85,5 +91,17 @@ generic_matcher_based_assertion_t<Single_Source, Assertion_Status>::source_map(
 ) const noexcept
 {
 	return _m_matcher_map;
+}
+template<
+	bool Single_Source,
+	typename Assertion_Status
+>
+	requires std::derived_from<Assertion_Status, dynamic_status_t>
+__constexpr_imp
+const std::optional<std::string>&
+generic_matcher_based_assertion_t<Single_Source, Assertion_Status>::annotation(
+) const noexcept
+{
+	return _m_annotation;
 }
 _END_ABC_REPORTS_NS

@@ -33,18 +33,14 @@ _TEST_CASE("Basic static assertions", "examples::basic_assertions")
 _TEST_CASE("Static assertions with messages", "examples::basic_examples::assertions")
 {
 	/*!
-	* Like all assertions in this library, each of the static assertion macros
-	* have an associated _MSG counterpart, which allows the user to set a message
-	* which will be written to the underlying function object, and then shown to the user
-	* when the user is diagnosing what is wrong with the test.
+	* Like all assertions in this library, each static assertion can have an assocaited
+	* annotation with it. The user can use these to describe what is being tested.
 	* 
-	* Note that _SUCCEED_MSG is really only included for completeness; it cannot fail,
-	* and therefore its message makes no sense. 
-	* 
+	* Static assertions have their own macros which annotate the assetions.
 	*/
-	_SUCCEED_WITH_MSG("This message will never be shown!");
-	_FAIL_WITH_MSG("This message will!");
-	_TERMINATE_WITH_MSG("This message will kill the test!");
+	_SUCCEED_WITH_MSG("Testing success");
+	_FAIL_WITH_MSG("Testing failure");
+	_TERMINATE_WITH_MSG("Testing termination");
 }
 
 _TEST_CASE("Getting the result of a static assertion", "examples::basic_examples::assertions")
@@ -105,19 +101,28 @@ _TEST_CASE("Matcher-based assertion", "examples::basic_examples::assertions")
 	*/
 	using namespace abc;
 	/*!
-	* This will pass.
+	* These will pass.
 	*/
 	_CHECK(abc::eq(1, 1));
+	_REQUIRE(eq(1, 1));
 	/*!
 	* This will fail.
 	*/
 	_CHECK(abc::eq(1, 2));
 	/*!
-	* These will pass. We can also get the results of these.
+	* To annotate matchers, there is a special function.
+	* 
+	* There are two implementations, so either of these is fine.
+	*/
+	_CHECK(annotate("Checking equality",
+		eq(1, 2)));
+	_CHECK(annotate(eq(1, 2), "Checking for equality"));
+	/*!
+	* We can also get the results of checks and requires.
 	*/
 	_REQUIRE(eq(1, 1));
-	bool b1 = _CHECK_WITH_MSG(eq(1, 1), "The numbers aren't the same");
-	_REQUIRE_WITH_MSG(eq(1, 1), "The numbers aren't the same");
+	bool b1 = _CHECK(annotate(eq(1, 1), "The numbers aren't the same"));
+	_REQUIRE(annotate(eq(1, 1), "The numbers aren't the same"));
 }
 
 _TEST_CASE("Example of simulating logical operators", "examples::basic_examples::assertions")

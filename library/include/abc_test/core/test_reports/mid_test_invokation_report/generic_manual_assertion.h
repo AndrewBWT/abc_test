@@ -18,8 +18,7 @@ public:
 			const bool _a_pass,
 			const user_initialised_report_t<Single_Source>::source_t& _a_source,
 			const log_infos_t& _a_log_infos,
-			const std::optional<std::string_view>& _a_fail_msg,
-			const std::optional<std::string_view>& _a_pass_msg
+			const std::optional<std::string_view>& _a_annotation
 		) noexcept;
 };
 
@@ -36,11 +35,10 @@ generic_manual_assertion_t<Single_Source,Assertion_Status>::generic_manual_asser
 	const bool _a_pass,
 	const user_initialised_report_t<Single_Source>::source_t& _a_source,
 	const log_infos_t& _a_log_infos,
-	const std::optional<std::string_view>& _a_fail_msg,
-	const std::optional<std::string_view>& _a_pass_msg
+	const std::optional<std::string_view>& _a_annotation
 ) noexcept
 	: generic_assertion_t<Single_Source, Assertion_Status>(Assertion_Status(_a_pass), _a_source,
-		_a_log_infos, _a_fail_msg,_a_pass_msg)
+		_a_log_infos, _a_annotation)
 {
 
 }

@@ -108,6 +108,7 @@ set(LIBRARY_FILES
   include/abc_test/core/test_reports/completed_test_report.h
   # Matcher subfolder. Code contains logic for writing individual assertions.
   include/abc_test/matchers/matcher.h
+  include/abc_test/matchers/annotation.h
   include/abc_test/matchers/basic_matchers.h
   include/abc_test/matchers/generic_matcher.h
   include/abc_test/matchers/operator_based_matcher.h
