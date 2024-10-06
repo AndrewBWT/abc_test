@@ -4,7 +4,7 @@
 #include "abc_test/global.h"
 
 #include <exception>
-#include "abc_test/core/test_reports/mid_test_invokation_report/single_source.h"
+#include "abc_test/core/ds/source/single_source.h"
 
 #include "abc_test/utility/internal/macros.h"
 

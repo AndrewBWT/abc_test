@@ -1,6 +1,6 @@
 #pragma once
 #include "abc_test/utility/internal/macros.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/single_source.h"
+#include "abc_test/core/ds/source/single_source.h"
 #include <optional>
 #include "abc_test/matchers/matcher.h"
 #include "abc_test/matchers/annotation.h"

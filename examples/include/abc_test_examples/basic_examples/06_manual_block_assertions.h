@@ -78,13 +78,13 @@ _TEST_CASE("Assertion block", "examples::basic_examples::06_manual_block_asserti
 
 	_BEGIN_CHECK_ASSERTION_BLOCK(_l_mn, "description");
 	_l_mn = matcher_t(false_matcher());
-	_END_CHECK_ASSERTION_BLOCK(_l_mn);
+	_END_BLOCK(_l_mn);
 	/*!
 	* Another example showing what happens when we use the _MATCHER macro
 	*/
 	_BEGIN_CHECK_ASSERTION_BLOCK(_l_mn, "description");
 	_l_mn = _MATCHER(matcher_t(false_matcher()));
-	_END_CHECK_ASSERTION_BLOCK(_l_mn);
+	_END_BLOCK(_l_mn);
 }
 
 namespace testing
@@ -137,11 +137,11 @@ namespace testing
 		}
 		catch (const std::exception& _l_e)
 		{
-			_l_test_exception_code =
-				annotate(_MATCHER(
-					(eq<string, string>(_l_e.what(),
-						"The exceptioniano type"))),
-					"Testing exception's what() message is correct");
+			_l_test_exception_code = _MATCHER(
+				annotate(
+					eq<string, string>(_l_e.what(),
+						"The exceptioniano type"),
+					"Testing exception's what() message is correct"));
 		}
 		catch (...)
 		{
@@ -149,7 +149,7 @@ namespace testing
 				annotate(_MATCHER(false_matcher()),
 					"Shouldn't be able to throw any other types of element");
 		}
-		_END_CHECK_ASSERTION_BLOCK(_l_test_exception_code);
+		_END_BLOCK(_l_test_exception_code);
 	}
 }
 
@@ -173,4 +173,53 @@ _TEST_CASE("Example Using assertion blocks to deal with excetpions",
 	test_handling_code(1);
 	test_handling_code(2);
 	test_handling_code(3);
+}
+
+_TEST_CASE("Included macros using block assertions",
+	"examples::basic_examples::06_manual_block_assertion")
+{
+	using namespace abc;
+	using namespace std;
+	using namespace testing;
+	/*!
+	* We include some macros with abc_test to allow the user to work with exceptions.
+	* 
+	* However, these are all defined in terms of block assertions.
+	* 
+	* Below we show how the excpetions for checking a code block doens't throw work.
+	*/
+	_BEGIN_CHECK_NO_THROW_BLOCK(_l_name);
+	throw std::exception("hello");
+	_END_NO_THROW_BLOCK(_l_name);
+	_BEGIN_REQUIRE_NO_THROW_BLOCK(_l_name);
+	int x = 3;
+	_END_NO_THROW_BLOCK(_l_name);
+
+	_BEGIN_CHECK_THROW_ANY(_l_name);
+	int x = 3;
+	_END_THROW_BLOCK(_l_name);
+	_BEGIN_REQUIRE_THROW_ANY(_l_name);
+	throw std::exception("hello");
+	_END_THROW_BLOCK(_l_name);
+
+	_BEGIN_CHECK_EXCEPTION_TYPE(_l_name);
+	int x = 3;
+	_END_EXCEPTION_TYPE_BLOCK(_l_name, std::exception);
+	_BEGIN_REQUIRE_EXCEPTION_TYPE(_l_name);
+	throw std::exception("hello");
+	_END_EXCEPTION_TYPE_BLOCK(_l_name, std::exception);
+
+	_BEGIN_CHECK_EXCEPTION_MSG(_l_name);
+	throw std::runtime_error("WHAT!");
+	_END_EXCEPTION_MSG_BLOCK(_l_name, "WHAT");
+	_BEGIN_REQUIRE_EXCEPTION_MSG(_l_name);
+	throw std::exception("hello");
+	_END_EXCEPTION_MSG_BLOCK(_l_name, "hello");
+
+	_BEGIN_CHECK_EXCEPTION_TYPE_AND_MSG(_l_name);
+	throw std::runtime_error("WHAT!");
+	_END_EXCEPTION_TYPE_AND_MSG_BLOCK(_l_name, std::runtime_error,"WHAT");
+	_BEGIN_REQUIRE_EXCEPTION_TYPE_AND_MSG(_l_name);
+	throw std::exception("hello");
+	_END_EXCEPTION_TYPE_AND_MSG_BLOCK(_l_name, std::runtime_error,"hello");
 }

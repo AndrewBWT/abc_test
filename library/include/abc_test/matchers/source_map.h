@@ -10,7 +10,7 @@
 
 #include "abc_test/utility/str/string_utility.h"
 
-#include "abc_test/core/test_reports/mid_test_invokation_report/single_source.h"
+#include "abc_test/core/ds/source/single_source.h"
 
 _BEGIN_ABC_NS
 struct source_location_lt_t

@@ -13,7 +13,7 @@
 #include "fmt/format.h"
 
 #include "abc_test/core/ds/test_collections/test_list.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/single_source.h"
+#include "abc_test/core/ds/source/single_source.h"
 
 /*! Inner macro which declares a test, registers a test, and then provides that test's
 * definition.

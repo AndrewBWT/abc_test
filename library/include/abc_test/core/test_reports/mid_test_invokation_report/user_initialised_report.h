@@ -4,8 +4,7 @@
 
 #include <type_traits>
 //#include "abc_test/core/log_test_msg.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/source_pair.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/single_source.h"
+#include "abc_test/core/ds/source/source_pair.h"
 
 _BEGIN_ABC_REPORTS_NS
 using log_infos_t = std::vector<std::string>;

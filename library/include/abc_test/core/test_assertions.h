@@ -32,23 +32,11 @@
 		abc::reports::pass_or_fail_t,\
 		abc::utility::str::create_string({"_CHECK(", #_a_matcher, ")"})\
 	)
-#define _CHECK_WITH_MSG(_a_matcher, _a_msg_on_failure) \
-	_INTERNAL_CREATE_ASSERTION(\
-		_a_matcher, \
-		abc::reports::pass_or_fail_t,\
-		abc::utility::str::create_string({ "_CHECK_WITH_MSG(", #_a_matcher, ",", #_a_msg_on_failure,")" })\
-	)
 #define _REQUIRE(_a_matcher) \
 	_INTERNAL_CREATE_ASSERTION(\
 		_a_matcher, \
 		abc::reports::pass_or_terminate_t,\
 		abc::utility::str::create_string({"_REQUIRE(", #_a_matcher, ")"})\
-	)
-#define _REQUIRE_WITH_MSG(_a_matcher, _a_msg_on_failure) \
-	_INTERNAL_CREATE_ASSERTION(\
-		_a_matcher, \
-		abc::reports::pass_or_terminate_t,\
-		abc::utility::str::create_string({ "_REQUIRE_WITH_MSG(", #_a_matcher, ",", #_a_msg_on_failure,")" })\
 	)
 #define _INTERNAL_STATIC_MATCHER(_a_assertion_type, _a_msg,\
 		_a_str_representation)\
@@ -93,12 +81,8 @@
 		abc::utility::str::create_string({ "_SUCCEED_WITH_MSG(", #_a_msg,")" })\
 	)
 
-#define _SOURCE(_a_line) \
-	abc::global::get_this_threads_test_runner_ref().register_source(std::source_location::current(), #_a_line,#_a_line);\
-	_a_line
-
 #define _MATCHER(_a_matcher)\
-	abc::matcher_t(_a_matcher,\
+	abc::matcher_macro(_a_matcher,\
 		abc::reports::single_source_t(\
 			abc::utility::str::create_string({"_MATCHER(",#_a_matcher,")"}),\
 			std::source_location::current()))
@@ -125,9 +109,11 @@
 	abc::test_block_t<_a_assertion_type> _a_name(_a_description,\
 		reports::single_source_t(_a_str_representation,std::source_location::current()));
 
-#define _INNER_END_BLOCK(_a_name, _a_str_representation)\
+#define _END_BLOCK(_a_name)\
 	_a_name.register_end(\
-		abc::reports::single_source_t(_a_str_representation,\
+		abc::reports::single_source_t(\
+			abc::utility::str::create_string(\
+			{"_END_BLOCK(", #_a_name, ")"}),\
 		std::source_location::current()));\
 	abc::create_assertion_block(_a_name, \
 		abc::global::get_this_threads_test_runner_ref());\
@@ -138,22 +124,135 @@ _INNER_BEGIN_BLOCK(_a_name, _a_description, abc::reports::pass_or_fail_t, \
 	abc::utility::str::create_string({ \
 	"_BEGIN_CHECK_ASSERTION_BLOCK(",#_a_name,")" }));
 
-#define _END_CHECK_ASSERTION_BLOCK(_a_name)\
-	_INNER_END_BLOCK(_a_name,\
-		abc::utility::str::create_string(\
-			{"_END_CHECK_ASSERTION_BLOCK(", #_a_name,")"}))
 
 #define _BEGIN_REQUIRE_ASSERTION_BLOCK(_a_name, _a_description)\
-_INNER_BEGIN_BLOCK(_a_name, _a_description, abc::matcher_t, abc::reports::pass_or_terminate_t, \
+_INNER_BEGIN_BLOCK(_a_name, _a_description, abc::reports::pass_or_terminate_t, \
 	abc::utility::str::create_string({ \
 	"_BEGIN_CHECK_ASSERTION_BLOCK(",#_a_name,")" }));
 
-#define _END_REQUIRE_ASSERTION_BLOCK(_a_name)\
-	_INNER_END_BLOCK(_a_name,\
-		abc::utility::str::create_string(\
-			{"_END_REQUIRE_ASSERTION_BLOCK(", #_a_name,")"}))
+#define _BEGIN_CHECK_NO_THROW_BLOCK(_a_name)\
+	_BEGIN_CHECK_ASSERTION_BLOCK(_a_name,"Checking code does not throw an exception");\
+	try\
+	{
+
+#define _BEGIN_REQUIRE_NO_THROW_BLOCK(_a_name)\
+	_BEGIN_REQUIRE_ASSERTION_BLOCK(_a_name,"Checking code does not throw an exception");\
+	try\
+	{
+
+#define _END_NO_THROW_BLOCK(_a_name)\
+}\
+catch (...)\
+{\
+	_a_name = _MATCHER(abc::annotate("Code block threw an entity.",false_matcher()));\
+}\
+_END_BLOCK(_a_name);
+
+#define _BEGIN_CHECK_THROW_ANY(_a_name)\
+	_BEGIN_CHECK_ASSERTION_BLOCK(_a_name,"Checking code does throw an exception");\
+	_a_name = annotate("Code does not throw any excpetion",false_matcher());\
+	try\
+	{
+
+#define _BEGIN_REQUIRE_THROW_ANY(_a_name)\
+	_BEGIN_REQUIRE_ASSERTION_BLOCK(_a_name,"Checking code does throw an exception");\
+	_a_name = annotate("Code does not throw an excpetion",false_matcher());\
+	try\
+	{
+
+#define _END_THROW_BLOCK(_a_name)\
+}\
+catch (...)\
+{\
+	_a_name = _MATCHER(abc::annotate("Code block threw an entity.",true_matcher()));\
+}\
+_END_BLOCK(_a_name);
+
+#define _BEGIN_CHECK_EXCEPTION_TYPE(_a_name)\
+	_BEGIN_CHECK_ASSERTION_BLOCK(_a_name,"Checking code throws a specific exception type");\
+	_a_name = annotate("Code does not throw any excpetion",false_matcher());\
+	try\
+	{
+
+#define _BEGIN_REQUIRE_EXCEPTION_TYPE(_a_name)\
+	_BEGIN_REQUIRE_ASSERTION_BLOCK(_a_name,"Checking code throws a specific exception type");\
+	_a_name = annotate("Code does not throw any excpetion",false_matcher());\
+	try\
+	{
+
+#define _END_EXCEPTION_TYPE_BLOCK(_a_name, _a_exception_type)\
+}\
+catch (const _a_exception_type& _l_et)\
+{\
+	_a_name = _MATCHER(abc::annotate("Code block threw the required entity.",true_matcher()));\
+}\
+catch (...)\
+{\
+	_a_name = annotate("Code throws an exception not of the correct type",false_matcher());\
+}\
+_END_BLOCK(_a_name);
+
+
+#define _BEGIN_CHECK_EXCEPTION_MSG(_a_name)\
+	_BEGIN_CHECK_ASSERTION_BLOCK(_a_name,"Checking code throws an exception who's what() message shows a specific message");\
+	_a_name = annotate("Code does not throw any excpetion",false_matcher());\
+	try\
+	{
+
+#define _BEGIN_REQUIRE_EXCEPTION_MSG(_a_name)\
+	_BEGIN_REQUIRE_ASSERTION_BLOCK(_a_name,"Checking code throws an exception who's what() message shows a specific message");\
+	_a_name = annotate("Code does not throw any excpetion",false_matcher());\
+	try\
+	{
+
+#define _END_EXCEPTION_MSG_BLOCK(_a_name, _a_msg)\
+}\
+catch (const std::exception& _l_et)\
+{\
+	_a_name = _MATCHER(abc::annotate("Code block threw the required entity.",\
+		abc::eq<std::string, std::string>(_a_msg, _l_et.what())));\
+}\
+catch (...)\
+{\
+	_a_name = annotate("Code throws an exception not derived from std::exception",false_matcher());\
+}\
+_END_BLOCK(_a_name);
+
+#define _BEGIN_CHECK_EXCEPTION_TYPE_AND_MSG(_a_name)\
+	_BEGIN_CHECK_ASSERTION_BLOCK(_a_name,"Checking code throws an exception who's what() message shows a specific message");\
+	_a_name = annotate("Code does not throw any excpetion",false_matcher());\
+	try\
+	{
+
+#define _BEGIN_REQUIRE_EXCEPTION_TYPE_AND_MSG(_a_name)\
+	_BEGIN_REQUIRE_ASSERTION_BLOCK(_a_name,"Checking code throws an exception who's what() message shows a specific message");\
+	_a_name = annotate("Code does not throw any excpetion",false_matcher());\
+	try\
+	{
+
+#define _END_EXCEPTION_TYPE_AND_MSG_BLOCK(_a_name, _a_type, _a_msg)\
+}\
+catch (const _a_type& _l_et)\
+{\
+	_a_name = _MATCHER(abc::annotate("Code block threw the required entity.",\
+		abc::eq<std::string, std::string>(_a_msg, _l_et.what())));\
+}\
+catch (...)\
+{\
+	_a_name = annotate("Code throws an exception not derived from std::exception",false_matcher());\
+}\
+_END_BLOCK(_a_name);
 
 _BEGIN_ABC_NS
+template<
+	typename T
+>
+__constexpr
+T
+matcher_macro(
+	const T & _a_element,
+	const reports::single_source_t & _a_source
+) noexcept;
 template<
 	typename T
 >
@@ -223,6 +322,18 @@ namespace
 _END_ABC_NS
 
 _BEGIN_ABC_NS
+template<
+	typename T
+>
+__constexpr_imp
+T
+matcher_macro(
+	const T& _a_element,
+	const reports::single_source_t& _a_source
+) noexcept
+{
+	return T(_a_element, _a_source);
+}
 template<
 	typename T
 >

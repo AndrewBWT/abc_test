@@ -36,6 +36,8 @@ set(LIBRARY_FILES
   include/abc_test/core/ds/test_collections/test_tree.h
       src/abc_test/core/ds/test_collections/test_tree.cpp
   include/abc_test/core/ds/test_collections/test_tree_iterator.h
+  include/abc_test/core/ds/source/single_source.h
+  include/abc_test/core/ds/source/source_pair.h
   include/abc_test/core/ds/types.h
   # Contains objects and functions pertaining to recoverable and unrecoverable errors,
   # as well as errors encountered when evaluating tests.
@@ -84,8 +86,6 @@ set(LIBRARY_FILES
   include/abc_test/core/test_reports/mid_test_invokation_report/unexpected_report.h
   include/abc_test/core/test_reports/mid_test_invokation_report/unexpected_thrown_non_descript_entity.h
   include/abc_test/core/test_reports/mid_test_invokation_report/unexpected_thrown_exception.h
-  include/abc_test/core/test_reports/mid_test_invokation_report/single_source.h
-  include/abc_test/core/test_reports/mid_test_invokation_report/source_pair.h
   include/abc_test/core/test_reports/mid_test_invokation_report/assertion_status/assertion_status_base.h
   include/abc_test/core/test_reports/mid_test_invokation_report/assertion_status/dynamic_status.h
   include/abc_test/core/test_reports/mid_test_invokation_report/assertion_status/static_status.h
