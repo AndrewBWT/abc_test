@@ -58,34 +58,6 @@ _TEST_CASE("Getting the result of a static assertion", "examples::basic_examples
 	bool b3 = _TERMINATE_WITH_MSG("This message will kill the test!");
 }
 
-_TEST_CASE("Manual assertions", "examples::basic_assertions")
-{
-	/*!
-	* Manual assertions are the building blocks of the library. They come in two forms:
-	* - _CHECK_BOOL(_a_bool). Checks the boolean argument. Issues a SUCCESS if its true, or _FAIL if false.
-	* - _REQUIRE_BOOL(_a_bool). Like above. Issues SUCCESS if true, TERMINATE if false.
-	* 
-	* Bofh of these functions can be re-written using the static assertions described previously.
-	* 
-	* _CHECK_BOOL(b1) =
-	* if (b1) { _SUCCEED(); }
-	* else { _FAILURE();}
-	* 
-	* Like the static functions, there are messaged versions of these functions, and
-	* we are able to get the boolean result of them.
-	*/
-	_CHECK_BOOL(false);
-	_REQUIRE_BOOL(true);
-
-	_CHECK_BOOL_WITH_MSG(false, "A fantastic message");
-	_REQUIRE_BOOL_WITH_MSG(true, "A message that won't get read as we can't terminate yet!");
-
-	bool b2 = true && false;
-	std::string str = "This won't ever work!!";
-	bool b1 = _CHECK_BOOL_WITH_MSG(b2, "Any bool really");
-	_REQUIRE_BOOL_WITH_MSG(b1, str);
-}
-
 _TEST_CASE("Matcher-based assertion", "examples::basic_examples::assertions")
 {
 	/*!

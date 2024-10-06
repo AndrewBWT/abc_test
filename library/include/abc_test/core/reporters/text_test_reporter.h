@@ -15,7 +15,6 @@
 #include "abc_test/core/reporters/text_test_reporter/list_formatter/generic_matcher_based_assertion.h"
 #include "abc_test/core/reporters/text_test_reporter/list_formatter/matcher_based_assertion.h"
 #include "abc_test/core/reporters/text_test_reporter/list_formatter/matcher_based_assertion_block.h"
-#include "abc_test/core/reporters/text_test_reporter/list_formatter/manual_assertion.h"
 #include "abc_test/core/reporters/text_test_reporter/list_formatter/static_assertion.h"
 #include "abc_test/core/reporters/text_test_reporter/list_formatter/after_execution_test_report.h"
 #include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_fail.h"
@@ -30,7 +29,6 @@
 #include "abc_test/core/reporters/text_test_reporter/list_formatter/unexpected_thrown_non_descript_entity.h"
 #include "abc_test/core/reporters/text_test_reporter/list_formatter/matcher_based_assertion.h"
 #include "abc_test/core/reporters/text_test_reporter/list_formatter/matcher_based_assertion_block.h"
-#include "abc_test/core/reporters/text_test_reporter/list_formatter/manual_assertion_block.h"
 _BEGIN_ABC_REPORTERS_NS
 /*!
 * Object used to print data about tests to some text output - either the console or a file
@@ -236,30 +234,6 @@ __constexpr_imp
 	{
 		return get_all_data(_m_print_config.matcher_based_assertion_block_fields(), *_l_ptr,
 			_m_print_config, matcher_based_assertion_block_list_formatter_t<pass_or_terminate_t>());
-	}
-	else if (auto _l_ptr{ dynamic_cast<const manual_assertion_block_t<pass_or_fail_t>*>(_a_gur) };
-		_l_ptr != nullptr)
-	{
-		return get_all_data(_m_print_config.manual_assertion_block_fields(), *_l_ptr,
-			_m_print_config, manual_assertion_block_list_formatter_t<pass_or_fail_t>());
-	}
-	else if (auto _l_ptr{ dynamic_cast<const manual_assertion_block_t<pass_or_terminate_t>*>(_a_gur) };
-		_l_ptr != nullptr)
-	{
-		return get_all_data(_m_print_config.manual_assertion_block_fields(), *_l_ptr,
-			_m_print_config,manual_assertion_block_list_formatter_t<pass_or_terminate_t>());
-	}
-	else if (auto _l_ptr{ dynamic_cast<const manual_assertion_t<pass_or_terminate_t>*>(_a_gur) };
-		_l_ptr != nullptr)
-	{
-		return get_all_data(_m_print_config.manual_assertion_fields(), *_l_ptr,
-			_m_print_config, manual_assertion_list_formatter_t<pass_or_terminate_t>());
-	}
-	else if (auto _l_ptr{ dynamic_cast<const manual_assertion_t<pass_or_fail_t>*>(_a_gur) };
-		_l_ptr != nullptr)
-	{
-		return get_all_data(_m_print_config.manual_assertion_fields(), *_l_ptr,
-			_m_print_config, manual_assertion_list_formatter_t<pass_or_fail_t>());
 	}
 	else if (auto _l_ptr{ dynamic_cast<const static_assertion_t<pass_t>*>(_a_gur) };
 		_l_ptr != nullptr)

@@ -59,14 +59,8 @@ set(LIBRARY_FILES
   include/abc_test/core/reporters/text_test_reporter/enum_fields/generic_assertion.h
   include/abc_test/core/reporters/text_test_reporter/list_formatter/matcher_based_assertion.h
   include/abc_test/core/reporters/text_test_reporter/enum_fields/matcher_based_assertion.h
-  include/abc_test/core/reporters/text_test_reporter/list_formatter/manual_assertion.h
-  include/abc_test/core/reporters/text_test_reporter/enum_fields/manual_assertion.h
-  include/abc_test/core/reporters/text_test_reporter/list_formatter/generic_manual_assertion.h
-  include/abc_test/core/reporters/text_test_reporter/enum_fields/generic_manual_assertion.h
   include/abc_test/core/reporters/text_test_reporter/list_formatter/generic_matcher_based_assertion.h
   include/abc_test/core/reporters/text_test_reporter/enum_fields/generic_matcher_based_assertion.h
-  include/abc_test/core/reporters/text_test_reporter/list_formatter/manual_assertion_block.h
-  include/abc_test/core/reporters/text_test_reporter/enum_fields/manual_assertion_block.h
   include/abc_test/core/reporters/text_test_reporter/list_formatter/matcher_based_assertion_block.h
   include/abc_test/core/reporters/text_test_reporter/enum_fields/matcher_based_assertion_block.h
   include/abc_test/core/reporters/text_test_reporter/list_formatter/static_assertion.h
@@ -87,7 +81,6 @@ set(LIBRARY_FILES
   include/abc_test/core/test_reports/mid_test_invokation_report/generic_assertion.h
   include/abc_test/core/test_reports/mid_test_invokation_report/matcher_based_assertion.h
   include/abc_test/core/test_reports/mid_test_invokation_report/static_assertion.h
-  include/abc_test/core/test_reports/mid_test_invokation_report/manual_assertion.h
   include/abc_test/core/test_reports/mid_test_invokation_report/unexpected_report.h
   include/abc_test/core/test_reports/mid_test_invokation_report/unexpected_thrown_non_descript_entity.h
   include/abc_test/core/test_reports/mid_test_invokation_report/unexpected_thrown_exception.h
@@ -101,9 +94,7 @@ set(LIBRARY_FILES
   include/abc_test/core/test_reports/mid_test_invokation_report/assertion_status/terminate.h
   include/abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_fail.h
   include/abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_terminate.h
-  include/abc_test/core/test_reports/mid_test_invokation_report/manual_assertion_block.h
   include/abc_test/core/test_reports/mid_test_invokation_report/matcher_based_assertion_block.h
-  include/abc_test/core/test_reports/mid_test_invokation_report/generic_manual_assertion.h
   include/abc_test/core/test_reports/mid_test_invokation_report/generic_matcher_based_assertion.h
   include/abc_test/core/test_reports/completed_test_report.h
   # Matcher subfolder. Code contains logic for writing individual assertions.

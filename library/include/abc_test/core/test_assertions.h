@@ -10,15 +10,12 @@
 #include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_fail.h"
 #include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_terminate.h"
 #include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/terminate.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/manual_assertion.h"
 
 #include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass.h"
 #include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/fail.h"
 #include <concepts>
 
 #include "abc_test/core/test_assertions/test_block.h"
-
-#include "abc_test/core/test_reports/mid_test_invokation_report/manual_assertion_block.h"
 #include "abc_test/core/test_reports/mid_test_invokation_report/matcher_based_assertion_block.h"
 
 #include "abc_test/matchers/annotation.h"
@@ -95,40 +92,6 @@
 		std::optional<std::string_view>(_a_msg),\
 		abc::utility::str::create_string({ "_SUCCEED_WITH_MSG(", #_a_msg,")" })\
 	)
-#define _INTERNAL_MANUAL_MATCHER(_a_type,_a_bool,_a_msg,_a_str_representation)\
-	abc::create_manual_assertion<_a_type>(\
-		_a_bool,\
-		_a_msg,\
-		abc::reports::single_source_t(_a_str_representation, std::source_location::current()),\
-		abc::global::get_this_threads_test_runner_ref())
-#define _CHECK_BOOL(_a_bool)\
-	_INTERNAL_MANUAL_MATCHER(\
-		abc::reports::pass_or_fail_t,\
-		_a_bool,\
-		std::optional<std::string_view>{},\
-		abc::utility::str::create_string({"_CHECK_BOOL(",#_a_bool,")"})\
-	)
-#define _REQUIRE_BOOL(_a_bool)\
-	_INTERNAL_MANUAL_MATCHER(\
-		abc::reports::pass_or_terminate_t,\
-		_a_bool,\
-		std::optional<std::string_view>{},\
-		abc::utility::str::create_string({"_REQUIRE_BOOL(",#_a_bool,")"})\
-	)
-#define _CHECK_BOOL_WITH_MSG(_a_bool, _a_msg)\
-	_INTERNAL_MANUAL_MATCHER(\
-		abc::reports::pass_or_fail_t,\
-		_a_bool,\
-		std::optional<std::string_view>{_a_msg},\
-		abc::utility::str::create_string({"_CHECK_BOOL_WITH_MSG(",#_a_bool,",", #_a_msg,")"})\
-	)
-#define _REQUIRE_BOOL_WITH_MSG(_a_bool, _a_msg)\
-	_INTERNAL_MANUAL_MATCHER(\
-		abc::reports::pass_or_terminate_t,\
-		_a_bool,\
-		std::optional<std::string_view>{_a_msg},\
-		abc::utility::str::create_string({"_REQUIRE_BOOL_WITH_MSG(",#_a_bool,",", #_a_msg,")"})\
-	)
 
 #define _SOURCE(_a_line) \
 	abc::global::get_this_threads_test_runner_ref().register_source(std::source_location::current(), #_a_line,#_a_line);\
@@ -158,8 +121,8 @@
 		abc::utility::str::create_string({ "_PROCESS(",#_a_matcher,",",#_a_matcher_to_add_as_expression,")" }), \
 		std::source_location::current()));
 
-#define _INNER_BEGIN_BLOCK(_a_name,_a_description, _a_test_block_type,_a_assertion_type, _a_str_representation) {\
-	abc::test_block_t<_a_test_block_type,_a_assertion_type> _a_name(_a_description,\
+#define _INNER_BEGIN_BLOCK(_a_name,_a_description,_a_assertion_type, _a_str_representation) {\
+	abc::test_block_t<_a_assertion_type> _a_name(_a_description,\
 		reports::single_source_t(_a_str_representation,std::source_location::current()));
 
 #define _INNER_END_BLOCK(_a_name, _a_str_representation)\
@@ -170,29 +133,8 @@
 		abc::global::get_this_threads_test_runner_ref());\
 	}
 
-#define _BEGIN_MANUAL_CHECK_ASSERTION_BLOCK(_a_name, _a_description)\
-_INNER_BEGIN_BLOCK(_a_name, _a_description, bool, abc::reports::pass_or_fail_t,\
-	abc::utility::str::create_string({ \
-	"_BEGIN_MANUAL_CHECK_ASSERTION_BLOCK(",#_a_name,")" }));
-
-#define _END_MANUAL_CHECK_ASSERTION_BLOCK(_a_name) \
-	_INNER_END_BLOCK(_a_name,\
-		abc::utility::str::create_string(\
-			{"_END_MANUAL_CHECK_ASSERTION_BLOCK(", #_a_name,")"}))
-
-
-#define _BEGIN_MANUAL_REQUIRE_ASSERTION_BLOCK(_a_name, _a_description)\
-_INNER_BEGIN_BLOCK(_a_name, _a_description, bool, abc::reports::pass_or_terminate_t, \
-	abc::utility::str::create_string({ \
-	"_BEGIN_MANUAL_REQUIRE_ASSERTION_BLOCK(",#_a_name,")" }));
-
-#define _END_MANUAL_REQUIRE_ASSERTION_BLOCK(_a_name)\
-	_INNER_END_BLOCK(_a_name,\
-		abc::utility::str::create_string(\
-			{"_END_MANUAL_REQUIRE_ASSERTION_BLOCK(", #_a_name,")"}))
-
 #define _BEGIN_CHECK_ASSERTION_BLOCK(_a_name, _a_description)\
-_INNER_BEGIN_BLOCK(_a_name, _a_description, abc::matcher_t, abc::reports::pass_or_fail_t, \
+_INNER_BEGIN_BLOCK(_a_name, _a_description, abc::reports::pass_or_fail_t, \
 	abc::utility::str::create_string({ \
 	"_BEGIN_CHECK_ASSERTION_BLOCK(",#_a_name,")" }));
 
@@ -250,31 +192,9 @@ template<
 >
 	requires std::derived_from<T, reports::dynamic_status_t>
 __constexpr
-bool
-create_manual_assertion(
-	const bool _a_pass,
-	const std::optional<std::string_view>& _a_str_to_print,
-	const reports::single_source_t& _a_source,
-	test_runner_t& _a_test_runner
-) noexcept(std::same_as<T, reports::pass_or_fail_t>);
-template<
-	typename T
->
-	requires std::derived_from<T, reports::dynamic_status_t>
-__constexpr
 void
 create_assertion_block(
-	const test_block_t<bool, T>& _a_test_block,
-	test_runner_t & _a_test_runner
-) noexcept(std::same_as<T, reports::pass_or_fail_t>);
-template<
-	typename T
->
-	requires std::derived_from<T, reports::dynamic_status_t>
-__constexpr
-void
-create_assertion_block(
-	const test_block_t<matcher_t, T>&_a_test_block,
+	const test_block_t<T>&_a_test_block,
 	test_runner_t & _a_test_runner
 ) noexcept(std::same_as<T, reports::pass_or_fail_t>);
 namespace
@@ -378,87 +298,39 @@ template<
 >
 	requires std::derived_from<T, reports::dynamic_status_t>
 __constexpr_imp
-bool
-create_manual_assertion(
-	const bool _a_pass,
-	const std::optional<std::string_view>& _a_str_to_print,
-	const reports::single_source_t& _a_source,
-	test_runner_t& _a_test_runner
-) noexcept(std::same_as<T,reports::pass_or_fail_t>)
-{
-	using namespace reports;
-	const generic_assertion_t<true, T>* _l_gur{
-		new manual_assertion_t<T>(
-			_a_pass,
-			_a_source,
-			_a_test_runner.get_log_infos(false),
-			_a_str_to_print
-			)
-	};
-	_a_test_runner.add_assertion(_l_gur);
-	return return_result<T>(_a_pass);
-}
-template<
-	typename T
->
-	requires std::derived_from<T, reports::dynamic_status_t>
-__constexpr_imp
 void
 create_assertion_block(
-	const test_block_t<bool, T>& _a_test_block,
-	test_runner_t& _a_test_runner
-) noexcept(std::same_as<T, reports::pass_or_fail_t>)
-{
-	using namespace reports;
-	const generic_assertion_t<false, T>* _l_gur{
-		new manual_assertion_block_t<T>(
-			_a_test_block.inner_value(),
-			_a_test_block.source(),
-			_a_test_runner.get_log_infos(false),
-			_a_test_block.test_annotation()
-			)
-	};
-	_a_test_runner.add_assertion(_l_gur);
-	return_result<T>(_a_test_block.inner_value());
-}
-template<
-	typename T
->
-	requires std::derived_from<T, reports::dynamic_status_t>
-__constexpr_imp
-void
-create_assertion_block(
-	const test_block_t<matcher_t, T>& _a_test_block,
+	const test_block_t<T>& _a_test_block,
 	test_runner_t& _a_test_runner
 ) noexcept(std::same_as<T, reports::pass_or_fail_t>)
 {
 	using namespace reports;
 	const generic_assertion_t<false, T>* _l_gur;
 	bool _l_passed{ true };
-	if (_a_test_block.inner_value().internal_matcher() == nullptr)
+	if (_a_test_block.matcher().internal_matcher() == nullptr)
 	{
 		_l_gur = new matcher_based_assertion_block_t<T>(_a_test_block.source(),
 			_a_test_runner.get_log_infos(false),
 			_a_test_block.test_annotation(),
 			matcher_result_t(),
 			matcher_source_map_t(),
-			"placeholder"
+			_a_test_block.matcher_annotation()
 		);
 		_a_test_runner.add_assertion_and_warning(_l_gur,
 			"Matcher_t object has not been initialised. Assertion is set to true");
 	}
 	else
 	{
-		matcher_result_t _l_mr{ _a_test_block.inner_value().internal_matcher()->run_test(_a_test_runner) };
+		matcher_result_t _l_mr{ _a_test_block.matcher().internal_matcher()->run_test(_a_test_runner) };
 		matcher_source_map_t _l_msm;
-		_a_test_block.inner_value().internal_matcher()->gather_map_source(_l_msm);
+		_a_test_block.matcher().internal_matcher()->gather_map_source(_l_msm);
 		_l_passed = _l_mr.passed();
 		_l_gur = new matcher_based_assertion_block_t<T>(_a_test_block.source(),
 			_a_test_runner.get_log_infos(false),
 			_a_test_block.test_annotation(),
 			_l_mr,
 			_l_msm,
-			"placeholder"
+			_a_test_block.matcher_annotation()
 		);
 		_a_test_runner.add_assertion(_l_gur);
 	}

@@ -108,6 +108,11 @@ __constexpr
 matcher_t
 false_matcher(
 ) noexcept;
+__constexpr
+matcher_t
+bool_matcher(
+	const bool _a_bool
+) noexcept;
 _END_ABC_NS
 
 _BEGIN_ABC_NS
@@ -270,5 +275,13 @@ false_matcher(
 ) noexcept
 {
 	return matcher(new false_matcher_t());
+}
+__constexpr_imp
+matcher_t
+bool_matcher(
+	const bool _a_bool
+) noexcept
+{
+	return matcher(new bool_matcher_t(_a_bool));
 }
 _END_ABC_NS

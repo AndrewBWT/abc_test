@@ -1,5 +1,4 @@
 #pragma once
-#include "abc_test/core/reporters/text_test_reporter/list_formatter/generic_manual_assertion.h"
 #include "abc_test/core/test_reports/mid_test_invokation_report/matcher_based_assertion.h"
 #include "abc_test/core/reporters/text_test_reporter/enum_fields/matcher_based_assertion.h"
 _BEGIN_ABC_REPORTERS_NS

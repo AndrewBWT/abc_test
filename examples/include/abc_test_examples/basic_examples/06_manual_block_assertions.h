@@ -36,9 +36,7 @@ _TEST_CASE("Assertion block", "examples::basic_examples::06_manual_block_asserti
 	* Each of these take an argument. The object which underpins these blocks is
 	* given this name. Below we show its basic use
 	*/
-	_BEGIN_MANUAL_CHECK_ASSERTION_BLOCK(_l_mn,"description");
-	int x = 5;
-	_END_MANUAL_CHECK_ASSERTION_BLOCK(_l_mn);
+
 	/*!
 	* Internally, these macros create and close a new scope. The name element (in this
 	* case, _l_mn) can be accessed and edited. When the closing macro is called (
@@ -52,16 +50,12 @@ _TEST_CASE("Assertion block", "examples::basic_examples::06_manual_block_asserti
 	* 
 	* The example above succeeds. The example below fails.
 	*/
-	_BEGIN_MANUAL_CHECK_ASSERTION_BLOCK(_l_mn, "description");
-	_l_mn = false;
-	_END_MANUAL_CHECK_ASSERTION_BLOCK(_l_mn);
+
 	/*!
 	* We can also set the message associated with the assertion block, using the function
 	* "set_assertion", as shown below.
 	*/
-	_BEGIN_MANUAL_CHECK_ASSERTION_BLOCK(_l_mn, "description");
-	_l_mn = false;
-	_END_MANUAL_CHECK_ASSERTION_BLOCK(_l_mn);
+
 	/* 
 	* Essentially this is all there is to assertion blocks. They are essentially named
 	* blocks, which can be accessed and edited. 
@@ -80,9 +74,7 @@ _TEST_CASE("Assertion block", "examples::basic_examples::06_manual_block_asserti
 	* 
 	* Below we show some examples of the use of these.
 	*/ 
-	_BEGIN_MANUAL_REQUIRE_ASSERTION_BLOCK(_l_mn, "description");
-	_l_mn = true;
-	_END_MANUAL_REQUIRE_ASSERTION_BLOCK(_l_mn);
+
 
 	_BEGIN_CHECK_ASSERTION_BLOCK(_l_mn, "description");
 	_l_mn = matcher_t(false_matcher());
@@ -128,27 +120,34 @@ namespace testing
 	{
 		using namespace abc;
 		using namespace std;
-		_BEGIN_CHECK_ASSERTION_BLOCK(_l_test_exception_code, "description");
+		_BEGIN_CHECK_ASSERTION_BLOCK(_l_test_exception_code, "Test \"test_function\" return value and exceptions");
 		try
 		{
 			int _l_rv = test_function(_l_id);
-			_l_test_exception_code = _MATCHER(_EXPR(0 == _l_rv));
+			_l_test_exception_code = annotate("Testing return value",_MATCHER(_EXPR(0 == _l_rv)));
 		}
 		catch (const std::runtime_error& _l_re)
 		{
-			_l_test_exception_code = _MATCHER(
-				(eq<string, string>(_l_re.what(),
-				"The runtime error")));
+			_l_test_exception_code =
+				annotate(
+					_MATCHER(
+						(eq<string, string>(_l_re.what(),
+							"The runtime error"))),
+					"Testing runtime_error what() message is correct");
 		}
 		catch (const std::exception& _l_e)
 		{
-			_l_test_exception_code = _MATCHER(
-				(eq<string, string>(_l_e.what(),
-					"The exceptioniano type")));
+			_l_test_exception_code =
+				annotate(_MATCHER(
+					(eq<string, string>(_l_e.what(),
+						"The exceptioniano type"))),
+					"Testing exception's what() message is correct");
 		}
 		catch (...)
 		{
-			_l_test_exception_code = _MATCHER(false_matcher());
+			_l_test_exception_code =
+				annotate(_MATCHER(false_matcher()),
+					"Shouldn't be able to throw any other types of element");
 		}
 		_END_CHECK_ASSERTION_BLOCK(_l_test_exception_code);
 	}

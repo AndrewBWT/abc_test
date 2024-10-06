@@ -5,6 +5,7 @@ _BEGIN_ABC_NS
 class bool_matcher_t
 	: public generic_matcher_t
 {
+public:
 	__constexpr
 		bool_matcher_t(
 			const bool _a_pass

@@ -63,6 +63,26 @@ _TEST_CASE("Matchers, explained", "examples::basic_examples::02_basic_matchers")
 
 }
 
+_TEST_CASE("Bool-based matchers", "examples::basic_assertions")
+{
+	/*!
+	* Assertions in abc_test use matchers predominantly. However, we recognise that the
+	* user may not want to or need to make their own matchers. Instead, they may
+	* just require an assertion which checks if a bool is true or false. To that end,
+	* one of the core matchers included with abc_test is the bool_matcher_t.
+	*/
+	_CHECK(bool_matcher(false));
+	_REQUIRE(bool_matcher(true));
+
+	_CHECK(annoate(bool_matcher(false),"A fantastic message"));
+	_CHECK(annoate(bool_matcher(true), "A second description"));
+
+	bool b2 = true && false;
+	std::string str = "This won't ever work!!";
+	bool b1 = _CHECK(bool_matcher(b2), "Any bool really");
+	_REQUIRE(annotate(b1, str));
+}
+
 _TEST_CASE("The _MATCHER macro", "examples::basic_examples::02_basic_matchers")
 {
 	using namespace abc;

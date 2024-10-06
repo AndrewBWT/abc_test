@@ -2,10 +2,11 @@
 #include "abc_test/utility/internal/macros.h"
 #include "abc_test/core/test_reports/mid_test_invokation_report/single_source.h"
 #include <optional>
+#include "abc_test/matchers/matcher.h"
+#include "abc_test/matchers/annotation.h"
 
 _BEGIN_ABC_NS
 template<
-	typename T,
 	typename Assertion_Type
 >
 class test_block_t
@@ -25,15 +26,24 @@ public:
 	__constexpr_imp
 		test_block_t&
 		operator=(
-			const T& _a_element
+			const matcher_t& _a_element
+			) noexcept;
+	__constexpr_imp
+		test_block_t&
+		operator=(
+			const matcher_with_annotation_t& _a_element
 			) noexcept;
 	__constexpr
-		const T&
-		inner_value(
+		const matcher_t&
+		matcher(
 		) const noexcept;
 	__constexpr
 		const std::optional<std::string>&
 		test_annotation(
+		) const noexcept;
+	__constexpr
+		const std::optional<std::string>&
+		matcher_annotation(
 		) const noexcept;
 	__constexpr
 		void
@@ -47,18 +57,18 @@ public:
 private:
 	reports::source_pair_t _m_source;
 	std::optional<std::string> _m_test_annotation;
-	T _m_inner_element;
+	std::optional<std::string> _m_matcher_annotation;
+	matcher_t _m_matcher;
 	bool _m_processed;
 };
 _END_ABC_NS
 
 _BEGIN_ABC_NS
 template<
-	typename T,
 	typename Assertion_Type
 >
 __constexpr_imp
-test_block_t<T, Assertion_Type>::test_block_t(
+test_block_t<Assertion_Type>::test_block_t(
 	const std::string_view _a_test_annotation,
 	const reports::single_source_t& _a_source
 ) noexcept
@@ -68,11 +78,10 @@ test_block_t<T, Assertion_Type>::test_block_t(
 
 }
 template<
-	typename T,
 	typename Assertion_Type
 >
 __constexpr_imp
-test_block_t<T,Assertion_Type>::~test_block_t(
+test_block_t<Assertion_Type>::~test_block_t(
 ) noexcept
 {
 	if (not _m_processed)
@@ -81,59 +90,78 @@ test_block_t<T,Assertion_Type>::~test_block_t(
 	}
 }
 template<
-	typename T,
 	typename Assertion_Type
 >
 __constexpr_imp
-test_block_t<T,Assertion_Type>&
-test_block_t<T, Assertion_Type>::operator=(
-	const T& _a_element
+test_block_t<Assertion_Type>&
+test_block_t<Assertion_Type>::operator=(
+	const matcher_t& _a_element
 	) noexcept
 {
-	this->_m_inner_element = _a_element;
+	this->_m_matcher = _a_element;
+	this->_m_matcher_annotation = std::optional<std::string>();
 	return *this;
 }
 template<
-	typename T,
 	typename Assertion_Type
 >
 __constexpr_imp
-const T&
-test_block_t<T, Assertion_Type>::inner_value(
-) const noexcept
+test_block_t<Assertion_Type>&
+test_block_t<Assertion_Type>::operator=(
+	const matcher_with_annotation_t& _a_element
+	) noexcept
 {
-	return _m_inner_element;
+	this->_m_matcher = _a_element.matcher();
+	this->_m_matcher_annotation = _a_element.annotation();
+	return *this;
 }
 template<
-	typename T,
+	typename Assertion_Type
+>
+__constexpr_imp
+const matcher_t&
+test_block_t<Assertion_Type>::matcher(
+) const noexcept
+{
+	return _m_matcher;
+}
+template<
 	typename Assertion_Type
 >
 __constexpr_imp
 const std::optional<std::string>&
-test_block_t<T, Assertion_Type>::test_annotation(
+test_block_t<Assertion_Type>::test_annotation(
 ) const noexcept
 {
 	return _m_test_annotation;
 }
 template<
-	typename T,
+	typename Assertion_Type
+>
+__constexpr_imp
+const std::optional<std::string>&
+test_block_t<Assertion_Type>::matcher_annotation(
+) const noexcept
+{
+	return _m_matcher_annotation;
+}
+template<
 	typename Assertion_Type
 >
 __constexpr_imp
 void
-test_block_t<T, Assertion_Type>::register_end(
+test_block_t<Assertion_Type>::register_end(
 	const reports::single_source_t& _a_end_source
 ) noexcept
 {
 	_m_source = reports::source_pair_t(_m_source.begin_source(),_a_end_source);
 }
 template<
-	typename T,
 	typename Assertion_Type
 >
 __constexpr_imp
 const reports::source_pair_t&
-test_block_t<T, Assertion_Type>::source(
+test_block_t<Assertion_Type>::source(
 ) const noexcept
 {
 	using namespace reports;
