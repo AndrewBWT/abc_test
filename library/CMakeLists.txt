@@ -84,6 +84,7 @@ set(LIBRARY_FILES
   include/abc_test/core/test_reports/mid_test_invokation_report/matcher_based_assertion.h
   include/abc_test/core/test_reports/mid_test_invokation_report/static_assertion.h
   include/abc_test/core/test_reports/mid_test_invokation_report/unexpected_report.h
+  include/abc_test/core/test_reports/mid_test_invokation_report/basic_text_warning.h
   include/abc_test/core/test_reports/mid_test_invokation_report/unexpected_thrown_non_descript_entity.h
   include/abc_test/core/test_reports/mid_test_invokation_report/unexpected_thrown_exception.h
   include/abc_test/core/test_reports/mid_test_invokation_report/assertion_status/assertion_status_base.h

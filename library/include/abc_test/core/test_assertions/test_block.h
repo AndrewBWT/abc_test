@@ -54,6 +54,10 @@ public:
 		const reports::source_pair_t&
 		source(
 		) const noexcept;
+	__constexpr
+		void
+		set_processed(
+		) noexcept;
 private:
 	reports::source_pair_t _m_source;
 	std::optional<std::string> _m_test_annotation;
@@ -74,6 +78,7 @@ test_block_t<Assertion_Type>::test_block_t(
 ) noexcept
 	: _m_source(reports::source_pair_t(_a_source))
 	, _m_test_annotation(_a_test_annotation)
+	, _m_processed(false)
 {
 
 }
@@ -86,7 +91,10 @@ test_block_t<Assertion_Type>::~test_block_t(
 {
 	if (not _m_processed)
 	{
-		std::cout << "unprocessed" << std::endl;
+		global::get_this_threads_test_runner_ref().add_warning(
+			fmt::format("test_block_t is being deleted, however it has not been "
+				"processed for its true or false status. "
+			));
 	}
 }
 template<
@@ -166,5 +174,15 @@ test_block_t<Assertion_Type>::source(
 {
 	using namespace reports;
 	return _m_source;
+}
+template<
+	typename Assertion_Type
+>
+__constexpr_imp
+void
+test_block_t<Assertion_Type>::set_processed(
+) noexcept
+{
+	_m_processed = true;
 }
 _END_ABC_NS

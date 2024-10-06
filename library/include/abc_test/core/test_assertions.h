@@ -115,6 +115,7 @@
 			abc::utility::str::create_string(\
 			{"_END_BLOCK(", #_a_name, ")"}),\
 		std::source_location::current()));\
+	_a_name.set_processed();\
 	abc::create_assertion_block(_a_name, \
 		abc::global::get_this_threads_test_runner_ref());\
 	}

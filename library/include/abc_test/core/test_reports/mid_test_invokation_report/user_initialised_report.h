@@ -36,6 +36,10 @@ public:
 		const log_infos_t&
 		log_infos(
 		) const noexcept;
+	__constexpr
+		const single_source_t&
+		last_source(
+		) const noexcept;
 protected:
 	__constexpr
 		user_initialised_report_t(
@@ -75,6 +79,23 @@ user_initialised_report_t<Single_Source>::log_infos(
 ) const noexcept
 {
 	return _m_log_infos;
+}
+template<
+	bool Single_Source
+>
+__constexpr_imp
+const single_source_t&
+user_initialised_report_t<Single_Source>::last_source(
+) const noexcept
+{
+	if constexpr (Single_Source)
+	{
+		return _m_source;
+	}
+	else
+	{
+		return _m_source.last_source();
+	}
 }
 template<
 	bool Single_Source

@@ -80,6 +80,7 @@ _BEGIN_ABC_REPORTERS_NS
 		) noexcept
 		: threated_text_output_reporter_t(std::cout)
 	, _m_print_config(print_config_t(true))
+	, _m_has_colour_output(false)
 	{
 	}
 	__constexpr_imp
@@ -88,6 +89,7 @@ _BEGIN_ABC_REPORTERS_NS
 		) noexcept
 		: threated_text_output_reporter_t(_a_file_output)
 		, _m_print_config(print_config_t(false))
+		, _m_has_colour_output(true)
 	{
 	}
 	__no_constexpr_imp

@@ -15,6 +15,19 @@ class unexpected_report_t
 {
 public:
 	__constexpr
+		virtual
+		~unexpected_report_t(
+		) noexcept;
+	__constexpr
+		const single_source_t&
+		source(
+		) const noexcept;
+	__constexpr
+		bool
+		exact_source(
+		) const noexcept;
+protected:
+	__constexpr
 		unexpected_report_t(
 		) noexcept = delete;
 	__constexpr
@@ -27,18 +40,6 @@ public:
 			const source_pair_t& _a_sources,
 			const bool _a_exact_source
 		) noexcept;
-	__constexpr
-		virtual
-		~unexpected_report_t(
-		) noexcept;
-	__constexpr
-		const single_source_t&
-		source(
-		) const noexcept;
-	__constexpr
-		bool
-		exact_source(
-		) const noexcept;
 protected:
 	single_source_t _m_last_source;
 	bool _m_exact_source;
@@ -70,8 +71,8 @@ unexpected_report_t<Terminate>::unexpected_report_t(
 	const source_pair_t& _a_sources,
 	const bool _a_exact_source
 ) noexcept
-	//: _m_last_source(_a_source)
-	//, _m_exact_source(_a_exact_source)
+	: _m_last_source(_a_sources.begin_source())
+	, _m_exact_source(_a_exact_source)
 {
 
 }

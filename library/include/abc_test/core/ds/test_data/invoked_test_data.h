@@ -158,8 +158,7 @@ struct fmt::formatter<abc::ds::invoked_test_info_t> : formatter<string_view>
 	* Provides a formatter for a poset_setup_test_data_t object
 	*/
 	__constexpr
-		auto
-		format(
+		auto format(
 			abc::ds::invoked_test_info_t _a_iti,
 			format_context& _a_cxt
 		) const

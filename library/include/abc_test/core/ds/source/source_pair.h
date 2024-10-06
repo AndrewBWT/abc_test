@@ -23,6 +23,10 @@ public:
 		const std::optional<single_source_t>&
 		end_source(
 		) const noexcept;
+	__constexpr
+		const single_source_t&
+		last_source(
+		) const noexcept;
 private:
 	single_source_t _m_begin_source;
 	std::optional<single_source_t> _m_end_source;
@@ -62,5 +66,19 @@ source_pair_t::end_source(
 ) const noexcept
 {
 	return _m_end_source;
+}
+__constexpr_imp
+const single_source_t&
+source_pair_t::last_source(
+) const noexcept
+{
+	if (_m_end_source.has_value())
+	{
+		return _m_end_source.value();
+	}
+	else
+	{
+		return _m_begin_source;
+	}
 }
 _END_ABC_REPORTS_NS

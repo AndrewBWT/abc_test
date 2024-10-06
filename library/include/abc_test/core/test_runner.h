@@ -10,6 +10,8 @@
 
 #include "abc_test/core/test_reports/mid_test_invokation_report/generic_assertion.h"
 
+#include "abc_test/core/test_reports/mid_test_invokation_report/basic_text_warning.h"
+
 
 _BEGIN_ABC_NS
 struct log_test_msg_t;
@@ -130,6 +132,12 @@ public:
 			const reports::generic_assertion_t<Single_Source, Assertion_Status>* _a_fr,
 			const std::string_view _a_warning
 		) noexcept;
+	__constexpr
+		void
+		add_warning(
+			const std::string_view _a_warning
+		) noexcept;
+
 	/*__constexpr
 		void
 		register_source(
@@ -291,6 +299,17 @@ test_runner_t::add_assertion_and_warning(
 	using namespace std;
 	add_assertion_and_optional_warning(_a_fr, optional<string_view>{_a_warning});
 }
+__constexpr_imp
+void
+test_runner_t::add_warning(
+	const std::string_view _a_warning
+) noexcept
+{
+	using namespace reports;
+	_m_after_execution_test_report.add_warning(
+		new basic_text_warning_t(_m_tests_most_recent_source, false, _a_warning)
+	);
+}
 /*__constexpr_imp
 void
 test_runner_t::register_source(
@@ -354,7 +373,7 @@ test_runner_t::add_assertion_and_optional_warning(
 	if (_a_optional_warning.has_value())
 	{
 		_m_after_execution_test_report.add_warning(
-			new unexpected_report_t<false>(_a_uir->source(), true)
+			new basic_text_warning_t(_a_uir->last_source(), true, _a_optional_warning.value())
 		);
 	}
 }

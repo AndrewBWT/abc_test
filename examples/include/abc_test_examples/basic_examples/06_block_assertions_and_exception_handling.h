@@ -18,7 +18,7 @@
 #include <vector>
 #include "abc_test/matchers/function_wrapper.h"
 
-_TEST_CASE("Assertion block", "examples::basic_examples::06_block_assertions_and_exception_handling")
+_TEST_CASE("Assertion block", "examples::basic_examples::06_manual_block_assertion")
 {
 	using namespace abc;
 	/*!
@@ -154,7 +154,7 @@ namespace testing
 }
 
 _TEST_CASE("Example Using assertion blocks to deal with excetpions", 
-	"examples::basic_examples::06_block_assertions_and_exception_handling")
+	"examples::basic_examples::06_manual_block_assertion")
 {
 	using namespace abc;
 	using namespace std;
@@ -176,7 +176,7 @@ _TEST_CASE("Example Using assertion blocks to deal with excetpions",
 }
 
 _TEST_CASE("Included macros using block assertions",
-	"examples::basic_examples::06_block_assertions_and_exception_handling")
+	"examples::basic_examples::06_manual_block_assertion")
 {
 	using namespace abc;
 	using namespace std;
