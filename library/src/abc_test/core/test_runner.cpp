@@ -23,10 +23,11 @@ __no_constexpr_or_inline_imp
 			"About to run the following test: {0}",
 			_a_post_setup_test_data
 		));
-		_m_current_test = invoked_test_info_t(generate_random_seeds(), _a_post_setup_test_data, _m_tests_ran, _m_test_options);
-		_m_after_execution_test_report = after_execution_test_report_t(_m_current_test, &_m_test_options);
+		_m_current_test = shared_ptr<invoked_test_info_t>(
+			new invoked_test_info_t(generate_random_seeds(), _a_post_setup_test_data, _m_tests_ran, _m_test_options));
+		_m_after_execution_test_report = after_execution_test_report_t(*_m_current_test, &_m_test_options);
 		//const post_setup_test_data_t& _l_pstd{ _m_current_test.post_setup_test_data() };
-		const registered_test_data_t& _l_rtd{ _m_current_test.post_setup_test_data().registered_test_data() };
+		const registered_test_data_t& _l_rtd{ _m_current_test->post_setup_test_data().registered_test_data() };
 		if (false)//not _l_rtd._m_source_location.has_value())
 		{
 			throw test_library_exception_t(
@@ -59,7 +60,7 @@ __no_constexpr_or_inline_imp
 				_m_after_execution_test_report.set_unexpected_termination(
 					new unexpected_thrown_non_descript_entity_t(most_recent_source()));
 			}
-			_m_after_execution_test_report.add_repetition_tree(_m_current_test.repetition_tree(),&_m_test_options);
+			_m_after_execution_test_report.add_repetition_tree(_m_current_test->repetition_tree(),&_m_test_options);
 			_m_trc->report_test(_m_after_execution_test_report);
 			_m_current_error_log_msgs.clear();
 			++_m_tests_ran;

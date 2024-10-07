@@ -73,6 +73,7 @@ _TEST_CASE(abc::test_data_t({
 	.path = "examples::basic_examples::02_basic_matchers"
 	}))
 {
+	using namespace abc;
 	/*!
 	* Assertions in abc_test use matchers predominantly. However, we recognise that the
 	* user may not want to or need to make their own matchers. Instead, they may
@@ -82,13 +83,13 @@ _TEST_CASE(abc::test_data_t({
 	_CHECK(bool_matcher(false));
 	_REQUIRE(bool_matcher(true));
 
-	_CHECK(annoate(bool_matcher(false),"A fantastic message"));
-	_CHECK(annoate(bool_matcher(true), "A second description"));
+	_CHECK(annotate(bool_matcher(false),"A fantastic message"));
+	_CHECK(annotate(bool_matcher(true), "A second description"));
 
 	bool b2 = true && false;
 	std::string str = "This won't ever work!!";
-	bool b1 = _CHECK(bool_matcher(b2), "Any bool really");
-	_REQUIRE(annotate(b1, str));
+	bool b1 = _CHECK(annotate(bool_matcher(b2), "Any bool really"));
+	_REQUIRE(annotate(bool_matcher(b1), str));
 }
 
 _TEST_CASE(abc::test_data_t({

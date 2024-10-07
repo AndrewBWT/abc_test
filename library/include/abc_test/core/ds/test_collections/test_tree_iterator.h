@@ -187,6 +187,6 @@ _BEGIN_ABC_DS_NS
         {
             throw test_library_exception_t("Could not dereference tree_iterator");
         }
-        return _m_stack.top()->_m_nodes_tests[_m_test_index];
+        return *_m_stack.top()->_m_nodes_tests[_m_test_index];
     }
     _END_ABC_DS_NS

@@ -83,13 +83,15 @@ _BEGIN_ABC_DS_NS
 					&_m_options.get_test_repetition_configurations().at(_m_test_discovery_id) :
 					nullptr
 				};
-				const opt_setup_error_t _l_res{ _m_test_tree.add_test(post_setup_test_data_t(
+				const opt_setup_error_t _l_res{ _m_test_tree.add_test(
+					std::shared_ptr<post_setup_test_data_t>(
+					new post_setup_test_data_t(
 						_l_test_element,
 						_m_options._m_path_delimiter,
 						_m_test_discovery_id,
 						_m_options.check_if_test_is_to_be_ran(_m_test_discovery_id),
 						_l_reps,
-						_m_options._m_threads),_m_options) };
+						_m_options._m_threads)),_m_options) };
 				if (_l_res.has_value())
 				{
 					_m_error_reporter_controller.report_error(_l_res.value());

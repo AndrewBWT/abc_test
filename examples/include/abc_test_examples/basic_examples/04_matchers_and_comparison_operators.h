@@ -103,7 +103,7 @@ template
 >
 struct fmt::formatter<testing::Test2> : formatter<string_view>
 {
-	__constexpr_imp
+	__no_constexpr_imp
 		auto
 		format(
 			testing::Test2 _a_rd,

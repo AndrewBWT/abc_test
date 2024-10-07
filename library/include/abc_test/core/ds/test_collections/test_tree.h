@@ -4,13 +4,15 @@
 #include <vector>
 #include "abc_test/core/ds/test_data/post_setup_test_data.h"
 #include "abc_test/core/test_options.h"
+#include <memory>
 
 _BEGIN_ABC_DS_NS
 	class test_tree_t;
 	struct test_tree_iterator_t;
 	using test_tree_child_node = std::unique_ptr<test_tree_t>;
 	using test_tree_child_nodes = std::vector<test_tree_child_node>;
-	using node_t = post_setup_test_data_t;
+	using node_t = std::shared_ptr<post_setup_test_data_t>;
+	using add_element_t = post_setup_test_data_t;
 	using flat_test_set = std::vector<node_t>;
 	/*!
 	* Class for describing test trees. The idea behind the test tree is
@@ -32,7 +34,7 @@ _BEGIN_ABC_DS_NS
 		* Adds a test to the test_tree, using the delimiter provied as an argument.
 		* @param _a_test The test to be registered.
 		*/
-		__constexpr
+		__no_constexpr
 			errors::opt_setup_error_t
 			add_test(
 				const node_t& _a_test,
@@ -90,7 +92,7 @@ _BEGIN_ABC_DS_NS
 		, _m_nodes_child_nodes(test_tree_child_nodes())
 	{
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		errors::opt_setup_error_t
 		test_tree_t::add_test(
 			const node_t& _a_test,
@@ -99,25 +101,33 @@ _BEGIN_ABC_DS_NS
 	{
 		using namespace std;
 		using namespace errors;
-		if (not _a_test.has_registered_test_data())
+		if (_a_test == nullptr)
 		{
-			return opt_setup_error_t(setup_error_t(fmt::format(
-				"setup_test_error: post_setup_test_data_t object has a nullptr registered_test_data_t variable. "
-				"post_setup_test_data_t = {0}",_a_test
-			),false));
+			return errors::opt_setup_error_t();
 		}
-		if (_a_test.thread_resourses_required() > _a_options._m_threads)
+		else
 		{
-			return opt_setup_error_t(setup_error_t(fmt::format(
-				"setup_test_error: post_setup_test_data_t's required thread resourses greater than those allocated to the system. "
-				"post_setup_test_data_t requires {0} threads, while the system has {1} threads available. "
-				"post_setup_test_data_t = {2}",
-				_a_test.thread_resourses_required(),
-				_a_options._m_threads,
-				_a_test
-			), false));
+			const post_setup_test_data_t& _l_test{ *_a_test };
+			//if (not _a_test.has_registered_test_data())
+			//{
+			//	return opt_setup_error_t(setup_error_t(fmt::format(
+			//		"setup_test_error: post_setup_test_data_t object has a nullptr registered_test_data_t variable. "
+		//			"post_setup_test_data_t = {0}",_a_test
+		//		),false));
+		//	}
+			if (_l_test.thread_resourses_required() > _a_options._m_threads)
+			{
+				return opt_setup_error_t(setup_error_t(fmt::format(
+					"setup_test_error: post_setup_test_data_t's required thread resourses greater than those allocated to the system. "
+					"post_setup_test_data_t requires {0} threads, while the system has {1} threads available. "
+					"post_setup_test_data_t = {2}",
+					_l_test.thread_resourses_required(),
+					_a_options._m_threads,
+					*_a_test
+				), false));
+			}
+			return add_test(_a_test, 0);
 		}
-		return add_test(_a_test, 0);
 	}
 	__constexpr_imp
 		bool
@@ -137,28 +147,28 @@ _BEGIN_ABC_DS_NS
 		using namespace std;
 		using namespace errors;
 		using namespace utility;
-		const test_path_hierarchy_t& _l_test_hierarchy{ _a_test.test_path_hierarchy()};
+		const test_path_hierarchy_t& _l_test_hierarchy{ _a_test->test_path_hierarchy()};
 		if (_a_idx >= _l_test_hierarchy.size())
 		{
 			if (_m_nodes_tests.size() > 0)
 			{
 				auto _l_x = upper_bound(_m_nodes_tests.begin(), _m_nodes_tests.end(), _a_test,
 					[](const node_t& _a_left, const node_t& _a_right) {
-						return _a_left.registered_test_data()._m_user_data.name <
-							_a_right.registered_test_data()._m_user_data.name;
+						return _a_left->registered_test_data()._m_user_data.name <
+							_a_right->registered_test_data()._m_user_data.name;
 					}
 				);
 				if (_l_x != _m_nodes_tests.end() && 
-					_l_x->registered_test_data()._m_user_data.name ==
-					_a_test.registered_test_data()._m_user_data.name)
+					_l_x->get()->registered_test_data()._m_user_data.name ==
+					_a_test->registered_test_data()._m_user_data.name)
 				{
 					return opt_setup_error_t(setup_error_t(fmt::format(
 						"setup_test_error: post_setup_test_data_t's registered_test_data has the same description as a "
 						"current entry in the test_tree_t object. "
 						"The post_setup_test_data object we are attempting to insert is {0}, "
 						"while the post_setup_test_data_t object blocking its insertion is {1}. ",
-						_a_test,
-						*_l_x
+						*_a_test,
+						(*_l_x->get())
 					), false));
 				}
 				_m_nodes_tests.insert(_l_x, _a_test);
