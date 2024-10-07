@@ -6,6 +6,7 @@ _BEGIN_ABC_REPORTS_NS
 class basic_text_warning_t
 	: public unexpected_report_t<false>
 {
+	
 public:
 	__constexpr
 		basic_text_warning_t(

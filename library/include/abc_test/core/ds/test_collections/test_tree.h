@@ -106,13 +106,6 @@ _BEGIN_ABC_DS_NS
 				"post_setup_test_data_t = {0}",_a_test
 			),false));
 		}
-		else if (_a_test.registered_test_data()._m_test_function == nullptr)
-		{
-			return opt_setup_error_t(setup_error_t(fmt::format(
-				"setup_test_error: post_setup_test_data_t's registered_test_data_t has a nullptr test_function. "
-				"post_setup_test_data_t = {0}", _a_test
-			),false));
-		}
 		if (_a_test.thread_resourses_required() > _a_options._m_threads)
 		{
 			return opt_setup_error_t(setup_error_t(fmt::format(
@@ -151,13 +144,13 @@ _BEGIN_ABC_DS_NS
 			{
 				auto _l_x = upper_bound(_m_nodes_tests.begin(), _m_nodes_tests.end(), _a_test,
 					[](const node_t& _a_left, const node_t& _a_right) {
-						return _a_left.registered_test_data()._m_description <
-							_a_right.registered_test_data()._m_description;
+						return _a_left.registered_test_data()._m_user_data.test_name() <
+							_a_right.registered_test_data()._m_user_data.test_name();
 					}
 				);
 				if (_l_x != _m_nodes_tests.end() && 
-					_l_x->registered_test_data()._m_description ==
-					_a_test.registered_test_data()._m_description)
+					_l_x->registered_test_data()._m_user_data.test_name() ==
+					_a_test.registered_test_data()._m_user_data.test_name())
 				{
 					return opt_setup_error_t(setup_error_t(fmt::format(
 						"setup_test_error: post_setup_test_data_t's registered_test_data has the same description as a "

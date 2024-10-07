@@ -6,29 +6,77 @@
 
 #include "abc_test/core/test_runner.h"
 
+/*!
+* This file contains all of the functions which access and modify global variables in the
+* abc_test framework.
+* 
+* Unless you are building ontop of abc_test, it is any users of abc_test will need any
+* of the functions in this file.
+* 
+* In regards to why we use global variables, there are two distinct "barriers" in this
+* abc_test; the test code written by users appears to not need any references to the
+* testing library. In actual fact, for many of the features to work, it needs extensive 
+* access to the mechanisms in abc_test. The functions in this file are used to access
+* parts of the testing library that would otherwise be inaccessable.
+* 
+*/
 //Definitions
 _BEGIN_ABC_GLOBAL_NS
+/*!
+* Sets up the global test options (GTO). It also links the 
+* global error_reporter_controller_t to the GTO. 
+* 
+*/
 __constexpr
 	test_options_t&
 	setup_global_variables(
 		const test_options_t& _a_options
 	) noexcept;
+/*!
+* Gets a reference to the global test_reporter_controller_t object.
+*
+*/
 __constexpr
 	reporters::test_reporter_controller_t&
 	get_global_test_reporter_controller(
 	) noexcept;
+/*!
+* Gets a reference to this threads test_runner_t object. 
+*
+*/
 __constexpr
 	test_runner_t&
 	get_this_threads_test_runner_ref(
 	) noexcept;
+/*!
+* Gets a const reference to the global test_options_t object.
+*
+*/
 __constexpr
 	const test_options_t&
 	get_global_test_options(
 	) noexcept;
+/*!
+* Gets a pointer to this threads test_runner_t object.
+* 
+* This can be useful when initialising a pointer which is part of an object. The default
+* constructor could then use nullptr, whereas if it was a reference this wouldn't be
+* possible.
+*
+*/
 __constexpr
 	test_runner_t*
 	get_this_threads_test_runner_ptr(
 	) noexcept;
+/*!
+* Gets a reference to this threads current invoked_test_info. That is, the current
+* test that is running.
+* 
+* TODO: Currently this thread (assuming its not a nullptr) has a current element which
+* is set at the default constructor. If we want to remove the default constructor, and
+* only use elements created on the heap, this function would need to be changed. 
+*
+*/
 __constexpr
 	ds::invoked_test_info_t&
 	get_this_threads_current_test(

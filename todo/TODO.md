@@ -48,3 +48,6 @@
 - Write exception macros.
 - When stringifying types in the comparison matcher, we need more checks for whether its a string, and then to include quotes.
 - Write logic to deal with nested _MATCHER's copying the same line.
+- Decide on what type of style we want to use regarding ill-formed objects:
+-- Do we use default constructors which don't really mean anything, but if they're created it won't mess stuff up.
+-- Or, do we delete those default constructors, and use objects allocated on the heap when wanting a collection of entities.

@@ -328,7 +328,7 @@ _BEGIN_ABC_DS_NS
 				{
 					_l_path /= _a_test_path_component;
 				}
-				_l_path /= _a_test_info.registered_test_data()._m_description;
+				_l_path /= _a_test_info.registered_test_data()._m_user_data.test_name();
 				if (not exists(_l_path))
 				{
 					create_directories(_l_path);

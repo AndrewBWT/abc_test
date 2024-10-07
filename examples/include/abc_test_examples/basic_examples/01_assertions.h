@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/gen_data/enumerable/specializations/enum.h"
 #include "abc_test/core/test_assertions.h"
-#include "abc_test/core/ds/test_data/registered_test_data.h"
+#include "abc_test/core/ds/test_data/macros.h"
 #include "abc_test/matchers/matcher.h"
 #include "abc_test/matchers/comparison/constructors.h"
 
@@ -9,6 +9,16 @@
 
 #include <ranges>
 #include <numeric>
+
+/*_AUTO_FUNC(user_data(
+	name("Name of the test"),
+	description("A description of the test"),
+	path("hello::goodbye"),
+	threads(1)
+)
+{
+
+}*/
 
 _TEST_CASE("A simple test case with no assertions. This will alwyas pass", "examples::basic_examples::assertions")
 {
