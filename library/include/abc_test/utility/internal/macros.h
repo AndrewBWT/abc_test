@@ -3,12 +3,12 @@
 /*!
 * Macro which adds a constexpr keyword.
 */
-#define __constexpr
+#define __constexpr constexpr
 
 /*!
 * Macro which adds a constexpr and inline keyword
 */
-#define __constexpr_imp inline
+#define __constexpr_imp constexpr inline
 
 /*!
 * Macro which adds no constexpr keyword.

@@ -116,7 +116,8 @@ struct fmt::formatter<abc::ds::repetition_tree_for_loop_index_data_t> : formatte
 	/*!
 	* Provides a formatter for a poset_setup_test_data_t object
 	*/
-	__constexpr
+		//Can't be constexpr due to use of fmt::format.
+	__no_constexpr
 		auto
 		format(
 			abc::ds::repetition_tree_for_loop_index_data_t _a_rt,
@@ -371,7 +372,7 @@ struct fmt::formatter<abc::ds::repetition_tree_for_loop_index_data_t> : formatte
 		) const noexcept
 	{
 		using namespace std;
-		string _l_rv{ fmt::format("({},[", _m_for_loop_index) };
+		string _l_rv{ "({},[" + to_string(_m_for_loop_index) };
 		for (size_t _l_idx{ 0 }; _l_idx < _m_for_loop_member.size(); ++_l_idx)
 		{
 			_l_rv.append(_m_for_loop_member[_l_idx].print());
@@ -476,7 +477,7 @@ struct fmt::formatter<abc::ds::repetition_tree_for_loop_index_data_t> : formatte
 	_END_ABC_DS_NS
 
 
-__constexpr_imp
+__no_constexpr_imp
 auto
 fmt::formatter<abc::ds::repetition_tree_for_loop_index_data_t>::format(
 	abc::ds::repetition_tree_for_loop_index_data_t _a_rt,
@@ -500,11 +501,14 @@ fmt::formatter<abc::ds::repetition_tree_for_loop_index_data_t>::format(
 		}
 	}
 	_l_children_str.append("]");
-	string _l_rv{ fmt::format(
-		"repetition_tree_for_loop_index_data_t {{"
-		"_m_for_loop_index = {0}, "
-		"_m_for_loop_member = {1}}}",
-		_a_rt.for_loop_index(),_l_children_str
+	const string _l_rv{ fmt::format(
+		"{0} {{"
+		"{1} = {2}"
+		", {3} = {4}"
+		"}}"
+		, typeid(_a_rt).name()
+		, "_m_for_loop_index", _a_rt.for_loop_index()
+		, "_m_for_loop_member", _l_children_str
 	) };
 	return formatter<string_view>::format(_l_rv, _a_ctx);
 }

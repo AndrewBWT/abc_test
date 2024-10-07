@@ -10,22 +10,36 @@
 #include <ranges>
 #include <numeric>
 
-/*_AUTO_FUNC(user_data(
-	name("Name of the test"),
-	description("A description of the test"),
-	path("hello::goodbye"),
-	threads(1)
-)
+
+/*!
+ * Each test case we create is written using the abc::test_data_t object. It is
+ * a synonym for the user_defined_test_data_t object. We use designiated initializers
+ * to initialise the object.
+ * 
+ * Note the abnoraml syntax; we need an extra bracket to escape the macro separating
+ * via the commas in the data structure. We could move the second bracket to before the
+ * abc::test_data_t, as shown in the next example. 
+ */
+_TEST_CASE(abc::test_data_t({
+	.name = "file_01_example_01",
+	.description = "A simple test case with no assertions. It will alwyas pass",
+	.path = "examples::basic_examples::assertions",
+	.threads_required = 2
+	}))
 {
-
-}*/
-
-_TEST_CASE("A simple test case with no assertions. This will alwyas pass", "examples::basic_examples::assertions")
-{
-
+	
 }
 
-_TEST_CASE("Basic static assertions", "examples::basic_assertions")
+/*!
+ * This function shows how to use static assertions; assertions which either pass, fail
+ * or terminate the function. 
+ */
+
+_TEST_CASE((abc::test_data_t{
+	.name = "file_01_example_02",
+	.description = "Examples of basic static assertions",
+	.path = "examples::basic_examples::assertions"
+	}))
 {
 	/*!
 	* Static assertions are the simplest types of assertions in the library. They will alwways do one thing;
@@ -40,7 +54,11 @@ _TEST_CASE("Basic static assertions", "examples::basic_assertions")
 	_TERMINATE();
 }
 
-_TEST_CASE("Static assertions with messages", "examples::basic_examples::assertions")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_01_example_03",
+	.description = "Examples of static assertions with messages",
+	.path = "examples::basic_examples::assertions"
+	}))
 {
 	/*!
 	* Like all assertions in this library, each static assertion can have an assocaited
@@ -53,7 +71,11 @@ _TEST_CASE("Static assertions with messages", "examples::basic_examples::asserti
 	_TERMINATE_WITH_MSG("Testing termination");
 }
 
-_TEST_CASE("Getting the result of a static assertion", "examples::basic_examples::assertions")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_01_example_04",
+	.description = "Examples showing how to get the result of a static assertion",
+	.path = "examples::basic_examples::assertions"
+	}))
 {
 	/*!
 	* All macros built around assertions in this library are, at a very basic level,
@@ -68,7 +90,11 @@ _TEST_CASE("Getting the result of a static assertion", "examples::basic_examples
 	bool b3 = _TERMINATE_WITH_MSG("This message will kill the test!");
 }
 
-_TEST_CASE("Matcher-based assertion", "examples::basic_examples::assertions")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_01_example_05",
+	.description = "Examples of matcher-based assertions",
+	.path = "examples::basic_examples::assertions"
+	}))
 {
 	/*!
 	* These are what we believe the majority of users will use when writing testing code.
@@ -107,7 +133,11 @@ _TEST_CASE("Matcher-based assertion", "examples::basic_examples::assertions")
 	_REQUIRE(annotate(eq(1, 1), "The numbers aren't the same"));
 }
 
-_TEST_CASE("Example of simulating logical operators", "examples::basic_examples::assertions")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_01_example_06",
+	.description = "Examples showing the simulationg of logical operators",
+	.path = "examples::basic_examples::assertions"
+	}))
 {
 	using namespace abc;
 	using namespace std;

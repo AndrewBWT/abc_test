@@ -4,5 +4,5 @@
 //#include "abc_test_examples/basic_examples/03_matchers_and_logical_operators.h"
 //#include "abc_test_examples/basic_examples/04_matchers_and_comparison_operators.h"
 //#include "abc_test_examples/basic_examples/05_user_defined_matcher.h"
-#include "abc_test_examples/basic_examples/06_manual_block_assertions.h"
+//#include "abc_test_examples/basic_examples/06_manual_block_assertions.h"
 //#include "abc_test_examples/basic_examples/exceptions.h"

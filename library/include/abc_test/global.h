@@ -27,7 +27,7 @@ _BEGIN_ABC_GLOBAL_NS
 * global error_reporter_controller_t to the GTO. 
 * 
 */
-__constexpr
+__no_constexpr
 	test_options_t&
 	setup_global_variables(
 		const test_options_t& _a_options
@@ -36,7 +36,7 @@ __constexpr
 * Gets a reference to the global test_reporter_controller_t object.
 *
 */
-__constexpr
+__no_constexpr
 	reporters::test_reporter_controller_t&
 	get_global_test_reporter_controller(
 	) noexcept;
@@ -44,7 +44,7 @@ __constexpr
 * Gets a reference to this threads test_runner_t object. 
 *
 */
-__constexpr
+__no_constexpr
 	test_runner_t&
 	get_this_threads_test_runner_ref(
 	) noexcept;
@@ -52,7 +52,7 @@ __constexpr
 * Gets a const reference to the global test_options_t object.
 *
 */
-__constexpr
+__no_constexpr
 	const test_options_t&
 	get_global_test_options(
 	) noexcept;
@@ -64,7 +64,7 @@ __constexpr
 * possible.
 *
 */
-__constexpr
+__no_constexpr
 	test_runner_t*
 	get_this_threads_test_runner_ptr(
 	) noexcept;
@@ -77,29 +77,29 @@ __constexpr
 * only use elements created on the heap, this function would need to be changed. 
 *
 */
-__constexpr
+__no_constexpr
 	ds::invoked_test_info_t&
 	get_this_threads_current_test(
 	);
-__constexpr
+__no_constexpr
 	const test_options_t&
 	get_global_test_options(
 	) noexcept;
-__constexpr
+__no_constexpr
 	const test_options_t*
 	get_global_test_options_ptr(
 	) noexcept;
-__constexpr
+__no_constexpr
 	reporters::error_reporter_controller_t&
 	get_global_error_reporter_controller(
 	) noexcept;
 namespace
 {
-	__constexpr
+	__no_constexpr
 		test_options_t&
 		get_inner_global_test_options(
 		) noexcept;
-	__constexpr
+	__no_constexpr
 		reporters::error_reporter_controller_t&
 		get_inner_global_error_reporter_controller(
 		) noexcept;
@@ -108,7 +108,7 @@ _END_ABC_GLOBAL_NS
 
 //Implementation
 _BEGIN_ABC_GLOBAL_NS
-__constexpr_imp
+__no_constexpr_imp
 	test_options_t&
 	setup_global_variables(
 		const test_options_t& _a_options
@@ -121,7 +121,7 @@ __constexpr_imp
 	_l_erc.set_test_options(_l_to);
 	return _l_to;
 }
-__constexpr_imp
+__no_constexpr_imp
 	reporters::test_reporter_controller_t&
 	get_global_test_reporter_controller(
 	) noexcept
@@ -130,7 +130,7 @@ __constexpr_imp
 	static test_reporter_controller_t _s_gtrc(get_global_test_options());
 	return _s_gtrc;
 }
-__constexpr_imp
+__no_constexpr_imp
 	test_runner_t&
 	get_this_threads_test_runner_ref(
 	) noexcept
@@ -138,21 +138,21 @@ __constexpr_imp
 	thread_local test_runner_t _tl_tr(get_global_test_reporter_controller(), get_global_test_options());
 	return _tl_tr;
 }
-__constexpr_imp
+__no_constexpr_imp
 	const test_options_t&
 	get_global_test_options(
 	) noexcept
 {
 	return get_inner_global_test_options();
 }
-__constexpr_imp
+__no_constexpr_imp
 	test_runner_t*
 	get_this_threads_test_runner_ptr(
 	) noexcept
 {
 	return &get_this_threads_test_runner_ref();
 }
-__constexpr_imp
+__no_constexpr_imp
 	ds::invoked_test_info_t&
 	get_this_threads_current_test(
 	)
@@ -168,14 +168,14 @@ __constexpr_imp
 		return _l_tr->current_test();
 	}
 }
-__constexpr_imp
+__no_constexpr_imp
 	const test_options_t*
 	get_global_test_options_ptr(
 	) noexcept
 {
 	return &get_global_test_options();
 }
-__constexpr_imp
+__no_constexpr_imp
 	reporters::error_reporter_controller_t&
 	get_global_error_reporter_controller(
 	) noexcept
@@ -184,7 +184,7 @@ __constexpr_imp
 }
 namespace
 {
-	__constexpr_imp
+	__no_constexpr_imp
 		test_options_t&
 		get_inner_global_test_options(
 		) noexcept
@@ -192,7 +192,7 @@ namespace
 		static test_options_t _s_to;
 		return _s_to;
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		reporters::error_reporter_controller_t&
 		get_inner_global_error_reporter_controller(
 		) noexcept

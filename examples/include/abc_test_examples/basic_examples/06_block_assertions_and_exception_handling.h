@@ -18,7 +18,11 @@
 #include <vector>
 #include "abc_test/matchers/function_wrapper.h"
 
-_TEST_CASE("Assertion block", "examples::basic_examples::06_manual_block_assertion")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_06_example_01",
+	.description = "Examples showing assertion blocks",
+	.path = "examples::basic_examples::06_manual_block_assertion"
+	}))
 {
 	using namespace abc;
 	/*!
@@ -153,8 +157,11 @@ namespace testing
 	}
 }
 
-_TEST_CASE("Example Using assertion blocks to deal with excetpions", 
-	"examples::basic_examples::06_manual_block_assertion")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_06_example_02",
+	.description = "Example Using assertion blocks to deal with excetpions",
+	.path = "examples::basic_examples::06_manual_block_assertion"
+	}))
 {
 	using namespace abc;
 	using namespace std;
@@ -175,8 +182,11 @@ _TEST_CASE("Example Using assertion blocks to deal with excetpions",
 	test_handling_code(3);
 }
 
-_TEST_CASE("Included macros using block assertions",
-	"examples::basic_examples::06_manual_block_assertion")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_06_example_03",
+	.description = "Included macros using block assertions",
+	.path = "examples::basic_examples::06_manual_block_assertion"
+	}))
 {
 	using namespace abc;
 	using namespace std;

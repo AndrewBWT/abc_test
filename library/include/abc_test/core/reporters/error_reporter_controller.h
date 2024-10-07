@@ -57,7 +57,8 @@ _BEGIN_ABC_REPORTERS_NS
 		* 
 		* Then std::exit is called with an exit code of -1.
 		*/
-		__constexpr
+		//Can't be constepxr due to std::exit.
+		__no_constexpr
 			void
 			hard_exit(
 			) noexcept;
@@ -166,7 +167,7 @@ _BEGIN_ABC_REPORTERS_NS
 			}
 		}
 	}
-	__no_constexpr_imp
+	__constexpr_imp
 		void
 		error_reporter_controller_t::report_information(
 			const std::string_view _a_str
@@ -181,7 +182,7 @@ _BEGIN_ABC_REPORTERS_NS
 			_l_reporter_ptr->report_information(_a_str);
 		}
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		void
 		error_reporter_controller_t::hard_exit(
 		) noexcept

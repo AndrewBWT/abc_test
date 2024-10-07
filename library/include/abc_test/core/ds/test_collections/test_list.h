@@ -18,28 +18,32 @@ using test_list_t = std::list<test_list_element_t>;
 /*!
 * Get the global test_list.
 */
-__constexpr
+//Can't be constexpr due to use of calling et_mutable_test_list
+__no_constexpr
 	const test_list_t&
 	get_global_test_list(
 	) noexcept;
 /*!
 * Add a test to the global test_list.
 */
-__constexpr
-	void
+//Can't be constexpr due to use of calling et_mutable_test_list
+__no_constexpr
+	std::size_t
 	add_test(
 		const test_list_element_t& _a_test_list_internal
 	) noexcept;
 /*!
 * Clear the global test_list.
 */
-__constexpr
+//Can't be constexpr due to use of calling et_mutable_test_list
+__no_constexpr
 	void
 	clear_test_list(
 	) noexcept;
 namespace
 {
-	__constexpr
+	//Can't be constexpr due to use of static var.
+	__no_constexpr
 		test_list_t&
 		get_mutable_test_list(
 		) noexcept;
@@ -47,23 +51,24 @@ namespace
 _END_ABC_DS_NS
 
 _BEGIN_ABC_DS_NS
-__constexpr_imp
+__no_constexpr_imp
 	const test_list_t&
 	get_global_test_list(
 	) noexcept
 {
 	return get_mutable_test_list();
 }
-__constexpr_imp
-	void
+__no_constexpr_imp
+	std::size_t
 	add_test(
 		const test_list_element_t& _a_test_list_internal
 	) noexcept
 {
 	test_list_t& _l_test_list{ get_mutable_test_list() };
 	_l_test_list.push_back(_a_test_list_internal);
+	return 0;
 }
-__constexpr_imp
+__no_constexpr_imp
 	void
 	clear_test_list(
 	) noexcept
@@ -73,7 +78,7 @@ __constexpr_imp
 }
 namespace
 {
-	__constexpr_imp
+	__no_constexpr_imp
 		test_list_t&
 		get_mutable_test_list(
 		) noexcept

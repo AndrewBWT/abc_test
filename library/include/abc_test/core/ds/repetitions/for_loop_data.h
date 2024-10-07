@@ -21,7 +21,8 @@ _BEGIN_ABC_DS_NS
 		/*!
 		* Main constructor. This is the one that should be used by the user.
 		*/
-		__constexpr
+		//Cannot be constexpr due to use of test_failure_func_t
+		__no_constexpr
 			for_loop_data_t(
 				const std::size_t _a_for_loop_index,
 				const test_failure_func_t _a_on_error_function,
@@ -31,7 +32,8 @@ _BEGIN_ABC_DS_NS
 		/*!
 		* Default constructor. _m_for_loop_index is set at zero, funciton is void and repetition_data is empty.
 		*/
-		__constexpr
+		//Cant be constexpr due to use of std::function
+		__no_constexpr
 			for_loop_data_t(
 			) noexcept;
 		/*!
@@ -58,7 +60,8 @@ _BEGIN_ABC_DS_NS
 		* it is then possible to re-run these "problematic" values first, while using a different random seed
 		* to run different tests. 
 		*/
-		__constexpr
+		//Cant be constexpr due to use of test_failure_func_t.
+		__no_constexpr
 			void
 			update(
 				const test_failure_func_t _a_on_error_function,
@@ -71,7 +74,8 @@ _BEGIN_ABC_DS_NS
 		* the test, not the specific circumstances concerning how the test was ran in this instance.
 		* 
 		*/
-		__constexpr
+		//Can't be constexpr due to it calling _m_on_failure_function, of type std::funciton.
+		__no_constexpr
 			const ds::repetition_data_t
 			inform_test_generator_of_failure_and_generate_alternate_repetition_data(
 			) const noexcept;
@@ -90,7 +94,8 @@ struct fmt::formatter<abc::ds::for_loop_data_t> : formatter<string_view>
 	/*!
 	* Provides a formatter for a poset_setup_test_data_t object
 	*/
-	__constexpr
+	//Cannot be constexpr due to paramter for_loop_data_t.
+	__no_constexpr
 		auto
 		format(
 			abc::ds::for_loop_data_t _a_fld,
@@ -100,14 +105,14 @@ struct fmt::formatter<abc::ds::for_loop_data_t> : formatter<string_view>
 };
 
 _BEGIN_ABC_DS_NS
-	__constexpr_imp
+	__no_constexpr_imp
 		for_loop_data_t::for_loop_data_t(
 		) noexcept
 		: for_loop_data_t(0, std::function<repetition_data_t()>{}, 0, nullptr)
 	{
 
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		for_loop_data_t::for_loop_data_t(
 			const std::size_t _a_for_loop_index,
 			const test_failure_func_t _a_on_error_function,
@@ -134,7 +139,7 @@ _BEGIN_ABC_DS_NS
 	{
 		return *_m_repetition_data;
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		void
 		for_loop_data_t::update(
 			const test_failure_func_t _a_on_error_function,
@@ -148,7 +153,7 @@ _BEGIN_ABC_DS_NS
 		_m_repetition_data = _a_repetition_data;
 		_m_repetition_data->set_for_loop_and_generation_collection_indexs(_l_for_loop_index, _a_generation_collection_index);
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		const ds::repetition_data_t
 		for_loop_data_t::inform_test_generator_of_failure_and_generate_alternate_repetition_data(
 		) const noexcept
@@ -157,7 +162,7 @@ _BEGIN_ABC_DS_NS
 	}
 	_END_ABC_DS_NS
 
-__constexpr_imp
+__no_constexpr_imp
 auto
 fmt::formatter<abc::ds::for_loop_data_t>::format(
 	abc::ds::for_loop_data_t _a_fld,
@@ -166,12 +171,14 @@ fmt::formatter<abc::ds::for_loop_data_t>::format(
 -> format_context::iterator
 {
 	using namespace std;
-	string _l_rv{ fmt::format(
-		"for_loop_data_t {{"
-		"_m_for_loop_index = {0},"
-		"_m_repetition_data = {1}}}",
-		_a_fld.for_loop_index(),
-		_a_fld.repetition_data()
+	const string _l_rv{ fmt::format(
+		"{0} {{"
+		"{1} = {2}"
+		", {3} = {4}"
+		"}}"
+		, typeid(_a_fld).name()
+		, "_m_for_loop_index", _a_fld.for_loop_index()
+		, "_m_repetition_data", _a_fld.repetition_data()
 	) };
 	return formatter<string_view>::format(_l_rv, _a_ctx);
 }

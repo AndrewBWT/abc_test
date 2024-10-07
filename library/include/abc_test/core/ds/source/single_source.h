@@ -40,11 +40,11 @@ _END_ABC_REPORTS_NS
 template
 <
 >
-__constexpr
 struct fmt::formatter<abc::reports::single_source_t> : formatter<string_view> {
 	// parse is inherited from formatter<string_view>.
-
-	auto
+	//Can'tbe constexpr due to use of fmt::format
+	__no_constexpr
+		auto
 		format(
 			abc::reports::single_source_t _a_rtd,
 			format_context& _a_ctx
@@ -98,7 +98,7 @@ single_source_t::operator==(
 }
 _END_ABC_REPORTS_NS
 
-__constexpr_imp
+__no_constexpr_imp
 auto
 fmt::formatter<abc::reports::single_source_t>::format(
 	abc::reports::single_source_t _a_rtd,
@@ -106,9 +106,8 @@ fmt::formatter<abc::reports::single_source_t>::format(
 ) const
 -> format_context::iterator
 {
-	size_t _m_thread_resourses_required;
 	using namespace std;
-	string _l_rv{ fmt::format(
+	const string _l_rv{ fmt::format(
 		"{0} {{"
 		"{1} = {2}, "
 		"{3} = {4}"

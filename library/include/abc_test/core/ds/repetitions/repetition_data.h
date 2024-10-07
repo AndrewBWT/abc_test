@@ -123,7 +123,8 @@ struct fmt::formatter<abc::ds::repetition_data_t> : formatter<string_view>
 	/*!
 	* Provides a formatter for a poset_setup_test_data_t object
 	*/
-	__constexpr
+//Cannot be constexpr due to use of fmt::format.
+	__no_constexpr
 		auto
 		format(
 			abc::ds::repetition_data_t _a_rd,
@@ -252,7 +253,7 @@ struct fmt::formatter<abc::ds::repetition_data_t> : formatter<string_view>
 	}
 	_END_ABC_DS_NS
 
-__constexpr_imp
+__no_constexpr_imp
 auto
 fmt::formatter<abc::ds::repetition_data_t>::format(
 	abc::ds::repetition_data_t _a_rd,
@@ -261,16 +262,18 @@ fmt::formatter<abc::ds::repetition_data_t>::format(
 -> format_context::iterator
 {
 	using namespace std;
-	string _l_rv{ fmt::format(
-		"repetition_data_t {{"
-		"_m_for_loop_index = {0}, "
-		"_m_generation_collection_index = {1}, "
-		"_m_additional_data = {2}, "
-		"_m_mode = {3}}}",
-		_a_rd.for_loop_index(),
-		_a_rd.generation_collection_index(),
-		_a_rd.additional_data(),
-		_a_rd.mode()
-	) };
+	const string _l_rv{ 
+		fmt::format(
+			"{0} {{"
+			"{1} = {2}"
+			", {3} = {4}"
+			", {5} = {6}"
+			", {7} = {8}}}"
+			, typeid(_a_rd).name()
+			, "_m_for_loop_index", _a_rd.for_loop_index()
+			, "_m_generation_collection_index", _a_rd.generation_collection_index()
+			, "_m_additional_data", _a_rd.additional_data()
+			, "_m_mode", _a_rd.mode()
+		)};
 	return formatter<string_view>::format(_l_rv, _a_ctx);
 }

@@ -15,7 +15,7 @@
 #include "abc_test/core/ds/test_collections/test_list.h"
 #include "abc_test/core/ds/source/single_source.h"
 
-#include "abc_test/core/ds/test_data/user_defined_test_data.h"
+#include "abc_test/core/ds/test_data/checked_user_defined_test_data.h"
 
 _BEGIN_ABC_DS_NS
 //! The type of test functions; simply a reference to a function with no arguments and
@@ -46,7 +46,7 @@ public:
 		__constexpr
 			registered_test_data_t(
 				const test_function_t _a_test_function,
-				const user_defined_test_data_t _a_user_data,
+				const checked_user_defined_test_data_t _a_user_data,
 				//	const test_description_ref_t _a_description,
 				//	const test_path_ref_t _a_test_path,
 				const reports::single_source_t& _a_source
@@ -92,10 +92,10 @@ _END_ABC_DS_NS
 template
 <
 >
-__constexpr
 struct fmt::formatter<abc::ds::registered_test_data_t> : formatter<string_view> {
 	// parse is inherited from formatter<string_view>.
-
+	//Can't be constexpr due to use of fmt::format.
+	__no_constexpr
 	auto 
 		format(
 			abc::ds::registered_test_data_t _a_rtd, 
@@ -115,20 +115,20 @@ _BEGIN_ABC_DS_NS
 	__constexpr_imp
 		registered_test_data_t::registered_test_data_t(
 			const test_function_t _a_test_function,
-			const user_defined_test_data_t _a_user_data,
+			const checked_user_defined_test_data_t _a_user_data,
 		//	const test_description_ref_t _a_description,
 		//	const test_path_ref_t _a_test_path,
 			const reports::single_source_t& _a_source
 		//	const std::size_t _a_thread_resourses_required
 		) noexcept
-		: _m_user_data(_a_user_data)
+		: _m_user_data(_a_user_data.user_defined_test_data())
 		//: _m_description(_a_description)
 		//, _m_test_path(_a_test_path)
 		, _m_source(_a_source)
 		, _m_test_function(_a_test_function)
 		//, _m_thread_resourses_required(_a_thread_resourses_required)
 	{
-		abc::ds::add_test(*this);
+		
 	}
 	__constexpr_imp
 		bool
@@ -146,7 +146,7 @@ _BEGIN_ABC_DS_NS
 	}
 	_END_ABC_DS_NS
 
-__constexpr_imp
+__no_constexpr_imp
 	auto 
 	fmt::formatter<abc::ds::registered_test_data_t>::format(
 		abc::ds::registered_test_data_t _a_rtd,

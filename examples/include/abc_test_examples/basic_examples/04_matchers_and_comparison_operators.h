@@ -16,7 +16,11 @@
 
 #include "abc_test/core/log_test_msg.h"
 
-_TEST_CASE("Comparison matchers revisted", "examples::basic_examples::04_matchers_and_comparison_operators")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_04_example_01",
+	.description = "Examples revisiting comparision matchers",
+	.path = "examples::basic_examples::04_matchers_and_comparison_operators"
+	}))
 {
 	using namespace abc;
 	/*!
@@ -32,10 +36,14 @@ _TEST_CASE("Comparison matchers revisted", "examples::basic_examples::04_matcher
 	_CHECK(lt(2, 1));
 	_CHECK(geq(1, 2));
 	_CHECK(leq(2, 1));
-	_CHECK_WITH_MSG(neq(1, 1), "These two numbers aren't equal!");
+	_CHECK(annotate(neq(1, 1), "These two numbers aren't equal!"));
 }
 
-_TEST_CASE("Comparison matchers using operators", "examples::basic_examples::04_matchers_and_comparison_operators")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_04_example_02",
+	.description = "Examples showing comparison matchers using operators",
+	.path = "examples::basic_examples::04_matchers_and_comparison_operators"
+	}))
 {
 	using namespace abc;
 	using namespace std;
@@ -109,7 +117,11 @@ struct fmt::formatter<testing::Test2> : formatter<string_view>
 	}
 };
 
-_TEST_CASE("Using own types with comparison operators", "examples::basic_examples::04_matchers_and_comparison_operators")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_04_example_03",
+	.description = "Using own types with comparison operators",
+	.path = "examples::basic_examples::04_matchers_and_comparison_operators"
+	}))
 {
 	using namespace abc;
 	using namespace std;

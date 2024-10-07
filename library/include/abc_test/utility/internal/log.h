@@ -4,6 +4,7 @@
 #include <iostream>
 #include "abc_test/utility/internal/log/params.h"
 #include <map>
+#include <fmt/std.h>
 
 
 #ifndef __LOGGING_ON
@@ -28,13 +29,15 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 		/*!
 		* Default constructor, initialised using a default internal_log_params_t object.
 		*/
-		__constexpr
+		//Cannot be constexpr as it calls internal_log_t(internal_log_params_t) constructor.
+		__no_constexpr
 			internal_log_t(
 			) noexcept;
 		/*!
 		* Constructor which takes a bespoke internal_log_params_t object.
 		*/
-		__constexpr
+		//Cannot be constexpr due to use of io::threaded_ostream_output_reporter_t.
+		__no_constexpr
 			internal_log_t(
 				const internal_log_params_t& _a_internal_logger_params
 			) noexcept;
@@ -61,8 +64,8 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 			) noexcept;
 	private:
 		internal_log_params_t _m_internal_logger_params;
-		std::map<std::size_t, std::size_t> _m_thread_map;
-		__constexpr
+		std::map<std::thread::id, std::size_t> _m_thread_map;
+		__no_constexpr
 			std::size_t
 			get_thread_id(
 			) noexcept;
@@ -70,7 +73,8 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 	/*!
 	* The global function used to log data. This calls the global internal_log_t object.
 	*/
-	__no_constexpr_or_inline
+//Cannot be constexpr due to call to get_internal_library_logger.
+	__no_constexpr
 		void
 		log(
 			const internal_log_enum_t _a_internal_logger_enum,
@@ -79,13 +83,15 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 	/*!
 	* Sets the internal_log_params_t object of the global internal_log_t object to that given as an argument.
 	*/
-	__no_constexpr_or_inline
+	//Cannot be constexpr due to call to get_internal_library_logger.
+	__no_constexpr
 		void
 		set_internal_library_logger(
 			const internal_log_params_t& _a_internal_looger_params
 		) noexcept;
 	namespace
 	{
+		//Cannot be constexpr or inline due to use of static.
 		__no_constexpr_or_inline
 			internal_log_t&
 			get_internal_library_logger(
@@ -94,13 +100,13 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 	_END_ABC_UTILITY_INTERNAL_NS
 
 _BEGIN_ABC_UTILITY_INTERNAL_NS
-	__constexpr_imp
+	__no_constexpr_imp
 		internal_log_t::internal_log_t(
 		) noexcept
 		: internal_log_t(internal_log_params_t())
 	{
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		internal_log_t::internal_log_t(
 			const internal_log_params_t& _a_internal_logger_params
 		) noexcept
@@ -126,39 +132,37 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 		using namespace std;
 		if (_m_internal_logger_params.is_set(_a_internal_logger_enum))
 		{
-			threaded_ostream_output_reporter_t::write("LOG: " +
-				to_string(get_thread_id()) + 
-			//	to_string(hash<thread::id>{}(this_thread::get_id())) +
-				" : " +
-				to_str(_a_internal_logger_enum) + " - " +
-				string(_a_str));
+			threaded_ostream_output_reporter_t::write(
+				fmt::format("LOG: {0}: {1} - {2}",
+					get_thread_id(),
+					to_str(_a_internal_logger_enum),
+					_a_str));
 		}
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		std::size_t
 		internal_log_t::get_thread_id(
 		) noexcept
 	{
 		using namespace std;
 		using enum internal_log_enum_t;
-		const size_t _l_hashed_thread_id{ hash<thread::id>{}(this_thread::get_id()) };
-		if (not _m_thread_map.contains(_l_hashed_thread_id))
+		const thread::id _l_id{ this_thread::get_id() };
+		if (not _m_thread_map.contains(_l_id))
 		{
 			const size_t _l_new_thread_id{ _m_thread_map.size() };
 			threaded_ostream_output_reporter_t::write("LOG: " +
 				to_string(_l_new_thread_id) +
-				//	to_string(hash<thread::id>{}(this_thread::get_id())) +
 				" : " +
 				to_str(THREAD_MAPPING) + " - " +
-				fmt::format("Mapping new thread ID (hash = {0}) to {1}",
-					to_string(hash<thread::id>{}(this_thread::get_id())),
+				fmt::format("Mapping new thread ID (thread::id = {0}) to {1}",
+					_l_id,
 					_l_new_thread_id
 					));
-			_m_thread_map.insert({ _l_hashed_thread_id,_l_new_thread_id });
+			_m_thread_map.insert({ _l_id,_l_new_thread_id });
 		}
-		return _m_thread_map.at(_l_hashed_thread_id);
+		return _m_thread_map.at(_l_id);
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		void
 		log(
 			const internal_log_enum_t _a_internal_logger_enum,
@@ -168,7 +172,7 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 		internal_log_t& _l_il{ get_internal_library_logger() };
 		_l_il.write(_a_internal_logger_enum, _a_str);
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		void
 		set_internal_library_logger(
 			const internal_log_params_t& _a_internal_looger_params
@@ -179,7 +183,7 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 	}
 	namespace
 	{
-		__constexpr_imp
+		__no_constexpr_or_inline_imp
 			internal_log_t&
 			get_internal_library_logger(
 			) noexcept

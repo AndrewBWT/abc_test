@@ -33,7 +33,8 @@ _BEGIN_ABC_DS_NS
 		* would have a template parameter we cannot reasonably be expected to know. This way,
 		* we can retain enough information to encode any repetition data. 
 		*/
-		__constexpr
+		//Can't be constexpr due to use of rest_failure_func_t argument.
+		__no_constexpr
 			void
 			increment(
 				const test_failure_func_t _a_on_error_function,
@@ -50,7 +51,8 @@ _BEGIN_ABC_DS_NS
 		/*!
 		* Updates the last elemnet in the internal stack with the given data.
 		*/
-		__constexpr
+		//Can't be constexpr due to use of rest_failure_func_t argument.
+		__no_constexpr
 			void
 			update(
 				const test_failure_func_t _a_on_error_function,
@@ -105,7 +107,8 @@ struct fmt::formatter<abc::ds::for_loop_data_collection_t> : formatter<string_vi
 	/*!
 	* Provides a formatter for a poset_setup_test_data_t object
 	*/
-	__constexpr
+	//can't be constexpr due to calling fmt::format
+	__no_constexpr
 		auto
 		format(
 			abc::ds::for_loop_data_collection_t _a_rt,
@@ -123,7 +126,7 @@ _BEGIN_ABC_DS_NS
 	{
 
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		void
 		for_loop_data_collection_t::increment(
 			const test_failure_func_t _a_on_error_function,
@@ -153,7 +156,7 @@ _BEGIN_ABC_DS_NS
 				fmt::format("decrement called when _m_for_loop_data_collection size == 0"));
 		}
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		void
 		for_loop_data_collection_t::update(
 			const test_failure_func_t _a_on_error_function,
@@ -220,7 +223,7 @@ _BEGIN_ABC_DS_NS
 	}
 	_END_ABC_DS_NS
 
-__constexpr_imp
+__no_constexpr_imp
 auto
 fmt::formatter<abc::ds::for_loop_data_collection_t>::format(
 	abc::ds::for_loop_data_collection_t _a_fldc,
@@ -229,12 +232,14 @@ fmt::formatter<abc::ds::for_loop_data_collection_t>::format(
 -> format_context::iterator
 {
 	using namespace std;
-	string _l_rv{ fmt::format(
-		"for_loop_data_collection_t {{"
-		"_m_for_loop_data_collection = {0},"
-		"_m_current_for_loop_index = {1}}}",
-		_a_fldc.for_loop_data_collection(),
-		_a_fldc.current_for_loop_index()
+	const string _l_rv{ fmt::format(
+		"{0} {{"
+		"{1} = {2}"
+		", {3} = {4}"
+		"}}"
+		, typeid(_a_fldc).name()
+		, "_m_for_loop_data_collection", _a_fldc.for_loop_data_collection()
+		, "_m_current_for_loop_index", _a_fldc.current_for_loop_index()
 	) };
 	return formatter<string_view>::format(_l_rv, _a_ctx);
 }

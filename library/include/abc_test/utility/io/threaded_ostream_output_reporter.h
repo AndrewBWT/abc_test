@@ -13,11 +13,13 @@ public:
 	__constexpr
 		threaded_ostream_output_reporter_t(
 		) noexcept = delete;
-	__constexpr
+	//Cannot be constexpr due to use of std::osyncstream.
+	__no_constexpr
 		threaded_ostream_output_reporter_t(
 			std::ostream& _a_ostream
 		) noexcept;
-	__constexpr
+	//Cannot be constexpr due to use of std::osyncstream.
+	__no_constexpr
 		void
 		write(
 			const std::string_view _a_line
@@ -29,14 +31,14 @@ protected:
 _END_ABC_UTILITY_IO_NS
 
 _BEGIN_ABC_UTILITY_IO_NS
-__constexpr_imp
+__no_constexpr_imp
 	threaded_ostream_output_reporter_t::threaded_ostream_output_reporter_t(
 		std::ostream& _a_ostream
 	) noexcept
 	: _m_output_stream(_a_ostream)
 {
 }
-__constexpr_imp
+__no_constexpr_imp
 	void
 	threaded_ostream_output_reporter_t::write(
 		const std::string_view _a_line

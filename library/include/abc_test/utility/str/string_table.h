@@ -7,20 +7,20 @@ _BEGIN_ABC_UTILITY_STR_NS
 class string_table_t
 {
 public:
-	__constexpr
+	__no_constexpr
 		string_table_t(
 			const std::vector<std::size_t>& _a_columns_to_align = std::vector<std::size_t>()
 		) noexcept;
 	__constexpr
 		std::string
 		operator()() const noexcept;
-	__constexpr
+	__no_constexpr
 		void
 		push_back(
 			const std::string_view _a_str,
 			const std::size_t _a_indent = 0
 		) noexcept;
-	__constexpr
+	__no_constexpr
 		void
 		push_empty(
 		) noexcept;
@@ -36,7 +36,7 @@ private:
 };
 namespace 
 {
-	__constexpr
+	__no_constexpr
 		std::map<std::size_t, std::size_t>
 		make_columns_to_largest_str(
 			const std::vector<std::size_t>& _a_columns_to_align
@@ -44,7 +44,7 @@ namespace
 }
 _END_ABC_UTILITY_STR_NS
 _BEGIN_ABC_UTILITY_STR_NS
-__constexpr_imp
+__no_constexpr_imp
 	string_table_t::string_table_t(
 		const std::vector<std::size_t>& _a_columns_to_align
 	) noexcept
@@ -79,7 +79,7 @@ __constexpr_imp
 	}
 	return _l_rv;
 }
-__constexpr_imp
+__no_constexpr_imp
 	void
 	string_table_t::push_back(
 		const std::string_view _a_str,
@@ -104,7 +104,7 @@ __constexpr_imp
 	++_m_next_column;
 	_m_str_table.back().push_back(_l_to_insert);
 }
-__constexpr
+__no_constexpr
 	void
 	string_table_t::push_empty(
 	) noexcept
@@ -123,7 +123,7 @@ __constexpr_imp
 }
 namespace
 {
-	__constexpr_imp
+	__no_constexpr_imp
 		std::map<std::size_t, std::size_t>
 		make_columns_to_largest_str(
 			const std::vector<std::size_t>& _a_columns_to_align

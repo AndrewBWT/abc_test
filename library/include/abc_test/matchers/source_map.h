@@ -25,7 +25,8 @@ struct source_location_lt_t
 class matcher_source_map_t
 {
 public:
-	__constexpr
+	//Can't be constexpr as calls insert_source.
+	__no_constexpr
 		void
 		insert(
 			const reports::single_source_t& _a_source
@@ -35,16 +36,18 @@ public:
 		map(
 		) const noexcept;
 	__constexpr
-		std::size_t
-		size(
+		bool
+		has_elements(
 		) const noexcept;
 	__no_constexpr_or_inline
 		std::string
 		gather_list_of_sources_and_representations(
 		) const noexcept;
 private:
+	bool _m_has_elements = false;
 	std::map<std::source_location, std::vector<std::string>, source_location_lt_t> _m_internal_map;
-	__constexpr
+	//Can't be constexpr as changes map.
+	__no_constexpr
 		void
 		insert_source(
 			const std::source_location& _a_sl
@@ -64,7 +67,8 @@ struct fmt::formatter<abc::matcher_source_map_t> : formatter<string_view>
 	/*!
 	* Provides a formatter for a poset_setup_test_data_t object
 	*/
-	__constexpr
+	//Can't be constexpr due to fmt.
+	__no_constexpr
 		auto
 		format(
 			abc::matcher_source_map_t _a_iti,
@@ -117,7 +121,7 @@ source_location_lt_t::operator()(
 		}
 	}
 }
-__constexpr_imp
+__no_constexpr_imp
 	void
 	matcher_source_map_t::insert(
 		const reports::single_source_t& _a_source
@@ -125,6 +129,7 @@ __constexpr_imp
 {
 	using namespace std;
 	using namespace reports;
+	_m_has_elements = true;
 	insert_source(_a_source.source_location());
 	_m_internal_map.at(_a_source.source_location()).push_back(string(_a_source.str()));
 }
@@ -136,13 +141,13 @@ __constexpr_imp
 	return _m_internal_map;
 }
 __constexpr_imp
-	std::size_t
-	matcher_source_map_t::size(
+	bool
+	matcher_source_map_t::has_elements(
 	) const noexcept
 {
-	return _m_internal_map.size();
+	return _m_has_elements;
 }
-__constexpr_imp
+__no_constexpr_imp
 void
 matcher_source_map_t::insert_source(
 	const std::source_location& _a_sl
@@ -155,7 +160,7 @@ matcher_source_map_t::insert_source(
 }
 _END_ABC_NS
 
-__constexpr_imp
+__no_constexpr_imp
 auto
 fmt::formatter<abc::matcher_source_map_t>::format(
 	abc::matcher_source_map_t _a_rtd,

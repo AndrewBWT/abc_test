@@ -18,13 +18,13 @@ _BEGIN_ABC_DS_NS
 		/*!
 		* Default constructor, shouldn't be used
 		*/
-		__constexpr
+		__no_constexpr
 			invoked_test_info_t(
 			) noexcept;
 		/*!
 		* The generic constructor. Generally this should be used.
 		*/
-		__constexpr
+		__no_constexpr
 			invoked_test_info_t(
 				const utility::seed_t& _a_seed_seq,
 				const post_setup_test_data_t& _a_test_info,
@@ -127,7 +127,7 @@ _BEGIN_ABC_DS_NS
 		std::size_t _m_order_ran_id;
 		utility::rng _m_this_tests_random_generator;
 		std::filesystem::path _m_path;
-		__constexpr
+		__no_constexpr
 			invoked_test_info_t(
 				const utility::seed_t& _a_seed_seq,
 				const post_setup_test_data_t* _a_post_setup_test_data,
@@ -137,7 +137,7 @@ _BEGIN_ABC_DS_NS
 	};
 	namespace
 	{
-		__constexpr
+		__no_constexpr
 			std::filesystem::path
 			create_test_path(
 				const post_setup_test_data_t& _a_test_info,
@@ -157,7 +157,7 @@ struct fmt::formatter<abc::ds::invoked_test_info_t> : formatter<string_view>
 	/*!
 	* Provides a formatter for a poset_setup_test_data_t object
 	*/
-	__constexpr
+	__no_constexpr
 		auto format(
 			abc::ds::invoked_test_info_t _a_iti,
 			format_context& _a_cxt
@@ -166,14 +166,14 @@ struct fmt::formatter<abc::ds::invoked_test_info_t> : formatter<string_view>
 };
 
 _BEGIN_ABC_DS_NS
-	__constexpr_imp
+	__no_constexpr_imp
 		invoked_test_info_t::invoked_test_info_t(
 		) noexcept
 		: invoked_test_info_t(utility::seed_t(), nullptr, 0, test_options_t())
 	{
 
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		invoked_test_info_t::invoked_test_info_t(
 			const utility::seed_t& _a_seed_seq,
 			const post_setup_test_data_t& _a_test_info,
@@ -290,7 +290,7 @@ _BEGIN_ABC_DS_NS
 	{
 		return _m_order_ran_id;
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		invoked_test_info_t::invoked_test_info_t(
 			const utility::seed_t& _a_seed_seq,
 			const post_setup_test_data_t* _a_post_setup_test_data,
@@ -308,7 +308,7 @@ _BEGIN_ABC_DS_NS
 	}
 	namespace
 	{
-		__constexpr_imp
+		__no_constexpr_imp
 			std::filesystem::path
 			create_test_path(
 				const post_setup_test_data_t& _a_test_info,
@@ -328,7 +328,7 @@ _BEGIN_ABC_DS_NS
 				{
 					_l_path /= _a_test_path_component;
 				}
-				_l_path /= _a_test_info.registered_test_data()._m_user_data.test_name();
+				_l_path /= _a_test_info.registered_test_data()._m_user_data.name;
 				if (not exists(_l_path))
 				{
 					create_directories(_l_path);
@@ -339,7 +339,7 @@ _BEGIN_ABC_DS_NS
 	}
 	_END_ABC_DS_NS
 
-__constexpr_imp
+__no_constexpr_imp
 auto
 fmt::formatter<abc::ds::invoked_test_info_t>::format(
 	abc::ds::invoked_test_info_t _a_iti,

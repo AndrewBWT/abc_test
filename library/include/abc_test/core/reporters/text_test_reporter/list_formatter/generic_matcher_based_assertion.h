@@ -68,7 +68,7 @@ generic_matcher_based_assertion_list_formatter_t<Single_Source,Assertion_Status>
 		case MATCHER_OUTPUT:
 			return true;
 		case MATCHER_SOURCE_MAP:
-			return _a_element.source_map().size() > 0;
+			return _a_element.source_map().has_elements();
 		case MATCHER_ANNOTATION:
 			return _a_element.annotation().has_value();
 		default:

@@ -17,20 +17,20 @@ _BEGIN_ABC_REPORTERS_NS
 		/*!
 		Constructor for std::cerr to be where the output is posted.
 		*/
-		__constexpr
+		__no_constexpr
 			text_error_reporter_t(
 			) noexcept;
 		/*!
 		Constructor whcih allows a file to be where the output is posted.
 		*/
-		__constexpr
+		__no_constexpr
 			text_error_reporter_t(
 				const utility::io::file_name_t& _a_file_output
 			) noexcept;
 		/*!
 		* Describes how to deal with an error_t being reported.
 		*/
-		__constexpr
+		__no_constexpr
 			virtual
 			bool
 			report_error(
@@ -39,7 +39,7 @@ _BEGIN_ABC_REPORTERS_NS
 		/*!
 		* Function for dealing with simple information; in this case, it is streamed to the output.
 		*/
-		__constexpr
+		__no_constexpr
 			virtual
 			void
 			report_information(
@@ -48,7 +48,7 @@ _BEGIN_ABC_REPORTERS_NS
 		/*!
 		* What to do if the test suite is terminated - e.g. any cleaning up
 		*/
-		__constexpr
+		__no_constexpr
 			virtual
 			void
 			exit(
@@ -64,7 +64,7 @@ _BEGIN_ABC_REPORTERS_NS
 	{
 
 	}
-	__constexpr_imp
+__no_constexpr_imp
 		text_error_reporter_t::text_error_reporter_t(
 			const utility::io::file_name_t& _a_file_output
 		) noexcept
@@ -72,7 +72,7 @@ _BEGIN_ABC_REPORTERS_NS
 	{
 
 	}
-	__constexpr_imp
+__no_constexpr_imp
 		bool
 		text_error_reporter_t::report_error(
 			const errors::setup_error_t& _a_setup_test_error
@@ -96,7 +96,7 @@ _BEGIN_ABC_REPORTERS_NS
 			));
 		return true;
 	}
-	__constexpr_imp
+__no_constexpr_imp
 		void
 		text_error_reporter_t::report_information(
 			const std::string_view _a_str
@@ -104,7 +104,7 @@ _BEGIN_ABC_REPORTERS_NS
 	{
 		write("WARNING: " + std::string(_a_str));
 	}
-	__constexpr_imp
+__no_constexpr_imp
 		void
 		text_error_reporter_t::exit(
 		) noexcept

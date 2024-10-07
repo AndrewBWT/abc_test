@@ -9,23 +9,23 @@ _BEGIN_ABC_UTILITY_IO_NS
 		public threaded_ostream_output_reporter_t
 	{
 	public:
-		__constexpr
+		__no_constexpr
 			threated_text_output_reporter_t(
 			) noexcept = delete;
-		__constexpr
+		__no_constexpr
 			~threated_text_output_reporter_t(
 			) noexcept;
-		__constexpr
+		__no_constexpr
 			threated_text_output_reporter_t(
 				const file_name_t& _a_file_name
 			) noexcept;
-		__constexpr
+		__no_constexpr
 			threated_text_output_reporter_t(
 				std::ostream& _a_ostream
 			) noexcept;
 	protected:
 		std::optional<file_name_t> _m_file_name;
-		__constexpr
+		__no_constexpr
 			threated_text_output_reporter_t(
 				const std::optional<file_name_t>& _a_file_name,
 				std::ostream& _a_ostream
@@ -34,7 +34,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 _END_ABC_UTILITY_IO_NS
 
 _BEGIN_ABC_UTILITY_IO_NS
-	__constexpr_imp
+	__no_constexpr_imp
 		threated_text_output_reporter_t::~threated_text_output_reporter_t(
 		) noexcept
 	{
@@ -43,7 +43,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 			delete this->_m_output_stream.get_wrapped();
 		}
 	}
-	__constexpr_imp
+__no_constexpr_imp
 		threated_text_output_reporter_t::threated_text_output_reporter_t(
 			const file_name_t& _a_file_name
 		) noexcept
@@ -53,7 +53,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 	{
 
 	}
-	__constexpr
+	__no_constexpr_imp
 		threated_text_output_reporter_t::threated_text_output_reporter_t(
 			std::ostream& _a_ostream
 		) noexcept
@@ -62,7 +62,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 	{
 
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		threated_text_output_reporter_t::threated_text_output_reporter_t(
 			const std::optional<file_name_t>& _a_file_name,
 			std::ostream& _a_ostream

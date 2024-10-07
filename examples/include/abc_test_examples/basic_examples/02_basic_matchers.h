@@ -12,7 +12,11 @@
 
 #include "abc_test/matchers/annotation.h"
 
-_TEST_CASE("Matchers, explained", "examples::basic_examples::02_basic_matchers")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_02_example_01",
+	.description = "Examples concerning matchers",
+	.path = "examples::basic_examples::02_basic_matchers"
+	}))
 {
 	using namespace abc;
 	/*!
@@ -63,7 +67,11 @@ _TEST_CASE("Matchers, explained", "examples::basic_examples::02_basic_matchers")
 
 }
 
-_TEST_CASE("Bool-based matchers", "examples::basic_assertions")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_02_example_02",
+	.description = "Boolean-based matchers",
+	.path = "examples::basic_examples::02_basic_matchers"
+	}))
 {
 	/*!
 	* Assertions in abc_test use matchers predominantly. However, we recognise that the
@@ -83,7 +91,11 @@ _TEST_CASE("Bool-based matchers", "examples::basic_assertions")
 	_REQUIRE(annotate(b1, str));
 }
 
-_TEST_CASE("The _MATCHER macro", "examples::basic_examples::02_basic_matchers")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_02_example_03",
+	.description = "Examples using the _MATCHER macro",
+	.path = "examples::basic_examples::02_basic_matchers"
+	}))
 {
 	using namespace abc;
 	/*!
@@ -122,7 +134,11 @@ _TEST_CASE("The _MATCHER macro", "examples::basic_examples::02_basic_matchers")
 	_CHECK(_MATCHER(l2));
 }
 
-_TEST_CASE("Annotating", "examples::basic_examples::02_basic_matchers")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_02_example_04",
+	.description = "Examples showing matcher's annotations",
+	.path = "examples::basic_examples::02_basic_matchers"
+	}))
 {
 	using namespace abc;
 	/*!

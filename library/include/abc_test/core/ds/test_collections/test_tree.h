@@ -144,13 +144,13 @@ _BEGIN_ABC_DS_NS
 			{
 				auto _l_x = upper_bound(_m_nodes_tests.begin(), _m_nodes_tests.end(), _a_test,
 					[](const node_t& _a_left, const node_t& _a_right) {
-						return _a_left.registered_test_data()._m_user_data.test_name() <
-							_a_right.registered_test_data()._m_user_data.test_name();
+						return _a_left.registered_test_data()._m_user_data.name <
+							_a_right.registered_test_data()._m_user_data.name;
 					}
 				);
 				if (_l_x != _m_nodes_tests.end() && 
-					_l_x->registered_test_data()._m_user_data.test_name() ==
-					_a_test.registered_test_data()._m_user_data.test_name())
+					_l_x->registered_test_data()._m_user_data.name ==
+					_a_test.registered_test_data()._m_user_data.name)
 				{
 					return opt_setup_error_t(setup_error_t(fmt::format(
 						"setup_test_error: post_setup_test_data_t's registered_test_data has the same description as a "

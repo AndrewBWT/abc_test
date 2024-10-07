@@ -10,27 +10,27 @@ _BEGIN_ABC_DS_NS
         /*!
         * Default constructor for tree iterator
         */
-        __constexpr
+        __no_constexpr
             test_tree_iterator_t(
             ) noexcept;
         /*!
         * Default constructor for tree iterator
         */
-        __constexpr
+        __no_constexpr
             test_tree_iterator_t(
                 test_tree_const_ptr_t _a_node_ptr
             ) noexcept;
         /*!
         * Increment operator for iterator
         */
-        __constexpr
+        __no_constexpr
             test_tree_iterator_t&
             operator++(
                 );
         /*!
         * Increment operator for iterator
         */
-        __constexpr
+        __no_constexpr
             test_tree_iterator_t
             operator++(
                 int
@@ -46,7 +46,7 @@ _BEGIN_ABC_DS_NS
         /*!
         * Dereference operator for iterator.
         */
-        __constexpr
+        __no_constexpr
             const post_setup_test_data_t&
             operator*(
             ) const;
@@ -54,21 +54,22 @@ _BEGIN_ABC_DS_NS
         size_t _m_test_index;
         using tree_stack_t = std::stack<test_tree_const_ptr_t>;
         tree_stack_t _m_stack;
-        void
+        __no_constexpr
+            void
             find_next_test(
             ) noexcept;
     };
 _END_ABC_DS_NS
 
 _BEGIN_ABC_DS_NS
-    __constexpr_imp
+    __no_constexpr_imp
         test_tree_iterator_t::test_tree_iterator_t(
         ) noexcept
         : test_tree_iterator_t(nullptr)
     {
 
     }
-    __constexpr_imp
+    __no_constexpr_imp
         test_tree_iterator_t::test_tree_iterator_t(
             test_tree_const_ptr_t _a_node_ptr
         ) noexcept
@@ -80,7 +81,7 @@ _BEGIN_ABC_DS_NS
     {
         find_next_test();
     }
-    __constexpr_imp
+    __no_constexpr_imp
         test_tree_iterator_t&
         test_tree_iterator_t::operator++(
             )
@@ -116,7 +117,7 @@ _BEGIN_ABC_DS_NS
         }
         return *this;
     }
-    __constexpr_imp
+    __no_constexpr_imp
         test_tree_iterator_t
         test_tree_iterator_t::operator++(
             int)
@@ -125,7 +126,7 @@ _BEGIN_ABC_DS_NS
         ++(*this);
         return _l_cpy;
     }
-    __constexpr_imp
+    __no_constexpr_imp
         void
         test_tree_iterator_t::find_next_test(
         ) noexcept
@@ -174,7 +175,7 @@ _BEGIN_ABC_DS_NS
         return true;
     }
 
-    __constexpr_imp
+    __no_constexpr_imp
         const post_setup_test_data_t&
         test_tree_iterator_t::operator*(
             ) const

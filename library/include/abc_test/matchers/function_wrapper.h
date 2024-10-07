@@ -13,20 +13,20 @@ public:
 	__constexpr
 		function_wrapper_matcher_t(
 		) noexcept = delete;
-	__constexpr
+	__no_constexpr
 		function_wrapper_matcher_t(
 			function_wrapper_internal_t _a_function
 		) noexcept;
 private:
 	function_wrapper_internal_t _m_function;
-	__constexpr
+	__no_constexpr
 		virtual
 		matcher_result_t
 		run(
 			test_runner_t&
 		) override final;
 };
-__constexpr
+__no_constexpr_imp
 matcher_t
 function_wrapper(
 	const function_wrapper_internal_t& _a_function
@@ -34,7 +34,7 @@ function_wrapper(
 _END_ABC_NS
 
 _BEGIN_ABC_NS
-__constexpr_imp
+__no_constexpr_imp
 	function_wrapper_matcher_t::function_wrapper_matcher_t(
 		function_wrapper_internal_t _a_function
 	) noexcept
@@ -42,7 +42,7 @@ __constexpr_imp
 {
 
 }
-__constexpr_imp
+__no_constexpr_imp
 	matcher_result_t
 	function_wrapper_matcher_t::run(
 		test_runner_t&
@@ -50,7 +50,7 @@ __constexpr_imp
 {
 	return _m_function();
 }
-__constexpr
+__no_constexpr_imp
 matcher_t
 function_wrapper(
 	const function_wrapper_internal_t& _a_function

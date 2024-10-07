@@ -21,7 +21,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 		* Checks if the file name is valid. Specificallly checks for things like an empty string,
 		* or characters not allowed in a file name.
 		*/
-		__constexpr
+		__no_constexpr
 			bool
 			is_valid(
 			) const noexcept;
@@ -53,7 +53,7 @@ struct fmt::formatter<abc::utility::io::file_name_t> : formatter<string_view>
 	/*!
 	* Provides a formatter for a poset_setup_test_data_t object
 	*/
-	__constexpr
+	__no_constexpr
 		auto
 		format(
 			abc::utility::io::file_name_t _a_fnwe,
@@ -82,7 +82,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 	{
 
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		bool
 		file_name_t::is_valid(
 		) const noexcept
@@ -112,7 +112,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 
 
 
-__constexpr_imp
+__no_constexpr_imp
 auto
 fmt::formatter<abc::utility::io::file_name_t>::format(
 	abc::utility::io::file_name_t _a_fn,

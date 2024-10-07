@@ -15,17 +15,17 @@ _BEGIN_ABC_DS_NS
 		/*!
 		* Default constructor, represents empty collection.
 		*/
-		__constexpr
+		__no_constexpr
 			finalised_test_collection_t(
 			) noexcept;
 		/*!
 		* Adds all test collection elemnets to collection
 		*/
-		__constexpr
+		__no_constexpr
 			finalised_test_collection_t(
 				const test_collection_t& _a_tc
 			) noexcept;
-		__constexpr
+		__no_constexpr
 			finalised_test_collection_t(
 				test_collection_t&& _a_tc
 			) noexcept;
@@ -39,7 +39,7 @@ _BEGIN_ABC_DS_NS
 		/*!
 		* Gets the next element in the collection
 		*/
-		__constexpr
+		__no_constexpr
 			const post_setup_test_data_t&
 			next(
 			) noexcept;
@@ -58,7 +58,7 @@ _BEGIN_ABC_DS_NS
 	_END_ABC_DS_NS
 
 _BEGIN_ABC_DS_NS
-	__constexpr_imp
+	__no_constexpr_imp
 		finalised_test_collection_t::finalised_test_collection_t(
 		) noexcept
 		: _m_tests(post_setup_test_data_collection_t{})
@@ -66,7 +66,7 @@ _BEGIN_ABC_DS_NS
 	{
 
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		finalised_test_collection_t::finalised_test_collection_t(
 			const test_collection_t& _a_tc
 		) noexcept
@@ -74,7 +74,7 @@ _BEGIN_ABC_DS_NS
 	{
 		process_test_collection(_a_tc);
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		finalised_test_collection_t::finalised_test_collection_t(
 			test_collection_t&& _a_tc
 		) noexcept
@@ -89,7 +89,7 @@ _BEGIN_ABC_DS_NS
 	{
 		return std::distance(_m_itt, _m_tests.end());
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		const post_setup_test_data_t&
 		finalised_test_collection_t::next(
 		) noexcept

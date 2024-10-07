@@ -107,7 +107,8 @@ struct fmt::formatter<abc::ds::repetition_tree_t> : formatter<string_view>
 	/*!
 	* Provides a formatter for a poset_setup_test_data_t object
 	*/
-	__constexpr
+		//Can't be constexpr due to use of fmt
+	__no_constexpr
 		auto
 		format(
 			abc::ds::repetition_tree_t _a_rt,
@@ -287,7 +288,7 @@ _BEGIN_ABC_DS_NS
 	_END_ABC_DS_NS
 
 
-__constexpr_imp
+__no_constexpr_imp
 auto
 fmt::formatter<abc::ds::repetition_tree_t>::format(
 	abc::ds::repetition_tree_t _a_rt,
@@ -297,9 +298,11 @@ fmt::formatter<abc::ds::repetition_tree_t>::format(
 {
 	using namespace std;
 	string _l_rv{ fmt::format(
-		"repetition_tree {{"
-		"top_level_for_loops = {0}}}",
-		_a_rt.print_repetition_tree()
+		"{0} {{"
+		"{1} = {2}}}"
+		, typeid(_a_rt).name()
+		, "_m_top_level_for_loops"
+		, _a_rt.print_repetition_tree()
 	) };
 	return formatter<string_view>::format(_l_rv, _a_ctx);
 }

@@ -100,7 +100,8 @@ __constexpr_imp
 		const std::string_view _a_str
 	) noexcept
 {
-	return fmt::format("\"{0}\"", _a_str);
+	using namespace std;
+	return string("\"").append(_a_str).append("\"");
 }
 __constexpr_imp
 	std::string
@@ -110,6 +111,6 @@ __constexpr_imp
 	) noexcept
 {
 	using namespace std;
-	return fmt::format("{0}{1}", string(_a_size, ' '), _a_str);
+	return string(_a_size, ' ').append(_a_str);
 }
 _END_ABC_UTILITY_STR_NS

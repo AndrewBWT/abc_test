@@ -33,13 +33,13 @@ _BEGIN_ABC_NS
 		/*!
 		* Default constructor. This should be generally used.
 		*/
-		__constexpr
+		__no_constexpr
 			test_main_t(
 			) noexcept;
 		/*!
 		* Sets the options of the object.
 		*/
-		__constexpr
+		__no_constexpr
 			void
 			set_options(
 				const test_options_t& _a_options
@@ -136,7 +136,7 @@ _BEGIN_ABC_NS
 		/*!
 		* Runs the test of the underlying object.
 		*/
-		__constexpr
+		__no_constexpr
 			void
 			run_tests(
 			) noexcept;
@@ -153,7 +153,7 @@ _BEGIN_ABC_NS
 		std::mutex _m_threads_mutex;
 		std::vector<std::jthread> _m_threads;
 		std::set<std::size_t> _m_threads_free;
-		__constexpr
+		__no_constexpr
 			void
 			run_individual_thread(
 				const ds::post_setup_test_data_t& _a_prtd,
@@ -169,7 +169,7 @@ _BEGIN_ABC_NS
 _END_ABC_NS
 
 _BEGIN_ABC_NS
-	__constexpr_imp
+__no_constexpr_imp
 		test_main_t::test_main_t(
 		) noexcept
 		: _m_test_list_collection(ds::test_lists_t())
@@ -190,7 +190,7 @@ _BEGIN_ABC_NS
 			_m_threads_free.insert(_l_idx);
 		}
 	}
-	__constexpr_imp
+__no_constexpr_imp
 		void
 		test_main_t::set_options(
 			const test_options_t& _a_options
@@ -284,7 +284,7 @@ _BEGIN_ABC_NS
 	{
 		add_error_reporter_not_owned_by_class(&_a_error_reporter);
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		void
 		test_main_t::run_tests(
 		) noexcept
@@ -398,7 +398,7 @@ _BEGIN_ABC_NS
 		_LIBRARY_LOG(MAIN_INFO, "Finalising reports.");
 		_l_global_trc.finalise_reports();
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		void
 		test_main_t::run_individual_thread(
 			const ds::post_setup_test_data_t& _a_prtd,

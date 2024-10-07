@@ -5,7 +5,7 @@ _BEGIN_ABC_NS
 class matcher_with_annotation_t
 {
 public:
-	__constexpr_imp
+	__no_constexpr_imp
 		matcher_with_annotation_t(
 			const matcher_t& _a_matcher,
 			const std::string_view _a_annotation
@@ -16,7 +16,7 @@ public:
 	{
 
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		matcher_with_annotation_t(
 			const matcher_with_annotation_t& _a_matcher,
 			const reports::single_source_t& _a_single_source
@@ -53,7 +53,7 @@ private:
 	matcher_t _m_matcher;
 	bool _m_initialised_with_source;
 };
-__constexpr_imp
+__no_constexpr_imp
 matcher_with_annotation_t
 annotate(
 	const matcher_t& _a_matcher,
@@ -62,7 +62,7 @@ annotate(
 {
 	return matcher_with_annotation_t(_a_matcher, _a_annotation);
 }
-__constexpr_imp
+__no_constexpr_imp
 matcher_with_annotation_t
 annotate(
 	const std::string_view _a_annotation,

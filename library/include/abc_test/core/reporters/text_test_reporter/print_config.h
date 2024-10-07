@@ -92,7 +92,7 @@ public:
 		const std::string_view
 		assertions_recieved_str(
 		) const noexcept;
-	__constexpr
+	__no_constexpr
 		std::string
 		assertions_recieved(
 			const std::size_t _a_passed
@@ -311,7 +311,7 @@ public:
 		highlight_fail(
 			const std::string _a_str
 		) const noexcept;
-	__constexpr
+	__no_constexpr
 		std::string
 		quote(
 			const std::string_view _a_str
@@ -499,7 +499,7 @@ print_config_t::assertions_recieved_str(
 {
 	return "Assertions evaluated";
 }
-__constexpr_imp
+__no_constexpr_imp
 std::string
 print_config_t::assertions_recieved(
 	const std::size_t _a_assertions
@@ -899,7 +899,7 @@ print_config_t::highlight_fail(
 {
 	return style(_a_str, _m_failure_style);
 }
-__constexpr_imp
+__no_constexpr_imp
 std::string
 print_config_t::quote(
 	const std::string_view _a_str

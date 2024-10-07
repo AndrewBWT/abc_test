@@ -91,7 +91,11 @@ namespace test
 	}
 }
 
-_TEST_CASE("User defined matcher", "examples::basic_examples::05_user_defined_matcher")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_05_example_01",
+	.description = "User-defined matchers",
+	.path = "examples::basic_examples::05_user_defined_matcher"
+	}))
 {
 	using namespace abc;
 	/*!
@@ -128,7 +132,11 @@ _TEST_CASE("User defined matcher", "examples::basic_examples::05_user_defined_ma
 	_CHECK(matcher_t(list_same_matcher(_l_x)));
 }
 
-_TEST_CASE("User-defined matcher using function_wrapper", "examples::basic_examples::05_user_defined_matcher")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_05_example_02",
+	.description = "User-defined matchers using function_wrapper",
+	.path = "examples::basic_examples::05_user_defined_matcher"
+	}))
 {
 	using namespace abc;
 	/*!
@@ -198,7 +206,11 @@ namespace testing
 	}
 }
 
-_TEST_CASE("User-defined matcher using function_wrapper", "examples::basic_examples::05_user_defined_matcher")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_05_example_03",
+	.description = "A second user-defined matchers using function_wrapper",
+	.path = "examples::basic_examples::05_user_defined_matcher"
+	}))
 {
 	using namespace abc;
 	/*!

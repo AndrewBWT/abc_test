@@ -10,7 +10,11 @@
 #include <ranges>
 #include <numeric>
 
-_TEST_CASE("Basic logical operators", "examples::basic_examples::03_matchers_and_logical_operators")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_03_example_01",
+	.description = "Basic logical operators examples",
+	.path = "examples::basic_examples::03_matchers_and_logical_operators"
+	}))
 {
 	using namespace abc;
 	/*!
@@ -35,7 +39,11 @@ _TEST_CASE("Basic logical operators", "examples::basic_examples::03_matchers_and
 	_CHECK(_l_1);
 }
 
-_TEST_CASE("Short-circuiting logical operators", "examples::basic_examples::03_matchers_and_logical_operators")
+_TEST_CASE(abc::test_data_t({
+	.name = "file_03_example_02",
+	.description = "Short-circuiting logical operators",
+	.path = "examples::basic_examples::03_matchers_and_logical_operators"
+	}))
 {
 	using namespace abc;
 	/*!
@@ -68,19 +76,19 @@ _TEST_CASE("Short-circuiting logical operators", "examples::basic_examples::03_m
 		//Computationaly expensive matcher which will never be evaluated.
 		_PROCESS(_l_1, true_matcher() && false_matcher());
 	}
-	_CHECK_WITH_MSG(_l_1, "Unevaluated right branch");
+	_CHECK(annotate(_l_1, "Unevaluated right branch"));
 	_l_1 = _MATCHER(false_matcher());
 	_IF_OR_STATEMENT(_l_1)
 	{
 		//Computationaly expensive matcher which will never be evaluated.
 		_PROCESS(_l_1, true_matcher() && false_matcher());
 	}
-	_CHECK_WITH_MSG(_l_1, "Evaluated right branch");
+	_CHECK(annotate(_l_1, "Evaluated right branch"));
 	_l_1 = _MATCHER(false_matcher());
 	_IF_AND_STATEMENT(_l_1)
 	{
 		//Computationaly expensive matcher which will never be evaluated.
 		_PROCESS(_l_1, true_matcher() && false_matcher());
 	}
-	_REQUIRE_WITH_MSG(_l_1, "This one will terminate!");
+	_REQUIRE(annotate(_l_1, "This one will terminate!"));
 }

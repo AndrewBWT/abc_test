@@ -33,14 +33,14 @@ _BEGIN_ABC_DS_NS
 		/*!
 		* Gets an iterator to the internal tree object
 		*/
-		__constexpr
+		__no_constexpr
 			test_tree_iterator_t
 			begin(
 			) const noexcept;
 		/*!
 		* Gets an end iterator to the internal tree object, of const type.
 		*/
-		__constexpr
+		__no_constexpr
 			test_tree_iterator_t
 			end(
 			) const noexcept;
@@ -98,14 +98,14 @@ _BEGIN_ABC_DS_NS
 			}
 		}
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		test_tree_iterator_t
 		test_collection_t::begin(
 		) const noexcept
 	{
 		return std::begin(_m_test_tree);
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		test_tree_iterator_t
 		test_collection_t::end(
 		) const noexcept

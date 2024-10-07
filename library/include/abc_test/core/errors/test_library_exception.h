@@ -16,14 +16,16 @@ _BEGIN_ABC_ERRORS_NS
 		/*!
 		* For when a simple error has been created. Only contains a stacktrace.
 		*/
-		__constexpr
+		//Not constexpr due to calling other constructor also not constexpr
+		__no_constexpr
 			test_library_exception_t(
 				const std::stacktrace& _a_stacktrace = std::stacktrace::current()
 			) noexcept;
 		/*!
 		* Simple constructor with a stactracek and a user-defined string describing the error.
 		*/
-		__constexpr
+		//Not constexpr due to base class std::exception.
+		__no_constexpr
 			test_library_exception_t(
 				const std::string_view _a_error,
 				const std::stacktrace& _a_stacktrace = std::stacktrace::current()
@@ -46,7 +48,8 @@ _BEGIN_ABC_ERRORS_NS
 		std::string _m_error;
 		std::stacktrace _m_stacktrace;
 	};
-	__constexpr
+//Can't be constexpr due to non-literal return type.
+	__no_constexpr
 		test_library_exception_t
 		unsupported_mode_exception(
 			const std::string_view _a_type,
@@ -80,7 +83,7 @@ _BEGIN_ABC_ERRORS_NS
 	_END_ABC_ERRORS_NS
 
 		_BEGIN_ABC_ERRORS_NS
-	__constexpr_imp
+	__no_constexpr_imp
 		test_library_exception_t::test_library_exception_t(
 			const std::stacktrace& _a_stacktrace
 		) noexcept
@@ -88,12 +91,13 @@ _BEGIN_ABC_ERRORS_NS
 	{
 
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		test_library_exception_t::test_library_exception_t(
 			const std::string_view _a_error,
 			const std::stacktrace& _a_stacktrace
 		) noexcept
-		: _m_error(_a_error)
+		: std::exception()
+		, _m_error(_a_error)
 		, _m_stacktrace(_a_stacktrace)
 	{
 
@@ -112,7 +116,7 @@ _BEGIN_ABC_ERRORS_NS
 	{
 		return _m_error;
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		test_library_exception_t
 		unsupported_mode_exception(
 			const std::string_view _a_type,

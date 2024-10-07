@@ -179,7 +179,7 @@ __constexpr_imp
 	//	mid_execution_test_reporters_t(),
 		_a_iti.has_post_setup_test_data() && 
 		_a_iti.post_setup_test_data().has_registered_test_data() ?
-		std::optional<std::string>(_a_iti.post_setup_test_data().registered_test_data()._m_user_data.test_name()) :
+		std::optional<std::string>(_a_iti.post_setup_test_data().registered_test_data()._m_user_data.name) :
 		std::optional<std::string>(),
 		_a_iti.has_post_setup_test_data() &&
 		_a_iti.post_setup_test_data().has_registered_test_data() ?
@@ -187,7 +187,7 @@ __constexpr_imp
 		reports::single_source_t(),
 		_a_iti.has_post_setup_test_data() &&
 		_a_iti.post_setup_test_data().has_registered_test_data() ?
-		_a_iti.post_setup_test_data().registered_test_data()._m_user_data.test_path() : "",
+		_a_iti.post_setup_test_data().registered_test_data()._m_user_data.path : "",
 		_a_iti.has_post_setup_test_data() &&
 		_a_iti.post_setup_test_data().has_repetition_data() ?
 		_a_iti.post_setup_test_data().repetition_data().print_repetition_tree() : "",

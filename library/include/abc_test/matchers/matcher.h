@@ -10,23 +10,23 @@ using matcher_internal_ptr_const_ref_t = const matcher_internal_ptr_t&;
 struct matcher_t
 {
 public:
-	__constexpr
+	__no_constexpr
 		matcher_t(
 		) noexcept;
-	__constexpr
+	__no_constexpr
 		explicit
 		matcher_t(
 			const bool _a_bool
 		) noexcept;
-	__constexpr
+	__no_constexpr
 		matcher_t(
 			generic_matcher_t* _a_matcher_internal
 		) noexcept;
-	__constexpr
+	__no_constexpr
 		matcher_t(
 			matcher_internal_ptr_t _a_matcher_internal
 		) noexcept;
-	__constexpr_imp
+	__no_constexpr_imp
 		matcher_t(
 			const matcher_t& _a_matcher,
 			const reports::single_source_t& _a_single_source
@@ -47,13 +47,13 @@ public:
 		matcher_internal_ptr_const_ref_t
 		internal_matcher(
 		) const noexcept;
-	__constexpr
+	__no_constexpr
 		bool
 		or_statement(
 			const reports::single_source_t& _a_single_source,
 			test_runner_t& _a_test_runner = abc::global::get_this_threads_test_runner_ref()
 		) noexcept;
-	__constexpr
+	__no_constexpr
 		bool
 		and_statement(
 			const reports::single_source_t& _a_single_source,
@@ -65,7 +65,7 @@ public:
 			const matcher_t& _a_matcher,
 			const reports::single_source_t& _a_single_source
 		);
-	__constexpr
+	__no_constexpr_imp
 		matcher_t
 		operator!(
 			) const noexcept
@@ -73,12 +73,12 @@ public:
 		return matcher_t(matcher_internal_ptr_t(
 			new logic_matcher_t<NOT>(this->internal_matcher())));
 	}
-	__constexpr
+	__no_constexpr
 		matcher_t
 		operator&&(
 			const matcher_t& _a_matcher
 			) const noexcept;
-	__constexpr
+	__no_constexpr
 		matcher_t
 		operator||(
 			const matcher_t& _a_matcher
@@ -95,20 +95,20 @@ private:
 			const matcher_t& _a_matcher
 		) noexcept;
 };
-__constexpr
+__no_constexpr_imp
 matcher_t
 matcher(
 	generic_matcher_t* _a_generic_matcher_ptr
 ) noexcept;
-__constexpr
+__no_constexpr_imp
 matcher_t
 true_matcher(
 ) noexcept;
-__constexpr
+__no_constexpr_imp
 matcher_t
 false_matcher(
 ) noexcept;
-__constexpr
+__no_constexpr_imp
 matcher_t
 bool_matcher(
 	const bool _a_bool
@@ -116,13 +116,13 @@ bool_matcher(
 _END_ABC_NS
 
 _BEGIN_ABC_NS
-__constexpr_imp
+__no_constexpr_imp
 matcher_t::matcher_t(
 ) noexcept
 	: matcher_t(true)
 {
 }
-__constexpr_imp
+__no_constexpr_imp
 matcher_t::matcher_t(
 	const bool _a_bool
 ) noexcept
@@ -133,7 +133,7 @@ matcher_t::matcher_t(
 {
 
 }
-__constexpr_imp
+__no_constexpr_imp
 matcher_t::matcher_t(
 	generic_matcher_t* _a_matcher_internal
 ) noexcept
@@ -141,7 +141,7 @@ matcher_t::matcher_t(
 {
 
 }
-__constexpr_imp
+__no_constexpr_imp
 matcher_t::matcher_t(
 	matcher_internal_ptr_t _a_matcher_internal
 ) noexcept
@@ -170,7 +170,7 @@ __constexpr_imp
 {
 	return _m_matcher_internal;
 }
-__constexpr_imp
+__no_constexpr_imp
 	bool
 	matcher_t::or_statement(
 		const reports::single_source_t& _a_single_source,
@@ -183,7 +183,7 @@ __constexpr_imp
 	_m_matcher_internal->add_source_info(_a_single_source);
 	return not _l_result;
 }
-__constexpr_imp
+__no_constexpr_imp
 	bool
 	matcher_t::and_statement(
 		const reports::single_source_t& _a_single_source,
@@ -215,7 +215,7 @@ __constexpr_imp
 		this->_m_matcher_internal->add_source_info(_a_single_source);
 	}
 }
-__constexpr_imp
+__no_constexpr_imp
 	matcher_t
 	matcher_t::operator&&(
 		const matcher_t& _a_matcher
@@ -224,7 +224,7 @@ __constexpr_imp
 	return matcher(new logic_matcher_t<AND>(this->internal_matcher(),
 		_a_matcher.internal_matcher()));
 }
-__constexpr_imp
+__no_constexpr_imp
 	matcher_t
 	matcher_t::operator||(
 		const matcher_t& _a_matcher
@@ -254,7 +254,7 @@ matcher_t::process_(
 		return false;
 	}
 }
-__constexpr_imp
+__no_constexpr_imp
 	matcher_t
 	matcher(
 		generic_matcher_t* _a_generic_matcher_ptr
@@ -262,21 +262,21 @@ __constexpr_imp
 {
 	return matcher_t(matcher_internal_ptr_t(_a_generic_matcher_ptr));
 }
-__constexpr_imp
+__no_constexpr_imp
 matcher_t
 true_matcher(
 ) noexcept
 {
 	return matcher(new true_matcher_t());
 }
-__constexpr_imp
+__no_constexpr_imp
 matcher_t
 false_matcher(
 ) noexcept
 {
 	return matcher(new false_matcher_t());
 }
-__constexpr_imp
+__no_constexpr_imp
 matcher_t
 bool_matcher(
 	const bool _a_bool

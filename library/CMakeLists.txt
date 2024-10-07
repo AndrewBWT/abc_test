@@ -30,6 +30,7 @@ set(LIBRARY_FILES
   include/abc_test/core/ds/test_data/registered_test_data.h
   include/abc_test/core/ds/test_data/post_setup_test_data.h
   include/abc_test/core/ds/test_data/user_defined_test_data.h
+  include/abc_test/core/ds/test_data/checked_user_defined_test_data.h
   include/abc_test/core/ds/test_data/macros.h
   # Bespoke data structures for the library for storing tests in various forms.
   include/abc_test/core/ds/test_collections/test_list.h

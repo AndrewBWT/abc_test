@@ -132,7 +132,7 @@ struct fmt::formatter<abc::ds::post_setup_test_data_t> : formatter<string_view>
 	/*!
 	* Provides a formatter for a poset_setup_test_data_t object
 	*/
-	__constexpr
+	__no_constexpr
 		auto 
 		format(
 			abc::ds::post_setup_test_data_t _a_pstd, 
@@ -159,10 +159,10 @@ _BEGIN_ABC_DS_NS
 			const size_t _a_maximum_threads_allowed
 		) noexcept
 		: post_setup_test_data_t(&_a_registered_test_data,
-			utility::str::split_string(_a_registered_test_data._m_user_data.test_path(), _a_test_hierarchy_delimiter)
+			utility::str::split_string(_a_registered_test_data._m_user_data.path, _a_test_hierarchy_delimiter)
 			, _a_discovery_id, _a_is_test_to_be_ran, _a_repetition_data,
-			_a_registered_test_data._m_user_data.thread_resourses_required() == 0 ?
-			_a_maximum_threads_allowed : std::min(_a_maximum_threads_allowed, _a_registered_test_data._m_user_data.thread_resourses_required()))
+			_a_registered_test_data._m_user_data.threads_required == 0 ?
+			_a_maximum_threads_allowed : std::min(_a_maximum_threads_allowed, _a_registered_test_data._m_user_data.threads_required))
 	{
 
 	}
@@ -263,7 +263,7 @@ _BEGIN_ABC_DS_NS
 	}
 	_END_ABC_DS_NS
 
-__constexpr_imp
+__no_constexpr_imp
 	auto 
 	fmt::formatter<abc::ds::post_setup_test_data_t>::format(
 		abc::ds::post_setup_test_data_t _a_pstd,

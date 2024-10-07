@@ -30,13 +30,13 @@ _BEGIN_ABC_NS
 struct log_test_msg_t
 {
 public:
-	__constexpr
+	__no_constexpr
 		log_test_msg_t(
 			const reports::single_source_t& _a_single_source,
 			const std::string_view _a_str,
 			const bool _a_delete_after_use
 		) noexcept;
-	__constexpr
+	__no_constexpr
 		~log_test_msg_t(
 		) noexcept;
 	__constexpr
@@ -57,7 +57,7 @@ _END_ABC_NS
 
 _BEGIN_ABC_NS
 
-__constexpr_imp
+__no_constexpr_imp
 	log_test_msg_t::log_test_msg_t(
 		const reports::single_source_t& _a_single_source,
 		const std::string_view _a_str,
@@ -70,7 +70,7 @@ __constexpr_imp
 	using namespace global;
 	get_this_threads_test_runner_ref().register_tests_most_recent_source(_a_single_source);
 }
-__constexpr_imp
+__no_constexpr_imp
 	log_test_msg_t::~log_test_msg_t(
 	) noexcept
 {

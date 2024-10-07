@@ -41,13 +41,13 @@ public:
 	/*!
 	Constructor for std::cout to be where the output is posted.
 	*/
-	__constexpr
+	__no_constexpr
 		text_test_reporter_t(
 		) noexcept;
 	/*!
 	Constructor whcih allows a file to be where the output is posted.
 	*/
-	__constexpr
+	__no_constexpr
 		text_test_reporter_t(
 			const utility::io::file_name_t& _a_file_output
 		) noexcept;
@@ -83,7 +83,7 @@ _BEGIN_ABC_REPORTERS_NS
 	, _m_has_colour_output(false)
 	{
 	}
-	__constexpr_imp
+__no_constexpr_imp
 		text_test_reporter_t::text_test_reporter_t(
 			const utility::io::file_name_t& _a_file_output
 		) noexcept

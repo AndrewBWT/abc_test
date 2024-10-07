@@ -23,13 +23,14 @@ public:
 	/*!
 	* Default constructor
 	*/
-	__constexpr
+	//Can't be constexpr due to std::filesystem::current_path.
+	__no_constexpr
 		test_options_t(
 		) noexcept;
 	/*!
 	* Validates the input to ensure it is correct
 	*/
-	__constexpr
+	__no_constexpr
 		void
 		validate_input(
 			reporters::error_reporter_controller_t& _a_erc
@@ -37,14 +38,15 @@ public:
 	/*!
 	* Checks if this configuration of test_options allows tests to be repeated.
 	*/
-	__constexpr
+	//Can't be constexpr due to use of map.
+	__no_constexpr
 		bool
 		repeating_tests(
 		) const noexcept;
 	/*!
 	* Checks if a specific test is to be re-ran.
 	*/
-	__constexpr
+	__no_constexpr
 		bool
 		check_if_test_is_to_be_ran(
 			const size_t _m_discovery_id
@@ -114,7 +116,7 @@ private:
 		validate_repeat_tests_string(
 			reporters::error_reporter_controller_t& _a_erc
 		) noexcept;
-	__constexpr
+	__no_constexpr
 		void
 		verify_no_confliting_options(
 			reporters::error_reporter_controller_t& _a_erc
@@ -127,7 +129,7 @@ namespace
 _END_ABC_NS
 
 _BEGIN_ABC_NS
-__constexpr_imp
+__no_constexpr_imp
 	test_options_t::test_options_t(
 	) noexcept
 	: _m_path_delimiter("::")
@@ -156,7 +158,7 @@ __constexpr_imp
 	, _m_store_passed_test_assertions(true)
 {
 }
-__constexpr_imp
+__no_constexpr_imp
 	void
 	test_options_t::validate_input(
 		reporters::error_reporter_controller_t& _a_erc
@@ -165,14 +167,14 @@ __constexpr_imp
 	validate_repeat_tests_string(_a_erc);
 	verify_no_confliting_options(_a_erc);
 }
-__constexpr_imp
+__no_constexpr_imp
 	bool
 	test_options_t::repeating_tests(
 	) const noexcept
 {
 	return _m_test_repetition_configurations.size() > 0;
 }
-__constexpr_imp
+__no_constexpr_imp
 	bool
 	test_options_t::check_if_test_is_to_be_ran(
 		const size_t _m_discovery_id
@@ -288,7 +290,7 @@ __constexpr_imp
 	}
 }
 
-__constexpr_imp
+__no_constexpr_imp
 	void
 	test_options_t::verify_no_confliting_options(
 		reporters::error_reporter_controller_t& _a_erc

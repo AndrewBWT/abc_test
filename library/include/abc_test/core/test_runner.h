@@ -26,7 +26,7 @@ public:
 	/*!
 	* Main constructor used; initialises the test_reporter controller and global test_options
 	*/
-	__constexpr
+	__no_constexpr
 		test_runner_t(
 			reporters::test_reporter_controller_t& _a_trc,
 			const test_options_t& _a_test_options
@@ -44,7 +44,7 @@ public:
 		register_tests_most_recent_source(
 			const reports::source_pair_t& _a_source_locations
 		) noexcept;
-	__constexpr
+	__no_constexpr
 		std::list<const log_test_msg_t*>::iterator
 		add_error_info(
 			const log_test_msg_t* _a_log
@@ -181,7 +181,7 @@ private:
 _END_ABC_NS
 
 _BEGIN_ABC_NS
-	__constexpr_imp
+	__no_constexpr_imp
 		test_runner_t::test_runner_t(
 			reporters::test_reporter_controller_t& _a_trc,
 			const test_options_t& _a_test_options
@@ -214,20 +214,7 @@ _BEGIN_ABC_NS
 	{
 		
 	}
-	/*__constexpr_imp
-		void
-		test_runner_t::add_error(
-			const errors::test_failure_info_t& _a_str
-		) noexcept
-	{
-		using namespace std;
-		using namespace ds;
-		_m_after_execution_test_report
-		_m_error_infos.add_error_msg(_a_str);
-		vector<repetition_data_t> _l_rds{ _m_current_test.for_loop_data_collection().inform_test_generators_of_failure() };
-		_m_current_test.update_repetition_tree(_l_rds);
-	}*/
-	__constexpr_imp
+	__no_constexpr_imp
 		std::list<const log_test_msg_t*>::iterator
 		test_runner_t::add_error_info(
 			const log_test_msg_t* _a_log
