@@ -33,9 +33,7 @@ set(LIBRARY_FILES
   include/abc_test/core/ds/test_data/checked_user_defined_test_data.h
   include/abc_test/core/ds/test_data/macros.h
   # Bespoke data structures for the library for storing tests in various forms.
-  include/abc_test/core/ds/test_collections/test_list.h
   include/abc_test/core/ds/test_collections/test_collection.h
-  include/abc_test/core/ds/test_collections/finalised_test_collection.h
   include/abc_test/core/ds/test_collections/test_tree.h
       src/abc_test/core/ds/test_collections/test_tree.cpp
   include/abc_test/core/ds/test_collections/test_tree_iterator.h

@@ -1,9 +1,7 @@
 #pragma once
 
 #include "abc_test/core/ds/test_collections/test_collection.h"
-#include "abc_test/core/ds/test_collections/test_list.h"
 #include "abc_test/core/test_options.h"
-#include "abc_test/core/ds/test_collections/finalised_test_collection.h"
 
 #include <thread>
 #include <syncstream>
@@ -204,7 +202,7 @@ __no_constexpr_imp
 		test_main_t::add_global_test_list(
 		) noexcept
 	{
-		add_test_list_not_owned_by_class(ds::get_global_test_list());
+		add_test_list_not_owned_by_class(global::get_global_test_list());
 	}
 	__constexpr_imp
 		void
@@ -329,15 +327,17 @@ __no_constexpr_imp
 			_LIBRARY_LOG(MAIN_INFO, "Exiting due to error when adding tests.");
 			return;
 		}
-		_LIBRARY_LOG(MAIN_INFO, "Creating finalised_test_collection_t.");
-		finalised_test_collection_t _l_ftc(_l_tc);
+		_LIBRARY_LOG(MAIN_INFO, "Running make_finalied_post_setup_test_list_in_run_order");
+		const post_setup_test_list_t _l_pstd{ _l_tc.make_finalied_post_setup_test_list_in_run_order()};
+		post_setup_test_list_itt_t _l_pstd_itt{ _l_pstd.begin() };
+		const post_setup_test_list_itt_t _l_pstd_end{ _l_pstd.end() };
 		_l_global_trc.add_reporters(_m_test_reporters);
 		//The actual logic for running the threads
 		_LIBRARY_LOG(MAIN_INFO, "Beginning loop going through all tests.");
-		while (_l_ftc.remaining_elements() > 0 && _l_erc.should_exit() == false)
+		while (_l_pstd_itt != _l_pstd_end && _l_erc.should_exit() == false)
 		{
 			//Get the current element in the list.
-			const post_setup_test_data_t& _l_test{ _l_ftc.next() };
+			const post_setup_test_data_t& _l_test{ (*_l_pstd_itt++).get()};
 			_LIBRARY_LOG(MAIN_INFO, fmt::format("Loaded test {0}.", _l_test));
 			//Find out the resourses required for this test;
 			const size_t _l_next_thread_size{ _l_test.thread_resourses_required()};
@@ -390,7 +390,7 @@ __no_constexpr_imp
 				"The entire testing harness was terminated. There were {0} tests which were not run at all, and "
 				"{1} terminated due to catastrophic error(s). "
 				"We would highly suggest either checking your program, or contacting the developer of this library.",
-				_l_ftc.remaining_elements(),
+				std::distance(_l_pstd_itt, _l_pstd_end),
 				_l_erc.catastrophic_errors()
 			));
 			_l_erc.hard_exit();

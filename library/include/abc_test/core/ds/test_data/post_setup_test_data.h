@@ -30,7 +30,7 @@ public:
 		post_setup_test_data_t(
 			const registered_test_data_t& _a_registered_test_data,
 			const test_path_delimiter_ref _a_test_hierarchy_delimiter,
-			const size_t _a_discovery_id,
+			const unique_id_t _a_discovery_id,
 			const bool _a_is_test_to_be_ran,
 			const ds::repetition_tree_t* _a_repetition_data,
 			const size_t _a_maximum_threads_allowed
@@ -64,7 +64,7 @@ public:
 	 * @return The test's discovery ID.
 	 */
 	__constexpr
-		std::size_t
+		unique_id_t
 		discovery_id(
 		) const noexcept;
 	/*!
@@ -108,7 +108,7 @@ public:
 private:
 	const registered_test_data_t& _m_registered_test_data;
 	test_path_hierarchy_t _m_test_path_hierarchy;
-	size_t _m_discovery_id;
+	unique_id_t _m_discovery_id;
 	bool _m_is_test_to_be_ran;
 	size_t _m_thread_resourses_required;
 	const ds::repetition_tree_t* _m_repetition_data;
@@ -140,7 +140,7 @@ __constexpr_imp
 post_setup_test_data_t::post_setup_test_data_t(
 	const registered_test_data_t& _a_registered_test_data,
 	const test_path_delimiter_ref _a_test_hierarchy_delimiter,
-	const size_t _a_discovery_id,
+	const unique_id_t _a_discovery_id,
 	const bool _a_is_test_to_be_ran,
 	const ds::repetition_tree_t* _a_repetition_data,
 	const size_t _a_maximum_threads_allowed
@@ -179,7 +179,7 @@ post_setup_test_data_t::is_test_to_be_ran(
 	return _m_is_test_to_be_ran;
 }
 __constexpr_imp
-size_t
+unique_id_t
 post_setup_test_data_t::discovery_id(
 ) const noexcept
 {

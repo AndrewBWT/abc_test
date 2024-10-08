@@ -12,7 +12,6 @@
 
 #include "fmt/format.h"
 
-#include "abc_test/core/ds/test_collections/test_list.h"
 #include "abc_test/core/ds/source/single_source.h"
 
 #include "abc_test/core/ds/test_data/checked_user_defined_test_data.h"

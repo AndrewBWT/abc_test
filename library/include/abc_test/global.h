@@ -5,6 +5,11 @@
 #include "abc_test/core/reporters/test_reporter_controller.h"
 
 #include "abc_test/core/test_runner.h"
+#include "abc_test/core/ds/type_synonyms.h"
+
+_BEGIN_ABC_DS_NS
+struct registered_test_data_t;
+_END_ABC_DS_NS
 
 /*!
 * This file contains all of the functions which access and modify global variables in the
@@ -93,6 +98,39 @@ __no_constexpr
 	reporters::error_reporter_controller_t&
 	get_global_error_reporter_controller(
 	) noexcept;
+/*!
+* Get the global test_list.
+*/
+//Can't be constexpr due to use of calling et_mutable_test_list
+__no_constexpr
+const ds::test_list_t&
+get_global_test_list(
+) noexcept;
+/*!
+* Add a test to the global test_list.
+*/
+//Can't be constexpr due to use of calling et_mutable_test_list
+__no_constexpr
+std::size_t
+add_test(
+	const ds::test_list_element_t& _a_test_list_internal
+) noexcept;
+/*!
+* Clear the global test_list.
+*/
+//Can't be constexpr due to use of calling et_mutable_test_list
+__no_constexpr
+void
+clear_test_list(
+) noexcept;
+namespace
+{
+	//Can't be constexpr due to use of static var.
+	__no_constexpr
+		ds::test_list_t&
+		get_mutable_test_list(
+		) noexcept;
+}
 namespace
 {
 	__no_constexpr
@@ -201,6 +239,45 @@ namespace
 		static error_reporter_controller_t _s_erc;
 		_s_erc.set_test_options(get_inner_global_test_options());
 		return _s_erc;
+	}
+}
+__no_constexpr_imp
+const ds::test_list_t&
+get_global_test_list(
+) noexcept
+{
+	return get_mutable_test_list();
+}
+__no_constexpr_imp
+std::size_t
+add_test(
+	const ds::test_list_element_t& _a_test_list_internal
+) noexcept
+{
+	using namespace ds;
+	test_list_t& _l_test_list{ get_mutable_test_list() };
+	_l_test_list.push_back(_a_test_list_internal);
+	return 0;
+}
+__no_constexpr_imp
+void
+clear_test_list(
+) noexcept
+{
+	using namespace ds;
+	test_list_t& _l_test_list{ get_mutable_test_list() };
+	_l_test_list.clear();
+}
+namespace
+{
+	__no_constexpr_imp
+		ds::test_list_t&
+		get_mutable_test_list(
+		) noexcept
+	{
+		using namespace ds;
+		static test_list_t _static_test_list;
+		return _static_test_list;
 	}
 }
 _END_ABC_GLOBAL_NS
