@@ -356,7 +356,7 @@ __no_constexpr_imp
 					}
 				);
 			}
-			if (_l_erc.should_exit() == false)
+			if (_l_erc.should_exit() == false && _m_threads_free.size() > 0)
 			{
 				//Otherwise, get a lock for the threads, remove the resousrses...
 				unique_lock _l_thread_lock(_m_threads_mutex);

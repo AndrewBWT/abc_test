@@ -180,20 +180,15 @@ struct fmt::formatter<abc::ds::repetition_tree_for_loop_index_data_t> : formatte
 			const repetition_data_t& _l_element{ _a_rds[_a_idx] };
 			for (repetition_tree_for_loop_iteration_data_t& _l_rfl : _m_for_loop_member)
 			{
-				if (_l_rfl == _l_element)
+				if (_l_rfl.for_loop_iteration_data == _l_element.for_loop_iteration_data)
 				{
 					//Its added. Move on down.
 					return _l_rfl.add_repetition(_a_rds, _a_idx + 1);
 				}
 			}
-			repetition_tree_for_loop_iteration_data_t _l_to_insert{ _l_element.generation_collection_index(),
-				_l_element.mode(),
-				_l_element.additional_data() };
-			auto _l_x = upper_bound(_m_for_loop_member.begin(), _m_for_loop_member.end(), _l_to_insert);// ,
-			//	[](const repetition_tree_for_loop_iteration_data_t& _a_left, const repetition_tree_for_loop_iteration_data_t& _a_right) {return
-
-			//	std::tuple(_a_left.additional_data(), _a_left.generation_index(), _a_left.mode()) <
-			//	std::tuple(_a_right.additional_data(), _a_right.generation_index(), _a_right.mode()); });
+			repetition_tree_for_loop_iteration_data_t _l_to_insert(_l_element.for_loop_iteration_data);
+			auto _l_x = upper_bound(_m_for_loop_member.begin(), _m_for_loop_member.end(), _l_to_insert,
+				[](const auto& _a_lhs, const auto& _a_rhs) {return _a_lhs.for_loop_iteration_data < _a_rhs.for_loop_iteration_data; });// ,
 			auto _l_itt = _m_for_loop_member.insert(
 				_m_for_loop_member.end(),
 				_l_to_insert
@@ -213,11 +208,7 @@ struct fmt::formatter<abc::ds::repetition_tree_for_loop_index_data_t> : formatte
 		if (_a_idx >= _a_rds.size())
 		{
 			const repetition_tree_for_loop_iteration_data_t& _l_rfl{ _m_for_loop_member[0] };
-			const repetition_data_t _l_rv(
-				_a_idx,
-				_l_rfl.generation_index(),
-				_l_rfl.mode(),
-				_l_rfl.additional_data());
+			const repetition_data_t _l_rv(_a_idx, _l_rfl.for_loop_iteration_data);
 			_LIBRARY_LOG(REPETITION_INFO, fmt::format("_a_idx ({0}) >= _a_rds.size() ({1}), "
 				"returning {2}", _a_idx, _a_rds.size(), _l_rv));
 			return _l_rv;
@@ -227,9 +218,7 @@ struct fmt::formatter<abc::ds::repetition_tree_for_loop_index_data_t> : formatte
 			const repetition_data_t& _l_fst{ _a_rds[_a_idx] };
 			for (const repetition_tree_for_loop_iteration_data_t& _l_rfl : _m_for_loop_member)
 			{
-				if (_l_rfl.additional_data() == _l_fst.additional_data() &&
-					_l_rfl.generation_index() == _l_fst.generation_collection_index() &&
-					_l_rfl.mode() == _l_fst.mode())
+				if (_l_rfl.for_loop_iteration_data == _l_fst.for_loop_iteration_data)
 				{
 					//Its added. Move on down.
 					_LIBRARY_LOG(REPETITION_INFO, fmt::format(
@@ -270,14 +259,11 @@ struct fmt::formatter<abc::ds::repetition_tree_for_loop_index_data_t> : formatte
 			size_t _l_idx{ 0 };
 			for (const repetition_tree_for_loop_iteration_data_t& _l_rfl : _m_for_loop_member)
 			{
-				if (_l_rfl == _l_fst &&
+				if (_l_rfl.for_loop_iteration_data == _l_fst.for_loop_iteration_data &&
 					_l_idx + 1 < _m_for_loop_member.size())
 				{
-					const repetition_data_t _l_rv(
-						_m_for_loop_index,
-						_m_for_loop_member[_l_idx + 1].generation_index(),
-						_m_for_loop_member[_l_idx + 1].mode(),
-						_m_for_loop_member[_l_idx + 1].additional_data());
+					const repetition_data_t _l_rv{
+						_m_for_loop_index,_m_for_loop_member[_l_idx + 1].for_loop_iteration_data };
 					_LIBRARY_LOG(REPETITION_INFO, fmt::format(
 						"_a_idx + 1 ({0}) == _a_rds.size() ({1}), "
 						"_a_rds[_a_idx] = {2}, "
@@ -299,7 +285,7 @@ struct fmt::formatter<abc::ds::repetition_tree_for_loop_index_data_t> : formatte
 			const repetition_data_t& _l_fst{ _a_rds[_a_idx] };
 			for (const repetition_tree_for_loop_iteration_data_t& _l_rfl : _m_for_loop_member)
 			{
-				if (_l_rfl == _l_fst)
+				if (_l_rfl.for_loop_iteration_data == _l_fst.for_loop_iteration_data)
 				{
 					//Its added. Move on down.
 					_LIBRARY_LOG(REPETITION_INFO, fmt::format(
@@ -340,7 +326,7 @@ struct fmt::formatter<abc::ds::repetition_tree_for_loop_index_data_t> : formatte
 			size_t _l_idx{ 0 };
 			for (const repetition_tree_for_loop_iteration_data_t& _l_rfl : _m_for_loop_member)
 			{
-				if (_l_rfl == _l_fst)
+				if (_l_rfl.for_loop_iteration_data == _l_fst.for_loop_iteration_data)
 				{
 					return true;
 				}
@@ -353,7 +339,7 @@ struct fmt::formatter<abc::ds::repetition_tree_for_loop_index_data_t> : formatte
 			const repetition_data_t& _l_fst{ _a_rds[_a_idx] };
 			for (const repetition_tree_for_loop_iteration_data_t& _l_rfl : _m_for_loop_member)
 			{
-				if (_l_rfl == _l_fst)
+				if (_l_rfl.for_loop_iteration_data == _l_fst.for_loop_iteration_data)
 				{
 					//Its added. Move on down.
 					_LIBRARY_LOG(REPETITION_INFO, fmt::format(

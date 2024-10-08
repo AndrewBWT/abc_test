@@ -13,7 +13,7 @@
 #include "abc_test/utility/io/file/file_writer.h"
 #include "abc_test/core/ds/repetitions/repetition_data.h"
 #include "abc_test/utility/io/file/file_rw.h"
-#include "abc_test/core/ds/types.h"
+#include "abc_test/core/ds/type_synonyms.h"
 
 _BEGIN_ABC_NS
 /*!
@@ -35,6 +35,10 @@ public:
 	__constexpr
 		ds::repetition_data_t*
 		repetition_data_ptr(
+		) noexcept;
+	__constexpr
+		ds::repetition_data_t&
+		repetition_data_ref(
 		) noexcept;
 	__constexpr
 		std::size_t
@@ -117,11 +121,21 @@ template<
 	typename T
 >
 __constexpr_imp
+ds::repetition_data_t&
+gen_data_base_t<T>::repetition_data_ref(
+) noexcept
+{
+	return _m_repetition_data;
+}
+template<
+	typename T
+>
+__constexpr_imp
 	std::size_t
 	gen_data_base_t<T>::mode(
 	) const noexcept
 {
-	return _m_repetition_data.mode();
+	return _m_repetition_data.for_loop_iteration_data.mode;
 }
 template<
 	typename T
@@ -131,7 +145,7 @@ __constexpr_imp
 	gen_data_base_t<T>::finish_setup(
 	) noexcept
 {
-	_m_repetition_data.set_mode(determine_mode());
-	_m_repetition_data.set_string(get_rep_string());
+	_m_repetition_data.for_loop_iteration_data.mode = determine_mode();
+	_m_repetition_data.for_loop_iteration_data.additional_data = get_rep_string();
 }
 _END_ABC_NS

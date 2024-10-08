@@ -104,7 +104,8 @@ using static_rep_data_t = std::size_t;
 	* Constructor which should be used. It creates a singleton collection.
 	*/
 	template<
-		typename R
+		typename T,
+		typename R = std::vector<T>
 	>
 	__constexpr
 		gen_data_collection_t<std::ranges::range_value_t<R>>
@@ -139,10 +140,10 @@ _BEGIN_ABC_NS
 		) noexcept
 		: gen_data_with_repetition_type_t<T, static_rep_data_t>(0)
 	//	: gen_data_base_t<T>(0, std::optional<utility::io::file_rw_info_t<T>>{}, "", std::vector<T>())
-	//	, _m_elements(std::ranges::size(_a_init_list) == 0 ?
-	//		nullptr : 
-	//		new T[std::ranges::size(_a_init_list)])
-	//	, _m_elements_size(_a_init_list.size())
+		, _m_elements(std::ranges::size(_a_init_list) == 0 ?
+			nullptr : 
+			new T[std::ranges::size(_a_init_list)])
+		, _m_elements_size(_a_init_list.size())
 	{
 		for (std::size_t _l_idx{ 0 }; auto&& _l_element : _a_init_list)
 		{
@@ -246,8 +247,10 @@ _BEGIN_ABC_NS
 		return false;
 	}
 	template<
+		typename T,
 		typename R
 	>
+	requires std::same_as<std::ranges::range_value_t<R>,T>
 	__constexpr_imp
 		gen_data_collection_t<std::ranges::range_value_t<R>>
 		iterate_over(
@@ -255,7 +258,7 @@ _BEGIN_ABC_NS
 		)
 	{
 		using namespace std;
-		using T = ranges::range_value_t<R>;
-		return unary_collection<T>(new static_data_t<T>(forward<R>(_a_init_list)));
+		using TT = ranges::range_value_t<R>;
+		return unary_collection<T>(new static_data_t<TT>(forward<R>(_a_init_list)));
 	}
 _END_ABC_NS

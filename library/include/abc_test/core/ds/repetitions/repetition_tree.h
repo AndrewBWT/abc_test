@@ -159,7 +159,7 @@ _BEGIN_ABC_DS_NS
 		using enum utility::internal::internal_log_enum_t;
 		const repetition_data_sequence_t& _l_rds{ _a_for_loop_data_collection.repetition_data_sequence() };
 		const size_t _l_for_loop_to_check{ _l_rds.size() == 0 ? _a_for_loop_data_collection.current_for_loop_index() :
-			_l_rds[0].for_loop_index()};
+			_l_rds[0].for_loop_index};
 		_LIBRARY_LOG(REPETITION_INFO, fmt::format("Find next for loop, _l_rds = {0}, "
 			"_l_for_loop_to_check = {1}", _l_rds, _l_for_loop_to_check));
 		const vector< repetition_tree_for_loop_index_data_t>::const_iterator _l_itt{ find_with_for_loop_index(_l_for_loop_to_check) };
@@ -185,7 +185,7 @@ _BEGIN_ABC_DS_NS
 		using namespace std;
 		using enum utility::internal::internal_log_enum_t;
 		const repetition_data_sequence_t& _l_rds{ _a_for_loop_data_collection.repetition_data_sequence() };
-		const size_t _l_for_loop_to_check{ _l_rds[0].for_loop_index() };
+		const size_t _l_for_loop_to_check{ _l_rds[0].for_loop_index };
 		_LIBRARY_LOG(REPETITION_INFO, fmt::format("Increment last index, _l_rds = {0}, "
 			"_l_for_loop_to_check = {1}", _l_rds, _l_for_loop_to_check));
 		const vector< repetition_tree_for_loop_index_data_t>::const_iterator _l_itt{ find_with_for_loop_index(_l_for_loop_to_check) };
@@ -217,7 +217,7 @@ _BEGIN_ABC_DS_NS
 		}
 		else
 		{
-			const size_t _l_for_loop_to_check{ _l_rds[0].for_loop_index() };
+			const size_t _l_for_loop_to_check{ _l_rds[0].for_loop_index };
 			_LIBRARY_LOG(REPETITION_INFO, fmt::format("Is repetition to be repeated. _l_rds = {0}, "
 				"_l_for_loop_to_check = {1}", _l_rds, _l_for_loop_to_check));
 			const vector< repetition_tree_for_loop_index_data_t>::const_iterator _l_itt{ find_with_for_loop_index(_l_for_loop_to_check) };
@@ -250,13 +250,13 @@ _BEGIN_ABC_DS_NS
 			const repetition_data_t& _l_fst{ _a_rds[0] };
 			for (repetition_tree_for_loop_index_data_t& _l_rfl : _m_top_level_for_loops)
 			{
-				if (_l_rfl.for_loop_index() == _l_fst.for_loop_index())
+				if (_l_rfl.for_loop_index() == _l_fst.for_loop_index)
 				{
 					//Its added. Move on down.
 					return _l_rfl.add_repetition(_a_rds, 0);
 				}
 			}
-			repetition_tree_for_loop_index_data_t _l_to_insert{ _l_fst.for_loop_index() };
+			repetition_tree_for_loop_index_data_t _l_to_insert{ _l_fst.for_loop_index };
 			auto _l_x = upper_bound(_m_top_level_for_loops.begin(), _m_top_level_for_loops.end(), _l_to_insert,
 				[](const repetition_tree_for_loop_index_data_t& _a_left, const repetition_tree_for_loop_index_data_t& _a_right) {return _a_left.for_loop_index() < _a_right.for_loop_index(); });
 			auto _l_itt = _m_top_level_for_loops.insert(

@@ -22,13 +22,13 @@ namespace ds
 			const repetition_data_t& _l_element{ _a_rds[_a_idx] };
 			for (repetition_tree_for_loop_index_data_t& _l_rfl : _m_for_loops)
 			{
-				if (_l_element.for_loop_index() == _l_rfl.for_loop_index())
+				if (_l_element.for_loop_index == _l_rfl.for_loop_index())
 				{
 					//Its added. Move on down.
 					return _l_rfl.add_repetition(_a_rds, _a_idx);
 				}
 			}
-			repetition_tree_for_loop_index_data_t _l_to_insert{ _l_element.for_loop_index() };
+			repetition_tree_for_loop_index_data_t _l_to_insert{ _l_element.for_loop_index };
 			auto _l_x = upper_bound(_m_for_loops.begin(), _m_for_loops.end(), _l_to_insert,
 				[](const repetition_tree_for_loop_index_data_t& _a_left, const repetition_tree_for_loop_index_data_t& _a_right) {return _a_left.for_loop_index() < _a_right.for_loop_index(); });
 			auto _l_itt = _m_for_loops.insert(
@@ -57,9 +57,9 @@ namespace ds
 			{
 				auto _l_rv_val{ _l_rv.value() };
 				repetition_data_t _l_rrv(_m_for_loops[0].for_loop_index(),
-					_l_rv_val.for_loop_index(),
-					_l_rv_val.mode(),
-					_l_rv_val.additional_data());
+					{ _l_rv_val.for_loop_index,
+					_l_rv_val.for_loop_iteration_data.mode,
+					_l_rv_val.for_loop_iteration_data.additional_data });
 				_LIBRARY_LOG(REPETITION_INFO, fmt::format(
 					"Returning {0}", _l_rrv));
 				return _l_rv;
@@ -73,7 +73,7 @@ namespace ds
 		{
 			for (const repetition_tree_for_loop_index_data_t& _l_rfl : _m_for_loops)
 			{
-				if (_l_rfl.for_loop_index() == _a_rds[_a_idx].for_loop_index())
+				if (_l_rfl.for_loop_index() == _a_rds[_a_idx].for_loop_index)
 				{
 					//Its added. Move on down.
 					_LIBRARY_LOG(REPETITION_INFO, fmt::format(
@@ -105,7 +105,7 @@ namespace ds
 		{
 			for (const repetition_tree_for_loop_index_data_t& _l_rfl : _m_for_loops)
 			{
-				if (_l_rfl.for_loop_index() == _a_rds[_a_idx].for_loop_index())
+				if (_l_rfl.for_loop_index() == _a_rds[_a_idx].for_loop_index)
 				{
 					//Its added. Move on down.
 					_LIBRARY_LOG(REPETITION_INFO, fmt::format(
@@ -136,7 +136,7 @@ namespace ds
 		{
 			for (const repetition_tree_for_loop_index_data_t& _l_rfl : _m_for_loops)
 			{
-				if (_l_rfl.for_loop_index() == _a_rds[_a_idx].for_loop_index())
+				if (_l_rfl.for_loop_index() == _a_rds[_a_idx].for_loop_index)
 				{
 					//Its added. Move on down.
 					_LIBRARY_LOG(REPETITION_INFO, fmt::format(
@@ -154,7 +154,8 @@ namespace ds
 		) const noexcept
 	{
 		using namespace std;
-		string _l_rv{ fmt::format("({0},{1},\"{2}\",[", _m_generation_index, _m_mode,_m_additional_data) };
+		string _l_rv{ fmt::format("({0},{1},\"{2}\",[", for_loop_iteration_data.generation_collection_index,
+			for_loop_iteration_data.mode,for_loop_iteration_data.additional_data) };
 		for (size_t _l_idx{ 0 }; _l_idx < _m_for_loops.size(); ++_l_idx)
 		{
 			const repetition_tree_for_loop_index_data_t& _l_elem{ _m_for_loops[_l_idx] };
@@ -273,7 +274,7 @@ namespace ds
 			auto res = std::from_chars(_l_vect[0].data(), _l_vect[0].data() + _l_vect[0].size(), _l_size_t);
 			auto res2 = std::from_chars(_l_vect[1].data(), _l_vect[1].data() + _l_vect[1].size(), _l_gen_data_mode);
 		}
-		repetition_tree_for_loop_iteration_data_t _l_rflm(_l_size_t, _l_gen_data_mode, _l_vect[2]);
+		repetition_tree_for_loop_iteration_data_t _l_rflm(for_loop_iteration_data_t{ _l_size_t, _l_gen_data_mode, _l_vect[2] });
 		for (auto& _l_c : _l_children)
 		{
 			expected< repetition_tree_for_loop_index_data_t,string> _l_opt{ parse_repetition_for_loop(_l_c, _a_depth+1) };

@@ -6,7 +6,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 	struct file_line_writer_t
 	{
 	public:
-		__constexpr
+		__no_constexpr
 			file_line_writer_t(
 				const file_name_with_extension_t& _a_file_name,
 				const test_options_t* _a_test_options
@@ -14,12 +14,12 @@ _BEGIN_ABC_UTILITY_IO_NS
 		__constexpr
 			file_line_writer_t(
 			) noexcept;
-		__constexpr
+		__no_constexpr
 			void
 			write_comment(
 				const std::string_view _a_str_to_write
 			) noexcept;
-		__constexpr
+		__no_constexpr
 			void
 			write_line(
 				const std::string_view _a_str_to_write
@@ -33,7 +33,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 _END_ABC_UTILITY_IO_NS
 
 _BEGIN_ABC_UTILITY_IO_NS
-	__constexpr_imp
+	__no_constexpr_imp
 		file_line_writer_t::file_line_writer_t(
 			const file_name_with_extension_t& _a_file_name,
 			const test_options_t* _a_test_options
@@ -76,7 +76,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 	{
 
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		void
 		file_line_writer_t::write_comment(
 			const std::string_view _a_str_to_write
@@ -86,7 +86,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 			_m_test_options == nullptr ? "" : _m_test_options->_m_comment_str, 
 			_a_str_to_write));
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		void
 		file_line_writer_t::write_line(
 			const std::string_view _a_str_to_write

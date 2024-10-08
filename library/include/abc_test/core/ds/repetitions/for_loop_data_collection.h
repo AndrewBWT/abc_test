@@ -39,7 +39,7 @@ _BEGIN_ABC_DS_NS
 			increment(
 				const test_failure_func_t _a_on_error_function,
 				const size_t _a_generation_collection_index,
-				repetition_data_t* _a_repetition_data
+				repetition_data_t& _a_repetition_data
 			) noexcept;
 		/*!
 		* Removes the current element from the for loop stack, and updates the for loop counter.
@@ -57,7 +57,7 @@ _BEGIN_ABC_DS_NS
 			update(
 				const test_failure_func_t _a_on_error_function,
 				const size_t _a_generation_collection_index,
-				repetition_data_t* _a_repetition_data
+				repetition_data_t& _a_repetition_data
 			);
 		/*!
 		* Calls all the for loop element's failure functions.
@@ -131,7 +131,7 @@ _BEGIN_ABC_DS_NS
 		for_loop_data_collection_t::increment(
 			const test_failure_func_t _a_on_error_function,
 			const size_t _a_generation_collection_index,
-			repetition_data_t* _a_repetition_data
+			repetition_data_t& _a_repetition_data
 		) noexcept
 	{
 		_m_for_loop_data_collection.push_back(
@@ -161,7 +161,7 @@ _BEGIN_ABC_DS_NS
 		for_loop_data_collection_t::update(
 			const test_failure_func_t _a_on_error_function,
 			const size_t _a_generation_collection_index,
-			repetition_data_t* _a_repetition_data
+			repetition_data_t& _a_repetition_data
 		//	const std::size_t _a_mode,
 		//	const std::string_view _a_additional_data
 		)

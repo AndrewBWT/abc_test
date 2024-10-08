@@ -12,7 +12,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 				const file_name_t& _a_file_name,
 				const std::string_view _a_file_extension
 			) noexcept;
-		__constexpr
+		__no_constexpr
 			bool
 			exists(
 			) const noexcept;
@@ -29,7 +29,7 @@ struct fmt::formatter<abc::utility::io::file_name_with_extension_t> : formatter<
 	/*!
 	* Provides a formatter for a poset_setup_test_data_t object
 	*/
-	__constexpr
+	__no_constexpr
 		auto
 		format(
 			abc::utility::io::file_name_with_extension_t _a_fnwe,
@@ -56,7 +56,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 	{
 
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		bool
 		file_name_with_extension_t::exists(
 		) const noexcept
@@ -65,7 +65,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 	}
 	_END_ABC_UTILITY_IO_NS
 
-__constexpr_imp
+__no_constexpr_imp
 auto
 fmt::formatter<abc::utility::io::file_name_with_extension_t>::format(
 	abc::utility::io::file_name_with_extension_t _a_fn,

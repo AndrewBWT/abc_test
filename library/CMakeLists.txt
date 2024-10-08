@@ -25,6 +25,7 @@ set(LIBRARY_FILES
   include/abc_test/core/ds/repetitions/repetition_tree_for_loop_index_data.h
   include/abc_test/core/ds/repetitions/for_loop_data.h
   include/abc_test/core/ds/repetitions/for_loop_data_collection.h
+  include/abc_test/core/ds/repetitions/for_loop_iteration_data.h 
   # Contains code for test data - e.g. name, location, repetition data.
   include/abc_test/core/ds/test_data/invoked_test_data.h
   include/abc_test/core/ds/test_data/registered_test_data.h

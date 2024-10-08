@@ -104,7 +104,7 @@ public:
 		bool
 		operator==(
 			const post_setup_test_data_t& _a_rhs
-		) const noexcept;
+			) const noexcept = default;
 private:
 	const registered_test_data_t& _m_registered_test_data;
 	test_path_hierarchy_t _m_test_path_hierarchy;
@@ -216,20 +216,6 @@ post_setup_test_data_t::thread_resourses_required(
 ) const noexcept
 {
 	return _m_thread_resourses_required;
-}
-__constexpr_imp
-bool
-post_setup_test_data_t::operator==(
-	const post_setup_test_data_t& _a_rhs
-) const noexcept
-{
-	__cmp_test(_m_test_path_hierarchy);
-	__cmp_test(_m_registered_test_data);
-	__cmp_test(_m_discovery_id);
-	__cmp_test(_m_is_test_to_be_ran);
-	__cmp_test(_m_repetition_data);
-	__cmp_test(_m_thread_resourses_required);
-	return true;
 }
 _END_ABC_DS_NS
 

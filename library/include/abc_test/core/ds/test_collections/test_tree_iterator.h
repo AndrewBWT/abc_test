@@ -15,7 +15,7 @@ public:
      */
     __no_constexpr
         test_tree_iterator_t(
-        ) noexcept;
+        ) noexcept = default;
     /*!
      * @brief Constructor for specific iterator element.
      * @param _a_node_ptr The pointer to the element the iterator is to point at.
@@ -49,7 +49,7 @@ public:
         bool
         operator==(
             const test_tree_iterator_t& _a_rhs
-            ) const;
+            ) const = default;
     /*!
      * @brief Dereference operator for test_tree_iterator_t element
      * @return 
@@ -59,23 +59,17 @@ public:
         operator*(
         ) const;
 private:
-    size_t _m_test_index;
+    size_t _m_test_index = 0;
     using tree_stack_t = std::stack<test_tree_const_ptr_t>;
     tree_stack_t _m_stack;
     __no_constexpr
         void
         find_next_test(
-        ) noexcept;
+        );
 };
 _END_ABC_DS_NS
 
 _BEGIN_ABC_DS_NS
-__no_constexpr_imp
-test_tree_iterator_t::test_tree_iterator_t(
-) noexcept
-    : test_tree_iterator_t(nullptr)
-{
-}
 __no_constexpr_imp
 test_tree_iterator_t::test_tree_iterator_t(
     test_tree_const_ptr_t _a_node_ptr
@@ -145,7 +139,7 @@ int)
 __no_constexpr_imp
 void
 test_tree_iterator_t::find_next_test(
-) noexcept
+)
 {
     //We now from the caller sights that:
     //The size is definitely > 0
@@ -191,17 +185,6 @@ test_tree_iterator_t::find_next_test(
         }
     }
 }
-__constexpr_imp
-bool
-test_tree_iterator_t::operator==(
-    const test_tree_iterator_t& _a_rhs
-) const
-{
-    __cmp_test(_m_test_index);
-    __cmp_test(_m_stack);
-    return true;
-}
-
 __no_constexpr_imp
 const post_setup_test_data_t&
 test_tree_iterator_t::operator*(

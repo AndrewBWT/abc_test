@@ -125,27 +125,27 @@ struct test_runner_t;
 		invoked_test_info_t& _l_current_test{ _m_test_runner->current_test() };
 		if (_m_add_repeatable_test_config)
 		{
-			if (_l_current_test.has_post_setup_test_data())
-			{
+		//	if (_l_current_test.has_post_setup_test_data())
+			//{
 				if (_l_current_test.post_setup_test_data().has_repetition_data())
 				{
 					increment_iterator(_l_current_test.get_repetition_iterator_data());
 				}
-			}
-			else
-			{
-				throw test_library_exception_t(fmt::format(
-					"invoked_test_info_t has no post_setup_test_data element. "
-					"invoked_test_info_t = {0}.",
-					_l_current_test));
-			}
+		//	}
+			//else
+			//{
+			//	throw test_library_exception_t(fmt::format(
+			//		"invoked_test_info_t has no post_setup_test_data element. "
+			//		"invoked_test_info_t = {0}.",
+			//		_l_current_test));
+			//}
 			if (_m_this_iterator != _m_end_iterator)
 			{
 				auto& _l_this_iterator_ref{ *_m_this_iterator };
 				_l_current_test.for_loop_data_collection().increment(
 					_l_this_iterator_ref->create_test_failure_function(),
 					std::distance(_m_begin_iterator, _m_this_iterator),
-					_l_this_iterator_ref->repetition_data_ptr());
+					_l_this_iterator_ref->repetition_data_ref());
 			}
 			else
 			{
@@ -176,7 +176,7 @@ struct test_runner_t;
 		using namespace std;
 		using namespace ds;
 		invoked_test_info_t& _l_current_test{ _m_test_runner->current_test() };
-		if (_l_current_test.has_post_setup_test_data())
+		//if (_l_current_test.has_post_setup_test_data())
 		{
 			if (_l_current_test.post_setup_test_data().has_repetition_data())
 			{
@@ -213,7 +213,7 @@ struct test_runner_t;
 				auto& _l_this_iterator_ref{ *_m_this_iterator };
 				_l_current_test.for_loop_data_collection().update(_l_this_iterator_ref->create_test_failure_function(),
 					std::distance(_m_begin_iterator, _m_this_iterator),
-					_l_this_iterator_ref->repetition_data_ptr());
+					_l_this_iterator_ref->repetition_data_ref());
 					//_l_this_iterator_ref->infer_correct_mode(),
 					//_l_this_iterator_ref->get_additinoal_string_data());
 			}
@@ -314,7 +314,7 @@ struct test_runner_t;
 		if (_a_opt_repetition_data.has_value())
 		{
 			const repetition_data_t& _l_rd{ _a_opt_repetition_data.value() };
-			size_t _l_generation_collection_index{ _l_rd.generation_collection_index() };
+			size_t _l_generation_collection_index{ _l_rd.for_loop_iteration_data.generation_collection_index };
 			int64_t _l_current{ std::distance(_m_begin_iterator, _m_this_iterator) };
 			while (std::distance(_m_begin_iterator, _m_this_iterator) < _l_generation_collection_index)
 			{
@@ -322,7 +322,7 @@ struct test_runner_t;
 			}
 			auto& _l_this_iterator_ref{ *_m_this_iterator };
 			_l_this_iterator_ref->set_data_using_mode_and_string_representing_repetition_data(
-				_l_rd.mode(),_l_rd.additional_data());
+				_l_rd.for_loop_iteration_data.mode,_l_rd.for_loop_iteration_data.additional_data);
 		}
 		else
 		{

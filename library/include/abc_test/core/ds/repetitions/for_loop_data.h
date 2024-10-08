@@ -27,7 +27,7 @@ _BEGIN_ABC_DS_NS
 				const std::size_t _a_for_loop_index,
 				const test_failure_func_t _a_on_error_function,
 				const size_t _a_generation_collection_index,
-				repetition_data_t* _a_repetition_data
+				repetition_data_t& _a_repetition_data
 			) noexcept;
 		/*!
 		* Default constructor. _m_for_loop_index is set at zero, funciton is void and repetition_data is empty.
@@ -66,7 +66,7 @@ _BEGIN_ABC_DS_NS
 			update(
 				const test_failure_func_t _a_on_error_function,
 				const std::size_t _a_generation_collection_index,
-				repetition_data_t* _a_repetition_data
+				repetition_data_t& _a_repetition_data
 			) noexcept;
 		/*!
 		* Calls the on_failure_function of the object. It also returns the repetition_data_t object
@@ -82,7 +82,7 @@ _BEGIN_ABC_DS_NS
 	private:
 		std::size_t _m_for_loop_index;
 		test_failure_func_t _m_on_failure_function;
-		repetition_data_t* _m_repetition_data;
+		repetition_data_t& _m_repetition_data;
 	};
 _END_ABC_DS_NS
 
@@ -105,25 +105,27 @@ struct fmt::formatter<abc::ds::for_loop_data_t> : formatter<string_view>
 };
 
 _BEGIN_ABC_DS_NS
-	__no_constexpr_imp
-		for_loop_data_t::for_loop_data_t(
-		) noexcept
-		: for_loop_data_t(0, std::function<repetition_data_t()>{}, 0, nullptr)
-	{
+	//__no_constexpr_imp
+	//	for_loop_data_t::for_loop_data_t(
+	//	) noexcept
+	//	: for_loop_data_t(0, std::function<repetition_data_t()>{}, 0, nullptr)
+	//{
 
-	}
+	//}
 	__no_constexpr_imp
 		for_loop_data_t::for_loop_data_t(
 			const std::size_t _a_for_loop_index,
 			const test_failure_func_t _a_on_error_function,
 			const size_t _a_generation_collection_index,
-			repetition_data_t* _a_repetition_data
+			repetition_data_t& _a_repetition_data
 		) noexcept
 		: _m_for_loop_index(_a_for_loop_index)
 		, _m_on_failure_function(_a_on_error_function)
 		, _m_repetition_data(_a_repetition_data)
 	{
-		_m_repetition_data->set_for_loop_and_generation_collection_indexs(_a_for_loop_index, _a_generation_collection_index);
+		_m_repetition_data.for_loop_index = _a_for_loop_index;
+		_m_repetition_data.for_loop_iteration_data.generation_collection_index = _a_generation_collection_index;
+//		_m_repetition_data->set_for_loop_and_generation_collection_indexs(_a_for_loop_index, _a_generation_collection_index);
 	}
 	__constexpr_imp
 		std::size_t
@@ -137,21 +139,23 @@ _BEGIN_ABC_DS_NS
 		for_loop_data_t::repetition_data(
 		) const noexcept
 	{
-		return *_m_repetition_data;
+		return _m_repetition_data;
 	}
 	__no_constexpr_imp
 		void
 		for_loop_data_t::update(
 			const test_failure_func_t _a_on_error_function,
 			const std::size_t _a_generation_collection_index,
-			repetition_data_t* _a_repetition_data
+			repetition_data_t& _a_repetition_data
 		) noexcept
 	{
 		using namespace std;
 		_m_on_failure_function = _a_on_error_function;
-		const size_t _l_for_loop_index{ _m_repetition_data->for_loop_index() };
+		const size_t _l_for_loop_index{ _m_repetition_data.for_loop_index };
 		_m_repetition_data = _a_repetition_data;
-		_m_repetition_data->set_for_loop_and_generation_collection_indexs(_l_for_loop_index, _a_generation_collection_index);
+		_m_repetition_data.for_loop_index = _l_for_loop_index;
+		_m_repetition_data.for_loop_iteration_data.generation_collection_index = _a_generation_collection_index;
+	//	_m_repetition_data->set_for_loop_and_generation_collection_indexs(_l_for_loop_index, _a_generation_collection_index);
 	}
 	__no_constexpr_imp
 		const ds::repetition_data_t

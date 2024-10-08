@@ -48,9 +48,11 @@ public:
 			const size_t _a_elements_generated,
 			const test_options_t* _a_test_options = global::get_global_test_options_ptr()
 		) noexcept;
+protected:
 	T _m_element;
 	std::size_t _m_elements_generated;
 	test_runner_t* _m_test_runner;
+public:
 	__constexpr
 		virtual
 		bool
@@ -348,6 +350,8 @@ __constexpr_imp
 		_a_rep_data_file_extension))
 	, _m_rep_data_rw_info(utility::str::rw_info_t<Rep_Data>())
 	, _m_has_current_element_been_written_to_file(false)
+	, _m_elements_generated(0)
+	, _m_element(T{})
 {
 	/*if (_m_core_data_rw_file.has_current_element())
 	{
@@ -470,8 +474,8 @@ __constexpr_imp
 	{
 		const size_t _l_mode{ _l_result.value() };
 		_m_has_current_element_been_written_to_file = false;
-		this->_m_repetition_data.set_mode(_l_mode);
-		this->_m_repetition_data.set_string(get_rep_string());
+		this->_m_repetition_data.for_loop_iteration_data.mode = (_l_mode);
+		this->_m_repetition_data.for_loop_iteration_data.additional_data = (get_rep_string());
 		if (_l_mode == 1)
 		{
 			subclass_set_data_using_mode_and_repetition_data(this->mode(),

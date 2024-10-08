@@ -37,7 +37,7 @@ public:
 	 */
 	__constexpr
 		test_tree_t(
-		) noexcept;
+		) noexcept = default;
 	/*!
 	 * @brief Adds a test to the underlying test tree.
 	 * @param _a_test The test to be added.
@@ -97,15 +97,6 @@ using test_tree_const_ptr_t = const test_tree_t*;
 _END_ABC_DS_NS
 
 _BEGIN_ABC_DS_NS
-__constexpr_imp
-test_tree_t::test_tree_t(
-) noexcept
-	: _m_node_name(test_path_element_t())
-	, _m_nodes_tests(flat_test_set())
-	, _m_nodes_child_nodes(test_tree_child_nodes())
-{
-	
-}
 __no_constexpr_imp
 errors::opt_setup_error_t
 test_tree_t::add_test(
@@ -115,27 +106,19 @@ test_tree_t::add_test(
 {
 	using namespace std;
 	using namespace errors;
-
-	//if (_a_test == nullptr)
-	//{
-	//	return errors::opt_setup_error_t();
-	//}
-	//else
+	const post_setup_test_data_t& _l_test{ _a_test.get() };
+	if (_l_test.thread_resourses_required() > _a_options._m_threads)
 	{
-		const post_setup_test_data_t& _l_test{ _a_test.get()};
-		if (_l_test.thread_resourses_required() > _a_options._m_threads)
-		{
-			return opt_setup_error_t(setup_error_t(fmt::format(
-				"setup_test_error: post_setup_test_data_t's required thread resourses greater than those allocated to the system. "
-				"post_setup_test_data_t requires {0} threads, while the system has {1} threads available. "
-				"post_setup_test_data_t = {2}",
-				_l_test.thread_resourses_required(),
-				_a_options._m_threads,
-				_l_test
-			), false));
-		}
-		return add_test(_a_test, 0);
+		return opt_setup_error_t(setup_error_t(fmt::format(
+			"setup_test_error: post_setup_test_data_t's required thread resourses greater than those allocated to the system. "
+			"post_setup_test_data_t requires {0} threads, while the system has {1} threads available. "
+			"post_setup_test_data_t = {2}",
+			_l_test.thread_resourses_required(),
+			_a_options._m_threads,
+			_l_test
+		), false));
 	}
+	return add_test(_a_test, 0);
 }
 __constexpr_imp
 bool

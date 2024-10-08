@@ -23,7 +23,7 @@ public:
 		bool
 		operator==(
 			const user_defined_test_data_t& _a_rhs
-			) const noexcept;
+			) const noexcept = default;
 	//! The name of the test. This should never be equal to "".
 	std::string_view name;
 	/*!
@@ -68,18 +68,6 @@ struct fmt::formatter<abc::ds::user_defined_test_data_t> : formatter<string_view
 };
 
 _BEGIN_ABC_DS_NS
-__constexpr_imp
-bool
-user_defined_test_data_t::operator==(
-	const user_defined_test_data_t& _a_rhs
-	) const noexcept
-{
-	__cmp_test(name);
-	__cmp_test(description);
-	__cmp_test(path);
-	__cmp_test(threads_required);
-	return true;
-}
 _END_ABC_DS_NS
 
 __no_constexpr_imp

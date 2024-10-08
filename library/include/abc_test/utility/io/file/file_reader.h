@@ -11,12 +11,12 @@ _BEGIN_ABC_UTILITY_IO_NS
 struct file_line_reader_t
 {
 public:
-	__constexpr
+	__no_constexpr
 	file_line_reader_t(
 			const file_name_with_extension_t& _a_file_name,
 			const test_options_t* _a_test_options
 		);
-	__constexpr
+	__no_constexpr
 		file_line_reader_t(
 		) noexcept;
 	__constexpr
@@ -42,7 +42,7 @@ private:
 _END_ABC_UTILITY_IO_NS
 
 _BEGIN_ABC_UTILITY_IO_NS
-__constexpr_imp
+__no_constexpr_imp
 	file_line_reader_t::file_line_reader_t(
 		const file_name_with_extension_t& _a_file_name,
 		const test_options_t* _a_test_options
@@ -85,7 +85,7 @@ __constexpr_imp
 				_m_file_name.file_path()));
 	}
 }
-__constexpr_imp
+__no_constexpr_imp
 	file_line_reader_t::file_line_reader_t(
 	) noexcept
 	: _m_current_line_idx(0)

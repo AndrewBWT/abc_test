@@ -51,7 +51,7 @@ public:
 		bool
 		operator==(
 			const registered_test_data_t& _a_rhs
-			) const noexcept;
+			) const noexcept = default;
 	/*!
 	* The location of the function for this test.
 	*/
@@ -95,17 +95,6 @@ registered_test_data_t::registered_test_data_t(
 	, _m_source(_a_source)
 	, _m_test_function(_a_test_function)
 {
-}
-__constexpr_imp
-bool
-registered_test_data_t::operator==(
-	const registered_test_data_t& _a_rhs
-) const noexcept
-{
-	__cmp_test(_m_test_function);
-	__cmp_test(_m_user_data);
-	__cmp_test(_m_source);
-	return true;
 }
 _END_ABC_DS_NS
 

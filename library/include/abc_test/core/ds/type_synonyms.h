@@ -8,6 +8,7 @@
 _BEGIN_ABC_DS_NS
 //Forward declarations
 struct registered_test_data_t;
+struct post_setup_test_data_t;
 
 //! The type of test functions; simply a reference to a function with no arguments and
 //! which returns nothing.
