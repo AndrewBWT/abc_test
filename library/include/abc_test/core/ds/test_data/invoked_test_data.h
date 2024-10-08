@@ -9,15 +9,18 @@
 
 _BEGIN_ABC_DS_NS
 /*!
-* Object used for tests that are currently being ran. Information pertaining to how they
-* perform is stored in instances of this object.
-*/
+ * @brief Object used to represent a test currently being ran.
+ */
 struct invoked_test_info_t
 {
 public:
 	/*!
-	* The generic constructor. Generally this should be used.
-	*/
+	 * @brief Constructor
+	 * @param _a_seed_seq The seed for this test. 
+	 * @param _a_test_info The post_setup_test_data_t component of this test.
+	 * @param _a_order_ran_id The ID representing the order this test was ran in.
+	 * @param _a_options The options_t object used to setup this object.
+	 */
 	__no_constexpr
 		invoked_test_info_t(
 			const utility::seed_t& _a_seed_seq,
@@ -26,83 +29,112 @@ public:
 			const test_options_t& _a_options
 		) noexcept;
 	/*!
-	* Returns the path of the object. The path should be a specific, unique location where information
-	* can be stored or retrieved for a specific test.
-	*/
+	 * @brief Returns the path of the test to the caller.
+	 * 
+	 * Each test has a path, built from the user-defined path, and the test's name.
+	 * 
+	 * It is used to store data, such as failed test results.
+	 * 
+	 * @return The path of the test.
+	 */
 	__constexpr
 		const std::filesystem::path&
 		path(
 		) const noexcept;
 	/*!
-	* Gets the tests random generator. Each test is given its own random generator, derived from the global
-	* random generator.
-	*/
+	 * @brief Returns the random generator to the caller.
+	 * @return Test's random generator.
+	 */
 	__constexpr
-		utility::rng&
+		const utility::rng&
 		get_random_generator(
 		) noexcept;
 	/*!
-	* Returns the post_setup_test_data object.
-	* It is UB if the object's post_setup_test_data_t object is an invalid pointer.
-	*/
+	 * @brief Returns the test's post_setup_tst_data_t object to the caller.
+	 * @return The test's post_setup_test_data_t object.
+	 */
 	__constexpr
 		const post_setup_test_data_t&
 		post_setup_test_data(
 		) const;
 	/*!
-	* Returns a reference to the internal for_loop_data_collection_t object.
-	*/
+	 * @brief Gets the test's for_loop_data_collection_t object.
+	 * @return A reference to the tests for_loop_data_collection_t object.
+	 */
 	__constexpr
 		ds::for_loop_data_collection_t&
 		for_loop_data_collection(
 		) noexcept;
 	/*!
-	* Gets the next set of iteration data from the underlying repetition data.
-	*
-	* Specifically, this is called when a new for loop is created. It gathers the repetition data
-	* for that for loop and ensures that the for loop moves to the first element described in the
-	* repetition.
+	* @brief Gets the next set of repetition_data from the underlying repetition_data
+	* and the current for_loop_data_collection structure.
+	* 
+	* If there is no next element, returns an empty optional.
+	* 
+	* @return An optional element, representing the next repetition_data_t element.
 	*/
 	__constexpr
 		std::optional<ds::repetition_data_t>
 		get_repetition_iterator_data(
 		) noexcept;
 	/*!
-	* Gets the next set of iteration data from the underlying repetition data.
-	*
-	* Specifically, this is called when iterating through a for loop. It analyses the current
-	* repetition data sequence, and gets the next one for that for loop as described in the
-	* repetition tree.
-	*/
+	 * @brief Gets the next "level" of iteration data, based on the current position
+	 * in the iteration data.
+	 * 
+	 * Specifically, it is used when a new for loop is encountered, getting the first
+	 * element in the repetition data for that for loop. If there isn't one, it returns
+	 * an empty optional.
+	 * 
+	 * @return An optional with the repetition_data_t object, representing the first
+	 * element to be repeated in the next for loop.
+	 */
 	__constexpr
 		std::optional<ds::repetition_data_t>
 		increment_repetition_iterator_data(
 		) noexcept;
 	/*!
-	* Returns true if the current repetition_data_sequence is contained in the repetition_tree.
-	*/
+	 * @brief Tells the caller if the current repetition_data_sequence_t is contained
+	 * in the test's reptition_tree.
+	 * 
+	 * Essentially this is used in manual for loops, to check whether the current
+	 * element is to be ran or not.
+	 * 
+	 * @return True if it is in the test's repetition tree, false if not.
+	 */
 	__constexpr
 		bool
 		is_repetition_to_be_repeated(
 		) const noexcept;
 	/*!
-	* Gets the internal repetition tree.
-	*/
+	 * @brief Returns the internal repetition_tree to the caller.
+	 * 
+	 * To be clear, this is the repetition_tree_t created by the test, not the one
+	 * given to the test as a parameter.
+	 * 
+	 * @return The test's repetition_tree.
+	 */
 	__constexpr
 		const ds::repetition_tree_t&
 		repetition_tree(
 		) const noexcept;
 	/*!
-	* Updates the current repetition tree.
-	*/
+	 * @brief Updates the test's repetition tree with a new repetition_data_sequence_t.
+	 * 
+	 */
 	__constexpr
 		void
 		update_repetition_tree(
 			const ds::repetition_data_sequence_t& _a_rds
 		) noexcept;
 	/*!
-	* Getrs the current order_id of the invoked_test_data_t object.
-	*/
+	 * @brief Gets the current order ran ID.
+	 * 
+	 * This is the order the tests are ran in. Note that this is given to the test
+	 * before it is spawned in its own thread, so it may be the case that the test_reporter
+	 * gets the tests in a different order to the order they were ran in.
+	 * 
+	 * @return Integer representing the order the test was ran in.
+	 */
 	__constexpr
 		std::size_t
 		order_ran_id(
@@ -168,7 +200,7 @@ invoked_test_info_t::path(
 	return _m_path;
 }
 __constexpr_imp
-utility::rng&
+const utility::rng&
 invoked_test_info_t::get_random_generator(
 ) noexcept
 {

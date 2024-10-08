@@ -6,12 +6,6 @@
 
 
 _BEGIN_ABC_DS_NS
-//! Type synonym for a test_path_hierarchy_t element.
-using test_path_element_t = std::string;
-//! A reference to a test_path_hierarchy_element_t. 
-using test_path_element_ref_t = std::string_view;
-//! Synonym for a vector of strings, used to represent the hierarchy a test path represents.
-using test_path_hierarchy_t = std::vector<test_path_element_t>;
 /*!
  * @brief Object represents a test after it has been processed by the runtime system;
  * that is, registered, its test path hierarchy calculated, 

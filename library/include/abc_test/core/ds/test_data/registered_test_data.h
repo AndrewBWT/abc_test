@@ -16,11 +16,9 @@
 #include "abc_test/core/ds/source/single_source.h"
 
 #include "abc_test/core/ds/test_data/checked_user_defined_test_data.h"
+#include "abc_test/core/ds/type_synonyms.h"
 
 _BEGIN_ABC_DS_NS
-//! The type of test functions; simply a reference to a function with no arguments and
-//! which returns nothing.
-using test_function_t = void (&)();
 /*!
 * The object used to store the data required for a test.
 * This object is designed to be initialised by a macro, not a human.

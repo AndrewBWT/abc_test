@@ -41,7 +41,7 @@ set(LIBRARY_FILES
   include/abc_test/core/ds/test_collections/test_tree_iterator.h
   include/abc_test/core/ds/source/single_source.h
   include/abc_test/core/ds/source/source_pair.h
-  include/abc_test/core/ds/types.h
+  include/abc_test/core/ds/type_synonyms.h
   # Contains objects and functions pertaining to recoverable and unrecoverable errors,
   # as well as errors encountered when evaluating tests.
   include/abc_test/core/errors/test_library_exception.h
