@@ -212,7 +212,12 @@ _BEGIN_ABC_NS
 			const reports::source_pair_t& _a_source_locations
 		) noexcept
 	{
-		
+		using namespace reports;
+		using namespace std;
+		const optional<single_source_t>& _l_end_source{ _a_source_locations.end_source()};
+		_m_tests_most_recent_source = 
+			_l_end_source.has_value() ? _l_end_source.value() :
+			_a_source_locations.begin_source();
 	}
 	__no_constexpr_imp
 		std::list<const log_test_msg_t*>::iterator
@@ -363,5 +368,6 @@ test_runner_t::add_assertion_and_optional_warning(
 			new basic_text_warning_t(_a_uir->last_source(), true, _a_optional_warning.value())
 		);
 	}
+	_m_current_test->update_repetition_tree(_m_current_test->for_loop_data_collection().repetition_data_sequence());
 }
 _END_ABC_NS

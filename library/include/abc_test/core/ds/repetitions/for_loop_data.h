@@ -1,7 +1,7 @@
 #pragma once
 
 #include <functional>
-#include "abc_test/core/ds/repetitions/repetition_data.h"
+#include "abc_test/core/ds/repetitions/for_loop_iteration_data.h"
 #include "fmt/base.h"
 #include "abc_test/core/ds/type_synonyms.h"
 
