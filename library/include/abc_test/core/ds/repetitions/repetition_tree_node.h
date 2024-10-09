@@ -1,22 +1,11 @@
 #pragma once
-
-
-
-
+#include <charconv>
 #include "abc_test/core/ds/repetitions/for_loop_data.h"
 #include "abc_test/core/errors/test_library_exception.h"
-#include "fmt/base.h"
-
-#include "fmt/ranges.h"
-#include <charconv>
 #include "abc_test/utility/str/parser_utility.h"
-
+#include "fmt/base.h"
+#include "fmt/ranges.h"
 #include <exception>
-
-_BEGIN_ABC_NS
-//Forward declaration
-class test_options_t;
-_END_ABC_NS
 
 _BEGIN_ABC_DS_NS
 /*!
@@ -37,17 +26,6 @@ public:
     __constexpr
         repetition_tree_node_t(
         ) noexcept = default;
-    template < typename = typename std::enable_if<not Is_Root>::type >
-    /*!
-    * @brief Constructor taking for_loop_iteration_data_t element.
-    * 
-    * This class can only be used when the element is not the root of a tree -
-    * as the root has no _m_for_loop_data member variable to set.
-    */
-    __constexpr
-        repetition_tree_node_t(
-            const for_loop_iteration_data_t& _a_flid
-        ) noexcept;
     /*!
      * @brief Prints the underlying tree in a "compressed format".
      *
@@ -154,9 +132,36 @@ public:
             const repetition_data_sequence_t& _a_rds
         ) const noexcept;
     friend class repetition_tree_node_t<not Is_Root>;
+    /*!
+     * @brief Static function used to parse a string to a repetition_data_node_t element.
+     * @tparam Is_Root Whether the element created is a root node.
+     * @param _a_str The input string.
+     * @return An expected value; either the constructed repetition_tree_node_t 
+     * or a std::string error message. 
+     */
+    template<
+        bool Is_Root
+    >
+    __constexpr
+        friend
+        std::expected<repetition_tree_node_t<Is_Root>, std::string>
+        parse_compressed_repetition_tree_node(
+            const std::string_view _a_str
+        ) noexcept;
 private:
     std::conditional_t<not Is_Root, for_loop_iteration_data_t, std::monostate> _m_for_loop_data;
     std::vector<std::vector<std::shared_ptr<repetition_tree_node_t<false>>>> _m_children;
+    template < typename = typename std::enable_if<not Is_Root>::type >
+    /*!
+    * @brief Constructor taking for_loop_iteration_data_t element.
+    *
+    * This class can only be used when the element is not the root of a tree -
+    * as the root has no _m_for_loop_data member variable to set.
+    */
+    __constexpr
+        repetition_tree_node_t(
+            const for_loop_iteration_data_t& _a_flid
+        ) noexcept;
     __constexpr
         std::optional<repetition_data_t>
         increment_last_index(
@@ -183,13 +188,6 @@ private:
         ) noexcept;
 };
 using repetition_tree_t = repetition_tree_node_t<true>;
-__constexpr
-std::expected<repetition_tree_t, std::string>
-parse_repetition_tree(
-    const std::string_view _a_str,
-    const test_options_t& _a_options,
-    const std::size_t _a_depth
-) noexcept;
 _END_ABC_DS_NS
 
 template<
@@ -211,18 +209,6 @@ struct fmt::formatter<abc::ds::repetition_tree_node_t<Is_Root>> : formatter<stri
 };
 
 _BEGIN_ABC_DS_NS
-template<
-    typename bool Is_Root
->
-template < typename>
-__constexpr_imp
-repetition_tree_node_t<Is_Root>::repetition_tree_node_t(
-    const for_loop_iteration_data_t& _a_flid
-) noexcept
-    : _m_for_loop_data(_a_flid)
-{
-
-}
 template<
     typename bool Is_Root
 >
@@ -328,6 +314,18 @@ repetition_tree_node_t<Is_Root>::find_next_for_loop(
 ) const noexcept
 {
     return find_next_for_loop(_a_rds, 0);
+}
+template<
+    typename bool Is_Root
+>
+template < typename>
+__constexpr_imp
+repetition_tree_node_t<Is_Root>::repetition_tree_node_t(
+    const for_loop_iteration_data_t& _a_flid
+) noexcept
+    : _m_for_loop_data(_a_flid)
+{
+
 }
 template<
     typename bool Is_Root
@@ -502,14 +500,128 @@ repetition_tree_node_t<Is_Root>::add_repetition(
         (*_l_itt)->add_repetition(_a_rds, _a_idx + 1);
     }
 }
+template<
+    bool Is_Root
+>
 __constexpr_imp
-std::expected<repetition_tree_t, std::string>
-parse_repetition_tree(
-    const std::string_view _a_str,
-    const test_options_t& _a_options,
-    const std::size_t _a_depth
+std::expected<repetition_tree_node_t<Is_Root>, std::string>
+parse_compressed_repetition_tree_node(
+    const std::string_view _a_str
 ) noexcept
 {
-    return std::unexpected("hello");
+    using namespace utility::str;
+    using namespace std;
+    using enum utility::internal::internal_log_enum_t;
+    std::string _l_str{};
+    
+    //Parse the bytes.
+    const char* _l_position = _a_str.data();
+    vector<unsigned char> _l_chars;
+    for (size_t _l_idx{ 0 }; _l_idx < (_a_str.size() / 2); ++_l_idx)
+    {
+        unsigned char value;
+        if (_l_idx * 2 + 1 >= _a_str.size())
+        {
+            return unexpected(
+                fmt::format(
+                    "Expected pairs of bytes, there was no element at index {0} after element {1}",
+                    _l_idx * 2, *_l_position));
+        }
+        auto [_l_ptr, _l_ec] = from_chars(_l_position, _l_position + 2, value, 16);
+        _l_position += 2;
+        //If no error, pass the byte to the list of chars
+        if (_l_ec == errc())
+        {
+            _l_chars.push_back(value);
+        }
+        else
+        {
+            //Else return failure
+            return unexpected{
+                fmt::format("Could not parse byte pair {0}{1}", *_l_position, *(_l_position + 1)) };
+        }
+    }
+    //Add all the chars to the string.
+    _l_str = string(_l_chars.begin(), _l_chars.end());
+    _LIBRARY_LOG(PARSING_SEED, fmt::format("Depth {0}. Repetition tree after conversion from hex is in form \"{1}\"",
+        _a_depth, _l_str));
+
+    //Separete the string into strings...
+    size_t _l_current_pos{ 0 };
+    size_t _l_mode{ 0 };
+    size_t _l_start{ 0 };
+    vector<vector<string>> _l_strs;
+    size_t _l_depth;
+    size_t _l_found_pos;
+    bool _l_end;
+    char _l_char;
+    size_t _l_previous_mode;
+    string _l_error_string;
+    size_t _l_old_pos;
+    constexpr std::size_t _l_mode_zero_next_mode =
+        Is_Root ? 1 : 2;
+    while (_l_current_pos < _l_str.size())
+    {
+        _l_previous_mode = _l_mode;
+        _l_old_pos = _l_current_pos;
+        switch (_l_mode)
+        {
+        case 0:
+            //Searching for opening bracket
+            locate_relevant_character(_l_str, _c_l_square_bracket, _l_current_pos, _l_error_string);
+            process_mode(_l_mode, _l_current_pos, _l_mode_zero_next_mode);
+            break;
+        case 1:
+            //Mode 1, searhicng for a round bracket to begin a tuple of data.
+            locate_relevant_character(_l_str, _c_l_round_bracket, _l_current_pos, _l_error_string);
+            process_mode(_l_mode, _l_current_pos, 2);
+            _l_start = _l_current_pos;
+            _l_depth = 1;
+            _l_start = _l_current_pos;
+            break;
+        case 2:
+            process_list_elements(_l_str, _l_current_pos, _l_error_string, _l_depth, _l_strs[0], _l_start, _l_mode, 3, 4);
+            //Check for end brackets, commas and begin next brackets.
+            break;
+        case 3:
+            //Escaping quotes
+            process_string(_l_str, _l_current_pos, _l_error_string, _l_mode, 2);
+            break;
+        case 4:
+            //Searching for next comma or end square bracket (, or ])
+            process_end_of_list(_l_str, _l_current_pos, _l_error_string, _l_mode, 1);
+            break;
+        default:
+            return unexpected("default case");
+        }
+        if (not _l_error_string.empty())
+        {
+            return unexpected(_l_error_string);
+        }
+        _l_current_pos++;
+    }
+
+    //Put it all together
+    repetition_tree_node_t<Is_Root> _l_rv;
+    for (const vector<string>& _l_str : _l_strs)
+    {
+        vector < shared_ptr<repetition_tree_node_t<false>>> _l_kids;
+        for (const string& _l_st : _l_str)
+        {
+            const expected<repetition_tree_node_t<false>, string> _l_op{ parse_compressed_repetition_tree_node<false>(_l_st) };
+            if (_l_op.has_value())
+            {
+                _l_kids.push_back(
+                    shared_ptr<repetition_tree_node_t<false>>(
+                        new repetition_tree_node_t<false>(_l_op.value())));
+            }
+            else
+            {
+                return unexpected("");
+            }
+        }
+        _l_rv._m_children.push_back(_l_kids);
+    }
+    return _l_rv;
 }
 _END_ABC_DS_NS

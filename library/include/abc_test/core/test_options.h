@@ -1,7 +1,7 @@
 #pragma once
 
 #include <filesystem>
-#include "abc_test/core/ds/repetitions/repetition_tree.h"
+#include "abc_test/core/ds/repetitions/repetition_tree_node.h"
 #include <map>
 #include "abc_test/utility/rng.h"
 #include "abc_test/core/reporters/error_reporter_controller.h"
@@ -265,7 +265,7 @@ __constexpr_imp
 						_l_pair_idx,
 						_l_second_str));
 					_l_pos = _l_repeat_delimter == string::npos ? _m_repeat_tests_string.size() : _l_pos + 1;
-					auto _l_rt{ parse_repetition_tree(_l_second_str, *this, 1) };
+					auto _l_rt{ parse_compressed_repetition_tree_node<true>(_l_second_str) };
 					if (_l_rt.has_value())
 					{
 						_LIBRARY_LOG(PARSING_SEED, fmt::format("Inserting pair {0} and {1} into "

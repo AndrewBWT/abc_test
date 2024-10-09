@@ -1,6 +1,9 @@
 #pragma once
 #include "abc_test/core/reporters/error_reporter.h"
 #include "abc_test/utility/ptr_utility.h"
+_BEGIN_ABC_NS
+struct test_options_t;
+_END_ABC_NS
 
 _BEGIN_ABC_REPORTERS_NS
 	using error_reporters_t = std::vector<utility::shared_and_raw_ptr<error_reporter_t>>;

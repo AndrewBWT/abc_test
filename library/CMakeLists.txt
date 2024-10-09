@@ -18,7 +18,7 @@ set(LIBRARY_FILES
   include/abc_test/core/test_assertions/test_block.h
   # Subfolder contains objects and functions pertaining to how repetition data is stored.
   include/abc_test/core/ds/repetitions/repetition_data.h
-  include/abc_test/core/ds/repetitions/repetition_tree.h
+  include/abc_test/core/ds/repetitions/repetition_tree_node.h
   include/abc_test/core/ds/repetitions/for_loop_data.h
   include/abc_test/core/ds/repetitions/for_loop_data_collection.h
   include/abc_test/core/ds/repetitions/for_loop_iteration_data.h 
