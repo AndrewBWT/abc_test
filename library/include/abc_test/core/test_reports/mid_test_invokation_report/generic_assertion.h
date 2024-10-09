@@ -169,7 +169,8 @@ generic_assertion_t<Single_Source, Assertion_Status>::get_pass_status(
 	}
 	else
 	{
-		static_assert(false, "Cannot instantiate");
+		__STATIC_ASSERT(Assertion_Status, "Cannot instantiate");
+		//static_assert(false, "Cannot instantiate");
 	}
 }
 template<

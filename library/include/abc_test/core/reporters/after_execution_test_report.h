@@ -190,7 +190,7 @@ __constexpr_imp
 		_a_iti.post_setup_test_data().repetition_data().print_repetition_tree() : "",
 		true &&
 		_a_iti.post_setup_test_data().has_repetition_data() ?
-		_a_iti.post_setup_test_data().repetition_data().print_repetition_tree(*_a_test_options) : "",
+		_a_iti.post_setup_test_data().repetition_data().print_repetition_tree_compressed() : "",
 		true,enum_termination_type_t::NO_TERMINATION,0,0,0, _a_test_options
 	)
 {
@@ -213,7 +213,7 @@ __constexpr_imp
 	_m_seed_to_use_to_re_run_test = 
 		_a_repetition_tree.print_repetition_tree();
 	_m_seed_to_use_to_re_run_test_in_hex =
-		_a_repetition_tree.print_repetition_tree(*_a_test_options);
+		_a_repetition_tree.print_repetition_tree_compressed();
 }
 __constexpr_imp
 	const std::optional<std::string>&

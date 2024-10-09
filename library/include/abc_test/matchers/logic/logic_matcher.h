@@ -125,7 +125,7 @@ __constexpr_imp
 {
 	if constexpr (Logic_Enum == NOT)
 	{
-		static_assert(false, "Cannot set the right child of a NOT logic statement");
+		__STATIC_ASSERT(Logic_Enum, "Cannot set the right child of a NOT logic statement");
 	}
 	else
 	{
@@ -167,7 +167,7 @@ __constexpr_imp
 	}
 	else
 	{
-		static_assert(false, "logic_matcher_t::run function does not work for given template type.");
+		__STATIC_ASSERT(Logic_Enum, "logic_matcher_t::run function does not work for given template type.");
 		return matcher_result_t();
 	}
 }

@@ -77,7 +77,7 @@ __constexpr_imp
 	}
 	else
 	{
-		static_assert(false, "precedence function does not have value for given template type.");
+		__STATIC_ASSERT(Comparison_Enum, "precedence function does not have value for given template type.");
 		return 0;
 	}
 }
@@ -120,7 +120,7 @@ __constexpr_imp
 	}
 	else
 	{
-		static_assert(false, "cmp function does not have value for given template type.");
+		__STATIC_ASSERT(Comparison_Enum, "cmp function does not have value for given template type.");
 		return true;
 	}
 }
@@ -159,7 +159,7 @@ __constexpr_imp
 	}
 	else
 	{
-		static_assert(false, "str function does not have value for given template type.");
+		__STATIC_ASSERT(Comparison_Enum,"str function does not have value for given template type.");
 		return "";
 	}
 }

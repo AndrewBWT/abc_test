@@ -124,3 +124,15 @@ _END_ABC_NS \
 #define _END_ABC_REPORTS_NS \
 _END_ABC_NS \
 }
+
+//Appears to be a regression regarding static_assert(false, msg). This is a macro
+// which performs a workaround.
+
+namespace abc::internal
+{
+    template<class>
+    constexpr bool dependent_false = false; // workaround before CWG2518/P2593R1
+}
+
+#define __STATIC_ASSERT(_a_type, _a_msg) \
+    static_assert(abc::internal::dependent_false<_a_type>, _a_msg);

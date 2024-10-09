@@ -60,7 +60,7 @@ __constexpr_imp
 	}
 	else
 	{
-		static_assert(false, "precedence function does not have value for given template type.");
+		__STATIC_ASSERT(Logic_Enum, "precedence function does not have value for given template type.");
 		return 0;
 	}
 }
@@ -87,7 +87,8 @@ __constexpr_imp
 	}
 	else
 	{
-		static_assert(false, "str function does not have value for given template type.");
+		__STATIC_ASSERT(Logic_Enum, "precedence function does not have value for given template type.");
+		//static_assert(false, "str function does not have value for given template type.");
 		return "";
 	}
 }
@@ -116,7 +117,7 @@ __constexpr_imp
 	}
 	else
 	{
-		static_assert(false, "compute_logic_result function does not have value for given "
+		__STATIC_ASSERT(Logic_Enum, "compute_logic_result function does not have value for given "
 			"template type.");
 		return "";
 	}

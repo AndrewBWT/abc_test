@@ -32,6 +32,6 @@ _BEGIN_ABC_NS
 		min_value_t<T>::min_value(
 		) const noexcept
 	{
-		static_assert(false, "Function requires a specialization of the function min_value_t<T>::min_value.");
+		__STATIC_ASSERT(T, "Function requires a specialization of the function min_value_t<T>::min_value.");
 	}
 	_END_ABC_NS

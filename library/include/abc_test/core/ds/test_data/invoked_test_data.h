@@ -229,7 +229,7 @@ invoked_test_info_t::get_repetition_iterator_data(
 	using namespace ds;
 	using enum utility::internal::internal_log_enum_t;
 	const optional<repetition_data_t> _l_rv{
-		_m_post_setup_test_data.repetition_data().find_next_for_loop(_m_for_loop_data_collection) };
+		_m_post_setup_test_data.repetition_data().find_next_for_loop(_m_for_loop_data_collection.repetition_data_sequence()) };
 	return _l_rv;
 }
 __constexpr_imp
@@ -241,7 +241,7 @@ invoked_test_info_t::increment_repetition_iterator_data(
 	using namespace ds;
 	using enum utility::internal::internal_log_enum_t;
 	const optional<repetition_data_t> _l_rv{
-		_m_post_setup_test_data.repetition_data().increment_last_index(_m_for_loop_data_collection) };
+		_m_post_setup_test_data.repetition_data().increment_last_index(_m_for_loop_data_collection.repetition_data_sequence()) };
 	return _l_rv;
 }
 __constexpr_imp
@@ -250,7 +250,7 @@ invoked_test_info_t::is_repetition_to_be_repeated(
 ) const noexcept
 {
 	return (not _m_post_setup_test_data.has_repetition_data()) ? true :
-		_m_post_setup_test_data.repetition_data().is_repetition_to_be_repeated(_m_for_loop_data_collection);
+		_m_post_setup_test_data.repetition_data().is_repetition_to_be_repeated(_m_for_loop_data_collection.repetition_data_sequence());
 }
 __constexpr_imp
 const ds::repetition_tree_t&

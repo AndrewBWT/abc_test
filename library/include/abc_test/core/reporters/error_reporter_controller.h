@@ -10,7 +10,7 @@ _BEGIN_ABC_REPORTERS_NS
 		/*!
 		* Default constructor, contains an empty error_reporter_controller_t
 		*/
-		__constexpr
+		__no_constexpr
 			error_reporter_controller_t(
 			) noexcept;
 		__constexpr
@@ -92,7 +92,7 @@ _BEGIN_ABC_REPORTERS_NS
 		bool _m_should_exit;
 		std::size_t _m_catastrophic_errors;
 		std::mutex _m_errors_mutex;
-		__constexpr
+		__no_constexpr
 			error_reporter_controller_t(
 				const test_options_t* _a_options
 			) noexcept;
@@ -112,7 +112,7 @@ _BEGIN_ABC_REPORTERS_NS
 	_END_ABC_REPORTERS_NS
 
 _BEGIN_ABC_REPORTERS_NS
-	__constexpr_imp
+__no_constexpr_imp
 		error_reporter_controller_t::error_reporter_controller_t(
 		) noexcept
 		: error_reporter_controller_t(nullptr)
@@ -224,7 +224,7 @@ _BEGIN_ABC_REPORTERS_NS
 		unique_lock _l_error_reporter_unique_lock(_m_errors_mutex);
 		return _m_catastrophic_errors;
 	}
-	__constexpr_imp
+	__no_constexpr_imp
 		error_reporter_controller_t::error_reporter_controller_t(
 			const test_options_t* _a_options
 		) noexcept

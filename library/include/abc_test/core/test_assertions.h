@@ -402,7 +402,7 @@ create_static_assertion(
 	}
 	else
 	{
-		static_assert(false);
+		__STATIC_ASSERT(T, "create_static_assertion_Failure")
 	}
 }
 template<
@@ -519,7 +519,7 @@ namespace
 		}
 		else
 		{
-			static_assert(false);
+			__STATIC_ASSERT(T, "return result failure");
 		}
 	}
 	template<

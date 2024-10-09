@@ -19,10 +19,6 @@ set(LIBRARY_FILES
   # Subfolder contains objects and functions pertaining to how repetition data is stored.
   include/abc_test/core/ds/repetitions/repetition_data.h
   include/abc_test/core/ds/repetitions/repetition_tree.h
-      src/abc_test/core/ds/repetitions/repetition_tree.cpp
-  include/abc_test/core/ds/repetitions/repetition_tree_for_loop_iteration_data.h
-      src/abc_test/core/ds/repetitions/repetition_tree_for_loop_iteration_data.cpp
-  include/abc_test/core/ds/repetitions/repetition_tree_for_loop_index_data.h
   include/abc_test/core/ds/repetitions/for_loop_data.h
   include/abc_test/core/ds/repetitions/for_loop_data_collection.h
   include/abc_test/core/ds/repetitions/for_loop_iteration_data.h 

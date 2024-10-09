@@ -824,7 +824,7 @@ print_config_t::status(
 	}
 	else
 	{
-		static_assert(false);
+		__STATIC_ASSERT(T, "Cannot instantiate");
 	}
 }
 __constexpr_imp

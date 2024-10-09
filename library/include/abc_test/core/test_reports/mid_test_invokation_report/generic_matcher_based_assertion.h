@@ -17,7 +17,7 @@ struct generic_matcher_based_assertion_t
 public:
 	__constexpr
 		generic_matcher_based_assertion_t(
-			const user_initialised_report_t<Single_Source>::source_t& _a_source,
+			typename const user_initialised_report_t<Single_Source>::source_t& _a_source,
 			const log_infos_t& _a_log_infos,
 			const std::optional<std::string_view>& _a_test_annotation,
 			const matcher_result_t& _a_matcher_result,
@@ -51,7 +51,7 @@ template<
 	requires std::derived_from<Assertion_Status, dynamic_status_t>
 __constexpr_imp
 generic_matcher_based_assertion_t<Single_Source, Assertion_Status>::generic_matcher_based_assertion_t(
-	const user_initialised_report_t<Single_Source>::source_t& _a_source,
+	typename const user_initialised_report_t<Single_Source>::source_t& _a_source,
 	const log_infos_t& _a_log_infos,
 	const std::optional<std::string_view>& _a_test_annotation,
 	const matcher_result_t& _a_matcher_result,
