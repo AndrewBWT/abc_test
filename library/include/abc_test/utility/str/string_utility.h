@@ -39,6 +39,13 @@ __constexpr
 		const std::size_t _a_size,
 		const std::string_view _a_str
 	) noexcept;
+__constexpr
+const std::string_view
+return_str_if_next_index_in_bound(
+	const std::size_t _a_index_to_check,
+	const std::size_t _a_max_index,
+	const std::string_view _a_str
+) noexcept;
 _END_ABC_UTILITY_STR_NS
 
 _BEGIN_ABC_UTILITY_STR_NS
@@ -112,5 +119,15 @@ __constexpr_imp
 {
 	using namespace std;
 	return string(_a_size, ' ').append(_a_str);
+}
+__constexpr_imp
+const std::string_view
+return_str_if_next_index_in_bound(
+	const std::size_t _a_index_to_check,
+	const std::size_t _a_max_index,
+	const std::string_view _a_str
+) noexcept
+{
+	return _a_index_to_check + 1 < _a_max_index ? _a_str : "";
 }
 _END_ABC_UTILITY_STR_NS

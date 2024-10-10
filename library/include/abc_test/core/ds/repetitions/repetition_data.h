@@ -37,6 +37,7 @@ public:
 	for_loop_iteration_data_t for_loop_iteration_data;
 };
 using repetition_data_sequence_t = std::vector<repetition_data_t>;
+using opt_repetition_data_t = std::optional<repetition_data_t>;
 _END_ABC_DS_NS
 
 template
