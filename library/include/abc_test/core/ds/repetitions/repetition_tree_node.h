@@ -13,7 +13,16 @@ _BEGIN_ABC_DS_NS
 // Forward declare
 template <typename bool Is_Root>
 class repetition_tree_node_t;
+/*!
+ * @brief Type synonym representing a complete repetition tree.
+ */
 using repetition_tree_t = repetition_tree_node_t<true>;
+/*!
+ * @brief Type synonym representing the result from parsing a string to a
+ * repetition_tree_node_t object.
+ * @tparam Is_Root Denotes whether the created object is a root tree node or
+ * not.
+ */
 template <bool Is_Root>
 using parse_repetition_tree_result_t
     = std::expected<repetition_tree_node_t<Is_Root>, std::string>;
@@ -22,18 +31,34 @@ namespace
 {
 // A synonym for the internal node type.
 using repetition_tree_non_root_t = repetition_tree_node_t<false>;
+// Type synonym for the child of a repetition_tree_node_t.
 using rep_tree_child_t    = std::shared_ptr<repetition_tree_node_t<false>>;
+// Type synonym for a list of rep_tree_child_t elements.
 using rep_tree_children_t = std::vector<rep_tree_child_t>;
+// Type synonym for the for-loop-level container of rep_tree_children_t objects.
 using for_loop_indexed_children_t = std::vector<rep_tree_children_t>;
-using rep_tree_node_ptr_t         = repetition_tree_node_t<false>*;
+// Type synonym for an optional pointer to a child node of a
+// repetition_tree_node_t object.
 using opt_itt_t = std::optional<rep_tree_children_t::const_iterator>;
 } // namespace
 
 /*!
- * @brief Represents the node in a repetition tree, a structure used
- * when navigating through gen_data for loops to either memoize data so
- * parts of tests can be repeated, or to read memoized data and tell other
- * parts of abc_test whether to skip for loops or not.
+ * @brief This class is used to represent repetition trees, a structure used
+ * in this library to store information about entities generated from gen_data_t
+ * objects.
+ *
+ * The structure itself consists of node data in the form repetition_data_t
+ * (except the root, which hhas no data), and 2D vector containing
+ * repetition_tree_node_t elements. Each outer vector's index represents the
+ * for loop index. The inner vector is the collection of entities at that index.
+ *
+ * A repetition tree can be thought of as a trie for data generated from
+ * gen_data_t elements. Because each gen_data_t element can have multiple
+ * children generated from differnet children, we organise the data using this
+ * object.
+ *
+ * @tparam Is_Root Denotes whether an instance of this object is the root node
+ * in a tree or not.
  */
 template <typename bool Is_Root>
 class repetition_tree_node_t
@@ -41,149 +66,225 @@ class repetition_tree_node_t
 public:
     /*!
      * @brief Default constructor.
+     *
+     * Only available public constructor.
      */
     __constexpr
     repetition_tree_node_t() noexcept
         = default;
     /*!
-     * @brief Prints the underlying tree in a "compressed format".
+     * @brief Returns a string representing the repetition_tree_node_t object in
+     * a compressed format.
      *
-     * Currently this means taking the string from
-     * "print_repetition_tree" and turning it into hex.
+     * Currently the compressed format is created by taking the output from
+     * print_repetition_tree_compressed and turning it into hex.
      *
-     * @return Compressed string representing the object.
+     * @return Compressed string representing the repetition_tree_node_t object.
      */
     __constexpr std::string
                 print_repetition_tree_compressed() const noexcept;
     /*!
-     * @brief Prints a string representing the object.
+     * @brief Returns a string representing the repetition_tree_node_t object.
      *
-     * If the element is a root, then it returns a string in the form:
+     * The output differs depending on whether the object is a root or not.
      *
-     * "[_m_children]"
+     * If it is, then it only prints out a list of the children.
      *
-     * If it is not the root, it returns a string in the form:
+     * If it is not, then it also prints out the node data.
      *
-     * "(_m_for_loop_data.generation_collection_index,
-     *  _m_for_loop_data.mode,
-     *  "_m_for_loop_data.additional_data",
-     *  _m_children)"
-     *
-     * @return The string representing the object.
+     * @return String representing the repetition_tree_node_t object.
      */
     __constexpr std::string
                 print_repetition_tree() const noexcept;
     /*!
-     * @brief Given a repetition_data_sequnece_t object, analysis the
-     * repetition_tree_node_t object and, if there is one available in the tree,
-     * returns an incremented version of the last element in the
-     * repetition_data_sequence_t object.
+     * @brief This function firstly finds the tree node representing the
+     * repetition_data_sequence_t argument. It then finds that node's first
+     * successor sibling s, and returns the repetition_data_t which would need
+     * to be substituted with the last element in the repetition_data_sequence_t
+     * argument to create s.
      *
-     * The algorithm analysis the internal repetition_tree, and finds the place
-     * of the given repetition_data_sequnece_t object. If there exists a "next"
-     * version of the last element in _a_rds, it is returned.
+     * By "successor sibling", we mean a sibling which is found after the node
+     * in an in-order traversal.
      *
      * The reader may think that this function and find_next_for_loop could
-     * be combined into one function. However, due to the way in which
-     * these functions interact with the ranged-based for loop, these
-     * must be separated, and called from different parts of the
-     * gen_data_collection_iterator_t class.
+     * be combined into one function, so as to act as an iterator on the tree.
+     * However, in our use-case, we need these functions to be separated. This
+     * is because of how they interact with user-defined tests; in essence
+     * print_repetition_tree is called when incrementing an iterator in a for
+     * loop, and find_next_for_loop is used when a new for loop is created.
      *
-     * If _a_rds is empty, then the function returns an empty optional.
+     * If _a_rds is empty or there is no "next" element, the function returns an
+     * empty optional.
      *
-     * If there is no "next" element, the function returns an empty optional.
-     *
-     * @param _a_rds The repetition_data_sequence_t object to increment.
-     * @return The "incremented" version of the last element of _a_rds.
+     * @param _a_rds The repetition_data_sequence_t object used to find the
+     * successor element in the tree.
+     * @return The opt_repetition_data_t object used to create the successor
+     * sibling.
      */
     __constexpr opt_repetition_data_t
         increment_last_index(const repetition_data_sequence_t& _a_rds
         ) const noexcept;
     /*!
-     * @brief Given a repetition_data_sequence_t object _a_rds, tells the caller
-     * whether that _a_rds is contained within this repetition_tree.
+     * @brief This function finds the tree node representing the
+     * repetition_data_sequence_t argument. If it exists in the tree,
+     * then this function returns true. Else, it returns false.
      *
-     * @param _a_rds The reptition_data_stequence_t object to test against.
-     * @return True if _a_rds is contained in the tree, false if not.
+     * @param _a_rds The repetition_data_sequence_t object to test.
+     * @return True if _a_rds is in the tree. False otherwise.
      */
     __constexpr bool
-        is_repetition_to_be_repeated(const repetition_data_sequence_t& _a_rds
+        is_sequence_in_tree(const repetition_data_sequence_t& _a_rds
         ) const noexcept;
     /*!
-     * @brief Adds a repetition_data_sequence_t object to the object.
+     * @brief Adds a repetition_data_sequence_t object to the underlying
+     * structure.
      *
-     * This is the function which is used to build repetition_tree_node_t
-     * instances; they are built up from processing successive
-     * repetition_data_sequence_t objects.
+     * This functin takes the repetition_data_sequence_t argument, finds any
+     * initial sequence which already exists in the tree, and navigates to that
+     * node. It then adds nodes representing each remaining repetition_data_t
+     * element in the repetition_data_sequence_t argument until the tree has a
+     * representation of the repetition_data_sequence_t argument within it.
      *
-     * @param _a_rds The repetition_data_sequence_t object to add to the object.
+     *
+     * @param _a_rds The repetition_data_sequence_t object to add to the
+     * structure.
      */
     __constexpr void
         add_repetition(const repetition_data_sequence_t& _a_rds) noexcept;
     /*!
-     * @brief Finds the next element to be added to the
-     * repetition_data_sequence_t given as the argument.
+     * @brief This function firstly finds the tree node representing the
+     * repetition_data_sequence_t argument. It then finds the first child node
+     * of that element, and returns the repetition_data_t element which would
+     * have to be appended to the repetition_data_sequence_t argument to create
+     * it.
      *
-     * This function essentially analysis the given repetition_data_sequence_t
-     * object _a_rds, and finds whether there is a "next" for loop for it;
-     * in essence, whether it has any children in the tree.
+     * If the node has no children, this function returns a nullopt.
      *
-     * If given an empty repetition_data_sequence_t, then this function
-     * simply finds the first element in the first for loop.
+     * If the repetition_data_sequence_t is empty, and there are any elements in
+     * the tree, this function will return the first of them.
      *
-     * @param _a_rds repetition_data_sequence_t to find the next element for.
-     * @return Nullopt if the element has no child, a repetition_data_t object
-     * representing it if it does.
+     * If the repetition_data_sequence_t argument is not represented in the
+     * tree, then the function returns a nullopt.
+     *
+     * @param _a_rds The repetition_data_sequence_t object used to find the
+     * next element in the tree.
+     * @return The opt_repetition_data_t object used to create _a_rds's first
+     * child node.
      */
     __constexpr opt_repetition_data_t
         find_next_for_loop(const repetition_data_sequence_t& _a_rds
         ) const noexcept;
     friend class repetition_tree_node_t<not Is_Root>;
     /*!
-     * @brief Static function used to parse a string to a repetition_data_node_t
+     * @brief Parses a string into a repetition_tree_node_t element.
+     *
+     * This function assumes the string has been written using
+     * print_repetition_tree_compressed.
+     *
+     * @tparam Is_Root The template of the returned repetition_tree_node_t
      * element.
-     * @tparam Is_Root Whether the element created is a root node.
-     * @param _a_str The input string.
-     * @return An expected value; either the constructed repetition_tree_node_t
-     * or a std::string error message.
+     * @param _a_str The string to parse.
+     * @return An parse_repetition_tree_result_t. If the string could be parsed,
+     * it is a repetition_tree_node_t element. Otherwise it returns nullopt.
      */
     template <bool Is_Root>
     friend __constexpr parse_repetition_tree_result_t<Is_Root>
         parse_compressed_repetition_tree_node(const std::string_view _a_str
         ) noexcept;
 private:
+    /*!
+     * @brief Conditional variable used to hold node data.
+     *
+     * Only variables which are not the root hold for_loop_iteration_data_t
+     * elements, hence the use of the conditional.
+     */
     std::conditional_t<not Is_Root, for_loop_iteration_data_t, std::monostate>
                                 _m_for_loop_data;
     for_loop_indexed_children_t _m_children;
-    template <typename = typename std::enable_if<not Is_Root>::type>
     /*!
      * @brief Constructor taking for_loop_iteration_data_t element.
      *
      * This class can only be used when the element is not the root of a tree -
      * as the root has no _m_for_loop_data member variable to set.
      */
+    template <typename = typename std::enable_if<not Is_Root>::type>
     __constexpr
     repetition_tree_node_t(const for_loop_iteration_data_t& _a_flid) noexcept;
+    /*!
+     * @brief Internal increment_last_index function. The
+     * integer argument represents the element currently being processed in the
+     * repetition_data_sequence_t argument.
+     * @param _a_rds The repetition_data_sequence_t to use.
+     * @param _a_idx The index of the current repetition_data_sequence_t
+     * element.
+     * @return Optional repetition_data_t, representing the "sucessor" element
+     * in the tree. Nullopt if there is not one.
+     */
     __constexpr opt_repetition_data_t
         increment_last_index(
             const repetition_data_sequence_t& _a_rds,
             const std::size_t                 _a_idx
         ) const noexcept;
+    /*!
+     * @brief Internal find_next_for_loop function. The
+     * integer argument represents the element currently being processed in the
+     * repetition_data_sequence_t argument.
+     * @param _a_rds The repetition_data_sequence_t to use.
+     * @param _a_idx The index of the current repetition_data_sequence_t
+     * element.
+     * @return Optional repetition_data_t, representing _a_rds's child element
+     * in the tree. Nullopt if there is not one.
+     */
     __constexpr opt_repetition_data_t
         find_next_for_loop(
             const repetition_data_sequence_t& _a_rds,
             const std::size_t                 _a_idx
         ) const noexcept;
+    /*!
+     * @brief Internal is_sequence_in_tree function. The
+     * integer argument represents the element currently being processed in the
+     * repetition_data_sequence_t argument.
+     * @param _a_rds The repetition_data_sequence_t to use.
+     * @param _a_idx The index of the current repetition_data_sequence_t
+     * element.
+     * @return True if the element is in the tree, false otherwise.
+     */
     __constexpr bool
-        is_repetition_to_be_repeated(
+        is_sequence_in_tree(
             const repetition_data_sequence_t& _a_rds,
             const std::size_t                 _a_idx
         ) const noexcept;
+    /*!
+     * @brief Internal function to add a repetition to the structure. The
+     * integer argument represents the element currently being processed in the
+     * repetition_data_sequence_t argument.
+     *
+     * See add_repetition for more information.
+     *
+     * @param _a_rds The repetition_data_sequence_t argument.
+     * @param _a_idx The index of the repetition_data_sequence_t currently being
+     * considered.
+     */
     __constexpr void
         add_repetition(
             const repetition_data_sequence_t& _a_rds,
             const std::size_t                 _a_idx
         ) noexcept;
+    /*!
+     * @brief If the repetition_data_t argument is represented in this nodes
+     * chidlren, then this function returns it. Otherwise, it returns an empty
+     * optional.
+     *
+     * As the elements are ordered in each vector, and repetition_data_t has an
+     * exact for loop index, this function is O(log n), where n is the size of
+     * the largest inner vector in the node's children.
+     *
+     * @param _a_rd The repetition_data_t representing the element to find in
+     * the nodes children.
+     * @return An optional iterator to the child which matches _a_rd. If there
+     * is such an element, the iterator pointing to that element is returned.
+     * Otherwise, a nullopt is returned.
+     */
     __constexpr opt_itt_t
         get_itt_to_rep_tree_node(const repetition_data_t& _a_rd) const noexcept;
 };
@@ -264,8 +365,8 @@ __constexpr_imp std::string
         return fmt::format(
             "({0},{1},\"{2}\",{3})",
             _m_for_loop_data.generation_collection_index,
-            _m_for_loop_data.mode,
-            _m_for_loop_data.additional_data,
+            _m_for_loop_data.flied.mode,
+            _m_for_loop_data.flied.additional_data,
             _l_children_str
         );
     }
@@ -282,11 +383,11 @@ __constexpr_imp opt_repetition_data_t
 
 template <typename bool Is_Root>
 __constexpr_imp bool
-    repetition_tree_node_t<Is_Root>::is_repetition_to_be_repeated(
+    repetition_tree_node_t<Is_Root>::is_sequence_in_tree(
         const repetition_data_sequence_t& _a_rds
     ) const noexcept
 {
-    return is_repetition_to_be_repeated(_a_rds, 0);
+    return is_sequence_in_tree(_a_rds, 0);
 }
 
 template <typename bool Is_Root>
@@ -411,7 +512,7 @@ __constexpr_imp opt_repetition_data_t
 
 template <typename bool Is_Root>
 __constexpr_imp bool
-    repetition_tree_node_t<Is_Root>::is_repetition_to_be_repeated(
+    repetition_tree_node_t<Is_Root>::is_sequence_in_tree(
         const repetition_data_sequence_t& _a_rds,
         const std::size_t                 _a_idx
     ) const noexcept
@@ -434,7 +535,7 @@ __constexpr_imp bool
         {
             return (*_l_opt_itt.value())
                 .get()
-                ->is_repetition_to_be_repeated(_a_rds, _a_idx + 1);
+                ->is_sequence_in_tree(_a_rds, _a_idx + 1);
         }
         else
         {
@@ -559,9 +660,25 @@ __constexpr_imp parse_repetition_tree_result_t<Is_Root>
     using enum utility::internal::internal_log_enum_t;
     if ((_a_str.size() % 2) != 0)
     {
-        return unexpected(fmt::format(
-            "Compressed repetition_tree_t is in the " "form " "a string " "in " "hex." " " "As each " "hex " "digit " "requires two bytes, " "the " "total size of " "the string " "must be " "divisble " "by" " 2" ". " "This string is not"
-        ));
+        return unexpected(fmt::format("Compressed repetition_tree_t is in the "
+                                      "form "
+                                      "a string "
+                                      "in "
+                                      "hex."
+                                      " "
+                                      "As each "
+                                      "hex "
+                                      "digit "
+                                      "requires two bytes, "
+                                      "the "
+                                      "total size of "
+                                      "the string "
+                                      "must be "
+                                      "divisble "
+                                      "by"
+                                      " 2"
+                                      ". "
+                                      "This string is not"));
     }
     else
     {
@@ -597,7 +714,22 @@ __constexpr_imp parse_repetition_tree_result_t<Is_Root>
         _LIBRARY_LOG(
             PARSING_SEED,
             fmt::format(
-                "Depth {0}. Repetition tree after " "conversion " "from " "hex " "is " "i" "n" " " "f" "o" "r" "m" " " "\"{" "1}" "\"",
+                "Depth {0}. Repetition tree after "
+                "conversion "
+                "from "
+                "hex "
+                "is "
+                "i"
+                "n"
+                " "
+                "f"
+                "o"
+                "r"
+                "m"
+                " "
+                "\"{"
+                "1}"
+                "\"",
                 _a_depth,
                 _l_str
             )

@@ -22,6 +22,7 @@ set(LIBRARY_FILES
   include/abc_test/core/ds/repetitions/for_loop_data.h
   include/abc_test/core/ds/repetitions/for_loop_data_collection.h
   include/abc_test/core/ds/repetitions/for_loop_iteration_data.h 
+  include/abc_test/core/ds/repetitions/for_loop_iteration_element_data.h
   # Contains code for test data - e.g. name, location, repetition data.
   include/abc_test/core/ds/test_data/invoked_test_data.h
   include/abc_test/core/ds/test_data/registered_test_data.h
@@ -124,6 +125,7 @@ set(LIBRARY_FILES
   include/abc_test/gen_data/file.h
   include/abc_test/gen_data/collection.h
   include/abc_test/gen_data/collection_iterator.h
+  include/abc_test/gen_data/collection_sentinel.h
   include/abc_test/gen_data/random_data.h
   include/abc_test/gen_data/random_data_description.h
   # Subfolder contains logic specifically to do with random data generation.

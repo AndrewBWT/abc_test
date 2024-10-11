@@ -33,12 +33,12 @@ public:
 		gen_data_base_t(
 		) noexcept;
 	__constexpr
-		ds::repetition_data_t*
-		repetition_data_ptr(
+		ds::for_loop_iteration_element_data_t*
+		for_loop_iteration_element_data_ptr(
 		) noexcept;
 	__constexpr
-		ds::repetition_data_t&
-		repetition_data_ref(
+		ds::for_loop_iteration_element_data_t&
+		for_loop_iteration_element_data_ref(
 		) noexcept;
 	__constexpr
 		std::size_t
@@ -87,7 +87,7 @@ public:
 		determine_mode(
 		)const noexcept= 0;
 protected:
-	ds::repetition_data_t _m_repetition_data;
+	ds::for_loop_iteration_element_data_t _m_flied;
 };
 template<
 	typename T
@@ -103,7 +103,7 @@ template<
 __constexpr_imp
 	gen_data_base_t<T>::gen_data_base_t(
 	) noexcept
-	: _m_repetition_data(ds::repetition_data_t())
+	: _m_flied(ds::for_loop_iteration_element_data_t())
 {
 
 }
@@ -111,21 +111,21 @@ template<
 	typename T
 >
 __constexpr_imp
-	ds::repetition_data_t*
-	gen_data_base_t<T>::repetition_data_ptr(
+	ds::for_loop_iteration_element_data_t*
+	gen_data_base_t<T>::for_loop_iteration_element_data_ptr(
 	) noexcept
 {
-	return &_m_repetition_data;
+	return &_m_flied;
 }
 template<
 	typename T
 >
 __constexpr_imp
-ds::repetition_data_t&
-gen_data_base_t<T>::repetition_data_ref(
+ds::for_loop_iteration_element_data_t&
+gen_data_base_t<T>::for_loop_iteration_element_data_ref(
 ) noexcept
 {
-	return _m_repetition_data;
+	return _m_flied;
 }
 template<
 	typename T
@@ -135,7 +135,7 @@ __constexpr_imp
 	gen_data_base_t<T>::mode(
 	) const noexcept
 {
-	return _m_repetition_data.for_loop_iteration_data.mode;
+	return _m_flied.mode;
 }
 template<
 	typename T
@@ -145,7 +145,7 @@ __constexpr_imp
 	gen_data_base_t<T>::finish_setup(
 	) noexcept
 {
-	_m_repetition_data.for_loop_iteration_data.mode = determine_mode();
-	_m_repetition_data.for_loop_iteration_data.additional_data = get_rep_string();
+	_m_flied.mode = determine_mode();
+	_m_flied.additional_data = get_rep_string();
 }
 _END_ABC_NS

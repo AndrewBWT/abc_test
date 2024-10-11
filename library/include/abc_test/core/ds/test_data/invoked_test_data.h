@@ -250,7 +250,7 @@ invoked_test_info_t::is_repetition_to_be_repeated(
 ) const noexcept
 {
 	return (not _m_post_setup_test_data.has_repetition_data()) ? true :
-		_m_post_setup_test_data.repetition_data().is_repetition_to_be_repeated(_m_for_loop_data_collection.repetition_data_sequence());
+		_m_post_setup_test_data.repetition_data().is_sequence_in_tree(_m_for_loop_data_collection.repetition_data_sequence());
 }
 __constexpr_imp
 const ds::repetition_tree_t&

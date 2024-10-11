@@ -146,7 +146,7 @@ std::optional<ds::repetition_data_t>
 		if (_m_file_rw.has_value())
 		{
 			//Should we write to file?
-			if (_a_rep_data.for_loop_iteration_data.mode == 2)
+			if (_a_rep_data.for_loop_iteration_data.flied.mode == 2)
 			{
 
 			}

@@ -4,12 +4,15 @@
 #include "abc_test/gen_data/gen_data_base.h"
 #include <cstdarg>
 
+#include "abc_test/gen_data/collection_sentinel.h"
+
 _BEGIN_ABC_NS
 	//Forward declaration
 	template<
 		typename T
 	>
 	struct gen_data_collection_iterator_t;
+	struct gen_data_collection_sentinel_t;
 	/*!
 	* Describes a collection of gen_data elements. This object contains the logic for allowing for loops
 	* to work properly with a collection of gen_data elements.
@@ -28,6 +31,10 @@ _BEGIN_ABC_NS
 		using iterator = gen_data_collection_iterator_t<T>;
 		//! Const iterator for the object
 		using const_iterator = gen_data_collection_iterator_t<T>;
+
+		using sentinel_t = gen_data_collection_sentinel_t;
+
+		using const_sentinel_t = sentinel_t;
 		/*!
 		* Default constructor for hte object
 		*/
@@ -55,7 +62,7 @@ _BEGIN_ABC_NS
 		* Gets end iterator for object
 		*/
 		__constexpr
-			iterator
+			sentinel_t
 			end(
 			);
 		/*!
@@ -69,7 +76,7 @@ _BEGIN_ABC_NS
 		* Gets const end iterator for object
 		*/
 		__constexpr
-			const_iterator
+			const_sentinel_t
 			end(
 			) const;
 		/*!
@@ -83,7 +90,7 @@ _BEGIN_ABC_NS
 		* Gets const end iterator for object
 		*/
 		__constexpr
-			const_iterator
+			const_sentinel_t
 			cend(
 			) const;
 		/*!
@@ -211,11 +218,11 @@ _BEGIN_ABC_NS
 		typename T
 	>
 	__constexpr_imp
-		gen_data_collection_t<T>::iterator
+		gen_data_collection_t<T>::sentinel_t
 		gen_data_collection_t<T>::end(
 		)
 	{
-		return gen_iterator_end();
+		return sentinel_t();
 	}
 	template<
 		typename T
@@ -231,11 +238,11 @@ _BEGIN_ABC_NS
 		typename T
 	>
 	__constexpr_imp
-		gen_data_collection_t<T>::const_iterator
+		gen_data_collection_t<T>::const_sentinel_t
 		gen_data_collection_t<T>::end(
 		) const
 	{
-		return gen_iterator_end();
+		return const_sentinel_t();
 	}
 	template<
 		typename T
@@ -245,17 +252,17 @@ _BEGIN_ABC_NS
 		gen_data_collection_t<T>::cbegin(
 		) const
 	{
-		return _m_elements.cbegin();
+		return gen_iterator_begin();
 	}
 	template<
 		typename T
 	>
 	__constexpr_imp
-		gen_data_collection_t<T>::const_iterator
+		gen_data_collection_t<T>::const_sentinel_t
 		gen_data_collection_t<T>::cend(
 		) const
 	{
-		return _m_elements.cend();
+		return const_sentinel_t();
 	}
 	template<
 		typename T

@@ -3,6 +3,8 @@
 #include "abc_test/gen_data/gen_data_base.h"
 #include "abc_test/gen_data/collection.h"
 
+#include "abc_test/gen_data/collection_sentinel.h"
+
 
 _BEGIN_ABC_NS
 struct test_runner_t;
@@ -14,6 +16,7 @@ struct test_runner_t;
 	/*!
 	* Iterator object for a gen_data_collection_t object.
 	*/
+
 	template<
 		typename T
 	>
@@ -66,7 +69,7 @@ struct test_runner_t;
 		__constexpr
 			bool
 			operator==(
-				const gen_data_collection_iterator_t<T>& _a_rhs
+				const gen_data_collection_sentinel_t& _a_rhs
 			) const noexcept;
 		/*!
 		* Inequality comparison
@@ -74,7 +77,7 @@ struct test_runner_t;
 		__constexpr
 			bool
 			operator!=(
-				const gen_data_collection_iterator_t<T>& _a_rhs
+				const gen_data_collection_sentinel_t& _a_rhs
 			) const noexcept;
 		/*!
 		* Dereference operator
@@ -95,6 +98,7 @@ struct test_runner_t;
 		gdc_iterator _m_begin_iterator;
 		gdc_iterator _m_end_iterator;
 		gdc_iterator _m_this_iterator;
+		ds::opt_repetition_data_t _m_repetition_data;
 		size_t _m_this_iterators_index;
 		bool _m_add_repeatable_test_config;
 		test_runner_t* _m_test_runner;
@@ -145,7 +149,7 @@ struct test_runner_t;
 				_l_current_test.for_loop_data_collection().increment(
 					_l_this_iterator_ref->create_test_failure_function(),
 					std::distance(_m_begin_iterator, _m_this_iterator),
-					_l_this_iterator_ref->repetition_data_ref());
+					_l_this_iterator_ref->for_loop_iteration_element_data_ref());
 			}
 			else
 			{
@@ -213,9 +217,7 @@ struct test_runner_t;
 				auto& _l_this_iterator_ref{ *_m_this_iterator };
 				_l_current_test.for_loop_data_collection().update(_l_this_iterator_ref->create_test_failure_function(),
 					std::distance(_m_begin_iterator, _m_this_iterator),
-					_l_this_iterator_ref->repetition_data_ref());
-					//_l_this_iterator_ref->infer_correct_mode(),
-					//_l_this_iterator_ref->get_additinoal_string_data());
+					_l_this_iterator_ref->for_loop_iteration_element_data_ref());
 			}
 		}
 		return *this;
@@ -239,30 +241,31 @@ struct test_runner_t;
 	__constexpr_imp
 		bool
 		gen_data_collection_iterator_t<T>::operator==(
-			const gen_data_collection_iterator_t<T>& _a_rhs
+			const gen_data_collection_sentinel_t& _a_rhs
 			) const noexcept
 	{
-		if (_m_begin_iterator != _a_rhs._m_begin_iterator)
-		{
-			return false;
-		}
-		if (_m_end_iterator != _a_rhs._m_end_iterator)
-		{
-			return false;
-		}
-		if (_m_this_iterator != _a_rhs._m_this_iterator)
-		{
-			return false;
-		}
+		return _m_this_iterator == _m_end_iterator;
+		//if (_m_begin_iterator != _a_rhs._m_begin_iterator)
+		//{
+		//	return false;
+		//}
+		//if (_m_end_iterator != _a_rhs._m_end_iterator)
+	//	{
+		//	return false;
+	//	}
+	//	if (_m_this_iterator != _a_rhs._m_this_iterator)
+	//	{
+		//	return false;
+	//	}
 		//	if (_m_this_iterators_index != _a_rhs._m_this_iterators_index)
 		//	{
 		//		return false;
 		//	}
-		if (_m_test_runner != _a_rhs._m_test_runner)
-		{
-			return false;
-		}
-		return true;
+	//	if (_m_test_runner != _a_rhs._m_test_runner)
+	//	{
+	//		return false;
+	//	}
+	//	return true;
 	}
 	template<
 		typename T
@@ -270,7 +273,7 @@ struct test_runner_t;
 	__constexpr_imp
 		bool
 		gen_data_collection_iterator_t<T>::operator!=(
-			const gen_data_collection_iterator_t<T>& _a_rhs
+			const gen_data_collection_sentinel_t& _a_rhs
 			) const noexcept
 	{
 		return !(*this == _a_rhs);
@@ -315,14 +318,13 @@ struct test_runner_t;
 		{
 			const repetition_data_t& _l_rd{ _a_opt_repetition_data.value() };
 			size_t _l_generation_collection_index{ _l_rd.for_loop_iteration_data.generation_collection_index };
-			int64_t _l_current{ std::distance(_m_begin_iterator, _m_this_iterator) };
 			while (std::distance(_m_begin_iterator, _m_this_iterator) < _l_generation_collection_index)
 			{
 				++_m_this_iterator;
 			}
 			auto& _l_this_iterator_ref{ *_m_this_iterator };
 			_l_this_iterator_ref->set_data_using_mode_and_string_representing_repetition_data(
-				_l_rd.for_loop_iteration_data.mode,_l_rd.for_loop_iteration_data.additional_data);
+				_l_rd.for_loop_iteration_data.flied.mode,_l_rd.for_loop_iteration_data.flied.additional_data);
 		}
 		else
 		{

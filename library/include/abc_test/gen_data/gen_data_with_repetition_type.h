@@ -423,7 +423,6 @@ __constexpr_imp
 	gen_data_with_repetition_type_t<T, Rep_Data>::has_current_element(
 	) const noexcept
 {
-	auto _l_rp{ this->_m_repetition_data };
 	if (_m_core_data_rw_file.has_current_element(this->mode()))
 	{
 		return true;
@@ -474,8 +473,8 @@ __constexpr_imp
 	{
 		const size_t _l_mode{ _l_result.value() };
 		_m_has_current_element_been_written_to_file = false;
-		this->_m_repetition_data.for_loop_iteration_data.mode = (_l_mode);
-		this->_m_repetition_data.for_loop_iteration_data.additional_data = (get_rep_string());
+		this->_m_flied.mode = (_l_mode);
+		this->_m_flied.additional_data = (get_rep_string());
 		if (_l_mode == 1)
 		{
 			subclass_set_data_using_mode_and_repetition_data(this->mode(),
@@ -525,19 +524,20 @@ __constexpr_imp
 	{
 		using namespace std;
 		using namespace ds;
-		if (optional<repetition_data_t> _l_res{ _m_core_data_rw_file.log_failure_and_return_rep_data(
-			_m_has_current_element_been_written_to_file, this->_m_repetition_data) }; _l_res.has_value())
+		//if (optional<repetition_data_t> _l_res{ 
+		//	_m_core_data_rw_file.log_failure_and_return_rep_data(
+		//	_m_has_current_element_been_written_to_file, this->_m_repetition_data) }; _l_res.has_value())
+		//{
+		//	return _l_res.value();
+		//}
+	//	else if (optional<repetition_data_t> _l_res{ _m_rep_data_rw_file.log_failure_and_return_rep_data(
+	//		_m_has_current_element_been_written_to_file, this->_m_repetition_data) }; _l_res.has_value())
+		//{
+		//	return _l_res.value();
+		//}
+		//else
 		{
-			return _l_res.value();
-		}
-		else if (optional<repetition_data_t> _l_res{ _m_rep_data_rw_file.log_failure_and_return_rep_data(
-			_m_has_current_element_been_written_to_file, this->_m_repetition_data) }; _l_res.has_value())
-		{
-			return _l_res.value();
-		}
-		else
-		{
-			return this->_m_repetition_data;
+			return ds::repetition_data_t();
 		}
 	};
 }

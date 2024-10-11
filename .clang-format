@@ -193,7 +193,7 @@ LambdaBodyIndentation: Signature
 
 # String options
 AlwaysBreakBeforeMultilineStrings: false
-BreakAdjacentStringLiterals: false
+BreakAdjacentStringLiterals: true
 BreakStringLiterals: true
 
   
