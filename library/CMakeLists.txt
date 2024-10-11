@@ -17,12 +17,11 @@ set(LIBRARY_FILES
   include/abc_test/core/test_assertions.h
   include/abc_test/core/test_assertions/test_block.h
   # Subfolder contains objects and functions pertaining to how repetition data is stored.
-  include/abc_test/core/ds/repetitions/repetition_data.h
-  include/abc_test/core/ds/repetitions/repetition_tree_node.h
-  include/abc_test/core/ds/repetitions/for_loop_data.h
-  include/abc_test/core/ds/repetitions/for_loop_data_collection.h
-  include/abc_test/core/ds/repetitions/for_loop_iteration_data.h 
-  include/abc_test/core/ds/repetitions/for_loop_iteration_element_data.h
+  include/abc_test/core/ds/gen_data_memoization/for_loop_creation_data.h
+  include/abc_test/core/ds/gen_data_memoization/for_loop_stack_trie.h
+  include/abc_test/core/ds/gen_data_memoization/for_loop_stack.h
+  include/abc_test/core/ds/gen_data_memoization/gen_collection_creation_data.h 
+  include/abc_test/core/ds/gen_data_memoization/gen_data_creation_data.h
   # Contains code for test data - e.g. name, location, repetition data.
   include/abc_test/core/ds/test_data/invoked_test_data.h
   include/abc_test/core/ds/test_data/registered_test_data.h
@@ -125,6 +124,7 @@ set(LIBRARY_FILES
   include/abc_test/gen_data/file.h
   include/abc_test/gen_data/collection.h
   include/abc_test/gen_data/collection_iterator.h
+  include/abc_test/gen_data/collection_iterator_agnostic_data.h
   include/abc_test/gen_data/collection_sentinel.h
   include/abc_test/gen_data/random_data.h
   include/abc_test/gen_data/random_data_description.h

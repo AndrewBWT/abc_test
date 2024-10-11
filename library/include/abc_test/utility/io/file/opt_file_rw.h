@@ -35,10 +35,10 @@ public:
 			const std::size_t _a_mode
 		) noexcept;
 	__constexpr
-		std::optional<ds::repetition_data_t>
+		std::optional<ds::for_loop_creation_data_t>
 		log_failure_and_return_rep_data(
 			bool& _a_has_current_element_been_written_to_file,
-			const ds::repetition_data_t& _a_rep_data
+			const ds::for_loop_creation_data_t& _a_rep_data
 		) noexcept;
 	__constexpr
 		std::size_t
@@ -132,10 +132,10 @@ template<
 	std::size_t Mode
 >
 __constexpr_imp
-std::optional<ds::repetition_data_t>
+std::optional<ds::for_loop_creation_data_t>
 	opt_file_rw_t<T, Mode>::log_failure_and_return_rep_data(
 		bool& _a_has_current_element_been_written_to_file,
-		const ds::repetition_data_t& _a_rep_data
+		const ds::for_loop_creation_data_t& _a_rep_data
 	) noexcept
 {
 	using namespace ds;
@@ -152,7 +152,7 @@ std::optional<ds::repetition_data_t>
 			}
 		}
 	}
-	return optional<repetition_data_t>{};
+	return optional<for_loop_creation_data_t>{};
 }
 template<
 	typename T,

@@ -32,7 +32,7 @@ public:
 			const test_path_delimiter_ref _a_test_hierarchy_delimiter,
 			const unique_id_t _a_discovery_id,
 			const bool _a_is_test_to_be_ran,
-			const ds::repetition_tree_t* _a_repetition_data,
+			const ds::for_loop_stack_trie_root_t* _a_repetition_data,
 			const size_t _a_maximum_threads_allowed
 		) noexcept;
 	/*!
@@ -84,7 +84,7 @@ public:
 	 * @return Gets a cref to the internal repetition tree of the test. 
 	 */
 	__constexpr
-		const ds::repetition_tree_t&
+		const ds::for_loop_stack_trie_root_t&
 		repetition_data(
 		) const;
 	/*!
@@ -111,7 +111,7 @@ private:
 	unique_id_t _m_discovery_id;
 	bool _m_is_test_to_be_ran;
 	size_t _m_thread_resourses_required;
-	const ds::repetition_tree_t* _m_repetition_data;
+	const ds::for_loop_stack_trie_root_t* _m_repetition_data;
 };
 _END_ABC_DS_NS
 
@@ -142,7 +142,7 @@ post_setup_test_data_t::post_setup_test_data_t(
 	const test_path_delimiter_ref _a_test_hierarchy_delimiter,
 	const unique_id_t _a_discovery_id,
 	const bool _a_is_test_to_be_ran,
-	const ds::repetition_tree_t* _a_repetition_data,
+	const ds::for_loop_stack_trie_root_t* _a_repetition_data,
 	const size_t _a_maximum_threads_allowed
 ) noexcept
 	: _m_registered_test_data(_a_registered_test_data)
@@ -193,7 +193,7 @@ post_setup_test_data_t::has_repetition_data(
 	return _m_repetition_data != nullptr;
 }
 __constexpr_imp
-const ds::repetition_tree_t&
+const ds::for_loop_stack_trie_root_t&
 post_setup_test_data_t::repetition_data(
 ) const
 {
@@ -241,7 +241,7 @@ fmt::formatter<abc::ds::post_setup_test_data_t>::format(
 		_a_pstd.discovery_id(),
 		_a_pstd.is_test_to_be_ran(),
 		_a_pstd.thread_resourses_required(),
-		_a_pstd.has_repetition_data() ? _a_pstd.repetition_data().print_repetition_tree() : "nullptr"
+		_a_pstd.has_repetition_data() ? _a_pstd.repetition_data().print_for_loop_stack_trie() : "nullptr"
 	) };
 	return formatter<string_view>::format(_l_rv, _a_ctx);
 }

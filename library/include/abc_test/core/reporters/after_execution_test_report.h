@@ -36,7 +36,7 @@ public:
 	__constexpr
 		void
 		add_repetition_tree(
-			const ds::repetition_tree_t& _a_repetition_tree,
+			const ds::for_loop_stack_trie_root_t& _a_repetition_tree,
 			const test_options_t* _a_test_options
 		) noexcept;
 	__constexpr
@@ -187,10 +187,10 @@ __constexpr_imp
 		_a_iti.post_setup_test_data().registered_test_data()._m_user_data.path : "",
 		true &&
 		_a_iti.post_setup_test_data().has_repetition_data() ?
-		_a_iti.post_setup_test_data().repetition_data().print_repetition_tree() : "",
+		_a_iti.post_setup_test_data().repetition_data().print_for_loop_stack_trie() : "",
 		true &&
 		_a_iti.post_setup_test_data().has_repetition_data() ?
-		_a_iti.post_setup_test_data().repetition_data().print_repetition_tree_compressed() : "",
+		_a_iti.post_setup_test_data().repetition_data().print_for_loop_stack_trie_compressed() : "",
 		true,enum_termination_type_t::NO_TERMINATION,0,0,0, _a_test_options
 	)
 {
@@ -206,14 +206,14 @@ __constexpr_imp
 __constexpr_imp
 	void
 	after_execution_test_report_t::add_repetition_tree(
-		const ds::repetition_tree_t& _a_repetition_tree,
+		const ds::for_loop_stack_trie_root_t& _a_repetition_tree,
 		const test_options_t* _a_test_options
 	) noexcept
 {
 	_m_seed_to_use_to_re_run_test = 
-		_a_repetition_tree.print_repetition_tree();
+		_a_repetition_tree.print_for_loop_stack_trie();
 	_m_seed_to_use_to_re_run_test_in_hex =
-		_a_repetition_tree.print_repetition_tree_compressed();
+		_a_repetition_tree.print_for_loop_stack_trie_compressed();
 }
 __constexpr_imp
 	const std::optional<std::string>&

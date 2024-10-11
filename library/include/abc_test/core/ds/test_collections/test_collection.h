@@ -82,7 +82,7 @@ test_collection_t::add_tests(
 		const_ptr_t<test_list_t> _l_tl{ get_ptr(_l_test_list_element) };
 		for (const test_list_element_t& _l_test_element : *_l_tl)
 		{
-			const repetition_tree_t* _l_reps{
+			const for_loop_stack_trie_root_t* _l_reps{
 				_m_options.get_test_repetition_configurations().contains(_m_test_discovery_id) ?
 				&_m_options.get_test_repetition_configurations().at(_m_test_discovery_id) :
 				nullptr

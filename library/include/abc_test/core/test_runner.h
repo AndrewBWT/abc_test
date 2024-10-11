@@ -368,6 +368,6 @@ test_runner_t::add_assertion_and_optional_warning(
 			new basic_text_warning_t(_a_uir->last_source(), true, _a_optional_warning.value())
 		);
 	}
-	_m_current_test->update_repetition_tree(_m_current_test->for_loop_data_collection().repetition_data_sequence());
+	_m_current_test->update_repetition_tree(_m_current_test->for_loop_data_collection().create_data_sequence());
 }
 _END_ABC_NS

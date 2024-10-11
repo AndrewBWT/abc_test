@@ -104,11 +104,6 @@ public:
 		) = 0;
 	__constexpr
 		virtual
-		ds::test_failure_func_t
-		create_test_failure_function(
-		) noexcept final;
-	__constexpr
-		virtual
 		void
 		subclass_reset_data(
 		) noexcept  = 0;
@@ -121,12 +116,16 @@ public:
 		std::size_t
 		virtual 
 		determine_mode(
-		)const noexcept override final;
+		)const;
 	__constexpr
 		virtual
 		void
 		finish_setup(
 		) noexcept final;
+	__constexpr virtual ds::gen_data_creation_data_t
+		generate_repeat_repetition_data() const noexcept override final;
+	__constexpr virtual ds::gen_data_creation_data_t
+		generate_repetition_data() const noexcept override final;
 private:
 	//! Contains the core data reader/writer.
 	utility::io::opt_file_rw_t<T,0> _m_core_data_rw_file;
@@ -515,37 +514,6 @@ template<
 	typename Rep_Data
 >
 __constexpr_imp
-	ds::test_failure_func_t
-	gen_data_with_repetition_type_t<T, Rep_Data>::create_test_failure_function(
-	) noexcept
-{
-
-	return [this]()
-	{
-		using namespace std;
-		using namespace ds;
-		//if (optional<repetition_data_t> _l_res{ 
-		//	_m_core_data_rw_file.log_failure_and_return_rep_data(
-		//	_m_has_current_element_been_written_to_file, this->_m_repetition_data) }; _l_res.has_value())
-		//{
-		//	return _l_res.value();
-		//}
-	//	else if (optional<repetition_data_t> _l_res{ _m_rep_data_rw_file.log_failure_and_return_rep_data(
-	//		_m_has_current_element_been_written_to_file, this->_m_repetition_data) }; _l_res.has_value())
-		//{
-		//	return _l_res.value();
-		//}
-		//else
-		{
-			return ds::repetition_data_t();
-		}
-	};
-}
-template<
-	typename T,
-	typename Rep_Data
->
-__constexpr_imp
 	generate_next_return_type_t
 	gen_data_with_repetition_type_t<T, Rep_Data>::initialise_rep_data_level(
 	) noexcept
@@ -623,7 +591,7 @@ template<
 __constexpr_imp
 	std::size_t
 	gen_data_with_repetition_type_t<T, Rep_Data>::determine_mode(
-	)const noexcept
+	)const
 {
 	if (_m_core_data_rw_file.has_current_element(this->mode()))
 	{
@@ -659,5 +627,36 @@ __constexpr_imp
 		//	subclass_set_data_using_mode_and_repetition_data(this->mode(),
 		//		_m_rep_data_rw_file.current_element());
 	}
+}
+template<
+	typename T,
+	typename Rep_Data
+>
+__constexpr_imp ds::gen_data_creation_data_t
+gen_data_with_repetition_type_t<T, Rep_Data>::generate_repeat_repetition_data() const noexcept
+{
+	using namespace std;
+	using namespace ds;
+	if (optional<for_loop_creation_data_t> _l_res{};
+	//	_m_core_data_rw_file.log_failure_and_return_rep_data(
+	//	_m_has_current_element_been_written_to_file, this->_m_repetition_data) }; 
+	 _l_res.has_value())
+	{
+		return gen_data_creation_data_t{};
+	}
+	else
+	{
+		return generate_repetition_data();
+	}
+}
+template<
+	typename T,
+	typename Rep_Data
+>
+__constexpr_imp ds::gen_data_creation_data_t
+gen_data_with_repetition_type_t<T, Rep_Data>::generate_repetition_data() const noexcept
+{
+	using namespace ds;
+	return gen_data_creation_data_t{ this->mode(),get_rep_string() };
 }
 _END_ABC_NS

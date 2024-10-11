@@ -1,7 +1,7 @@
 #pragma once
 
 #include <filesystem>
-#include "abc_test/core/ds/repetitions/repetition_tree_node.h"
+#include "abc_test/core/ds/gen_data_memoization/for_loop_stack_trie.h"
 #include <map>
 #include "abc_test/utility/rng.h"
 #include "abc_test/core/reporters/error_reporter_controller.h"
@@ -55,7 +55,7 @@ public:
 	* Gets the set of test_repetition_configurations.
 	*/
 	__constexpr
-		const std::map<size_t, ds::repetition_tree_t>&
+		const std::map<size_t, ds::for_loop_stack_trie_root_t>&
 		get_test_repetition_configurations(
 		) const noexcept;
 	//! The path delimiter used to organise tests. E.g. written as "a::b::c" with a delimieter of "::",
@@ -110,7 +110,7 @@ public:
 
 	bool _m_store_passed_test_assertions;
 private:
-	std::map<size_t, ds::repetition_tree_t> _m_test_repetition_configurations;
+	std::map<size_t, ds::for_loop_stack_trie_root_t> _m_test_repetition_configurations;
 	__constexpr
 		void
 		validate_repeat_tests_string(
@@ -190,7 +190,7 @@ __no_constexpr_imp
 	}
 }
 __constexpr_imp
-	const std::map<size_t, ds::repetition_tree_t>&
+	const std::map<size_t, ds::for_loop_stack_trie_root_t>&
 	test_options_t::get_test_repetition_configurations(
 	) const noexcept
 {

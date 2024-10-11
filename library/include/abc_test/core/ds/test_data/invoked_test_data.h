@@ -3,7 +3,7 @@
 
 #include "abc_test/core/ds/test_data/post_setup_test_data.h"
 
-#include "abc_test/core/ds/repetitions/for_loop_data_collection.h"
+#include "abc_test/core/ds/gen_data_memoization/for_loop_stack.h"
 
 #include <fmt/ranges.h>
 
@@ -62,7 +62,7 @@ public:
 	 * @return A reference to the tests for_loop_data_collection_t object.
 	 */
 	__constexpr
-		ds::for_loop_data_collection_t&
+		ds::for_loop_stack_t&
 		for_loop_data_collection(
 		) noexcept;
 	/*!
@@ -74,7 +74,7 @@ public:
 	* @return An optional element, representing the next repetition_data_t element.
 	*/
 	__constexpr
-		std::optional<ds::repetition_data_t>
+		std::optional<ds::for_loop_creation_data_t>
 		get_repetition_iterator_data(
 		) noexcept;
 	/*!
@@ -89,7 +89,7 @@ public:
 	 * element to be repeated in the next for loop.
 	 */
 	__constexpr
-		std::optional<ds::repetition_data_t>
+		std::optional<ds::for_loop_creation_data_t>
 		increment_repetition_iterator_data(
 		) noexcept;
 	/*!
@@ -114,7 +114,7 @@ public:
 	 * @return The test's repetition_tree.
 	 */
 	__constexpr
-		const ds::repetition_tree_t&
+		const ds::for_loop_stack_trie_root_t&
 		repetition_tree(
 		) const noexcept;
 	/*!
@@ -124,7 +124,7 @@ public:
 	__constexpr
 		void
 		update_repetition_tree(
-			const ds::repetition_data_sequence_t& _a_rds
+			const ds::for_loop_creation_data_sequence_t& _a_rds
 		) noexcept;
 	/*!
 	 * @brief Gets the current order ran ID.
@@ -141,8 +141,8 @@ public:
 		) const noexcept;
 private:
 	const post_setup_test_data_t& _m_post_setup_test_data;
-	ds::repetition_tree_t _m_repetition_tree;
-	ds::for_loop_data_collection_t _m_for_loop_data_collection;
+	ds::for_loop_stack_trie_root_t _m_repetition_tree;
+	ds::for_loop_stack_t _m_for_loop_data_collection;
 	std::size_t _m_order_ran_id;
 	utility::rng _m_this_tests_random_generator;
 	std::filesystem::path _m_path;
@@ -186,7 +186,7 @@ invoked_test_info_t::invoked_test_info_t(
 	const test_options_t& _a_options
 ) noexcept
 	: _m_post_setup_test_data(_a_post_setup_test_data)
-	, _m_for_loop_data_collection(ds::for_loop_data_collection_t())
+	, _m_for_loop_data_collection(ds::for_loop_stack_t())
 	, _m_order_ran_id(_a_order_ran_id)
 	, _m_this_tests_random_generator(_a_seed_seq)
 	, _m_path(create_test_path(_a_post_setup_test_data, _a_options))
@@ -214,34 +214,34 @@ invoked_test_info_t::post_setup_test_data(
 	return _m_post_setup_test_data;
 }
 __constexpr_imp
-ds::for_loop_data_collection_t&
+ds::for_loop_stack_t&
 invoked_test_info_t::for_loop_data_collection(
 ) noexcept
 {
 	return _m_for_loop_data_collection;
 }
 __constexpr_imp
-std::optional<ds::repetition_data_t>
+std::optional<ds::for_loop_creation_data_t>
 invoked_test_info_t::get_repetition_iterator_data(
 ) noexcept
 {
 	using namespace std;
 	using namespace ds;
 	using enum utility::internal::internal_log_enum_t;
-	const optional<repetition_data_t> _l_rv{
-		_m_post_setup_test_data.repetition_data().find_next_for_loop(_m_for_loop_data_collection.repetition_data_sequence()) };
+	const optional<for_loop_creation_data_t> _l_rv{
+		_m_post_setup_test_data.repetition_data().find_first_child_of_sequence_in_trie(_m_for_loop_data_collection.create_data_sequence()) };
 	return _l_rv;
 }
 __constexpr_imp
-std::optional<ds::repetition_data_t>
+std::optional<ds::for_loop_creation_data_t>
 invoked_test_info_t::increment_repetition_iterator_data(
 ) noexcept
 {
 	using namespace std;
 	using namespace ds;
 	using enum utility::internal::internal_log_enum_t;
-	const optional<repetition_data_t> _l_rv{
-		_m_post_setup_test_data.repetition_data().increment_last_index(_m_for_loop_data_collection.repetition_data_sequence()) };
+	const optional<for_loop_creation_data_t> _l_rv{
+		_m_post_setup_test_data.repetition_data().increment_last_index(_m_for_loop_data_collection.create_data_sequence()) };
 	return _l_rv;
 }
 __constexpr_imp
@@ -250,10 +250,10 @@ invoked_test_info_t::is_repetition_to_be_repeated(
 ) const noexcept
 {
 	return (not _m_post_setup_test_data.has_repetition_data()) ? true :
-		_m_post_setup_test_data.repetition_data().is_sequence_in_tree(_m_for_loop_data_collection.repetition_data_sequence());
+		_m_post_setup_test_data.repetition_data().is_sequence_in_trie(_m_for_loop_data_collection.create_data_sequence());
 }
 __constexpr_imp
-const ds::repetition_tree_t&
+const ds::for_loop_stack_trie_root_t&
 invoked_test_info_t::repetition_tree(
 ) const noexcept
 {
@@ -262,12 +262,12 @@ invoked_test_info_t::repetition_tree(
 __constexpr_imp
 void
 invoked_test_info_t::update_repetition_tree(
-	const ds::repetition_data_sequence_t& _a_rds
+	const ds::for_loop_creation_data_sequence_t& _a_rds
 ) noexcept
 {
 	using enum utility::internal::internal_log_enum_t;
-	_m_repetition_tree.add_repetition(_a_rds);
-	_LIBRARY_LOG(REPETITION_INFO, fmt::format("Repetition tree after insertion = {0}", _m_repetition_tree.print_repetition_tree()));
+	_m_repetition_tree.add_for_loop_creation_data_sequence(_a_rds);
+	_LIBRARY_LOG(REPETITION_INFO, fmt::format("Repetition tree after insertion = {0}", _m_repetition_tree.print_for_loop_stack_trie()));
 }
 __constexpr_imp
 std::size_t

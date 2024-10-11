@@ -2,7 +2,7 @@
 
 #include "abc_test/utility/internal/macros.h"
 #include <functional>
-#include "abc_test/core/ds/repetitions/repetition_data.h"
+#include "abc_test/core/ds/gen_data_memoization/for_loop_creation_data.h"
 #include "abc_test/utility/ptr_utility.h"
 
 _BEGIN_ABC_DS_NS
@@ -20,8 +20,7 @@ using test_path_element_ref_t = std::string_view;
 //! Synonym for a vector of strings, used to represent the hierarchy a test path represents.
 using test_path_hierarchy_t = std::vector<test_path_element_t>;
 //! Type synonym for a failure function, called when a function fails and book-keeping
-//! needs to be done.
-using test_failure_func_t = std::function<repetition_data_t()>;
+//! needs to be done
 
 /*!
 * A type synonym for a test_lit_t element.
