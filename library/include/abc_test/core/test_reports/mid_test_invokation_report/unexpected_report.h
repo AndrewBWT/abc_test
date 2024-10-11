@@ -19,7 +19,7 @@ public:
 		~unexpected_report_t(
 		) noexcept;
 	__constexpr
-		const single_source_t&
+		const ds::single_source_t&
 		source(
 		) const noexcept;
 	__constexpr
@@ -32,16 +32,16 @@ protected:
 		) noexcept = delete;
 	__constexpr
 		unexpected_report_t(
-			const single_source_t& _a_source,
+			const ds::single_source_t& _a_source,
 			const bool _a_exact_source
 		) noexcept;
 	__constexpr
 		unexpected_report_t(
-			const source_pair_t& _a_sources,
+			const ds::source_pair_t& _a_sources,
 			const bool _a_exact_source
 		) noexcept;
 protected:
-	single_source_t _m_last_source;
+	ds::single_source_t _m_last_source;
 	bool _m_exact_source;
 };
 using opt_unexpected_report_t = std::optional< std::shared_ptr<const unexpected_report_t<true>>>;
@@ -55,7 +55,7 @@ template<
 >
 __constexpr_imp
 unexpected_report_t<Terminate>::unexpected_report_t(
-	const single_source_t& _a_source,
+	const ds::single_source_t& _a_source,
 	const bool _a_exact_source
 ) noexcept
 	: _m_last_source(_a_source)
@@ -68,7 +68,7 @@ template<
 >
 __constexpr_imp
 unexpected_report_t<Terminate>::unexpected_report_t(
-	const source_pair_t& _a_sources,
+	const ds::source_pair_t& _a_sources,
 	const bool _a_exact_source
 ) noexcept
 	: _m_last_source(_a_sources.begin_source())
@@ -89,7 +89,7 @@ template<
 	bool Terminate
 >
 __constexpr_imp
-const single_source_t&
+const ds::single_source_t&
 unexpected_report_t<Terminate>::source(
 ) const noexcept
 {

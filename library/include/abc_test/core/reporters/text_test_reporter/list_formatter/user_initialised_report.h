@@ -83,7 +83,7 @@ user_initialised_report_list_formatter_t<Single_Source>::get_data(
 				_a_pc.colon(_a_pc.source_location_str()),
 				_a_pc.indent(_a_pc.source_location(_a_element.source().source_location())),
 				_a_pc.colon(_a_pc.source_code_str()),
-				_a_pc.indent(_a_pc.source_representation(_a_element.source().str()))
+				_a_pc.indent(_a_pc.source_representation(_a_element.source().source_code_representation()))
 			};
 		}
 		else
@@ -94,7 +94,7 @@ user_initialised_report_list_formatter_t<Single_Source>::get_data(
 				_a_pc.indent(_a_pc.colon(_a_pc.source_location_str())),
 				_a_pc.indent(_a_pc.source_location(_a_element.source().begin_source().source_location()),2),
 				_a_pc.indent(_a_pc.colon(_a_pc.source_code_str())),
-				_a_pc.indent(_a_pc.source_representation(_a_element.source().begin_source().str()),2),
+				_a_pc.indent(_a_pc.source_representation(_a_element.source().begin_source().source_code_representation()),2),
 				_a_pc.colon(_a_pc.source_location_pair_end_str()),
 			};
 			if (not _a_element.source().end_source().has_value())
@@ -103,13 +103,13 @@ user_initialised_report_list_formatter_t<Single_Source>::get_data(
 			}
 			else
 			{
-				const reports::single_source_t _l_end{ _a_element.source().end_source().value()};
+				const ds::single_source_t _l_end{ _a_element.source().end_source().value()};
 				_l_rv.append_range(
 					std::vector<std::string>({
 					_a_pc.indent(_a_pc.colon(_a_pc.source_location_str())),
 					_a_pc.indent(_a_pc.source_location(_l_end.source_location()), 2),
 					_a_pc.indent(_a_pc.colon(_a_pc.source_code_str())),
-					_a_pc.indent(_a_pc.source_representation(_l_end.str()), 2)
+					_a_pc.indent(_a_pc.source_representation(_l_end.source_code_representation()), 2)
 					}));
 			}
 			return _l_rv;

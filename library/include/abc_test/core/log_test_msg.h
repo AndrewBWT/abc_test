@@ -32,7 +32,7 @@ struct log_test_msg_t
 public:
 	__no_constexpr
 		log_test_msg_t(
-			const reports::single_source_t& _a_single_source,
+			const ds::single_source_t& _a_single_source,
 			const std::string_view _a_str,
 			const bool _a_delete_after_use
 		) noexcept;
@@ -59,7 +59,7 @@ _BEGIN_ABC_NS
 
 __no_constexpr_imp
 	log_test_msg_t::log_test_msg_t(
-		const reports::single_source_t& _a_single_source,
+		const ds::single_source_t& _a_single_source,
 		const std::string_view _a_str,
 		const bool _a_delete_after_use
 	) noexcept

@@ -42,7 +42,7 @@ BraceWrapping:
  SplitEmptyRecord: false
  SplitEmptyNamespace: true
 BreakAfterReturnType: All
-InsertBraces: true
+InsertBraces: false
 RemoveBracesLLVM: false
 RemoveParentheses: ReturnStatement
 RemoveSemicolon: true
@@ -132,8 +132,8 @@ AllowShortFunctionsOnASingleLine: None
 BinPackParameters: false
 BreakFunctionDefinitionParameters: true
 IndentWrappedFunctionNames: true
-QualifierAlignment: Custom
-QualifierOrder: [inline, constexpr, static, friend, const, type, volatile, restrict]
+QualifierAlignment: Leave
+#QualifierOrder: [inline, constexpr, static, friend, const, type, volatile, restrict]
 ExperimentalAutoDetectBinPacking: false
 
 # Function call modifiers

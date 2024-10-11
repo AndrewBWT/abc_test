@@ -59,7 +59,7 @@ public:
 	__constexpr
 		void
 		add_source_info(
-			const reports::single_source_t& _a_source
+			const ds::single_source_t& _a_source
 		) noexcept;
 	/*!
 	* Determines whether a test has passed or not.
@@ -78,7 +78,7 @@ public:
 		) const noexcept;*/
 protected:
 	matcher_result_t _m_test_result;
-	std::vector<reports::single_source_t> _m_sources;
+	std::vector<ds::single_source_t> _m_sources;
 private:
 	__constexpr
 		virtual
@@ -98,7 +98,7 @@ _BEGIN_ABC_NS
 __constexpr_imp
 	generic_matcher_t::generic_matcher_t(
 	) noexcept
-	: _m_sources(std::vector<reports::single_source_t>())
+	: _m_sources(std::vector<ds::single_source_t>())
 	//: generic_matcher_t(std::optional<std::string>(),
 	//	std::optional<std::source_location>())
 {
@@ -157,7 +157,7 @@ __constexpr_imp
 		matcher_source_map_t& _a_matcher_source_map
 	) const noexcept
 {
-	using namespace reports;
+	using namespace ds;
 	for (const single_source_t& _l_source : _m_sources)
 	{
 		_a_matcher_source_map.insert(_l_source);
@@ -166,7 +166,7 @@ __constexpr_imp
 __constexpr_imp
 	void
 	generic_matcher_t::add_source_info(
-		const reports::single_source_t& _a_source
+		const ds::single_source_t& _a_source
 	) noexcept
 {
 	_m_sources.push_back(_a_source);

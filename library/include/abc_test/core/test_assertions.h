@@ -24,7 +24,7 @@
 	_a_str_representation_of_line)\
 	abc::create_assertion<_a_assertion_type>(\
 		_a_matcher,\
-		abc::reports::single_source_t(_a_str_representation_of_line, std::source_location::current()),\
+		abc::ds::single_source_t(_a_str_representation_of_line, std::source_location::current()),\
 		abc::global::get_this_threads_test_runner_ref())
 #define _CHECK(_a_matcher) \
 	_INTERNAL_CREATE_ASSERTION(\
@@ -42,7 +42,7 @@
 		_a_str_representation)\
 	create_static_assertion<_a_assertion_type>(\
 		_a_msg,\
-		abc::reports::single_source_t(_a_str_representation, std::source_location::current()),\
+		abc::ds::single_source_t(_a_str_representation, std::source_location::current()),\
 		abc::global::get_this_threads_test_runner_ref())
 #define _FAIL()\
 	_INTERNAL_STATIC_MATCHER(\
@@ -252,7 +252,7 @@ __constexpr
 T
 matcher_macro(
 	const T & _a_element,
-	const reports::single_source_t & _a_source
+	const ds::single_source_t & _a_source
 ) noexcept;
 template<
 	typename T
@@ -262,7 +262,7 @@ __constexpr
 bool
 create_assertion(
 	const matcher_t & _a_matcher,
-	const reports::single_source_t & _a_source,
+	const ds::single_source_t & _a_source,
 	test_runner_t & _a_test_runner
 ) noexcept(std::same_as<T, reports::pass_or_fail_t>);
 template<
@@ -273,7 +273,7 @@ __constexpr
 bool
 create_assertion(
 	const matcher_with_annotation_t& _a_matcher,
-	const reports::single_source_t & _a_source,
+	const ds::single_source_t & _a_source,
 	test_runner_t & _a_test_runner
 ) noexcept(std::same_as<T, reports::pass_or_fail_t>);
 template<
@@ -284,7 +284,7 @@ __constexpr
 bool
 create_static_assertion(
 	const std::optional<std::string_view>& _a_str_to_print,
-	const reports::single_source_t& _a_source,
+	const ds::single_source_t& _a_source,
 	test_runner_t& _a_test_runner
 ) noexcept(not std::same_as<T, reports::terminate_t>);
 template<
@@ -316,7 +316,7 @@ namespace
 		create_assertion(
 			const matcher_t& _a_matcher,
 			const std::optional<std::string_view>& _a_str_to_print,
-			const reports::single_source_t& _a_source,
+			const ds::single_source_t& _a_source,
 			test_runner_t& _a_test_runner
 		) noexcept(std::same_as<T, reports::pass_or_fail_t>);
 }
@@ -330,7 +330,7 @@ __constexpr_imp
 T
 matcher_macro(
 	const T& _a_element,
-	const reports::single_source_t& _a_source
+	const ds::single_source_t& _a_source
 ) noexcept
 {
 	return T(_a_element, _a_source);
@@ -343,7 +343,7 @@ __constexpr_imp
 bool
 create_assertion(
 	const matcher_t& _a_matcher,
-	const reports::single_source_t& _a_source,
+	const ds::single_source_t& _a_source,
 	test_runner_t& _a_test_runner
 ) noexcept(std::same_as<T, reports::pass_or_fail_t>)
 {
@@ -358,7 +358,7 @@ __constexpr_imp
 bool
 create_assertion(
 	const matcher_with_annotation_t& _a_matcher,
-	const reports::single_source_t& _a_source,
+	const ds::single_source_t& _a_source,
 	test_runner_t& _a_test_runner
 ) noexcept(std::same_as<T, reports::pass_or_fail_t>)
 {
@@ -374,7 +374,7 @@ __constexpr_imp
 bool
 create_static_assertion(
 	const std::optional<std::string_view>& _a_str_to_print,
-	const reports::single_source_t& _a_source,
+	const ds::single_source_t& _a_source,
 	test_runner_t& _a_test_runner
 ) noexcept(not std::same_as<T, reports::terminate_t>)
 {
@@ -457,7 +457,7 @@ void
 matcher_based_assertion_block(
 	const matcher_t& _a_matcher,
 	const std::optional<std::string_view>& _a_str_to_print,
-	const reports::single_source_t& _a_source,
+	const ds::single_source_t& _a_source,
 	test_runner_t& _a_test_runner
 ) noexcept(std::same_as<T, reports::pass_or_fail_t>)
 {
@@ -531,7 +531,7 @@ namespace
 		create_assertion(
 			const matcher_t& _a_matcher,
 			const std::optional<std::string_view>& _a_matcher_label,
-			const reports::single_source_t& _a_source,
+			const ds::single_source_t& _a_source,
 			test_runner_t& _a_test_runner
 		) noexcept(std::same_as<T, reports::pass_or_fail_t>)
 	{

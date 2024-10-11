@@ -45,7 +45,7 @@
 	auto NAMED_COUNTER(FUNCTION_PREFIX){global::add_test(registered_test_data_t(\
 		_a_function_name,\
 		_a_user_defined_test_data_name,\
-		reports::single_source_t(_a_str_representation,std::source_location::current())\
+		ds::single_source_t(_a_str_representation,std::source_location::current())\
 	))};\
 	}\
 	static void _a_function_name()

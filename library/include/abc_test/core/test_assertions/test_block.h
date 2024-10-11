@@ -18,7 +18,7 @@ public:
 	__constexpr
 		test_block_t(
 			const std::string_view _a_test_annotation,
-			const reports::single_source_t& _a_source
+			const ds::single_source_t& _a_source
 		) noexcept;
 	__constexpr
 		~test_block_t(
@@ -48,10 +48,10 @@ public:
 	__constexpr
 		void
 		register_end(
-			const reports::single_source_t& _a_end_source
+			const ds::single_source_t& _a_end_source
 		) noexcept;
 	__constexpr
-		const reports::source_pair_t&
+		const ds::source_pair_t&
 		source(
 		) const noexcept;
 	__constexpr
@@ -59,7 +59,7 @@ public:
 		set_processed(
 		) noexcept;
 private:
-	reports::source_pair_t _m_source;
+	ds::source_pair_t _m_source;
 	std::optional<std::string> _m_test_annotation;
 	std::optional<std::string> _m_matcher_annotation;
 	matcher_t _m_matcher;
@@ -74,9 +74,9 @@ template<
 __constexpr_imp
 test_block_t<Assertion_Type>::test_block_t(
 	const std::string_view _a_test_annotation,
-	const reports::single_source_t& _a_source
+	const ds::single_source_t& _a_source
 ) noexcept
-	: _m_source(reports::source_pair_t(_a_source))
+	: _m_source(ds::source_pair_t(_a_source))
 	, _m_test_annotation(_a_test_annotation)
 	, _m_processed(false)
 {
@@ -159,16 +159,17 @@ template<
 __constexpr_imp
 void
 test_block_t<Assertion_Type>::register_end(
-	const reports::single_source_t& _a_end_source
+	const ds::single_source_t& _a_end_source
 ) noexcept
 {
-	_m_source = reports::source_pair_t(_m_source.begin_source(),_a_end_source);
+	_m_source.set_end_source(_a_end_source);
+	_m_source = ds::source_pair_t(_m_source.begin_source(),_a_end_source);
 }
 template<
 	typename Assertion_Type
 >
 __constexpr_imp
-const reports::source_pair_t&
+const ds::source_pair_t&
 test_block_t<Assertion_Type>::source(
 ) const noexcept
 {

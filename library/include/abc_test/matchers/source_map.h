@@ -29,7 +29,7 @@ public:
 	__no_constexpr
 		void
 		insert(
-			const reports::single_source_t& _a_source
+			const ds::single_source_t& _a_source
 		);
 	__constexpr
 		const std::map<std::source_location, std::vector<std::string>, source_location_lt_t>&
@@ -124,14 +124,14 @@ source_location_lt_t::operator()(
 __no_constexpr_imp
 	void
 	matcher_source_map_t::insert(
-		const reports::single_source_t& _a_source
+		const ds::single_source_t& _a_source
 	)
 {
 	using namespace std;
-	using namespace reports;
+	using namespace ds;
 	_m_has_elements = true;
 	insert_source(_a_source.source_location());
-	_m_internal_map.at(_a_source.source_location()).push_back(string(_a_source.str()));
+	_m_internal_map.at(_a_source.source_location()).push_back(string(_a_source.source_code_representation()));
 }
 __constexpr_imp
 	const std::map<std::source_location, std::vector<std::string>, source_location_lt_t>&

@@ -19,7 +19,7 @@ public:
 	__no_constexpr_imp
 		matcher_with_annotation_t(
 			const matcher_with_annotation_t& _a_matcher,
-			const reports::single_source_t& _a_single_source
+			const ds::single_source_t& _a_single_source
 		)
 		: _m_matcher(_a_matcher.matcher())
 		, _m_initialised_with_source(true)

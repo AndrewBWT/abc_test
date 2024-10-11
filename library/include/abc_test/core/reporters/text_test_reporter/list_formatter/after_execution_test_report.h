@@ -97,7 +97,7 @@ test_report_list_formatter::get_data(
 		return
 		{
 			_a_pc.space(_a_pc.colon(_a_pc.source_code_str())),
-			_a_pc.source_representation(_a_element.location().str())
+			_a_pc.source_representation(_a_element.location().source_code_representation())
 		};
 	case TEST_PATH:
 		return

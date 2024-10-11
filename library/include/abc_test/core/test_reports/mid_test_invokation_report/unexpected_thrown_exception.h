@@ -9,7 +9,7 @@ class unexpected_thrown_exception_t :
 public:
 	__constexpr
 		unexpected_thrown_exception_t(
-			const single_source_t& _a_source,
+			const ds::single_source_t& _a_source,
 			const std::string_view _a_exception_name,
 			const std::string_view _a_exception_what_function
 		) noexcept;
@@ -30,7 +30,7 @@ _END_ABC_REPORTS_NS
 _BEGIN_ABC_REPORTS_NS
 __constexpr_imp
 unexpected_thrown_exception_t::unexpected_thrown_exception_t(
-	const single_source_t& _a_source,
+	const ds::single_source_t& _a_source,
 	const std::string_view _a_exception_name,
 	const std::string_view _a_exception_what_function
 ) noexcept

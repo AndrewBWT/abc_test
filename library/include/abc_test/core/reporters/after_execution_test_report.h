@@ -44,7 +44,7 @@ public:
 		name(
 		) const noexcept;
 	__constexpr
-		const reports::single_source_t&
+		const ds::single_source_t&
 		location(
 		) const noexcept;
 	__constexpr
@@ -120,7 +120,7 @@ private:
 	reports::unexpected_non_terminating_report_collection_t _m_warnings;
 //	generic_assertions _m_function_reports;
 	std::optional<std::string> _m_name;
-	reports::single_source_t _m_source_location;
+	ds::single_source_t _m_source_location;
 	std::string _m_test_path;
 	std::string _m_seed;
 	std::string _m_seed_in_hex;
@@ -142,7 +142,7 @@ private:
 		after_execution_test_report_t(
 		//	const mid_execution_test_reporters_t& _a_mid_execution_reports,
 			const std::optional<std::string>& _a_name,
-			const reports::single_source_t& _a_sl,
+			const ds::single_source_t& _a_sl,
 			const std::string_view _a_test_path,
 			const std::string_view _a_seed,
 			const std::string_view _a_seed_in_hex,
@@ -163,7 +163,7 @@ __constexpr_imp
 	: after_execution_test_report_t(
 	//	mid_execution_test_reporters_t(),
 		std::optional<std::string>(),
-		reports::single_source_t(),
+		ds::single_source_t(),
 		"",
 		"","",false,enum_termination_type_t::NO_TERMINATION,0,0,0,nullptr
 	)
@@ -182,7 +182,7 @@ __constexpr_imp
 		std::optional<std::string>(),
 		true && true ?
 		_a_iti.post_setup_test_data().registered_test_data()._m_source :
-		reports::single_source_t(),
+		ds::single_source_t(),
 		true && true ?
 		_a_iti.post_setup_test_data().registered_test_data()._m_user_data.path : "",
 		true &&
@@ -223,7 +223,7 @@ __constexpr_imp
 	return _m_name;
 }
 __constexpr_imp
-	const reports::single_source_t&
+	const ds::single_source_t&
 	after_execution_test_report_t::location(
 	) const noexcept
 {
@@ -364,7 +364,7 @@ __constexpr_imp
 	after_execution_test_report_t::after_execution_test_report_t(
 	//	const mid_execution_test_reporters_t& _a_mid_execution_reports,
 		const std::optional<std::string>& _a_name,
-		const reports::single_source_t& _a_sl,
+		const ds::single_source_t& _a_sl,
 		const std::string_view _a_test_path,
 		const std::string_view _a_seed,
 		const std::string_view _a_seed_in_hex,

@@ -29,7 +29,7 @@ public:
 	__no_constexpr_imp
 		matcher_t(
 			const matcher_t& _a_matcher,
-			const reports::single_source_t& _a_single_source
+			const ds::single_source_t& _a_single_source
 		)
 		: _m_matcher_internal(_a_matcher.internal_matcher())
 		, _m_initialised_with_source(true)
@@ -50,20 +50,20 @@ public:
 	__no_constexpr
 		bool
 		or_statement(
-			const reports::single_source_t& _a_single_source,
+			const ds::single_source_t& _a_single_source,
 			test_runner_t& _a_test_runner = abc::global::get_this_threads_test_runner_ref()
 		) noexcept;
 	__no_constexpr
 		bool
 		and_statement(
-			const reports::single_source_t& _a_single_source,
+			const ds::single_source_t& _a_single_source,
 			test_runner_t& _a_test_runner = abc::global::get_this_threads_test_runner_ref()
 		) noexcept;
 	__constexpr
 		void
 		process(
 			const matcher_t& _a_matcher,
-			const reports::single_source_t& _a_single_source
+			const ds::single_source_t& _a_single_source
 		);
 	__no_constexpr_imp
 		matcher_t
@@ -173,7 +173,7 @@ __constexpr_imp
 __no_constexpr_imp
 	bool
 	matcher_t::or_statement(
-		const reports::single_source_t& _a_single_source,
+		const ds::single_source_t& _a_single_source,
 		test_runner_t& _a_test_runner
 	) noexcept
 {
@@ -186,7 +186,7 @@ __no_constexpr_imp
 __no_constexpr_imp
 	bool
 	matcher_t::and_statement(
-		const reports::single_source_t& _a_single_source,
+		const ds::single_source_t& _a_single_source,
 		test_runner_t& _a_test_runner
 	) noexcept
 {
@@ -200,7 +200,7 @@ __constexpr_imp
 	void
 	matcher_t::process(
 		const matcher_t& _a_matcher,
-		const reports::single_source_t& _a_single_source
+		const ds::single_source_t& _a_single_source
 	)
 {
 	using enum logic_enum_t;

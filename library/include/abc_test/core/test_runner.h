@@ -37,12 +37,12 @@ public:
 	__constexpr
 		void
 		register_tests_most_recent_source(
-			const reports::single_source_t& _a_source_location
+			const ds::single_source_t& _a_source_location
 		) noexcept;
 	__constexpr
 		void
 		register_tests_most_recent_source(
-			const reports::source_pair_t& _a_source_locations
+			const ds::source_pair_t& _a_source_locations
 		) noexcept;
 	__no_constexpr
 		std::list<const log_test_msg_t*>::iterator
@@ -110,7 +110,7 @@ public:
 		generate_random_seeds(
 		) noexcept;
 	__constexpr
-		const reports::single_source_t&
+		const ds::single_source_t&
 		most_recent_source(
 		) const noexcept;
 	template<
@@ -165,7 +165,7 @@ private:
 	utility::rng _m_random_generator;
 	test_order_enum_t _m_test_order;
 	const test_options_t& _m_test_options;
-	reports::single_source_t _m_tests_most_recent_source;
+	ds::single_source_t _m_tests_most_recent_source;
 //	std::optional<reports::single_source_t> _m_registered_source;
 	template<
 		bool Single_Source,
@@ -193,7 +193,7 @@ _BEGIN_ABC_NS
 		, _m_random_generator(utility::rng(_a_test_options._m_seed_values))
 		, _m_test_order(test_order_enum_t::IN_ORDER)
 		, _m_test_options(_a_test_options)
-	, _m_tests_most_recent_source(reports::single_source_t())
+	, _m_tests_most_recent_source(ds::single_source_t())
 	{
 
 	}
@@ -201,7 +201,7 @@ _BEGIN_ABC_NS
 	__constexpr_imp
 		void
 		test_runner_t::register_tests_most_recent_source(
-			const reports::single_source_t& _a_source_location
+			const ds::single_source_t& _a_source_location
 		) noexcept
 	{
 		_m_tests_most_recent_source = _a_source_location;
@@ -209,10 +209,10 @@ _BEGIN_ABC_NS
 	__constexpr_imp
 		void
 		test_runner_t::register_tests_most_recent_source(
-			const reports::source_pair_t& _a_source_locations
+			const ds::source_pair_t& _a_source_locations
 		) noexcept
 	{
-		using namespace reports;
+		using namespace ds;
 		using namespace std;
 		const optional<single_source_t>& _l_end_source{ _a_source_locations.end_source()};
 		_m_tests_most_recent_source = 
@@ -258,7 +258,7 @@ _BEGIN_ABC_NS
 		return _l_seed;
 	}
 __constexpr_imp
-	const reports::single_source_t&
+	const ds::single_source_t&
 	test_runner_t::most_recent_source(
 	) const noexcept
 {

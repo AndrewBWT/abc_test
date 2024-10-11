@@ -40,7 +40,7 @@ public:
 		registered_test_data_t(
 			const test_function_t _a_test_function,
 			const checked_user_defined_test_data_t _a_user_data,
-			const reports::single_source_t& _a_source
+			const ds::single_source_t& _a_source
 		) noexcept;
 	/*!
 	 * @brief User defined equality operator.
@@ -62,7 +62,7 @@ public:
 	/*!
 	* The location of the test. This is an optional field.
 	*/
-	reports::single_source_t _m_source;
+	ds::single_source_t _m_source;
 };
 _END_ABC_DS_NS
 
@@ -89,7 +89,7 @@ __constexpr_imp
 registered_test_data_t::registered_test_data_t(
 	const test_function_t _a_test_function,
 	const checked_user_defined_test_data_t _a_user_data,
-	const reports::single_source_t& _a_source
+	const ds::single_source_t& _a_source
 ) noexcept
 	: _m_user_data(_a_user_data.user_defined_test_data())
 	, _m_source(_a_source)

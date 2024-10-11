@@ -82,7 +82,7 @@ unexpected_report_list_formatter_t<Terminating>::get_data(
 			_a_pc.indent(_a_pc.colon(_a_pc.potential_source_str(_a_element.exact_source()))),
 			_a_pc.indent(_a_pc.source_location(_a_element.source().source_location()),2),
 			_a_pc.indent(_a_pc.colon(_a_pc.potential_code_str(_a_element.exact_source()))),
-			_a_pc.indent(_a_pc.source_representation(_a_element.source().str()),2)
+			_a_pc.indent(_a_pc.source_representation(_a_element.source().source_code_representation()),2)
 		};
 	case STR_REPRESENTATION:
 		return

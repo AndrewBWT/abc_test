@@ -10,7 +10,7 @@ class basic_text_warning_t
 public:
 	__constexpr
 		basic_text_warning_t(
-			const single_source_t& _a_source,
+			const ds::single_source_t& _a_source,
 			const bool _a_exact_source,
 			const std::string_view _a_str
 		) noexcept;
@@ -22,7 +22,7 @@ _END_ABC_REPORTS_NS
 _BEGIN_ABC_REPORTS_NS
 __constexpr_imp
 basic_text_warning_t::basic_text_warning_t(
-	const single_source_t& _a_source,
+	const ds::single_source_t& _a_source,
 	const bool _a_exact_source,
 	const std::string_view _a_str
 ) noexcept

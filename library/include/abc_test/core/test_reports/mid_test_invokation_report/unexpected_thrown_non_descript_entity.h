@@ -10,7 +10,7 @@ class unexpected_thrown_non_descript_entity_t :
 public:
 	__constexpr
 		unexpected_thrown_non_descript_entity_t(
-			const single_source_t& _a_source
+			const ds::single_source_t& _a_source
 		) noexcept;
 };
 
@@ -18,7 +18,7 @@ _END_ABC_REPORTS_NS
 _BEGIN_ABC_REPORTS_NS
 __constexpr_imp
 unexpected_thrown_non_descript_entity_t::unexpected_thrown_non_descript_entity_t(
-	const single_source_t& _a_source
+	const ds::single_source_t& _a_source
 ) noexcept
 	: unexpected_report_t<true>(_a_source, false)
 {
