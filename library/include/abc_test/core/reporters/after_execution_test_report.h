@@ -36,7 +36,7 @@ public:
 	__constexpr
 		void
 		add_repetition_tree(
-			const ds::for_loop_stack_trie_root_t& _a_repetition_tree,
+			const ds::for_loop_stack_trie_t& _a_repetition_tree,
 			const test_options_t* _a_test_options
 		) noexcept;
 	__constexpr
@@ -206,7 +206,7 @@ __constexpr_imp
 __constexpr_imp
 	void
 	after_execution_test_report_t::add_repetition_tree(
-		const ds::for_loop_stack_trie_root_t& _a_repetition_tree,
+		const ds::for_loop_stack_trie_t& _a_repetition_tree,
 		const test_options_t* _a_test_options
 	) noexcept
 {

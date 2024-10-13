@@ -163,7 +163,6 @@ test_block_t<Assertion_Type>::register_end(
 ) noexcept
 {
 	_m_source.set_end_source(_a_end_source);
-	_m_source = ds::source_pair_t(_m_source.begin_source(),_a_end_source);
 }
 template<
 	typename Assertion_Type

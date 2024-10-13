@@ -33,6 +33,7 @@ set(LIBRARY_FILES
   include/abc_test/core/ds/test_collections/test_collection.h
   include/abc_test/core/ds/test_collections/test_tree.h
       src/abc_test/core/ds/test_collections/test_tree.cpp
+  include/abc_test/core/ds/test_collections/test_tree_sentinel.h
   include/abc_test/core/ds/test_collections/test_tree_iterator.h
   include/abc_test/core/ds/source/single_source.h
   include/abc_test/core/ds/source/source_pair.h

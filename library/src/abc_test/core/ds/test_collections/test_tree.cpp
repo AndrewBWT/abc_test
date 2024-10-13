@@ -7,13 +7,13 @@ __no_constexpr_or_inline_imp
 	test_tree_t::begin(
 	) const noexcept
 {
-	return test_tree_iterator_t(this);
+	return test_tree_iterator_t(std::ref(*this));
 }
 __no_constexpr_or_inline_imp
-	test_tree_iterator_t
+test_tree_iterator_sentinel_t
 	test_tree_t::end(
 	) const noexcept
 {
-	return test_tree_iterator_t(nullptr);
+	return test_tree_iterator_sentinel_t();
 }
 _END_ABC_DS_NS

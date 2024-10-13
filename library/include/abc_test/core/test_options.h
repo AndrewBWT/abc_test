@@ -55,7 +55,7 @@ public:
 	* Gets the set of test_repetition_configurations.
 	*/
 	__constexpr
-		const std::map<size_t, ds::for_loop_stack_trie_root_t>&
+		const std::map<size_t, ds::for_loop_stack_trie_t>&
 		get_test_repetition_configurations(
 		) const noexcept;
 	//! The path delimiter used to organise tests. E.g. written as "a::b::c" with a delimieter of "::",
@@ -110,7 +110,7 @@ public:
 
 	bool _m_store_passed_test_assertions;
 private:
-	std::map<size_t, ds::for_loop_stack_trie_root_t> _m_test_repetition_configurations;
+	std::map<size_t, ds::for_loop_stack_trie_t> _m_test_repetition_configurations;
 	__constexpr
 		void
 		validate_repeat_tests_string(
@@ -190,7 +190,7 @@ __no_constexpr_imp
 	}
 }
 __constexpr_imp
-	const std::map<size_t, ds::for_loop_stack_trie_root_t>&
+	const std::map<size_t, ds::for_loop_stack_trie_t>&
 	test_options_t::get_test_repetition_configurations(
 	) const noexcept
 {
@@ -265,7 +265,7 @@ __constexpr_imp
 						_l_pair_idx,
 						_l_second_str));
 					_l_pos = _l_repeat_delimter == string::npos ? _m_repeat_tests_string.size() : _l_pos + 1;
-					auto _l_rt{ parse_compressed_repetition_tree_node<true>(_l_second_str) };
+					auto _l_rt{ parse_compressed_repetition_tree_node(_l_second_str) };
 					if (_l_rt.has_value())
 					{
 						_LIBRARY_LOG(PARSING_SEED, fmt::format("Inserting pair {0} and {1} into "

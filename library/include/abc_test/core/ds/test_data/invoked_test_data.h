@@ -114,7 +114,7 @@ public:
 	 * @return The test's repetition_tree.
 	 */
 	__constexpr
-		const ds::for_loop_stack_trie_root_t&
+		const ds::for_loop_stack_trie_t&
 		repetition_tree(
 		) const noexcept;
 	/*!
@@ -141,7 +141,7 @@ public:
 		) const noexcept;
 private:
 	const post_setup_test_data_t& _m_post_setup_test_data;
-	ds::for_loop_stack_trie_root_t _m_repetition_tree;
+	ds::for_loop_stack_trie_t _m_repetition_tree;
 	ds::for_loop_stack_t _m_for_loop_data_collection;
 	std::size_t _m_order_ran_id;
 	utility::rng _m_this_tests_random_generator;
@@ -253,7 +253,7 @@ invoked_test_info_t::is_repetition_to_be_repeated(
 		_m_post_setup_test_data.repetition_data().is_sequence_in_trie(_m_for_loop_data_collection.create_data_sequence());
 }
 __constexpr_imp
-const ds::for_loop_stack_trie_root_t&
+const ds::for_loop_stack_trie_t&
 invoked_test_info_t::repetition_tree(
 ) const noexcept
 {
