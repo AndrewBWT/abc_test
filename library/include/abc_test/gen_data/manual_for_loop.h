@@ -69,12 +69,12 @@ _BEGIN_ABC_NS
 	{
 		using namespace global;
 		using namespace ds;
-		invoked_test_info_t& _l_current_test{ get_this_threads_current_test() };
+		invoked_test_data_t& _l_current_test{ get_this_threads_current_test() };
 		_l_current_test.for_loop_data_collection().increment(
 			[&]() {return _m_repetition_data; },
 			0,
 			&_m_repetition_data);
-		_m_should_idx_be_ran = _l_current_test.is_repetition_to_be_repeated();
+		_m_should_idx_be_ran = _l_current_test.is_current_for_loop_stack_in_true();
 	}
 	__constexpr_imp
 		manual_for_loop_t::~manual_for_loop_t(
@@ -103,12 +103,12 @@ _BEGIN_ABC_NS
 		using namespace ds;
 		_m_idx++;
 		_m_repetition_data.set_string(to_string(_m_idx));
-		invoked_test_info_t& _l_current_test{ get_this_threads_current_test()};
+		invoked_test_data_t& _l_current_test{ get_this_threads_current_test()};
 		_l_current_test.for_loop_data_collection().update(
 			[&]() {return _m_repetition_data; },
 			0,
 			&_m_repetition_data);
-		_m_should_idx_be_ran = _l_current_test.is_repetition_to_be_repeated();
+		_m_should_idx_be_ran = _l_current_test.is_current_for_loop_stack_in_true();
 		return *this;
 	}
 	/*!

@@ -26,7 +26,7 @@ public:
 		) noexcept;
 	__constexpr
 		after_execution_test_report_t(
-			const ds::invoked_test_info_t& _a_iti,
+			const ds::invoked_test_data_t& _a_iti,
 			const test_options_t* _a_test_options
 		) noexcept;
 	__constexpr
@@ -172,7 +172,7 @@ __constexpr_imp
 }
 __constexpr_imp
 	after_execution_test_report_t::after_execution_test_report_t(
-		const ds::invoked_test_info_t& _a_iti,
+		const ds::invoked_test_data_t& _a_iti,
 		const test_options_t* _a_test_options
 	) noexcept
 	: after_execution_test_report_t(
@@ -186,11 +186,11 @@ __constexpr_imp
 		true && true ?
 		_a_iti.post_setup_test_data().registered_test_data()._m_user_data.path : "",
 		true &&
-		_a_iti.post_setup_test_data().has_repetition_data() ?
-		_a_iti.post_setup_test_data().repetition_data().print_for_loop_stack_trie() : "",
+		_a_iti.post_setup_test_data().has_for_loop_stack_trie() ?
+		_a_iti.post_setup_test_data().for_loop_stack_trie().print_for_loop_stack_trie() : "",
 		true &&
-		_a_iti.post_setup_test_data().has_repetition_data() ?
-		_a_iti.post_setup_test_data().repetition_data().print_for_loop_stack_trie_compressed() : "",
+		_a_iti.post_setup_test_data().has_for_loop_stack_trie() ?
+		_a_iti.post_setup_test_data().for_loop_stack_trie().print_for_loop_stack_trie_compressed() : "",
 		true,enum_termination_type_t::NO_TERMINATION,0,0,0, _a_test_options
 	)
 {

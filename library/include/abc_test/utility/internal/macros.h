@@ -50,9 +50,9 @@ return false;\
 
 //Macros which are used to facilitate entities having a unique numerical identifier.
 
-#define INTERNAL_NAMED_COUNTER_2(Name, Counter) Name##Counter
-#define INTERNAL_NAMED_COUNTER(Name, Counter) INTERNAL_NAMED_COUNTER_2(Name, Counter)
-#define NAMED_COUNTER(Name) INTERNAL_NAMED_COUNTER(Name, __COUNTER__ )
+#define __ABC_TEST_INTERNAL_NAMED_COUNTER_2(Name, Counter) Name##Counter
+#define __ABC_TEST_INTERNAL_NAMED_COUNTER(Name, Counter) __ABC_TEST_INTERNAL_NAMED_COUNTER_2(Name, Counter)
+#define __ABC_TEST_NAMED_COUNTER(Name) __ABC_TEST_INTERNAL_NAMED_COUNTER(Name, __COUNTER__ )
 
 /*!
 * Macros for namespace

@@ -4,6 +4,7 @@
 
 #include "abc_test/core/ds/gen_data_memoization/gen_data_creation_data.h"
 #include "abc_test/utility/internal/macros.h"
+#include "abc_test/core/ds/gen_data_memoization/gen_collection_creation_data.h"
 
 
 _BEGIN_ABC_NS

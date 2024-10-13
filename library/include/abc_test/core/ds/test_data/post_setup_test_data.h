@@ -2,246 +2,266 @@
 #include "abc_test/core/ds/test_data/registered_test_data.h"
 #include "abc_test/core/test_options.h"
 #include "abc_test/utility/str/string_utility.h"
+
 #include <vector>
 
 
 _BEGIN_ABC_DS_NS
+
 /*!
- * @brief Object represents a test after it has been processed by the runtime system;
- * that is, registered, its test path hierarchy calculated, 
- * its discovery id found, 
- * its repetition tree (if it has one) found from the input paramters,
- * and a normalised number of threads allowed for the test.
- * 
+ * @brief Object represents a test after it has been processed by the runtime
+ * system; that is, registered, its test path hierarchy calculated, its
+ * discovery id found, its repetition tree (if it has one) found from the input
+ * paramters, and a normalised number of threads allowed for the test.
+ *
+ */
+
+/*!
+ * @brief Structure holds test data. This data is specifically meant to be
+ * created after abc_test has pre-processed all the tests it is going to run,
+ * but before any actual tests have been ran
+ *
+ * It contains member variables which could not be known at compile time, and
+ * provides an opportunity for incorrectly defined tests to be spotted and
+ * stopped from running.
  */
 struct post_setup_test_data_t
 {
 public:
-	/*!
-	 * @brief Constructor
-	 * @param _a_registered_test_data Underlying registered_test_data_t object.
-	 * @param _a_test_hierarchy_delimiter The delimiter used to split the test path.
-	 * @param _a_discovery_id The discovery ID of the test.
-	 * @param _a_is_test_to_be_ran Whether the test is to be ran.
-	 * @param _a_repetition_data The repetition data (if any) associated with the test
-	 * @param _a_maximum_threads_allowed The normalised number of threads allowed.
-	 */
-	__constexpr
-		post_setup_test_data_t(
-			const registered_test_data_t& _a_registered_test_data,
-			const test_path_delimiter_ref _a_test_hierarchy_delimiter,
-			const unique_id_t _a_discovery_id,
-			const bool _a_is_test_to_be_ran,
-			const ds::for_loop_stack_trie_t* _a_repetition_data,
-			const size_t _a_maximum_threads_allowed
-		) noexcept;
-	/*!
-	 * @brief Gets the internal registered_test_data object.
-	 * @return Internal registered_test_data_t object.
-	 */
-	__constexpr
-		const registered_test_data_t&
-		registered_test_data(
-		) const;
-	/*!
-	 * @brief Gets the internal test_path_hierarchy of the test.
-	 * @return A cref to the test's test_path_hierarchy_t object.
-	 */
-	__constexpr
-		const test_path_hierarchy_t&
-		test_path_hierarchy(
-		) const noexcept;
-	/*!
-	 * @brief Tells the caller whether the test is to be ran.
-	 * @return True if the test is to be ran, false otherwise. 
-	 */
-	__constexpr
-		bool
-		is_test_to_be_ran(
-		) const noexcept;
-	/*!
-	 * @brief Tells the caller this test's discovery ID.
-	 * @return The test's discovery ID.
-	 */
-	__constexpr
-		unique_id_t
-		discovery_id(
-		) const noexcept;
-	/*!
-	 * @brief Tells the caller whether this test has repetition data associated with it.
-	 * @return True if it does, false if it does not.
-	 */
-	__constexpr
-		bool
-		has_repetition_data(
-		) const noexcept;
-	/*!
-	 * @brief Gets the internal repetition tree of the test.
-	 * 
-	 * Note this function will throw an exception if the internal repetition_tree_t
-	 * object is a nullptr.
-	 * 
-	 * @return Gets a cref to the internal repetition tree of the test. 
-	 */
-	__constexpr
-		const ds::for_loop_stack_trie_t&
-		repetition_data(
-		) const;
-	/*!
-	 * @brief Gets the number of thread resourses required by the test.
-	 * @return std::size_t representing the number of thread resourses required by the test.
-	 */
-	__constexpr
-		std::size_t
-		thread_resourses_required(
-		) const noexcept;
-	/*!
-	 * @brief Equality operator.
-	 * @param _a_rhs The post_setup_test_data_t object to compare this object to.
-	 * @return True if equal, false if not.
-	 */
-	__constexpr
-		bool
-		operator==(
-			const post_setup_test_data_t& _a_rhs
-			) const noexcept = default;
+    /*!
+     * @brief Constructor
+     * @param _a_registered_test_data Underlying registered_test_data_t object.
+     * @param _a_test_hierarchy_delimiter The delimiter used to split the test
+     * path.
+     * @param _a_discovery_id The discovery ID of the post_setup_test_data_t
+     * object.
+     * @param _a_is_test_to_be_ran Denotes whether the test is to be ran.
+     * @param _a_for_loop_stack_trie The for_loop_stack_trie_t object (if there
+     * is any) associated with the post_setup_test_data_t object.
+     * @param _a_maximum_threads_allowed The number of threads the test
+     * requires. This is guaranteed to be above 0, and less than or equal to the
+     * maximum number of threads the system will allow.
+     */
+    __constexpr
+    post_setup_test_data_t(
+        const registered_test_data_t&    _a_registered_test_data,
+        const test_path_delimiter_ref    _a_test_hierarchy_delimiter,
+        const unique_id_t                _a_discovery_id,
+        const bool                       _a_is_test_to_be_ran,
+        const ds::for_loop_stack_trie_t* _a_for_loop_stack_trie,
+        const size_t                     _a_maximum_threads_allowed
+    ) noexcept;
+    /*!
+     * @brief Returns a cref to the registered_test_data_t member variable.
+     * @return A cref to the registered_test_data_t member variable.
+     */
+    __constexpr const registered_test_data_t&
+        registered_test_data() const;
+    /*!
+     * @brief Returns a cref to the test_path_hierarchy_t member variable.
+     * @return A cref to the test_path_hierarchy_t member variable.
+     */
+    __constexpr const test_path_hierarchy_t&
+        test_path_hierarchy() const noexcept;
+    /*!
+     * @brief Tells the caller whether the test is to be ran.
+     * @return True if the test is to be ran; false otherwise.
+     */
+    __constexpr bool
+        is_test_to_be_ran() const noexcept;
+    /*!
+     * @brief Returns the unique_id_t of the object.
+     * @return The unique_id_t of the object.
+     */
+    __constexpr unique_id_t
+        discovery_id() const noexcept;
+    /*!
+     * @brief Tells the caller whether this object has a for_loop_stack_trie_t
+     * object associated with it.
+     * @return True if there is a trie associated with this object. false
+     * otherwise.
+     */
+    __constexpr bool
+        has_for_loop_stack_trie() const noexcept;
+    /*!
+     * @brief Gets a cref to the for_loop_stack_trie_t variable associated with
+     * this object.
+     *
+     * This function will throw an exception if there is no
+     * for_loop_stack_trie_t associated with it. We recomend using
+     * has_for_loop_stack_trie() with this function.
+     *
+     * @return A cref to the for_loop_stack_tree_t variable associated with this
+     * object.
+     */
+    __constexpr const ds::for_loop_stack_trie_t&
+                      for_loop_stack_trie() const;
+    /*!
+     * @brief Returns the thread resourses required by this test, as stipulated
+     * by the user.
+     *
+     * Note this value has been normalised; it will be > 0 and <= the number of
+     * threads available to the system.
+     *
+     * @return The thread resourses required by this test.
+     */
+    __constexpr std::size_t
+                thread_resourses_required() const noexcept;
+    /*!
+     * @brief Equality operator for post_setup_test_data_t objects.
+     * @param _a_rhs The post_setup_test_data_t object to compare this object
+     * to.
+     * @return True if the objects are equal; false otherwise.
+     */
+    __constexpr bool
+        operator==(const post_setup_test_data_t& _a_rhs) const noexcept
+        = default;
 private:
-	const registered_test_data_t& _m_registered_test_data;
-	test_path_hierarchy_t _m_test_path_hierarchy;
-	unique_id_t _m_discovery_id;
-	bool _m_is_test_to_be_ran;
-	size_t _m_thread_resourses_required;
-	const ds::for_loop_stack_trie_t* _m_repetition_data;
+    // A cref to the registered_test_data_t object associated with this test.
+    const registered_test_data_t& _m_registered_test_data;
+    // The test path hierarchy of this test.
+    test_path_hierarchy_t _m_test_path_hierarchy;
+    // The unique ID of this test.
+    unique_id_t _m_discovery_id;
+    // The bool stipulating whether this test is to be ran.
+    bool _m_is_test_to_be_ran;
+    // The number of threads required by the system.
+    size_t _m_thread_resourses_required;
+    // A pointer to the trie associated with this test.
+    const ds::for_loop_stack_trie_t* _m_for_loop_stack_trie;
 };
+
 _END_ABC_DS_NS
 
 /*!
-* formatter for post_setup_test_ata object.
-*/
-template
-<
-> 
-struct fmt::formatter<abc::ds::post_setup_test_data_t> : formatter<string_view> 
+ * formatter for post_setup_test_ata object.
+ */
+template <>
+struct fmt::formatter<abc::ds::post_setup_test_data_t> : formatter<string_view>
 {
-	/*!
-	* Provides a formatter for a poset_setup_test_data_t object
-	*/
-	__no_constexpr
-		auto 
-		format(
-			abc::ds::post_setup_test_data_t _a_pstd, 
-			format_context& _a_cxt
-		) const
-		->format_context::iterator;
+    /*!
+     * Provides a formatter for a poset_setup_test_data_t object
+     */
+    __no_constexpr auto
+        format(abc::ds::post_setup_test_data_t _a_pstd, format_context& _a_cxt)
+            const -> format_context::iterator;
 };
 
 _BEGIN_ABC_DS_NS
 __constexpr_imp
-post_setup_test_data_t::post_setup_test_data_t(
-	const registered_test_data_t& _a_registered_test_data,
-	const test_path_delimiter_ref _a_test_hierarchy_delimiter,
-	const unique_id_t _a_discovery_id,
-	const bool _a_is_test_to_be_ran,
-	const ds::for_loop_stack_trie_t* _a_repetition_data,
-	const size_t _a_maximum_threads_allowed
-) noexcept
-	: _m_registered_test_data(_a_registered_test_data)
-	, _m_test_path_hierarchy(utility::str::split_string(_a_registered_test_data._m_user_data.path, _a_test_hierarchy_delimiter))
-	, _m_discovery_id(_a_discovery_id)
-	, _m_is_test_to_be_ran(_a_is_test_to_be_ran)
-	, _m_repetition_data(_a_repetition_data)
-	, _m_thread_resourses_required(
-		_a_registered_test_data._m_user_data.threads_required == 0 ?
-		_a_maximum_threads_allowed : 
-		std::min(_a_maximum_threads_allowed, _a_registered_test_data._m_user_data.threads_required))
-{
+    post_setup_test_data_t::post_setup_test_data_t(
+        const registered_test_data_t&    _a_registered_test_data,
+        const test_path_delimiter_ref    _a_test_hierarchy_delimiter,
+        const unique_id_t                _a_discovery_id,
+        const bool                       _a_is_test_to_be_ran,
+        const ds::for_loop_stack_trie_t* _a_repetition_data,
+        const size_t                     _a_maximum_threads_allowed
+    ) noexcept
+    : _m_registered_test_data(_a_registered_test_data)
+    , _m_test_path_hierarchy(utility::str::split_string(
+          _a_registered_test_data._m_user_data.path,
+          _a_test_hierarchy_delimiter
+      ))
+    , _m_discovery_id(_a_discovery_id)
+    , _m_is_test_to_be_ran(_a_is_test_to_be_ran)
+    , _m_for_loop_stack_trie(_a_repetition_data)
+    , _m_thread_resourses_required(
+          _a_registered_test_data._m_user_data.threads_required == 0
+              ? _a_maximum_threads_allowed
+              : std::min(
+                    _a_maximum_threads_allowed,
+                    _a_registered_test_data._m_user_data.threads_required
+                )
+      )
+{}
 
-}
-__constexpr_imp
-const registered_test_data_t&
-post_setup_test_data_t::registered_test_data(
-) const
+__constexpr_imp const registered_test_data_t&
+    post_setup_test_data_t::registered_test_data() const
 {
-	return _m_registered_test_data;
+    return _m_registered_test_data;
 }
-__constexpr_imp
-const test_path_hierarchy_t&
-post_setup_test_data_t::test_path_hierarchy(
-) const noexcept
+
+__constexpr_imp const test_path_hierarchy_t&
+    post_setup_test_data_t::test_path_hierarchy() const noexcept
 {
-	return _m_test_path_hierarchy;
+    return _m_test_path_hierarchy;
 }
-__constexpr_imp
-bool
-post_setup_test_data_t::is_test_to_be_ran(
-) const noexcept
+
+__constexpr_imp bool
+    post_setup_test_data_t::is_test_to_be_ran() const noexcept
 {
-	return _m_is_test_to_be_ran;
+    return _m_is_test_to_be_ran;
 }
-__constexpr_imp
-unique_id_t
-post_setup_test_data_t::discovery_id(
-) const noexcept
+
+__constexpr_imp unique_id_t
+    post_setup_test_data_t::discovery_id() const noexcept
 {
-	return _m_discovery_id;
+    return _m_discovery_id;
 }
-__constexpr_imp
-bool
-post_setup_test_data_t::has_repetition_data(
-) const noexcept
+
+__constexpr_imp bool
+    post_setup_test_data_t::has_for_loop_stack_trie() const noexcept
 {
-	return _m_repetition_data != nullptr;
+    return _m_for_loop_stack_trie != nullptr;
 }
-__constexpr_imp
-const ds::for_loop_stack_trie_t&
-post_setup_test_data_t::repetition_data(
-) const
+
+__constexpr_imp const ds::for_loop_stack_trie_t&
+                      post_setup_test_data_t::for_loop_stack_trie() const
 {
-	if (_m_repetition_data == nullptr)
-	{
-		throw abc::errors::test_library_exception_t(
-			"Attempted to access post_setup_test_data_t's repetition data. "
-			"However, the reptition_data contains a nullptr. "
-			"Use has_repetition_data to check this."
-		);
-	}
-	else
-	{
-		return *_m_repetition_data;
-	}
+    if (_m_for_loop_stack_trie == nullptr)
+    {
+        throw abc::errors::test_library_exception_t(
+            "Attempted to access post_setup_test_data_t's repetition data. "
+            "However, the for_loop_stack_trie contains a nullptr. "
+            "Use has_for_loop_stack_trie to check this."
+        );
+    }
+    else
+    {
+        return *_m_for_loop_stack_trie;
+    }
 }
-__constexpr_imp
-std::size_t
-post_setup_test_data_t::thread_resourses_required(
-) const noexcept
+
+__constexpr_imp std::size_t
+    post_setup_test_data_t::thread_resourses_required() const noexcept
 {
-	return _m_thread_resourses_required;
+    return _m_thread_resourses_required;
 }
+
 _END_ABC_DS_NS
 
-__no_constexpr_imp
-auto 
-fmt::formatter<abc::ds::post_setup_test_data_t>::format(
-	abc::ds::post_setup_test_data_t _a_pstd,
-	format_context& _a_ctx
-) const
--> format_context::iterator
+__no_constexpr_imp auto
+    fmt::formatter<abc::ds::post_setup_test_data_t>::format(
+        abc::ds::post_setup_test_data_t _a_pstd,
+        format_context&                 _a_ctx
+    ) const -> format_context::iterator
 {
-	using namespace std;
-	const string _l_rv{ fmt::format(
-		"post_setup_test_data_t {{"
-		"_m_registered_test_data = {0}, "
-		"_m_test_path_hierarchy = {1}, "
-		"_m_discovery_id = {2}, "
-		"_m_is_test_to_be_ran = {3}, "
-		"_m_thread_resourses_required = {4}, "
-		"_m_repetition_data = {5}}}",
-		fmt::format("{0}", _a_pstd.registered_test_data()),
-		_a_pstd.test_path_hierarchy(),
-		_a_pstd.discovery_id(),
-		_a_pstd.is_test_to_be_ran(),
-		_a_pstd.thread_resourses_required(),
-		_a_pstd.has_repetition_data() ? _a_pstd.repetition_data().print_for_loop_stack_trie() : "nullptr"
-	) };
-	return formatter<string_view>::format(_l_rv, _a_ctx);
+    using namespace std;
+    const string _l_rv{fmt::format(
+        "{0} "
+        "{{{1} = {2}"
+        ", {3} = {4}"
+        ", {5} = {6}"
+        ", {7} = {8}"
+        ", {9} = {10}",
+        ", {11} = {12}",
+        ", {13} = {14}"
+        "}}",
+        typeid(_a_pstd).name(),
+        "_m_registered_test_data",
+        _a_pstd.registered_test_data(),
+        "_m_test_path_hierarchy",
+        _a_pstd.test_path_hierarchy(),
+        "_m_discovery_id",
+        _a_pstd.discovery_id(),
+        "_m_is_test_to_be_ran",
+        _a_pstd.is_test_to_be_ran(),
+        "_m_thread_resourses_required",
+        _a_pstd.thread_resourses_required(),
+        "_m_for_loop_stack_trie",
+        _a_pstd.has_for_loop_stack_trie()
+            ? fmt::format("{0}", _a_pstd.for_loop_stack_trie())
+            : "nullptr"
+    )};
+    return formatter<string_view>::format(_l_rv, _a_ctx);
 }

@@ -5,7 +5,7 @@
 
 _BEGIN_ABC_REPORTERS_NS
 	//Forward declarations
-	struct ds::invoked_test_info_t;
+	struct ds::invoked_test_data_t;
 	/*!
 	* An generic object used to report information regarding tests.
 	*

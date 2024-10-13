@@ -8,6 +8,7 @@ set(REQUIRED_LIBS
 # The set of all files included with the library.
 set(LIBRARY_FILES
   # The core subfolder; contains the core logic for how the library works.
+  include/abc_test/core.h
   include/abc_test/core/test_main.h
   include/abc_test/core/test_options.h
   include/abc_test/core/test_order_enum.h

@@ -237,10 +237,11 @@ private:
     /*!
      * @brief If one exists, finds the node which represents the
      * for_loop_creation_data_sequence_t argument.
-     * 
+     *
      * @param _a_flcds for_loop_creation_data_sequence_t argument used to find
      * the node.
-     * @return
+     * @return An optional iterator pointing at the node which represents
+     * _a_flcds. If nullopt, no node exists.
      */
     __constexpr opt_itt_t
         find_iterator(const for_loop_creation_data_sequence_t& _a_flcds
@@ -708,3 +709,21 @@ __constexpr_imp parse_for_loop_stack_trie_result_t
 }
 
 _END_ABC_DS_NS
+
+__no_constexpr_imp auto
+    fmt::formatter<abc::ds::for_loop_stack_trie_t>::format(
+        abc::ds::for_loop_stack_trie_t _a_rt,
+        format_context&                _a_cxt
+    ) const -> format_context::iterator
+{
+    using namespace std;
+    const string _l_rv{ fmt::format(
+        "{0}"
+        "{{{1} = {2}"
+        "}}",
+        typeid(_a_rt).name(),
+        "_m_children",
+        _a_rt.print_for_loop_stack_trie()
+    ) };
+    return formatter<string_view>::format(_l_rv, _a_cxt);
+}

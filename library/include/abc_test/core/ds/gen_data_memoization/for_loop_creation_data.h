@@ -51,7 +51,7 @@ using for_loop_creation_data_sequence_t = std::vector<for_loop_creation_data_t>;
 /*!
  * @brief A synonym for an optional for_loop_creation_data_t element.
  */
-using opt_for_loop_creation_data_t = std::optional<const for_loop_creation_data_t>;
+using opt_for_loop_creation_data_t = std::optional<for_loop_creation_data_t>;
 _END_ABC_DS_NS
 
 template <>

@@ -1,331 +1,438 @@
-
 #pragma once
 
+#include "abc_test/core/ds/gen_data_memoization/for_loop_stack.h"
 #include "abc_test/core/ds/test_data/post_setup_test_data.h"
 
-#include "abc_test/core/ds/gen_data_memoization/for_loop_stack.h"
-
 #include <fmt/ranges.h>
+#include <functional>
 
 _BEGIN_ABC_DS_NS
+
 /*!
  * @brief Object used to represent a test currently being ran.
  */
-struct invoked_test_info_t
+
+/*!
+ * @brief Structure used to represent a test which is currently invoked.
+ *
+ * invoked_test_data_t builds on the other test types. It can be thought of as
+ * storing run-time information.
+ */
+struct invoked_test_data_t
 {
 public:
-	/*!
-	 * @brief Constructor
-	 * @param _a_seed_seq The seed for this test. 
-	 * @param _a_test_info The post_setup_test_data_t component of this test.
-	 * @param _a_order_ran_id The ID representing the order this test was ran in.
-	 * @param _a_options The options_t object used to setup this object.
-	 */
-	__no_constexpr
-		invoked_test_info_t(
-			const utility::seed_t& _a_seed_seq,
-			const post_setup_test_data_t& _a_test_info,
-			const size_t _a_order_ran_id,
-			const test_options_t& _a_options
-		) noexcept;
-	/*!
-	 * @brief Returns the path of the test to the caller.
-	 * 
-	 * Each test has a path, built from the user-defined path, and the test's name.
-	 * 
-	 * It is used to store data, such as failed test results.
-	 * 
-	 * @return The path of the test.
-	 */
-	__constexpr
-		const std::filesystem::path&
-		path(
-		) const noexcept;
-	/*!
-	 * @brief Returns the random generator to the caller.
-	 * @return Test's random generator.
-	 */
-	__constexpr
-		const utility::rng&
-		get_random_generator(
-		) noexcept;
-	/*!
-	 * @brief Returns the test's post_setup_tst_data_t object to the caller.
-	 * @return The test's post_setup_test_data_t object.
-	 */
-	__constexpr
-		const post_setup_test_data_t&
-		post_setup_test_data(
-		) const;
-	/*!
-	 * @brief Gets the test's for_loop_data_collection_t object.
-	 * @return A reference to the tests for_loop_data_collection_t object.
-	 */
-	__constexpr
-		ds::for_loop_stack_t&
-		for_loop_data_collection(
-		) noexcept;
-	/*!
-	* @brief Gets the next set of repetition_data from the underlying repetition_data
-	* and the current for_loop_data_collection structure.
-	* 
-	* If there is no next element, returns an empty optional.
-	* 
-	* @return An optional element, representing the next repetition_data_t element.
-	*/
-	__constexpr
-		std::optional<ds::for_loop_creation_data_t>
-		get_repetition_iterator_data(
-		) noexcept;
-	/*!
-	 * @brief Gets the next "level" of iteration data, based on the current position
-	 * in the iteration data.
-	 * 
-	 * Specifically, it is used when a new for loop is encountered, getting the first
-	 * element in the repetition data for that for loop. If there isn't one, it returns
-	 * an empty optional.
-	 * 
-	 * @return An optional with the repetition_data_t object, representing the first
-	 * element to be repeated in the next for loop.
-	 */
-	__constexpr
-		std::optional<ds::for_loop_creation_data_t>
-		increment_repetition_iterator_data(
-		) noexcept;
-	/*!
-	 * @brief Tells the caller if the current repetition_data_sequence_t is contained
-	 * in the test's reptition_tree.
-	 * 
-	 * Essentially this is used in manual for loops, to check whether the current
-	 * element is to be ran or not.
-	 * 
-	 * @return True if it is in the test's repetition tree, false if not.
-	 */
-	__constexpr
-		bool
-		is_repetition_to_be_repeated(
-		) const noexcept;
-	/*!
-	 * @brief Returns the internal repetition_tree to the caller.
-	 * 
-	 * To be clear, this is the repetition_tree_t created by the test, not the one
-	 * given to the test as a parameter.
-	 * 
-	 * @return The test's repetition_tree.
-	 */
-	__constexpr
-		const ds::for_loop_stack_trie_t&
-		repetition_tree(
-		) const noexcept;
-	/*!
-	 * @brief Updates the test's repetition tree with a new repetition_data_sequence_t.
-	 * 
-	 */
-	__constexpr
-		void
-		update_repetition_tree(
-			const ds::for_loop_creation_data_sequence_t& _a_rds
-		) noexcept;
-	/*!
-	 * @brief Gets the current order ran ID.
-	 * 
-	 * This is the order the tests are ran in. Note that this is given to the test
-	 * before it is spawned in its own thread, so it may be the case that the test_reporter
-	 * gets the tests in a different order to the order they were ran in.
-	 * 
-	 * @return Integer representing the order the test was ran in.
-	 */
-	__constexpr
-		std::size_t
-		order_ran_id(
-		) const noexcept;
+    __no_constexpr
+        invoked_test_data_t() noexcept
+        = delete;
+    /*!
+     * @brief Main constructor.
+     * @param _a_seed_seq The seed for this invoked_test_data_t instance.
+     * @param _a_test_info The post_setup_test_data_t component for this
+     * invoked_test_data_t instance.
+     * @param _a_order_ran_id A unique ID representing the order this
+     * invoked_test_data_t element is being ran in.
+     * @param _a_options The test_options_t object used when setting up this
+     * invoked_test_data_t instance.
+     */
+    __no_constexpr
+        invoked_test_data_t(
+            const utility::seed_t&        _a_seed_seq,
+            const post_setup_test_data_t& _a_test_info,
+            const size_t                  _a_order_ran_id,
+            const test_options_t&         _a_options
+        ) noexcept;
+    /*!
+     * @brief Returns the path of the invoked_test_data_t test to the caller.
+     *
+     * Each invoked_test_data_t test has a path, built from the user-defined
+     * path and the name in registered_test_data_t.
+     *
+     * These are folders, not files. They are used by various sub-systems in the
+     * testing framework to store data.
+     *
+     * @return The test's file path.
+     */
+    __constexpr const std::filesystem::path&
+                      path() const noexcept;
+    /*!
+     * @brief Returns a cref to the invoked_test_data_t's utility::rng object.
+     * @return Cref to the invoked_test_data_t's utility::rng object.
+     */
+    __constexpr const utility::rng&
+                      get_random_generator() noexcept;
+    /*!
+     * @brief Returns a cref to the invoked_test_data_t's post_setup_tst_data_t
+     * object.
+     * @return The invoked_test_data_t's post_setup_test_data_t object.
+     */
+    __constexpr const post_setup_test_data_t&
+        post_setup_test_data() const;
+    /*!
+     * @brief Gets a cref to the invoked_test_data_t's for_loop_stack_t object.
+     *
+     * This can be thought of as the current set of gen_data_t structures
+     * currently used.
+     *
+     * Note it is read only; it cannot be edited.
+     *
+     * @return A cref to the invoked_test_data_t's for_loop_stack_t object.
+     */
+    __constexpr const ds::for_loop_stack_t&
+                      for_loop_data_collection() const noexcept;
+    /*!
+     * @brief Decrements the invoked_test_data_t for_loop_stack_t member
+     * variable.
+     */
+    __constexpr void
+        decrement_for_loop_stack() noexcept;
+    /*!
+     * @brief Updates the invoked_test_data_t for_loop_stack_t member variable.
+     * @param _a_ptr The gdc_itt_agnostic_data_ref_t used to update the
+     * for_loop_stack_t variable.
+     */
+    __no_constexpr void
+        update_for_loop_stack(gdc_itt_agnostic_data_ref_t _a_ptr) noexcept;
+    /*!
+     * @brief Increments the invoked_test_data_t's for_loop_stack_t member
+     * variable.
+     * @param _a_pstr The gdc_itt_agnostic_data_ref_t used to incrment the
+     * for_loop_stack_t variable.
+     */
+    __no_constexpr void
+        increment_for_loop_stack(gdc_itt_agnostic_data_ref_t _a_pstr) noexcept;
+    /*!
+     * @brief Gets the first child of the current for_loop_stack in the memoized
+     * for_loop_stack_trie contained in the invoked_test_data_t's
+     * post_setup_test_data member variable.
+     *
+     * If the post_setup_test_data_t member variable has no for_loop_stack_trie
+     * (this corresponds to there being no specific set of for loop data
+     * variables to re-generate), then this function will return a nullopt.
+     *
+     * To be clear, this function is used when trying to repeat parts of a test.
+     * The post_setup_test_data_t, containing a specific set of for loop data
+     * elements to repeat is probed, to find the first in the child of the
+     * current for loop trie.
+     *
+     * Essentially, it is called when a new for loop is entered.
+     *
+     * @return Next element in the post_setup_test_data_t's repetition data when
+     * the current for_loop_trie is considered the node.
+     */
+    __constexpr opt_for_loop_creation_data_t
+        get_first_child_of_current_for_loop_stack() noexcept;
+    /*!
+     * @brief Gets the next element in the post_setup_test_data_t's
+     * for_loop_stack_trie_t member variable, assuming it has one.
+     *
+     * To be clear, this function is to be called when wanting to repeat tests
+     * which use gen_data_collection_t structures in loops. This function is
+     * called when incrementing such a structure; it assumes that the current
+     * for_loop_stack_t is correct, and finds its node in the
+     * post_setup_test_data_t's for_loop_stack_trie_t member variable. It then
+     * finds its "sibling" in the structure and, assuming it has one, returns
+     * the for_loop_creation_data_t object which would need to be exchanged with
+     * the current last element in the for_loop_stack_t to create that
+     * for_loop_stack_t object.
+     *
+     * If the post_setup_test_data_t object contains no for_loop_stack_trie_t
+     * object, there is no "successor" node, or the current node cannot be found
+     * in the for_loop_stack_trie_t, then this function returns a nullopt.
+     *
+     * @return opt_for_loop_creation_data_t object. This function returns a
+     * nullopt if it cannot find a successor value, otherwise returns the
+     * successor value.
+     */
+    __constexpr opt_for_loop_creation_data_t
+        increment_last_value_of_current_for_loop_stack() noexcept;
+
+    /*!
+     * @brief Tells the caller if the current repetition_data_sequence_t is
+     * contained in the test's reptition_tree.
+     *
+     * Essentially this is used in manual for loops, to check whether the
+     * current element is to be ran or not.
+     *
+     * @return True if it is in the test's repetition tree, false if not.
+     */
+
+    /*!
+     * @brief Tells the caller if the current for_loop_stack_trie_t object is in
+     * the post_setup_test_data_t's for_loop_stack_trie_t member variable.
+     *
+     * The user may think that get_first_child_of_current_for_loop_stack() and
+     * increment_last_value_of_current_for_loop_stack() are all that is needed
+     * to navigate gen_data_collection_t for loops. However, when using manual
+     * for loops, this function must be used, to allow the test to skip over
+     * expressions.
+     *
+     * @return True if the current for_loop_stack_trie_t variable is contained
+     * in the post_setup_test_data_t's for_loop_stack_trie_t member variable.
+     */
+    __constexpr bool
+        is_current_for_loop_stack_in_true() const noexcept;
+    /*!
+     * @brief Returns the internal repetition_tree to the caller.
+     *
+     * To be clear, this is the repetition_tree_t created by the test, not the
+     * one given to the test as a parameter.
+     *
+     * @return The test's repetition_tree.
+     */
+
+    /*!
+     * @brief Returns a cref to this object's for_loop_stack_trie_t.
+     *
+     * To be clear, this is different to the post_setup_test_data_t's
+     * for_loop_stack_trie_t. This structure is used when creating seeds used to
+     * repeat tests; the variable in the post_setup_test_data_t is that used
+     * when repeating tests.
+     *
+     * While the post_setup_test_data_t object can point to a nullptr (which
+     * corresponds to no repetition data being available), this structure is
+     * always available.
+     *
+     * @return A cref to the internal for_loop_stack_trie_t object.
+     */
+    __constexpr const ds::for_loop_stack_trie_t&
+                      for_loop_stack_trie() const noexcept;
+    /*!
+     * @brief Adds the current for_loop_stack_t to the internal
+     * for_loop_stack_trie_t object.
+     *
+     * This function is called when the overarching system wants to state that
+     * some data from a gen_data_collection_t object should be repeated.
+     *
+     */
+    __constexpr void
+        add_current_for_loop_stack_to_trie() noexcept;
+    /*!
+     * @brief Gets the current order ran ID.
+     *
+     * This ID denotes the order the tests should be ran in. Note that, if
+     * mult-threading is used to run the tests, then it is entirely possible
+     * this order will not be adhered to.
+     *
+     * @return Integer representing the order the test should be ran in.
+     */
+    __constexpr std::size_t
+                order_ran_id() const noexcept;
 private:
-	const post_setup_test_data_t& _m_post_setup_test_data;
-	ds::for_loop_stack_trie_t _m_repetition_tree;
-	ds::for_loop_stack_t _m_for_loop_data_collection;
-	std::size_t _m_order_ran_id;
-	utility::rng _m_this_tests_random_generator;
-	std::filesystem::path _m_path;
+    const post_setup_test_data_t& _m_post_setup_test_data;
+    ds::for_loop_stack_trie_t     _m_tests_for_loop_stack_trie;
+    ds::for_loop_stack_t          _m_for_loop_data_collection;
+    std::size_t                   _m_order_ran_id;
+    utility::rng                  _m_this_tests_random_generator;
+    std::filesystem::path         _m_path;
 };
+
 namespace
 {
-	__no_constexpr
-		std::filesystem::path
-		create_test_path(
-			const post_setup_test_data_t& _a_test_info,
-			const test_options_t& _a_options
-		) noexcept;
-}
+__no_constexpr std::filesystem::path
+               create_test_path(
+                   const post_setup_test_data_t& _a_test_info,
+                   const test_options_t&         _a_options
+               ) noexcept;
+} // namespace
+
 _END_ABC_DS_NS
 
 /*!
-* formatter for post_setup_test_ata object.
-*/
-template
-<
->
-struct fmt::formatter<abc::ds::invoked_test_info_t> : formatter<string_view>
+ * formatter for post_setup_test_ata object.
+ */
+template <>
+struct fmt::formatter<abc::ds::invoked_test_data_t> : formatter<string_view>
 {
-	/*!
-	* Provides a formatter for a poset_setup_test_data_t object
-	*/
-	__no_constexpr
-		auto format(
-			abc::ds::invoked_test_info_t _a_iti,
-			format_context& _a_cxt
-		) const
-		->format_context::iterator;
+    /*!
+     * Provides a formatter for a poset_setup_test_data_t object
+     */
+    __no_constexpr auto
+        format(abc::ds::invoked_test_data_t _a_iti, format_context& _a_cxt)
+            const -> format_context::iterator;
 };
 
 _BEGIN_ABC_DS_NS
 __no_constexpr_imp
-invoked_test_info_t::invoked_test_info_t(
-	const utility::seed_t& _a_seed_seq,
-	const post_setup_test_data_t& _a_post_setup_test_data,
-	const size_t _a_order_ran_id,
-	const test_options_t& _a_options
-) noexcept
-	: _m_post_setup_test_data(_a_post_setup_test_data)
-	, _m_for_loop_data_collection(ds::for_loop_stack_t())
-	, _m_order_ran_id(_a_order_ran_id)
-	, _m_this_tests_random_generator(_a_seed_seq)
-	, _m_path(create_test_path(_a_post_setup_test_data, _a_options))
+    invoked_test_data_t::invoked_test_data_t(
+        const utility::seed_t&        _a_seed_seq,
+        const post_setup_test_data_t& _a_post_setup_test_data,
+        const size_t                  _a_order_ran_id,
+        const test_options_t&         _a_options
+    ) noexcept
+    : _m_post_setup_test_data(_a_post_setup_test_data)
+    , _m_for_loop_data_collection(ds::for_loop_stack_t())
+    , _m_order_ran_id(_a_order_ran_id)
+    , _m_this_tests_random_generator(_a_seed_seq)
+    , _m_path(create_test_path(_a_post_setup_test_data, _a_options))
+{}
+
+__constexpr_imp const std::filesystem::path&
+                      invoked_test_data_t::path() const noexcept
 {
+    return _m_path;
 }
-__constexpr_imp
-const std::filesystem::path&
-invoked_test_info_t::path(
-) const noexcept
+
+__constexpr_imp const utility::rng&
+                      invoked_test_data_t::get_random_generator() noexcept
 {
-	return _m_path;
+    return _m_this_tests_random_generator;
 }
-__constexpr_imp
-const utility::rng&
-invoked_test_info_t::get_random_generator(
-) noexcept
+
+__constexpr_imp const post_setup_test_data_t&
+    invoked_test_data_t::post_setup_test_data() const
 {
-	return _m_this_tests_random_generator;
+    return _m_post_setup_test_data;
 }
-__constexpr_imp
-const post_setup_test_data_t&
-invoked_test_info_t::post_setup_test_data(
-) const
+
+__constexpr_imp const ds::for_loop_stack_t&
+    invoked_test_data_t::for_loop_data_collection() const noexcept
 {
-	return _m_post_setup_test_data;
+    return _m_for_loop_data_collection;
 }
-__constexpr_imp
-ds::for_loop_stack_t&
-invoked_test_info_t::for_loop_data_collection(
-) noexcept
+
+__constexpr_imp void
+    invoked_test_data_t::decrement_for_loop_stack() noexcept
 {
-	return _m_for_loop_data_collection;
+    _m_for_loop_data_collection.decrement();
 }
-__constexpr_imp
-std::optional<ds::for_loop_creation_data_t>
-invoked_test_info_t::get_repetition_iterator_data(
-) noexcept
+
+__no_constexpr_imp void
+    invoked_test_data_t::update_for_loop_stack(
+        gdc_itt_agnostic_data_ref_t _a_ptr
+    ) noexcept
 {
-	using namespace std;
-	using namespace ds;
-	using enum utility::internal::internal_log_enum_t;
-	const optional<for_loop_creation_data_t> _l_rv{
-		_m_post_setup_test_data.repetition_data().find_first_child_of_sequence_in_trie(_m_for_loop_data_collection.create_data_sequence()) };
-	return _l_rv;
+    _m_for_loop_data_collection.update(_a_ptr);
 }
-__constexpr_imp
-std::optional<ds::for_loop_creation_data_t>
-invoked_test_info_t::increment_repetition_iterator_data(
-) noexcept
+
+__no_constexpr_imp void
+    invoked_test_data_t::increment_for_loop_stack(
+        gdc_itt_agnostic_data_ref_t _a_ptr
+    ) noexcept
 {
-	using namespace std;
-	using namespace ds;
-	using enum utility::internal::internal_log_enum_t;
-	const optional<for_loop_creation_data_t> _l_rv{
-		_m_post_setup_test_data.repetition_data().increment_last_index(_m_for_loop_data_collection.create_data_sequence()) };
-	return _l_rv;
+    _m_for_loop_data_collection.increment(_a_ptr);
 }
-__constexpr_imp
-bool
-invoked_test_info_t::is_repetition_to_be_repeated(
-) const noexcept
+
+__constexpr_imp opt_for_loop_creation_data_t
+    invoked_test_data_t::get_first_child_of_current_for_loop_stack() noexcept
 {
-	return (not _m_post_setup_test_data.has_repetition_data()) ? true :
-		_m_post_setup_test_data.repetition_data().is_sequence_in_trie(_m_for_loop_data_collection.create_data_sequence());
+    using namespace std;
+    using namespace ds;
+    using enum utility::internal::internal_log_enum_t;
+    const optional<for_loop_creation_data_t> _l_rv{
+        not _m_post_setup_test_data.has_for_loop_stack_trie()
+            ? opt_for_loop_creation_data_t{}
+            : _m_post_setup_test_data.for_loop_stack_trie()
+                  .find_first_child_of_sequence_in_trie(
+                      _m_for_loop_data_collection.create_data_sequence()
+                  )
+    };
+    return _l_rv;
 }
-__constexpr_imp
-const ds::for_loop_stack_trie_t&
-invoked_test_info_t::repetition_tree(
-) const noexcept
+
+__constexpr_imp opt_for_loop_creation_data_t
+    invoked_test_data_t::increment_last_value_of_current_for_loop_stack(
+    ) noexcept
 {
-	return _m_repetition_tree;
+    using namespace std;
+    using namespace ds;
+    using enum utility::internal::internal_log_enum_t;
+    const opt_for_loop_creation_data_t _l_rv{
+        not _m_post_setup_test_data.has_for_loop_stack_trie()
+            ? opt_for_loop_creation_data_t{}
+            : _m_post_setup_test_data.for_loop_stack_trie()
+                  .increment_last_index(
+                      _m_for_loop_data_collection.create_data_sequence()
+                  )
+    };
+    return _l_rv;
 }
-__constexpr_imp
-void
-invoked_test_info_t::update_repetition_tree(
-	const ds::for_loop_creation_data_sequence_t& _a_rds
-) noexcept
+
+__constexpr_imp bool
+    invoked_test_data_t::is_current_for_loop_stack_in_true() const noexcept
 {
-	using enum utility::internal::internal_log_enum_t;
-	_m_repetition_tree.add_for_loop_creation_data_sequence(_a_rds);
-	_LIBRARY_LOG(REPETITION_INFO, fmt::format("Repetition tree after insertion = {0}", _m_repetition_tree.print_for_loop_stack_trie()));
+    return (not _m_post_setup_test_data.has_for_loop_stack_trie())
+               ? true
+               : _m_post_setup_test_data.for_loop_stack_trie()
+                     .is_sequence_in_trie(
+                         _m_for_loop_data_collection.create_data_sequence()
+                     );
 }
-__constexpr_imp
-std::size_t
-invoked_test_info_t::order_ran_id(
-) const noexcept
+
+__constexpr_imp const ds::for_loop_stack_trie_t&
+                      invoked_test_data_t::for_loop_stack_trie() const noexcept
 {
-	return _m_order_ran_id;
+    return _m_tests_for_loop_stack_trie;
 }
+
+__constexpr_imp void
+    invoked_test_data_t::add_current_for_loop_stack_to_trie() noexcept
+{
+    _m_tests_for_loop_stack_trie.add_for_loop_creation_data_sequence(
+        _m_for_loop_data_collection.create_data_sequence()
+    );
+}
+
+__constexpr_imp std::size_t
+                invoked_test_data_t::order_ran_id() const noexcept
+{
+    return _m_order_ran_id;
+}
+
 namespace
 {
-	__no_constexpr_imp
-		std::filesystem::path
-		create_test_path(
-			const post_setup_test_data_t& _a_test_info,
-			const test_options_t& _a_options
-		) noexcept
-	{
-		using namespace std::filesystem;
-		using namespace utility;
-		path_t _l_path{ _a_options._m_test_data_root_path };
-		for (const test_path_element_ref_t& _a_test_path_component : _a_test_info.test_path_hierarchy())
-		{
-			_l_path /= _a_test_path_component;
-		}
-		_l_path /= _a_test_info.registered_test_data()._m_user_data.name;
-		if (not exists(_l_path))
-		{
-			create_directories(_l_path);
-		}
-		return _l_path;
-	}
+__no_constexpr_imp std::filesystem::path
+                   create_test_path(
+                       const post_setup_test_data_t& _a_test_info,
+                       const test_options_t&         _a_options
+                   ) noexcept
+{
+    using namespace std::filesystem;
+    using namespace utility;
+    path_t _l_path{_a_options._m_test_data_root_path};
+    for (const test_path_element_ref_t& _a_test_path_component :
+         _a_test_info.test_path_hierarchy())
+    {
+        _l_path /= _a_test_path_component;
+    }
+    _l_path /= _a_test_info.registered_test_data()._m_user_data.name;
+    if (not exists(_l_path))
+    {
+        create_directories(_l_path);
+    }
+    return _l_path;
 }
+} // namespace
+
 _END_ABC_DS_NS
 
-__no_constexpr_imp
-auto
-fmt::formatter<abc::ds::invoked_test_info_t>::format(
-	abc::ds::invoked_test_info_t _a_iti,
-	format_context& _a_ctx
-) const
--> format_context::iterator
+__no_constexpr_imp auto
+    fmt::formatter<abc::ds::invoked_test_data_t>::format(
+        abc::ds::invoked_test_data_t _a_iti,
+        format_context&              _a_ctx
+    ) const -> format_context::iterator
 {
-	using namespace std;
-	const string _l_rv{ fmt::format(
-		"{0} {{"
-		"{1} = {2}, "
-		"{3} = {4}, "
-		"{5} = {6}, "
-		"{7} = {8}, "
-		"{9} = {10}, "
-		"{11} = {12}}}",
-		typeid(_a_iti).name(),
-		"_m_post_setup_test_data", _a_iti.post_setup_test_data(),
-		"_m_repetition_tree", _a_iti.repetition_tree(),
-		"_m_for_loop_data_collection", _a_iti.for_loop_data_collection(),
-		"_m_order_ran_id", _a_iti.order_ran_id(),
-		"_m_this_tests_random_generator","<unwritten>",
-		"_m_path", _a_iti.path().string()
-	) };
-	return formatter<string_view>::format(_l_rv, _a_ctx);
+    using namespace std;
+    const string _l_rv{fmt::format(
+        "{0} {{"
+        "{1} = {2}, "
+        "{3} = {4}, "
+        "{5} = {6}, "
+        "{7} = {8}, "
+        "{9} = {10}, "
+        "{11} = {12}}}",
+        typeid(_a_iti).name(),
+        "_m_post_setup_test_data",
+        _a_iti.post_setup_test_data(),
+        "_m_repetition_tree",
+        _a_iti.for_loop_stack_trie(),
+        "_m_for_loop_data_collection",
+        _a_iti.for_loop_data_collection(),
+        "_m_order_ran_id",
+        _a_iti.order_ran_id(),
+        "_m_this_tests_random_generator",
+        "<unwritten>",
+        "_m_path",
+        _a_iti.path().string()
+    )};
+    return formatter<string_view>::format(_l_rv, _a_ctx);
 }

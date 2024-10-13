@@ -1,5 +1,6 @@
 #pragma once
 
+#include "abc_test/core/ds/gen_data_memoization/for_loop_creation_data.h"
 #include "abc_test/core/errors/test_library_exception.h"
 #include "abc_test/gen_data/collection_iterator_agnostic_data.h"
 #include "fmt/base.h"
@@ -7,15 +8,12 @@
 
 
 _BEGIN_ABC_DS_NS
-
 /*!
- * Object which holds ma colleciton of for loop data, which allows us to
- * represent an arbitrarily deep set of gen_data for loops. These mechanisms
- * allows tests to be re-run effeciently, without having to go through
- * additional use-cases. At any point, a current test will have a stack of for
- * loops it is navigating with distinct values generated from those for-loops.
- * This object encodes that data
+ * @brief Type synonym for a refernece wrapper containing a
+ * gen_data_collection_iterator_agnostic_data_t object.
  */
+using gdc_itt_agnostic_data_ref_t
+    = std::reference_wrapper<gen_data_collection_iterator_agnostic_data_t>;
 
 /*!
  * @brief This structure holds the current set of
@@ -49,8 +47,7 @@ public:
      * @param _a_ptr The pointer to add to the internal collection.
      */
     __no_constexpr void
-        increment(gen_data_collection_iterator_agnostic_data_t* _a_ptr
-        ) noexcept;
+        increment(gdc_itt_agnostic_data_ref_t _a_ptr) noexcept;
     /*!
      * Removes the current element from the for loop stack, and updates the for
      * loop counter.
@@ -76,7 +73,7 @@ public:
      * @param _a_ptr The pointer to add to the internal collection.
      */
     __no_constexpr void
-        update(gen_data_collection_iterator_agnostic_data_t* _a_ptr);
+        update(gdc_itt_agnostic_data_ref_t _a_ptr);
     /*!
      * Calls all the for loop element's failure functions.
      *
@@ -129,15 +126,14 @@ public:
      * Internally, what ordered numerical identifier is assigned to the current
      * for loop is also maintained in this object. This function returns the
      * current one to the caller.
-     * 
+     *
      * @return The numerical identifier assigned to the current for loop.
      */
     __constexpr std::size_t
                 current_for_loop_index() const noexcept;
 private:
-    std::vector<gen_data_collection_iterator_agnostic_data_t*>
-                             _m_for_loop_pointers;
-    std::vector<std::size_t> _m_current_for_loop_indexes = {0};
+    std::vector<gdc_itt_agnostic_data_ref_t> _m_for_loop_pointers;
+    std::vector<std::size_t>                 _m_current_for_loop_indexes = {0};
 };
 
 _END_ABC_DS_NS
@@ -158,7 +154,7 @@ _BEGIN_ABC_DS_NS
 
 __no_constexpr_imp void
     for_loop_stack_t::increment(
-        gen_data_collection_iterator_agnostic_data_t* _a_ptr
+        gdc_itt_agnostic_data_ref_t _a_ptr
     ) noexcept
 {
     _m_for_loop_pointers.push_back(_a_ptr);
@@ -185,7 +181,7 @@ __constexpr_imp void
 
 __no_constexpr_imp void
     for_loop_stack_t::update(
-        gen_data_collection_iterator_agnostic_data_t* _a_ptr
+        gdc_itt_agnostic_data_ref_t _a_ptr
     )
 {
     using namespace errors;
@@ -211,7 +207,7 @@ __constexpr_imp ds::for_loop_creation_data_sequence_t
     {
         _l_rds.push_back(for_loop_creation_data_t{
             _m_current_for_loop_indexes.back(),
-            _l_element->get_repeat_test_repetition_data()
+            _l_element.get().get_repeat_test_repetition_data()
         });
     }
     return _l_rds;
@@ -225,7 +221,7 @@ __constexpr_imp for_loop_creation_data_sequence_t
     {
         _l_rds.push_back(for_loop_creation_data_t{
             _m_current_for_loop_indexes.back(),
-            _l_element->get_test_repetition_data()
+            _l_element.get().get_test_repetition_data()
         });
     }
     return _l_rds;

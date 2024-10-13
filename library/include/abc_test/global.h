@@ -83,7 +83,7 @@ __no_constexpr
 *
 */
 __no_constexpr
-	ds::invoked_test_info_t&
+	ds::invoked_test_data_t&
 	get_this_threads_current_test(
 	);
 __no_constexpr
@@ -191,7 +191,7 @@ __no_constexpr_imp
 	return &get_this_threads_test_runner_ref();
 }
 __no_constexpr_imp
-	ds::invoked_test_info_t&
+	ds::invoked_test_data_t&
 	get_this_threads_current_test(
 	)
 {

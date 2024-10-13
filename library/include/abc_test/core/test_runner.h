@@ -99,7 +99,7 @@ public:
 	* Returns to the user the current invoked test for this object instance.
 	*/
 	__no_constexpr
-		ds::invoked_test_info_t&
+		ds::invoked_test_data_t&
 		current_test(
 		) noexcept;
 	/*!
@@ -161,7 +161,7 @@ private:
 	//errors::test_failures_info_t _m_error_infos;
 	reporters::test_reporter_controller_t* _m_trc;
 	std::size_t _m_tests_ran;
-	std::shared_ptr<ds::invoked_test_info_t> _m_current_test;
+	std::unique_ptr<ds::invoked_test_data_t> _m_current_test;
 	utility::rng _m_random_generator;
 	test_order_enum_t _m_test_order;
 	const test_options_t& _m_test_options;
@@ -189,7 +189,7 @@ _BEGIN_ABC_NS
 		: _m_after_execution_test_report(reporters::after_execution_test_report_t{})
 		, _m_trc(&_a_trc)
 		, _m_tests_ran{ 0 }
-		, _m_current_test(std::shared_ptr<ds::invoked_test_info_t>())
+		, _m_current_test(nullptr)
 		, _m_random_generator(utility::rng(_a_test_options._m_seed_values))
 		, _m_test_order(test_order_enum_t::IN_ORDER)
 		, _m_test_options(_a_test_options)
@@ -237,7 +237,7 @@ _BEGIN_ABC_NS
 		return _m_tests_ran;
 	}
 	__no_constexpr_imp
-		ds::invoked_test_info_t&
+		ds::invoked_test_data_t&
 		test_runner_t::current_test(
 		) noexcept
 	{
@@ -368,6 +368,6 @@ test_runner_t::add_assertion_and_optional_warning(
 			new basic_text_warning_t(_a_uir->last_source(), true, _a_optional_warning.value())
 		);
 	}
-	_m_current_test->update_repetition_tree(_m_current_test->for_loop_data_collection().create_data_sequence());
+	_m_current_test->add_current_for_loop_stack_to_trie();
 }
 _END_ABC_NS

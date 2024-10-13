@@ -112,19 +112,16 @@ __constexpr_imp
 {
     using namespace ds;
     using namespace errors;
-    invoked_test_info_t& _l_current_test{_m_test_runner->current_test()};
+    invoked_test_data_t& _l_current_test{_m_test_runner->current_test()};
     if (_m_add_repeatable_test_config)
     {
-        if (_l_current_test.post_setup_test_data().has_repetition_data())
+        if (_l_current_test.post_setup_test_data().has_for_loop_stack_trie())
         {
-            increment_iterator(_l_current_test.get_repetition_iterator_data());
+            increment_iterator(_l_current_test.get_first_child_of_current_for_loop_stack());
         }
         if (_m_this_iterator != _m_end_iterator)
         {
-            auto& _l_this_iterator_ref{*_m_this_iterator};
-            _l_current_test.for_loop_data_collection().increment(
-                this
-            );
+            _l_current_test.increment_for_loop_stack(std::ref(*this));
         }
         else
         {
@@ -139,7 +136,8 @@ __constexpr_imp
 {
     if (_m_add_repeatable_test_config)
     {
-        _m_test_runner->current_test().for_loop_data_collection().decrement();
+        global::get_this_threads_current_test().decrement_for_loop_stack();
+       // _m_test_runner->current_test().for_loop_data_collection().decrement();
     }
 }
 
@@ -149,13 +147,13 @@ __constexpr_imp gen_data_collection_iterator_t<T>&
 {
     using namespace std;
     using namespace ds;
-    invoked_test_info_t& _l_current_test{_m_test_runner->current_test()};
+    invoked_test_data_t& _l_current_test{global::get_this_threads_current_test()};
     // if (_l_current_test.has_post_setup_test_data())
     {
-        if (_l_current_test.post_setup_test_data().has_repetition_data())
+        if (_l_current_test.post_setup_test_data().has_for_loop_stack_trie())
         {
             increment_iterator(
-                _l_current_test.increment_repetition_iterator_data()
+                _l_current_test.increment_last_value_of_current_for_loop_stack()
             );
         }
         else
@@ -188,10 +186,7 @@ __constexpr_imp gen_data_collection_iterator_t<T>&
         }
         if (_m_this_iterator != _m_end_iterator)
         {
-            auto& _l_this_iterator_ref{*_m_this_iterator};
-            _l_current_test.for_loop_data_collection().update(
-                this
-            );
+            _l_current_test.update_for_loop_stack(std::ref(*this));
         }
     }
     return *this;
