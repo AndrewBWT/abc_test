@@ -1,11 +1,11 @@
 #pragma once
-#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/fail.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_fail.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_terminate.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/terminate.h"
+#include "abc_test/core/test_reports/assertion_status/fail.h"
+#include "abc_test/core/test_reports/assertion_status/pass.h"
+#include "abc_test/core/test_reports/assertion_status/pass_or_fail.h"
+#include "abc_test/core/test_reports/assertion_status/pass_or_terminate.h"
+#include "abc_test/core/test_reports/assertion_status/terminate.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/after_execution_test_report.h"
-#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion.h"
+#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion_single_line.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion_block.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/static_assertion.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_thrown_exception.h"
@@ -91,7 +91,7 @@ public:
     __constexpr       std::string
                       str_status(const bool _a_passed) const noexcept;
     __constexpr
-    enum_print_pair_collection_t<combined_enum_matcher_based_assertion_fields_t>
+    enum_print_pair_collection_t<combined_enum_matcher_based_assertion_single_line_fields_t>
                 matcher_based_assertion_fields() const noexcept;
     __constexpr enum_print_pair_collection_t<
         combined_enum_matcher_based_assertion_block_fields_t>
@@ -100,7 +100,7 @@ public:
         enum_print_pair_collection_t<enum_after_execution_test_report_fields_t>
         after_execution_test_report_fields() const noexcept;
     __constexpr
-        enum_print_pair_collection_t<combined_enum_generic_assertion_fields_t>
+        enum_print_pair_collection_t<combined_enum_assertion_fields_t>
         static_assertion_fields() const noexcept;
     __constexpr enum_print_pair_collection_t<
         combined_enum_unexpected_thrown_non_descript_entity_fields_t>
@@ -151,12 +151,12 @@ public:
         message_str(const std::optional<std::string>& _a_str) const noexcept;
     enum_print_pair_collection_t<enum_after_execution_test_report_fields_t>
         _m_after_execution_test_report_fields_t;
-    enum_print_pair_collection_t<combined_enum_matcher_based_assertion_fields_t>
+    enum_print_pair_collection_t<combined_enum_matcher_based_assertion_single_line_fields_t>
         _m_matcher_assertion_fields;
     enum_print_pair_collection_t<
         combined_enum_matcher_based_assertion_block_fields_t>
         _m_matcher_assertion_block_fields;
-    enum_print_pair_collection_t<combined_enum_generic_assertion_fields_t>
+    enum_print_pair_collection_t<combined_enum_assertion_fields_t>
         _m_static_assertion_fields;
     enum_print_pair_collection_t<
         combined_enum_unexpected_thrown_non_descript_entity_fields_t>
@@ -511,7 +511,7 @@ __constexpr_imp std::string
 }
 
 __constexpr_imp
-    enum_print_pair_collection_t<combined_enum_matcher_based_assertion_fields_t>
+    enum_print_pair_collection_t<combined_enum_matcher_based_assertion_single_line_fields_t>
     print_config_t::matcher_based_assertion_fields() const noexcept
 {
     return _m_matcher_assertion_fields;
@@ -532,7 +532,7 @@ __constexpr_imp
 }
 
 __constexpr_imp
-    enum_print_pair_collection_t<combined_enum_generic_assertion_fields_t>
+    enum_print_pair_collection_t<combined_enum_assertion_fields_t>
     print_config_t::static_assertion_fields() const noexcept
 {
     return _m_static_assertion_fields;

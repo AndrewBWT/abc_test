@@ -12,19 +12,19 @@
 
 #include "abc_test/utility/str/string_table.h"
 
-#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/generic_matcher_based_assertion.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion.h"
+#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_single_line.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_block.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/static_assertion.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/after_execution_test_report.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_fail.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_terminate.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/fail.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/terminate.h"
+#include "abc_test/core/test_reports/assertion_status/pass_or_fail.h"
+#include "abc_test/core/test_reports/assertion_status/pass_or_terminate.h"
+#include "abc_test/core/test_reports/assertion_status/fail.h"
+#include "abc_test/core/test_reports/assertion_status/pass.h"
+#include "abc_test/core/test_reports/assertion_status/terminate.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/print_config.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/unexpected_thrown_exception.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/unexpected_thrown_non_descript_entity.h"
+#include "abc_test/core/test_reports/unexpected_thrown_exception.h"
+#include "abc_test/core/test_reports/unexpected_thrown_non_descript_entity.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_thrown_exception.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_thrown_non_descript_entity.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion.h"
@@ -73,7 +73,7 @@ private:
 	__constexpr
 		std::vector<std::string>
 		process_assertion(
-			const reports::generic_assertion_type_t* _a_gur
+			const reports::assertion_base_t* _a_gur
 		) const;
 };
 _END_ABC_REPORTERS_NS
@@ -147,8 +147,8 @@ __no_constexpr_imp
 		{
 			string_table_t _l_st({ 0 });
 			size_t _l_idx{ 1 };
-			const generic_user_report_collection_t& _l_reports{ _a_itd.assertions() };
-			for (const generic_user_report_ptr_t& _l_report : _l_reports)
+			const assertion_base_collection_t& _l_reports{ _a_itd.assertions() };
+			for (const assertion_base_ptr_t& _l_report : _l_reports)
 			{
 				const vector<string> _l_strs = process_assertion(_l_report.get());
 				size_t _l_data_idx{ 0 };
@@ -195,7 +195,7 @@ __constexpr
 		return get_all_data(_m_print_config.unexpected_thrown_exception_fields(), *_l_ptr,
 			_m_print_config, unexpected_thrown_exception_list_formatter_t());
 	}
-	else if (auto _l_ptr{ dynamic_cast<const unexpected_thrown_non_descript_entity_t*>(&_a_unexpected_report) };
+	else if (auto _l_ptr{ dynamic_cast<const unexpected_thrown_not_derived_from_std_exception_t*>(&_a_unexpected_report) };
 		_l_ptr != nullptr)
 	{
 		return get_all_data(_m_print_config.unexpected_thrown_non_descript_entity_fields(), *_l_ptr,
@@ -213,21 +213,21 @@ __constexpr
 __constexpr_imp
 	std::vector<std::string>
 	text_test_reporter_t::process_assertion(
-		const reports::generic_assertion_type_t* _a_gur
+		const reports::assertion_base_t* _a_gur
 	) const
 {
 	using namespace reports;
-	if (auto _l_ptr{ dynamic_cast<const matcher_based_assertion_t<pass_or_fail_t>*>(_a_gur) };
+	if (auto _l_ptr{ dynamic_cast<const matcher_based_assertion_single_line_t<pass_or_fail_t>*>(_a_gur) };
 		_l_ptr != nullptr)
 	{
 		return get_all_data(_m_print_config.matcher_based_assertion_fields(), *_l_ptr,
-			_m_print_config, matcher_based_assertion_list_formatter_t<pass_or_fail_t>());
+			_m_print_config, matcher_based_assertion_single_line_list_formatter_t<pass_or_fail_t>());
 	}
-	else if (auto _l_ptr{ dynamic_cast<const matcher_based_assertion_t<pass_or_terminate_t>*>(_a_gur) };
+	else if (auto _l_ptr{ dynamic_cast<const matcher_based_assertion_single_line_t<pass_or_terminate_t>*>(_a_gur) };
 			_l_ptr != nullptr)
 	{
 		return get_all_data(_m_print_config.matcher_based_assertion_fields(), *_l_ptr,
-			_m_print_config, matcher_based_assertion_list_formatter_t<pass_or_terminate_t>());
+			_m_print_config, matcher_based_assertion_single_line_list_formatter_t<pass_or_terminate_t>());
 	}
 	else if (auto _l_ptr{ dynamic_cast<const matcher_based_assertion_block_t<pass_or_fail_t>*>(_a_gur) };
 		_l_ptr != nullptr)

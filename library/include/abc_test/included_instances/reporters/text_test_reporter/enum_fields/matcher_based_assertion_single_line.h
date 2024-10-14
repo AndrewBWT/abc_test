@@ -2,22 +2,22 @@
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_print_data.h"
 _BEGIN_ABC_REPORTERS_NS
-enum class enum_matcher_based_assertion_block_fields_t
+enum class enum_matcher_based_assertion_single_line_fields_t
 {
 
 };
-using combined_enum_matcher_based_assertion_block_fields_t =
-std::variant< enum_matcher_based_assertion_block_fields_t, combined_enum_matcher_based_assertion_fields_t>;
+using combined_enum_matcher_based_assertion_single_line_fields_t =
+std::variant< enum_matcher_based_assertion_single_line_fields_t, combined_enum_matcher_based_assertion_fields_t>;
 __constexpr
-enum_print_pair_collection_t< combined_enum_matcher_based_assertion_block_fields_t>
-default_matcher_based_assertion_block_fields(
+enum_print_pair_collection_t< combined_enum_matcher_based_assertion_single_line_fields_t>
+default_matcher_based_assertion_fields(
 ) noexcept;
 _END_ABC_REPORTERS_NS
 
 _BEGIN_ABC_REPORTERS_NS
 __constexpr_imp
-enum_print_pair_collection_t< combined_enum_matcher_based_assertion_block_fields_t>
-default_matcher_based_assertion_block_fields(
+enum_print_pair_collection_t< combined_enum_matcher_based_assertion_single_line_fields_t>
+default_matcher_based_assertion_fields(
 ) noexcept
 {
 	using enum enum_assertion_fields_t;
@@ -32,7 +32,7 @@ default_matcher_based_assertion_block_fields(
 		{LOG_INFOS, CONTEXTUAL_PRINT},
 		{STATUS,DONT_PRINT},
 		{MATCHER_SOURCE_MAP, CONTEXTUAL_PRINT},
-		{MATCHER_OUTPUT,CONTEXTUAL_PRINT},
+		{MATCHER_OUTPUT,PRINT},
 		{MATCHER_ANNOTATION, CONTEXTUAL_PRINT},
 	};
 }

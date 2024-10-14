@@ -3,7 +3,7 @@
 #include "abc_test/core/errors/test_assertion_exception.h"
 #include "abc_test/core/errors/test_library_exception.h"
 #include "abc_test/core/log_test_msg.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/unexpected_thrown_exception.h"
+#include "abc_test/core/test_reports//unexpected_thrown_exception.h"
 #include "abc_test/utility/internal/log.h"
 
 _BEGIN_ABC_NS
@@ -62,7 +62,7 @@ __no_constexpr_or_inline_imp void
     {
         _m_current_test->set_unexpected_termination(
             make_unique<const unexpected_report_t<true>>(
-                unexpected_thrown_non_descript_entity_t(most_recent_source())
+                unexpected_thrown_not_derived_from_std_exception_t(most_recent_source())
             )
         );
     }

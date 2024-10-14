@@ -2,8 +2,8 @@
 #include "abc_test/core/ds/source/single_source.h"
 #include "abc_test/core/reporters/test_reporter_controller.h"
 #include "abc_test/core/test_order_enum.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/basic_text_warning.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/generic_assertion.h"
+#include "abc_test/core/test_reports/basic_text_warning.h"
+#include "abc_test/core/test_reports/assertion.h"
 
 #include <memory>
 
@@ -95,13 +95,13 @@ public:
     template <bool Single_Source, typename Assertion_Status>
     __constexpr void
         add_assertion(
-            reports::generic_assertion_ptr_t<Single_Source, Assertion_Status>&
+            reports::assertion_ptr_t<Single_Source, Assertion_Status>&
                 _a_ptr
         ) noexcept;
     template <bool Single_Source, typename Assertion_Status>
     __constexpr void
         add_assertion_and_warning(
-            reports::generic_assertion_ptr_t<Single_Source, Assertion_Status>&
+            reports::assertion_ptr_t<Single_Source, Assertion_Status>&
                                    _a_ptr,
             const std::string_view _a_warning
         ) noexcept;
@@ -138,7 +138,7 @@ private:
     template <bool Single_Source, typename Assertion_Status>
     __constexpr void
         add_assertion_and_optional_warning(
-            reports::generic_assertion_ptr_t<Single_Source, Assertion_Status>&
+            reports::assertion_ptr_t<Single_Source, Assertion_Status>&
                                                    _a_ptr,
             const std::optional<std::string_view>& _a_optional_warning
         ) noexcept;
@@ -233,7 +233,7 @@ __constexpr_imp const ds::single_source_t&
 template <bool Single_Source, typename Assertion_Status>
 __constexpr_imp void
     test_runner_t::add_assertion(
-        reports::generic_assertion_ptr_t<Single_Source, Assertion_Status>&
+        reports::assertion_ptr_t<Single_Source, Assertion_Status>&
             _a_ptr
     ) noexcept
 {
@@ -244,7 +244,7 @@ __constexpr_imp void
 template <bool Single_Source, typename Assertion_Status>
 __constexpr_imp void
     test_runner_t::add_assertion_and_warning(
-        reports::generic_assertion_ptr_t<Single_Source, Assertion_Status>&
+        reports::assertion_ptr_t<Single_Source, Assertion_Status>&
                                _a_ptr,
         const std::string_view _a_warning
     ) noexcept
@@ -306,7 +306,7 @@ test_runner_t::record_sources(
 template <bool Single_Source, typename Assertion_Status>
 __constexpr_imp void
     test_runner_t::add_assertion_and_optional_warning(
-        reports::generic_assertion_ptr_t<Single_Source, Assertion_Status>&
+        reports::assertion_ptr_t<Single_Source, Assertion_Status>&
                                                _a_ptr,
         const std::optional<std::string_view>& _a_optional_warning
     ) noexcept

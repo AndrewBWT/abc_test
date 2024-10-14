@@ -59,4 +59,8 @@ using post_setup_test_list_t
  * post_setup_test_data_t elements.
  */
 using post_setup_test_list_itt_t = post_setup_test_list_t::const_iterator;
+/*!
+ * @brief Type synonym for a set of log info.
+ */
+using log_infos_t = std::vector<std::string>;
 _END_ABC_DS_NS

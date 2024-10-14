@@ -5,18 +5,18 @@
 
 #include "abc_test/utility/str/string_utility.h"
 
-#include "abc_test/core/test_reports/mid_test_invokation_report/static_assertion.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/generic_matcher_based_assertion.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_fail.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass_or_terminate.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/terminate.h"
+#include "abc_test/core/test_reports/static_assertion.h"
+#include "abc_test/core/test_reports/matcher_based_assertion.h"
+#include "abc_test/core/test_reports/assertion_status/pass_or_fail.h"
+#include "abc_test/core/test_reports/assertion_status/pass_or_terminate.h"
+#include "abc_test/core/test_reports/assertion_status/terminate.h"
 
-#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/pass.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/assertion_status/fail.h"
+#include "abc_test/core/test_reports/assertion_status/pass.h"
+#include "abc_test/core/test_reports/assertion_status/fail.h"
 #include <concepts>
 
 #include "abc_test/core/test_assertions/test_block.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/matcher_based_assertion_block.h"
+#include "abc_test/core/test_reports/matcher_based_assertion_block.h"
 
 #include "abc_test/matchers/annotation.h"
 
@@ -381,7 +381,7 @@ create_static_assertion(
 	using namespace std;
 	using namespace reports;
 	using namespace errors;
-	const generic_assertion_t<true, T>* _l_gur{
+	const assertion_t<true, T>* _l_gur{
 		new static_assertion_t<T>(_a_source,
 			_a_test_runner.get_log_infos(false),
 			_a_str_to_print
@@ -417,7 +417,7 @@ create_assertion_block(
 ) noexcept(std::same_as<T, reports::pass_or_fail_t>)
 {
 	using namespace reports;
-	const generic_assertion_t<false, T>* _l_gur;
+	const assertion_t<false, T>* _l_gur;
 	bool _l_passed{ true };
 	if (_a_test_block.matcher().internal_matcher() == nullptr)
 	{
@@ -462,7 +462,7 @@ matcher_based_assertion_block(
 ) noexcept(std::same_as<T, reports::pass_or_fail_t>)
 {
 	using namespace reports;
-	const generic_assertion_t<true, T>* _l_gur;
+	const assertion_t<true, T>* _l_gur;
 	bool _l_passed{ true };
 	if (_a_matcher.internal_matcher() == nullptr)
 	{
@@ -537,11 +537,11 @@ namespace
 	{
 		using namespace reports;
 		using namespace std;
-		generic_assertion_ptr_t<true, T> _l_gur;
+		assertion_ptr_t<true, T> _l_gur;
 		bool _l_passed{ true };
 		if (_a_matcher.internal_matcher() == nullptr)
 		{
-			_l_gur = make_unique<const generic_assertion_t<true, T>>(matcher_based_assertion_t<T>(_a_source,
+			_l_gur = make_unique<const assertion_t<true, T>>(matcher_based_assertion_single_line_t<T>(_a_source,
 				_a_test_runner.get_log_infos(false),
 				matcher_result_t(),
 				matcher_source_map_t(),
@@ -556,7 +556,7 @@ namespace
 			matcher_source_map_t _l_msm;
 			_a_matcher.internal_matcher()->gather_map_source(_l_msm);
 			_l_passed = _l_mr.passed();
-			_l_gur = make_unique<const generic_assertion_t<true, T>>(matcher_based_assertion_t<T>(_a_source,
+			_l_gur = make_unique<const assertion_t<true, T>>(matcher_based_assertion_single_line_t<T>(_a_source,
 				_a_test_runner.get_log_infos(false),
 				_l_mr,
 				_l_msm,

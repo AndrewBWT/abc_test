@@ -1,15 +1,15 @@
 #pragma once
-#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/generic_assertion.h"
+#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/assertion.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/user_initialised_report.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/generic_assertion.h"
+#include "abc_test/core/test_reports/assertion.h"
 _BEGIN_ABC_REPORTERS_NS
 template<
 	bool Single_Source,
 	typename Assertion_Status
 >
-struct generic_assertion_list_formatter_t
-	: public list_formattable_t< reports::generic_assertion_t<Single_Source, Assertion_Status>,
-	combined_enum_generic_assertion_fields_t, print_config_t>,
+struct assertion_list_formatter_t
+	: public list_formattable_t< reports::assertion_t<Single_Source, Assertion_Status>,
+	combined_enum_assertion_fields_t, print_config_t>,
 	public user_initialised_report_list_formatter_t<Single_Source>
 {
 public:
@@ -17,22 +17,22 @@ public:
 		virtual
 		bool
 		check_data(
-			const combined_enum_generic_assertion_fields_t& _a_fid,
-			const reports::generic_assertion_t<Single_Source, Assertion_Status>& _a_element
+			const combined_enum_assertion_fields_t& _a_fid,
+			const reports::assertion_t<Single_Source, Assertion_Status>& _a_element
 		) const;
 	__constexpr
 		virtual
 		std::vector<std::string>
 		get_data(
-			const combined_enum_generic_assertion_fields_t& _a_fid,
-			const reports::generic_assertion_t<Single_Source, Assertion_Status>& _a_element,
+			const combined_enum_assertion_fields_t& _a_fid,
+			const reports::assertion_t<Single_Source, Assertion_Status>& _a_element,
 			const print_config_t& _a_pc
 		) const;
 	__constexpr
 		virtual
 		std::string
 		get_str_representation(
-			const reports::generic_assertion_t<Single_Source, Assertion_Status>& _a_element,
+			const reports::assertion_t<Single_Source, Assertion_Status>& _a_element,
 			const print_config_t& _a_pc
 		) const = 0;
 };
@@ -43,7 +43,7 @@ template<
 __constexpr
 std::string
 construct_str_representation(
-	const reports::generic_assertion_t<Single_Source, Assertion_Status>& _a_element
+	const reports::assertion_t<Single_Source, Assertion_Status>& _a_element
 ) noexcept;
 _END_ABC_REPORTERS_NS
 
@@ -54,9 +54,9 @@ template<
 >
 __constexpr_imp
 bool
-generic_assertion_list_formatter_t<Single_Source, Assertion_Status>::check_data(
-	const combined_enum_generic_assertion_fields_t& _a_fid,
-	const reports::generic_assertion_t<Single_Source, Assertion_Status>& _a_element
+assertion_list_formatter_t<Single_Source, Assertion_Status>::check_data(
+	const combined_enum_assertion_fields_t& _a_fid,
+	const reports::assertion_t<Single_Source, Assertion_Status>& _a_element
 ) const
 {
 	using namespace std;
@@ -65,10 +65,10 @@ generic_assertion_list_formatter_t<Single_Source, Assertion_Status>::check_data(
 	{
 		return user_initialised_report_list_formatter_t<Single_Source>::check_data(*_l_ptr, _a_element);
 	}
-	else if (auto _l_ptr{ get_if< enum_generic_assertion_fields_t>(&_a_fid) };
+	else if (auto _l_ptr{ get_if< enum_assertion_fields_t>(&_a_fid) };
 		_l_ptr != nullptr)
 	{
-		using enum enum_generic_assertion_fields_t;
+		using enum enum_assertion_fields_t;
 		switch (*_l_ptr)
 		{
 		case STATUS:
@@ -91,9 +91,9 @@ template<
 >
 __constexpr_imp
 std::vector<std::string>
-generic_assertion_list_formatter_t<Single_Source, Assertion_Status>::get_data(
-	const combined_enum_generic_assertion_fields_t& _a_fid,
-	const reports::generic_assertion_t<Single_Source, Assertion_Status>& _a_element,
+assertion_list_formatter_t<Single_Source, Assertion_Status>::get_data(
+	const combined_enum_assertion_fields_t& _a_fid,
+	const reports::assertion_t<Single_Source, Assertion_Status>& _a_element,
 	const print_config_t& _a_pc
 ) const
 {
@@ -103,10 +103,10 @@ generic_assertion_list_formatter_t<Single_Source, Assertion_Status>::get_data(
 	{
 		return user_initialised_report_list_formatter_t<Single_Source>::get_data(*_l_ptr, _a_element, _a_pc);
 	}
-	else if (auto _l_ptr{ get_if< enum_generic_assertion_fields_t>(&_a_fid) };
+	else if (auto _l_ptr{ get_if< enum_assertion_fields_t>(&_a_fid) };
 		_l_ptr != nullptr)
 	{
-		using enum enum_generic_assertion_fields_t;
+		using enum enum_assertion_fields_t;
 		switch (*_l_ptr)
 		{
 		case STATUS:
@@ -144,7 +144,7 @@ template<
 __constexpr_imp
 std::string
 construct_str_representation(
-	const reports::generic_assertion_t<Single_Source, Assertion_Status>& _a_element,
+	const reports::assertion_t<Single_Source, Assertion_Status>& _a_element,
 	const std::string_view _a_str
 ) noexcept
 {

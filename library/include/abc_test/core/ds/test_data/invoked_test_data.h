@@ -3,8 +3,8 @@
 #include "abc_test/core/ds/gen_data_memoization/for_loop_stack.h"
 #include "abc_test/core/ds/test_data/enum_test_status.h"
 #include "abc_test/core/ds/test_data/post_setup_test_data.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/generic_assertion.h"
-#include "abc_test/core/test_reports/mid_test_invokation_report/unexpected_report.h"
+#include "abc_test/core/test_reports/assertion.h"
+#include "abc_test/core/test_reports/unexpected_report.h"
 
 #include <fmt/ranges.h>
 #include <functional>
@@ -233,7 +233,7 @@ public:
     template <bool Single_Source, typename Assertion_Status>
     __constexpr void
         add_assertion(
-            reports::generic_assertion_ptr_t<Single_Source, Assertion_Status>&
+            reports::assertion_ptr_t<Single_Source, Assertion_Status>&
                 _a_ptr
         );
     /*!
@@ -301,7 +301,7 @@ public:
      * the caller.
      * @return A cref to the object's generic_user_report_collection_t.
      */
-    __constexpr const reports::generic_user_report_collection_t&
+    __constexpr const reports::assertion_base_collection_t&
                       assertions() const noexcept;
 private:
     const post_setup_test_data_t& _m_post_setup_test_data;
@@ -314,7 +314,7 @@ private:
     std::size_t                   _m_total_number_assertions_recieved;
     std::size_t                   _m_total_number_assertions_passed;
     std::size_t                   _m_total_number_assertions_failed;
-    reports::generic_user_report_collection_t _m_assertions;
+    reports::assertion_base_collection_t _m_assertions;
     reports::opt_unexpected_report_t          _m_termination_report;
     reports::unexpected_non_terminating_report_collection_t _m_warnings;
 };
@@ -474,7 +474,7 @@ __constexpr_imp std::size_t
 template <bool Single_Source, typename Assertion_Status>
 __constexpr_imp void
     invoked_test_data_t::add_assertion(
-        reports::generic_assertion_ptr_t<Single_Source, Assertion_Status>&
+        reports::assertion_ptr_t<Single_Source, Assertion_Status>&
             _a_ptr
     )
 {
@@ -498,7 +498,7 @@ __constexpr_imp void
     }
     else
     {
-        const reports::generic_assertion_t<Single_Source, Assertion_Status>&
+        const reports::assertion_t<Single_Source, Assertion_Status>&
             _l_ref{*_a_ptr};
         _m_total_number_assertions_recieved++;
         // Assertin recived, correct status (either pass or fail but no
@@ -523,7 +523,7 @@ __constexpr_imp void
             }
         }
         // This has to be the last thing, or accessing _a_ptr would be invalid.
-        _m_assertions.push_back(generic_user_report_ptr_t(std::move(_a_ptr)));
+        _m_assertions.push_back(assertion_base_ptr_t(std::move(_a_ptr)));
     }
 }
 
@@ -624,7 +624,7 @@ __constexpr_imp const reports::opt_unexpected_report_t&
     return _m_termination_report;
 }
 
-__constexpr_imp const reports::generic_user_report_collection_t&
+__constexpr_imp const reports::assertion_base_collection_t&
                       invoked_test_data_t::assertions() const noexcept
 {
     return _m_assertions;
