@@ -1,6 +1,6 @@
 #pragma once
-#include "abc_test/core/reporters/text_test_reporter/enum_fields/generic_assertion.h"
-#include "abc_test/core/reporters/text_test_reporter/enum_print_data.h"
+#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/generic_assertion.h"
+#include "abc_test/included_instances/reporters/text_test_reporter/enum_print_data.h"
 _BEGIN_ABC_REPORTERS_NS
 __constexpr
 enum_print_pair_collection_t< combined_enum_generic_assertion_fields_t>

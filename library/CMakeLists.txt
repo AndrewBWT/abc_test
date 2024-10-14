@@ -29,7 +29,9 @@ set(LIBRARY_FILES
   include/abc_test/core/ds/test_data/post_setup_test_data.h
   include/abc_test/core/ds/test_data/user_defined_test_data.h
   include/abc_test/core/ds/test_data/checked_user_defined_test_data.h
+  include/abc_test/core/ds/test_data/enum_test_status.h
   include/abc_test/core/ds/test_data/macros.h
+  include/abc_test/core/ds/test_data/test_set_data.h
   # Bespoke data structures for the library for storing tests in various forms.
   include/abc_test/core/ds/test_collections/test_collection.h
   include/abc_test/core/ds/test_collections/test_tree.h
@@ -47,37 +49,8 @@ set(LIBRARY_FILES
   # Contains code for reporting errors and test results to the user.
   include/abc_test/core/reporters/error_reporter.h
   include/abc_test/core/reporters/error_reporter_controller.h
-  include/abc_test/core/reporters/text_error_reporter.h
   include/abc_test/core/reporters/test_reporter.h
-  # This is the reporter included with the library. It is designed to be extendable for the user. The files
-  # below are all to allow this functionality. It also mirrors the hierarchy of the assertion structures.
-  include/abc_test/core/reporters/text_test_reporter.h
-  include/abc_test/core/reporters/text_test_reporter/list_formatter.h
-  include/abc_test/core/reporters/text_test_reporter/print_config.h
-  include/abc_test/core/reporters/text_test_reporter/enum_print_data.h
-  include/abc_test/core/reporters/text_test_reporter/list_formatter/user_initialised_report.h
-  include/abc_test/core/reporters/text_test_reporter/enum_fields/user_initialised_report.h
-  include/abc_test/core/reporters/text_test_reporter/list_formatter/generic_assertion.h
-  include/abc_test/core/reporters/text_test_reporter/enum_fields/generic_assertion.h
-  include/abc_test/core/reporters/text_test_reporter/list_formatter/matcher_based_assertion.h
-  include/abc_test/core/reporters/text_test_reporter/enum_fields/matcher_based_assertion.h
-  include/abc_test/core/reporters/text_test_reporter/list_formatter/generic_matcher_based_assertion.h
-  include/abc_test/core/reporters/text_test_reporter/enum_fields/generic_matcher_based_assertion.h
-  include/abc_test/core/reporters/text_test_reporter/list_formatter/matcher_based_assertion_block.h
-  include/abc_test/core/reporters/text_test_reporter/enum_fields/matcher_based_assertion_block.h
-  include/abc_test/core/reporters/text_test_reporter/list_formatter/static_assertion.h
-  include/abc_test/core/reporters/text_test_reporter/enum_fields/static_assertion.h
-  include/abc_test/core/reporters/text_test_reporter/list_formatter/after_execution_test_report.h
-  include/abc_test/core/reporters/text_test_reporter/enum_fields/after_execution_test_report.h
-  include/abc_test/core/reporters/text_test_reporter/list_formatter/unexpected_report.h
-  include/abc_test/core/reporters/text_test_reporter/enum_fields/unexpected_report.h
-  include/abc_test/core/reporters/text_test_reporter/list_formatter/unexpected_thrown_non_descript_entity.h
-  include/abc_test/core/reporters/text_test_reporter/enum_fields/unexpected_thrown_non_descript_entity.h
-  include/abc_test/core/reporters/text_test_reporter/list_formatter/unexpected_thrown_exception.h
-  include/abc_test/core/reporters/text_test_reporter/enum_fields/unexpected_thrown_exception.h
   include/abc_test/core/reporters/test_reporter_controller.h
-  include/abc_test/core/reporters/after_execution_test_report.h
-  include/abc_test/core/reporters/mid_execution_test_report.h
   # Contains data structures representing things reported from a test. e.g. assertions, unexpected exceptions
   include/abc_test/core/test_reports/mid_test_invokation_report/user_initialised_report.h
   include/abc_test/core/test_reports/mid_test_invokation_report/generic_assertion.h
@@ -199,6 +172,34 @@ set(LIBRARY_FILES
   include/abc_test/utility/str/rw_info.h
   # Global file
   include/abc_test/global.h
+  # Included instances
+  # Text test reporter
+  include/abc_test/included_instances/reporters/text_test_reporter.h
+  include/abc_test/included_instances/reporters/text_test_reporter/list_formatter.h
+  include/abc_test/included_instances/reporters/text_test_reporter/print_config.h
+  include/abc_test/included_instances/reporters/text_test_reporter/enum_print_data.h
+  include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/user_initialised_report.h
+  include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/user_initialised_report.h
+  include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/generic_assertion.h
+  include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/generic_assertion.h
+  include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion.h
+  include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion.h
+  include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/generic_matcher_based_assertion.h
+  include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/generic_matcher_based_assertion.h
+  include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_block.h
+  include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion_block.h
+  include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/static_assertion.h
+  include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/static_assertion.h
+  include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/after_execution_test_report.h
+  include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/after_execution_test_report.h
+  include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_report.h
+  include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_report.h
+  include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_thrown_non_descript_entity.h
+  include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_thrown_non_descript_entity.h
+  include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_thrown_exception.h
+  include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_thrown_exception.h
+  # Error reporter
+  include/abc_test/included_instances/reporters/text_error_reporter.h
 )
 
 

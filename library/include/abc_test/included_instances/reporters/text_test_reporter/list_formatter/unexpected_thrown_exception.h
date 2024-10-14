@@ -1,6 +1,6 @@
 #pragma once
 #include "abc_test/core/test_reports/mid_test_invokation_report/unexpected_thrown_exception.h"
-#include "abc_test/core/reporters/text_test_reporter/list_formatter/unexpected_thrown_non_descript_entity.h"
+#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_thrown_non_descript_entity.h"
 _BEGIN_ABC_REPORTERS_NS
 struct unexpected_thrown_exception_list_formatter_t
 	: public list_formattable_t< reports::unexpected_thrown_exception_t, combined_enum_unexpected_exception_fields_t, print_config_t>

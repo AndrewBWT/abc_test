@@ -25,6 +25,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 			) noexcept;
 	protected:
 		std::optional<file_name_t> _m_file_name;
+		std::size_t _m_line_len;
 		__no_constexpr
 			threated_text_output_reporter_t(
 				const std::optional<file_name_t>& _a_file_name,

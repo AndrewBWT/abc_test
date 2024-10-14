@@ -24,7 +24,7 @@ public:
 
 	}
 };
-using generic_user_report_ptr_t = std::shared_ptr<const generic_assertion_type_t>;
+using generic_user_report_ptr_t = std::unique_ptr<const generic_assertion_type_t>;
 using generic_user_report_collection_t = std::vector<generic_user_report_ptr_t>;
 template<
 	bool Single_Source,
@@ -90,6 +90,11 @@ protected:
 	//std::optional<std::string> _m_pass_message;
 private:
 };
+template<
+	bool Single_Source,
+	typename Assertion_Status
+>
+using generic_assertion_ptr_t = std::unique_ptr<const reports::generic_assertion_t<Single_Source, Assertion_Status>>;
 
 _END_ABC_REPORTS_NS
 

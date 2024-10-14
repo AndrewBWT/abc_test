@@ -1,6 +1,6 @@
 #pragma once
 #include "abc_test/core/test_reports/mid_test_invokation_report/matcher_based_assertion_block.h"
-#include "abc_test/core/reporters/text_test_reporter/enum_fields/matcher_based_assertion_block.h"
+#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion_block.h"
 _BEGIN_ABC_REPORTERS_NS
 template<
 	typename Assertion_Status

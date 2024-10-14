@@ -44,8 +44,8 @@ protected:
 	ds::single_source_t _m_last_source;
 	bool _m_exact_source;
 };
-using opt_unexpected_report_t = std::optional< std::shared_ptr<const unexpected_report_t<true>>>;
-using unexpected_non_terminating_report_ptr_t = std::shared_ptr<const unexpected_report_t<false>>;
+using opt_unexpected_report_t = std::unique_ptr<const unexpected_report_t<true>>;
+using unexpected_non_terminating_report_ptr_t = std::unique_ptr<const unexpected_report_t<false>>;
 using unexpected_non_terminating_report_collection_t = std::vector<unexpected_non_terminating_report_ptr_t>;
 _END_ABC_REPORTS_NS
 

@@ -91,7 +91,7 @@ test_block_t<Assertion_Type>::~test_block_t(
 {
 	if (not _m_processed)
 	{
-		global::get_this_threads_test_runner_ref().add_warning(
+		global::get_this_threads_current_test().add_warning(
 			fmt::format("test_block_t is being deleted, however it has not been "
 				"processed for its true or false status. "
 			));

@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/utility/internal/macros.h"
 #include <vector>
-#include "abc_test/core/reporters/text_test_reporter/enum_print_data.h"
+#include "abc_test/included_instances/reporters/text_test_reporter/enum_print_data.h"
 #include <string>
 #include <variant>
 

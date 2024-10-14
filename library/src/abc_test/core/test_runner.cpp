@@ -31,44 +31,45 @@ __no_constexpr_or_inline_imp void
         _m_tests_ran,
         _m_test_options
     );
-    _m_after_execution_test_report
-        = after_execution_test_report_t(*_m_current_test, &_m_test_options);
-    // const post_setup_test_data_t& _l_pstd{
-    // _m_current_test.post_setup_test_data() };
+    invoked_test_data_t&          _l_current_test{*_m_current_test};
     const registered_test_data_t& _l_rtd{
-        _m_current_test->post_setup_test_data().registered_test_data()
+        _l_current_test.post_setup_test_data().registered_test_data()
     };
     _m_tests_most_recent_source = _l_rtd._m_source;
     try
     {
         (_l_rtd._m_test_function)();
     }
-    catch (test_assertion_exception_t& _l_assertion)
+    catch (const test_assertion_exception_t& _l_assertion)
     {}
-    catch (test_library_exception_t& _l_internal_logic_error)
+    catch (const test_library_exception_t& _l_internal_logic_error)
     {
         throw _l_internal_logic_error;
     }
-    catch (std::exception& _l_exception)
+    catch (const exception& _l_exception)
     {
-        _m_after_execution_test_report.set_unexpected_termination(
-            new unexpected_thrown_exception_t(
-                most_recent_source(),
-                typeid(_l_exception).name(),
-                _l_exception.what()
+        _m_current_test->set_unexpected_termination(
+            make_unique<const unexpected_report_t<true>>(
+                unexpected_thrown_exception_t(
+                    most_recent_source(),
+                    typeid(_l_exception).name(),
+                    _l_exception.what()
+                )
             )
         );
     }
     catch (...)
     {
-        _m_after_execution_test_report.set_unexpected_termination(
-            new unexpected_thrown_non_descript_entity_t(most_recent_source())
+        _m_current_test->set_unexpected_termination(
+            make_unique<const unexpected_report_t<true>>(
+                unexpected_thrown_non_descript_entity_t(most_recent_source())
+            )
         );
     }
-    _m_after_execution_test_report.add_repetition_tree(
-        _m_current_test->for_loop_stack_trie(), &_m_test_options
-    );
-    _m_trc->report_test(_m_after_execution_test_report);
+    // _m_after_execution_test_report.add_repetition_tree(
+    //     _m_current_test->for_loop_stack_trie(), &_m_test_options
+    // );
+    _m_trc->report_test(*_m_current_test);
     _m_current_error_log_msgs.clear();
     ++_m_tests_ran;
 }

@@ -32,7 +32,7 @@ _BEGIN_ABC_REPORTERS_NS
 		*/
 		__no_constexpr
 			virtual
-			bool
+			void
 			report_error(
 				const errors::setup_error_t& _a_error
 			) noexcept;
@@ -73,7 +73,7 @@ __no_constexpr_imp
 
 	}
 __no_constexpr_imp
-		bool
+		void
 		text_error_reporter_t::report_error(
 			const errors::setup_error_t& _a_setup_test_error
 		) noexcept
@@ -94,7 +94,6 @@ __no_constexpr_imp
 			 to_string(_a_setup_test_error.opt_stacktrace().value()) :
 			"No stacktrace"
 			));
-		return true;
 	}
 __no_constexpr_imp
 		void

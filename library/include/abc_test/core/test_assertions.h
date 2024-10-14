@@ -536,16 +536,17 @@ namespace
 		) noexcept(std::same_as<T, reports::pass_or_fail_t>)
 	{
 		using namespace reports;
-		const generic_assertion_t<true, T>* _l_gur;
+		using namespace std;
+		generic_assertion_ptr_t<true, T> _l_gur;
 		bool _l_passed{ true };
 		if (_a_matcher.internal_matcher() == nullptr)
 		{
-			_l_gur = new matcher_based_assertion_t<T>(_a_source,
+			_l_gur = make_unique<const generic_assertion_t<true, T>>(matcher_based_assertion_t<T>(_a_source,
 				_a_test_runner.get_log_infos(false),
 				matcher_result_t(),
 				matcher_source_map_t(),
 				_a_matcher_label
-			);
+			));
 			_a_test_runner.add_assertion_and_warning(_l_gur,
 				"Matcher_t object has not been initialised. Assertion is set to true");
 		}
@@ -555,12 +556,12 @@ namespace
 			matcher_source_map_t _l_msm;
 			_a_matcher.internal_matcher()->gather_map_source(_l_msm);
 			_l_passed = _l_mr.passed();
-			_l_gur = new matcher_based_assertion_t<T>(_a_source,
+			_l_gur = make_unique<const generic_assertion_t<true, T>>(matcher_based_assertion_t<T>(_a_source,
 				_a_test_runner.get_log_infos(false),
 				_l_mr,
 				_l_msm,
 				_a_matcher_label
-			);
+			));
 			_a_test_runner.add_assertion(_l_gur);
 		}
 		return return_result<T>(_l_passed);

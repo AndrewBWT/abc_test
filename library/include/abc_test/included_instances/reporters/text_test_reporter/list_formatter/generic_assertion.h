@@ -1,6 +1,6 @@
 #pragma once
-#include "abc_test/core/reporters/text_test_reporter/enum_fields/generic_assertion.h"
-#include "abc_test/core/reporters/text_test_reporter/list_formatter/user_initialised_report.h"
+#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/generic_assertion.h"
+#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/user_initialised_report.h"
 #include "abc_test/core/test_reports/mid_test_invokation_report/generic_assertion.h"
 _BEGIN_ABC_REPORTERS_NS
 template<

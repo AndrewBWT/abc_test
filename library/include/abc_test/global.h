@@ -156,7 +156,6 @@ __no_constexpr_imp
 	test_options_t& _l_to{ get_inner_global_test_options() };
 	_l_to = _a_options;
 	error_reporter_controller_t& _l_erc{ get_inner_global_error_reporter_controller() };
-	_l_erc.set_test_options(_l_to);
 	return _l_to;
 }
 __no_constexpr_imp
@@ -165,7 +164,7 @@ __no_constexpr_imp
 	) noexcept
 {
 	using namespace reporters;
-	static test_reporter_controller_t _s_gtrc(get_global_test_options());
+	static test_reporter_controller_t _s_gtrc;
 	return _s_gtrc;
 }
 __no_constexpr_imp
@@ -237,7 +236,6 @@ namespace
 	{
 		using namespace reporters;
 		static error_reporter_controller_t _s_erc;
-		_s_erc.set_test_options(get_inner_global_test_options());
 		return _s_erc;
 	}
 }

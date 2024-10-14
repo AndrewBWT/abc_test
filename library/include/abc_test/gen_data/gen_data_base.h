@@ -88,6 +88,13 @@ template<
 	typename T
 >
 using gen_data_ptr_t = std::shared_ptr<gen_data_base_t<T>>;
+
+__no_constexpr errors::test_library_exception_t
+unsupported_mode_exception(
+	const std::string_view                    _a_type,
+	const std::size_t                         _a_mode,
+	const std::initializer_list<std::size_t>& _a_supported_elements
+);
 _END_ABC_NS
 
 _BEGIN_ABC_NS
@@ -142,5 +149,21 @@ __constexpr_imp
 {
 //	_m_flied.mode = determine_mode();
 //	_m_flied.additional_data = get_rep_string();
+}
+__no_constexpr_imp errors::test_library_exception_t
+unsupported_mode_exception(
+	const std::string_view                    _a_type,
+	const std::size_t                         _a_mode,
+	const std::initializer_list<std::size_t>& _a_supported_elements
+)
+{
+	using namespace errors;
+	return test_library_exception_t(fmt::format(
+		"{0} does not support mode {1}. {0} only supports the following modes: "
+		"{2}",
+		_a_type,
+		_a_mode,
+		_a_supported_elements
+	));
 }
 _END_ABC_NS

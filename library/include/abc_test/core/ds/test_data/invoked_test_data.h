@@ -1,7 +1,10 @@
 #pragma once
 
 #include "abc_test/core/ds/gen_data_memoization/for_loop_stack.h"
+#include "abc_test/core/ds/test_data/enum_test_status.h"
 #include "abc_test/core/ds/test_data/post_setup_test_data.h"
+#include "abc_test/core/test_reports/mid_test_invokation_report/generic_assertion.h"
+#include "abc_test/core/test_reports/mid_test_invokation_report/unexpected_report.h"
 
 #include <fmt/ranges.h>
 #include <functional>
@@ -217,6 +220,89 @@ public:
      */
     __constexpr std::size_t
                 order_ran_id() const noexcept;
+    /*!
+     * @brief Adds an assertin to the test's list of assertions ran.
+     *
+     * This function can throw an exception if the unique pointer contained a
+     * nullptr, or if the test_status signifies that a termination has already
+     * occoured.
+     *
+     * @param _a_ptr A generic_assertion_ptr_t, a std::unique ptr type,
+     * representing the assertion.
+     */
+    template <bool Single_Source, typename Assertion_Status>
+    __constexpr void
+        add_assertion(
+            reports::generic_assertion_ptr_t<Single_Source, Assertion_Status>&
+                _a_ptr
+        );
+    /*!
+     * @brief Adds an unexpected assertion to the object.
+     *
+     * If there already is an unexpected exception object registered, or the
+     * unexpected exception is a nullptr, then this function throws an
+     *
+     *
+     * @param _a_ur Rvalue to unique_ptr containing report.
+     */
+    __constexpr_imp void
+        set_unexpected_termination(reports::opt_unexpected_report_t&& _a_ur);
+    /*!
+     * @brief Registers a warning with the object.
+     *
+     * If the warning is a nullptr, then this function throws an exception.
+     *
+     * @param _a_warning The unique ptr warning type.
+     */
+    __constexpr void
+        add_warning(
+            reports::unexpected_non_terminating_report_ptr_t&& _a_warning
+        );
+    /*!
+     * @brief Gets the number of assertions reported to the object which have
+     * passed.
+     * @return The number of passed assertions reported to the test.
+     */
+    __constexpr std::size_t
+                assertions_passed() const noexcept;
+    /*!
+     * @brief Returns the number of failed assertions to the caller.
+     * @return The number of failed assertions.
+     */
+    __constexpr std::size_t
+                assertions_failed() const noexcept;
+    /*!
+     * @brief Returns the total number of assertions reported to the object.
+     * @return The total number of assertions reported to the object.
+     */
+    __constexpr std::size_t
+                assertions_recieved() const noexcept;
+    /*!
+     * @brief Returns the status of the test.
+     * @return The status of the test.
+     */
+    __constexpr enum_test_status_t
+        test_status() const noexcept;
+    /*!
+     * @brief Returns the number of warnings the object recived to the caller.
+     * @return The number of warnings the object recieved.
+     */
+    __constexpr std::size_t
+                warnings_recieved() const noexcept;
+    /*!
+     * @brief Returns a cref to the object's opt_unexpected_report_t to the
+     * caller.
+     * @return A cref to the object's opt_unexpected_report_t.
+     */
+    __constexpr const reports::opt_unexpected_report_t&
+                      unexpected_termination() const noexcept;
+    /*!
+     * @brief Returns a cref to the object's generic_user_report_collection_t to
+     * the caller.
+     * @return A cref to the object's generic_user_report_collection_t.
+     */
+    __constexpr const reports::generic_user_report_collection_t&
+                      assertions() const noexcept;
 private:
     const post_setup_test_data_t& _m_post_setup_test_data;
     ds::for_loop_stack_trie_t     _m_tests_for_loop_stack_trie;
@@ -224,6 +310,13 @@ private:
     std::size_t                   _m_order_ran_id;
     utility::rng                  _m_this_tests_random_generator;
     std::filesystem::path         _m_path;
+    enum_test_status_t            _m_test_status;
+    std::size_t                   _m_total_number_assertions_recieved;
+    std::size_t                   _m_total_number_assertions_passed;
+    std::size_t                   _m_total_number_assertions_failed;
+    reports::generic_user_report_collection_t _m_assertions;
+    reports::opt_unexpected_report_t          _m_termination_report;
+    reports::unexpected_non_terminating_report_collection_t _m_warnings;
 };
 
 namespace
@@ -378,6 +471,165 @@ __constexpr_imp std::size_t
     return _m_order_ran_id;
 }
 
+template <bool Single_Source, typename Assertion_Status>
+__constexpr_imp void
+    invoked_test_data_t::add_assertion(
+        reports::generic_assertion_ptr_t<Single_Source, Assertion_Status>&
+            _a_ptr
+    )
+{
+    using namespace reports;
+    using enum enum_test_status_t;
+    if (terminated(_m_test_status))
+    {
+        // In the incorrect status; a termination has been thrown from this
+        // test, why is it still running?
+        throw errors::test_library_exception_t(fmt::format(
+            "add_assertions function has been entered, however should have "
+            "already termianted. _m_test_status = {0}",
+            _m_test_status
+        ));
+    }
+    else if (_a_ptr == nullptr)
+    {
+        // Input is a nullptr. Incorrect.
+        throw errors::unaccounted_for_nullptr(_a_ptr.get());
+        _m_test_status = TERMINATION_OCCOURED_UNEXPECTED_THROW;
+    }
+    else
+    {
+        const reports::generic_assertion_t<Single_Source, Assertion_Status>&
+            _l_ref{*_a_ptr};
+        _m_total_number_assertions_recieved++;
+        // Assertin recived, correct status (either pass or fail but no
+        // terminations).
+        if (_l_ref.get_pass_status())
+        {
+            // Increment the pass.
+            _m_total_number_assertions_passed++;
+        }
+        else
+        {
+            _m_total_number_assertions_failed++;
+            if (_l_ref.terminated())
+            {
+                // If failed and terminated change to a termiantion status.
+                _m_test_status = TERMINATION_OCCOURED_TEST_FAILED;
+            }
+            else
+            {
+                // Else set to a fail status.
+                _m_test_status = NO_TERMINATION_TEST_FAILED;
+            }
+        }
+        // This has to be the last thing, or accessing _a_ptr would be invalid.
+        _m_assertions.push_back(generic_user_report_ptr_t(std::move(_a_ptr)));
+    }
+}
+
+__constexpr_imp void
+    invoked_test_data_t::set_unexpected_termination(
+        reports::opt_unexpected_report_t&& _a_ur
+    )
+{
+    using namespace reports;
+    using enum enum_test_status_t;
+    if (terminated(_m_test_status))
+    {
+        // In the incorrect status; a termination has been thrown from this
+        // test, why is it still running?
+        throw errors::test_library_exception_t(fmt::format(
+            "set_unexpected_termination function has been entered, however "
+            "should have already termianted. _m_test_status = {0}",
+            _m_test_status
+        ));
+    }
+    else if (_m_termination_report != nullptr)
+    {
+        throw errors::test_library_exception_t(
+            "Attempting to call set_unexpected_termination, however an "
+            "unexpected termination has already been registered."
+        );
+    }
+    else if (_a_ur == nullptr)
+    {
+        throw errors::unaccounted_for_nullptr(_a_ur.get());
+    }
+    else
+    {
+        _m_termination_report = opt_unexpected_report_t(std::move(_a_ur));
+        _m_test_status        = TERMINATION_OCCOURED_UNEXPECTED_THROW;
+    }
+}
+
+__constexpr_imp void
+    invoked_test_data_t::add_warning(
+        reports::unexpected_non_terminating_report_ptr_t&& _a_warning
+    )
+{
+    using namespace reports;
+    if (terminated(_m_test_status))
+    {
+        // In the incorrect status; a termination has been thrown from this
+        // test, why is it still running?
+        throw errors::test_library_exception_t(fmt::format(
+            "add_warning function has been entered, however "
+            "should have already termianted. _m_test_status = {0}",
+            _m_test_status
+        ));
+    }
+    else if (_a_warning == nullptr)
+    {
+        throw errors::unaccounted_for_nullptr(_a_warning.get());
+    }
+    else
+    {
+        _m_warnings.push_back(std::move(_a_warning));
+    }
+}
+
+__constexpr_imp std::size_t
+                invoked_test_data_t::assertions_passed() const noexcept
+{
+    return _m_total_number_assertions_passed;
+}
+
+__constexpr_imp std::size_t
+                invoked_test_data_t::assertions_failed() const noexcept
+{
+    return _m_total_number_assertions_failed;
+}
+
+__constexpr_imp std::size_t
+                invoked_test_data_t::assertions_recieved() const noexcept
+{
+    return _m_total_number_assertions_recieved;
+}
+
+__constexpr_imp enum_test_status_t
+    invoked_test_data_t::test_status() const noexcept
+{
+    return _m_test_status;
+}
+
+__constexpr_imp std::size_t
+                invoked_test_data_t::warnings_recieved() const noexcept
+{
+    return _m_warnings.size();
+}
+
+__constexpr_imp const reports::opt_unexpected_report_t&
+    invoked_test_data_t::unexpected_termination() const noexcept
+{
+    return _m_termination_report;
+}
+
+__constexpr_imp const reports::generic_user_report_collection_t&
+                      invoked_test_data_t::assertions() const noexcept
+{
+    return _m_assertions;
+}
+
 namespace
 {
 __no_constexpr_imp std::filesystem::path
@@ -412,14 +664,23 @@ __no_constexpr_imp auto
     ) const -> format_context::iterator
 {
     using namespace std;
+    const string _l_unwritten_str{"<unwritten-printer>"};
     const string _l_rv{fmt::format(
-        "{0} {{"
-        "{1} = {2}, "
-        "{3} = {4}, "
-        "{5} = {6}, "
-        "{7} = {8}, "
-        "{9} = {10}, "
-        "{11} = {12}}}",
+        "{0}"
+        "{{{1} = {2}"
+        ", {3} = {4}"
+        ", {5} = {6}"
+        ", {7} = {8}"
+        ", {9} = {10}"
+        ", {11} = {12}"
+        ", {13} = {14}"
+        ", {15} = {16}"
+        ", {17} = {18}"
+        ", {19} = {20}"
+        ", {21} = {22}"
+        ", {23} = {24}"
+        ", {25} = {26}"
+        "}}",
         typeid(_a_iti).name(),
         "_m_post_setup_test_data",
         _a_iti.post_setup_test_data(),
@@ -430,9 +691,23 @@ __no_constexpr_imp auto
         "_m_order_ran_id",
         _a_iti.order_ran_id(),
         "_m_this_tests_random_generator",
-        "<unwritten>",
+        _l_unwritten_str,
         "_m_path",
-        _a_iti.path().string()
+        _a_iti.path().string(),
+        "_m_test_status",
+        _a_iti.test_status(),
+        "_m_total_number_assertions_recieved",
+        _a_iti.assertions_recieved(),
+        "_m_total_number_assertions_passed",
+        _a_iti.assertions_passed(),
+        "_m_total_number_assertions_failed",
+        _a_iti.assertions_failed(),
+        "_m_assertions",
+        _l_unwritten_str,
+        "_m_termination_report",
+        _l_unwritten_str,
+        "_m_warnings",
+        _l_unwritten_str
     )};
     return formatter<string_view>::format(_l_rv, _a_ctx);
 }
