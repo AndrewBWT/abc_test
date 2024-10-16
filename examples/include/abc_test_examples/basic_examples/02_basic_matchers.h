@@ -1,6 +1,6 @@
 #pragma once
 #include "abc_test/gen_data/enumerable/specializations/enum.h"
-#include "abc_test/core/test_assertions.h"
+#include "abc_test/core/test_assertions/macros.h"
 #include "abc_test/core/ds/test_data/macros.h"
 #include "abc_test/matchers/matcher.h"
 #include "abc_test/matchers/comparison/constructors.h"
@@ -9,8 +9,6 @@
 
 #include <ranges>
 #include <numeric>
-
-#include "abc_test/matchers/annotation.h"
 
 _TEST_CASE(abc::test_data_t({
 	.name = "file_02_example_01",
@@ -150,7 +148,7 @@ _TEST_CASE(abc::test_data_t({
 	*/
 	matcher_t _l_1;
 	_CHECK(annotate(_l_1, "Some test annotation"));
-	matcher_with_annotation_t _l_2(_l_1, "A very important test");
+	annotated_matcher_t _l_2(_l_1, "A very important test");
 	_CHECK(_l_2);
 	/*!
 	*

@@ -18,7 +18,7 @@ public:
 			const opt_file_rw_info_t<T>& _a_opt_file_rw_info,
 			const std::string_view _a_str,
 			R&& _a_range = {},
-			const test_options_t* _a_test_options = global::get_global_test_options_ptr()
+			const test_options_base_t* _a_test_options = &global::get_global_test_options()
 		) noexcept;
 	__constexpr
 		bool
@@ -62,7 +62,7 @@ __constexpr_imp
 		const opt_file_rw_info_t<T>& _a_opt_file_rw_info,
 		const std::string_view _a_str,
 		R&& _a_range,
-		const test_options_t* _a_test_options
+		const test_options_base_t* _a_test_options
 	) noexcept
 	: _m_file_rw(_a_opt_file_rw_info.has_value() ?
 		std::optional<file_rw_t<T>>(file_rw_t<T>(_a_opt_file_rw_info.value(), _a_str, 

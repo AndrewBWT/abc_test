@@ -3,7 +3,7 @@
 
 _BEGIN_ABC_NS
 class bool_matcher_t
-	: public generic_matcher_t
+	: public matcher_base_t
 {
 public:
 	__constexpr
@@ -25,7 +25,7 @@ template<
 requires std::same_as<Assertion_Status,reports::pass_t> ||
 std::same_as<Assertion_Status,reports::fail_t>
 class static_matcher_t
-	: public generic_matcher_t
+	: public matcher_base_t
 {
 public:
 	__constexpr
@@ -35,7 +35,7 @@ public:
 };
 
 struct true_matcher_t
-	: public generic_matcher_t
+	: public matcher_base_t
 {
 public:
 	__constexpr
@@ -46,7 +46,7 @@ public:
 		);
 };
 struct false_matcher_t
-	: public generic_matcher_t
+	: public matcher_base_t
 {
 	__constexpr
 		virtual

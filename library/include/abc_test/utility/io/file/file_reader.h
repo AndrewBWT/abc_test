@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include "abc_test/utility/io/file/file_name_with_extension.h"
-#include "abc_test/core/test_options.h"
+#include "abc_test/core/options/test_options_base.h"
 
 #include <iostream>
 #include <fmt/std.h>
@@ -14,7 +14,7 @@ public:
 	__no_constexpr
 	file_line_reader_t(
 			const file_name_with_extension_t& _a_file_name,
-			const test_options_t* _a_test_options
+			const test_options_base_t* _a_test_options
 		);
 	__no_constexpr
 		file_line_reader_t(
@@ -36,7 +36,7 @@ private:
 	std::string _m_current_line;
 	std::shared_ptr<std::ifstream> _m_file_handler;
 	file_name_with_extension_t _m_file_name;
-	const test_options_t* _m_test_options;
+	const test_options_base_t* _m_test_options;
 	bool _m_finished_reading;
 };
 _END_ABC_UTILITY_IO_NS
@@ -45,7 +45,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 __no_constexpr_imp
 	file_line_reader_t::file_line_reader_t(
 		const file_name_with_extension_t& _a_file_name,
-		const test_options_t* _a_test_options
+		const test_options_base_t* _a_test_options
 	)
 	: _m_current_line_idx(0)
 	, _m_current_line("")
@@ -154,7 +154,7 @@ __constexpr_imp
 					_l_file_hander.bad()));
 		}
 		else if (_m_test_options != nullptr &&
-			_m_current_line.starts_with(_m_test_options->_m_comment_str))
+			_m_current_line.starts_with(_m_test_options->comment_str))
 		{
 			if (_m_finished_reading)
 			{

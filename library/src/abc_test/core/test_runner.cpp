@@ -2,7 +2,7 @@
 
 #include "abc_test/core/errors/test_assertion_exception.h"
 #include "abc_test/core/errors/test_library_exception.h"
-#include "abc_test/core/log_test_msg.h"
+#include "abc_test/core/logging/log_msg.h"
 #include "abc_test/core/test_reports//unexpected_thrown_exception.h"
 #include "abc_test/utility/internal/log.h"
 
@@ -29,7 +29,7 @@ __no_constexpr_or_inline_imp void
         generate_random_seeds(),
         _a_post_setup_test_data,
         _m_tests_ran,
-        _m_test_options
+        _m_test_options.root_path
     );
     invoked_test_data_t&          _l_current_test{*_m_current_test};
     const registered_test_data_t& _l_rtd{
@@ -66,9 +66,6 @@ __no_constexpr_or_inline_imp void
             )
         );
     }
-    // _m_after_execution_test_report.add_repetition_tree(
-    //     _m_current_test->for_loop_stack_trie(), &_m_test_options
-    // );
     _m_trc->report_test(*_m_current_test);
     _m_current_error_log_msgs.clear();
     ++_m_tests_ran;
@@ -76,14 +73,13 @@ __no_constexpr_or_inline_imp void
 
 __no_constexpr_or_inline_imp void
     test_runner_t::remove_error_info(
-        std::list<const log_test_msg_t*>::iterator _a_itt
+        std::list<const log_msg_t*>::iterator _a_itt
     ) noexcept
 {
     using namespace std;
     //_m_cached_log_msgs.push_back(string((*_a_itt)->str()));
     _m_current_error_log_msgs.erase(_a_itt);
 }
-
 __no_constexpr_or_inline_imp std::vector<std::string>
                              test_runner_t::get_log_infos(
         const bool _a_get_cached_results
@@ -97,13 +93,13 @@ __no_constexpr_or_inline_imp std::vector<std::string>
     }
     else
     {
-        using itt = list<const log_test_msg_t*>::iterator;
+        using itt = list<const log_msg_t*>::iterator;
         itt         _l_end{_m_current_error_log_msgs.end()};
         vector<itt> _l_to_deletes;
         for (itt _l_itt{_m_current_error_log_msgs.begin()}; _l_itt != _l_end;
              ++_l_itt)
         {
-            const log_test_msg_t* _l_elem = *_l_itt;
+            const log_msg_t* _l_elem = *_l_itt;
             _l_rv.push_back(string(_l_elem->str()));
             if (_l_elem->delete_after_use())
             {

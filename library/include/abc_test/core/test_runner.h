@@ -6,10 +6,13 @@
 #include "abc_test/core/test_reports/assertion.h"
 
 #include <memory>
+#include "abc_test/core/options/test_options_base.h"
+#include "abc_test/core/ds/type_synonyms.h"
+//#include "abc_test/core/test_options.h"
 
 
 _BEGIN_ABC_NS
-struct log_test_msg_t;
+struct log_msg_t;
 // Forward declarations
 struct ds::registered_test_data_t;
 
@@ -26,7 +29,7 @@ public:
     __no_constexpr
         test_runner_t(
             reporters::test_reporter_controller_t& _a_trc,
-            const test_options_t&                  _a_test_options
+            const test_options_base_t&                  _a_test_options
         ) noexcept;
     /*!
      * Registers a source with the object, used when showing information
@@ -40,15 +43,31 @@ public:
         register_tests_most_recent_source(
             const ds::source_pair_t& _a_source_locations
         ) noexcept;
-    __no_constexpr std::list<const log_test_msg_t*>::iterator
-                   add_error_info(const log_test_msg_t* _a_log) noexcept;
+    __no_constexpr std::list<const log_msg_t*>::iterator
+                   add_error_info(const log_msg_t* _a_log) noexcept;
     /*!
      * Removes an element from the current log list.
      */
     __no_constexpr_or_inline void
-        remove_error_info(std::list<const log_test_msg_t*>::iterator _a_itt
+        remove_error_info(std::list<const log_msg_t*>::iterator _a_itt
         ) noexcept;
-
+    /*!
+ * @brief Adds a text based warning to the internal set of warnings.
+ * @param _a_str The string test which describes the warning.
+ */
+    __constexpr void
+        add_text_warning(const std::string_view _a_str) noexcept;
+    /*!
+     * @brief Adds a text-based warning to the internal set of warnings.
+     * @param _a_sr The string text which describes the warning.
+     * @param _a_source The exact source associated with the warning.
+     * @return
+     */
+    __constexpr void
+        add_test_warning_with_source(
+            const std::string_view     _a_sr,
+            const ds::single_source_t& _a_source
+        ) noexcept;
     constexpr void
         add_cached_exception(
             const std::string_view _a_str
@@ -123,7 +142,7 @@ public:
         record_sources(
         ) const noexcept;*/
 private:
-    std::list<const log_test_msg_t*> _m_current_error_log_msgs;
+    std::list<const log_msg_t*> _m_current_error_log_msgs;
     std::vector<std::string>         _m_cached_log_msgs;
     // reporters::after_execution_test_report_t _m_after_execution_test_report;
     // errors::test_failures_info_t _m_error_infos;
@@ -131,8 +150,7 @@ private:
     std::size_t                              _m_tests_ran;
     std::unique_ptr<ds::invoked_test_data_t> _m_current_test;
     utility::rng                             _m_random_generator;
-    test_order_enum_t                        _m_test_order;
-    const test_options_t&                    _m_test_options;
+    const test_options_base_t&                    _m_test_options;
     ds::single_source_t                      _m_tests_most_recent_source;
     //	std::optional<reports::single_source_t> _m_registered_source;
     template <bool Single_Source, typename Assertion_Status>
@@ -150,14 +168,13 @@ _BEGIN_ABC_NS
 __no_constexpr_imp
     test_runner_t::test_runner_t(
         reporters::test_reporter_controller_t& _a_trc,
-        const test_options_t&                  _a_test_options
+        const test_options_base_t&                  _a_test_options
     ) noexcept
     //: _m_after_execution_test_report(reporters::after_execution_test_report_t{})
     : _m_trc(&_a_trc)
     , _m_tests_ran{0}
     , _m_current_test(nullptr)
-    , _m_random_generator(utility::rng(_a_test_options._m_seed_values))
-    , _m_test_order(test_order_enum_t::IN_ORDER)
+   // , _m_random_generator(utility::rng(_a_test_options.rng_seed))
     , _m_test_options(_a_test_options)
     , _m_tests_most_recent_source(ds::single_source_t())
 {}
@@ -185,9 +202,9 @@ __constexpr_imp void
                                       : _a_source_locations.begin_source();
 }
 
-__no_constexpr_imp std::list<const log_test_msg_t*>::iterator
+__no_constexpr_imp std::list<const log_msg_t*>::iterator
                    test_runner_t::add_error_info(
-        const log_test_msg_t* _a_log
+        const log_msg_t* _a_log
     ) noexcept
 {
     using namespace std;
@@ -211,8 +228,8 @@ __constexpr_imp utility::seed_t
                 test_runner_t::generate_random_seeds() noexcept
 {
     using namespace utility;
-    const size_t _l_n_elements_used_to_seed_random_generators{
-        _m_test_options._m_numb_elements_used_to_seed_random_generators
+    const size_t _l_n_elements_used_to_seed_random_generators{0
+   //     _m_test_options.number_of_integers_used_to_seed_random_generators
     };
     seed_t _l_seed(_l_n_elements_used_to_seed_random_generators);
     for (size_t _l_idx{0};
@@ -317,14 +334,62 @@ __constexpr_imp void
     register_tests_most_recent_source(_a_ptr->source());
     if (_a_optional_warning.has_value())
     {
-        _m_current_test->add_warning(
-            make_unique<const unexpected_report_t<false>>(basic_text_warning_t(
-                _a_ptr->last_source(), true, _a_optional_warning.value()
-            ))
-        );
+        add_test_warning_with_source(_a_optional_warning.value(), _a_ptr->last_source());
     }
     _m_current_test->add_current_for_loop_stack_to_trie();
     _m_current_test->add_assertion(_a_ptr);
 }
 
+/*
+__constexpr_imp void
+    invoked_test_data_t::add_text_warning(
+        const std::string_view _a_str
+    ) noexcept
+{
+    using namespace reports;
+    using namespace std;
+    using namespace global;
+    _m_warnings.push_back(make_unique<basic_text_warning_t>(
+        get_this_threads_test_runner_ref().most_recent_source(), false, _a_str
+    ));
+}
+
+__constexpr_imp void
+    invoked_test_data_t::add_test_warning_with_source(
+        const std::string_view     _a_str,
+        const ds::single_source_t& _a_source
+    ) noexcept
+{
+    using namespace reports;
+    using namespace std;
+    using namespace global;
+    _m_warnings.push_back(
+        make_unique<basic_text_warning_t>(_a_source, true, _a_str)
+    );
+}
+*/
+__constexpr_imp void
+test_runner_t::add_text_warning(
+    const std::string_view _a_str
+) noexcept
+{
+    using namespace reports;
+    using namespace std;
+    _m_current_test->add_warning(make_unique<basic_text_warning_t>(
+        most_recent_source(), false, _a_str
+    ));
+}
+
+__constexpr_imp void
+test_runner_t::add_test_warning_with_source(
+    const std::string_view     _a_str,
+    const ds::single_source_t& _a_source
+) noexcept
+{
+    using namespace reports;
+    using namespace std;
+    _m_current_test->add_warning(make_unique<basic_text_warning_t>(
+        _a_source, true, _a_str
+    ));
+}
 _END_ABC_NS

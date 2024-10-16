@@ -18,12 +18,12 @@ public:
 		) noexcept = delete;
 	__constexpr
 		logic_matcher_t(
-			const std::shared_ptr<generic_matcher_t>& _a_arg
+			const std::shared_ptr<matcher_base_t>& _a_arg
 		) noexcept;
 	__constexpr
 		logic_matcher_t(
-			const std::shared_ptr<generic_matcher_t>& _a_matcher_l,
-			const std::shared_ptr<generic_matcher_t>& _a_matcher_r
+			const std::shared_ptr<matcher_base_t>& _a_matcher_l,
+			const std::shared_ptr<matcher_base_t>& _a_matcher_r
 		) noexcept;
 	__constexpr
 		virtual
@@ -33,7 +33,7 @@ public:
 	__constexpr
 		void
 		set_right_child(
-			const std::shared_ptr<generic_matcher_t>& _a_matcher
+			const std::shared_ptr<matcher_base_t>& _a_matcher
 		) noexcept;
 	__constexpr
 		virtual
@@ -42,8 +42,8 @@ public:
 			matcher_source_map_t& _a_matcher_source_map
 		) const noexcept override final;
 private:
-	std::shared_ptr<generic_matcher_t> _m_matcher_l;
-	std::shared_ptr<generic_matcher_t> _m_matcher_r;
+	std::shared_ptr<matcher_base_t> _m_matcher_l;
+	std::shared_ptr<matcher_base_t> _m_matcher_r;
 	__constexpr
 		virtual
 		matcher_result_t
@@ -69,7 +69,7 @@ namespace
 	__constexpr
 		std::string
 		make_str(
-			std::shared_ptr<generic_matcher_t>& _a_ptr,
+			std::shared_ptr<matcher_base_t>& _a_ptr,
 			const std::string_view _a_str
 		) noexcept;
 }
@@ -82,7 +82,7 @@ template<
 __constexpr_imp
 	logic_matcher_t<Logic_Enum>::logic_matcher_t(
 		//const logic_enum_t _a_logic_enum,
-		const std::shared_ptr<generic_matcher_t>& _a_matcher
+		const std::shared_ptr<matcher_base_t>& _a_matcher
 	) noexcept
 	: _m_matcher_l(_a_matcher)
 	//, _m_logic_enum(_a_logic_enum)
@@ -95,8 +95,8 @@ template<
 __constexpr_imp
 	logic_matcher_t<Logic_Enum>::logic_matcher_t(
 	//	const logic_enum_t _a_logic_enum,
-		const std::shared_ptr<generic_matcher_t>& _a_matcher_l,
-		const std::shared_ptr<generic_matcher_t>& _a_matcher_r
+		const std::shared_ptr<matcher_base_t>& _a_matcher_l,
+		const std::shared_ptr<matcher_base_t>& _a_matcher_r
 	) noexcept
 	// _m_logic_enum(_a_logic_enum)
 	: _m_matcher_l(_a_matcher_l)
@@ -120,7 +120,7 @@ template<
 __constexpr_imp
 	void
 	logic_matcher_t<Logic_Enum>::set_right_child(
-		const std::shared_ptr<generic_matcher_t>& _a_matcher
+		const std::shared_ptr<matcher_base_t>& _a_matcher
 	) noexcept
 {
 	if constexpr (Logic_Enum == NOT)
@@ -180,7 +180,7 @@ void
 	matcher_source_map_t& _a_matcher_source_map
 ) const noexcept
 {
-	generic_matcher_t::gather_map_source(_a_matcher_source_map);
+	matcher_base_t::gather_map_source(_a_matcher_source_map);
 	if (_m_matcher_l != nullptr)
 	{
 		_m_matcher_l->gather_map_source(_a_matcher_source_map);
@@ -262,7 +262,7 @@ namespace
 	__constexpr_imp
 		std::string
 		make_str(
-			std::shared_ptr<generic_matcher_t>& _a_ptr,
+			std::shared_ptr<matcher_base_t>& _a_ptr,
 			const std::string_view _a_str
 		) noexcept
 	{

@@ -1,188 +1,204 @@
 #pragma once
-#include "abc_test/utility/internal/macros.h"
 #include "abc_test/core/ds/source/single_source.h"
-#include <optional>
 #include "abc_test/matchers/matcher.h"
-#include "abc_test/matchers/annotation.h"
+#include "abc_test/utility/internal/macros.h"
+
+#include <optional>
 
 _BEGIN_ABC_NS
-template<
-	typename Assertion_Type
->
+
+/*!
+ * @brief Structure used when creating test blocks; testing apparatus in which
+ * an assertion is declared in a block, and its only checked when destroyed.
+ * @tparam Assertion_Type The assertion type. Must be derived from
+ * dynamic_status_t.
+ */
+template <typename Assertion_Type>
+requires std::derived_from<Assertion_Type, reports::dynamic_status_t>
 class test_block_t
 {
 public:
-	__constexpr
-		test_block_t(
-		) noexcept = delete;
-	__constexpr
-		test_block_t(
-			const std::string_view _a_test_annotation,
-			const ds::single_source_t& _a_source
-		) noexcept;
-	__constexpr
-		~test_block_t(
-		) noexcept;
-	__constexpr_imp
-		test_block_t&
-		operator=(
-			const matcher_t& _a_element
-			) noexcept;
-	__constexpr_imp
-		test_block_t&
-		operator=(
-			const matcher_with_annotation_t& _a_element
-			) noexcept;
-	__constexpr
-		const matcher_t&
-		matcher(
-		) const noexcept;
-	__constexpr
-		const std::optional<std::string>&
-		test_annotation(
-		) const noexcept;
-	__constexpr
-		const std::optional<std::string>&
-		matcher_annotation(
-		) const noexcept;
-	__constexpr
-		void
-		register_end(
-			const ds::single_source_t& _a_end_source
-		) noexcept;
-	__constexpr
-		const ds::source_pair_t&
-		source(
-		) const noexcept;
-	__constexpr
-		void
-		set_processed(
-		) noexcept;
+    __constexpr
+    test_block_t() noexcept
+        = delete;
+    /*!
+     * @brief Constructor
+     * @param _a_test_annotation The block's annotation.
+     * @param _a_source The blocks' beginning source.
+     */
+    __constexpr
+    test_block_t(
+        const std::string_view     _a_test_annotation,
+        const ds::single_source_t& _a_source
+    ) noexcept;
+    /*!
+     * @brief Destructor.
+     *
+     * The destructor will issue a warning to the test_runner_t if its matcher
+     * has not been checked. If the user is using the macros, this will be done
+     * when ending a test block.
+     */
+    __constexpr ~test_block_t() noexcept;
+    /*!
+     * @brief Equals operator taking a matcher_wrapper_t. This is used when
+     * wanting to attach a matcher_wrapper_t to this object.
+     * @tparam Boolean denoting whether the argument matcher_wrapper_t has an
+     * annotation.
+     * @param _a_element The matcher_wrapper_t to attach to this object.
+     * @return Reference to test_block_t with matcher_wrapper_t attached.
+     */
+    template <bool Has_Annotation>
+    __constexpr_imp test_block_t<Assertion_Type>&
+        operator=(const matcher_wrapper_t<Has_Annotation>& _a_element) noexcept;
+    /*!
+     * @brief Returns a cref to the object's matcher_base_ptr_t to the caller.
+     * @return A cref to the object's matcher_base_ptr_t.
+     */
+    __constexpr const matcher_base_ptr_t&
+        matcher() const noexcept;
+    /*!
+     * @brief Returns a cref to the object's optional test annotation.
+     * @return A cref to the object's optional test annotation.
+     */
+    __constexpr const std::optional<std::string>&
+                      test_annotation() const noexcept;
+    /*!
+     * @brief Returns a cref to the object's optional matcher annotation.
+     * @return A cref to the object's optional matcher annotation.
+     */
+    __constexpr const std::optional<std::string>&
+                      matcher_annotation() const noexcept;
+    /*!
+     * @brief Registers an end source with the object.
+     *
+     * This should be called by the macro _END_BLOCK.
+     *
+     * @param _a_end_source The source location being registered to this object.
+     */
+    __constexpr void
+        register_end(const ds::single_source_t& _a_end_source) noexcept;
+    /*!
+     * @brief Gets a cref to the object's ds::source_pair_t.
+     * @return A cref to the object's ds::source_pair_t.
+     */
+    __constexpr const ds::source_pair_t&
+                      source() const noexcept;
+    /*!
+     * @brief Tells the caller whether the object has been processed - that is,
+     * the function register_end called on the object.
+     * @return True if the object has been processed; false otherwise.
+     */
+    __constexpr void
+        set_processed() noexcept;
 private:
-	ds::source_pair_t _m_source;
-	std::optional<std::string> _m_test_annotation;
-	std::optional<std::string> _m_matcher_annotation;
-	matcher_t _m_matcher;
-	bool _m_processed;
+    ds::source_pair_t          _m_source;
+    std::optional<std::string> _m_test_annotation;
+    std::optional<std::string> _m_matcher_annotation;
+    matcher_base_ptr_t         _m_matcher;
+    bool                       _m_processed;
 };
+
 _END_ABC_NS
 
 _BEGIN_ABC_NS
-template<
-	typename Assertion_Type
->
+template <typename Assertion_Type>
+requires std::derived_from<Assertion_Type, reports::dynamic_status_t>
 __constexpr_imp
-test_block_t<Assertion_Type>::test_block_t(
-	const std::string_view _a_test_annotation,
-	const ds::single_source_t& _a_source
-) noexcept
-	: _m_source(ds::source_pair_t(_a_source))
-	, _m_test_annotation(_a_test_annotation)
-	, _m_processed(false)
-{
+    test_block_t<Assertion_Type>::test_block_t(
+        const std::string_view     _a_test_annotation,
+        const ds::single_source_t& _a_source
+    ) noexcept
+    : _m_source(ds::source_pair_t(_a_source))
+    , _m_test_annotation(_a_test_annotation)
+    , _m_processed(false)
+{}
 
-}
-template<
-	typename Assertion_Type
->
-__constexpr_imp
-test_block_t<Assertion_Type>::~test_block_t(
-) noexcept
+template <typename Assertion_Type>
+requires std::derived_from<Assertion_Type, reports::dynamic_status_t>
+__constexpr_imp test_block_t<Assertion_Type>::~test_block_t() noexcept
 {
-	if (not _m_processed)
-	{
-		global::get_this_threads_current_test().add_warning(
-			fmt::format("test_block_t is being deleted, however it has not been "
-				"processed for its true or false status. "
-			));
-	}
+    using namespace global;
+    using namespace std;
+    using namespace reports;
+    if (not _m_processed)
+    {
+        get_this_threads_test_runner_ref().add_text_warning(fmt::format(
+            "test_block_t is being deleted, however it has not been "
+            "processed for its true or false status. "
+        ));
+    }
 }
-template<
-	typename Assertion_Type
->
-__constexpr_imp
-test_block_t<Assertion_Type>&
-test_block_t<Assertion_Type>::operator=(
-	const matcher_t& _a_element
-	) noexcept
+
+template <typename Assertion_Type>
+requires std::derived_from<Assertion_Type, reports::dynamic_status_t>
+template <bool Has_Annotation>
+__constexpr_imp test_block_t<Assertion_Type>&
+                test_block_t<Assertion_Type>::operator=(
+        const matcher_wrapper_t<Has_Annotation>& _a_element
+    ) noexcept
 {
-	this->_m_matcher = _a_element;
-	this->_m_matcher_annotation = std::optional<std::string>();
-	return *this;
+    this->_m_matcher = _a_element.internal_matcher();
+    if constexpr (Has_Annotation)
+    {
+        this->_m_matcher_annotation
+            = std::optional<std::string>(_a_element.annotation());
+    }
+    else
+    {
+        this->_m_matcher_annotation = std::optional<std::string>();
+    }
+    return *this;
 }
-template<
-	typename Assertion_Type
->
-__constexpr_imp
-test_block_t<Assertion_Type>&
-test_block_t<Assertion_Type>::operator=(
-	const matcher_with_annotation_t& _a_element
-	) noexcept
+
+template <typename Assertion_Type>
+requires std::derived_from<Assertion_Type, reports::dynamic_status_t>
+__constexpr_imp const matcher_base_ptr_t&
+    test_block_t<Assertion_Type>::matcher() const noexcept
 {
-	this->_m_matcher = _a_element.matcher();
-	this->_m_matcher_annotation = _a_element.annotation();
-	return *this;
+    return _m_matcher;
 }
-template<
-	typename Assertion_Type
->
-__constexpr_imp
-const matcher_t&
-test_block_t<Assertion_Type>::matcher(
-) const noexcept
+
+template <typename Assertion_Type>
+requires std::derived_from<Assertion_Type, reports::dynamic_status_t>
+__constexpr_imp const std::optional<std::string>&
+    test_block_t<Assertion_Type>::test_annotation() const noexcept
 {
-	return _m_matcher;
+    return _m_test_annotation;
 }
-template<
-	typename Assertion_Type
->
-__constexpr_imp
-const std::optional<std::string>&
-test_block_t<Assertion_Type>::test_annotation(
-) const noexcept
+
+template <typename Assertion_Type>
+requires std::derived_from<Assertion_Type, reports::dynamic_status_t>
+__constexpr_imp const std::optional<std::string>&
+    test_block_t<Assertion_Type>::matcher_annotation() const noexcept
 {
-	return _m_test_annotation;
+    return _m_matcher_annotation;
 }
-template<
-	typename Assertion_Type
->
-__constexpr_imp
-const std::optional<std::string>&
-test_block_t<Assertion_Type>::matcher_annotation(
-) const noexcept
+
+template <typename Assertion_Type>
+requires std::derived_from<Assertion_Type, reports::dynamic_status_t>
+__constexpr_imp void
+    test_block_t<Assertion_Type>::register_end(
+        const ds::single_source_t& _a_end_source
+    ) noexcept
 {
-	return _m_matcher_annotation;
+    _m_source.set_end_source(_a_end_source);
 }
-template<
-	typename Assertion_Type
->
-__constexpr_imp
-void
-test_block_t<Assertion_Type>::register_end(
-	const ds::single_source_t& _a_end_source
-) noexcept
+
+template <typename Assertion_Type>
+requires std::derived_from<Assertion_Type, reports::dynamic_status_t>
+__constexpr_imp const ds::source_pair_t&
+                      test_block_t<Assertion_Type>::source() const noexcept
 {
-	_m_source.set_end_source(_a_end_source);
+    using namespace reports;
+    return _m_source;
 }
-template<
-	typename Assertion_Type
->
-__constexpr_imp
-const ds::source_pair_t&
-test_block_t<Assertion_Type>::source(
-) const noexcept
+
+template <typename Assertion_Type>
+requires std::derived_from<Assertion_Type, reports::dynamic_status_t>
+__constexpr_imp void
+    test_block_t<Assertion_Type>::set_processed() noexcept
 {
-	using namespace reports;
-	return _m_source;
+    _m_processed = true;
 }
-template<
-	typename Assertion_Type
->
-__constexpr_imp
-void
-test_block_t<Assertion_Type>::set_processed(
-) noexcept
-{
-	_m_processed = true;
-}
+
 _END_ABC_NS

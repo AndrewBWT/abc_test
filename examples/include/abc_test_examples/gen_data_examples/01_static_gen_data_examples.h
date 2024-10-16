@@ -1,6 +1,6 @@
 #pragma once
 #include "abc_test/gen_data/enumerable/specializations/enum.h"
-#include "abc_test/core/test_assertions.h"
+#include "abc_test/core/test_assertions/macros.h"
 #include "abc_test/core/ds/test_data/macros.h"
 #include "abc_test/matchers/matcher.h"
 #include "abc_test/matchers/comparison/constructors.h"
@@ -17,6 +17,7 @@
 
 #include "abc_test/gen_data/collection_iterator.h"
 #include "abc_test/matchers/comparison.h"
+#include "abc_test/core/test_assertions/macros.h"
 
 
 _TEST_CASE(abc::test_data_t({

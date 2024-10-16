@@ -618,19 +618,19 @@ TEST_CASE("Basic test script", "abc")
 	// 	// 	// 	// 	// 	// 	// 	//hello
 	if (_l_to._m_repeat_tests_string == "")
 	{
-		_l_to._m_write_random_data_to_file = true;
+		_l_to.write_data_to_files = true;
 	}
 	else
 	{
-		_l_to._m_write_random_data_to_file = false;
+		_l_to.write_data_to_files = false;
 	}
 	//_l_to._m_test_data_root_path = "awheipvuch34r";
 	std::cout << std::filesystem::current_path() << std::endl;
-	_l_to._m_test_data_root_path = "..\\..\\test_data\\test_dir1";
+	_l_to.root_path = "..\\..\\test_data\\test_dir1";
 	_l_to._m_create_test_folders_if_dont_exist = true;
 	_l_to._m_internal_logging = true;
 	test_main_t _l_test_main;
-	_l_to._m_threads = 1;
+	_l_to.threads = 1;
 	_l_test_main.set_options(_l_to);
 	reporters::text_test_reporter_t _l_i;
 	_l_test_main.add_test_reporter_owned_by_class(new text_test_reporter_t());

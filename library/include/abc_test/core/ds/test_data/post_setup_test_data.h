@@ -1,7 +1,9 @@
 #pragma once
 #include "abc_test/core/ds/test_data/registered_test_data.h"
-#include "abc_test/core/test_options.h"
+//#include "abc_test/core/test_options.h"
 #include "abc_test/utility/str/string_utility.h"
+#include "abc_test/core/ds/type_synonyms.h"
+#include "abc_test/core/ds/gen_data_memoization/for_loop_stack_trie.h"
 
 #include <vector>
 

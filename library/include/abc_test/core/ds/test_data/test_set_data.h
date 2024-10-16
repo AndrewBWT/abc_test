@@ -11,6 +11,12 @@ struct test_set_data_t
 {
 public:
     /*!
+     * @brief Default constructor.
+     */
+    __constexpr
+    test_set_data_t()
+        = default;
+    /*!
      * @brief Constructor.
      *
      * This constructor is combines a set of test_set_data_t objects. Internally
@@ -25,7 +31,8 @@ public:
     /*!
      * @brief This function processes a single invoked_test_data_t object,
      * updating its internal variabels based on how the test ran.
-     * @param _a_invoked_test The invoked_test_data_t entity used to update this object.
+     * @param _a_invoked_test The invoked_test_data_t entity used to update this
+     * object.
      */
     __constexpr void
         process_invoked_test(ds::invoked_test_data_t& _a_invoked_test) noexcept;

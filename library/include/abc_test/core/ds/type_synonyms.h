@@ -63,4 +63,12 @@ using post_setup_test_list_itt_t = post_setup_test_list_t::const_iterator;
  * @brief Type synonym for a set of log info.
  */
 using log_infos_t = std::vector<std::string>;
+
+using test_path_delimiter = std::string;
+using test_path_delimiter_ref = std::string_view;
+using path_t = std::filesystem::path;
 _END_ABC_DS_NS
+_BEGIN_ABC_NS
+struct test_options_base_t;
+struct validated_test_options_t;
+_END_ABC_NS

@@ -23,7 +23,7 @@ public:
      */
     __no_constexpr
         test_collection_t(
-            const test_options_t& _a_test_options,
+            const test_options_base_t& _a_test_options,
             const reporters::error_reporter_controller_t&
                 _a_error_reporter_controller
         ) noexcept;
@@ -56,7 +56,7 @@ private:
     test_tree_t                            _m_test_tree;
     reporters::error_reporter_controller_t _m_error_reporter_controller;
     unique_id_t                            _m_test_discovery_id;
-    const test_options_t&                  _m_options;
+    const test_options_base_t&                  _m_options;
 };
 
 _END_ABC_DS_NS
@@ -64,7 +64,7 @@ _END_ABC_DS_NS
 _BEGIN_ABC_DS_NS
 __no_constexpr_imp
     test_collection_t::test_collection_t(
-        const test_options_t& _a_test_options,
+        const test_options_base_t& _a_test_options,
         const reporters::error_reporter_controller_t&
             _a_error_reporter_controller
     ) noexcept
@@ -89,21 +89,22 @@ __constexpr_imp void
         for (const test_list_element_t& _l_test_element : *_l_tl)
         {
             const for_loop_stack_trie_t* _l_reps{
-                _m_options.get_test_repetition_configurations().contains(
+                _m_options.map_of_unique_ids_and_for_loop_stack_tries.contains(
                     _m_test_discovery_id
                 )
-                    ? &_m_options.get_test_repetition_configurations().at(
+                    ? &_m_options.map_of_unique_ids_and_for_loop_stack_tries.at(
                           _m_test_discovery_id
                       )
                     : nullptr
             };
             _m_post_setup_tests.push_back(post_setup_test_data_t(
                 _l_test_element,
-                _m_options._m_path_delimiter,
+                _m_options.path_delimiter,
                 _m_test_discovery_id,
-                _m_options.check_if_test_is_to_be_ran(_m_test_discovery_id),
+                true,
+//                _m_options.check_if_test_is_to_be_ran(_m_test_discovery_id),
                 _l_reps,
-                _m_options._m_threads
+                _m_options.threads
             ));
             const opt_setup_error_t _l_res{_m_test_tree.add_test(
                 std::cref(_m_post_setup_tests.back()), _m_options

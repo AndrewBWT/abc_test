@@ -25,13 +25,13 @@ public:
 			R&& _a_elements,
 			const std::string_view _a_rep_data_file_extension,
 			const utility::io::opt_file_rw_info_t<Rep_Data>& _a_rep_data_rw_info,
-			const test_options_t* _a_test_options = global::get_global_test_options_ptr()
+			const test_options_base_t* _a_test_options = &global::get_global_test_options()
 		);
 	__constexpr
 		gen_data_with_repetition_type_t(
 			const size_t _a_elements_generated,
 			const utility::io::opt_file_rw_info_t<Rep_Data>& _a_rep_data_rw_info,
-			const test_options_t* _a_test_options = global::get_global_test_options_ptr()
+			const test_options_base_t* _a_test_options = &global::get_global_test_options()
 		) noexcept;
 	template<
 		typename R = std::vector<T>
@@ -41,12 +41,12 @@ public:
 			const size_t _a_elements_generated,
 			const utility::io::opt_file_rw_info_t<T>& _a_core_data_rw_info,
 			R&& _a_elements,
-			const test_options_t* _a_test_options = global::get_global_test_options_ptr()
+			const test_options_base_t* _a_test_options = &global::get_global_test_options()
 		) noexcept;
 	__constexpr
 		gen_data_with_repetition_type_t(
 			const size_t _a_elements_generated,
-			const test_options_t* _a_test_options = global::get_global_test_options_ptr()
+			const test_options_base_t* _a_test_options = &global::get_global_test_options()
 		) noexcept;
 protected:
 	T _m_element;
@@ -340,11 +340,11 @@ __constexpr_imp
 		R&& _a_elements,
 		const std::string_view _a_rep_data_file_extension,
 		const utility::io::opt_file_rw_info_t<Rep_Data>& _a_rep_data_rw_info,
-		const test_options_t* _a_test_options
+		const test_options_base_t* _a_test_options
 	) 
 	: gen_data_base_t<T>()
 	, _m_core_data_rw_file(utility::io::opt_file_rw_t<T, 0>(_a_core_data_rw_info, 
-		_a_test_options->_m_general_data_extension, std::forward<R>(_a_elements)))
+		_a_test_options->general_data_extension, std::forward<R>(_a_elements)))
 	, _m_rep_data_rw_file(utility::io::opt_file_rw_t<Rep_Data, 1>(_a_rep_data_rw_info,
 		_a_rep_data_file_extension))
 	, _m_rep_data_rw_info(utility::str::rw_info_t<Rep_Data>())
@@ -373,7 +373,7 @@ __constexpr_imp
 	gen_data_with_repetition_type_t<T, Rep_Data>::gen_data_with_repetition_type_t(
 		const size_t _a_elements_generated,
 		const utility::io::opt_file_rw_info_t<Rep_Data>& _a_rep_data_rw_info,
-		const test_options_t* _a_test_options
+		const test_options_base_t* _a_test_options
 	) noexcept
 	: gen_data_with_repetition_type_t<T, Rep_Data>(
 		_a_elements_generated, {}, {}, _a_rep_data_rw_info, _a_test_options)
@@ -392,7 +392,7 @@ __constexpr_imp
 		const size_t _a_elements_generated,
 		const utility::io::opt_file_rw_info_t<T>& _a_core_data_rw_info,
 		R&& _a_elements,
-		const test_options_t* _a_test_options
+		const test_options_base_t* _a_test_options
 	) noexcept
 	: gen_data_with_repetition_type_t<T, Rep_Data>(
 		_a_elements_generated, _a_core_data_rw_info, _a_elements, "", {}, _a_test_options)
@@ -406,7 +406,7 @@ template<
 __constexpr_imp
 	gen_data_with_repetition_type_t<T, Rep_Data>::gen_data_with_repetition_type_t(
 		const size_t _a_elements_generated,
-		const test_options_t* _a_test_options
+		const test_options_base_t* _a_test_options
 	) noexcept
 	: gen_data_with_repetition_type_t<T, Rep_Data>(
 		_a_elements_generated, {}, {}, "",{}, _a_test_options)

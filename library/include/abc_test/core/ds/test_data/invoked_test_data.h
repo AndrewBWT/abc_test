@@ -5,6 +5,7 @@
 #include "abc_test/core/ds/test_data/post_setup_test_data.h"
 #include "abc_test/core/test_reports/assertion.h"
 #include "abc_test/core/test_reports/unexpected_report.h"
+#include "abc_test/utility/rng.h"
 
 #include <fmt/ranges.h>
 #include <functional>
@@ -34,15 +35,15 @@ public:
      * invoked_test_data_t instance.
      * @param _a_order_ran_id A unique ID representing the order this
      * invoked_test_data_t element is being ran in.
-     * @param _a_options The test_options_t object used when setting up this
-     * invoked_test_data_t instance.
+     * @param _a_root_path The root filepath of the system, where all other
+     * paths originate from.
      */
     __no_constexpr
         invoked_test_data_t(
             const utility::seed_t&        _a_seed_seq,
             const post_setup_test_data_t& _a_test_info,
             const size_t                  _a_order_ran_id,
-            const test_options_t&         _a_options
+            const std::filesystem::path& _a_root_path
         ) noexcept;
     /*!
      * @brief Returns the path of the invoked_test_data_t test to the caller.
@@ -150,16 +151,6 @@ public:
         increment_last_value_of_current_for_loop_stack() noexcept;
 
     /*!
-     * @brief Tells the caller if the current repetition_data_sequence_t is
-     * contained in the test's reptition_tree.
-     *
-     * Essentially this is used in manual for loops, to check whether the
-     * current element is to be ran or not.
-     *
-     * @return True if it is in the test's repetition tree, false if not.
-     */
-
-    /*!
      * @brief Tells the caller if the current for_loop_stack_trie_t object is in
      * the post_setup_test_data_t's for_loop_stack_trie_t member variable.
      *
@@ -174,15 +165,6 @@ public:
      */
     __constexpr bool
         is_current_for_loop_stack_in_true() const noexcept;
-    /*!
-     * @brief Returns the internal repetition_tree to the caller.
-     *
-     * To be clear, this is the repetition_tree_t created by the test, not the
-     * one given to the test as a parameter.
-     *
-     * @return The test's repetition_tree.
-     */
-
     /*!
      * @brief Returns a cref to this object's for_loop_stack_trie_t.
      *
@@ -233,8 +215,7 @@ public:
     template <bool Single_Source, typename Assertion_Status>
     __constexpr void
         add_assertion(
-            reports::assertion_ptr_t<Single_Source, Assertion_Status>&
-                _a_ptr
+            reports::assertion_ptr_t<Single_Source, Assertion_Status>& _a_ptr
         );
     /*!
      * @brief Adds an unexpected assertion to the object.
@@ -247,17 +228,6 @@ public:
      */
     __constexpr_imp void
         set_unexpected_termination(reports::opt_unexpected_report_t&& _a_ur);
-    /*!
-     * @brief Registers a warning with the object.
-     *
-     * If the warning is a nullptr, then this function throws an exception.
-     *
-     * @param _a_warning The unique ptr warning type.
-     */
-    __constexpr void
-        add_warning(
-            reports::unexpected_non_terminating_report_ptr_t&& _a_warning
-        );
     /*!
      * @brief Gets the number of assertions reported to the object which have
      * passed.
@@ -303,19 +273,22 @@ public:
      */
     __constexpr const reports::assertion_base_collection_t&
                       assertions() const noexcept;
+    __constexpr void
+        add_warning(reports::unexpected_non_terminating_report_ptr_t&& _a_pstr
+        ) noexcept;
 private:
-    const post_setup_test_data_t& _m_post_setup_test_data;
-    ds::for_loop_stack_trie_t     _m_tests_for_loop_stack_trie;
-    ds::for_loop_stack_t          _m_for_loop_data_collection;
-    std::size_t                   _m_order_ran_id;
-    utility::rng                  _m_this_tests_random_generator;
-    std::filesystem::path         _m_path;
-    enum_test_status_t            _m_test_status;
-    std::size_t                   _m_total_number_assertions_recieved;
-    std::size_t                   _m_total_number_assertions_passed;
-    std::size_t                   _m_total_number_assertions_failed;
+    const post_setup_test_data_t&        _m_post_setup_test_data;
+    ds::for_loop_stack_trie_t            _m_tests_for_loop_stack_trie;
+    ds::for_loop_stack_t                 _m_for_loop_data_collection;
+    std::size_t                          _m_order_ran_id;
+    utility::rng                         _m_this_tests_random_generator;
+    std::filesystem::path                _m_path;
+    enum_test_status_t                   _m_test_status;
+    std::size_t                          _m_total_number_assertions_recieved;
+    std::size_t                          _m_total_number_assertions_passed;
+    std::size_t                          _m_total_number_assertions_failed;
     reports::assertion_base_collection_t _m_assertions;
-    reports::opt_unexpected_report_t          _m_termination_report;
+    reports::opt_unexpected_report_t     _m_termination_report;
     reports::unexpected_non_terminating_report_collection_t _m_warnings;
 };
 
@@ -324,7 +297,7 @@ namespace
 __no_constexpr std::filesystem::path
                create_test_path(
                    const post_setup_test_data_t& _a_test_info,
-                   const test_options_t&         _a_options
+                   const std::filesystem::path& _a_root_path
                ) noexcept;
 } // namespace
 
@@ -350,13 +323,14 @@ __no_constexpr_imp
         const utility::seed_t&        _a_seed_seq,
         const post_setup_test_data_t& _a_post_setup_test_data,
         const size_t                  _a_order_ran_id,
-        const test_options_t&         _a_options
+        const std::filesystem::path& _a_root_path
     ) noexcept
     : _m_post_setup_test_data(_a_post_setup_test_data)
     , _m_for_loop_data_collection(ds::for_loop_stack_t())
     , _m_order_ran_id(_a_order_ran_id)
     , _m_this_tests_random_generator(_a_seed_seq)
-    , _m_path(create_test_path(_a_post_setup_test_data, _a_options))
+    , _m_path(create_test_path(_a_post_setup_test_data, _a_root_path))
+    , _m_test_status(enum_test_status_t::NO_TERMINATION_TEST_PASSED)
 {}
 
 __constexpr_imp const std::filesystem::path&
@@ -474,8 +448,7 @@ __constexpr_imp std::size_t
 template <bool Single_Source, typename Assertion_Status>
 __constexpr_imp void
     invoked_test_data_t::add_assertion(
-        reports::assertion_ptr_t<Single_Source, Assertion_Status>&
-            _a_ptr
+        reports::assertion_ptr_t<Single_Source, Assertion_Status>& _a_ptr
     )
 {
     using namespace reports;
@@ -498,8 +471,9 @@ __constexpr_imp void
     }
     else
     {
-        const reports::assertion_t<Single_Source, Assertion_Status>&
-            _l_ref{*_a_ptr};
+        const reports::assertion_t<Single_Source, Assertion_Status>& _l_ref{
+            *_a_ptr
+        };
         _m_total_number_assertions_recieved++;
         // Assertin recived, correct status (either pass or fail but no
         // terminations).
@@ -562,32 +536,6 @@ __constexpr_imp void
     }
 }
 
-__constexpr_imp void
-    invoked_test_data_t::add_warning(
-        reports::unexpected_non_terminating_report_ptr_t&& _a_warning
-    )
-{
-    using namespace reports;
-    if (terminated(_m_test_status))
-    {
-        // In the incorrect status; a termination has been thrown from this
-        // test, why is it still running?
-        throw errors::test_library_exception_t(fmt::format(
-            "add_warning function has been entered, however "
-            "should have already termianted. _m_test_status = {0}",
-            _m_test_status
-        ));
-    }
-    else if (_a_warning == nullptr)
-    {
-        throw errors::unaccounted_for_nullptr(_a_warning.get());
-    }
-    else
-    {
-        _m_warnings.push_back(std::move(_a_warning));
-    }
-}
-
 __constexpr_imp std::size_t
                 invoked_test_data_t::assertions_passed() const noexcept
 {
@@ -630,17 +578,25 @@ __constexpr_imp const reports::assertion_base_collection_t&
     return _m_assertions;
 }
 
+__constexpr_imp void
+    invoked_test_data_t::add_warning(
+        reports::unexpected_non_terminating_report_ptr_t&& _a_pstr
+    ) noexcept
+{
+    _m_warnings.push_back(std::move(_a_pstr));
+}
+
 namespace
 {
 __no_constexpr_imp std::filesystem::path
                    create_test_path(
                        const post_setup_test_data_t& _a_test_info,
-                       const test_options_t&         _a_options
+                       const std::filesystem::path& _a_root_path
                    ) noexcept
 {
     using namespace std::filesystem;
     using namespace utility;
-    path_t _l_path{_a_options._m_test_data_root_path};
+    path_t _l_path{ _a_root_path };
     for (const test_path_element_ref_t& _a_test_path_component :
          _a_test_info.test_path_hierarchy())
     {

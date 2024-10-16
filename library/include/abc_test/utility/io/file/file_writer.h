@@ -9,7 +9,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 		__no_constexpr
 			file_line_writer_t(
 				const file_name_with_extension_t& _a_file_name,
-				const test_options_t* _a_test_options
+				const test_options_base_t* _a_test_options
 			);
 		__constexpr
 			file_line_writer_t(
@@ -28,7 +28,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 		size_t _m_current_line_idx;
 		std::unique_ptr<std::ofstream> _m_file_handler;
 		file_name_with_extension_t _m_file_name;
-		const test_options_t* _m_test_options;
+		const test_options_base_t* _m_test_options;
 	};
 _END_ABC_UTILITY_IO_NS
 
@@ -36,7 +36,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 	__no_constexpr_imp
 		file_line_writer_t::file_line_writer_t(
 			const file_name_with_extension_t& _a_file_name,
-			const test_options_t* _a_test_options
+			const test_options_base_t* _a_test_options
 		) 
 		: _m_file_handler(std::unique_ptr<std::ofstream>(nullptr))
 		, _m_current_line_idx(0)
@@ -83,7 +83,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 		) noexcept
 	{
 		write_line(fmt::format("{0}{1}", 
-			_m_test_options == nullptr ? "" : _m_test_options->_m_comment_str, 
+			_m_test_options == nullptr ? "" : _m_test_options->comment_str, 
 			_a_str_to_write));
 	}
 	__no_constexpr_imp

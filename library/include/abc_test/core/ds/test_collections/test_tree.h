@@ -2,7 +2,7 @@
 
 #include "abc_test/core/ds/test_collections/test_tree_sentinel.h"
 #include "abc_test/core/ds/test_data/post_setup_test_data.h"
-#include "abc_test/core/test_options.h"
+#include "abc_test/core/options/test_options_base.h"
 
 #include <memory>
 #include <ranges>
@@ -63,18 +63,18 @@ public:
     /*!
      * @brief Adds a single test to the underlying tree.
      *
-     * A test_options_t object is used as it contains some information
+     * A test_options_base_t object is used as it contains some information
      * pertaining to logical inconsistencies.
      *
      * @param _a_test The test to be added to the tree.
-     * @param _a_options The test_options_t object used when checking for
+     * @param _a_options The test_options_base_t object used when checking for
      * errors.
      * @return An optional error; if there were any inconsistencies found when
      * adding the test, this object will contain a string description of them.
      * If not, it contains a nullopt.
      */
     __no_constexpr errors::opt_setup_error_t
-        add_test(const node_t& _a_test, const test_options_t& _a_options)
+        add_test(const node_t& _a_test, const test_options_base_t& _a_options)
             noexcept;
     /*!
      * @brief Returns an iterator to the beginning of the tree.
@@ -132,20 +132,35 @@ private:
             test_tree_ref_t             _a_tree_root,
             const test_path_hierarchy_t _a_path_hierarchy
         ) noexcept;
+    /*!
+     * @brief Static function which performs the insertion of a test.
+     * @param _a_test_tree The root of the test_tree_t to insert into.
+     * @param _a_test A pointer to the test being inserted.
+     * @param _a_test_ref A reference to the same test.
+     * @return opt_setup_error_t. Empty if there is no error, otherwise a text
+     * description of the error.
+     */
+    __no_constexpr friend errors::opt_setup_error_t
+        static_add_test(
+            std::reference_wrapper<test_tree_t> _a_test_tree,
+            const node_t&                       _a_test,
+            const ds::post_setup_test_data_t&   _a_test_ref
+        ) noexcept;
 };
+
 _END_ABC_DS_NS
 
 _BEGIN_ABC_DS_NS
 __no_constexpr_imp errors::opt_setup_error_t
                    test_tree_t::add_test(
         const node_t&         _a_test,
-        const test_options_t& _a_options
+        const test_options_base_t& _a_options
     ) noexcept
 {
     using namespace std;
     using namespace errors;
     const post_setup_test_data_t& _l_test{_a_test.get()};
-    if (_l_test.thread_resourses_required() > _a_options._m_threads)
+    if (_l_test.thread_resourses_required() > _a_options.threads)
     {
         return opt_setup_error_t(setup_error_t(
             fmt::format(
@@ -155,7 +170,7 @@ __no_constexpr_imp errors::opt_setup_error_t
                 "has {1} threads available. "
                 "post_setup_test_data_t = {2}",
                 _l_test.thread_resourses_required(),
-                _a_options._m_threads,
+                _a_options.threads,
                 _l_test
             ),
             false
@@ -163,61 +178,7 @@ __no_constexpr_imp errors::opt_setup_error_t
     }
     else
     {
-
-        // Find the node of the test hierarchy.
-        test_tree_ref_t   _l_node{find_or_create_test_node(
-            std::ref(*this), _l_test.test_path_hierarchy()
-        )};
-        const string_view _a_name{
-            _a_test.get().registered_test_data()._m_user_data.name
-        };
-        if (_l_node.get()._m_nodes_tests.size() == 0)
-        {
-            _l_node.get()._m_nodes_tests.push_back(_a_test);
-            return opt_setup_error_t();
-        }
-        else
-        {
-            // find the place to insert the test, using the name to order the tests.
-            ranges::subrange<flat_test_set::iterator> _l_name_range_itts{
-                ranges::equal_range(
-                    _l_node.get()._m_nodes_tests,
-                    _a_name,
-                    ranges::less{},
-                    [](const node_t& _a_ref)
-                    {
-                        return _a_ref.get()
-                            .registered_test_data()
-                            ._m_user_data.name;
-                    }
-                )
-            };
-            if (_l_name_range_itts.begin() != _l_name_range_itts.end())
-            {
-                // There is a range of equal elements. Can't add, gotta throw an
-                // error.
-                return opt_setup_error_t(setup_error_t(
-                    fmt::format(
-                        "setup_test_error: post_setup_test_data_t's "
-                        "registered_test_data has the same description as a "
-                        "current entry in the test_tree_t object. "
-                        "The post_setup_test_data object we are attempting to "
-                        "insert is {0}, "
-                        "while the post_setup_test_data_t object blocking its "
-                        "insertion is {1}. ",
-                        _a_test.get(),
-                        (_l_name_range_itts.begin()->get())
-                    ),
-                    false
-                ));
-            }
-            else
-            {
-                // No equal members, just insert at the end of the range.
-                _m_nodes_tests.insert(_l_name_range_itts.end(), _a_test);
-                return opt_setup_error_t();
-            }
-        }
+        return static_add_test(std::ref(*this), _a_test, _l_test);
     }
 }
 
@@ -285,6 +246,74 @@ __constexpr_imp test_tree_ref_t
         }
     }
     return _l_current_node_ref;
+}
+
+__no_constexpr_imp errors::opt_setup_error_t
+                   static_add_test(
+                       std::reference_wrapper<test_tree_t> _a_test_tree,
+                       const node_t&                       _a_test,
+                       const ds::post_setup_test_data_t&   _a_test_ref
+                   ) noexcept
+{
+    // Find the node of the test hierarchy.
+    using namespace std;
+    using namespace errors;
+    test_tree_ref_t   _l_node{find_or_create_test_node(
+        _a_test_tree, _a_test_ref.test_path_hierarchy()
+    )};
+    const string_view _a_name{
+        _a_test.get().registered_test_data()._m_user_data.name
+    };
+    if (_l_node.get()._m_nodes_tests.size() == 0)
+    {
+        _l_node.get()._m_nodes_tests.push_back(_a_test);
+        return opt_setup_error_t{};
+    }
+    else
+    {
+        // find the place to insert the test, using the name to order the
+        // tests.
+        ranges::subrange<flat_test_set::iterator> _l_name_range_itts{
+            ranges::equal_range(
+                _l_node.get()._m_nodes_tests,
+                _a_name,
+                ranges::less{},
+                [](const node_t& _a_ref)
+                {
+                    return _a_ref.get()
+                        .registered_test_data()
+                        ._m_user_data.name;
+                }
+            )
+        };
+        if (_l_name_range_itts.begin() != _l_name_range_itts.end())
+        {
+            // There is a range of equal elements. Can't add, gotta throw an
+            // error.
+            return opt_setup_error_t(setup_error_t(
+                fmt::format(
+                    "setup_test_error: post_setup_test_data_t's "
+                    "registered_test_data has the same description as a "
+                    "current entry in the test_tree_t object. "
+                    "The post_setup_test_data object we are attempting to "
+                    "insert is {0}, "
+                    "while the post_setup_test_data_t object blocking its "
+                    "insertion is {1}. ",
+                    _a_test.get(),
+                    (_l_name_range_itts.begin()->get())
+                ),
+                false
+            ));
+        }
+        else
+        {
+            // No equal members, just insert at the end of the range.
+            _l_node.get()._m_nodes_tests.insert(
+                _l_name_range_itts.end(), _a_test
+            );
+            return opt_setup_error_t{};
+        }
+    }
 }
 
 _END_ABC_DS_NS

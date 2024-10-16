@@ -20,21 +20,21 @@ using matcher_msg_t = std::string;
 * Type synonym for a reference to a matcher_msg, described above.
 */
 using matcher_msg_ref_t = std::string_view;
-struct generic_matcher_t
+struct matcher_base_t
 {
 public:
 	/*!
 	* Default constructor
 	*/
 	__constexpr
-		generic_matcher_t(
+		matcher_base_t(
 		) noexcept;
 	__constexpr
-		generic_matcher_t(
+		matcher_base_t(
 			const std::source_location& _a_source_location
 		) noexcept;
 	__constexpr
-		generic_matcher_t(
+		matcher_base_t(
 			const std::string_view _a_str_representation,
 			const std::source_location& _a_source_location
 		) noexcept;
@@ -87,7 +87,7 @@ private:
 			test_runner_t& _a_test_runner
 		) = 0;
 	__constexpr
-		generic_matcher_t(
+		matcher_base_t(
 			const std::optional<std::string>& _a_str_representation,
 			const std::optional<std::source_location>& _a_source_location
 		) noexcept;
@@ -96,7 +96,7 @@ _END_ABC_NS
 
 _BEGIN_ABC_NS
 __constexpr_imp
-	generic_matcher_t::generic_matcher_t(
+	matcher_base_t::matcher_base_t(
 	) noexcept
 	: _m_sources(std::vector<ds::single_source_t>())
 	//: generic_matcher_t(std::optional<std::string>(),
@@ -125,7 +125,7 @@ __constexpr_imp
 }*/
 __constexpr_imp
 	const matcher_result_t&
-	generic_matcher_t::run_test(
+	matcher_base_t::run_test(
 		test_runner_t& _a_test_runner
 	)
 {
@@ -137,7 +137,7 @@ __constexpr_imp
 }
 __constexpr_imp
 	const matcher_result_t&
-	generic_matcher_t::matcher_result(
+	matcher_base_t::matcher_result(
 	) const noexcept
 {
 	return _m_test_result;
@@ -153,7 +153,7 @@ __constexpr_imp
 }*/
 __constexpr_imp
 	void
-	generic_matcher_t::gather_map_source(
+	matcher_base_t::gather_map_source(
 		matcher_source_map_t& _a_matcher_source_map
 	) const noexcept
 {
@@ -165,7 +165,7 @@ __constexpr_imp
 }
 __constexpr_imp
 	void
-	generic_matcher_t::add_source_info(
+	matcher_base_t::add_source_info(
 		const ds::single_source_t& _a_source
 	) noexcept
 {

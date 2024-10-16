@@ -261,6 +261,7 @@ __constexpr_imp
 	}
 	else
 	{
+		const std::string _l_i = typeid(*_a_gur).name();
 		throw errors::test_library_exception_t(fmt::format(
 			"Could not find function to format item of abstract class {0}. ",
 			typeid(*_a_gur).name()

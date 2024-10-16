@@ -10,13 +10,16 @@ set(LIBRARY_FILES
   # The core subfolder; contains the core logic for how the library works.
   include/abc_test/core.h
   include/abc_test/core/test_main.h
-  include/abc_test/core/test_options.h
-  include/abc_test/core/test_order_enum.h
+  include/abc_test/core/options/test_options_base.h
+  include/abc_test/core/options/validated_test_options.h
   include/abc_test/core/test_runner.h
       src/abc_test/core/test_runner.cpp
-  include/abc_test/core/log_test_msg.h
-  include/abc_test/core/test_assertions.h
+  # Logging messages, associated with tests
+  include/abc_test/core/logging/macros.h 
+  include/abc_test/core/logging/log_msg.h
   include/abc_test/core/test_assertions/test_block.h
+  include/abc_test/core/test_assertions/macros.h
+  include/abc_test/core/test_assertions/functions.h
   # Subfolder contains objects and functions pertaining to how repetition data is stored.
   include/abc_test/core/ds/gen_data_memoization/for_loop_creation_data.h
   include/abc_test/core/ds/gen_data_memoization/for_loop_stack_trie.h
@@ -73,7 +76,6 @@ set(LIBRARY_FILES
   include/abc_test/core/test_reports/matcher_based_assertion.h
   # Matcher subfolder. Code contains logic for writing individual assertions.
   include/abc_test/matchers/matcher.h
-  include/abc_test/matchers/annotation.h
   include/abc_test/matchers/basic_matchers.h
   include/abc_test/matchers/generic_matcher.h
   include/abc_test/matchers/operator_based_matcher.h
@@ -172,6 +174,7 @@ set(LIBRARY_FILES
   include/abc_test/utility/str/rw_info.h
   # Global file
   include/abc_test/global.h
+      src/abc_test/global.cpp
   # Included instances
   # Text test reporter
   include/abc_test/included_instances/reporters/text_test_reporter.h
@@ -200,6 +203,7 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_thrown_exception.h
   # Error reporter
   include/abc_test/included_instances/reporters/text_error_reporter.h
+  include/abc_test/included_instances/test_assertions/macros.h
 )
 
 

@@ -7,7 +7,7 @@
 
 _BEGIN_ABC_NS
 using function_wrapper_internal_t = std::function<matcher_result_t()>;
-struct function_wrapper_matcher_t : public generic_matcher_t
+struct function_wrapper_matcher_t : public matcher_base_t
 {
 public:
 	__constexpr

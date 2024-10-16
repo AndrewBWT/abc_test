@@ -3,7 +3,7 @@
 #include "abc_test/core/ds/test_collections/test_collection.h"
 #include "abc_test/core/reporters/test_reporter.h"
 #include "abc_test/core/reporters/test_reporter_controller.h"
-#include "abc_test/core/test_options.h"
+#include "abc_test/core/options/validated_test_options.h"
 #include "abc_test/core/test_runner.h"
 #include "abc_test/global.h"
 #include "abc_test/included_instances/reporters/text_error_reporter.h"
@@ -23,95 +23,14 @@ _BEGIN_ABC_NS
 struct test_main_t
 {
 public:
+    __constexpr
+        test_main_t() = delete;
     /*!
      * Default constructor. This should be generally used.
      */
     __no_constexpr
-        test_main_t() noexcept;
-    /*!
-     * Sets the options of the object.
-     */
-    __no_constexpr void
-        set_options(const test_options_t& _a_options) noexcept;
-    /*!
-     * Simple function to add the global test list to the object.
-     * Essentially the same as called add_test_list(global_test_list())
-     */
-    __constexpr void
-        add_global_test_list() noexcept;
-    /*!
-     * Adds a test list using a shared pointer.
-     */
-    __constexpr void
-        add_test_list_owned_by_class(const ds::test_list_t* _a_test_list
-        ) noexcept;
-    /*!
-     * Adds a test list using a regular pointer. test_main_t does not take
-     * ownership of the pointer, and it is up to the user to deallocate memory
-     * (if applicable).
-     */
-    __constexpr void
-        add_test_list_not_owned_by_class(const ds::test_list_t* _a_test_list
-        ) noexcept;
-    /*!
-     * Adds a test list using a reference. test_main does not take ownership of
-     * any underlyilng pointer, or copy the data. The user must ensure that the
-     * reference stays alive for the lifetime of the test_main object.
-     */
-    __constexpr void
-        add_test_list_not_owned_by_class(const ds::test_list_t& _a_test_list
-        ) noexcept;
-    /*!
-     * Adds a test_reporter_t using a shared pointer.
-     */
-    __constexpr void
-        add_test_reporter_owned_by_class(
-            reporters::test_reporter_t* _a_test_reporter
-        ) noexcept;
-    /*!
-     * Adds a test_reporter_t using a regular pointer. test_main_t does not take
-     * ownership of the pointer, and it is up to the user to deallocate memory
-     * (if applicable).
-     */
-    __constexpr void
-        add_test_reporter_not_owned_by_class(
-            reporters::test_reporter_t* _a_test_reporter
-        ) noexcept;
-    /*!
-     * Adds a test_reporter_t using a reference. test_main does not take
-     * ownership of any underlyilng pointer, or copy the data. The user must
-     * ensure that the reference stays alive for the lifetime of the test_main
-     * object.
-     */
-    __constexpr void
-        add_test_reporter_not_owned_by_class(
-            reporters::test_reporter_t& _a_test_reporter
-        ) noexcept;
-    /*!
-     * Adds a error_reporter_t using a shared pointer.
-     */
-    __constexpr void
-        add_error_reporter_owned_by_class(
-            reporters::error_reporter_t* _a_error_reporter
-        ) noexcept;
-    /*!
-     * Adds a error_reporter_t using a regular pointer. test_main_t does not
-     * take ownership of the pointer, and it is up to the user to deallocate
-     * memory (if applicable).
-     */
-    __constexpr void
-        add_error_reporter_not_owned_by_class(
-            reporters::error_reporter_t* _a_error_reporter
-        ) noexcept;
-    /*!
-     * Adds a error_reporter_t using a reference. test_main does not take
-     * ownership of any underlyilng pointer, or copy the data. The user must
-     * ensure that the reference stays alive for the lifetime of the test_main
-     * object.
-     */
-    __constexpr void
-        add_error_reporter_not_owned_by_class(
-            reporters::error_reporter_t& _a_error_reporter
+        test_main_t(
+        const validated_test_options_t& _a_validated_test_options
         ) noexcept;
     /*!
      * Runs the test of the underlying object.
@@ -120,7 +39,7 @@ public:
         run_tests() noexcept;
 private:
     ds::test_lists_t                 _m_test_list_collection;
-    test_options_t                   _m_options;
+    test_options_base_t                   _m_options;
     reporters::test_reporters_t      _m_test_reporters;
     reporters::error_reporters_t     _m_error_reporters;
     std::mutex                       _m_mutex;
@@ -139,7 +58,7 @@ private:
             ds::test_set_data_t&              _a_test_set_data
         ) noexcept;
     __constexpr void
-        validate_reporters(const test_options_t& _a_test_options) noexcept;
+        validate_reporters(const test_options_base_t& _a_test_options) noexcept;
 };
 
 using tests_in_order_t = std::vector<int>;
@@ -147,9 +66,9 @@ _END_ABC_NS
 
 _BEGIN_ABC_NS
 __no_constexpr_imp
-    test_main_t::test_main_t() noexcept
+    test_main_t::test_main_t(const validated_test_options_t& _a_validated_test_options) noexcept
     : _m_test_list_collection(ds::test_lists_t())
-    , _m_options(test_options_t())
+    , _m_options(_a_validated_test_options.get_options())
     , _m_test_reporters(reporters::test_reporters_t())
     , _m_error_reporters(reporters::error_reporters_t())
     , _m_mutex(std::mutex())
@@ -160,106 +79,12 @@ __no_constexpr_imp
     , _m_threads_mutex(std::mutex())
     , _m_threads(std::vector<std::jthread>(std::thread::hardware_concurrency()))
     , _m_threads_free(std::set<std::size_t>())
+    , _m_test_set_data(std::vector<ds::test_set_data_t >(std::thread::hardware_concurrency()))
 {
     for (size_t _l_idx{0}; _l_idx < _m_current_thread_pool; _l_idx++)
     {
         _m_threads_free.insert(_l_idx);
     }
-}
-
-__no_constexpr_imp void
-    test_main_t::set_options(
-        const test_options_t& _a_options
-    ) noexcept
-{
-    using namespace std;
-    _m_options = _a_options;
-}
-
-__constexpr_imp void
-    test_main_t::add_global_test_list() noexcept
-{
-    add_test_list_not_owned_by_class(global::get_global_test_list());
-}
-
-__constexpr_imp void
-    test_main_t::add_test_list_owned_by_class(
-        const ds::test_list_t* _a_test_list
-    ) noexcept
-{
-    using namespace std;
-    using namespace ds;
-    _m_test_list_collection.push_back(shared_ptr<const test_list_t>(_a_test_list
-    ));
-}
-
-__constexpr_imp void
-    test_main_t::add_test_list_not_owned_by_class(
-        const ds::test_list_t* _a_test_list
-    ) noexcept
-{
-    _m_test_list_collection.push_back(_a_test_list);
-}
-
-__constexpr_imp void
-    test_main_t::add_test_list_not_owned_by_class(
-        const ds::test_list_t& _a_test_list
-    ) noexcept
-{
-    add_test_list_not_owned_by_class(&_a_test_list);
-}
-
-__constexpr_imp void
-    test_main_t::add_test_reporter_owned_by_class(
-        reporters::test_reporter_t* _a_test_reporter
-    ) noexcept
-{
-    using namespace std;
-    using namespace reporters;
-    _m_test_reporters.push_back(shared_ptr<test_reporter_t>(_a_test_reporter));
-}
-
-__constexpr_imp void
-    test_main_t::add_test_reporter_not_owned_by_class(
-        reporters::test_reporter_t* _a_test_reporter
-    ) noexcept
-{
-    _m_test_reporters.push_back(_a_test_reporter);
-}
-
-__constexpr_imp void
-    test_main_t::add_test_reporter_not_owned_by_class(
-        reporters::test_reporter_t& _a_test_reporter
-    ) noexcept
-{
-    add_test_reporter_not_owned_by_class(&_a_test_reporter);
-}
-
-__constexpr_imp void
-    test_main_t::add_error_reporter_owned_by_class(
-        reporters::error_reporter_t* _a_error_reporter
-    ) noexcept
-{
-    using namespace std;
-    using namespace reporters;
-    _m_error_reporters.push_back(shared_ptr<error_reporter_t>(_a_error_reporter)
-    );
-}
-
-__constexpr_imp void
-    test_main_t::add_error_reporter_not_owned_by_class(
-        reporters::error_reporter_t* _a_error_reporter
-    ) noexcept
-{
-    _m_error_reporters.push_back(_a_error_reporter);
-}
-
-__constexpr_imp void
-    test_main_t::add_error_reporter_not_owned_by_class(
-        reporters::error_reporter_t& _a_error_reporter
-    ) noexcept
-{
-    add_error_reporter_not_owned_by_class(&_a_error_reporter);
 }
 
 __no_constexpr_imp void
@@ -270,10 +95,10 @@ __no_constexpr_imp void
     using namespace reporters;
     using enum utility::internal::internal_log_enum_t;
     // Setup of data before running
-    _m_thread_pool = (_m_options._m_threads > thread::hardware_concurrency()
-                      || _m_options._m_threads == 0)
+    _m_thread_pool = (_m_options.threads > thread::hardware_concurrency()
+                      || _m_options.threads == 0)
                          ? thread::hardware_concurrency()
-                         : _m_options._m_threads;
+                         : _m_options.threads;
     _LIBRARY_LOG(
         MAIN_INFO,
         fmt::format(
@@ -281,30 +106,27 @@ __no_constexpr_imp void
             "_m_options._m_threads = {1} and "
             "thread::hardware_concurrency() = {2}",
             _m_thread_pool,
-            _m_options._m_threads,
+            _m_options.threads,
             thread::hardware_concurrency()
         )
     );
-    _LIBRARY_LOG(MAIN_INFO, "Setting global variables.");
-    test_options_t& _l_global_test_options{
-        global::setup_global_variables(_m_options)
-    };
+    _LIBRARY_LOG(MAIN_INFO, "Setting up global error reporters");
+
     error_reporter_controller_t& _l_erc{
         global::get_global_error_reporter_controller()
     };
-    test_reporter_controller_t& _l_global_trc{
-        global::get_global_test_reporter_controller()
-    };
     _LIBRARY_LOG(MAIN_INFO, "Validating reporters.");
-    validate_reporters(_l_global_test_options);
+    validate_reporters(_m_options);
     _l_erc.add_reporters(_m_error_reporters);
     _LIBRARY_LOG(MAIN_INFO, "Validating test_options_t.");
-    _l_global_test_options.validate_input(_l_erc);
+   // _m_options.validate_input(_l_erc);
     if (_l_erc.soft_exit())
     {
         _LIBRARY_LOG(MAIN_INFO, "Exiting due to invalid test_options_t.");
         return;
     }
+    global::setup_global_variables(_m_options);
+    const test_options_base_t& _l_global_test_options{ global::get_global_test_options() };
     test_collection_t _l_tc(_l_global_test_options, _l_erc);
     _LIBRARY_LOG(MAIN_INFO, "Adding tests to test_collection_t.");
     _l_tc.add_tests(_m_test_list_collection);
@@ -321,6 +143,9 @@ __no_constexpr_imp void
     };
     post_setup_test_list_itt_t       _l_pstd_itt{_l_pstd.begin()};
     const post_setup_test_list_itt_t _l_pstd_end{_l_pstd.end()};
+    test_reporter_controller_t& _l_global_trc{
+    global::get_global_test_reporter_controller()
+    };
     _l_global_trc.add_reporters(_m_test_reporters);
     // The actual logic for running the threads
     _LIBRARY_LOG(MAIN_INFO, "Beginning loop going through all tests.");
@@ -452,14 +277,14 @@ __no_constexpr_imp void
 
 __constexpr_imp void
     test_main_t::validate_reporters(
-        const test_options_t& _a_test_options
+        const test_options_base_t& _a_test_options
     ) noexcept
 {
     using namespace std;
     using namespace reporters;
     if (_m_test_reporters.size() == 0)
     {
-        if (_a_test_options._m_allow_empty_test_reporters_to_be_used)
+       // if (_a_test_options._m_allow_empty_test_reporters_to_be_used)
         {
             cout << "WARNING: No test reporters have been registered to the "
                     "test_main_t object. "
@@ -471,7 +296,7 @@ __constexpr_imp void
                     "\"_m_allow_empty_test_reporters_to_be_used\" to false."
                  << endl;
         }
-        else
+     //   else
         {
             cout << "WARNING: No test reporters have been registered to the "
                     "test_main_t object. "
@@ -489,7 +314,7 @@ __constexpr_imp void
     }
     if (_m_error_reporters.size() == 0)
     {
-        if (_a_test_options._m_allow_empty_error_reporters_to_be_used)
+      //  if (_a_test_options._m_allow_empty_error_reporters_to_be_used)
         {
             cout << "WARNING: No error reporters have been registered to the "
                     "test_main_t object. "
@@ -501,7 +326,7 @@ __constexpr_imp void
                     "\"_m_allow_empty_error_reporters_to_be_used\" to false."
                  << endl;
         }
-        else
+      //  else
         {
             cout << "WARNING: No error reporters have been registered to the "
                     "test_main_t object. "

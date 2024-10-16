@@ -31,7 +31,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 			file_rw_t(
 				const file_rw_info_t<T>& _a_tfrwi,
 				const std::string_view _a_extension,
-				const test_options_t* _a_test_options,
+				const test_options_base_t* _a_test_options,
 				R&& _a_elements = {}
 			);
 		/*template<
@@ -86,7 +86,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 		file_line_reader_t _m_reader;
 		file_line_writer_t _m_writer;
 		std::size_t _m_elements_read;
-		const test_options_t* _m_options;
+		const test_options_base_t* _m_options;
 		__constexpr
 			void
 			setup_writer(
@@ -113,7 +113,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 		file_rw_t<T>::file_rw_t(
 			const file_rw_info_t<T>& _a_tfrwi,
 			const std::string_view _a_extension,
-			const test_options_t* _a_test_options,
+			const test_options_base_t* _a_test_options,
 			R&& _a_elements
 		)
 		: _m_fnwe(file_name_with_extension_t(

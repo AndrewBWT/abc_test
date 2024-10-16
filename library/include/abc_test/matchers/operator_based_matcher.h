@@ -4,7 +4,7 @@
 
 _BEGIN_ABC_NS
 using precedence_t = std::size_t;
-struct operator_based_matcher_t : public generic_matcher_t
+struct operator_based_matcher_t : public matcher_base_t
 {
 public:
 	__constexpr
