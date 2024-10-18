@@ -23,7 +23,6 @@ public:
 	__constexpr
 		bool
 		has_current_element(
-			const std::size_t _a_mode
 		) const noexcept;
 	__constexpr
 		const T&
@@ -35,10 +34,10 @@ public:
 			const std::size_t _a_mode
 		) noexcept;
 	__constexpr
-		std::optional<ds::for_loop_creation_data_t>
+		std::optional<ds::idgc_memoized_element_t>
 		log_failure_and_return_rep_data(
 			bool& _a_has_current_element_been_written_to_file,
-			const ds::for_loop_creation_data_t& _a_rep_data
+			const ds::idgc_memoized_element_t& _a_rep_data
 		) noexcept;
 	__constexpr
 		std::size_t
@@ -77,7 +76,6 @@ template<
 __constexpr_imp
 	bool
 	opt_file_rw_t<T, Mode>::has_current_element(
-		const std::size_t _a_mode
 	) const noexcept
 {
 	return (
@@ -132,10 +130,10 @@ template<
 	std::size_t Mode
 >
 __constexpr_imp
-std::optional<ds::for_loop_creation_data_t>
+std::optional<ds::idgc_memoized_element_t>
 	opt_file_rw_t<T, Mode>::log_failure_and_return_rep_data(
 		bool& _a_has_current_element_been_written_to_file,
-		const ds::for_loop_creation_data_t& _a_rep_data
+		const ds::idgc_memoized_element_t& _a_rep_data
 	) noexcept
 {
 	using namespace ds;
@@ -152,7 +150,7 @@ std::optional<ds::for_loop_creation_data_t>
 			}
 		}
 	}
-	return optional<for_loop_creation_data_t>{};
+	return optional<idgc_memoized_element_t>{};
 }
 template<
 	typename T,

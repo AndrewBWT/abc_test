@@ -1,11 +1,11 @@
 #pragma once
 
 #include "abc_test/core/ds/test_collections/test_collection.h"
+#include "abc_test/core/options/validated_test_options.h"
 #include "abc_test/core/reporters/test_reporter.h"
 #include "abc_test/core/reporters/test_reporter_controller.h"
-#include "abc_test/core/options/validated_test_options.h"
 #include "abc_test/core/test_runner.h"
-#include "abc_test/global.h"
+#include "abc_test/core/global.h"
 #include "abc_test/included_instances/reporters/text_error_reporter.h"
 #include "abc_test/included_instances/reporters/text_test_reporter.h"
 
@@ -17,29 +17,35 @@
 _BEGIN_ABC_NS
 
 /*!
- * The main runner. This object holds the majority of logic concerning the
- * ordering of things within the system.
+ * @brief This class controls the core logic of the test suite.
  */
 struct test_main_t
 {
 public:
     __constexpr
-        test_main_t() = delete;
+    test_main_t()
+        = delete;
     /*!
-     * Default constructor. This should be generally used.
+     * @brief Constructor
+     * @param _a_validated_test_options The validated test options used for
+     * running the tests.
      */
     __no_constexpr
-        test_main_t(
-        const validated_test_options_t& _a_validated_test_options
+        test_main_t(const validated_test_options_t& _a_validated_test_options
         ) noexcept;
     /*!
-     * Runs the test of the underlying object.
+     * @brief This function runs the tests.
+     *
+     * We would not recomend running other code in a multi-threaded enviornment
+     * which accesses the global variables described in global.h. This class
+     * assumes it is the only entity (as well as those threads it spawns) which
+     * can access those variables.
      */
     __no_constexpr void
         run_tests() noexcept;
 private:
     ds::test_lists_t                 _m_test_list_collection;
-    test_options_base_t                   _m_options;
+    test_options_base_t              _m_options;
     reporters::test_reporters_t      _m_test_reporters;
     reporters::error_reporters_t     _m_error_reporters;
     std::mutex                       _m_mutex;
@@ -51,41 +57,69 @@ private:
     std::vector<std::jthread>        _m_threads;
     std::vector<ds::test_set_data_t> _m_test_set_data;
     std::set<std::size_t>            _m_threads_free;
+    /*!
+     * @brief Inner constructor. Protected so it can't be used outside of this class.
+     * @param _a_test_opts The test_options_base_t object.
+     */
+    __no_constexpr
+        test_main_t(const test_options_base_t& _a_test_opts) noexcept;
+    /*!
+     * @brief Runs an individual test in an individual thread.
+     * @param _a_prtd The post_setup_test_data_t to run.
+     * @param _a_thread_idx The thread index.
+     * @param _a_test_set_data The test_set_data_t element to write data to.
+     */
     __no_constexpr void
-        run_individual_thread(
+        run_individual_test(
             const ds::post_setup_test_data_t& _a_prtd,
             const size_t                      _a_thread_idx,
             ds::test_set_data_t&              _a_test_set_data
         ) noexcept;
-    __constexpr void
-        validate_reporters(const test_options_base_t& _a_test_options) noexcept;
 };
 
-using tests_in_order_t = std::vector<int>;
+namespace
+{
+__constexpr ds::test_lists_t
+            make_test_list_collection(
+                const std::vector<std::shared_ptr<ds::test_list_t>>&
+                           _a_ptrs_of_test_list,
+                const bool _a_use_global_test_list
+            ) noexcept;
+template <typename T>
+__constexpr std::vector<std::reference_wrapper<const T>>
+    make_ref_collection(std::vector<std::shared_ptr<T>> _a_ptrs) noexcept;
+template <typename T>
+__constexpr std::set<T>
+            set_from_min_to_n(const T _a_max) noexcept;
+} // namespace
+
 _END_ABC_NS
 
 _BEGIN_ABC_NS
 __no_constexpr_imp
-    test_main_t::test_main_t(const validated_test_options_t& _a_validated_test_options) noexcept
-    : _m_test_list_collection(ds::test_lists_t())
-    , _m_options(_a_validated_test_options.get_options())
-    , _m_test_reporters(reporters::test_reporters_t())
-    , _m_error_reporters(reporters::error_reporters_t())
-    , _m_mutex(std::mutex())
-    , _m_thread_pool(0)
-    , _m_thread_pool_mutex(std::mutex())
-    , _m_cv(std::condition_variable())
-    , _m_current_thread_pool(std::thread::hardware_concurrency())
-    , _m_threads_mutex(std::mutex())
-    , _m_threads(std::vector<std::jthread>(std::thread::hardware_concurrency()))
-    , _m_threads_free(std::set<std::size_t>())
-    , _m_test_set_data(std::vector<ds::test_set_data_t >(std::thread::hardware_concurrency()))
-{
-    for (size_t _l_idx{0}; _l_idx < _m_current_thread_pool; _l_idx++)
-    {
-        _m_threads_free.insert(_l_idx);
-    }
-}
+    test_main_t::test_main_t(
+        const validated_test_options_t& _a_validated_test_options
+    ) noexcept
+    : test_main_t(_a_validated_test_options.get_options())
+{}
+
+__no_constexpr_imp
+    test_main_t::test_main_t(
+        const test_options_base_t& _a_to
+    ) noexcept
+    : _m_test_list_collection(make_test_list_collection(
+          _a_to.test_lists,
+          _a_to.use_global_test_list
+      ))
+    , _m_options(_a_to)
+    , _m_test_reporters(make_ref_collection(_a_to.test_reporters))
+    , _m_error_reporters(make_ref_collection(_a_to.error_reporters))
+    , _m_thread_pool(_a_to.threads)
+    , _m_current_thread_pool(_a_to.threads)
+    , _m_threads(std::vector<std::jthread>(_a_to.threads))
+    , _m_threads_free(set_from_min_to_n(_a_to.threads))
+    , _m_test_set_data(std::vector<ds::test_set_data_t>(_a_to.threads))
+{}
 
 __no_constexpr_imp void
     test_main_t::run_tests() noexcept
@@ -94,61 +128,47 @@ __no_constexpr_imp void
     using namespace ds;
     using namespace reporters;
     using enum utility::internal::internal_log_enum_t;
-    // Setup of data before running
-    _m_thread_pool = (_m_options.threads > thread::hardware_concurrency()
-                      || _m_options.threads == 0)
-                         ? thread::hardware_concurrency()
-                         : _m_options.threads;
     _LIBRARY_LOG(
-        MAIN_INFO,
-        fmt::format(
-            "_m_thread_pool = {0}. Due to "
-            "_m_options._m_threads = {1} and "
-            "thread::hardware_concurrency() = {2}",
-            _m_thread_pool,
-            _m_options.threads,
-            thread::hardware_concurrency()
-        )
+        MAIN_INFO, "run_tests() beginning.\nSetting up global test options..."
     );
-    _LIBRARY_LOG(MAIN_INFO, "Setting up global error reporters");
 
+    const test_options_base_t& _l_global_test_options{
+        global::get_global_test_options()
+    };
+    global::setup_global_variables(_m_options);
+
+    _LIBRARY_LOG(MAIN_INFO, "Setting up global error reporter controller...");
     error_reporter_controller_t& _l_erc{
         global::get_global_error_reporter_controller()
     };
-    _LIBRARY_LOG(MAIN_INFO, "Validating reporters.");
-    validate_reporters(_m_options);
     _l_erc.add_reporters(_m_error_reporters);
-    _LIBRARY_LOG(MAIN_INFO, "Validating test_options_t.");
-   // _m_options.validate_input(_l_erc);
-    if (_l_erc.soft_exit())
-    {
-        _LIBRARY_LOG(MAIN_INFO, "Exiting due to invalid test_options_t.");
-        return;
-    }
-    global::setup_global_variables(_m_options);
-    const test_options_base_t& _l_global_test_options{ global::get_global_test_options() };
+
+    _LIBRARY_LOG(MAIN_INFO, "Setting up global test reporter controller...");
+    test_reporter_controller_t& _l_trc{
+        global::get_global_test_reporter_controller()
+    };
+    _l_trc.add_reporters(_m_test_reporters);
+
+    _LIBRARY_LOG(MAIN_INFO, "Adding test sets to local test_collection_t...");
     test_collection_t _l_tc(_l_global_test_options, _l_erc);
-    _LIBRARY_LOG(MAIN_INFO, "Adding tests to test_collection_t.");
     _l_tc.add_tests(_m_test_list_collection);
     if (_l_erc.soft_exit())
     {
-        _LIBRARY_LOG(MAIN_INFO, "Exiting due to error when adding tests.");
+        _LIBRARY_LOG(
+            MAIN_INFO,
+            "Exiting due to error when adding tests to test_collection_t"
+            "object."
+        );
         return;
     }
-    _LIBRARY_LOG(
-        MAIN_INFO, "Running make_finalied_post_setup_test_list_in_run_order"
-    );
+    _LIBRARY_LOG(MAIN_INFO, "Getting final set of tests in execution order");
     const post_setup_test_list_t _l_pstd{
         _l_tc.make_finalied_post_setup_test_list_in_run_order()
     };
     post_setup_test_list_itt_t       _l_pstd_itt{_l_pstd.begin()};
     const post_setup_test_list_itt_t _l_pstd_end{_l_pstd.end()};
-    test_reporter_controller_t& _l_global_trc{
-    global::get_global_test_reporter_controller()
-    };
-    _l_global_trc.add_reporters(_m_test_reporters);
-    // The actual logic for running the threads
-    _LIBRARY_LOG(MAIN_INFO, "Beginning loop going through all tests.");
+
+    _LIBRARY_LOG(MAIN_INFO, "Beginning running of tests...");
     while (_l_pstd_itt != _l_pstd_end && _l_erc.should_exit() == false)
     {
         // Get the current element in the list.
@@ -178,17 +198,21 @@ __no_constexpr_imp void
                 }
             );
         }
+        // Check we actually have the resourses... should we lock it here before
+        // doing this?
         if (_l_erc.should_exit() == false && _m_threads_free.size() > 0)
         {
-            // Otherwise, get a lock for the threads, remove the resousrses...
+            // Otherwise, get a lock for the threads, remove the
+            // resousrses...
             unique_lock  _l_thread_lock(_m_threads_mutex);
             const size_t _l_thread_idx{*_m_threads_free.begin()};
             _m_threads_free.erase(_l_thread_idx);
+            _m_current_thread_pool -= _l_test.thread_resourses_required();
             _l_thread_lock.unlock();
             // Then run the thread
             _LIBRARY_LOG(MAIN_INFO, "Starting new thread to run test.");
             _m_threads[_l_thread_idx] = jthread(
-                &test_main_t::run_individual_thread,
+                &test_main_t::run_individual_test,
                 this,
                 _l_test,
                 _l_thread_idx,
@@ -216,9 +240,11 @@ __no_constexpr_imp void
     {
         _LIBRARY_LOG(MAIN_INFO, "Catastrophic error found when running tests.");
         _l_erc.report_information(fmt::format(
-            "One (or more) of thre tests reported a catastrophic error which "
+            "One (or more) of thre tests reported a catastrophic error "
+            "which "
             "could not be recovered from. "
-            "The entire testing harness was terminated. There were {0} tests "
+            "The entire testing harness was terminated. There were {0} "
+            "tests "
             "which were not run at all, and "
             "{1} terminated due to catastrophic error(s). "
             "We would highly suggest either checking your program, or "
@@ -230,11 +256,11 @@ __no_constexpr_imp void
     }
     _LIBRARY_LOG(MAIN_INFO, "Finalising reports.");
     ds::test_set_data_t _l_final_report(_m_test_set_data);
-    _l_global_trc.finalise_reports(_l_final_report);
+    _l_trc.finalise_reports(_l_final_report);
 }
 
 __no_constexpr_imp void
-    test_main_t::run_individual_thread(
+    test_main_t::run_individual_test(
         const ds::post_setup_test_data_t& _a_prtd,
         const size_t                      _a_thread_idx,
         ds::test_set_data_t&              _a_test_set_data
@@ -243,17 +269,16 @@ __no_constexpr_imp void
     using namespace std;
     using namespace errors;
     using enum utility::internal::internal_log_enum_t;
-    unique_lock _l_thread_pool_lock(_m_thread_pool_mutex);
-    _LIBRARY_LOG(MAIN_INFO, "Updating thread pool.");
-    _m_current_thread_pool -= _a_prtd.thread_resourses_required();
-    _l_thread_pool_lock.unlock();
+    //Get the thread runner
     test_runner_t& _l_threads_runner{global::get_this_threads_test_runner_ref()
     };
+    //run in try
     try
     {
         _LIBRARY_LOG(MAIN_INFO, "Running test.");
         _l_threads_runner.run_test(_a_prtd);
     }
+    //Catch if its a library error.
     catch (test_library_exception_t& _l_the)
     {
         _LIBRARY_LOG(MAIN_INFO, "Exception encountered when running test.");
@@ -264,84 +289,79 @@ __no_constexpr_imp void
             setup_error_t(_l_the.error(), true, _l_the.stacktrace())
         );
     }
+    catch (...)
+    {
+        _LIBRARY_LOG(MAIN_INFO, "Unknown exception caught when running test.");
+        reporters::error_reporter_controller_t& _l_erc{
+            global::get_global_error_reporter_controller()
+        };
+        _l_erc.report_error(
+            setup_error_t("Unknown exception thrown from test_runner_t.", true)
+        );
+    }
     _LIBRARY_LOG(MAIN_INFO, "Test finished.");
-    unique_lock _l_thread_lock(_m_threads_mutex);
     _LIBRARY_LOG(MAIN_INFO, "Freeing thread resourses.");
+    unique_lock _l_thread_lock(_m_threads_mutex);
     _m_threads_free.insert(_a_thread_idx);
-    _l_thread_pool_lock.lock();
+    unique_lock _l_thread_pool_lock(_m_thread_pool_mutex);
     _m_current_thread_pool += _a_prtd.thread_resourses_required();
     _m_cv.notify_one();
     _a_test_set_data.process_invoked_test(_l_threads_runner.current_test());
     return;
 }
 
-__constexpr_imp void
-    test_main_t::validate_reporters(
-        const test_options_base_t& _a_test_options
-    ) noexcept
+namespace
+{
+__constexpr_imp ds::test_lists_t
+                make_test_list_collection(
+                    const std::vector<std::shared_ptr<ds::test_list_t>>&
+                               _a_ptrs_of_test_list,
+                    const bool _a_use_global_test_list
+                ) noexcept
+{
+    using namespace ds;
+    using namespace std;
+    test_lists_t _l_rv{};
+    if (_a_use_global_test_list)
+    {
+        _l_rv.push_back(std::ref(global::get_global_test_list()));
+    }
+    for (const shared_ptr<test_list_t>& _l_ptr : _a_ptrs_of_test_list)
+    {
+        _l_rv.push_back(std::ref(*_l_ptr));
+    }
+    return _l_rv;
+}
+
+template <typename T>
+__constexpr_imp std::vector<std::reference_wrapper<const T>>
+                make_ref_collection(
+                    std::vector<std::shared_ptr<T>> _a_ptrs
+                ) noexcept
 {
     using namespace std;
-    using namespace reporters;
-    if (_m_test_reporters.size() == 0)
+    std::vector<std::reference_wrapper<const T>> _l_rv{};
+    for (const shared_ptr<T>& _l_ptr : _a_ptrs)
     {
-       // if (_a_test_options._m_allow_empty_test_reporters_to_be_used)
-        {
-            cout << "WARNING: No test reporters have been registered to the "
-                    "test_main_t object. "
-                    "The test suite will be ran, however no results of any "
-                    "kind will be reported. "
-                    "If this circumstance is encountered again, and you wish "
-                    "for a simple console test reporter "
-                    "to be added, in the associated test_options_t object, set "
-                    "\"_m_allow_empty_test_reporters_to_be_used\" to false."
-                 << endl;
-        }
-     //   else
-        {
-            cout << "WARNING: No test reporters have been registered to the "
-                    "test_main_t object. "
-                    "A basic console output test reporter will be added, as we "
-                    "assume this is in error. "
-                    "If you wish to run the test_main_t object without any "
-                    "test reporters, in the associated "
-                    "test_options_t object, set "
-                    "\"_m_allow_empty_test_reporters_to_be_used\" to true."
-                 << endl;
-            _m_test_reporters.push_back(
-                shared_ptr<test_reporter_t>(new text_test_reporter_t())
-            );
-        }
+        _l_rv.push_back(std::ref(*_l_ptr));
     }
-    if (_m_error_reporters.size() == 0)
-    {
-      //  if (_a_test_options._m_allow_empty_error_reporters_to_be_used)
-        {
-            cout << "WARNING: No error reporters have been registered to the "
-                    "test_main_t object. "
-                    "The test suite will be ran, however no internal logic "
-                    "errors will be reported. "
-                    "If this circumstance is encountered again, and you wish "
-                    "for a simple console error reporter "
-                    "to be added, in the associated test_options_t object, set "
-                    "\"_m_allow_empty_error_reporters_to_be_used\" to false."
-                 << endl;
-        }
-      //  else
-        {
-            cout << "WARNING: No error reporters have been registered to the "
-                    "test_main_t object. "
-                    "A basic console output error reporter will be added, as "
-                    "we assume this is in error. "
-                    "If you wish to run the test_main_t object without any "
-                    "error reporters, in the associated "
-                    "test_options_t object, set "
-                    "\"_m_allow_empty_error_reporters_to_be_used\" to true."
-                 << endl;
-            _m_error_reporters.push_back(
-                shared_ptr<error_reporter_t>(new text_error_reporter_t())
-            );
-        }
-    }
+    return _l_rv;
 }
+
+template <typename T>
+__constexpr_imp std::set<T>
+                set_from_min_to_n(
+                    const T _a_max
+                ) noexcept
+{
+    using namespace std;
+    set<T> _l_set{};
+    for (T _l_idx{numeric_limits<T>::min()}; _l_idx < _a_max; ++_l_idx)
+    {
+        _l_set.insert(_l_idx);
+    }
+    return _l_set;
+}
+} // namespace
 
 _END_ABC_NS

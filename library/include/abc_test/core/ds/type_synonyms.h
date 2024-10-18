@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/core/ds/gen_data_memoization/for_loop_creation_data.h"
+#include "abc_test/core/ds/data_generator_memoization/indexed_data_generator_collection_memoized_element.h"
 #include "abc_test/utility/internal/macros.h"
 #include "abc_test/utility/ptr_utility.h"
 
@@ -44,7 +44,7 @@ using test_list_t             = std::list<test_list_element_t>;
  * @brief A type synonym for a list of test lists.
  */
 using test_lists_t
-    = std::vector<utility::const_shared_and_raw_ptr<test_list_t>>;
+    = std::vector<std::reference_wrapper<const test_list_t>>;
 /*!
  * @brief The type synonym for the unique id type.
  */
@@ -71,4 +71,8 @@ _END_ABC_DS_NS
 _BEGIN_ABC_NS
 struct test_options_base_t;
 struct validated_test_options_t;
+struct log_msg_t;
+using log_msg_ref_t = std::reference_wrapper<const log_msg_t>;
+using log_msg_ptrs_t = std::list<log_msg_ref_t>;
+using log_msg_itt_t = log_msg_ptrs_t::iterator;
 _END_ABC_NS

@@ -55,7 +55,7 @@ _BEGIN_ABC_NS
 	private:
 		std::size_t _m_idx;
 		bool _m_should_idx_be_ran;
-		ds::for_loop_creation_data_t _m_repetition_data;
+		ds::idgc_memoized_element_t _m_repetition_data;
 	};
 _END_ABC_NS
 
@@ -65,7 +65,7 @@ _BEGIN_ABC_NS
 		) noexcept
 		: _m_idx{ 0 }
 		, _m_should_idx_be_ran{ false }
-		, _m_repetition_data(ds::for_loop_creation_data_t(0,0,0,std::to_string(0)))
+		, _m_repetition_data(ds::idgc_memoized_element_t(0,0,0,std::to_string(0)))
 	{
 		using namespace global;
 		using namespace ds;

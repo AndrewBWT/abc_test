@@ -2,7 +2,7 @@
 #include "abc_test/core/errors/test_library_exception.h"
 #include "abc_test/matchers/logic/logic_matcher.h"
 #include "abc_test/matchers/basic_matchers.h"
-#include "abc_test/global.h"
+#include "abc_test/core/global.h"
 
 _BEGIN_ABC_NS
 using matcher_base_ptr_t = std::shared_ptr<matcher_base_t>;
@@ -21,6 +21,9 @@ public:
 			const matcher_wrapper_t<false>& _a_matcher,
 			const std::string_view _a_annotation
 		) noexcept
+		: _m_matcher_internal(_a_matcher.internal_matcher())
+		, _m_initialised_with_source(_a_matcher._m_initialised_with_source)
+		, _m_annotation(_a_annotation)
 	{
 
 	}
@@ -120,6 +123,7 @@ public:
 		operator||(
 			const matcher_wrapper_t& _a_matcher
 			) const noexcept;
+	friend matcher_wrapper_t<not Has_Annotation>;
 private:
 	matcher_base_ptr_t _m_matcher_internal;
 	bool _m_initialised_with_source;

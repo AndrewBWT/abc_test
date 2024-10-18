@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/core/ds/gen_data_memoization/for_loop_stack.h"
+#include "abc_test/core/ds/data_generator_memoization/typeless_data_generator_collection_stack.h"
 #include "abc_test/core/ds/test_data/enum_test_status.h"
 #include "abc_test/core/ds/test_data/post_setup_test_data.h"
 #include "abc_test/core/test_reports/assertion.h"
@@ -81,7 +81,7 @@ public:
      *
      * @return A cref to the invoked_test_data_t's for_loop_stack_t object.
      */
-    __constexpr const ds::for_loop_stack_t&
+    __constexpr const ds::tdg_collection_stack_t&
                       for_loop_data_collection() const noexcept;
     /*!
      * @brief Decrements the invoked_test_data_t for_loop_stack_t member
@@ -95,7 +95,7 @@ public:
      * for_loop_stack_t variable.
      */
     __no_constexpr void
-        update_for_loop_stack(gdc_itt_agnostic_data_ref_t _a_ptr) noexcept;
+        update_for_loop_stack(tdg_collection_itt_ref_t _a_ptr) noexcept;
     /*!
      * @brief Increments the invoked_test_data_t's for_loop_stack_t member
      * variable.
@@ -103,7 +103,7 @@ public:
      * for_loop_stack_t variable.
      */
     __no_constexpr void
-        increment_for_loop_stack(gdc_itt_agnostic_data_ref_t _a_pstr) noexcept;
+        increment_for_loop_stack(tdg_collection_itt_ref_t _a_pstr) noexcept;
     /*!
      * @brief Gets the first child of the current for_loop_stack in the memoized
      * for_loop_stack_trie contained in the invoked_test_data_t's
@@ -123,7 +123,7 @@ public:
      * @return Next element in the post_setup_test_data_t's repetition data when
      * the current for_loop_trie is considered the node.
      */
-    __constexpr opt_for_loop_creation_data_t
+    __constexpr opt_idgc_memoized_element_t
         get_first_child_of_current_for_loop_stack() noexcept;
     /*!
      * @brief Gets the next element in the post_setup_test_data_t's
@@ -147,7 +147,7 @@ public:
      * nullopt if it cannot find a successor value, otherwise returns the
      * successor value.
      */
-    __constexpr opt_for_loop_creation_data_t
+    __constexpr opt_idgc_memoized_element_t
         increment_last_value_of_current_for_loop_stack() noexcept;
 
     /*!
@@ -179,7 +179,7 @@ public:
      *
      * @return A cref to the internal for_loop_stack_trie_t object.
      */
-    __constexpr const ds::for_loop_stack_trie_t&
+    __constexpr const ds::tdg_collection_stack_trie_t&
                       for_loop_stack_trie() const noexcept;
     /*!
      * @brief Adds the current for_loop_stack_t to the internal
@@ -278,8 +278,8 @@ public:
         ) noexcept;
 private:
     const post_setup_test_data_t&        _m_post_setup_test_data;
-    ds::for_loop_stack_trie_t            _m_tests_for_loop_stack_trie;
-    ds::for_loop_stack_t                 _m_for_loop_data_collection;
+    ds::tdg_collection_stack_trie_t            _m_tests_for_loop_stack_trie;
+    ds::tdg_collection_stack_t                 _m_for_loop_data_collection;
     std::size_t                          _m_order_ran_id;
     utility::rng                         _m_this_tests_random_generator;
     std::filesystem::path                _m_path;
@@ -326,7 +326,7 @@ __no_constexpr_imp
         const std::filesystem::path& _a_root_path
     ) noexcept
     : _m_post_setup_test_data(_a_post_setup_test_data)
-    , _m_for_loop_data_collection(ds::for_loop_stack_t())
+    , _m_for_loop_data_collection(ds::tdg_collection_stack_t())
     , _m_order_ran_id(_a_order_ran_id)
     , _m_this_tests_random_generator(_a_seed_seq)
     , _m_path(create_test_path(_a_post_setup_test_data, _a_root_path))
@@ -351,7 +351,7 @@ __constexpr_imp const post_setup_test_data_t&
     return _m_post_setup_test_data;
 }
 
-__constexpr_imp const ds::for_loop_stack_t&
+__constexpr_imp const ds::tdg_collection_stack_t&
     invoked_test_data_t::for_loop_data_collection() const noexcept
 {
     return _m_for_loop_data_collection;
@@ -365,7 +365,7 @@ __constexpr_imp void
 
 __no_constexpr_imp void
     invoked_test_data_t::update_for_loop_stack(
-        gdc_itt_agnostic_data_ref_t _a_ptr
+        tdg_collection_itt_ref_t _a_ptr
     ) noexcept
 {
     _m_for_loop_data_collection.update(_a_ptr);
@@ -373,21 +373,21 @@ __no_constexpr_imp void
 
 __no_constexpr_imp void
     invoked_test_data_t::increment_for_loop_stack(
-        gdc_itt_agnostic_data_ref_t _a_ptr
+        tdg_collection_itt_ref_t _a_ptr
     ) noexcept
 {
     _m_for_loop_data_collection.increment(_a_ptr);
 }
 
-__constexpr_imp opt_for_loop_creation_data_t
+__constexpr_imp opt_idgc_memoized_element_t
     invoked_test_data_t::get_first_child_of_current_for_loop_stack() noexcept
 {
     using namespace std;
     using namespace ds;
     using enum utility::internal::internal_log_enum_t;
-    const optional<for_loop_creation_data_t> _l_rv{
+    const optional<idgc_memoized_element_t> _l_rv{
         not _m_post_setup_test_data.has_for_loop_stack_trie()
-            ? opt_for_loop_creation_data_t{}
+            ? opt_idgc_memoized_element_t{}
             : _m_post_setup_test_data.for_loop_stack_trie()
                   .find_first_child_of_sequence_in_trie(
                       _m_for_loop_data_collection.create_data_sequence()
@@ -396,16 +396,16 @@ __constexpr_imp opt_for_loop_creation_data_t
     return _l_rv;
 }
 
-__constexpr_imp opt_for_loop_creation_data_t
+__constexpr_imp opt_idgc_memoized_element_t
     invoked_test_data_t::increment_last_value_of_current_for_loop_stack(
     ) noexcept
 {
     using namespace std;
     using namespace ds;
     using enum utility::internal::internal_log_enum_t;
-    const opt_for_loop_creation_data_t _l_rv{
+    const opt_idgc_memoized_element_t _l_rv{
         not _m_post_setup_test_data.has_for_loop_stack_trie()
-            ? opt_for_loop_creation_data_t{}
+            ? opt_idgc_memoized_element_t{}
             : _m_post_setup_test_data.for_loop_stack_trie()
                   .increment_last_index(
                       _m_for_loop_data_collection.create_data_sequence()
@@ -425,7 +425,7 @@ __constexpr_imp bool
                      );
 }
 
-__constexpr_imp const ds::for_loop_stack_trie_t&
+__constexpr_imp const ds::tdg_collection_stack_trie_t&
                       invoked_test_data_t::for_loop_stack_trie() const noexcept
 {
     return _m_tests_for_loop_stack_trie;

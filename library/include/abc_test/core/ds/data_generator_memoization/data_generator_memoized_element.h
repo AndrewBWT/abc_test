@@ -9,15 +9,15 @@
 _BEGIN_ABC_DS_NS
 
 /*!
- * @brief Structure which holds information pertaining to a single piece of data
- * created from a gen_data_t element.
+ * @brief Structure which holds memoized data from a data_generator_t element.
+ * This data can be used to re-generate data from that data_generator_t element.
  *
- * Each derived class of gen_data_t has two pieces of data that, when put
- * together with the original gen_data_t object, should be able to re-generate
- * the same piece of data. This is the mode and the additional data string. This
- * class contains these data points.
+ * Each derived class of data_generator_t has two pieces of data that, when put
+ * together with the original data_generator_t object, should be able to
+ * re-generate some data from that data_generator_t. Instances of this class
+ * contain that data.
  */
-struct gen_data_creation_data_t
+struct data_generator_memoized_element_t
 {
 public:
     /*!
@@ -26,7 +26,8 @@ public:
      * @return True if equal, false if not.
      */
     __constexpr bool
-        operator==(const gen_data_creation_data_t& _a_rhs) const noexcept
+        operator==(const data_generator_memoized_element_t& _a_rhs
+        ) const noexcept
         = default;
     /*!
      * @brief Spaceship operator for gen_data_creation_data_t elements.
@@ -34,7 +35,8 @@ public:
      * @return Dependant on context.
      */
     __constexpr auto
-        operator<=>(const gen_data_creation_data_t& _a_rhs) const noexcept
+        operator<=>(const data_generator_memoized_element_t& _a_rhs
+        ) const noexcept
         = default;
     /*!
      * @brief The mode the gen_data_t element was in when the iteration data was
@@ -52,10 +54,17 @@ public:
     std::string additional_data;
 };
 
+/*!
+ * @brief Type synonym which shortens the name.
+ */
+using dg_memoized_element_t = data_generator_memoized_element_t;
+
+using opt_dg_memoized_element_t = std::optional<dg_memoized_element_t>;
+
 _END_ABC_DS_NS
 
 template <>
-struct fmt::formatter<abc::ds::gen_data_creation_data_t>
+struct fmt::formatter<abc::ds::data_generator_memoized_element_t>
     : formatter<string_view>
 {
     /*!
@@ -63,17 +72,19 @@ struct fmt::formatter<abc::ds::gen_data_creation_data_t>
      */
     // Cannot be constexpr due to use of fmt::format.
     __no_constexpr auto
-        format(abc::ds::gen_data_creation_data_t _a_rd, format_context& _a_cxt)
-            const -> format_context::iterator;
+        format(
+            abc::ds::data_generator_memoized_element_t _a_rd,
+            format_context&                            _a_cxt
+        ) const -> format_context::iterator;
 };
 
 _BEGIN_ABC_DS_NS
 _END_ABC_DS_NS
 
 __no_constexpr_imp auto
-    fmt::formatter<abc::ds::gen_data_creation_data_t>::format(
-        abc::ds::gen_data_creation_data_t _a_rd,
-        format_context&                   _a_ctx
+    fmt::formatter<abc::ds::data_generator_memoized_element_t>::format(
+        abc::ds::data_generator_memoized_element_t _a_rd,
+        format_context&                            _a_ctx
     ) const -> format_context::iterator
 {
     using namespace std;

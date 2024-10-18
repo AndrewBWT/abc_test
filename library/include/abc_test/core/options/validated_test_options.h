@@ -5,8 +5,12 @@
 
 _BEGIN_ABC_NS
 class validated_test_options_t;
+/*!
+ * @brief Type synonym for an expected type containing either a
+ * validated_test_options_t type or an error represented by an std::string.
+ */
 using validated_test_options_or_error_t
-    = std::expected<validated_test_options_t, std::string>;
+    = std::expected<validated_test_options_t, std::vector<std::string>>;
 
 /*!
  * @brief Class to hold a validated test_options_base_t variable.
@@ -53,7 +57,7 @@ __no_constexpr_imp validated_test_options_or_error_t
     ) noexcept
 {
     using namespace std;
-    if (optional<string> _l_error_msg{_a_test_options.validate()};
+    if (optional<vector<string>> _l_error_msg{_a_test_options.validate()};
         _l_error_msg.has_value())
     {
         return unexpected(_l_error_msg.value());

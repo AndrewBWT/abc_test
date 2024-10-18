@@ -81,8 +81,6 @@ protected:
     ) noexcept;
     Assertion_Status           _m_status;
     std::optional<std::string> _m_test_description;
-    // std::optional<std::string> _m_fail_message;
-    // std::optional<std::string> _m_pass_message;
 private:
 };
 

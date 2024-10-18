@@ -111,6 +111,7 @@ __constexpr_imp
     : _m_source(ds::source_pair_t(_a_source))
     , _m_test_annotation(_a_test_annotation)
     , _m_processed(false)
+    , _m_matcher(matcher_base_ptr_t(new true_matcher_t()))
 {}
 
 template <typename Assertion_Type>

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "abc_test/core/ds/gen_data_memoization/for_loop_stack_trie.h"
+#include "abc_test/core/ds/data_generator_memoization/typeless_data_generator_collection_stack_trie.h"
 #include "abc_test/core/ds/type_synonyms.h"
+#include "abc_test/core/global.h"
 #include "abc_test/core/reporters/error_reporter_controller.h"
 #include "abc_test/core/reporters/test_reporter_controller.h"
-#include "abc_test/global.h"
 #include "abc_test/utility/internal/log.h"
 #include "abc_test/utility/rng.h"
 #include "fmt/color.h"
@@ -62,7 +62,7 @@ public:
      * elements. This is specifically for those files where the reader and
      * writer uses fmt::format and scn::scan.
      */
-    std::string general_data_extension                       = "gd";
+    std::string general_data_extension                       = "dg";
     /*!
      * @brief The comment line string.
      *
@@ -89,7 +89,7 @@ public:
      * These are essentially data used when repeating tests; these tries tell
      * the test which elements of a for loop to re-generate.
      */
-    std::map<size_t, ds::for_loop_stack_trie_t>
+    std::map<size_t, ds::tdg_collection_stack_trie_t>
         map_of_unique_ids_and_for_loop_stack_tries;
     /*!
      * @brief Denotes whether to attach the global test list to the interanl
@@ -123,9 +123,19 @@ public:
      * @return Nullopt if there are no errors. Otherwise a string representation
      * of the error.
      */
-    __no_constexpr virtual std::optional<std::string>
+    __no_constexpr virtual std::optional<std::vector<std::string>>
         validate() const noexcept;
 };
+
+namespace
+{
+template <typename T>
+requires requires (const T& _a_ptr) {
+    { _a_ptr == nullptr } -> std::same_as<bool>;
+}
+__constexpr std::vector<std::size_t>
+    get_indexes_of_nullptrs(const std::vector<T>& _a_index_of_ptrs) noexcept;
+} // namespace
 
 _END_ABC_NS
 
@@ -142,12 +152,165 @@ struct fmt::formatter<abc::test_options_base_t> : formatter<string_view>
 _BEGIN_ABC_NS
 __no_constexpr_imp
 
-    std::optional<std::string>
+    std::optional<std::vector<std::string>>
     test_options_base_t::validate() const noexcept
 {
     using namespace std;
-    return optional<string>();
+    using namespace reporters;
+    vector<string> _l_rv;
+    if (error_reporters.size() == 0)
+    {
+        _l_rv.push_back(fmt::format(
+            "Error reporters must have atleast one element. Otherwise errors "
+            "cannot be reported. "
+            "If no others are available, "
+            "included_instances/reporters/text_error_reporter.h contains an "
+            "instance which prints errors to the console."
+        ));
+    }
+    else
+    {
+        vector<size_t> _l_indexes_of_nullptrs{
+            get_indexes_of_nullptrs(error_reporters)
+        };
+        if (_l_indexes_of_nullptrs.size() > 0)
+        {
+            _l_rv.push_back(fmt::format(
+                "error_reporters has some elemnets which point to nullptr. "
+                "Specifically those elements at the following indexes: {0}",
+                _l_indexes_of_nullptrs
+            ));
+        }
+    }
+    if (test_reporters.size() == 0)
+    {
+        _l_rv.push_back(fmt::format(
+            "test_reporters must have atleast one element. Otherwise tests "
+            "cannot be reported. "
+            "If no others are available, "
+            "included_instances/reporters/text_test_reporter.h contains an "
+            "instance which prints tests to the console."
+        ));
+    }
+    else
+    {
+        vector<size_t> _l_indexes_of_nullptrs{
+            get_indexes_of_nullptrs(error_reporters)
+        };
+        if (_l_indexes_of_nullptrs.size() > 0)
+        {
+            _l_rv.push_back(fmt::format(
+                "test_reporters has some elemnets which point to nullptr. "
+                "Specifically those elements at the following indexes: {0}",
+                _l_indexes_of_nullptrs
+            ));
+        }
+    }
+    if (test_lists.size() == 0 && use_global_test_list == false)
+    {
+        _l_rv.push_back(fmt::format(
+            "test_lists must have atleast one element or use_global_test_list "
+            "must be set to true. use_global_test_list = {0}",
+            use_global_test_list
+        ));
+    }
+    else if (test_lists.size() > 0)
+    {
+        vector<size_t> _l_indexes_of_nullptrs{get_indexes_of_nullptrs(test_lists
+        )};
+        if (_l_indexes_of_nullptrs.size() > 0)
+        {
+            _l_rv.push_back(fmt::format(
+                "test_lists has some elemnets which point to nullptr. "
+                "Specifically those elements at the following indexes: {0}",
+                _l_indexes_of_nullptrs
+            ));
+        }
+    }
+
+    if (map_of_unique_ids_and_for_loop_stack_tries.size() > 0
+        && write_data_to_files)
+    {
+        _l_rv.push_back(fmt::format(
+            "map_of_unique_ids_and_for_loop_stack_tries has elements in it - "
+            "thus this run of the test suite corresponds to some test "
+            "repetitions. However, we have set write_data_to_files to true. "
+            "These two options are incompatable."
+        ));
+    }
+    if (threads == 0 || threads > std::thread::hardware_concurrency())
+    {
+        _l_rv.push_back(fmt::format(
+            "threads = {0}. This value must be between 1 and the number of "
+            "threads available on the system ({1}",
+            threads,
+            std::thread::hardware_concurrency()
+        ));
+    }
+    if (comment_str == "" || comment_str == "\\n")
+    {
+        _l_rv.push_back(fmt::format(
+            "comment_str = \"{0}\". It cannot be empty or equal to \"\\n\"",
+            comment_str
+        ));
+    }
+    if (general_data_extension == "" || general_data_extension.contains("\n")
+        || general_data_extension.contains("."))
+    {
+        _l_rv.push_back(fmt::format(
+            "Invalid general_data_extension ({0}). Cannot be empty or contain "
+            "any of the following: {{\\n,'.'",
+            general_data_extension
+        ));
+    }
+    if (path_delimiter == "")
+    {
+        _l_rv.push_back(fmt::format(
+            "Invalid path_delimiter ({0}). Cannot be empty", path_delimiter
+        ));
+    }
+
+    if (not filesystem::is_directory(root_path))
+    {
+        _l_rv.push_back(
+            fmt::format("Root folder \"{0}\" does not exist", root_path)
+        );
+    }
+
+    if (_l_rv.size() == 0)
+    {
+        return optional<vector<string>>{};
+    }
+    else
+    {
+        return optional<vector<string>>{_l_rv};
+    }
 }
+
+namespace
+{
+template <typename T>
+requires requires (const T& _a_ptr) {
+    { _a_ptr == nullptr } -> std::same_as<bool>;
+}
+__constexpr_imp std::vector<std::size_t>
+                get_indexes_of_nullptrs(
+                    const std::vector<T>& _a_index_of_ptrs
+                ) noexcept
+{
+    using namespace std;
+    vector<size_t> _l_indexes_of_nullptrs;
+    for (size_t _l_idx{0}; const T& _l_ptr : _a_index_of_ptrs)
+    {
+        if (_l_ptr == nullptr)
+        {
+            _l_indexes_of_nullptrs.push_back(_l_idx);
+        }
+        ++_l_idx;
+    }
+    return _l_indexes_of_nullptrs;
+}
+} // namespace
 
 _END_ABC_NS
 

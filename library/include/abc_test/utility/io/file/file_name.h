@@ -1,5 +1,5 @@
 #pragma once
-#include "abc_test/global.h"
+#include "abc_test/core/global.h"
 
 _BEGIN_ABC_UTILITY_IO_NS
 	/*!

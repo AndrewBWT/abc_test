@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/core/ds/source/single_source.h"
 #include "abc_test/core/test_runner.h"
-#include "abc_test/global.h"
+#include "abc_test/core/global.h"
 #include "abc_test/utility/internal/macros.h"
 
 #include <exception>
@@ -63,9 +63,9 @@ public:
     __constexpr bool
         delete_after_use() const noexcept;
 protected:
-    std::string                           _m_str;
-    std::list<const log_msg_t*>::iterator _m_iterator;
-    bool                                  _m_delete_after_use;
+    std::string   _m_str;
+    log_msg_itt_t _m_iterator;
+    bool          _m_delete_after_use;
 };
 
 /*!
@@ -96,15 +96,10 @@ __no_constexpr_imp
         const bool                 _a_delete_after_use
     ) noexcept
     : _m_str(_a_str)
-    , _m_iterator(global::get_this_threads_test_runner_ref().add_error_info(this
-      ))
+    , _m_iterator(global::get_this_threads_test_runner_ref()
+                      .add_log_msg(std::ref(*this), _a_single_source))
     , _m_delete_after_use(_a_delete_after_use)
-{
-    using namespace global;
-    get_this_threads_test_runner_ref().register_tests_most_recent_source(
-        _a_single_source
-    );
-}
+{}
 
 __no_constexpr_imp log_msg_t::~log_msg_t() noexcept
 {
@@ -112,11 +107,11 @@ __no_constexpr_imp log_msg_t::~log_msg_t() noexcept
     using namespace global;
     if (uncaught_exceptions() > 0)
     {
-        get_this_threads_test_runner_ref().add_cached_exception(_m_str);
+        get_this_threads_test_runner_ref().add_cached_log_msg(_m_str);
     }
     if (not _m_delete_after_use)
     {
-        get_this_threads_test_runner_ref().remove_error_info(_m_iterator);
+        get_this_threads_test_runner_ref().remove_log_msg(_m_iterator);
     }
 }
 

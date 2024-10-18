@@ -1,5 +1,5 @@
 #pragma once
-#include "abc_test/core/ds/gen_data_memoization/gen_collection_creation_data.h"
+#include "abc_test/core/ds/data_generator_memoization/data_generator_memoized_element.h"
 #include "abc_test/core/ds/type_synonyms.h"
 #include "abc_test/core/errors/test_library_exception.h"
 #include "abc_test/utility/str/parser_utility.h"
@@ -13,19 +13,20 @@
 
 _BEGIN_ABC_DS_NS
 // Forward declare
-class for_loop_stack_trie_t;
+class typeless_data_generator_collection_stack_trie_t;
 /*!
  * @brief Type synonym representing the result from parsing a string to a
  * for_loop_stack_trie_t object.
  */
 
 using parse_for_loop_stack_trie_result_t
-    = std::expected<for_loop_stack_trie_t, std::string>;
+    = std::expected<typeless_data_generator_collection_stack_trie_t, std::string>;
 
 namespace
 {
 // Type synonym for the child of a repetition_tree_node_t.
-using for_loop_stack_trie_child_t    = std::shared_ptr<for_loop_stack_trie_t>;
+using for_loop_stack_trie_child_t
+    = std::shared_ptr<typeless_data_generator_collection_stack_trie_t>;
 // Type synonym for a list of rep_tree_child_t elements.
 using for_loop_stack_trie_children_t = std::vector<for_loop_stack_trie_child_t>;
 // Type synonym for the for-loop-level container of rep_tree_children_t objects.
@@ -70,7 +71,7 @@ using opt_itt_and_end_t = std::optional<std::pair<
  * loop index. We use a 2D vector as the outer contains all the data indexed by
  * the for loop index.
  */
-class for_loop_stack_trie_t
+class typeless_data_generator_collection_stack_trie_t
 {
 public:
     /*!
@@ -79,7 +80,7 @@ public:
      * Only available public constructor.
      */
     __constexpr
-    for_loop_stack_trie_t() noexcept
+        typeless_data_generator_collection_stack_trie_t() noexcept
         = default;
     /*!
      * @brief Returns a string representing the for_loop_stack_trie_t object in
@@ -130,8 +131,8 @@ public:
      * @return The opt_for_loop_creation_data_t object used to create the
      * successor sibling.
      */
-    __constexpr opt_for_loop_creation_data_t
-        increment_last_index(const for_loop_creation_data_sequence_t& _a_rds
+    __constexpr opt_idgc_memoized_element_t
+        increment_last_index(const idgc_memoized_element_sequence_t& _a_rds
         ) const noexcept;
     /*!
      * @brief This function finds the node representing the
@@ -142,7 +143,7 @@ public:
      * @return True if _a_rds is in the tree. False otherwise.
      */
     __constexpr bool
-        is_sequence_in_trie(const for_loop_creation_data_sequence_t& _a_rds
+        is_sequence_in_trie(const idgc_memoized_element_sequence_t& _a_rds
         ) const noexcept;
     /*!
      * @brief Adds a for_loop_creation_data_sequence_t object to the underlying
@@ -161,7 +162,7 @@ public:
      */
     __constexpr void
         add_for_loop_creation_data_sequence(
-            const for_loop_creation_data_sequence_t& _a_flcds
+            const idgc_memoized_element_sequence_t& _a_flcds
         ) noexcept;
     /*!
      * @brief This function firstly finds the tree node representing the
@@ -183,11 +184,11 @@ public:
      * @return The opt_for_loop_creation_data_t object used to create _a_rds's
      * first child node.
      */
-    __constexpr opt_for_loop_creation_data_t
+    __constexpr opt_idgc_memoized_element_t
         find_first_child_of_sequence_in_trie(
-            const for_loop_creation_data_sequence_t& _a_rds
+            const idgc_memoized_element_sequence_t& _a_rds
         ) const noexcept;
-    friend class for_loop_stack_trie_t;
+    friend class itdg_collection_stack_trie_t;
     /*!
      * @brief Parses a string into a for_loop_stack_trie_t element.
      *
@@ -210,7 +211,7 @@ private:
      * Only variables which are not the root hold gen_collection_creation_data_t
      * elements, hence the use of the conditional.
      */
-    gen_collection_creation_data_t         _m_for_loop_data;
+    dgc_memoized_element_t                 _m_for_loop_data;
     for_loop_stack_trie_indexed_children_t _m_children;
     /*!
      * @brief Constructor taking gen_collection_creation_data_t element.
@@ -219,8 +220,7 @@ private:
      * as the root has no _m_for_loop_data member variable to set.
      */
     __constexpr
-    for_loop_stack_trie_t(const gen_collection_creation_data_t& _a_flid
-    ) noexcept;
+        typeless_data_generator_collection_stack_trie_t(const dgc_memoized_element_t& _a_flid) noexcept;
     /*!
      * @brief Finds the element represented by the argument _a_flcds, as well as
      * that element's end iterator element.
@@ -232,7 +232,7 @@ private:
      * end of the list the node is contained in.
      */
     __constexpr opt_itt_and_end_t
-        find_iterator_and_end(const for_loop_creation_data_sequence_t& _a_flcds
+        find_iterator_and_end(const idgc_memoized_element_sequence_t& _a_flcds
         ) const noexcept;
     /*!
      * @brief If one exists, finds the node which represents the
@@ -244,7 +244,7 @@ private:
      * _a_flcds. If nullopt, no node exists.
      */
     __constexpr opt_itt_t
-        find_iterator(const for_loop_creation_data_sequence_t& _a_flcds
+        find_iterator(const idgc_memoized_element_sequence_t& _a_flcds
         ) const noexcept;
     /*!
      * @brief Core printing function.
@@ -258,24 +258,29 @@ private:
             const noexcept;
 };
 
+using tdg_collection_stack_trie_t = typeless_data_generator_collection_stack_trie_t;
 _END_ABC_DS_NS
 
 template <>
-struct fmt::formatter<abc::ds::for_loop_stack_trie_t> : formatter<string_view>
+struct fmt::formatter<abc::ds::typeless_data_generator_collection_stack_trie_t>
+    : formatter<string_view>
 {
     /*!
      * Provides a formatter for a poset_setup_test_data_t object
      */
     // Can't be constexpr due to use of fmt
     __no_constexpr auto
-        format(abc::ds::for_loop_stack_trie_t _a_rt, format_context& _a_cxt)
-            const -> format_context::iterator;
+        format(
+            abc::ds::typeless_data_generator_collection_stack_trie_t _a_rt,
+            format_context&                      _a_cxt
+        ) const -> format_context::iterator;
 };
 
 _BEGIN_ABC_DS_NS
 
 __no_constexpr_imp std::string
-    for_loop_stack_trie_t::print_for_loop_stack_trie_compressed() const noexcept
+typeless_data_generator_collection_stack_trie_t::print_for_loop_stack_trie_compressed(
+    ) const noexcept
 {
     using namespace std;
     string                _l_rv{print_for_loop_stack_trie()};
@@ -293,20 +298,20 @@ __no_constexpr_imp std::string
 }
 
 __no_constexpr_imp std::string
-    for_loop_stack_trie_t::print_for_loop_stack_trie() const noexcept
+typeless_data_generator_collection_stack_trie_t::print_for_loop_stack_trie() const noexcept
 {
     return inner_print_for_loop_stack_trie(true);
 }
 
-__constexpr_imp opt_for_loop_creation_data_t
-    for_loop_stack_trie_t::increment_last_index(
-        const for_loop_creation_data_sequence_t& _a_rds
+__constexpr_imp opt_idgc_memoized_element_t
+typeless_data_generator_collection_stack_trie_t::increment_last_index(
+        const idgc_memoized_element_sequence_t& _a_rds
     ) const noexcept
 {
     using namespace std;
     if (_a_rds.size() == 0)
     {
-        return opt_for_loop_creation_data_t{};
+        return opt_idgc_memoized_element_t{};
     }
     else
     {
@@ -316,42 +321,42 @@ __constexpr_imp opt_for_loop_creation_data_t
             auto& [_l_itt, _l_end]{_l_opt_itt.value()};
             if (_l_itt + 1 != _l_end)
             {
-                return opt_for_loop_creation_data_t{
-                    for_loop_creation_data_t{
-                                             _a_rds.back().for_loop_index,
-                                             (*(_l_itt + 1))->_m_for_loop_data
+                return opt_idgc_memoized_element_t{
+                    idgc_memoized_element_t{
+                                            _a_rds.back().for_loop_index,
+                                            (*(_l_itt + 1))->_m_for_loop_data
                     }
                 };
             }
             else
             {
-                return opt_for_loop_creation_data_t{};
+                return opt_idgc_memoized_element_t{};
             }
         }
         else
         {
-            return opt_for_loop_creation_data_t{};
+            return opt_idgc_memoized_element_t{};
         }
     }
 }
 
 __constexpr_imp bool
-    for_loop_stack_trie_t::is_sequence_in_trie(
-        const for_loop_creation_data_sequence_t& _a_rds
+typeless_data_generator_collection_stack_trie_t::is_sequence_in_trie(
+        const idgc_memoized_element_sequence_t& _a_rds
     ) const noexcept
 {
     return find_iterator(_a_rds).has_value();
 }
 
 __constexpr_imp void
-    for_loop_stack_trie_t::add_for_loop_creation_data_sequence(
-        const for_loop_creation_data_sequence_t& _a_flcds
+typeless_data_generator_collection_stack_trie_t::add_for_loop_creation_data_sequence(
+        const idgc_memoized_element_sequence_t& _a_flcds
     ) noexcept
 {
     using namespace std;
-    std::reference_wrapper<for_loop_stack_trie_t> _l_current_ref{*this};
+    std::reference_wrapper<tdg_collection_stack_trie_t> _l_current_ref{*this};
     // Go through each flcd, either creating or navigating as we go.
-    for (const for_loop_creation_data_t& _l_flcd : _a_flcds)
+    for (const idgc_memoized_element_t& _l_flcd : _a_flcds)
     {
         const size_t _l_for_loop_idx{_l_flcd.for_loop_index};
         for_loop_stack_trie_indexed_children_t& _l_for_loop_children{
@@ -384,8 +389,10 @@ __constexpr_imp void
             for_loop_stack_trie_children_t::iterator _l_inserted_itt{
                 _l_children.insert(
                     _l_equal_subrange.end(),
-                    make_unique<for_loop_stack_trie_t>(
-                        for_loop_stack_trie_t(_l_flcd.for_loop_iteration_data)
+                    make_unique<tdg_collection_stack_trie_t>(
+                        tdg_collection_stack_trie_t(
+                            _l_flcd.for_loop_iteration_data
+                        )
                     )
                 )
             };
@@ -400,9 +407,9 @@ __constexpr_imp void
     }
 }
 
-__constexpr_imp opt_for_loop_creation_data_t
-    for_loop_stack_trie_t::find_first_child_of_sequence_in_trie(
-        const for_loop_creation_data_sequence_t& _a_rds
+__constexpr_imp opt_idgc_memoized_element_t
+typeless_data_generator_collection_stack_trie_t::find_first_child_of_sequence_in_trie(
+        const idgc_memoized_element_sequence_t& _a_rds
     ) const noexcept
 {
     if (const opt_itt_t _l_opt_itt{find_iterator(_a_rds)};
@@ -413,40 +420,42 @@ __constexpr_imp opt_for_loop_creation_data_t
         };
         if (_l_children.size() > 0 && _l_children[0].size() > 0)
         {
-            return opt_for_loop_creation_data_t{
-                for_loop_creation_data_t{
-                                         _a_rds.size() == 0 ? 0 : _a_rds.back().for_loop_index,
-                                         _l_children[0][0]->_m_for_loop_data
+            return opt_idgc_memoized_element_t{
+                idgc_memoized_element_t{
+                                        _a_rds.size() == 0 ? 0 : _a_rds.back().for_loop_index,
+                                        _l_children[0][0]->_m_for_loop_data
                 }
             };
         }
         else
         {
-            return opt_for_loop_creation_data_t{};
+            return opt_idgc_memoized_element_t{};
         }
     }
     else
     {
-        return opt_for_loop_creation_data_t{};
+        return opt_idgc_memoized_element_t{};
     }
 }
 
 __constexpr_imp
-    for_loop_stack_trie_t::for_loop_stack_trie_t(
-        const gen_collection_creation_data_t& _a_flid
+typeless_data_generator_collection_stack_trie_t::typeless_data_generator_collection_stack_trie_t(
+        const dgc_memoized_element_t& _a_flid
     ) noexcept
     : _m_for_loop_data(_a_flid)
 {}
 
 __constexpr_imp opt_itt_and_end_t
-    for_loop_stack_trie_t::find_iterator_and_end(
-        const for_loop_creation_data_sequence_t& _a_flcds
+typeless_data_generator_collection_stack_trie_t::find_iterator_and_end(
+        const idgc_memoized_element_sequence_t& _a_flcds
     ) const noexcept
 {
     using namespace std;
-    std::reference_wrapper<const for_loop_stack_trie_t> _l_current_ref{*this};
+    std::reference_wrapper<const tdg_collection_stack_trie_t> _l_current_ref{
+        *this
+    };
     // Go through each flcd, either creating or navigating as we go.
-    for (const for_loop_creation_data_t& _l_flcd : _a_flcds)
+    for (const idgc_memoized_element_t& _l_flcd : _a_flcds)
     {
         const size_t _l_for_loop_idx{_l_flcd.for_loop_index};
         const for_loop_stack_trie_indexed_children_t& _l_for_loop_children{
@@ -490,8 +499,8 @@ __constexpr_imp opt_itt_and_end_t
 }
 
 __constexpr_imp opt_itt_t
-    for_loop_stack_trie_t::find_iterator(
-        const for_loop_creation_data_sequence_t& _a_flcds
+typeless_data_generator_collection_stack_trie_t::find_iterator(
+        const idgc_memoized_element_sequence_t& _a_flcds
     ) const noexcept
 {
     if (const opt_itt_and_end_t _l_res{find_iterator_and_end(_a_flcds)};
@@ -506,7 +515,7 @@ __constexpr_imp opt_itt_t
 }
 
 __no_constexpr_imp std::string
-                   for_loop_stack_trie_t::inner_print_for_loop_stack_trie(
+typeless_data_generator_collection_stack_trie_t::inner_print_for_loop_stack_trie(
         const bool _a_is_root
     ) const noexcept
 {
@@ -682,19 +691,19 @@ __constexpr_imp parse_for_loop_stack_trie_result_t
         }
 
         // Put it all together
-        for_loop_stack_trie_t _l_rv;
+        tdg_collection_stack_trie_t _l_rv;
         for (const vector<string>& _l_str : _l_strs)
         {
-            vector<shared_ptr<for_loop_stack_trie_t>> _l_kids;
+            vector<shared_ptr<tdg_collection_stack_trie_t>> _l_kids;
             for (const string& _l_st : _l_str)
             {
-                const expected<for_loop_stack_trie_t, string> _l_op{
+                const expected<tdg_collection_stack_trie_t, string> _l_op{
                     parse_compressed_repetition_tree_node(_l_st)
                 };
                 if (_l_op.has_value())
                 {
-                    _l_kids.push_back(shared_ptr<for_loop_stack_trie_t>(
-                        new for_loop_stack_trie_t(_l_op.value())
+                    _l_kids.push_back(shared_ptr<tdg_collection_stack_trie_t>(
+                        new tdg_collection_stack_trie_t(_l_op.value())
                     ));
                 }
                 else
@@ -711,19 +720,19 @@ __constexpr_imp parse_for_loop_stack_trie_result_t
 _END_ABC_DS_NS
 
 __no_constexpr_imp auto
-    fmt::formatter<abc::ds::for_loop_stack_trie_t>::format(
-        abc::ds::for_loop_stack_trie_t _a_rt,
-        format_context&                _a_cxt
+    fmt::formatter<abc::ds::tdg_collection_stack_trie_t>::format(
+        abc::ds::tdg_collection_stack_trie_t _a_rt,
+        format_context&                      _a_cxt
     ) const -> format_context::iterator
 {
     using namespace std;
-    const string _l_rv{ fmt::format(
+    const string _l_rv{fmt::format(
         "{0}"
         "{{{1} = {2}"
         "}}",
         typeid(_a_rt).name(),
         "_m_children",
         _a_rt.print_for_loop_stack_trie()
-    ) };
+    )};
     return formatter<string_view>::format(_l_rv, _a_cxt);
 }

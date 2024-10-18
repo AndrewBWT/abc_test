@@ -16,7 +16,7 @@
 #include "abc_test/utility/io/file/file_reader.h"
 #include "abc_test/utility/io/file/file_writer.h"
 
-#include "abc_test/global.h"
+#include "abc_test/core/global.h"
 
 _BEGIN_ABC_NS
 using file_type_rep_data_t = char;
@@ -26,7 +26,7 @@ using file_type_rep_data_t = char;
 	template<
 		typename T
 	>
-	struct file_data_t : public gen_data_with_repetition_type_and_element_t<T, file_type_rep_data_t>
+	struct file_data_t : public data_generator_with_file_support_and_element_storage_t<T, file_type_rep_data_t>
 	{
 	public:
 		/*!
@@ -98,7 +98,7 @@ using file_type_rep_data_t = char;
 		typename R
 	>
 	__constexpr
-		gen_data_collection_t<T>
+		data_generator_collection_t<T>
 		file_data(
 			const utility::io::file_name_t& _a_filename,
 			R&& _a_init_elements
@@ -117,7 +117,7 @@ using file_type_rep_data_t = char;
 			const utility::io::file_rw_info_t<T>& _a_templated_file_rw,
 			R&& _a_initial_values
 		)
-		: gen_data_with_repetition_type_and_element_t<T, file_type_rep_data_t>(0, _a_templated_file_rw,
+		: data_generator_with_file_support_and_element_storage_t<T, file_type_rep_data_t>(0, _a_templated_file_rw,
 			std::forward<R>(_a_initial_values), "", 
 			utility::io::opt_file_rw_info_t<file_type_rep_data_t>{}, T{},
 			global::get_global_test_options_ptr())
@@ -170,7 +170,7 @@ using file_type_rep_data_t = char;
 		typename R
 	>
 	__constexpr_imp
-		gen_data_collection_t<T>
+		data_generator_collection_t<T>
 		file_data(
 			const utility::io::file_name_t& _a_filename,
 			R&& _a_init_elements = R{}

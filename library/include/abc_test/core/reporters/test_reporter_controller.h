@@ -55,11 +55,10 @@ __no_constexpr_imp void
         ds::test_set_data_t& _a_test_set_data
     ) noexcept
 {
-    for (utility::shared_and_raw_ptr<test_reporter_t>& _l_reporter :
-         _m_reporters)
+    using namespace std;
+    for (reference_wrapper<const test_reporter_t> _l_reporter : _m_reporters)
     {
-        test_reporter_t* _l_reporter_ptr{utility::get_ptr(_l_reporter)};
-        _l_reporter_ptr->final_report(_a_test_set_data);
+        _l_reporter.get().final_report(_a_test_set_data);
     }
 }
 
@@ -68,12 +67,11 @@ __constexpr_imp void
         const ds::invoked_test_data_t& _a_itd
     ) noexcept
 {
-    std::unique_lock _l_report_test_unique_lokc(_m_reporters_mutex);
-    for (utility::shared_and_raw_ptr<test_reporter_t>& _l_reporter :
-         _m_reporters)
+    using namespace std;
+    unique_lock _l_report_test_unique_lokc(_m_reporters_mutex);
+    for (reference_wrapper<const test_reporter_t> _l_reporter : _m_reporters)
     {
-        test_reporter_t* _l_reporter_ptr{utility::get_ptr(_l_reporter)};
-        _l_reporter_ptr->report_test(_a_itd);
+        _l_reporter.get().report_test(_a_itd);
     }
 }
 

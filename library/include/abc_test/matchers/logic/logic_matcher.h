@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "abc_test/matchers/logic/logic_enum.h"
-#include "abc_test/global.h"
+#include "abc_test/core/global.h"
 
 _BEGIN_ABC_NS
 template<

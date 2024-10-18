@@ -1,5 +1,5 @@
 #pragma once
-#include "abc_test/core/ds/gen_data_memoization/gen_collection_creation_data.h"
+#include "abc_test/core/ds/data_generator_memoization/data_generator_collection_memoized_element.h"
 
 _BEGIN_ABC_DS_NS
 
@@ -14,7 +14,7 @@ _BEGIN_ABC_DS_NS
  * for_loop index, as gen_data_collection_t elements are designed to be used in
  * them.
  */
-struct for_loop_creation_data_t
+struct indexed_data_generator_collection_memoized_element_t
 {
 public:
     /*!
@@ -23,7 +23,7 @@ public:
      * @return True if equal, false if not.
      */
     __constexpr bool
-        operator==(const for_loop_creation_data_t& _a_rhs) const noexcept
+        operator==(const indexed_data_generator_collection_memoized_element_t& _a_rhs) const noexcept
         = default;
     /*!
      * @brief Spaceship operator for for_loop_creation_data_t elements.
@@ -31,7 +31,7 @@ public:
      * @return Dependant on context.
      */
     __constexpr auto
-        operator<=>(const for_loop_creation_data_t& _a_rhs) const noexcept
+        operator<=>(const indexed_data_generator_collection_memoized_element_t& _a_rhs) const noexcept
         = default;
     /*!
      * @brief The index of the for loop this data point refers to.
@@ -41,21 +41,21 @@ public:
      * @brief The specific set of data for the gen_data_collection_t this
      * structure points to.
      */
-    gen_collection_creation_data_t for_loop_iteration_data;
+    dgc_memoized_element_t for_loop_iteration_data;
 };
-
+using idgc_memoized_element_t = indexed_data_generator_collection_memoized_element_t;
 /*!
  * @brief A synonym for sequence of for_loop_creation_data_t elements.
  */
-using for_loop_creation_data_sequence_t = std::vector<for_loop_creation_data_t>;
+using idgc_memoized_element_sequence_t = std::vector<indexed_data_generator_collection_memoized_element_t>;
 /*!
  * @brief A synonym for an optional for_loop_creation_data_t element.
  */
-using opt_for_loop_creation_data_t = std::optional<for_loop_creation_data_t>;
+using opt_idgc_memoized_element_t = std::optional<indexed_data_generator_collection_memoized_element_t>;
 _END_ABC_DS_NS
 
 template <>
-struct fmt::formatter<abc::ds::for_loop_creation_data_t>
+struct fmt::formatter<abc::ds::indexed_data_generator_collection_memoized_element_t>
     : formatter<string_view>
 {
     /*!
@@ -63,7 +63,7 @@ struct fmt::formatter<abc::ds::for_loop_creation_data_t>
      */
     // Cannot be constexpr due to use of fmt::format.
     __no_constexpr auto
-        format(abc::ds::for_loop_creation_data_t _a_rd, format_context& _a_cxt)
+        format(abc::ds::indexed_data_generator_collection_memoized_element_t _a_rd, format_context& _a_cxt)
             const -> format_context::iterator;
 };
 
@@ -71,8 +71,8 @@ _BEGIN_ABC_DS_NS
 _END_ABC_DS_NS
 
 __no_constexpr_imp auto
-    fmt::formatter<abc::ds::for_loop_creation_data_t>::format(
-        abc::ds::for_loop_creation_data_t _a_rd,
+    fmt::formatter<abc::ds::indexed_data_generator_collection_memoized_element_t>::format(
+        abc::ds::indexed_data_generator_collection_memoized_element_t _a_rd,
         format_context&                   _a_ctx
     ) const -> format_context::iterator
 {

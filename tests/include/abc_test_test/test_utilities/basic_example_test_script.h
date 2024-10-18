@@ -722,7 +722,7 @@ namespace typed
 		for (auto& _l_element : _a_enumeration_tests)
 		{
 			_l_results.push_back(vector<T>());
-			for (auto&& _l_int : gen_data_collection_t<T>(
+			for (auto&& _l_int : data_generator_collection_t<T>(
 				enumerate_data(_l_element)))
 			{
 				_l_results.back().push_back(_l_int);
@@ -1895,7 +1895,7 @@ namespace typed
 	//	std::cout << std::endl;
 		cout <<
 			fmt::format("enumerate_data<{0}>(from_min_to_val<{0}>({1})", typeid(T).name(), _a_element) << endl;
-		for (const T& _l_int : gen_data_collection_t<T>(
+		for (const T& _l_int : data_generator_collection_t<T>(
 			enumerate_data<T>(from_min_to_val<T>(_a_element))
 		))
 		{
@@ -1904,7 +1904,7 @@ namespace typed
 		std::cout << std::endl;
 		cout <<
 			fmt::format("enumerate_data<{0}>(from_min_to_val<{0}>({1})", typeid(T).name(), _a_element) << endl;
-		for (const T& _l_int : gen_data_collection_t<T>(
+		for (const T& _l_int : data_generator_collection_t<T>(
 			randomly_probe_enumerated_data<T>(from_min_to_val<T>(_a_element))
 		))
 		{
@@ -1919,7 +1919,7 @@ namespace typed
 	{
 		using namespace abc;
 		using namespace typed;
-		for (auto&& _l_int : gen_data_collection_t<X3>(
+		for (auto&& _l_int : data_generator_collection_t<X3>(
 		//	enumerate_data(from_m_to_n(X3{}, X3{}, new typed::int_enumerate_t(2, 1)))
 			))
 		{
@@ -1939,7 +1939,7 @@ namespace typed
 		using namespace abc;
 		std::vector<T> _l_inits;
 			std::cout << "Enumerating all values" << std::endl;
-			for (auto&& _l_int : gen_data_collection_t<T>(
+			for (auto&& _l_int : data_generator_collection_t<T>(
 				static_data(_l_inits)
 			//	, enumeration<T>(finitely_enumerable<T>())
 			))
@@ -1962,7 +1962,7 @@ namespace typed
 		T _l_max;
 		_l_max[0] = 255;
 		_l_max[1] = 255;
-		for (auto&& _l_int : gen_data_collection_t<T>(
+		for (auto&& _l_int : data_generator_collection_t<T>(
 		//	iterate_over(_l_inits)
 			//Min and max bound. Direction and number of elemnets can be worked out automatically.
 		//	, enumeration<T>(*(new enumerable_array_t<uint8_t, 2>(finitely_enumerable<uint8_t>(), enum_range(_l_min, _l_max))))

@@ -14,7 +14,7 @@ struct error_reporter_t
      * @param _a_error The error being reported.
      */
     __constexpr virtual void
-        report_error(const errors::setup_error_t& _a_error) noexcept
+        report_error(const errors::setup_error_t& _a_error) const noexcept
         = 0;
     /*!
      * @brief Function to manage reporting information. This may be in the form
@@ -22,14 +22,14 @@ struct error_reporter_t
      * @param _a_str The string to be reported.
      */
     __constexpr virtual void
-        report_information(const std::string_view _a_str) noexcept
+        report_information(const std::string_view _a_str) const noexcept
         = 0;
     /*!
      * @brief The function to be called if termination occours. This function is
      * meant to manage any freeing of resourses.
      */
     __constexpr virtual void
-        exit() noexcept
+        exit() const noexcept
         = 0;
 };
 /*!
@@ -37,5 +37,5 @@ struct error_reporter_t
  * error_reproter_t.
  */
 using error_reporters_t
-= std::vector<utility::shared_and_raw_ptr<error_reporter_t>>;
+= std::vector<std::reference_wrapper<const error_reporter_t>>;
 _END_ABC_REPORTERS_NS

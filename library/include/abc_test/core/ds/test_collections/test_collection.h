@@ -56,7 +56,7 @@ private:
     test_tree_t                            _m_test_tree;
     reporters::error_reporter_controller_t _m_error_reporter_controller;
     unique_id_t                            _m_test_discovery_id;
-    const test_options_base_t&                  _m_options;
+    const test_options_base_t&             _m_options;
 };
 
 _END_ABC_DS_NS
@@ -82,13 +82,11 @@ __constexpr_imp void
     using namespace ds;
     using namespace utility;
     using namespace errors;
-    for (const const_shared_and_raw_ptr<test_list_t>& _l_test_list_element :
-         _a_test_list_collection)
+    for (std::reference_wrapper<const test_list_t> _l_test_list_element : _a_test_list_collection)
     {
-        const_ptr_t<test_list_t> _l_tl{get_ptr(_l_test_list_element)};
-        for (const test_list_element_t& _l_test_element : *_l_tl)
+        for (const test_list_element_t& _l_test_element : _l_test_list_element.get())
         {
-            const for_loop_stack_trie_t* _l_reps{
+            const tdg_collection_stack_trie_t* _l_reps{
                 _m_options.map_of_unique_ids_and_for_loop_stack_tries.contains(
                     _m_test_discovery_id
                 )
@@ -102,7 +100,7 @@ __constexpr_imp void
                 _m_options.path_delimiter,
                 _m_test_discovery_id,
                 true,
-//                _m_options.check_if_test_is_to_be_ran(_m_test_discovery_id),
+                // _m_options.check_if_test_is_to_be_ran(_m_test_discovery_id),
                 _l_reps,
                 _m_options.threads
             ));

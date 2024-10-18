@@ -1,264 +1,213 @@
 #pragma once
 
+#include "abc_test/core/data_generator/data_generator_collection.h"
+#include "abc_test/core/data_generator/data_generator_with_file_support.h"
+#include "abc_test/core/test_runner.h"
+
 #include <initializer_list>
 #include <vector>
-#include "abc_test/core/test_runner.h"
-#include "abc_test/gen_data/gen_data_with_repetition_type.h"
-#include "abc_test/gen_data/collection.h"
 
 _BEGIN_ABC_NS
 using static_rep_data_t = std::size_t;
-	template<
-		typename T
-	>
-	struct static_data_t : public gen_data_with_repetition_type_t<T, static_rep_data_t>
-	{
-	public:
-		/*!
-		* Default constructor which uses an empty list
-		*/
-		__constexpr
-			static_data_t(
-			) noexcept;
-		/*!
-		* Constructor which takes a range.
-		*/
-		template<
-			typename R
-		>
-			requires std::ranges::sized_range<R>&& std::same_as<std::ranges::range_value_t<R>, T>
-		__constexpr
-			static_data_t(
-				R&& _a_init_list
-			) noexcept;
-		/*!
-		* Destructor which destroys the internal array.
-		*/
-		__constexpr
-			~static_data_t(
-			);
-		/*!
-		* Overridden function which gets the string form of the relevant data. Specifically in
-		* this case its the index of the elemnet.
-		*/
-		__constexpr
-			virtual
-			static_rep_data_t
-			subclass_get_repetition_data(
-			) const noexcept;
-		/*!
-		* Determines whether there is a current element in the collection.
-		*/
-		__constexpr
-			virtual
-			bool
-			subclass_has_current_element(
-			) const noexcept;
-		/*!
-		* Returns a const reference to the current element.
-		*/
-		__constexpr
-			virtual
-			const T&
-			subclass_current_element(
-			) const noexcept;
-		/*!
-		* Increments the object, getting the next element in the internal collection.
-		*/
-		__constexpr
-			virtual
-			bool
-			subclass_generate_next(
-			);
-		/*!
-		* Increments the internal mechanisms using a string to represent additinoal data.
-		*/
-		__constexpr
-			virtual
-			void
-			subclass_set_data_using_mode_and_repetition_data(
-				const std::size_t _a_mode,
-				const static_rep_data_t _a_rep_data
-			);
-		/*!
-		* Determines whether failed values can be written to a file. For this class, they cannot.
-		*/
-		__constexpr
-			virtual
-			bool
-			are_failed_values_written_to_files(
-			) const noexcept;
-		__constexpr
-			virtual
-			void
-			subclass_reset_data(
-			) noexcept final
-		{
 
-		}
-	private:
-		T* _m_elements;
-		std::size_t _m_elements_size;
-	};
-	/*!
-	* Constructor which should be used. It creates a singleton collection.
-	*/
-	template<
-		typename T,
-		typename R = std::vector<T>
-	>
-	__constexpr
-		gen_data_collection_t<std::ranges::range_value_t<R>>
-		iterate_over(
-			R&& _a_init_list
-		);
+template <typename T>
+struct static_data_t
+    : public data_generator_with_file_support_t<T, static_rep_data_t,false,false>
+{
+public:
+    /*!
+     * Default constructor which uses an empty list
+     */
+    __constexpr
+    static_data_t() noexcept;
+    /*!
+     * Constructor which takes a range.
+     */
+    template <typename R>
+    requires std::ranges::sized_range<R>
+             && std::same_as<std::ranges::range_value_t<R>, T>
+    __constexpr
+    static_data_t(R&& _a_init_list) noexcept;
+    /*!
+     * Destructor which destroys the internal array.
+     */
+    __constexpr ~static_data_t();
+    /*!
+     * Overridden function which gets the string form of the relevant data.
+     * Specifically in this case its the index of the elemnet.
+     */
+    __constexpr virtual static_rep_data_t
+        subclass_get_repetition_data() const noexcept;
+    /*!
+     * Determines whether there is a current element in the collection.
+     */
+    __constexpr virtual bool
+        subclass_has_current_element() const noexcept;
+    /*!
+     * Returns a const reference to the current element.
+     */
+    __constexpr virtual const T&
+        subclass_current_element() const noexcept;
+    /*!
+     * Increments the object, getting the next element in the internal
+     * collection.
+     */
+    __constexpr virtual bool
+        subclass_generate_next();
+    /*!
+     * Increments the internal mechanisms using a string to represent additinoal
+     * data.
+     */
+    __constexpr virtual void
+        subclass_set_data_using_mode_and_repetition_data(
+            const std::size_t       _a_mode,
+            const static_rep_data_t _a_rep_data
+        );
+    /*!
+     * Determines whether failed values can be written to a file. For this
+     * class, they cannot.
+     */
+    __constexpr virtual bool
+        are_failed_values_written_to_files() const noexcept;
+
+    __constexpr virtual void
+        subclass_reset_data() noexcept final
+    {}
+private:
+    T*          _m_elements;
+    std::size_t _m_elements_size;
+};
+
+/*!
+ * Constructor which should be used. It creates a singleton collection.
+ */
+template <typename T, typename R = std::initializer_list<T>>
+requires std::same_as<std::ranges::range_value_t<R>, T>
+__constexpr data_generator_collection_t<std::ranges::range_value_t<R>, true>
+            iterate_over(R&& _a_init_list);
 _END_ABC_NS
 
 _BEGIN_ABC_NS
-	template<
-		typename T
-	>
-	__constexpr_imp
-		static_data_t<T>::static_data_t(
-		) noexcept
-		: gen_data_base_t<T>(0, std::optional<utility::io::file_rw_info_t<T>>{})
-		, _m_elements(nullptr)
-		, _m_elements_size(0)
-	{
+template <typename T>
+__constexpr_imp
+    static_data_t<T>::static_data_t() noexcept
+    : data_generator_t<T>(0, std::optional<utility::io::file_rw_info_t<T>>{})
+    , _m_elements(nullptr)
+    , _m_elements_size(0)
+{}
 
-	}
-	template<
-		typename T
-	>
-	template<
-		typename R
-	>
-	requires std::ranges::sized_range<R> && std::same_as<std::ranges::range_value_t<R>,T>
-	__constexpr_imp
-		static_data_t<T>::static_data_t(
-			R&& _a_init_list
-		) noexcept
-		: gen_data_with_repetition_type_t<T, static_rep_data_t>(0)
-	//	: gen_data_base_t<T>(0, std::optional<utility::io::file_rw_info_t<T>>{}, "", std::vector<T>())
-		, _m_elements(std::ranges::size(_a_init_list) == 0 ?
-			nullptr : 
-			new T[std::ranges::size(_a_init_list)])
-		, _m_elements_size(_a_init_list.size())
-	{
-		for (std::size_t _l_idx{ 0 }; auto&& _l_element : _a_init_list)
-		{
-			_m_elements[_l_idx++] = _l_element;
-		}
-	}
-	template<
-		typename T
-	>
-	__constexpr_imp
-		static_data_t<T>::~static_data_t(
-		)
-	{
-		if (_m_elements_size > 0)
-		{
-			delete _m_elements;
-		}
-	}
-	template<
-		typename T
-	>
-	__constexpr_imp
-		static_rep_data_t
-		static_data_t<T>::subclass_get_repetition_data(
-		) const noexcept
-	{
-		using namespace std;
-		return this->_m_elements_generated;
-	}
-	template<
-		typename T
-	>
-	__constexpr_imp
-		bool
-		static_data_t<T>::subclass_has_current_element(
-		) const noexcept
-	{
-		return this->_m_elements_generated < _m_elements_size;
-	}
-	template<
-		typename T
-	>
-	__constexpr_imp
-		const T&
-		static_data_t<T>::subclass_current_element(
-		) const noexcept
-	{
-		return _m_elements[this->_m_elements_generated];
-	}
-	template<
-		typename T
-	>
-	__constexpr_imp
-		bool
-		static_data_t<T>::subclass_generate_next(
-		)
-	{
-		this->_m_elements_generated++;
-		return subclass_has_current_element();
-	}
-	template<
-		typename T
-	>
-	__constexpr_imp
-		void
-		static_data_t<T>::subclass_set_data_using_mode_and_repetition_data(
-			const std::size_t _a_mode,
-			const static_rep_data_t _a_rep_data
-		)
-	{
-		using namespace utility::str;
-		using namespace errors;
-		using namespace std;
-		string _a_additional_data;
-		if (_a_mode == 1)
-		{
-			this->_m_elements_generated = parser_t<size_t>().run_parser_with_exception(_a_additional_data);
-			if (this->_m_elements_generated >= _m_elements_size)
-			{
-				throw test_library_exception_t(
-					fmt::format(
-						"Could not instantiate static_data_t element at index {0} "
-						"as size of static_data_t array is {1}.",
-						this->_m_elements_generated,
-						_m_elements_size));
-			}
-		}
-		else
-		{
-			throw unsupported_mode_exception("static_data_t", _a_mode, { 0,1 });
-		}
-	}
-	template<
-		typename T
-	>
-	__constexpr_imp
-		bool
-		static_data_t<T>::are_failed_values_written_to_files(
-		) const noexcept
-	{
-		return false;
-	}
-	template<
-		typename T,
-		typename R
-	>
-	requires std::same_as<std::ranges::range_value_t<R>,T>
-	__constexpr_imp
-		gen_data_collection_t<std::ranges::range_value_t<R>>
-		iterate_over(
-			R&& _a_init_list
-		)
-	{
-		using namespace std;
-		using TT = ranges::range_value_t<R>;
-		return unary_collection<T>(new static_data_t<TT>(forward<R>(_a_init_list)));
-	}
+template <typename T>
+template <typename R>
+requires std::ranges::sized_range<R>
+             && std::same_as<std::ranges::range_value_t<R>, T>
+__constexpr_imp
+    static_data_t<T>::static_data_t(
+        R&& _a_init_list
+    ) noexcept
+    : data_generator_with_file_support_t<T, static_rep_data_t,false,false>(0)
+    //	: gen_data_base_t<T>(0, std::optional<utility::io::file_rw_info_t<T>>{},
+    //"", std::vector<T>())
+    , _m_elements(
+          std::ranges::size(_a_init_list) == 0
+              ? nullptr
+              : new T[std::ranges::size(_a_init_list)]
+      )
+    , _m_elements_size(_a_init_list.size())
+{
+    for (std::size_t _l_idx{0}; auto&& _l_element : _a_init_list)
+    {
+        _m_elements[_l_idx++] = _l_element;
+    }
+}
+
+template <typename T>
+__constexpr_imp static_data_t<T>::~static_data_t()
+{
+    if (_m_elements_size > 0)
+    {
+        delete _m_elements;
+    }
+}
+
+template <typename T>
+__constexpr_imp static_rep_data_t
+    static_data_t<T>::subclass_get_repetition_data() const noexcept
+{
+    using namespace std;
+    return this->_m_elements_generated;
+}
+
+template <typename T>
+__constexpr_imp bool
+    static_data_t<T>::subclass_has_current_element() const noexcept
+{
+    return this->_m_elements_generated < _m_elements_size;
+}
+
+template <typename T>
+__constexpr_imp const T&
+    static_data_t<T>::subclass_current_element() const noexcept
+{
+    return _m_elements[this->_m_elements_generated];
+}
+
+template <typename T>
+__constexpr_imp bool
+    static_data_t<T>::subclass_generate_next()
+{
+    this->_m_elements_generated++;
+    return subclass_has_current_element();
+}
+
+template <typename T>
+__constexpr_imp void
+    static_data_t<T>::subclass_set_data_using_mode_and_repetition_data(
+        const std::size_t       _a_mode,
+        const static_rep_data_t _a_rep_data
+    )
+{
+    using namespace utility::str;
+    using namespace errors;
+    using namespace std;
+    string _a_additional_data;
+    if (_a_mode == 1)
+    {
+        this->_m_elements_generated
+            = parser_t<size_t>().run_parser_with_exception(_a_additional_data);
+        if (this->_m_elements_generated >= _m_elements_size)
+        {
+            throw test_library_exception_t(fmt::format(
+                "Could not instantiate static_data_t element at index {0} "
+                "as size of static_data_t array is {1}.",
+                this->_m_elements_generated,
+                _m_elements_size
+            ));
+        }
+    }
+    else
+    {
+        throw unsupported_mode_exception(typeid(*this), _a_mode, {0, 1});
+    }
+}
+
+template <typename T>
+__constexpr_imp bool
+    static_data_t<T>::are_failed_values_written_to_files() const noexcept
+{
+    return false;
+}
+
+template <typename T, typename R>
+requires std::same_as<std::ranges::range_value_t<R>, T>
+__constexpr_imp data_generator_collection_t<std::ranges::range_value_t<R>, true>
+                iterate_over(
+                    R&& _a_init_list
+                )
+{
+    using namespace std;
+    return unary_collection<T>(
+        make_shared<static_data_t<T>>(forward<R>(_a_init_list))
+    );
+}
+
 _END_ABC_NS

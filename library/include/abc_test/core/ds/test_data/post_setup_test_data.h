@@ -3,7 +3,7 @@
 //#include "abc_test/core/test_options.h"
 #include "abc_test/utility/str/string_utility.h"
 #include "abc_test/core/ds/type_synonyms.h"
-#include "abc_test/core/ds/gen_data_memoization/for_loop_stack_trie.h"
+#include "abc_test/core/ds/data_generator_memoization/typeless_data_generator_collection_stack_trie.h"
 
 #include <vector>
 
@@ -50,7 +50,7 @@ public:
         const test_path_delimiter_ref    _a_test_hierarchy_delimiter,
         const unique_id_t                _a_discovery_id,
         const bool                       _a_is_test_to_be_ran,
-        const ds::for_loop_stack_trie_t* _a_for_loop_stack_trie,
+        const ds::tdg_collection_stack_trie_t* _a_for_loop_stack_trie,
         const size_t                     _a_maximum_threads_allowed
     ) noexcept;
     /*!
@@ -96,7 +96,7 @@ public:
      * @return A cref to the for_loop_stack_tree_t variable associated with this
      * object.
      */
-    __constexpr const ds::for_loop_stack_trie_t&
+    __constexpr const ds::tdg_collection_stack_trie_t&
                       for_loop_stack_trie() const;
     /*!
      * @brief Returns the thread resourses required by this test, as stipulated
@@ -130,7 +130,7 @@ private:
     // The number of threads required by the system.
     size_t _m_thread_resourses_required;
     // A pointer to the trie associated with this test.
-    const ds::for_loop_stack_trie_t* _m_for_loop_stack_trie;
+    const ds::tdg_collection_stack_trie_t* _m_for_loop_stack_trie;
 };
 
 _END_ABC_DS_NS
@@ -156,7 +156,7 @@ __constexpr_imp
         const test_path_delimiter_ref    _a_test_hierarchy_delimiter,
         const unique_id_t                _a_discovery_id,
         const bool                       _a_is_test_to_be_ran,
-        const ds::for_loop_stack_trie_t* _a_repetition_data,
+        const ds::tdg_collection_stack_trie_t* _a_repetition_data,
         const size_t                     _a_maximum_threads_allowed
     ) noexcept
     : _m_registered_test_data(_a_registered_test_data)
@@ -207,7 +207,7 @@ __constexpr_imp bool
     return _m_for_loop_stack_trie != nullptr;
 }
 
-__constexpr_imp const ds::for_loop_stack_trie_t&
+__constexpr_imp const ds::tdg_collection_stack_trie_t&
                       post_setup_test_data_t::for_loop_stack_trie() const
 {
     if (_m_for_loop_stack_trie == nullptr)

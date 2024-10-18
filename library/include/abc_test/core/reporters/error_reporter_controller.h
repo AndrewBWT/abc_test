@@ -150,11 +150,10 @@ __no_constexpr_imp void
     using namespace std;
     using namespace utility;
     unique_lock _l_error_reporter_unique_lock(_m_errors_mutex);
-    for (const shared_and_raw_ptr<error_reporter_t>& _l_reporter :
+    for (reference_wrapper<const error_reporter_t> _l_reporter :
          _m_error_reporters)
     {
-        error_reporter_t* _l_reporter_ptr{get_ptr(_l_reporter)};
-        _l_reporter_ptr->report_error(_a_error);
+        _l_reporter.get().report_error(_a_error);
     }
     if (_a_error.unrecoverable_error())
     {
@@ -171,11 +170,10 @@ __constexpr_imp void
     using namespace std;
     using namespace utility;
     unique_lock _l_error_reporter_unique_lock(_m_errors_mutex);
-    for (const shared_and_raw_ptr<error_reporter_t>& _l_reporter :
+    for (reference_wrapper<const error_reporter_t> _l_reporter :
          _m_error_reporters)
     {
-        error_reporter_t* _l_reporter_ptr{get_ptr(_l_reporter)};
-        _l_reporter_ptr->report_information(_a_str);
+        _l_reporter.get().report_information(_a_str);
     }
 }
 
@@ -233,11 +231,10 @@ __constexpr_imp void
 {
     using namespace std;
     using namespace utility;
-    for (const shared_and_raw_ptr<error_reporter_t>& _l_reporter :
+    for (reference_wrapper<const error_reporter_t> _l_reporter :
          _m_error_reporters)
     {
-        error_reporter_t* _l_reporter_ptr{utility::get_ptr(_l_reporter)};
-        _l_reporter_ptr->exit();
+        _l_reporter.get().exit();
     }
 }
 

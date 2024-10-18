@@ -93,7 +93,7 @@ using enumerate_data_id_type_t = std::size_t;
 template<
 	typename T
 >
-class enumerate_data_t : public gen_data_with_repetition_type_and_element_t<T,enumerate_data_id_type_t>
+class enumerate_data_t : public data_generator_with_file_support_and_element_storage_t<T,enumerate_data_id_type_t>
 {
 public:
 	__constexpr
@@ -160,7 +160,7 @@ template<
 	typename T
 >
 __constexpr
-	gen_data_collection_t<T>
+	data_generator_collection_t<T>
 	enumerate_data(
 		const enumerate_t<T>& _a_enumerate
 	) noexcept;
@@ -168,7 +168,7 @@ template<
 	typename T
 >
 __constexpr
-	gen_data_collection_t<T>
+	data_generator_collection_t<T>
 	enumerate_data_using_file_type_1(
 		const enumerate_t<T>& _a_enumerate,
 		const utility::io::file_rw_info_t<T>& _a_file_data
@@ -177,7 +177,7 @@ template<
 	typename T
 >
 __constexpr
-	gen_data_collection_t<T>
+	data_generator_collection_t<T>
 	enumerate_data_using_file_type_2(
 		const enumerate_t<T>& _a_enumerate,
 		const utility::io::file_name_t& _a_file_name
@@ -186,7 +186,7 @@ template<
 	typename T
 >
 __constexpr
-	gen_data_collection_t<T>
+	data_generator_collection_t<T>
 	enumerate_data_using_file_type_3(
 		const enumerate_t<T>& _a_enumerate,
 		const utility::io::file_rw_info_t<T>& _a_file_data,
@@ -196,7 +196,7 @@ template<
 	typename T
 >
 __constexpr
-	gen_data_collection_t<T>
+	data_generator_collection_t<T>
 	randomly_probe_enumerated_data(
 		const enumerate_t<T>& _a_enumerate
 	) noexcept;
@@ -434,7 +434,7 @@ __constexpr_imp
 		const utility::io::opt_file_name_t& _a_enumerate_opt_data_file_name,
 		const test_options_t* _a_test_options
 	) noexcept
-	: gen_data_with_repetition_type_and_element_t<T, enumerate_data_id_type_t>(0, 
+	: data_generator_with_file_support_and_element_storage_t<T, enumerate_data_id_type_t>(0, 
 		_a_templated_file_rw, {},_a_test_options->_m_enumerate_data_file_type, 
 		_a_enumerate_opt_data_file_name, _a_enumerate.min(), _a_test_options)
 	, _m_enumerable(_a_enumerate)
@@ -493,7 +493,7 @@ template<
 	typename T
 >
 __constexpr_imp
-	gen_data_collection_t<T>
+	data_generator_collection_t<T>
 	enumerate_data(
 		const enumerate_t<T>& _a_enumerate
 	) noexcept
@@ -506,7 +506,7 @@ template<
 	typename T
 >
 __constexpr_imp
-	gen_data_collection_t<T>
+	data_generator_collection_t<T>
 	enumerate_data_using_file_type_1(
 		const enumerate_t<T>& _a_enumerate,
 		const utility::io::file_rw_info_t<T>& _a_file_data
@@ -520,7 +520,7 @@ template<
 	typename T
 >
 __constexpr_imp
-		gen_data_collection_t<T>
+		data_generator_collection_t<T>
 	enumerate_data_using_file_type_2(
 		const enumerate_t<T>& _a_enumerate,
 		const utility::io::file_name_t& _a_file_name
@@ -534,7 +534,7 @@ template<
 	typename T
 >
 __constexpr_imp
-	gen_data_collection_t<T>
+	data_generator_collection_t<T>
 	enumerate_data_using_file_type_3(
 		const enumerate_t<T>& _a_enumerate,
 		const utility::io::file_rw_info_t<T>& _a_file_data,
@@ -549,7 +549,7 @@ template<
 	typename T
 >
 __constexpr_imp
-	gen_data_collection_t<T>
+	data_generator_collection_t<T>
 	randomly_probe_enumerated_data(
 		const enumerate_t<T>& _a_enumerate
 	) noexcept

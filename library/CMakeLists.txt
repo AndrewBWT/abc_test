@@ -7,6 +7,9 @@ set(REQUIRED_LIBS
 )
 # The set of all files included with the library.
 set(LIBRARY_FILES
+  # Global file
+  include/abc_test/core/global.h
+      src/abc_test/core/global.cpp
   # The core subfolder; contains the core logic for how the library works.
   include/abc_test/core.h
   include/abc_test/core/test_main.h
@@ -21,11 +24,11 @@ set(LIBRARY_FILES
   include/abc_test/core/test_assertions/macros.h
   include/abc_test/core/test_assertions/functions.h
   # Subfolder contains objects and functions pertaining to how repetition data is stored.
-  include/abc_test/core/ds/gen_data_memoization/for_loop_creation_data.h
-  include/abc_test/core/ds/gen_data_memoization/for_loop_stack_trie.h
-  include/abc_test/core/ds/gen_data_memoization/for_loop_stack.h
-  include/abc_test/core/ds/gen_data_memoization/gen_collection_creation_data.h 
-  include/abc_test/core/ds/gen_data_memoization/gen_data_creation_data.h
+  include/abc_test/core/ds/data_generator_memoization/indexed_data_generator_collection_memoized_element.h
+  include/abc_test/core/ds/data_generator_memoization/typeless_data_generator_collection_stack_trie.h
+  include/abc_test/core/ds/data_generator_memoization/typeless_data_generator_collection_stack.h
+  include/abc_test/core/ds/data_generator_memoization/data_generator_collection_memoized_element.h 
+  include/abc_test/core/ds/data_generator_memoization/data_generator_memoized_element.h
   # Contains code for test data - e.g. name, location, repetition data.
   include/abc_test/core/ds/test_data/invoked_test_data.h
   include/abc_test/core/ds/test_data/registered_test_data.h
@@ -74,6 +77,14 @@ set(LIBRARY_FILES
   include/abc_test/core/test_reports/assertion_status/pass_or_terminate.h
   include/abc_test/core/test_reports/matcher_based_assertion_block.h
   include/abc_test/core/test_reports/matcher_based_assertion.h
+  # The core logic for the data generators. There are no objects here, only abstract objects and iterators.
+  include/abc_test/core/data_generator/data_generator.h
+  include/abc_test/core/data_generator/data_generator_with_file_support.h
+  include/abc_test/core/data_generator/data_generator_with_file_and_element_support.h
+  include/abc_test/core/data_generator/data_generator_collection.h
+  include/abc_test/core/data_generator/data_generator_collection_iterator.h
+  include/abc_test/core/data_generator/typeless_data_generator_collection_iterator.h
+  include/abc_test/core/data_generator/data_generator_collection_sentinel.h
   # Matcher subfolder. Code contains logic for writing individual assertions.
   include/abc_test/matchers/matcher.h
   include/abc_test/matchers/basic_matchers.h
@@ -94,15 +105,8 @@ set(LIBRARY_FILES
       src/abc_test/matchers/source_map.cpp
   include/abc_test/matchers/function_wrapper.h
   # gen_data subfolder. Contains the logic that allow the gen_data for loops to work.
-  include/abc_test/gen_data/gen_data_base.h
-  include/abc_test/gen_data/gen_data_with_repetition_type.h
-  include/abc_test/gen_data/gen_data_with_repetition_type_and_element.h
   include/abc_test/gen_data/manual_for_loop.h
   include/abc_test/gen_data/file.h
-  include/abc_test/gen_data/collection.h
-  include/abc_test/gen_data/collection_iterator.h
-  include/abc_test/gen_data/collection_iterator_agnostic_data.h
-  include/abc_test/gen_data/collection_sentinel.h
   include/abc_test/gen_data/random_data.h
   include/abc_test/gen_data/random_data_description.h
   # Subfolder contains logic specifically to do with random data generation.
@@ -172,9 +176,6 @@ set(LIBRARY_FILES
   include/abc_test/utility/str/string_table.h
   include/abc_test/utility/str.h
   include/abc_test/utility/str/rw_info.h
-  # Global file
-  include/abc_test/global.h
-      src/abc_test/global.cpp
   # Included instances
   # Text test reporter
   include/abc_test/included_instances/reporters/text_test_reporter.h

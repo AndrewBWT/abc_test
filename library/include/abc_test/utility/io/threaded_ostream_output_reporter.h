@@ -23,10 +23,10 @@ public:
 		void
 		write(
 			const std::string_view _a_line
-		) noexcept;
+		) const noexcept;
 protected:
-	std::osyncstream _m_output_stream;
-	std::mutex _l_mutex;
+	mutable std::osyncstream _m_output_stream;
+	mutable std::mutex _l_mutex;
 };
 _END_ABC_UTILITY_IO_NS
 
@@ -42,7 +42,7 @@ __no_constexpr_imp
 	void
 	threaded_ostream_output_reporter_t::write(
 		const std::string_view _a_line
-	) noexcept
+	) const noexcept
 {
 	using namespace std;
 	unique_lock _l_ul(_l_mutex);

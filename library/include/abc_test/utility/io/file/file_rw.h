@@ -1,5 +1,8 @@
 #pragma once
 #include "abc_test/utility/io/file/file_rw_info.h"
+#include "abc_test/utility/io/file/file_rw.h"
+#include "abc_test/utility/io/file/file_reader.h"
+#include "abc_test/utility/io/file/file_writer.h"
 
 _BEGIN_ABC_UTILITY_IO_NS
 	template<

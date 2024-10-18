@@ -56,9 +56,9 @@ public:
 		void
 		report_test(
 			const ds::invoked_test_data_t& _a_itd
-		) override;
+		) const override;
 	__constexpr_imp virtual void
-		final_report(ds::test_set_data_t& _a_test_set_data) noexcept
+		final_report(ds::test_set_data_t& _a_test_set_data) const noexcept
 	{
 
 	}
@@ -100,7 +100,7 @@ __no_constexpr_imp
 		void
 		text_test_reporter_t::report_test(
 			const ds::invoked_test_data_t& _a_itd
-		) 
+		) const
 	{
 		using namespace std;
 		using namespace ds;

@@ -48,7 +48,7 @@ __no_constexpr_or_inline_imp void
     }
     catch (const exception& _l_exception)
     {
-        _m_current_test->set_unexpected_termination(
+        _l_current_test.set_unexpected_termination(
             make_unique<const unexpected_report_t<true>>(
                 unexpected_thrown_exception_t(
                     most_recent_source(),
@@ -60,55 +60,58 @@ __no_constexpr_or_inline_imp void
     }
     catch (...)
     {
-        _m_current_test->set_unexpected_termination(
+        _l_current_test.set_unexpected_termination(
             make_unique<const unexpected_report_t<true>>(
-                unexpected_thrown_not_derived_from_std_exception_t(most_recent_source())
+                unexpected_thrown_not_derived_from_std_exception_t(
+                    most_recent_source()
+                )
             )
         );
     }
-    _m_trc->report_test(*_m_current_test);
-    _m_current_error_log_msgs.clear();
+    _m_trc.get().report_test(_l_current_test);
+    _m_current_log_msgs.clear();
     ++_m_tests_ran;
 }
 
 __no_constexpr_or_inline_imp void
-    test_runner_t::remove_error_info(
-        std::list<const log_msg_t*>::iterator _a_itt
+    test_runner_t::remove_log_msg(
+        log_msg_itt_t _a_itt
     ) noexcept
 {
     using namespace std;
-    //_m_cached_log_msgs.push_back(string((*_a_itt)->str()));
-    _m_current_error_log_msgs.erase(_a_itt);
+    _m_current_log_msgs.erase(_a_itt);
 }
-__no_constexpr_or_inline_imp std::vector<std::string>
+
+__no_constexpr_or_inline_imp ds::log_infos_t
                              test_runner_t::get_log_infos(
         const bool _a_get_cached_results
     ) noexcept
 {
     using namespace std;
-    vector<string> _l_rv;
+    using namespace ds;
+    log_infos_t _l_rv;
     if (_a_get_cached_results)
     {
         return _m_cached_log_msgs;
     }
     else
     {
-        using itt = list<const log_msg_t*>::iterator;
-        itt         _l_end{_m_current_error_log_msgs.end()};
-        vector<itt> _l_to_deletes;
-        for (itt _l_itt{_m_current_error_log_msgs.begin()}; _l_itt != _l_end;
+        log_msg_itt_t         _l_end{_m_current_log_msgs.end()};
+        vector<log_msg_itt_t> _l_to_deletes;
+        for (log_msg_itt_t _l_itt{_m_current_log_msgs.begin()};
+             _l_itt != _l_end;
              ++_l_itt)
         {
-            const log_msg_t* _l_elem = *_l_itt;
-            _l_rv.push_back(string(_l_elem->str()));
-            if (_l_elem->delete_after_use())
+            const log_msg_t& _l_elem{(*_l_itt).get()};
+            _l_rv.push_back(string(_l_elem.str()));
+            if (_l_elem.delete_after_use())
             {
                 _l_to_deletes.push_back(_l_itt);
             }
         }
-        for (itt _l_to_delete : _l_to_deletes)
+        for (log_msg_itt_t _l_to_delete : _l_to_deletes)
         {
-            _m_current_error_log_msgs.erase(_l_to_delete);
+            _m_current_log_msgs.erase(_l_to_delete);
         }
     }
     return _l_rv;

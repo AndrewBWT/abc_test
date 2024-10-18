@@ -22,7 +22,7 @@ using rep_data_t = std::pair<std::size_t, std::size_t>;
 template<
 	typename T
 >
-struct random_data_t : public gen_data_with_repetition_type_and_element_t<T, rep_data_t>
+struct random_data_t : public data_generator_with_file_support_and_element_storage_t<T, rep_data_t>
 {
 public:
 	/*!
@@ -105,7 +105,7 @@ template<
 	typename T
 >
 __constexpr
-	gen_data_collection_t<T>
+	data_generator_collection_t<T>
 	random_data(
 		random_generator_t<T>* _a_rnd_base = new random_generator_t<T>()
 	);
@@ -113,7 +113,7 @@ template<
 	typename T
 >
 __constexpr
-	gen_data_collection_t<T>
+	data_generator_collection_t<T>
 	random_data(
 		utility::io::file_name_t& _a_file_name,
 		random_generator_t<T>* _a_rnd_base = new random_generator_t<T>()
@@ -121,7 +121,7 @@ __constexpr
 template<
 	typename T
 >
-gen_data_collection_t<T>
+data_generator_collection_t<T>
 	random_data(
 		const utility::io::file_name_t& _a_file_name
 	) noexcept
@@ -131,7 +131,7 @@ gen_data_collection_t<T>
 template<
 	typename T
 >
-gen_data_collection_t<T>
+data_generator_collection_t<T>
 	random_data(
 		random_generator_t<T>* _a_rnd_base,
 		const utility::str::rw_info_t<T>& _a_rw_info
@@ -146,7 +146,7 @@ template<
 	typename T
 >
 __constexpr
-	gen_data_collection_t<T>
+	data_generator_collection_t<T>
 	random_data(
 		random_generator_t<T>* _a_rnd_base,
 		const std::optional<utility::io::file_rw_info_t<T>>& _a_opt_tfrw
@@ -256,7 +256,7 @@ __constexpr_imp
 		const utility::io::opt_file_name_t& _a_enumerate_opt_data_file_name,
 		const test_options_t* _a_test_options
 	) noexcept
-	: gen_data_with_repetition_type_and_element_t<T, rep_data_t>(0, _a_templated_file_rw, {},
+	: data_generator_with_file_support_and_element_storage_t<T, rep_data_t>(0, _a_templated_file_rw, {},
 		_a_test_options->_m_random_data_file_type, {}, T{})
 	//: gen_data_base_t<T>(0,
 	//	_a_templated_file_rw,std::vector<T>())
@@ -305,7 +305,7 @@ template<
 	typename T
 >
 __constexpr_imp
-	gen_data_collection_t<T>
+	data_generator_collection_t<T>
 	random_data(
 		random_generator_t<T>* _a_rnd_base
 	)
@@ -316,7 +316,7 @@ template<
 	typename T
 >
 __constexpr_imp
-	gen_data_collection_t<T>
+	data_generator_collection_t<T>
 	random_data(
 		random_generator_t<T>* _a_rnd_base,
 		const std::optional<utility::io::file_rw_info_t<T>>& _a_tfrwi

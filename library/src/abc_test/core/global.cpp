@@ -1,4 +1,4 @@
-#include "abc_test/global.h"
+#include "abc_test/core/global.h"
 
 #include "abc_test/core/options/test_options_base.h"
 #include "abc_test/core/test_runner.h"
@@ -13,9 +13,6 @@ __no_constexpr_or_inline_imp test_options_base_t&
     using namespace reporters;
     test_options_base_t& _l_to{get_inner_global_test_options()};
     _l_to = _a_options;
-    error_reporter_controller_t& _l_erc{
-        get_inner_global_error_reporter_controller()
-    };
     return _l_to;
 }
 

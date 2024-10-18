@@ -35,7 +35,7 @@ _BEGIN_ABC_REPORTERS_NS
 			void
 			report_error(
 				const errors::setup_error_t& _a_error
-			) noexcept;
+			) const noexcept;
 		/*!
 		* Function for dealing with simple information; in this case, it is streamed to the output.
 		*/
@@ -44,7 +44,7 @@ _BEGIN_ABC_REPORTERS_NS
 			void
 			report_information(
 				const std::string_view _a_str
-			) noexcept;
+			) const noexcept;
 		/*!
 		* What to do if the test suite is terminated - e.g. any cleaning up
 		*/
@@ -52,7 +52,7 @@ _BEGIN_ABC_REPORTERS_NS
 			virtual
 			void
 			exit(
-			) noexcept;
+			) const noexcept;
 	};
 _END_ABC_REPORTERS_NS
 
@@ -76,7 +76,7 @@ __no_constexpr_imp
 		void
 		text_error_reporter_t::report_error(
 			const errors::setup_error_t& _a_setup_test_error
-		) noexcept
+		) const noexcept
 	{
 		write(fmt::format(
 			"ERROR:\n"
@@ -99,14 +99,14 @@ __no_constexpr_imp
 		void
 		text_error_reporter_t::report_information(
 			const std::string_view _a_str
-		) noexcept
+		) const noexcept
 	{
 		write("WARNING: " + std::string(_a_str));
 	}
 __no_constexpr_imp
 		void
 		text_error_reporter_t::exit(
-		) noexcept
+		) const noexcept
 	{
 		write("Preparing to exit...");
 	}

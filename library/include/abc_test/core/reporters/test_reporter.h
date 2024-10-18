@@ -17,7 +17,7 @@ public:
     __constexpr virtual void
         report_test(
             const ds::invoked_test_data_t& _a_itd
-        )
+        ) const
         = 0;
     /*!
      * @brief Abstract function used to process the final report.
@@ -26,7 +26,7 @@ public:
      * performed.
      */
     __constexpr virtual void
-        final_report(ds::test_set_data_t& _a_test_set_data) noexcept
+        final_report(ds::test_set_data_t& _a_test_set_data) const noexcept
         = 0;
 };
 
@@ -35,5 +35,5 @@ public:
  * pointers or shared pointers.
  */
 using test_reporters_t
-    = std::vector<utility::shared_and_raw_ptr<test_reporter_t>>;
+    = std::vector<std::reference_wrapper<const test_reporter_t>>;
 _END_ABC_REPORTERS_NS

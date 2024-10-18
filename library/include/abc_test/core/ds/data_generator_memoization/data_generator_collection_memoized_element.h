@@ -1,5 +1,5 @@
 #pragma once
-#include "abc_test/core/ds/gen_data_memoization/gen_data_creation_data.h"
+#include "abc_test/core/ds/data_generator_memoization/data_generator_memoized_element.h"
 
 _BEGIN_ABC_DS_NS
 
@@ -26,7 +26,7 @@ _BEGIN_ABC_DS_NS
  * pertains to the index of the gen_data_t object in the gen_data_collection_t
  * collection.
  */
-struct gen_collection_creation_data_t
+struct data_generator_collection_memoized_element_t
 {
 public:
     /*!
@@ -35,7 +35,7 @@ public:
      * @return True if equal, false if not.
      */
     __constexpr bool
-        operator==(const gen_collection_creation_data_t& _a_rhs) const noexcept
+        operator==(const data_generator_collection_memoized_element_t& _a_rhs) const noexcept
         = default;
     /*!
      * @brief Spaceship operator for gen_collection_creation_data_t elements.
@@ -43,7 +43,7 @@ public:
      * @return Dependant on context.
      */
     __constexpr auto
-        operator<=>(const gen_collection_creation_data_t& _a_rhs) const noexcept
+        operator<=>(const data_generator_collection_memoized_element_t& _a_rhs) const noexcept
         = default;
     /*!
      * @brief The index in the gen_data_collection_t collection where the
@@ -53,13 +53,14 @@ public:
     /*!
      * @brief The internal gen_data_creation_data_t variable.
      */
-    gen_data_creation_data_t flied;
+    dg_memoized_element_t flied;
 };
+using dgc_memoized_element_t = data_generator_collection_memoized_element_t;
 
 _END_ABC_DS_NS
 
 template <>
-struct fmt::formatter<abc::ds::gen_collection_creation_data_t>
+struct fmt::formatter<abc::ds::data_generator_collection_memoized_element_t>
     : formatter<string_view>
 {
     /*!
@@ -68,7 +69,7 @@ struct fmt::formatter<abc::ds::gen_collection_creation_data_t>
     // Cannot be constexpr due to use of fmt::format.
     __no_constexpr auto
         format(
-            abc::ds::gen_collection_creation_data_t _a_rd,
+            abc::ds::data_generator_collection_memoized_element_t _a_rd,
             format_context&                         _a_cxt
         ) const -> format_context::iterator;
 };
@@ -77,8 +78,8 @@ _BEGIN_ABC_DS_NS
 _END_ABC_DS_NS
 
 __no_constexpr_imp auto
-    fmt::formatter<abc::ds::gen_collection_creation_data_t>::format(
-        abc::ds::gen_collection_creation_data_t _a_rd,
+    fmt::formatter<abc::ds::data_generator_collection_memoized_element_t>::format(
+        abc::ds::data_generator_collection_memoized_element_t _a_rd,
         format_context&                         _a_ctx
     ) const -> format_context::iterator
 {
