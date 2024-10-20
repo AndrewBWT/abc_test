@@ -2,12 +2,11 @@
 #include "abc_test/core/ds/test_data/macros.h"
 #include "abc_test/core/logging/log_msg.h"
 #include "abc_test/core/test_assertions/macros.h"
-#include "abc_test/gen_data/enumerable/specializations/enum.h"
-#include "abc_test/matchers/comparison.h"
-#include "abc_test/matchers/comparison/constructors.h"
-#include "abc_test/matchers/function_wrapper.h"
-#include "abc_test/matchers/matcher.h"
-#include "abc_test/matchers/ranges.h"
+#include "abc_test/included_instances/gen_data/enumerable/specializations/enum.h"
+#include "abc_test/core/matchers/comparison.h"
+#include "abc_test/included_instances/matchers/function_wrapper.h"
+#include "abc_test/core/matchers/matcher_wrapper.h"
+#include "abc_test/included_instances/matchers/ranges.h"
 
 #include <numeric>
 #include <ranges>

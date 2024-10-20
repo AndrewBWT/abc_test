@@ -2,8 +2,8 @@
 
 #include "abc_test/core/test_reports/assertion.h"
 #include "abc_test/core/test_reports/assertion_status/dynamic_status.h"
-#include "abc_test/matchers/matcher_result.h"
-#include "abc_test/matchers/source_map.h"
+#include "abc_test/core/matchers/matcher_result.h"
+#include "abc_test/core/matchers/source_map.h"
 
 _BEGIN_ABC_REPORTS_NS
 

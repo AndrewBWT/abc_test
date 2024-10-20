@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/gen_data/enumerable.h"
+#include "abc_test/included_instances/gen_data/enumerable.h"
 #include <map>
 
 _BEGIN_ABC_NS

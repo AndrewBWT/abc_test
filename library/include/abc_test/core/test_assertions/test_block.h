@@ -1,7 +1,8 @@
 #pragma once
 #include "abc_test/core/ds/source/single_source.h"
-#include "abc_test/matchers/matcher.h"
+#include "abc_test/core/matchers/matcher_wrapper.h"
 #include "abc_test/utility/internal/macros.h"
+#include "abc_test/core/matchers/static_matcher.h"
 
 #include <optional>
 
@@ -111,7 +112,7 @@ __constexpr_imp
     : _m_source(ds::source_pair_t(_a_source))
     , _m_test_annotation(_a_test_annotation)
     , _m_processed(false)
-    , _m_matcher(matcher_base_ptr_t(new true_matcher_t()))
+    , _m_matcher(matcher_base_ptr_t(new static_matcher_t<reports::pass_t>()))
 {}
 
 template <typename Assertion_Type>

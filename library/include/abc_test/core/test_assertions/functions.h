@@ -10,7 +10,7 @@
 #include "abc_test/core/test_reports/matcher_based_assertion.h"
 #include "abc_test/core/test_reports/matcher_based_assertion_block.h"
 #include "abc_test/core/test_reports/static_assertion.h"
-#include "abc_test/matchers/matcher.h"
+#include "abc_test/core/matchers/matcher_wrapper.h"
 #include "abc_test/utility/str/string_utility.h"
 
 #include <concepts>

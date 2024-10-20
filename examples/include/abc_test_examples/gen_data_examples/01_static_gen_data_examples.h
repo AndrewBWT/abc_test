@@ -2,12 +2,11 @@
 #include "abc_test/core/data_generator/data_generator_collection_iterator.h"
 #include "abc_test/core/ds/test_data/macros.h"
 #include "abc_test/core/test_assertions/macros.h"
-#include "abc_test/gen_data/enumerable/specializations/enum.h"
-#include "abc_test/gen_data/static_data.h"
-#include "abc_test/matchers/comparison.h"
-#include "abc_test/matchers/comparison/constructors.h"
-#include "abc_test/matchers/matcher.h"
-#include "abc_test/matchers/ranges.h"
+#include "abc_test/included_instances/gen_data/enumerable/specializations/enum.h"
+#include "abc_test/included_instances/gen_data/static_data.h"
+#include "abc_test/core/matchers/comparison.h"
+#include "abc_test/core/matchers/matcher_wrapper.h"
+#include "abc_test/included_instances/matchers/ranges.h"
 
 #include <numeric>
 #include <ranges>
@@ -17,7 +16,7 @@
 _TEST_CASE(
     abc::test_data_t(
         {.name             = "file_01_example_01",
-         .description      = "A simple static gen data examples",
+         .description      = "Simpe data generator example using static_data.",
          .path             = "examples::gen_data_examples::static_gen_data",
          .threads_required = 2}
     )
@@ -25,50 +24,74 @@ _TEST_CASE(
 {
     using namespace abc;
     using namespace std;
-    using test_data_t        = pair<int, int>;
-    vector<test_data_t> _l_x = {
-        {1,  1  },
-        {1,  2  },
-        {1,  3  },
-        {1,  5  },
-        {2,  2  },
-        {24, 243}
-    };
-    for (auto&& [_l_int1, _l_int2] :
-         iterate_over<test_data_t, vector<test_data_t>>({}))
+    /*
+     * In this example ,we are testing a function. To keep evertyhing condensed,
+     * we will write it here as a std::function
+     */
+    function<int(int)> _l_f = [](int _a_input)
     {
-        _CHECK(annotate(_EXPR(_l_int1 == _l_int2), "Testing _l_int1 == _l_int2")
-        );
-    }
-    for (auto&& [_l_int1, _l_int2] : iterate_over<test_data_t>({
-             {1,      2     },
-             {2,      3     },
-             {4,      51    },
-             {19'956, 27'234}
+        return _a_input * 2;
+    };
+    // To test this function, we describe our test data as a pair.
+    using test_data_t = pair<int, int>;
+    /*
+     * This is a data generator. It iterates over a set of data, given as a list
+     * of test_data_t elements.
+     */
+    for (auto&& [_l_input, _l_output] : iterate_over<test_data_t>({
+             {0, 0},
+             {1, 2},
+             {2, 4},
+             {4, 7}
     }))
     {
-        _CHECK(annotate(_EXPR(_l_int1 == _l_int2), "Testing _l_int1 == _l_int2")
-        );
+        /*
+         * This loop will report an errror on its fourth iteration.
+         */
+        _CHECK(annotate(
+            _EXPR(_l_f(_l_input) == _l_output),
+            fmt::format("Testing _l_f({0}) == {1}", _l_input, _l_output)
+        ));
     }
+}
 
-    for (auto&& [_l_int1, _l_int2] : 
-        data_generator_collection<test_data_t>(
+_TEST_CASE(
+    abc::test_data_t(
+        {.name        = "file_01_example_02",
+         .description = "Showing how to define collections of data generators.",
+         .path        = "examples::gen_data_examples::static_gen_data",
+         .threads_required = 1}
+    )
+)
+{
+    using namespace abc;
+    using namespace std;
+    /*
+     * In this example we use the same test case, just to show some examples
+     */
+    function<int(int)> _l_f = [](int _a_input)
+    {
+        return _a_input * 2;
+    };
+    using test_data_t = pair<int, int>;
+    /*!
+     * This is a collection of data generators. They will be processed one after
+     * another.
+     */
+    for (auto&& [_l_input, _l_output] : data_generator_collection<test_data_t>(
              iterate_over<test_data_t>({
-                 {1,      2     },
-                 {2,      3     },
-                 {4,      51    },
-                 {19'956, 27'234}
-             }),
-             iterate_over<test_data_t>(_l_x)
-        ))
+                 {0, 0},
+                 {1, 2},
+    }),
+             iterate_over<test_data_t>({})
+         ))
     {
-        _CHECK(annotate(_EXPR(_l_int1 == _l_int2), "Testing _l_int1 == _l_int2")
-        );
-    }
-
-    for (auto&& [_l_int1, _l_int2] : data_generator_collection<test_data_t>())
-    {
-        _CHECK(annotate(_EXPR(_l_int1 == _l_int2), "Testing _l_int1 == _l_int2")
-        );
+        /*
+         * This loop won't fail. Its just to show collections off.
+         */
+        _CHECK(annotate(
+            _EXPR(_l_f(_l_input) == _l_output),
+            fmt::format("Testing _l_f({0}) == {1}", _l_input, _l_output)
+        ));
     }
 }

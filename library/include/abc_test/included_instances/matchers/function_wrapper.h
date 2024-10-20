@@ -1,9 +1,9 @@
 #pragma once
 
 #include <functional>
-#include "abc_test/matchers/generic_matcher.h"
+#include "abc_test/core/matchers/matcher_base.h"
 
-#include "abc_test/matchers/matcher.h"
+#include "abc_test/core/matchers/matcher_wrapper.h"
 
 _BEGIN_ABC_NS
 using function_wrapper_internal_t = std::function<matcher_result_t()>;

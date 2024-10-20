@@ -85,51 +85,54 @@ set(LIBRARY_FILES
   include/abc_test/core/data_generator/data_generator_collection_iterator.h
   include/abc_test/core/data_generator/typeless_data_generator_collection_iterator.h
   include/abc_test/core/data_generator/data_generator_collection_sentinel.h
+  # Core matcher files
+  include/abc_test/core/matchers/matcher_wrapper.h
+  include/abc_test/core/matchers/bool_matcher.h
+  include/abc_test/core/matchers/static_matcher.h
+      src/abc_test/core/matchers/static_matcher.cpp
+  include/abc_test/core/matchers/matcher_base.h
+  include/abc_test/core/matchers/operator_based_matcher.h
+  include/abc_test/core/matchers/comparison.h
+  include/abc_test/core/matchers/comparison/macros.h
+  include/abc_test/core/matchers/matcher_result.h
+  include/abc_test/core/matchers/comparison/comparison_matcher.h
+  include/abc_test/core/matchers/comparison/comparison_enum.h
+  include/abc_test/core/matchers/comparison/operators.h
+  include/abc_test/core/matchers/comparison/comparison_placeholder.h
+  include/abc_test/core/matchers/comparison/comparison_wrapper.h
+  include/abc_test/core/matchers/logic/logic_matcher.h
+  include/abc_test/core/matchers/logic/logic_enum.h
+  include/abc_test/core/matchers/source_map.h
+      src/abc_test/core/matchers/source_map.cpp
   # Matcher subfolder. Code contains logic for writing individual assertions.
-  include/abc_test/matchers/matcher.h
-  include/abc_test/matchers/basic_matchers.h
-  include/abc_test/matchers/generic_matcher.h
-  include/abc_test/matchers/operator_based_matcher.h
-  include/abc_test/matchers/comparison.h
-  include/abc_test/matchers/matcher_result.h
-  include/abc_test/matchers/comparison/comparison_matcher.h
-  include/abc_test/matchers/comparison/comparison_enum.h
-  include/abc_test/matchers/comparison/constructors.h
-  include/abc_test/matchers/comparison/operators.h
-  include/abc_test/matchers/comparison/placeholder.h
-  include/abc_test/matchers/comparison/wrapper.h
-  include/abc_test/matchers/logic/logic_matcher.h
-  include/abc_test/matchers/logic/logic_enum.h
-  include/abc_test/matchers/ranges.h
-  include/abc_test/matchers/source_map.h
-      src/abc_test/matchers/source_map.cpp
-  include/abc_test/matchers/function_wrapper.h
+  include/abc_test/included_instances/matchers/ranges.h
+  include/abc_test/included_instances/matchers/function_wrapper.h
   # gen_data subfolder. Contains the logic that allow the gen_data for loops to work.
-  include/abc_test/gen_data/manual_for_loop.h
-  include/abc_test/gen_data/file.h
-  include/abc_test/gen_data/random_data.h
-  include/abc_test/gen_data/random_data_description.h
+  include/abc_test/included_instances/gen_data/manual_for_loop.h
+  include/abc_test/included_instances/gen_data/file.h
+  include/abc_test/included_instances/gen_data/random_data.h
+  include/abc_test/included_instances/gen_data/random_data_description.h
   # Subfolder contains logic specifically to do with random data generation.
-  include/abc_test/gen_data/random/base.h
-  include/abc_test/gen_data/random/specializations.h
+  include/abc_test/included_instances/gen_data/random/base.h
+  include/abc_test/included_instances/gen_data/random/specializations.h
   # Folder containing random data specializations for std types.
-  include/abc_test/gen_data/random/specializations/fundamental_types.h
-  include/abc_test/gen_data/random/specializations/enum.h
-  include/abc_test/gen_data/random/specializations/array.h
-  include/abc_test/gen_data/random/specializations/vector.h
+  include/abc_test/included_instances/gen_data/random/specializations/fundamental_types.h
+  include/abc_test/included_instances/gen_data/random/specializations/enum.h
+  include/abc_test/included_instances/gen_data/random/specializations/array.h
+  include/abc_test/included_instances/gen_data/random/specializations/vector.h
   # Static data files
-  include/abc_test/gen_data/static_data.h
+  include/abc_test/included_instances/gen_data/static_data.h
   # Enumeration files
-  include/abc_test/gen_data/enumeration.h
-  include/abc_test/gen_data/enumerable.h
-  include/abc_test/gen_data/enumerable/min_value.h
-  include/abc_test/gen_data/enumerable/max_value.h
-  include/abc_test/gen_data/enumerable/specializations.h
+  include/abc_test/included_instances/gen_data/enumeration.h
+  include/abc_test/included_instances/gen_data/enumerable.h
+  include/abc_test/included_instances/gen_data/enumerable/min_value.h
+  include/abc_test/included_instances/gen_data/enumerable/max_value.h
+  include/abc_test/included_instances/gen_data/enumerable/specializations.h
   # Folder containing random data specializations for std types.
-  include/abc_test/gen_data/enumerable/specializations/fundamental_types.h
-  include/abc_test/gen_data/enumerable/specializations/enum.h
-  include/abc_test/gen_data/enumerable/specializations/array.h
-  include/abc_test/gen_data/enumerable/specializations/vector.h
+  include/abc_test/included_instances/gen_data/enumerable/specializations/fundamental_types.h
+  include/abc_test/included_instances/gen_data/enumerable/specializations/enum.h
+  include/abc_test/included_instances/gen_data/enumerable/specializations/array.h
+  include/abc_test/included_instances/gen_data/enumerable/specializations/vector.h
   # utility subfolder. Contains axillary helper classes and functions not necessary
   # related to the core testing framework.
   include/abc_test/utility/ptr_utility.h

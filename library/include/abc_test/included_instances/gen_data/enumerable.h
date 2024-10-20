@@ -1,8 +1,8 @@
 #pragma once
-#include "abc_test/gen_data/enumerable/concepts.h"
+#include "abc_test/included_instances/gen_data/enumerable/concepts.h"
 #include "abc_test/utility/internal/macros.h"
-#include "abc_test/gen_data/enumerable/min_value.h"
-#include "abc_test/gen_data/enumerable/max_value.h"
+#include "abc_test/included_instances/gen_data/enumerable/min_value.h"
+#include "abc_test/included_instances/gen_data/enumerable/max_value.h"
 #include <variant>
 #include <functional>
 

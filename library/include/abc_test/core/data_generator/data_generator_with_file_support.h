@@ -8,6 +8,46 @@ _BEGIN_ABC_NS
 // Value represents new mode value.
 using generate_next_return_type_t = std::optional<std::size_t>;
 
+/*!
+ * @brief This abstract object is an extension of the data_generator_t object
+ * designed to provide built-in file reading and writing of values, and an easy
+ * way of reading and writing data to data_generator_memoized_element_t
+ * entities.
+ *
+ * There is functionality in this class for writing to and from files in two
+ * ways. These are described as follows:
+ * - Using a parser/printer to/from T. This way, data can be written to a
+ * "general data" file. Though the user can choose the printer/pasrer they use,
+ * this defaults to using fmt and scn.
+ * -- This functionality is controlled via a boolean template paramter
+ * Supports_General_Data_File_IO.
+ * -- When data is written to a file, the
+ * typeless_data_generator_collection_stack_t element is written not using the
+ * subclass's derived data generator, but uses the line number of where the file
+ * was written to.
+ *
+ * - The second file IO uses a tertiary type Rep_Data. Rep_Data is some
+ * additonal type which derived classes of this type can use to set the data
+ * generator using the function
+ * subclass_set_data_using_mode_and_repetition_data.
+ * -- This functionaliy is controled via a boolean template paramter
+ * Supports_Rep_Data_File_IO.
+ * -- When data is written to a file, the
+ * typeless_data_generator_collection_stack_t element is written not using the
+ * subclass's derived data generator, but uses the line number of where the file
+ * was written to - just like Supports_General_Data_File_IO.
+ * -- This intermeidary type can be useful when the user doesn't want to write
+ * their own fmt/scn pair. Allowing them to use file writing, but without the
+ * additional overhead.
+ *
+ *
+ * @tparam T The parameter of the data generator.
+ * @tparam Rep_Data The type of the intermediary data.
+ * @tparam Supports_General_Data_File_IO Whether this instance supports
+ * Supports_General_Data_File_IO or not.
+ * @tparam Supports_Rep_Data_File_IO Whether this instance supports
+ * Supports_Rep_Data_File_IO or not.
+ */
 template <
     typename T,
     typename Rep_Data,
@@ -18,10 +58,11 @@ class data_generator_with_file_support_t : public data_generator_t<T>
 public:
     /*!
      * @brief Implementation of base class's has_current_element().
-     *
-     * Checks both files (if they are contained) to see if there are any
-     * elements. If not, moves onto the elements' subclass_current_element
-     * method.
+     * 
+     * It checks (assuming the template conditions allow) the elements in the following order:
+     * - General_Data file
+     * - Rep_Data file
+     * - subclass has_current().
      *
      * @return True if there is a current element. False otherwise.
      */
@@ -29,9 +70,8 @@ public:
         has_current_element() const final;
     /*!
      * @brief Gets the current element.
-     *
-     * This function will probe the associated files, if they exist. It will
-     * also fail if the mode is not correct.
+     * 
+     * This follows the same ordering as has_current_element().
      *
      * @return A cref to the current element.
      */
@@ -238,29 +278,34 @@ __constexpr_imp bool
         Supports_General_Data_File_IO,
         Supports_Rep_Data_File_IO>::has_current_element() const
 {
-    if constexpr (Supports_General_Data_File_IO)
+    switch (this->_m_mode)
     {
-        if (this->_m_mode == _STATIC_GENERAL_FILE_IO_MODE
-            && _m_core_data_rw_file.has_current_element())
+    case _STATIC_GENERAL_FILE_IO_MODE:
+        if constexpr (Supports_General_Data_File_IO)
         {
-            return true;
+            if (_m_core_data_rw_file.has_current_element())
+            {
+                return true;
+            }
         }
-    }
-    if constexpr (Supports_Rep_Data_File_IO)
-    {
-        if (this->_m_mode == _STATIC_REP_DATA_FILE_IO_MODE
-            && _m_rep_data_rw_file.has_current_element())
+        else
         {
-            return true;
+            throw generate_incorrect_mode_exception();
         }
-    }
-    if (this->_m_mode >= _STATIC_SUBCLASS_MODE_BEGIN)
-    {
+    case _STATIC_REP_DATA_FILE_IO_MODE:
+        if constexpr (Supports_Rep_Data_File_IO)
+        {
+            if (_m_rep_data_rw_file.has_current_element())
+            {
+                return true;
+            }
+        }
+        else
+        {
+            throw generate_incorrect_mode_exception();
+        }
+    default:
         return subclass_has_current_element();
-    }
-    else
-    {
-        throw generate_incorrect_mode_exception();
     }
 }
 
@@ -276,27 +321,28 @@ __constexpr_imp const T&
         Supports_General_Data_File_IO,
         Supports_Rep_Data_File_IO>::current_element() const
 {
-    if constexpr (Supports_General_Data_File_IO)
+    switch (this->_m_mode)
     {
-        if (this->_m_mode == _STATIC_GENERAL_FILE_IO_MODE)
+    case _STATIC_GENERAL_FILE_IO_MODE:
+        if constexpr (Supports_General_Data_File_IO)
         {
             return _m_core_data_rw_file.current_element();
         }
-    }
-    if constexpr (Supports_Rep_Data_File_IO)
-    {
-        if (this->_m_mode == _STATIC_REP_DATA_FILE_IO_MODE)
+        else
+        {
+            throw generate_incorrect_mode_exception();
+        }
+    case _STATIC_REP_DATA_FILE_IO_MODE:
+        if constexpr (Supports_Rep_Data_File_IO)
         {
             return subclass_current_element();
         }
-    }
-    if (this->_m_mode >= _STATIC_SUBCLASS_MODE_BEGIN)
-    {
+        else
+        {
+            throw generate_incorrect_mode_exception();
+        }
+    default:
         return subclass_current_element();
-    }
-    else
-    {
-        throw generate_incorrect_mode_exception();
     }
 }
 
@@ -312,13 +358,19 @@ __constexpr_imp bool
         Supports_General_Data_File_IO,
         Supports_Rep_Data_File_IO>::generate_next()
 {
+    // Generate next inner does all the work. It returns the opt mode.
     const generate_next_return_type_t _l_result{generate_next_inner()};
     if (_l_result.has_value())
     {
+        // If there is a mode, set the current mode to it (even if its the same
+        // as before)
         const size_t _l_mode{_l_result.value()};
         _m_has_current_element_been_written_to_file = false;
-        this->_m_mode                               = (_l_mode);
-        if (_l_mode == 1)
+        this->_m_mode                               = _l_mode;
+        // Special for this mode; set data using the data from the mode.
+        // We don't do this for mode 0 as that data is just read straight from
+        // the file. The data from mode 1 requires some processing.
+        if (_l_mode == _STATIC_REP_DATA_FILE_IO_MODE)
         {
             subclass_set_data_using_mode_and_repetition_data(
                 this->mode(), _m_rep_data_rw_file.current_element()
@@ -374,16 +426,10 @@ __constexpr_imp std::string
         return _m_line_reader_writer.printer().run_printer(
             _m_rep_data_rw_file.elements_read()
         );
-    case _STATIC_SUBCLASS_MODE_BEGIN:
+    default:
         return _m_rep_data_rw_info.printer().run_printer(
             subclass_get_repetition_data()
         );
-        break;
-    default:
-        throw test_library_exception_t(fmt::format(
-            "Invalid mode {0}. Must be between 0 and 2 (inclusive)",
-            this->_m_mode
-        ));
     }
 }
 
