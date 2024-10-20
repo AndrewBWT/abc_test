@@ -2,7 +2,7 @@
 #include "abc_test_test/test_utilities/register_test.h"
 
 #include "abc_test_test/pc_test_reporter.h"
-#include "abc_test/core/register_test.h"
+#include "abc_test/internal/register_test.h"
 
 #include <optional>
 

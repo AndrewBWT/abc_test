@@ -15,8 +15,8 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/generators/catch_generators_adapters.hpp>
 
-#include "abc_test/core/test_main.h"
-#include "abc_test/core/register_test.h"
+#include "abc_test/internal/test_main.h"
+#include "abc_test/internal/register_test.h"
 #include "abc_test/matcher/comparison.h"
 #include "abc_test/matcher/logic.h"
 #include "abc_test/matcher/logic/operators.h"

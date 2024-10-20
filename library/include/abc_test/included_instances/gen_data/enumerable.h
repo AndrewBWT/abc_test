@@ -1,12 +1,12 @@
 #pragma once
 #include "abc_test/included_instances/gen_data/enumerable/concepts.h"
-#include "abc_test/utility/internal/macros.h"
+#include "abc_test/internal/utility/internal/macros.h"
 #include "abc_test/included_instances/gen_data/enumerable/min_value.h"
 #include "abc_test/included_instances/gen_data/enumerable/max_value.h"
 #include <variant>
 #include <functional>
 
-#include "abc_test/core/errors/test_library_exception.h"
+#include "abc_test/internal/errors/test_library_exception.h"
 
 _BEGIN_ABC_NS
 	using enumerate_index_t = std::size_t;

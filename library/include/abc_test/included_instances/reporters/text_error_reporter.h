@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "abc_test/utility/io/threaded_text_output_reporter.h"
+#include "abc_test/internal/utility/io/threaded_text_output_reporter.h"
 
 
 _BEGIN_ABC_REPORTERS_NS

@@ -1,8 +1,8 @@
 #pragma once
 #include "abc_test/included_instances/gen_data/enumerable/specializations/enum.h"
-#include "abc_test/core/test_assertions/macros.h"
-#include "abc_test/core/ds/test_data/macros.h"
-#include "abc_test/core/matchers/matcher_wrapper.h"
+#include "abc_test/internal/test_assertions/macros.h"
+#include "abc_test/internal/ds/test_data/macros.h"
+#include "abc_test/internal/matchers/matcher_wrapper.h"
 
 #include "abc_test/included_instances/matchers/ranges.h"
 
@@ -12,9 +12,9 @@
 #include <numeric>
 
 
-#include "abc_test/core/matchers/comparison.h"
+#include "abc_test/internal/matchers/comparison.h"
 
-#include "abc_test/core/logging/log_msg.h"
+#include "abc_test/internal/logging/log_msg.h"
 #include <vector>
 #include "abc_test/included_instances/matchers/function_wrapper.h"
 
@@ -81,13 +81,13 @@ _TEST_CASE(abc::test_data_t({
 
 
 	_BEGIN_CHECK_ASSERTION_BLOCK(_l_mn, "description");
-	_l_mn = matcher_wrapper_t(false_matcher());
+	_l_mn = matcher_t(false_matcher());
 	_END_BLOCK(_l_mn);
 	/*!
 	* Another example showing what happens when we use the _MATCHER macro
 	*/
 	_BEGIN_CHECK_ASSERTION_BLOCK(_l_mn, "description");
-	_l_mn = _MATCHER(matcher_wrapper_t(false_matcher()));
+	_l_mn = _MATCHER(matcher_t(false_matcher()));
 	_END_BLOCK(_l_mn);
 }
 

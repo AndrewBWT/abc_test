@@ -4,10 +4,10 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/generators/catch_generators_adapters.hpp>
 
-#include "abc_test/core/test_main.h"
-#include "abc_test/core/ds/test_data/registered_test_data.h"
+#include "abc_test/internal/test_main.h"
+#include "abc_test/internal/ds/test_data/registered_test_data.h"
 #include "abc_test/matchers/comparison.h"
-#include "abc_test/core/test_assertions.h"
+#include "abc_test/internal/test_assertions.h"
 
 #include <functional>
 #include <initializer_list>
@@ -18,8 +18,8 @@
 #include "abc_test/gen_data/random_data.h"
 
 #include "abc_test/utility/str.h"
-#include "abc_test/core/reporters/text_test_reporter.h"
-#include "abc_test/core/log_test_msg.h"
+#include "abc_test/internal/reporters/text_test_reporter.h"
+#include "abc_test/internal/log_test_msg.h"
 #include "abc_test/gen_data/collection_iterator.h"
 
 #include "abc_test/gen_data/manual_for_loop.h"

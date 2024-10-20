@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test_test/test_utilities/register_test.h"
 
-#include "abc_test/core/test_tree/iterator.h"
+#include "abc_test/internal/test_tree/iterator.h"
 
 #include <optional>
 

@@ -1,8 +1,8 @@
 #pragma once
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/assertion.h"
-#include "abc_test/core/test_reports/matcher_based_assertion.h"
-#include "abc_test/core/test_reports/assertion_status/pass_or_terminate.h"
+#include "abc_test/internal/test_reports/matcher_based_assertion.h"
+#include "abc_test/internal/test_reports/assertion_status/pass_or_terminate.h"
 //#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/generic_matcher_based_assertion.h"
 _BEGIN_ABC_REPORTERS_NS
 template<

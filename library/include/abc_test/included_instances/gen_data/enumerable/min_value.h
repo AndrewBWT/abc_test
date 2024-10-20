@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/utility/internal/macros.h"
+#include "abc_test/internal/utility/internal/macros.h"
 #include <concepts>
 
 _BEGIN_ABC_NS

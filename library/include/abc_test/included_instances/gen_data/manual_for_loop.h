@@ -1,11 +1,11 @@
 #pragma once
 
-#include "abc_test/utility/internal/macros.h"
+#include "abc_test/internal/utility/internal/macros.h"
 #include "abc_test/gen_data/collection.h"
 
 #include "abc_test/gen_data/gen_data_base.h"
 
-#include "abc_test/core/errors/test_library_exception.h"
+#include "abc_test/internal/errors/test_library_exception.h"
 
 /*!
 * Code to run a manual for loop iteration. The manual_for_loop object is given as the first argument

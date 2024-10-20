@@ -1,17 +1,17 @@
 #pragma once
 
 #include "abc_test/gen_data/gen_data_base.h"
-#include "abc_test/core/test_runner.h"
+#include "abc_test/internal/test_runner.h"
 #include <random>
 #include "abc_test/gen_data/static_data.h"
 #include <concepts>
-#include "abc_test/utility/io/file/file_reader.h"
-#include "abc_test/utility/io/file/file_writer.h"
-#include "abc_test/utility/io/file/file_name.h"
+#include "abc_test/internal/utility/io/file/file_reader.h"
+#include "abc_test/internal/utility/io/file/file_writer.h"
+#include "abc_test/internal/utility/io/file/file_name.h"
 #include "abc_test/gen_data/gen_data_with_repetition_type_and_element.h"
 #include "abc_test/gen_data/random/base.h"
 #include "abc_test/gen_data/random_data_description.h"
-#include "abc_test/utility/str/rw_info.h"
+#include "abc_test/internal/utility/str/rw_info.h"
 
 _BEGIN_ABC_NS
 using rep_data_t = std::pair<std::size_t, std::size_t>;

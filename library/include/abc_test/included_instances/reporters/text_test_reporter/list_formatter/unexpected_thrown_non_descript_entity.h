@@ -1,5 +1,5 @@
 #pragma once
-#include "abc_test/core/test_reports/unexpected_thrown_non_descript_entity.h"
+#include "abc_test/internal/test_reports/unexpected_thrown_non_descript_entity.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_report.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_thrown_non_descript_entity.h"
 

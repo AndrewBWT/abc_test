@@ -1,5 +1,5 @@
 #pragma once
-#include "abc_test/core/test_assertions/macros.h"
+#include "abc_test/internal/test_assertions/macros.h"
 
 #define _BEGIN_CHECK_NO_THROW_BLOCK(_a_name)                 \
     _BEGIN_CHECK_ASSERTION_BLOCK(                            \

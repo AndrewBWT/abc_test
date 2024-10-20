@@ -23,12 +23,13 @@ __constexpr matcher_t
     ) noexcept
 {
     using namespace std;
+    using namespace _ABC_NS_MATCHER;
     return matcher_t(matcher_base_ptr_t(new function_wrapper_matcher_t(
         [&]()
         {
             return matcher_result_t(
                 true,
-                (std::ranges::find(_a_range, _a_value) != _a_range.end()),
+                (ranges::find(_a_range, _a_value) != _a_range.end()),
                 fmt::format("{0} does not contain {1}", _a_range, _a_value)
             );
         }

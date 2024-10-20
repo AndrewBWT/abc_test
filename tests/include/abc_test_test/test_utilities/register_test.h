@@ -1,6 +1,6 @@
 #pragma once
 #include "abc_test_test/test_utilities/test_info.h"
-#include "abc_test/core/register_test.h"
+#include "abc_test/internal/register_test.h"
 
 namespace ab::test
 {

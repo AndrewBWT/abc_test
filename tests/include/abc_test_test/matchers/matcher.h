@@ -6,7 +6,7 @@
 
 #include "abc_test/matcher.h"
 #include "abc_test_test/pc_test_reporter.h"
-#include "abc_test/core/test_runner.h"
+#include "abc_test/internal/test_runner.h"
 #include "abc_test_test/example_matcher.h"
 
 TEST_CASE("Matcher tests", "ab::test")

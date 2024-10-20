@@ -1,12 +1,12 @@
 #pragma once
-#include "abc_test/core/ds/test_data/macros.h"
-#include "abc_test/core/logging/log_msg.h"
-#include "abc_test/core/test_assertions/macros.h"
 #include "abc_test/included_instances/gen_data/enumerable/specializations/enum.h"
-#include "abc_test/core/matchers/comparison.h"
 #include "abc_test/included_instances/matchers/function_wrapper.h"
-#include "abc_test/core/matchers/matcher_wrapper.h"
 #include "abc_test/included_instances/matchers/ranges.h"
+#include "abc_test/internal/ds/test_data/macros.h"
+#include "abc_test/internal/logging/log_msg.h"
+#include "abc_test/internal/matchers/comparison.h"
+#include "abc_test/internal/matchers/matcher_wrapper.h"
+#include "abc_test/internal/test_assertions/macros.h"
 
 #include <numeric>
 #include <ranges>
@@ -15,7 +15,7 @@
 namespace test
 {
 template <typename T>
-class list_same_matcher_t : public abc::matcher_base_t
+class list_same_matcher_t : public abc::matcher::matcher_base_t
 {
 public:
     constexpr list_same_matcher_t(
@@ -26,13 +26,14 @@ public:
 private:
     std::vector<T> _m_vector;
 
-    constexpr virtual abc::matcher_result_t
+    constexpr virtual abc::matcher::matcher_result_t
         run(
             abc::test_runner_t& _a_test_runner
         ) override
     {
         using namespace abc;
         using namespace std;
+        using namespace abc::matcher;
         T      _l_bad_element{};
         size_t _l_bad_idx{0};
         bool   _l_all_same{true};
@@ -81,7 +82,7 @@ abc::matcher_t
         const std::vector<T>& _a_vect
     ) noexcept
 {
-    return abc::matcher(new list_same_matcher_t(_a_vect));
+    return abc::matcher::make_matcher(new test::list_same_matcher_t(_a_vect));
 }
 } // namespace test
 
@@ -125,7 +126,7 @@ _TEST_CASE(
     /*!
      * Here are three more examples of valid code using this new matcher.
      */
-    _CHECK(matcher(new list_same_matcher_t(_l_x)));
+    _CHECK(make_matcher(new list_same_matcher_t(_l_x)));
     _CHECK(matcher_t(new list_same_matcher_t(_l_x)));
     _CHECK(matcher_t(list_same_matcher(_l_x)));
 }
@@ -152,9 +153,10 @@ _TEST_CASE(
      */
     using namespace std;
     using namespace test;
-    vector<int>                 _l_x{1, 1, 1, 1, 1, 1};
-    function_wrapper_internal_t _l_f1 = [&]()
+    vector<int>                               _l_x{1, 1, 1, 1, 1, 1};
+    abc::matcher::function_wrapper_internal_t _l_f1 = [&]()
     {
+        using namespace abc::matcher;
         if (_l_x.size() == 0)
         {
             return matcher_result_t(true, true, "Vector is empty");
@@ -164,9 +166,9 @@ _TEST_CASE(
             return matcher_result_t(true, false, "Vector is not empty");
         }
     };
-    _CHECK(matcher_t(new function_wrapper_matcher_t(_l_f1)));
+    _CHECK(matcher_t(new abc::matcher::function_wrapper_matcher_t(_l_f1)));
     _CHECK(matcher_t(function_wrapper(_l_f1)));
-    _CHECK(matcher(new function_wrapper_matcher_t(_l_f1)));
+    _CHECK(make_matcher(new abc::matcher::function_wrapper_matcher_t(_l_f1)));
     _CHECK(function_wrapper(_l_f1));
     /*!
      * However, this is very brittle; it literally works on a single element,
@@ -189,6 +191,7 @@ constexpr abc::matcher_t
 {
     using namespace std;
     using namespace abc;
+    using namespace _ABC_NS_MATCHER;
     return matcher_t(matcher_base_ptr_t(new function_wrapper_matcher_t(
         [&]()
         {

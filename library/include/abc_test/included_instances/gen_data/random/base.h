@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/utility/rng.h"
+#include "abc_test/internal/utility/rng.h"
 
 _BEGIN_ABC_NS
 	template<

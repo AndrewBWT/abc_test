@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "abc_test/core/test_reporter.h"
+#include "abc_test/internal/test_reporter.h"
 #include <optional>
 #include <source_location>
 

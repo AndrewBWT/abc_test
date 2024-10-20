@@ -3,7 +3,7 @@
 #include "abc_test/gen_data/enumerable.h"
 #include <limits>
 
-#include "abc_test/core/errors/test_library_exception.h"
+#include "abc_test/internal/errors/test_library_exception.h"
 
 _BEGIN_ABC_NS
 template<

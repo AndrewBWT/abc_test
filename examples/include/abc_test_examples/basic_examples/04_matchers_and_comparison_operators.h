@@ -1,8 +1,8 @@
 #pragma once
 #include "abc_test/included_instances/gen_data/enumerable/specializations/enum.h"
-#include "abc_test/core/test_assertions/macros.h"
-#include "abc_test/core/ds/test_data/macros.h"
-#include "abc_test/core/matchers/matcher_wrapper.h"
+#include "abc_test/internal/test_assertions/macros.h"
+#include "abc_test/internal/ds/test_data/macros.h"
+#include "abc_test/internal/matchers/matcher_wrapper.h"
 
 #include "abc_test/included_instances/matchers/ranges.h"
 
@@ -10,9 +10,9 @@
 #include <numeric>
 
 
-#include "abc_test/core/matchers/comparison.h"
+#include "abc_test/internal/matchers/comparison.h"
 
-#include "abc_test/core/logging/log_msg.h"
+#include "abc_test/internal/logging/log_msg.h"
 
 _TEST_CASE(abc::test_data_t({
 	.name = "file_04_example_01",
@@ -73,7 +73,7 @@ _TEST_CASE(abc::test_data_t({
 	* When you want the types of the arguments to be exact, it is worth
 	* using the named constructors. 
 	*/
-	matcher_wrapper_t _l_1 = abc::eq<string, string>("1", "2");
+	matcher_t _l_1 = abc::eq<string, string>("1", "2");
 	/*!
 	* But remember that commas in macros create issues. So wrap them in
 	* brackets when using macros.

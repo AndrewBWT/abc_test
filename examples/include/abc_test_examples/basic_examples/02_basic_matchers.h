@@ -1,14 +1,14 @@
 #pragma once
 #include "abc_test/included_instances/gen_data/enumerable/specializations/enum.h"
-#include "abc_test/core/test_assertions/macros.h"
-#include "abc_test/core/ds/test_data/macros.h"
-#include "abc_test/core/matchers/matcher_wrapper.h"
+#include "abc_test/internal/test_assertions/macros.h"
+#include "abc_test/internal/ds/test_data/macros.h"
+#include "abc_test/internal/matchers/matcher_wrapper.h"
 
 #include "abc_test/included_instances/matchers/ranges.h"
 
 #include <ranges>
 #include <numeric>
-#include "abc_test/core/matchers/bool_matcher.h"
+#include "abc_test/internal/matchers/bool_matcher.h"
 
 _TEST_CASE(abc::test_data_t({
 	.name = "file_02_example_01",
@@ -43,8 +43,8 @@ _TEST_CASE(abc::test_data_t({
 	* We include several matchers with the library. Two examples of basic matchers are
 	* true_matcher_t and false_matcher_t. These evaluate to true and false respectively.
 	*/
-	_l_1 = matcher(new static_matcher_t<reports::pass_t>());
-	_l_1 = matcher(new static_matcher_t<reports::fail_t>());
+	//_l_1 = matcher(new static_matcher_t<reports::pass_t>());
+	//_l_1 = matcher(new static_matcher_t<reports::fail_t>());
 	_REQUIRE(_l_1);
 	/*!
 	* For the in-built matcher types shipped with this library, we include named

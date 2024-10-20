@@ -2,7 +2,7 @@
 
 #include <initializer_list>
 #include <vector>
-#include "abc_test/core/test_runner.h"
+#include "abc_test/internal/test_runner.h"
 #include "abc_test/gen_data/gen_data_base.h"
 #include <filesystem>
 #include <iostream>
@@ -13,10 +13,10 @@
 #include <fmt/ranges.h>
 #include "abc_test/gen_data/gen_data_with_repetition_type_and_element.h"
 
-#include "abc_test/utility/io/file/file_reader.h"
-#include "abc_test/utility/io/file/file_writer.h"
+#include "abc_test/internal/utility/io/file/file_reader.h"
+#include "abc_test/internal/utility/io/file/file_writer.h"
 
-#include "abc_test/core/global.h"
+#include "abc_test/internal/global.h"
 
 _BEGIN_ABC_NS
 using file_type_rep_data_t = char;

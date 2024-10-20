@@ -1,13 +1,13 @@
 #pragma once
 
-#include "abc_test/core/data_generator/data_generator_collection.h"
-#include "abc_test/core/data_generator/data_generator_with_file_support.h"
-#include "abc_test/core/test_runner.h"
+#include "abc_test/internal/data_generator/data_generator_collection.h"
+#include "abc_test/internal/data_generator/data_generator_with_file_support.h"
+#include "abc_test/internal/test_runner.h"
 
 #include <initializer_list>
 #include <vector>
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_DG_NS
 using static_rep_data_t = std::size_t;
 
 template <typename T>
@@ -77,17 +77,18 @@ private:
     T*          _m_elements;
     std::size_t _m_elements_size;
 };
-
+_END_ABC_DG_NS
+_BEGIN_ABC_NS
 /*!
  * Constructor which should be used. It creates a singleton collection.
  */
 template <typename T, typename R = std::initializer_list<T>>
 requires std::same_as<std::ranges::range_value_t<R>, T>
-__constexpr data_generator_collection_t<std::ranges::range_value_t<R>, true>
+__constexpr _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>, true>
             iterate_over(R&& _a_init_list);
 _END_ABC_NS
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_DG_NS
 template <typename T>
 __constexpr_imp
     static_data_t<T>::static_data_t() noexcept
@@ -196,17 +197,18 @@ __constexpr_imp bool
 {
     return false;
 }
-
+_END_ABC_DG_NS
+_BEGIN_ABC_NS
 template <typename T, typename R>
 requires std::same_as<std::ranges::range_value_t<R>, T>
-__constexpr_imp data_generator_collection_t<std::ranges::range_value_t<R>, true>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>, true>
                 iterate_over(
                     R&& _a_init_list
                 )
 {
     using namespace std;
     return unary_collection<T>(
-        make_shared<static_data_t<T>>(forward<R>(_a_init_list))
+        make_shared<_ABC_NS_DG::static_data_t<T>>(forward<R>(_a_init_list))
     );
 }
 

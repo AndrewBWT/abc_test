@@ -1,6 +1,6 @@
 #pragma once
-#include "abc_test/core/options/validated_test_options.h"
-#include "abc_test/core/test_main.h"
+#include "abc_test/internal/options/validated_test_options.h"
+#include "abc_test/internal/test_main.h"
 
 // All tests
 //#include "abc_test_examples/enumeration.h"
@@ -14,8 +14,9 @@ int main(int argc, char* argv[])
     _CrtSetDbgFlag(_CRTDBG_CHECK_ALWAYS_DF);
     using namespace abc;
     using namespace std;
-    using namespace abc::reporters;
-    using namespace abc::ds;
+    using namespace _ABC_NS_REPORTERS;
+    using namespace _ABC_NS_DS;
+    using namespace _ABC_NS_UTILITY;
     test_options_base_t _l_to;
     _l_to.error_reporters.push_back(make_shared<text_error_reporter_t>());
     _l_to.test_reporters.push_back(make_shared<text_test_reporter_t>());
@@ -28,7 +29,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        utility::str::string_table_t _l_st({ 1 });
+        str::string_table_t _l_st({ 1 });
         for (size_t _l_idx{ 0 }; string& _l_error : _l_validated_test_options.error())
         {
             _l_st.push_back(fmt::format(" {0})  ", _l_idx++));

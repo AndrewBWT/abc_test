@@ -6,25 +6,25 @@
 
 #include <fmt/std.h>
 #include <array>
-#include "abc_test/utility/io/threaded_text_output_reporter.h"
+#include "abc_test/internal/utility/io/threaded_text_output_reporter.h"
 
-#include "abc_test/core/ds/test_data/invoked_test_data.h"
+#include "abc_test/internal/ds/test_data/invoked_test_data.h"
 
-#include "abc_test/utility/str/string_table.h"
+#include "abc_test/internal/utility/str/string_table.h"
 
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_single_line.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_block.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/static_assertion.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/after_execution_test_report.h"
-#include "abc_test/core/test_reports/assertion_status/pass_or_fail.h"
-#include "abc_test/core/test_reports/assertion_status/pass_or_terminate.h"
-#include "abc_test/core/test_reports/assertion_status/fail.h"
-#include "abc_test/core/test_reports/assertion_status/pass.h"
-#include "abc_test/core/test_reports/assertion_status/terminate.h"
+#include "abc_test/internal/test_reports/assertion_status/pass_or_fail.h"
+#include "abc_test/internal/test_reports/assertion_status/pass_or_terminate.h"
+#include "abc_test/internal/test_reports/assertion_status/fail.h"
+#include "abc_test/internal/test_reports/assertion_status/pass.h"
+#include "abc_test/internal/test_reports/assertion_status/terminate.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/print_config.h"
-#include "abc_test/core/test_reports/unexpected_thrown_exception.h"
-#include "abc_test/core/test_reports/unexpected_thrown_non_descript_entity.h"
+#include "abc_test/internal/test_reports/unexpected_thrown_exception.h"
+#include "abc_test/internal/test_reports/unexpected_thrown_non_descript_entity.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_thrown_exception.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_thrown_non_descript_entity.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion.h"

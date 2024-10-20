@@ -1,5 +1,5 @@
 #pragma once
-#include "abc_test/core/setup_tests_log_reporter.h"
+#include "abc_test/internal/setup_tests_log_reporter.h"
 #include <iostream>
 
 namespace ab::test

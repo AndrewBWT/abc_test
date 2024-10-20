@@ -5,7 +5,7 @@
 #include <catch2/generators/catch_generators_adapters.hpp>
 
 #include "abc_test_test/pc_test_reporter.h"
-#include "abc_test/core/test_collection.h"
+#include "abc_test/internal/test_collection.h"
 #include "abc_test/utility/combinatorics.h"
 
 TEST_CASE("Test collection default", "ab::test")

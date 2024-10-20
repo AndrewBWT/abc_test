@@ -1,11 +1,11 @@
 #pragma once
 
 #include <functional>
-#include "abc_test/core/matchers/matcher_base.h"
+#include "abc_test/internal/matchers/matcher_base.h"
 
-#include "abc_test/core/matchers/matcher_wrapper.h"
+#include "abc_test/internal/matchers/matcher_wrapper.h"
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_MATCHER_NS
 using function_wrapper_internal_t = std::function<matcher_result_t()>;
 struct function_wrapper_matcher_t : public matcher_base_t
 {
@@ -31,9 +31,9 @@ matcher_t
 function_wrapper(
 	const function_wrapper_internal_t& _a_function
 ) noexcept;
-_END_ABC_NS
+_END_ABC_MATCHER_NS
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_MATCHER_NS
 __no_constexpr_imp
 	function_wrapper_matcher_t::function_wrapper_matcher_t(
 		function_wrapper_internal_t _a_function
@@ -56,6 +56,6 @@ function_wrapper(
 	const function_wrapper_internal_t& _a_function
 ) noexcept
 {
-	return matcher(new function_wrapper_matcher_t(_a_function));
+	return make_matcher(new function_wrapper_matcher_t(_a_function));
 }
-_END_ABC_NS
+_END_ABC_MATCHER_NS
