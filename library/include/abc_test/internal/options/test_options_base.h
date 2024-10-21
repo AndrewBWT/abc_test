@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/internal/ds/data_generator_memoization/typeless_data_generator_collection_stack_trie.h"
+#include "abc_test/internal/ds/data_generator_memoization/map_unique_id_to_tdg_collection_stack_trie.h"
 #include "abc_test/internal/ds/type_synonyms.h"
 #include "abc_test/internal/global.h"
 #include "abc_test/internal/reporters/error_reporter_controller.h"
@@ -34,16 +34,16 @@ public:
      * Given the string "aa::bb::cc", this string would be split into "aa",
      * "bb", "cc".
      */
-    _ABC_NS_DS::test_path_delimiter path_delimiter  = "::";
+    _ABC_NS_DS::test_path_delimiter path_delimiter = "::";
     /*!
      * @brief The root folder. It is from this folder all relative paths in the
      * test library are navigated from.
      */
-    std::filesystem::path root_path         = std::filesystem::current_path();
+    std::filesystem::path root_path = std::filesystem::current_path();
     /*!
      * @brief The seed used for the random data structures.
      */
-    std::optional<_ABC_NS_UTILITY::seed_t> rng_seed = {};
+    _ABC_NS_UTILITY::global_seed_t global_seed               = std::monostate{};
     /*!
      * @brief The number of elements used to seed the random generators.
      *
@@ -89,7 +89,7 @@ public:
      * These are essentially data used when repeating tests; these tries tell
      * the test which elements of a for loop to re-generate.
      */
-    std::map<size_t, _ABC_NS_DS::tdg_collection_stack_trie_t>
+    _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t
         map_of_unique_ids_and_for_loop_stack_tries;
     /*!
      * @brief Denotes whether to attach the global test list to the interanl
@@ -104,13 +104,15 @@ public:
      * We use shared ptrs so that this object can be moved around freely by the
      * user.
      */
-    std::vector<std::shared_ptr<_ABC_NS_REPORTERS::test_reporter_t>> test_reporters;
+    std::vector<std::shared_ptr<_ABC_NS_REPORTERS::test_reporter_t>>
+        test_reporters;
     /*!
      * @brief A collectin of unique pointers to error_reporter_t elements. Each
      * of these is owned by the system. They are deleted when this object is
      * deleted.
      */
-    std::vector<std::shared_ptr<_ABC_NS_REPORTERS::error_reporter_t>> error_reporters;
+    std::vector<std::shared_ptr<_ABC_NS_REPORTERS::error_reporter_t>>
+        error_reporters;
     /*!
      * @brief The collection of test lists.
      */
@@ -123,8 +125,12 @@ public:
      * @return Nullopt if there are no errors. Otherwise a string representation
      * of the error.
      */
-    __no_constexpr virtual std::optional<std::vector<std::string>>
-        validate() const noexcept;
+    __no_constexpr std::optional<std::vector<std::string>>
+                   validate_and_pre_process() noexcept;
+protected:
+    __no_constexpr void virtual validate_and_pre_process_(
+        std::vector<std::string>& _a_error_ref
+    ) noexcept;
 };
 
 namespace
@@ -136,6 +142,11 @@ requires requires (const T& _a_ptr) {
 __constexpr std::vector<std::size_t>
     get_indexes_of_nullptrs(const std::vector<T>& _a_index_of_ptrs) noexcept;
 } // namespace
+
+__no_constexpr std::string
+            make_test_options_base_member_variables_fmt(
+                const test_options_base_t& _a_opts
+            ) noexcept;
 
 _END_ABC_NS
 
@@ -150,17 +161,33 @@ struct fmt::formatter<abc::test_options_base_t> : formatter<string_view>
 };
 
 _BEGIN_ABC_NS
-__no_constexpr_imp
+__no_constexpr_imp std::optional<std::vector<std::string>>
+                   test_options_base_t::validate_and_pre_process() noexcept
+{
+    using namespace std;
+    vector<string> _l_rv{};
+    validate_and_pre_process_(_l_rv);
+    if (_l_rv.size() == 0)
+    {
+        return optional<vector<string>>{};
+    }
+    else
+    {
+        return optional<vector<string>>{_l_rv};
+    }
+}
 
-    std::optional<std::vector<std::string>>
-    test_options_base_t::validate() const noexcept
+__no_constexpr_imp void
+    test_options_base_t::validate_and_pre_process_(
+        std::vector<std::string>& _a_error_ref
+    ) noexcept
 {
     using namespace std;
     using namespace _ABC_NS_REPORTERS;
     vector<string> _l_rv;
     if (error_reporters.size() == 0)
     {
-        _l_rv.push_back(fmt::format(
+        _a_error_ref.push_back(fmt::format(
             "Error reporters must have atleast one element. Otherwise errors "
             "cannot be reported. "
             "If no others are available, "
@@ -175,7 +202,7 @@ __no_constexpr_imp
         };
         if (_l_indexes_of_nullptrs.size() > 0)
         {
-            _l_rv.push_back(fmt::format(
+            _a_error_ref.push_back(fmt::format(
                 "error_reporters has some elemnets which point to nullptr. "
                 "Specifically those elements at the following indexes: {0}",
                 _l_indexes_of_nullptrs
@@ -184,7 +211,7 @@ __no_constexpr_imp
     }
     if (test_reporters.size() == 0)
     {
-        _l_rv.push_back(fmt::format(
+        _a_error_ref.push_back(fmt::format(
             "test_reporters must have atleast one element. Otherwise tests "
             "cannot be reported. "
             "If no others are available, "
@@ -199,7 +226,7 @@ __no_constexpr_imp
         };
         if (_l_indexes_of_nullptrs.size() > 0)
         {
-            _l_rv.push_back(fmt::format(
+            _a_error_ref.push_back(fmt::format(
                 "test_reporters has some elemnets which point to nullptr. "
                 "Specifically those elements at the following indexes: {0}",
                 _l_indexes_of_nullptrs
@@ -208,7 +235,7 @@ __no_constexpr_imp
     }
     if (test_lists.size() == 0 && use_global_test_list == false)
     {
-        _l_rv.push_back(fmt::format(
+        _a_error_ref.push_back(fmt::format(
             "test_lists must have atleast one element or use_global_test_list "
             "must be set to true. use_global_test_list = {0}",
             use_global_test_list
@@ -220,7 +247,7 @@ __no_constexpr_imp
         )};
         if (_l_indexes_of_nullptrs.size() > 0)
         {
-            _l_rv.push_back(fmt::format(
+            _a_error_ref.push_back(fmt::format(
                 "test_lists has some elemnets which point to nullptr. "
                 "Specifically those elements at the following indexes: {0}",
                 _l_indexes_of_nullptrs
@@ -231,7 +258,7 @@ __no_constexpr_imp
     if (map_of_unique_ids_and_for_loop_stack_tries.size() > 0
         && write_data_to_files)
     {
-        _l_rv.push_back(fmt::format(
+        _a_error_ref.push_back(fmt::format(
             "map_of_unique_ids_and_for_loop_stack_tries has elements in it - "
             "thus this run of the test suite corresponds to some test "
             "repetitions. However, we have set write_data_to_files to true. "
@@ -240,7 +267,7 @@ __no_constexpr_imp
     }
     if (threads == 0 || threads > std::thread::hardware_concurrency())
     {
-        _l_rv.push_back(fmt::format(
+        _a_error_ref.push_back(fmt::format(
             "threads = {0}. This value must be between 1 and the number of "
             "threads available on the system ({1}",
             threads,
@@ -249,7 +276,7 @@ __no_constexpr_imp
     }
     if (comment_str == "" || comment_str == "\\n")
     {
-        _l_rv.push_back(fmt::format(
+        _a_error_ref.push_back(fmt::format(
             "comment_str = \"{0}\". It cannot be empty or equal to \"\\n\"",
             comment_str
         ));
@@ -257,7 +284,7 @@ __no_constexpr_imp
     if (general_data_extension == "" || general_data_extension.contains("\n")
         || general_data_extension.contains("."))
     {
-        _l_rv.push_back(fmt::format(
+        _a_error_ref.push_back(fmt::format(
             "Invalid general_data_extension ({0}). Cannot be empty or contain "
             "any of the following: {{\\n,'.'",
             general_data_extension
@@ -265,25 +292,16 @@ __no_constexpr_imp
     }
     if (path_delimiter == "")
     {
-        _l_rv.push_back(fmt::format(
+        _a_error_ref.push_back(fmt::format(
             "Invalid path_delimiter ({0}). Cannot be empty", path_delimiter
         ));
     }
 
     if (not filesystem::is_directory(root_path))
     {
-        _l_rv.push_back(
+        _a_error_ref.push_back(
             fmt::format("Root folder \"{0}\" does not exist", root_path)
         );
-    }
-
-    if (_l_rv.size() == 0)
-    {
-        return optional<vector<string>>{};
-    }
-    else
-    {
-        return optional<vector<string>>{_l_rv};
     }
 }
 
@@ -311,6 +329,49 @@ __constexpr_imp std::vector<std::size_t>
     return _l_indexes_of_nullptrs;
 }
 } // namespace
+__no_constexpr_imp std::string
+make_test_options_base_member_variables_fmt(
+    const test_options_base_t& _a_opts
+) noexcept
+{
+    using namespace std;
+    const string _l_rv{ fmt::format(
+        "{0} = {1}"
+        ", {2} = {3}"
+        ", {4} = {5}"
+        ", {6} = {7}"
+        ", {8} = {9}"
+        ", {10} = {11}"
+        ", {12} = {13}"
+        ", {14} = {15}"
+        ", {16} = {17}",
+        // ", {19} = {20}"
+        // ", {21} = {22}"
+        // ", {23} = {24}",
+        "root_path",
+        _a_opts.root_path,
+        "global_seed",
+        _a_opts.global_seed,
+        "number_of_integers_used_to_seed_random_generators",
+        _a_opts.number_of_integers_used_to_seed_random_generators,
+        "general_data_extension",
+        _a_opts.general_data_extension,
+        "comment_str",
+        _a_opts.comment_str,
+        "write_data_to_files",
+        _a_opts.write_data_to_files,
+        "threads",
+        _a_opts.threads,
+        "map_of_unique_ids_and_for_loop_stack_tries",
+        _a_opts.map_of_unique_ids_and_for_loop_stack_tries,
+        "use_global_test_list",
+        _a_opts.use_global_test_list
+        //"test_reporters", _a_rtd.test_reporters,
+        // "error_reporters", _a_rtd.error_reporters,
+        // "test_lists", _a_rtd.test_lists
+    ) };
+    return _l_rv;
+}
 
 _END_ABC_NS
 
@@ -322,42 +383,9 @@ __no_constexpr_imp auto
 {
     using namespace std;
     const string _l_rv{fmt::format(
-        "{0} "
-        "{{{1} = {2}"
-        ", {3} = {4}"
-        ", {5} = {6}"
-        ", {7} = {8}"
-        ", {9} = {10}"
-        ", {11} = {12}"
-        ", {13} = {14}"
-        ", {15} = {16}"
-        ", {17} = {18}"
-        // ", {19} = {20}"
-        // ", {21} = {22}"
-        // ", {23} = {24}"
-        "}}",
+        "{0}{{{1}}}",
         typeid(_a_rtd).name(),
-        "root_path",
-        _a_rtd.root_path,
-        "rng_seed",
-        _a_rtd.rng_seed,
-        "number_of_integers_used_to_seed_random_generators",
-        _a_rtd.number_of_integers_used_to_seed_random_generators,
-        "general_data_extension",
-        _a_rtd.general_data_extension,
-        "comment_str",
-        _a_rtd.comment_str,
-        "write_data_to_files",
-        _a_rtd.write_data_to_files,
-        "threads",
-        _a_rtd.threads,
-        "map_of_unique_ids_and_for_loop_stack_tries",
-        _a_rtd.map_of_unique_ids_and_for_loop_stack_tries,
-        "use_global_test_list",
-        _a_rtd.use_global_test_list
-        //"test_reporters", _a_rtd.test_reporters,
-        // "error_reporters", _a_rtd.error_reporters,
-        // "test_lists", _a_rtd.test_lists
+        make_test_options_base_member_variables_fmt(_a_rtd)
     )};
     return formatter<string_view>::format(_l_rv, _a_ctx);
 }

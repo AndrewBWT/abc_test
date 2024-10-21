@@ -30,8 +30,9 @@ public:
      * @param _a_validated_test_options The validated test options used for
      * running the tests.
      */
+    template<typename T>
     __no_constexpr
-        test_main_t(const validated_test_options_t& _a_validated_test_options
+        test_main_t(const validated_test_options_t<T>& _a_validated_test_options
         ) noexcept;
     /*!
      * @brief This function runs the tests.
@@ -44,19 +45,20 @@ public:
     __no_constexpr void
         run_tests() noexcept;
 private:
-    _ABC_NS_DS::test_lists_t                 _m_test_list_collection;
-    test_options_base_t                      _m_options;
-    _ABC_NS_REPORTERS::test_reporters_t      _m_test_reporters;
-    _ABC_NS_REPORTERS::error_reporters_t     _m_error_reporters;
-    std::mutex                               _m_mutex;
-    size_t                                   _m_thread_pool;
-    std::mutex                               _m_thread_pool_mutex;
-    std::condition_variable                  _m_cv;
-    size_t                                   _m_current_thread_pool;
-    std::mutex                               _m_threads_mutex;
-    std::vector<std::jthread>                _m_threads;
-    std::vector<_ABC_NS_DS::test_set_data_t> _m_test_set_data;
-    std::set<std::size_t>                    _m_threads_free;
+    _ABC_NS_DS::test_lists_t             _m_test_list_collection;
+    test_options_base_t                  _m_options;
+    _ABC_NS_REPORTERS::test_reporters_t  _m_test_reporters;
+    _ABC_NS_REPORTERS::error_reporters_t _m_error_reporters;
+    std::mutex                           _m_mutex;
+    size_t                               _m_thread_pool;
+    std::mutex                           _m_thread_pool_mutex;
+    std::condition_variable              _m_cv;
+    size_t                               _m_current_thread_pool;
+    std::mutex                           _m_threads_mutex;
+    std::vector<std::jthread>            _m_threads;
+    // std::vector<_ABC_NS_DS::test_set_data_t> _m_test_set_data;
+    std::vector<test_runner_t> _m_test_runners;
+    std::set<std::size_t>      _m_threads_free;
     /*!
      * @brief Inner constructor. Protected so it can't be used outside of this
      * class.
@@ -74,7 +76,9 @@ private:
         run_individual_test(
             const _ABC_NS_DS::post_setup_test_data_t& _a_prtd,
             const size_t                              _a_thread_idx,
-            _ABC_NS_DS::test_set_data_t&              _a_test_set_data
+            test_runner_t&                            _a_test_runner,
+            const std::size_t _a_order_ran_id
+            //_ABC_NS_DS::test_set_data_t&              _a_test_set_data
         ) noexcept;
 };
 
@@ -97,9 +101,10 @@ __constexpr std::set<T>
 _END_ABC_NS
 
 _BEGIN_ABC_NS
+template<typename T>
 __no_constexpr_imp
     test_main_t::test_main_t(
-        const validated_test_options_t& _a_validated_test_options
+        const validated_test_options_t<T>& _a_validated_test_options
     ) noexcept
     : test_main_t(_a_validated_test_options.get_options())
 {}
@@ -119,7 +124,7 @@ __no_constexpr_imp
     , _m_current_thread_pool(_a_to.threads)
     , _m_threads(std::vector<std::jthread>(_a_to.threads))
     , _m_threads_free(set_from_min_to_n(_a_to.threads))
-    , _m_test_set_data(std::vector<_ABC_NS_DS::test_set_data_t>(_a_to.threads))
+//, _m_test_set_data(std::vector<_ABC_NS_DS::test_set_data_t>(_a_to.threads))
 {}
 
 __no_constexpr_imp void
@@ -165,11 +170,17 @@ __no_constexpr_imp void
     post_setup_test_list_itt_t       _l_pstd_itt{_l_pstd.begin()};
     const post_setup_test_list_itt_t _l_pstd_end{_l_pstd.end()};
 
+    _m_test_runners = vector<test_runner_t>(
+        _l_global_test_options.threads,
+        test_runner_t(_l_trc, _l_global_test_options)
+    );
+    size_t _l_order_ran_id_counter{ 0 };
     _LIBRARY_LOG(MAIN_INFO, "Beginning running of tests...");
     while (_l_pstd_itt != _l_pstd_end && _l_erc.should_exit() == false)
     {
         // Get the current element in the list.
         const post_setup_test_data_t& _l_test{(*_l_pstd_itt++).get()};
+        const size_t _l_order_ran_id{ _l_order_ran_id_counter++ };
         _LIBRARY_LOG(MAIN_INFO, fmt::format("Loaded test {0}.", _l_test));
         // Find out the resourses required for this test;
         const size_t _l_next_thread_size{_l_test.thread_resourses_required()};
@@ -213,7 +224,9 @@ __no_constexpr_imp void
                 this,
                 _l_test,
                 _l_thread_idx,
-                std::ref(_m_test_set_data[_l_thread_idx])
+                std::ref(_m_test_runners[_l_thread_idx]),
+                _l_order_ran_id
+                // std::ref(_m_test_set_data[_l_thread_idx])
             );
         }
         else
@@ -252,7 +265,11 @@ __no_constexpr_imp void
         _l_erc.hard_exit();
     }
     _LIBRARY_LOG(MAIN_INFO, "Finalising reports.");
-    test_set_data_t _l_final_report(_m_test_set_data);
+    test_set_data_t _l_final_report;
+    for (auto& _l_test_runner : _m_test_runners)
+    {
+        _l_final_report.process_final_report(_l_test_runner.test_set_data());
+    }
     _l_trc.finalise_reports(_l_final_report);
 }
 
@@ -260,7 +277,9 @@ __no_constexpr_imp void
     test_main_t::run_individual_test(
         const _ABC_NS_DS::post_setup_test_data_t& _a_prtd,
         const size_t                              _a_thread_idx,
-        _ABC_NS_DS::test_set_data_t&              _a_test_set_data
+        test_runner_t&                            _a_test_runner,
+        const std::size_t _a_order_ran_id
+        // _ABC_NS_DS::test_set_data_t&              _a_test_set_data
     ) noexcept
 {
     using namespace std;
@@ -269,12 +288,13 @@ __no_constexpr_imp void
     using namespace _ABC_NS_REPORTERS;
     using enum _ABC_NS_UTILITY::internal::internal_log_enum_t;
     // Get the thread runner
+    set_this_threads_test_runner(&_a_test_runner);
     test_runner_t& _l_threads_runner{get_this_threads_test_runner_ref()};
     // run in try
     try
     {
         _LIBRARY_LOG(MAIN_INFO, "Running test.");
-        _l_threads_runner.run_test(_a_prtd);
+        _l_threads_runner.run_test(_a_prtd, _a_order_ran_id);
     }
     // Catch if its a library error.
     catch (test_library_exception_t& _l_the)
@@ -304,7 +324,7 @@ __no_constexpr_imp void
     unique_lock _l_thread_pool_lock(_m_thread_pool_mutex);
     _m_current_thread_pool += _a_prtd.thread_resourses_required();
     _m_cv.notify_one();
-    _a_test_set_data.process_invoked_test(_l_threads_runner.current_test());
+    _l_threads_runner.set_data_process_test();
     return;
 }
 

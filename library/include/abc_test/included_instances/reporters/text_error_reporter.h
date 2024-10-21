@@ -3,6 +3,7 @@
 #pragma once
 
 #include "abc_test/internal/utility/io/threaded_text_output_reporter.h"
+#include "abc_test/internal/reporters/error_reporter.h"
 
 
 _BEGIN_ABC_REPORTERS_NS
@@ -25,7 +26,7 @@ _BEGIN_ABC_REPORTERS_NS
 		*/
 		__no_constexpr
 			text_error_reporter_t(
-				const utility::io::file_name_t& _a_file_output
+				const std::filesystem::path& _a_file_output
 			) noexcept;
 		/*!
 		* Describes how to deal with an error_t being reported.
@@ -66,7 +67,7 @@ _BEGIN_ABC_REPORTERS_NS
 	}
 __no_constexpr_imp
 		text_error_reporter_t::text_error_reporter_t(
-			const utility::io::file_name_t& _a_file_output
+			const std::filesystem::path& _a_file_output
 		) noexcept
 		: threated_text_output_reporter_t(_a_file_output)
 	{

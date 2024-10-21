@@ -283,10 +283,10 @@ private:
     std::size_t                          _m_order_ran_id;
     utility::rng                         _m_this_tests_random_generator;
     std::filesystem::path                _m_path;
-    enum_test_status_t                   _m_test_status;
-    std::size_t                          _m_total_number_assertions_recieved;
-    std::size_t                          _m_total_number_assertions_passed;
-    std::size_t                          _m_total_number_assertions_failed;
+    enum_test_status_t                   _m_test_status = enum_test_status_t::NO_TERMINATION_TEST_PASSED;
+    std::size_t                          _m_total_number_assertions_recieved = 0;
+    std::size_t                          _m_total_number_assertions_passed = 0;
+    std::size_t                          _m_total_number_assertions_failed = 0;
     reports::assertion_base_collection_t _m_assertions;
     reports::opt_unexpected_report_t     _m_termination_report;
     reports::unexpected_non_terminating_report_collection_t _m_warnings;

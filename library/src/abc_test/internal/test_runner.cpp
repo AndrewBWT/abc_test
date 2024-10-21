@@ -9,7 +9,8 @@
 _BEGIN_ABC_NS
 __no_constexpr_or_inline_imp void
     test_runner_t::run_test(
-        const _ABC_NS_DS::post_setup_test_data_t& _a_post_setup_test_data
+        const _ABC_NS_DS::post_setup_test_data_t& _a_post_setup_test_data,
+        const std::size_t _a_order_ran_id
     )
 {
     using namespace std;
@@ -25,11 +26,11 @@ __no_constexpr_or_inline_imp void
             "About to run the following test: {0}", _a_post_setup_test_data
         )
     );
-    _m_current_test = make_unique<invoked_test_data_t>(
-        generate_random_seeds(),
+    _m_current_test = make_shared<invoked_test_data_t>(
+        generate_random_seeds(_a_order_ran_id),
         _a_post_setup_test_data,
-        _m_tests_ran,
-        _m_test_options.root_path
+        _a_order_ran_id,
+        global::get_global_test_options().root_path
     );
     invoked_test_data_t&          _l_current_test{*_m_current_test};
     const registered_test_data_t& _l_rtd{
@@ -70,7 +71,7 @@ __no_constexpr_or_inline_imp void
     }
     _m_trc.get().report_test(_l_current_test);
     _m_current_log_msgs.clear();
-    ++_m_tests_ran;
+    //++_m_tests_ran;
 }
 
 __no_constexpr_or_inline_imp void

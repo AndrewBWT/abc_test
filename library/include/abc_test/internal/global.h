@@ -1,6 +1,7 @@
 #pragma once
 
 #include "abc_test/internal/ds/type_synonyms.h"
+#include "abc_test/internal/utility/rng.h"
 
 _BEGIN_ABC_DS_NS
 struct registered_test_data_t;
@@ -51,6 +52,8 @@ __no_constexpr_or_inline reporters::test_reporter_controller_t&
  */
 __no_constexpr_or_inline test_runner_t&
     get_this_threads_test_runner_ref() noexcept;
+__no_constexpr_or_inline void
+    set_this_threads_test_runner(test_runner_t* _a_test_runner_t) noexcept;
 /*!
  * Gets a const reference to the global test_options_base_t object.
  *
@@ -65,7 +68,7 @@ __no_constexpr_or_inline const test_options_base_t&
  * this wouldn't be possible.
  *
  */
-__no_constexpr_or_inline test_runner_t*
+__no_constexpr_or_inline test_runner_t*&
     get_this_threads_test_runner_ptr() noexcept;
 /*!
  * Gets a reference to this threads current invoked_test_info. That is, the
@@ -105,10 +108,6 @@ namespace
 // Can't be constexpr due to use of static var.
 __no_constexpr_or_inline ds::test_list_t&
                          get_mutable_test_list() noexcept;
-} // namespace
-
-namespace
-{
 __no_constexpr_or_inline test_options_base_t&
                          get_inner_global_test_options() noexcept;
 __no_constexpr_or_inline reporters::error_reporter_controller_t&

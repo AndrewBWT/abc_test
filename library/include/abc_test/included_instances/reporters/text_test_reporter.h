@@ -29,6 +29,7 @@
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_thrown_non_descript_entity.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_block.h"
+#include "abc_test/internal/reporters/test_reporter.h"
 _BEGIN_ABC_REPORTERS_NS
 /*!
 * Object used to print data about tests to some text output - either the console or a file
@@ -49,7 +50,7 @@ public:
 	*/
 	__no_constexpr
 		text_test_reporter_t(
-			const utility::io::file_name_t& _a_file_output
+			const std::filesystem::path& _a_file_output
 		) noexcept;
 	__no_constexpr
 		virtual
@@ -89,7 +90,7 @@ _BEGIN_ABC_REPORTERS_NS
 	}
 __no_constexpr_imp
 		text_test_reporter_t::text_test_reporter_t(
-			const utility::io::file_name_t& _a_file_output
+			const std::filesystem::path& _a_file_output
 		) noexcept
 		: threated_text_output_reporter_t(_a_file_output)
 		, _m_print_config(print_config_t(false))

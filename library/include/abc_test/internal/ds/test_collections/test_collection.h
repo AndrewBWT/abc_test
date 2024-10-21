@@ -87,10 +87,10 @@ __constexpr_imp void
         for (const test_list_element_t& _l_test_element : _l_test_list_element.get())
         {
             const tdg_collection_stack_trie_t* _l_reps{
-                _m_options.map_of_unique_ids_and_for_loop_stack_tries.contains(
+                _m_options.map_of_unique_ids_and_for_loop_stack_tries.map().contains(
                     _m_test_discovery_id
                 )
-                    ? &_m_options.map_of_unique_ids_and_for_loop_stack_tries.at(
+                    ? &_m_options.map_of_unique_ids_and_for_loop_stack_tries.map().at(
                           _m_test_discovery_id
                       )
                     : nullptr

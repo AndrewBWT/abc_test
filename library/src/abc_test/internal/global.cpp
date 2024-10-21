@@ -27,11 +27,18 @@ __no_constexpr_or_inline_imp reporters::test_reporter_controller_t&
 __no_constexpr_or_inline_imp test_runner_t&
     get_this_threads_test_runner_ref() noexcept
 {
-    thread_local test_runner_t _tl_tr(
-        get_global_test_reporter_controller(), get_global_test_options()
-    );
-    return _tl_tr;
+    return *get_this_threads_test_runner_ptr();
 }
+
+__no_constexpr_or_inline_imp void
+    set_this_threads_test_runner(
+        test_runner_t* _a_test_runner_t
+    ) noexcept
+{
+    test_runner_t*& _l_tr{get_this_threads_test_runner_ptr()};
+    _l_tr = _a_test_runner_t;
+}
+
 
 __no_constexpr_or_inline_imp const test_options_base_t&
     get_global_test_options() noexcept
@@ -39,10 +46,11 @@ __no_constexpr_or_inline_imp const test_options_base_t&
     return get_inner_global_test_options();
 }
 
-__no_constexpr_or_inline_imp test_runner_t*
+__no_constexpr_or_inline_imp test_runner_t*&
     get_this_threads_test_runner_ptr() noexcept
 {
-    return &get_this_threads_test_runner_ref();
+    thread_local test_runner_t* _tl_tr = nullptr;
+    return _tl_tr;
 }
 
 __no_constexpr_or_inline_imp ds::invoked_test_data_t&

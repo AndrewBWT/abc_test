@@ -17,18 +17,18 @@ _BEGIN_ABC_UTILITY_IO_NS
 			) noexcept;
 		__no_constexpr
 			threated_text_output_reporter_t(
-				const file_name_t& _a_file_name
+				const std::filesystem::path& _a_file_name
 			) noexcept;
 		__no_constexpr
 			threated_text_output_reporter_t(
 				std::ostream& _a_ostream
 			) noexcept;
 	protected:
-		std::optional<file_name_t> _m_file_name;
+		std::optional<std::filesystem::path> _m_file_name;
 		std::size_t _m_line_len;
 		__no_constexpr
 			threated_text_output_reporter_t(
-				const std::optional<file_name_t>& _a_file_name,
+				const std::optional<std::filesystem::path>& _a_file_name,
 				std::ostream& _a_ostream
 			) noexcept;
 	};
@@ -46,11 +46,11 @@ _BEGIN_ABC_UTILITY_IO_NS
 	}
 __no_constexpr_imp
 		threated_text_output_reporter_t::threated_text_output_reporter_t(
-			const file_name_t& _a_file_name
+			const std::filesystem::path& _a_file_name
 		) noexcept
 		: threated_text_output_reporter_t(
-			std::optional<file_name_t>(_a_file_name),
-			*new std::ofstream(_a_file_name.file_path()))
+			std::optional<std::filesystem::path>(_a_file_name),
+			*new std::ofstream(_a_file_name))
 	{
 
 	}
@@ -59,13 +59,13 @@ __no_constexpr_imp
 			std::ostream& _a_ostream
 		) noexcept
 		: threated_text_output_reporter_t(
-			std::optional<file_name_t>(), _a_ostream)
+			std::optional<std::filesystem::path>(), _a_ostream)
 	{
 
 	}
 	__no_constexpr_imp
 		threated_text_output_reporter_t::threated_text_output_reporter_t(
-			const std::optional<file_name_t>& _a_file_name,
+			const std::optional<std::filesystem::path>& _a_file_name,
 			std::ostream& _a_ostream
 		) noexcept
 		: threaded_ostream_output_reporter_t(_a_ostream)

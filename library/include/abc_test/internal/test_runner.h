@@ -1,5 +1,6 @@
 #pragma once
 #include "abc_test/internal/ds/source/single_source.h"
+#include "abc_test/internal/ds/test_data/test_set_data.h"
 #include "abc_test/internal/ds/type_synonyms.h"
 #include "abc_test/internal/options/test_options_base.h"
 #include "abc_test/internal/reporters/test_reporter_controller.h"
@@ -9,8 +10,6 @@
 
 #include <memory>
 
-#include "abc_test/internal/ds/type_synonyms.h"
-
 
 _BEGIN_ABC_LOGGING_NS
 struct log_msg_t;
@@ -19,6 +18,7 @@ _BEGIN_ABC_DS_NS
 struct registered_test_data_t;
 _END_ABC_DS_NS
 _BEGIN_ABC_NS
+
 // Forward declarations
 
 /*!
@@ -55,10 +55,10 @@ public:
      * @return An iterator to where the reference to this log message is stored.
      */
     __no_constexpr _ABC_NS_LOGGING::log_msg_itt_t
-        add_log_msg(
-            _ABC_NS_LOGGING::log_msg_ref_t _a_log,
-            const _ABC_NS_DS::single_source_t&      _a_source
-        ) noexcept;
+                   add_log_msg(
+                       _ABC_NS_LOGGING::log_msg_ref_t     _a_log,
+                       const _ABC_NS_DS::single_source_t& _a_source
+                   ) noexcept;
     /*!
      * @brief Removes the log message from the test_runner_t's internal
      * structure.
@@ -113,14 +113,15 @@ public:
      */
     __no_constexpr_or_inline void
         run_test(
-            const _ABC_NS_DS::post_setup_test_data_t& _a_post_setup_test_data
+            const _ABC_NS_DS::post_setup_test_data_t& _a_post_setup_test_data,
+            const std::size_t                         _a_order_ran_id
         );
     /*!
      * @brief Tells the caller how many tests this test_runner_t has run.
      * @return The number of tests this test_runner_t has ran.
      */
-    __constexpr std::size_t
-                tests_ran() const noexcept;
+    __constexpr const ds::test_set_data_t&
+                      test_set_data() const noexcept;
     /*!
      * @brief Returns the current test to the caller.
      * @return The current invoked_test_data_t object being ran.
@@ -132,8 +133,8 @@ public:
      * @return A random seed generated from this test_runner_t's random
      * generator.
      */
-    __constexpr _ABC_NS_UTILITY::seed_t
-                generate_random_seeds() noexcept;
+    __no_constexpr _ABC_NS_UTILITY::seed_t
+        generate_random_seeds(const std::size_t _a_order_ran_id) noexcept;
     /*!
      * @brief Returns to the caller this test_runner_t's most recent source.
      * @return The object's most recent source.
@@ -170,15 +171,18 @@ public:
                                    _a_ptr,
             const std::string_view _a_warning
         ) noexcept;
+    __constexpr void
+        set_data_process_test() noexcept;
 private:
-    _ABC_NS_LOGGING::log_msg_ptrs_t           _m_current_log_msgs;
-    std::vector<std::string> _m_cached_log_msgs;
+    _ABC_NS_LOGGING::log_msg_ptrs_t _m_current_log_msgs;
+    std::vector<std::string>        _m_cached_log_msgs;
     std::reference_wrapper<_ABC_NS_REPORTERS::test_reporter_controller_t>
-                                                     _m_trc;
-    std::size_t                                      _m_tests_ran;
-    std::unique_ptr<_ABC_NS_DS::invoked_test_data_t> _m_current_test;
+        _m_trc;
+    // std::size_t                                      _m_tests_ran;
+    std::shared_ptr<_ABC_NS_DS::invoked_test_data_t> _m_current_test;
     _ABC_NS_UTILITY::rng                             _m_random_generator;
-    const test_options_base_t&                       _m_test_options;
+    // const test_options_base_t&                       _m_test_options;
+    _ABC_NS_DS::test_set_data_t _m_test_data;
     _ABC_NS_DS::single_source_t _m_tests_most_recent_source;
     template <bool Single_Source, typename Assertion_Status>
     __constexpr void
@@ -206,10 +210,12 @@ __no_constexpr_imp
         const test_options_base_t&                     _a_test_options
     ) noexcept
     : _m_trc(_a_trc)
-    , _m_tests_ran{0}
     , _m_current_test(nullptr)
-    // , _m_random_generator(utility::rng(_a_test_options.rng_seed))
-    , _m_test_options(_a_test_options)
+    , _m_random_generator(_ABC_NS_UTILITY::rng(
+          _a_test_options.global_seed,
+          _a_test_options.number_of_integers_used_to_seed_random_generators
+      ))
+    // , _m_test_options(_a_test_options)
     , _m_tests_most_recent_source(_ABC_NS_DS::single_source_t())
 {}
 
@@ -237,9 +243,9 @@ __constexpr_imp void
 }
 
 __no_constexpr_imp _ABC_NS_LOGGING::log_msg_itt_t
-    test_runner_t::add_log_msg(
-        _ABC_NS_LOGGING::log_msg_ref_t _a_log,
-        const _ABC_NS_DS::single_source_t&      _a_source
+                   test_runner_t::add_log_msg(
+        _ABC_NS_LOGGING::log_msg_ref_t     _a_log,
+        const _ABC_NS_DS::single_source_t& _a_source
     ) noexcept
 {
     using namespace std;
@@ -248,10 +254,10 @@ __no_constexpr_imp _ABC_NS_LOGGING::log_msg_itt_t
     return --_m_current_log_msgs.end();
 }
 
-__constexpr_imp size_t
-    test_runner_t::tests_ran() const noexcept
+__constexpr_imp const ds::test_set_data_t&
+                      test_runner_t::test_set_data() const noexcept
 {
-    return _m_tests_ran;
+    return _m_test_data;
 }
 
 __no_constexpr_imp _ABC_NS_DS::invoked_test_data_t&
@@ -260,13 +266,19 @@ __no_constexpr_imp _ABC_NS_DS::invoked_test_data_t&
     return *_m_current_test;
 }
 
-__constexpr_imp _ABC_NS_UTILITY::seed_t
-                test_runner_t::generate_random_seeds() noexcept
+__no_constexpr_imp _ABC_NS_UTILITY::seed_t
+                   test_runner_t::generate_random_seeds(
+        const std::size_t _a_order_ran_id
+    ) noexcept
 {
     using namespace _ABC_NS_UTILITY;
     const size_t _l_n_elements_used_to_seed_random_generators{
-        _m_test_options.number_of_integers_used_to_seed_random_generators
+        global::get_global_test_options()
+            .number_of_integers_used_to_seed_random_generators
     };
+    _m_random_generator.progress(
+        _a_order_ran_id * _l_n_elements_used_to_seed_random_generators
+    );
     seed_t _l_seed(_l_n_elements_used_to_seed_random_generators);
     for (size_t _l_idx{0};
          _l_idx < _l_n_elements_used_to_seed_random_generators;
@@ -306,6 +318,12 @@ __constexpr_imp void
     add_assertion_and_optional_warning(
         _a_ptr, optional<string_view>{_a_warning}
     );
+}
+
+__constexpr_imp void
+    test_runner_t::set_data_process_test() noexcept
+{
+    _m_test_data.process_invoked_test(*_m_current_test);
 }
 
 template <bool Single_Source, typename Assertion_Status>

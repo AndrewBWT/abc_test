@@ -94,4 +94,8 @@ _TEST_CASE(
             fmt::format("Testing _l_f({0}) == {1}", _l_input, _l_output)
         ));
     }
+    /*
+    * These tests can be freely mixed with normal tests
+    */
+    _CHECK(_EXPR(1 == 2));
 }

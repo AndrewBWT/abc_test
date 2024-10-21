@@ -29,6 +29,7 @@ set(LIBRARY_FILES
   include/abc_test/internal/ds/data_generator_memoization/typeless_data_generator_collection_stack.h
   include/abc_test/internal/ds/data_generator_memoization/data_generator_collection_memoized_element.h 
   include/abc_test/internal/ds/data_generator_memoization/data_generator_memoized_element.h
+  include/abc_test/internal/ds/data_generator_memoization/map_unique_id_to_tdg_collection_stack_trie.h
   # Contains code for test data - e.g. name, location, repetition data.
   include/abc_test/internal/ds/test_data/invoked_test_data.h
   include/abc_test/internal/ds/test_data/registered_test_data.h
@@ -208,6 +209,10 @@ set(LIBRARY_FILES
   # Error reporter
   include/abc_test/included_instances/reporters/text_error_reporter.h
   include/abc_test/included_instances/test_assertions/macros.h
+  # Command line parsing
+  include/abc_test/included_instances/CLI11/CLI11.hpp
+  include/abc_test/included_instances/test_options/command_line_parser.h
+  include/abc_test/included_instances/test_options/included_instances_test_options.h
 )
 
 

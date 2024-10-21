@@ -16,18 +16,11 @@ public:
     __constexpr
     test_set_data_t()
         = default;
-    /*!
-     * @brief Constructor.
-     *
-     * This constructor is combines a set of test_set_data_t objects. Internally
-     * it is used to combine test_set_data_t objects from diferent threads.
-     *
-     * @param _a_test_set_datas The set of test_set_data_t objects to create
-     * this object from.
-     */
     __constexpr
-    test_set_data_t(const std::vector<test_set_data_t>& _a_test_set_datas
-    ) noexcept;
+        void
+        process_final_report(
+            const test_set_data_t& _a_test_set_data
+        ) noexcept;
     /*!
      * @brief This function processes a single invoked_test_data_t object,
      * updating its internal variabels based on how the test ran.
@@ -42,8 +35,9 @@ _END_ABC_DS_NS
 
 _BEGIN_ABC_DS_NS
 __constexpr_imp
-    test_set_data_t::test_set_data_t(
-        const std::vector<test_set_data_t>& _a_test_set_datas
+void
+    test_set_data_t::process_final_report(
+        const test_set_data_t& _a_test_set_data
     ) noexcept
 {}
 
