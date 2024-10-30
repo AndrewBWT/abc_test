@@ -1,14 +1,10 @@
 #pragma once
-#include "abc_test/included_instances/test_options/included_instances_test_options.h"
-#include "abc_test/internal/test_main.h"
 
-// All tests
-// #include "abc_test_examples/enumeration.h"
-#include "abc_test/included_instances/reporters/text_error_reporter.h"
-#include "abc_test/included_instances/reporters/text_test_reporter.h"
+#include "abc_test/included_instances.h"
+#include "abc_test/core.h"
+
 //#include "abc_test_examples/basic_examples.h"
 #include "abc_test_examples/gen_data_examples.h"
-#include "abc_test/included_instances/test_options/command_line_parser.h"
 
 int
     main(

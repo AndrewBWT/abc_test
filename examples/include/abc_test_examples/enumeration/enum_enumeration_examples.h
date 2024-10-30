@@ -1,10 +1,10 @@
 #pragma once
-#include "abc_test/gen_data/enumerable/specializations/enum.h"
+#include "abc_test/data_generator/enumerable/specializations/enum.h"
 #include "abc_test/internal/test_assertions.h"
 #include "abc_test/internal/ds/test_data/registered_test_data.h"
-#include "abc_test/gen_data/enumeration.h"
-#include "abc_test/gen_data/collection.h"
-#include "abc_test/gen_data/collection_iterator.h"
+#include "abc_test/data_generator/enumeration.h"
+#include "abc_test/data_generator/collection.h"
+#include "abc_test/data_generator/collection_iterator.h"
 #include "abc_test/matchers/matcher.h"
 #include "abc_test/matchers/comparison.h"
 

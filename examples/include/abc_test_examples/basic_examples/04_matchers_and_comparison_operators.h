@@ -1,5 +1,5 @@
 #pragma once
-#include "abc_test/included_instances/gen_data/enumerable/specializations/enum.h"
+#include "abc_test/included_instances/data_generator/enumerable/specializations/enum.h"
 #include "abc_test/core.h"
 #include "abc_test/included_instances/matchers/ranges.h"
 #include <ranges>

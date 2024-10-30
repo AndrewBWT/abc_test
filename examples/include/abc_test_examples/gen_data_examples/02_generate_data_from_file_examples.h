@@ -1,6 +1,6 @@
 #pragma once
 #include "abc_test/core.h"
-#include "abc_test/included_instances/gen_data/file.h"
+#include "abc_test/included_instances/data_generator/file.h"
 #include "abc_test/included_instances/matchers/ranges.h"
 #include "abc_test/internal/data_generator/data_generator_collection_iterator.h"
 

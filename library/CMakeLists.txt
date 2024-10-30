@@ -111,49 +111,37 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/matchers/ranges.h
   include/abc_test/included_instances/matchers/function_wrapper.h
   # gen_data subfolder. Contains the logic that allow the gen_data for loops to work.
-  include/abc_test/included_instances/gen_data/manual_for_loop.h
-  include/abc_test/included_instances/gen_data/file.h
-  include/abc_test/included_instances/gen_data/random_data.h
-  include/abc_test/included_instances/gen_data/random_data_description.h
+  include/abc_test/included_instances/data_generator/manual_for_loop.h
+  include/abc_test/included_instances/data_generator/file.h
+  include/abc_test/included_instances/data_generator/random_data.h
+  include/abc_test/included_instances/data_generator/random_data_description.h
   # Subfolder contains logic specifically to do with random data generation.
-  include/abc_test/included_instances/gen_data/random/base.h
-  include/abc_test/included_instances/gen_data/random/specializations.h
+  include/abc_test/included_instances/data_generator/random/base.h
+  include/abc_test/included_instances/data_generator/random/specializations.h
   # Folder containing random data specializations for std types.
-  include/abc_test/included_instances/gen_data/random/specializations/fundamental_types.h
-  include/abc_test/included_instances/gen_data/random/specializations/enum.h
-  include/abc_test/included_instances/gen_data/random/specializations/array.h
-  include/abc_test/included_instances/gen_data/random/specializations/vector.h
+  include/abc_test/included_instances/data_generator/random/specializations/fundamental_types.h
+  include/abc_test/included_instances/data_generator/random/specializations/enum.h
+  include/abc_test/included_instances/data_generator/random/specializations/array.h
+  include/abc_test/included_instances/data_generator/random/specializations/vector.h
   # Static data files
-  include/abc_test/included_instances/gen_data/static_data.h
+  include/abc_test/included_instances/data_generator/static_data.h
   # Enumeration files
-  include/abc_test/included_instances/gen_data/enumeration.h
-  include/abc_test/included_instances/gen_data/enumerable.h
-  include/abc_test/included_instances/gen_data/enumerable/min_value.h
-  include/abc_test/included_instances/gen_data/enumerable/max_value.h
-  include/abc_test/included_instances/gen_data/enumerable/specializations.h
+  include/abc_test/included_instances/data_generator/enumeration.h
+  include/abc_test/included_instances/data_generator/enumerable.h
+  include/abc_test/included_instances/data_generator/enumerable/min_value.h
+  include/abc_test/included_instances/data_generator/enumerable/max_value.h
+  include/abc_test/included_instances/data_generator/enumerable/specializations.h
   # Folder containing random data specializations for std types.
-  include/abc_test/included_instances/gen_data/enumerable/specializations/fundamental_types.h
-  include/abc_test/included_instances/gen_data/enumerable/specializations/enum.h
-  include/abc_test/included_instances/gen_data/enumerable/specializations/array.h
-  include/abc_test/included_instances/gen_data/enumerable/specializations/vector.h
+  include/abc_test/included_instances/data_generator/enumerable/specializations/fundamental_types.h
+  include/abc_test/included_instances/data_generator/enumerable/specializations/enum.h
+  include/abc_test/included_instances/data_generator/enumerable/specializations/array.h
+  include/abc_test/included_instances/data_generator/enumerable/specializations/vector.h
   # utility subfolder. Contains axillary helper classes and functions not necessary
   # related to the core testing framework.
   include/abc_test/internal/utility/ptr_utility.h
   include/abc_test/internal/utility/rng.h
   # BigInteger files. Currently we do not use these. We should determine whether we will
   # need these and, if not, remove them from the library.
-  include/abc_test/internal/utility/bigint/BigInteger.h
-      src/abc_test/internal/utility/bigint/BigInteger.cpp
-  include/abc_test/internal/utility/bigint/BigIntegerAlgorithms.h
-      src/abc_test/internal/utility/bigint/BigIntegerAlgorithms.cpp
-  include/abc_test/internal/utility/bigint/BigIntegerLibrary.h
-  include/abc_test/internal/utility/bigint/BigIntegerUtils.h
-      src/abc_test/internal/utility/bigint/BigIntegerUtils.cpp
-  include/abc_test/internal/utility/bigint/BigUnsigned.h
-      src/abc_test/internal/utility/bigint/BigUnsigned.cpp
-  include/abc_test/internal/utility/bigint/BigUnsignedInABase.h
-      src/abc_test/internal/utility/bigint/BigUnsignedInABase.cpp
-  include/abc_test/internal/utility/bigint/NumberlikeArray.h
   # Combinatorics files. Currently these are unused, however we plan to re-engineer them
   # and make them compatible with gen_data.
   include/abc_test/internal/utility/combinatorics.h
@@ -212,9 +200,22 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/reporters/text_error_reporter.h
   include/abc_test/included_instances/test_assertions/macros.h
   # Command line parsing
-  include/abc_test/included_instances/CLI11/CLI11.hpp
-  include/abc_test/included_instances/test_options/command_line_parser.h
-  include/abc_test/included_instances/test_options/included_instances_test_options.h
+  include/abc_test/included_instances/options/command_line_parser.h
+  include/abc_test/included_instances/options/included_instances_test_options.h
+  #Externally included libraries (we include the files rather than linking to the git repo).
+  include/abc_test/external/CLI11/CLI11.hpp
+  include/abc_test/external/bigint/BigInteger.h
+      src/abc_test/external/bigint/BigInteger.cpp
+  include/abc_test/external/bigint/BigIntegerAlgorithms.h
+      src/abc_test/external/bigint/BigIntegerAlgorithms.cpp
+  include/abc_test/external/bigint/BigIntegerLibrary.h
+  include/abc_test/external/bigint/BigIntegerUtils.h
+      src/abc_test/external/bigint/BigIntegerUtils.cpp
+  include/abc_test/external/bigint/BigUnsigned.h
+      src/abc_test/external/bigint/BigUnsigned.cpp
+  include/abc_test/external/bigint/BigUnsignedInABase.h
+      src/abc_test/external/bigint/BigUnsignedInABase.cpp
+  include/abc_test/external/bigint/NumberlikeArray.h
 )
 
 
