@@ -10,6 +10,16 @@ template<
 class opt_file_rw_t
 {
 public:
+	__constexpr
+		opt_file_rw_t() = default;
+	__constexpr
+		void
+		set_to_line(
+			const std::size_t _a_line_no
+		)
+	{
+
+	}
 	template<
 		typename R = std::vector<T>
 	>

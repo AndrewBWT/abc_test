@@ -14,12 +14,14 @@ public:
     file_name_t() noexcept;
     __constexpr
     file_name_t(
-        const char*                  _a_char_star,
+        const std::string_view                  _a_str,
         const std::filesystem::path& _a_folder = std::filesystem::path()
-       // = _ABC_NS_GLOBAL::get_this_threads_test_runner_ref()
-        //      .current_test()
-        //      .path()
     ) noexcept;
+    __constexpr
+        file_name_t(
+            const char*                  _a_str,
+            const std::filesystem::path& _a_folder = std::filesystem::path()
+        ) noexcept;
     /*!
      * Checks if the file name is valid. Specificallly checks for things like an
      * empty string, or characters not allowed in a file name.
@@ -57,19 +59,31 @@ struct fmt::formatter<_ABC_NS_UTILITY::io::file_name_t> : formatter<string_view>
 _BEGIN_ABC_UTILITY_IO_NS
 __constexpr_imp
     file_name_t::file_name_t() noexcept
-    : file_name_t(nullptr, std::filesystem::path())
+    : file_name_t(std::string_view{}, std::filesystem::path())
 {}
 
 __constexpr_imp
     file_name_t::file_name_t(
-        const char*                  _a_char_star,
+        const std::string_view                  _a_str,
         const std::filesystem::path& _a_folder
     ) noexcept
     : file_name_t(
-          _a_char_star == nullptr
+        _a_str.empty()
               ? std::filesystem::path{}
-              : std::filesystem::path(_a_folder) / (_a_char_star)
+              : std::filesystem::path(_a_folder) / (_a_str)
       )
+{}
+
+__constexpr_imp
+file_name_t::file_name_t(
+    const char*                  _a_str,
+    const std::filesystem::path& _a_folder
+) noexcept
+    : file_name_t(
+        _a_str == nullptr
+        ? std::filesystem::path{}
+        : std::filesystem::path(_a_folder) / (_a_str)
+    )
 {}
 
 __no_constexpr_imp bool

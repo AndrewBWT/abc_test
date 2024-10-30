@@ -1,6 +1,7 @@
 #pragma once
 
 #include "abc_test/internal/utility/internal/macros.h"
+#include "abc_test/internal/matchers/operator_based_matcher.h"
 
 _BEGIN_ABC_MATCHER_NS
 /*!

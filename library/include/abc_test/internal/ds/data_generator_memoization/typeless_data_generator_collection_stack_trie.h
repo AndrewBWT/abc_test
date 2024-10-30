@@ -370,8 +370,23 @@ typeless_data_generator_collection_stack_trie_t::add_for_loop_creation_data_sequ
         for_loop_stack_trie_children_t& _l_children{
             _l_for_loop_children[_l_for_loop_idx]
         };
+        if (_l_children.size() == 0 || _l_children.back()->_m_for_loop_data !=
+            _l_flcd.for_loop_iteration_data)
+        {
+            _l_children.push_back(make_unique<tdg_collection_stack_trie_t>(
+                tdg_collection_stack_trie_t(
+                    _l_flcd.for_loop_iteration_data
+                )
+            ));
+            _l_current_ref = ref(*_l_children.back());
+        }
+        else
+        {
+            _l_current_ref = ref(*_l_children.back());
+        }
+
         // Find the equal element; or the subragne around them.
-        ranges::subrange<for_loop_stack_trie_children_t::iterator>
+        /*ranges::subrange<for_loop_stack_trie_children_t::iterator>
             _l_equal_subrange{ranges::equal_range(
                 _l_children,
                 _l_flcd.for_loop_iteration_data,
@@ -403,7 +418,7 @@ typeless_data_generator_collection_stack_trie_t::add_for_loop_creation_data_sequ
         {
             // Element already in, just navigate to it.
             _l_current_ref = ref(*((*_l_equal_subrange.begin()).get()));
-        }
+        }*/
     }
 }
 

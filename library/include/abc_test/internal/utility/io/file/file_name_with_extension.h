@@ -52,7 +52,7 @@ _BEGIN_ABC_UTILITY_IO_NS
 			const std::string_view _a_file_extension
 		) noexcept
 		: file_name_t(
-			_a_file_name.file_path().string() + std::string(".") + std::string(_a_file_extension))
+			std::filesystem::path(_a_file_name.file_path().string() + std::string(".") + std::string(_a_file_extension)))
 	{
 
 	}

@@ -8,6 +8,95 @@
 #include <vector>
 
 _BEGIN_ABC_DG_NS
+
+template <typename T>
+class static_data_t
+{
+public:
+    using generator_type = T;
+    using tertiary_type  = std::size_t;
+
+    __constexpr ~static_data_t()
+    {
+        delete[] _m_elements;
+    }
+
+    template <typename R>
+    __constexpr
+    static_data_t(
+        R&& _a_elements
+    )
+        : _m_elements(new T[std::ranges::size(_a_elements)])
+        , _m_elements_size(std::ranges::size(_a_elements))
+    {
+        std::ranges::copy(_a_elements, _m_elements);
+    }
+    static_data_t& operator=(const static_data_t& other) // III. copy assignment
+    {
+        if (this == &other)
+        {
+            return *this;
+        }
+        static_data_t<T> temp(other);
+        std::swap(_m_rw_info, temp._m_rw_info);
+        std::swap(_m_idx, temp._m_idx);
+        std::swap(_m_elements, temp._m_elements);
+        std::swap(_m_elements_size, temp._m_elements_size);
+        return *this;
+    }
+    static_data_t(const static_data_t& other) // II. copy constructor
+        : _m_rw_info(other._m_rw_info)
+        , _m_idx(other._m_idx)
+        , _m_elements_size(other._m_elements_size)
+        , _m_elements(new T[other._m_elements_size])
+    {
+        std::ranges::copy(other._m_elements, other._m_elements + _m_elements_size, _m_elements);
+    }
+    __constexpr void
+        set_generator_using_tertiary_data(
+            const tertiary_type& _a_tertiary_data
+        )
+    {
+        _m_idx = _a_tertiary_data;
+    }
+
+    __constexpr bool
+        has_current_element() const
+    {
+        return _m_idx < _m_elements_size;
+    }
+
+    __constexpr bool
+        generate_next()
+    {
+        return ++_m_idx < _m_elements_size;
+    }
+
+    __constexpr const T&
+        current_element() const
+    {
+        return _m_elements[_m_idx];
+    }
+
+    __constexpr void
+        reset()
+    {
+        _m_idx = 0;
+    }
+
+    __constexpr const tertiary_type&
+        tertiary_data() const
+    {
+        return _m_idx;
+    }
+private:
+    abc::utility::str::rw_info_t<std::size_t> _m_rw_info;
+    std::size_t                               _m_idx{0};
+    T*                                        _m_elements{nullptr};
+    std::size_t                               _m_elements_size{0};
+};
+
+#if 0
 using static_rep_data_t = std::size_t;
 
 template <typename T>
@@ -69,14 +158,12 @@ public:
      */
     __constexpr virtual bool
         are_failed_values_written_to_files() const noexcept;
-
-    __constexpr virtual void
-        subclass_reset_data() noexcept final
-    {}
 private:
     T*          _m_elements;
     std::size_t _m_elements_size;
 };
+#endif
+
 _END_ABC_DG_NS
 _BEGIN_ABC_NS
 /*!
@@ -84,11 +171,13 @@ _BEGIN_ABC_NS
  */
 template <typename T, typename R = std::initializer_list<T>>
 requires std::same_as<std::ranges::range_value_t<R>, T>
-__constexpr _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>, true>
-            iterate_over(R&& _a_init_list);
+__constexpr
+    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>, true>
+    iterate_over(R&& _a_init_list);
 _END_ABC_NS
 
 _BEGIN_ABC_DG_NS
+#if 0
 template <typename T>
 __constexpr_imp
     static_data_t<T>::static_data_t() noexcept
@@ -197,18 +286,24 @@ __constexpr_imp bool
 {
     return false;
 }
+#endif
 _END_ABC_DG_NS
+
 _BEGIN_ABC_NS
 template <typename T, typename R>
 requires std::same_as<std::ranges::range_value_t<R>, T>
-__constexpr_imp _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>, true>
-                iterate_over(
-                    R&& _a_init_list
-                )
+__constexpr_imp
+    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>, true>
+    iterate_over(
+        R&& _a_init_list
+    )
 {
     using namespace std;
+    using namespace _ABC_NS_DG;
     return unary_collection<T>(
-        make_shared<_ABC_NS_DG::static_data_t<T>>(forward<R>(_a_init_list))
+        make_shared<data_generator_single_t<static_data_t<T>, false>>(
+            static_data_t<T>(_a_init_list)
+        )
     );
 }
 

@@ -90,7 +90,7 @@ private:
     bool                            _m_add_repeatable_test_config;
     test_runner_t*                  _m_test_runner;
     std::size_t                     _m_iterator_length;
-    std::size_t                     _m_iterator_index;
+    //std::size_t                     _m_iterator_index;
     /*!
      * Increment iterator using an optional set of repetition data.
      */
@@ -99,7 +99,7 @@ private:
                                _a_opt_repetition_data);
     __constexpr virtual ds::dg_memoized_element_t
         generate_data_generator_memoized_element(
-            const bool _a_get_data_for_repeating
+            const bool _a_get_original_dg_memoized_element_data
         ) const noexcept;
     __constexpr bool
         at_end_of_iterator() const noexcept;
@@ -118,7 +118,7 @@ __constexpr_imp
         )
     : _m_this_iterator(_a_begin_iterator)
     , _m_iterator_length(_a_iterator_length)
-    , _m_iterator_index(0)
+   // , _m_iterator_index(0)
     , _m_this_iterators_index{0}
     , _m_test_runner(_a_test_runner)
 {
@@ -152,6 +152,7 @@ __constexpr_imp data_generator_collection_iterator_t<T>&
 {
     using namespace std;
     using namespace ds;
+    typeless_data_generator_collection_iterator_t::reset();
     invoked_test_data_t& _l_current_test{global::get_this_threads_current_test()
     };
     // If we're in a repetition, get the next element in the for loop stack...
@@ -178,7 +179,7 @@ __constexpr_imp data_generator_collection_iterator_t<T>&
             do
             {
                 ++_m_this_iterator;
-                ++_m_iterator_index;
+                ++this->_m_generation_collection_index;
                 if (at_end_of_iterator())
                 {
                     break;
@@ -247,15 +248,15 @@ __constexpr_imp void
         _l_rd.for_loop_iteration_data.generation_collection_index
     };
     // If less than the element, move forewards.
-    while (_m_iterator_index < _l_generation_collection_index)
+    while (this->_m_generation_collection_index < _l_generation_collection_index)
     {
-        ++_m_iterator_index;
+        ++this->_m_generation_collection_index;
         ++_m_this_iterator;
     }
     // If greater than the element move backwards.
-    while (_m_iterator_index > _l_generation_collection_index)
+    while (this->_m_generation_collection_index > _l_generation_collection_index)
     {
-        --_m_iterator_index;
+        --this->_m_generation_collection_index;
         --++_m_this_iterator;
     }
     dgc_element_t<T>& _l_this_iterator_ref{*_m_this_iterator};
@@ -269,18 +270,18 @@ template <typename T>
 __constexpr_imp ds::dg_memoized_element_t
                 data_generator_collection_iterator_t<T>::
         generate_data_generator_memoized_element(
-            const bool _a_get_data_for_repeating
+            const bool _a_get_original_dg_memoized_element_data
         ) const noexcept
 {
     return (*_m_this_iterator)
-        ->get_data_generator_memoized_element(_a_get_data_for_repeating);
+        ->get_data_generator_memoized_element(_a_get_original_dg_memoized_element_data);
 }
 
 template <typename T>
 __constexpr_imp bool
     data_generator_collection_iterator_t<T>::at_end_of_iterator() const noexcept
 {
-    return _m_iterator_index == _m_iterator_length;
+    return this->_m_generation_collection_index == _m_iterator_length;
 }
 
 _END_ABC_DG_NS

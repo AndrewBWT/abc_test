@@ -1,0 +1,12 @@
+#pragma once
+#include "included_instances/gen_data/static_data.h"
+#include "included_instances/gen_data/file.h"
+//#include "included_instances/gen_data/enumeration.h"
+//#include "included_instances/gen_data/random_data.h"
+#include "included_instances/matchers/function_wrapper.h"
+#include "included_instances/matchers/ranges.h"
+#include "included_instances/reporters/text_error_reporter.h"
+#include "included_instances/reporters/text_test_reporter.h"
+#include "included_instances/test_assertions/macros.h"
+#include "included_instances/test_options/command_line_parser.h"
+#include "included_instances/test_options/included_instances_test_options.h"

@@ -5,6 +5,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <set>
 
 _BEGIN_ABC_UTILITY_IO_NS
 struct threaded_ostream_output_reporter_t

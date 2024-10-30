@@ -79,7 +79,7 @@ private:
             test_runner_t&                            _a_test_runner,
             const std::size_t _a_order_ran_id
             //_ABC_NS_DS::test_set_data_t&              _a_test_set_data
-        ) noexcept;
+        );
 };
 
 namespace
@@ -280,7 +280,7 @@ __no_constexpr_imp void
         test_runner_t&                            _a_test_runner,
         const std::size_t _a_order_ran_id
         // _ABC_NS_DS::test_set_data_t&              _a_test_set_data
-    ) noexcept
+    )
 {
     using namespace std;
     using namespace _ABC_NS_ERRORS;

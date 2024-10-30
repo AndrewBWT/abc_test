@@ -12,6 +12,7 @@ set(LIBRARY_FILES
       src/abc_test/internal/global.cpp
   # The core subfolder; contains the core logic for how the library works.
   include/abc_test/core.h
+  include/abc_test/included_instances.h
   include/abc_test/internal/test_main.h
   include/abc_test/internal/options/test_options_base.h
   include/abc_test/internal/options/validated_test_options.h
@@ -86,6 +87,7 @@ set(LIBRARY_FILES
   include/abc_test/internal/data_generator/data_generator_collection_iterator.h
   include/abc_test/internal/data_generator/typeless_data_generator_collection_iterator.h
   include/abc_test/internal/data_generator/data_generator_collection_sentinel.h
+  include/abc_test/internal/data_generator/data_generator_with_file_io.h
   # Core matcher files
   include/abc_test/internal/matchers/matcher_wrapper.h
   include/abc_test/internal/matchers/bool_matcher.h

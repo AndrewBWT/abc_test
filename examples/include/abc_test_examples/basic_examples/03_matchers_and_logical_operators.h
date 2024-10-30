@@ -1,8 +1,6 @@
 #pragma once
 #include "abc_test/included_instances/gen_data/enumerable/specializations/enum.h"
-#include "abc_test/internal/test_assertions/macros.h"
-#include "abc_test/internal/ds/test_data/macros.h"
-#include "abc_test/internal/matchers/matcher_wrapper.h"
+#include "abc_test/core.h"
 
 #include "abc_test/included_instances/matchers/ranges.h"
 

@@ -1,14 +1,10 @@
 #pragma once
 #include "abc_test/included_instances/gen_data/enumerable/specializations/enum.h"
-#include "abc_test/internal/test_assertions/macros.h"
-#include "abc_test/internal/ds/test_data/macros.h"
-#include "abc_test/internal/matchers/matcher_wrapper.h"
+#include "abc_test/core.h"
 
-#include "abc_test/included_instances/matchers/ranges.h"
 
 #include <ranges>
 #include <numeric>
-#include "abc_test/internal/matchers/bool_matcher.h"
 
 _TEST_CASE(abc::test_data_t({
 	.name = "file_02_example_01",

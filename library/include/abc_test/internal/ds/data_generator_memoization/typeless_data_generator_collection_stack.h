@@ -1,8 +1,8 @@
 #pragma once
 
+#include "abc_test/internal/data_generator/typeless_data_generator_collection_iterator.h"
 #include "abc_test/internal/ds/data_generator_memoization/indexed_data_generator_collection_memoized_element.h"
 #include "abc_test/internal/errors/test_library_exception.h"
-#include "abc_test/internal/data_generator/typeless_data_generator_collection_iterator.h"
 #include "fmt/base.h"
 #include "fmt/ranges.h"
 
@@ -12,8 +12,8 @@ _BEGIN_ABC_DS_NS
  * @brief Type synonym for a refernece wrapper containing a
  * gen_data_collection_iterator_agnostic_data_t object.
  */
-using tdg_collection_itt_ref_t
-    = std::reference_wrapper<_ABC_NS_DG::typeless_data_generator_collection_iterator_t>;
+using tdg_collection_itt_ref_t = std::reference_wrapper<
+    _ABC_NS_DG::typeless_data_generator_collection_iterator_t>;
 
 /*!
  * @brief This structure holds the current set of
@@ -35,7 +35,7 @@ public:
      *
      */
     __constexpr
-        typeless_data_generator_collection_stack_t() noexcept
+    typeless_data_generator_collection_stack_t() noexcept
         = default;
     // Can't be constexpr due to use of rest_failure_func_t argument.
     /*!
@@ -140,21 +140,24 @@ using tdg_collection_stack_t = typeless_data_generator_collection_stack_t;
 _END_ABC_DS_NS
 
 template <>
-struct fmt::formatter<_ABC_NS_DS::typeless_data_generator_collection_stack_t> : formatter<string_view>
+struct fmt::formatter<_ABC_NS_DS::typeless_data_generator_collection_stack_t>
+    : formatter<string_view>
 {
     /*!
      * Provides a formatter for a for_loop_stack_t object
      */
     // can't be constexpr due to calling fmt::format
     __no_constexpr auto
-        format(_ABC_NS_DS::typeless_data_generator_collection_stack_t _a_rt, format_context& _a_cxt)
-            const -> format_context::iterator;
+        format(
+            _ABC_NS_DS::typeless_data_generator_collection_stack_t _a_rt,
+            format_context&                                        _a_cxt
+        ) const -> format_context::iterator;
 };
 
 _BEGIN_ABC_DS_NS
 
 __no_constexpr_imp void
-typeless_data_generator_collection_stack_t::increment(
+    typeless_data_generator_collection_stack_t::increment(
         tdg_collection_itt_ref_t _a_ptr
     ) noexcept
 {
@@ -163,7 +166,7 @@ typeless_data_generator_collection_stack_t::increment(
 }
 
 __constexpr_imp void
-typeless_data_generator_collection_stack_t::decrement()
+    typeless_data_generator_collection_stack_t::decrement()
 {
     using namespace errors;
     if (_m_for_loop_pointers.size() > 0)
@@ -181,7 +184,7 @@ typeless_data_generator_collection_stack_t::decrement()
 }
 
 __no_constexpr_imp void
-typeless_data_generator_collection_stack_t::update(
+    typeless_data_generator_collection_stack_t::update(
         tdg_collection_itt_ref_t _a_ptr
     )
 {
@@ -199,29 +202,32 @@ typeless_data_generator_collection_stack_t::update(
 }
 
 __constexpr_imp ds::idgc_memoized_element_sequence_t
-typeless_data_generator_collection_stack_t::create_data_sequence_for_repetition() const noexcept
+                typeless_data_generator_collection_stack_t::
+        create_data_sequence_for_repetition() const noexcept
 {
     using namespace std;
     using namespace ds;
     idgc_memoized_element_sequence_t _l_rds{};
-    for (const tdg_collection_itt_ref_t& _l_element : _m_for_loop_pointers)
+    for (size_t                          _l_idx{0};
+         const tdg_collection_itt_ref_t& _l_element : _m_for_loop_pointers)
     {
         _l_rds.push_back(idgc_memoized_element_t{
-            _m_current_for_loop_indexes.back(),
-            _l_element.get().get_data_generator_memoized_element(true)
+            _m_current_for_loop_indexes[_l_idx++],
+            _l_element.get().get_data_generator_memoized_element(false)
         });
     }
     return _l_rds;
 }
 
 __constexpr_imp idgc_memoized_element_sequence_t
-typeless_data_generator_collection_stack_t::create_data_sequence() const noexcept
+    typeless_data_generator_collection_stack_t::create_data_sequence(
+    ) const noexcept
 {
     idgc_memoized_element_sequence_t _l_rds{};
-    for (auto& _l_element : _m_for_loop_pointers)
+    for (size_t _l_idx{0}; auto& _l_element : _m_for_loop_pointers)
     {
         _l_rds.push_back(idgc_memoized_element_t{
-            _m_current_for_loop_indexes.back(),
+            _m_current_for_loop_indexes[_l_idx++],
             _l_element.get().get_data_generator_memoized_element(false)
         });
     }
@@ -237,10 +243,11 @@ __constexpr_imp std::size_t
 _END_ABC_DS_NS
 
 __no_constexpr_imp auto
-    fmt::formatter<_ABC_NS_DS::typeless_data_generator_collection_stack_t>::format(
-        _ABC_NS_DS::typeless_data_generator_collection_stack_t _a_fldc,
-        format_context&                 _a_ctx
-    ) const -> format_context::iterator
+    fmt::formatter<_ABC_NS_DS::typeless_data_generator_collection_stack_t>::
+        format(
+            _ABC_NS_DS::typeless_data_generator_collection_stack_t _a_fldc,
+            format_context&                                        _a_ctx
+        ) const -> format_context::iterator
 {
     using namespace std;
     const string _l_rv{fmt::format(

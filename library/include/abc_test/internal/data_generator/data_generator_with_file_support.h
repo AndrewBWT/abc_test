@@ -4,6 +4,7 @@
 #include "abc_test/internal/utility/io/file/opt_file_rw.h"
 
 _BEGIN_ABC_DG_NS
+#if 0
 // no opt means generate next failed. a value means it was a success.
 // Value represents new mode value.
 using generate_next_return_type_t = std::optional<std::size_t>;
@@ -56,10 +57,14 @@ template <
 class data_generator_with_file_support_t : public data_generator_t<T>
 {
 public:
+    __constexpr
+    data_generator_with_file_support_t()
+        = default;
     /*!
      * @brief Implementation of base class's has_current_element().
-     * 
-     * It checks (assuming the template conditions allow) the elements in the following order:
+     *
+     * It checks (assuming the template conditions allow) the elements in the
+     * following order:
      * - General_Data file
      * - Rep_Data file
      * - subclass has_current().
@@ -70,7 +75,7 @@ public:
         has_current_element() const final;
     /*!
      * @brief Gets the current element.
-     * 
+     *
      * This follows the same ordering as has_current_element().
      *
      * @return A cref to the current element.
@@ -107,7 +112,7 @@ public:
      */
     __constexpr virtual ds::dg_memoized_element_t
         get_data_generator_memoized_element(const bool _a_get_data_for_repeating
-        ) const noexcept override final;
+        ) noexcept override final;
 protected:
     __constexpr_imp
         data_generator_with_file_support_t(
@@ -195,8 +200,7 @@ protected:
      * object.
      */
     __constexpr virtual void
-        subclass_reset_data() noexcept
-        = 0;
+        subclass_reset_data() noexcept;
     /*!
      * @brief Gets the repetition data for the current element.
      */
@@ -446,7 +450,7 @@ __constexpr_imp ds::dg_memoized_element_t
                     Supports_Rep_Data_File_IO>::
         get_data_generator_memoized_element(
             const bool _a_get_data_for_repeating
-        ) const noexcept
+        ) noexcept
 {
     using namespace std;
     using namespace ds;
@@ -454,7 +458,7 @@ __constexpr_imp ds::dg_memoized_element_t
     {
         if constexpr (Supports_General_Data_File_IO)
         {
-            if (optional<dg_memoized_element_t> _l_res{
+            /*if (optional<dg_memoized_element_t> _l_res{
                     _m_core_data_rw_file.log_failure_and_return_rep_data(
                         _m_has_current_element_been_written_to_file,
                         dg_memoized_element_t{
@@ -465,11 +469,11 @@ __constexpr_imp ds::dg_memoized_element_t
                 _l_res.has_value())
             {
                 return _l_res.value();
-            }
+            }*/
         }
         if constexpr (Supports_Rep_Data_File_IO)
         {
-            if (optional<dg_memoized_element_t> _l_res{
+            /*if (optional<dg_memoized_element_t> _l_res{
                     _m_rep_data_rw_file.log_failure_and_return_rep_data(
                         _m_has_current_element_been_written_to_file,
                         dg_memoized_element_t{this->_m_mode, to_string(0)}
@@ -478,7 +482,7 @@ __constexpr_imp ds::dg_memoized_element_t
                 _l_res.has_value())
             {
                 return _l_res.value();
-            }
+            }*/
         }
         return dg_memoized_element_t{this->mode(), get_additional_data()};
     }
@@ -528,7 +532,7 @@ __constexpr_imp generate_next_return_type_t
     {
         // Check the mode and core data file has data.
         if (_m_core_data_rw_file.has_current_element()
-            && this->mode == _STATIC_GENERAL_FILE_IO_MODE)
+            && this->_m_mode == _STATIC_GENERAL_FILE_IO_MODE)
         {
             // If it can generate next, return original.
             return _m_core_data_rw_file.generate_next(this->_m_mode)
@@ -537,7 +541,7 @@ __constexpr_imp generate_next_return_type_t
                        : initialise_rep_data_level();
         }
     }
-    if constexpr (Supports_General_Data_File_IO)
+    if constexpr (Supports_Rep_Data_File_IO)
     {
         if (_m_rep_data_rw_file.has_current_element()
             && this->_m_mode == _STATIC_REP_DATA_FILE_IO_MODE)
@@ -777,6 +781,19 @@ __constexpr_imp
     set_element_if_required();
 }
 
+template <
+    typename T,
+    typename Rep_Data,
+    bool Supports_General_Data_File_IO,
+    bool Supports_Rep_Data_File_IO>
+__constexpr_imp void
+    data_generator_with_file_support_t<
+        T,
+        Rep_Data,
+        Supports_General_Data_File_IO,
+        Supports_Rep_Data_File_IO>::subclass_reset_data() noexcept
+{}
+
 /*template<
     typename T,
     typename Rep_Data
@@ -790,5 +807,5 @@ __constexpr_imp
 _m_rep_data_rw_info.printer().run_printer(subclass_get_repetition_data());
 }*/
 
-
+#endif
 _END_ABC_DG_NS

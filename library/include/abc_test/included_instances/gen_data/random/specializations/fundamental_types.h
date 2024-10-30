@@ -1,13 +1,13 @@
 #pragma once
 
-#include "abc_test/gen_data/random/base.h"
+#include "abc_test/included_instances/gen_data/random/base.h"
 #include "concepts"
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_DG_NS
 	template<>
 	struct random_generator_t<bool>
 	{
-		__constexpr_imp
+		__no_constexpr_imp
 			virtual
 			bool
 			operator()(
@@ -43,7 +43,7 @@ _BEGIN_ABC_NS
 		{
 
 		}
-		__constexpr_imp
+		__no_constexpr_imp
 			virtual
 			T
 			operator()(
@@ -51,8 +51,8 @@ _BEGIN_ABC_NS
 				)
 		{
 			using namespace std;
-			T _l_val{ _a_rnd_generator() % _m_range };
+			T _l_val{ static_cast<T>(_a_rnd_generator() % _m_range) };
 			return _m_min + _l_val;
 		}
 	};
-	_END_ABC_NS
+	_END_ABC_DG_NS

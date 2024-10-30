@@ -62,7 +62,7 @@ public:
      * @brief Returns a cref to the invoked_test_data_t's utility::rng object.
      * @return Cref to the invoked_test_data_t's utility::rng object.
      */
-    __constexpr const utility::rng&
+    __constexpr utility::rng&
                       get_random_generator() noexcept;
     /*!
      * @brief Returns a cref to the invoked_test_data_t's post_setup_tst_data_t
@@ -339,7 +339,7 @@ __constexpr_imp const std::filesystem::path&
     return _m_path;
 }
 
-__constexpr_imp const utility::rng&
+__constexpr_imp utility::rng&
                       invoked_test_data_t::get_random_generator() noexcept
 {
     return _m_this_tests_random_generator;
