@@ -1,15 +1,15 @@
 #pragma once
 #include "abc_test/core.h"
-#include "abc_test/included_instances/data_generator/random/specializations/fundamental_types.h"
-#include "abc_test/included_instances/data_generator/random_data.h"
+#include "abc_test/included_instances/data_generator/random_data_generator.h"
+#include "abc_test/included_instances/data_generator/random_generator_object/specializations/fundamental_types.h"
 #include "abc_test/included_instances/matchers/ranges.h"
 #include "abc_test/internal/data_generator/data_generator_collection_iterator.h"
 
 #include <numeric>
 #include <ranges>
+#include <scn/ranges.h>
 #include <tuple>
 #include <vector>
-#include <scn/ranges.h>
 
 _TEST_CASE(
     abc::test_data_t(
@@ -37,17 +37,16 @@ _TEST_CASE(
      * This is a data generator. It iterates over a set of data, given as a list
      * of test_data_t elements.
      */
-   // for (auto&& _l_input : generate_data_randomly<test_data_t>())
-  //  {
-   //     _CHECK(annotate(
-    //        _EXPR(_l_f(_l_input) == _l_output),
-    //        fmt::format("Testing _l_f({0}) == {1}", _l_input, _l_output)
-   //     ));
-   // }
+    // for (auto&& _l_input : generate_data_randomly<test_data_t>())
+    // {
+    //    _CHECK(annotate(
+    //       _EXPR(_l_f(_l_input) == _l_output),
+    //       fmt::format("Testing _l_f({0}) == {1}", _l_input, _l_output)
+    // ));
+    // }
 
-    for (auto&& _l_input : generate_data_randomly<test_data_t>(
-             general_data_file("file1x")
-         ))
+    for (auto&& _l_input :
+         generate_data_randomly<test_data_t>(general_data_file("file1x")))
     {
         _CHECK(annotate(
             _EXPR(_l_f(_l_input) == _l_output),
@@ -55,8 +54,16 @@ _TEST_CASE(
         ));
     }
 
+    for (auto&& _l_input :
+         generate_data_randomly<test_data_t>(tertiary_data_file("file2")))
+    {
+        _CHECK(annotate(
+            _EXPR(_l_f(_l_input) == _l_output),
+            fmt::format("Testing _l_f({0}) == {1}", _l_input, _l_output)
+        ));
+    }
     for (auto&& _l_input : generate_data_randomly<test_data_t>(
-             tertiary_data_file("file2")
+             general_data_file("file3"), tertiary_data_file("file4")
          ))
     {
         _CHECK(annotate(
@@ -65,18 +72,7 @@ _TEST_CASE(
         ));
     }
     for (auto&& _l_input : generate_data_randomly<test_data_t>(
-             general_data_file("file3"),
-             tertiary_data_file("file4")
-         ))
-    {
-        _CHECK(annotate(
-            _EXPR(_l_f(_l_input) == _l_output),
-            fmt::format("Testing _l_f({0}) == {1}", _l_input, _l_output)
-        ));
-    }
-    for (auto&& _l_input : generate_data_randomly<test_data_t>(
-             tertiary_data_file("file5"),
-             general_data_file("file6")
+             tertiary_data_file("file5"), general_data_file("file6")
          ))
     {
         _CHECK(annotate(

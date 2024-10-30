@@ -14,8 +14,9 @@ class data_generator_file_reader_and_writer_t
 public:
     __constexpr
     data_generator_file_reader_and_writer_t(
-        const T&                                                    _a_object,
-        const utility::io::file_name_t<typename T::generator_type>& _a_frw
+        const T& _a_object,
+        const utility::io::file_name_t<typename T::generator_type>& _a_frw,
+        const std::string_view _a_comment_str
     );
     __constexpr std::size_t
                 write_data_to_file(const T& _a_element);
@@ -55,7 +56,8 @@ __constexpr
 data_generator_file_reader_and_writer_t<T>::
     data_generator_file_reader_and_writer_t(
         const T&                                                    _a_object,
-        const utility::io::file_name_t<typename T::generator_type>& _a_frw
+        const utility::io::file_name_t<typename T::generator_type>& _a_frw,
+        const std::string_view _a_comment_str
     )
     : _m_opt_rw_info(opt_rw_info(_a_frw))
     , _m_path(path(_a_frw))
@@ -66,7 +68,7 @@ data_generator_file_reader_and_writer_t<T>::
     if (not exists(_m_path))
     {
         file_line_writer_t _l_flw(_m_path);
-        _l_flw.write_comment(typeid(T).name());
+        _l_flw.write_comment(_a_comment_str);
     }
     _m_line_reader = file_line_reader_t(_m_path);
     if (_m_line_reader.has_current_line())

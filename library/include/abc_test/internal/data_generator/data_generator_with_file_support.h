@@ -87,8 +87,11 @@ data_generator_with_file_support_t<T, Has_File_Read_Writer>::
             _a_file_read_writer
     )
     : _m_object(_a_element)
-    , _m_file_read_writer(data_generator_file_reader_and_writer_t<T>(_a_element, _a_file_read_writer)
-      )
+    , _m_file_read_writer(data_generator_file_reader_and_writer_t<T>(
+          _a_element,
+          _a_file_read_writer,
+        generate_comment_str(_a_file_read_writer,typeid(typename T::tertiary_type))
+      ))
 {
     if (not _m_file_read_writer.has_current_element())
     {
@@ -122,7 +125,10 @@ data_generator_with_file_support_t<T, Has_File_Read_Writer>::
          ++_l_itt)
     {
         _m_file_writers.push_back(file_line_writer_with_optional_rw_info_t<
-                                  typename T::generator_type>(*_l_itt));
+                                  typename T::generator_type>(
+            *_l_itt,
+            generate_comment_str(*_l_itt, typeid(typename T::tertiary_type))
+        ));
     }
 }
 

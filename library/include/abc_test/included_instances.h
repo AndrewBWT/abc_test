@@ -1,6 +1,6 @@
 #pragma once
-#include "included_instances/data_generator/static_data.h"
-#include "included_instances/data_generator/file.h"
+#include "included_instances/data_generator/static_data_generator.h"
+#include "included_instances/data_generator/file_data_generator.h"
 #include "included_instances/matchers/function_wrapper.h"
 #include "included_instances/matchers/ranges.h"
 #include "included_instances/reporters/text_error_reporter.h"

@@ -112,19 +112,18 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/matchers/function_wrapper.h
   # gen_data subfolder. Contains the logic that allow the gen_data for loops to work.
   include/abc_test/included_instances/data_generator/manual_for_loop.h
-  include/abc_test/included_instances/data_generator/file.h
-  include/abc_test/included_instances/data_generator/random_data.h
-  include/abc_test/included_instances/data_generator/random_data_description.h
+  include/abc_test/included_instances/data_generator/file_data_generator.h
+  include/abc_test/included_instances/data_generator/random_data_generator.h
   # Subfolder contains logic specifically to do with random data generation.
-  include/abc_test/included_instances/data_generator/random/base.h
-  include/abc_test/included_instances/data_generator/random/specializations.h
+  include/abc_test/included_instances/data_generator/random_generator_object.h
+  include/abc_test/included_instances/data_generator/random_generator_object/specializations.h
   # Folder containing random data specializations for std types.
-  include/abc_test/included_instances/data_generator/random/specializations/fundamental_types.h
-  include/abc_test/included_instances/data_generator/random/specializations/enum.h
-  include/abc_test/included_instances/data_generator/random/specializations/array.h
-  include/abc_test/included_instances/data_generator/random/specializations/vector.h
+  include/abc_test/included_instances/data_generator/random_generator_object/specializations/fundamental_types.h
+  include/abc_test/included_instances/data_generator/random_generator_object/specializations/enum.h
+  include/abc_test/included_instances/data_generator/random_generator_object/specializations/array.h
+  include/abc_test/included_instances/data_generator/random_generator_object/specializations/vector.h
   # Static data files
-  include/abc_test/included_instances/data_generator/static_data.h
+  include/abc_test/included_instances/data_generator/static_data_generator.h
   # Enumeration files
   include/abc_test/included_instances/data_generator/enumeration.h
   include/abc_test/included_instances/data_generator/enumerable.h
