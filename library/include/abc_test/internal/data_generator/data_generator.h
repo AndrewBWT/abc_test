@@ -4,12 +4,10 @@
 #include "abc_test/internal/ds/type_synonyms.h"
 #include "abc_test/internal/global.h"
 #include "abc_test/internal/utility/io/file/file_name.h"
-#include "abc_test/internal/utility/io/file/file_reader.h"
-#include "abc_test/internal/utility/io/file/file_reader_and_writer.h"
-#include "abc_test/internal/utility/io/file/file_rw.h"
-#include "abc_test/internal/utility/io/file/file_writer.h"
-#include "abc_test/internal/utility/io/file/file_writer_with_optional_rw_info.h"
-#include "abc_test/internal/utility/io/file/opt_file_rw.h"
+#include "abc_test/internal/utility/io/file/file_line_reader.h"
+#include "abc_test/internal/data_generator/data_generator_file_reader_and_writer.h"
+#include "abc_test/internal/utility/io/file/file_line_writer.h"
+#include "abc_test/internal/utility/io/file/file_line_writer_with_optional_rw_info.h"
 
 #include <expected>
 #include <functional>

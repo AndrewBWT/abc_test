@@ -83,12 +83,11 @@ set(LIBRARY_FILES
   include/abc_test/internal/data_generator/data_generator.h
   include/abc_test/internal/data_generator/data_generator_with_file_support_concept.h
   include/abc_test/internal/data_generator/data_generator_with_file_support.h
-  include/abc_test/internal/data_generator/data_generator_with_file_and_element_support.h
   include/abc_test/internal/data_generator/data_generator_collection.h
   include/abc_test/internal/data_generator/data_generator_collection_iterator.h
   include/abc_test/internal/data_generator/typeless_data_generator_collection_iterator.h
   include/abc_test/internal/data_generator/data_generator_collection_sentinel.h
-  include/abc_test/internal/data_generator/data_generator_with_file_io.h
+  include/abc_test/internal/data_generator/data_generator_file_reader_and_writer.h
   # Core matcher files
   include/abc_test/internal/matchers/matcher_wrapper.h
   include/abc_test/internal/matchers/bool_matcher.h
@@ -169,17 +168,12 @@ set(LIBRARY_FILES
   include/abc_test/internal/utility/io/threaded_ostream_output_reporter.h
   # Utility file functions and objects.
   include/abc_test/internal/utility/io/file/file_name.h
-  include/abc_test/internal/utility/io/file/file_name_with_extension.h
-  include/abc_test/internal/utility/io/file/file_reader.h
-  include/abc_test/internal/utility/io/file/file_writer.h
-  include/abc_test/internal/utility/io/file/file_rw_info.h
-  include/abc_test/internal/utility/io/file/file_rw.h
-  include/abc_test/internal/utility/io/file/opt_file_rw.h
+  include/abc_test/internal/utility/io/file/file_line_reader.h
+  include/abc_test/internal/utility/io/file/file_line_writer.h
   include/abc_test/internal/utility/io/file/general_data_with_rw_info.h
   include/abc_test/internal/utility/io/file/general_data.h
   include/abc_test/internal/utility/io/file/tertiary_data.h
-  include/abc_test/internal/utility/io/file/file_writer_with_optional_rw_info.h
-  include/abc_test/internal/utility/io/file/file_reader_and_writer.h
+  include/abc_test/internal/utility/io/file/file_line_writer_with_optional_rw_info.h
   # Utility functions and objects for strings including parsing and printing.
   include/abc_test/internal/utility/str/parser.h
   include/abc_test/internal/utility/str/printer.h

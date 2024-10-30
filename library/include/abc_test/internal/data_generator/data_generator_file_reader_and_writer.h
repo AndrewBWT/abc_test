@@ -2,18 +2,18 @@
 
 #include "abc_test/internal/data_generator/data_generator_with_file_support_concept.h"
 #include "abc_test/internal/utility/internal/macros.h"
-#include "abc_test/internal/utility/io/file/file_reader.h"
-#include "abc_test/internal/utility/io/file/file_writer.h"
+#include "abc_test/internal/utility/io/file/file_line_reader.h"
+#include "abc_test/internal/utility/io/file/file_line_writer.h"
 
-_BEGIN_ABC_UTILITY_IO_NS
+_BEGIN_ABC_DG_NS
 
 template <typename T>
 requires data_gen::concept_for_data_generator_with_file_support<T>
-class file_read_writer_t
+class data_generator_file_reader_and_writer_t
 {
 public:
     __constexpr
-    file_read_writer_t(
+    data_generator_file_reader_and_writer_t(
         const T&                                                    _a_object,
         const utility::io::file_name_t<typename T::generator_type>& _a_frw
     );
@@ -33,28 +33,30 @@ public:
     __constexpr bool
         generate_next();
 private:
-    std::optional<str::rw_info_t<typename T::generator_type>> _m_opt_rw_info;
-    file_line_reader_t                                        _m_line_reader;
-    file_line_writer_t                                        _m_line_writer;
-    std::filesystem::path                                     _m_path;
-    T                                                         _m_object;
-    std::size_t                _m_elements_read_or_written{0};
-    typename T::generator_type _m_element;
+    std::optional<utility::str::rw_info_t<typename T::generator_type>>
+                                    _m_opt_rw_info;
+    utility::io::file_line_reader_t _m_line_reader;
+    utility::io::file_line_writer_t _m_line_writer;
+    std::filesystem::path           _m_path;
+    T                               _m_object;
+    std::size_t                     _m_elements_read_or_written{0};
+    typename T::generator_type      _m_element;
 
     __constexpr void
         set_element();
 };
 
-_END_ABC_UTILITY_IO_NS
+_END_ABC_DG_NS
 
-_BEGIN_ABC_UTILITY_IO_NS
+_BEGIN_ABC_DG_NS
 template <typename T>
 requires data_gen::concept_for_data_generator_with_file_support<T>
 __constexpr
-file_read_writer_t<T>::file_read_writer_t(
-    const T&                                                    _a_object,
-    const utility::io::file_name_t<typename T::generator_type>& _a_frw
-)
+data_generator_file_reader_and_writer_t<T>::
+    data_generator_file_reader_and_writer_t(
+        const T&                                                    _a_object,
+        const utility::io::file_name_t<typename T::generator_type>& _a_frw
+    )
     : _m_opt_rw_info(opt_rw_info(_a_frw))
     , _m_path(path(_a_frw))
     , _m_object(_a_object)
@@ -80,7 +82,7 @@ file_read_writer_t<T>::file_read_writer_t(
 template <typename T>
 requires data_gen::concept_for_data_generator_with_file_support<T>
 __constexpr std::size_t
-            file_read_writer_t<T>::write_data_to_file(
+            data_generator_file_reader_and_writer_t<T>::write_data_to_file(
         const T& _a_element
     )
 {
@@ -103,7 +105,8 @@ __constexpr std::size_t
 template <typename T>
 requires data_gen::concept_for_data_generator_with_file_support<T>
 __constexpr std::size_t
-            file_read_writer_t<T>::get_file_position() const noexcept
+            data_generator_file_reader_and_writer_t<T>::get_file_position(
+    ) const noexcept
 {
     return _m_elements_read_or_written;
 }
@@ -111,15 +114,16 @@ __constexpr std::size_t
 template <typename T>
 requires data_gen::concept_for_data_generator_with_file_support<T>
 __constexpr void
-    file_read_writer_t<T>::set_data_generator_using_additional_data(
-        const std::string_view _a_str
-    ) noexcept
+    data_generator_file_reader_and_writer_t<T>::
+        set_data_generator_using_additional_data(
+            const std::string_view _a_str
+        ) noexcept
 {}
 
 template <typename T>
 requires data_gen::concept_for_data_generator_with_file_support<T>
 __constexpr void
-    file_read_writer_t<T>::set_to_write()
+    data_generator_file_reader_and_writer_t<T>::set_to_write()
 {
     using namespace abc::utility::io;
     _m_line_reader = file_line_reader_t();
@@ -129,7 +133,7 @@ __constexpr void
 template <typename T>
 requires data_gen::concept_for_data_generator_with_file_support<T>
 __constexpr const typename T::generator_type&
-    file_read_writer_t<T>::current_element() const
+    data_generator_file_reader_and_writer_t<T>::current_element() const
 {
     if (_m_opt_rw_info.has_value())
     {
@@ -144,7 +148,7 @@ __constexpr const typename T::generator_type&
 template <typename T>
 requires data_gen::concept_for_data_generator_with_file_support<T>
 __constexpr bool
-    file_read_writer_t<T>::has_current_element()
+    data_generator_file_reader_and_writer_t<T>::has_current_element()
 {
     return _m_line_reader.has_current_line();
 }
@@ -152,7 +156,7 @@ __constexpr bool
 template <typename T>
 requires data_gen::concept_for_data_generator_with_file_support<T>
 __constexpr bool
-    file_read_writer_t<T>::generate_next()
+    data_generator_file_reader_and_writer_t<T>::generate_next()
 {
     const bool _l_has_next_line{_m_line_reader.get_next_line()};
     if (_l_has_next_line)
@@ -166,7 +170,7 @@ __constexpr bool
 template <typename T>
 requires data_gen::concept_for_data_generator_with_file_support<T>
 __constexpr void
-    file_read_writer_t<T>::set_element()
+    data_generator_file_reader_and_writer_t<T>::set_element()
 {
     if (_m_opt_rw_info.has_value())
     {
@@ -183,4 +187,4 @@ __constexpr void
     }
 }
 
-_END_ABC_UTILITY_IO_NS
+_END_ABC_DG_NS

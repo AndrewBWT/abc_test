@@ -5,11 +5,10 @@
 #include "abc_test/included_instances/gen_data/random_data_description.h"
 #include "abc_test/included_instances/gen_data/static_data.h"
 #include "abc_test/internal/data_generator/data_generator.h"
-#include "abc_test/internal/data_generator/data_generator_with_file_and_element_support.h"
 #include "abc_test/internal/test_runner.h"
 #include "abc_test/internal/utility/io/file/file_name.h"
-#include "abc_test/internal/utility/io/file/file_reader.h"
-#include "abc_test/internal/utility/io/file/file_writer.h"
+#include "abc_test/internal/utility/io/file/file_line_reader.h"
+#include "abc_test/internal/utility/io/file/file_line_writer.h"
 #include "abc_test/internal/utility/str/rw_info.h"
 
 #include <concepts>
@@ -154,8 +153,8 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
     }
 }
 
-template <typename T, typename... Args>
-__constexpr void
+template <typename T>
+__constexpr_imp void
 process_args_internal(
 	utility::io::file_names_t<T>& _a_fns
 ) noexcept
@@ -164,7 +163,7 @@ process_args_internal(
 }
 
 template <typename T, typename... Args>
-__constexpr void
+__constexpr_imp void
 process_args_internal(
 	utility::io::file_names_t<T>& _a_fns,
 	const utility::io::file_name_t<T>& _a_fn_no_type,
@@ -175,8 +174,8 @@ process_args_internal(
 	process_args_internal<T>(_a_fns, _a_elements...);
 }
 
-template <typename T, typename... Args>
-__constexpr void
+template <typename T>
+__constexpr_imp void
 process_args_internal(
 	utility::io::file_names_t<T>& _a_fns,
 	const utility::io::file_name_t<T>& _a_fn_no_type

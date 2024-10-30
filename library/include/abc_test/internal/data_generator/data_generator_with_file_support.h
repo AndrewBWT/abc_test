@@ -1,5 +1,10 @@
 #pragma once
+#include "abc_test/internal/data_generator/data_generator_file_reader_and_writer.h"
 #include "abc_test/internal/data_generator/data_generator_with_file_support_concept.h"
+#include "abc_test/internal/utility/io/file/file_line_writer_with_optional_rw_info.h"
+
+#include <type_traits>
+#include <vector>
 
 _BEGIN_ABC_DG_NS
 
@@ -49,11 +54,12 @@ private:
     T   _m_object;
     std::conditional_t<
         Has_File_Read_Writer,
-        utility::io::file_read_writer_t<T>,
+        data_generator_file_reader_and_writer_t<T>,
         std::monostate>
                 _m_file_read_writer;
     std::size_t _m_mode{0};
-    std::vector<utility::io::file_writer_t<typename T::generator_type>>
+    std::vector<utility::io::file_line_writer_with_optional_rw_info_t<
+        typename T::generator_type>>
                                                             _m_file_writers;
     abc::utility::str::rw_info_t<typename T::tertiary_type> _m_tertiary_rw_info;
 };
@@ -81,8 +87,7 @@ data_generator_with_file_support_t<T, Has_File_Read_Writer>::
             _a_file_read_writer
     )
     : _m_object(_a_element)
-    , _m_file_read_writer(
-          utility::io::file_read_writer_t<T>(_a_element, _a_file_read_writer)
+    , _m_file_read_writer(data_generator_file_reader_and_writer_t<T>(_a_element, _a_file_read_writer)
       )
 {
     if (not _m_file_read_writer.has_current_element())
@@ -116,9 +121,8 @@ data_generator_with_file_support_t<T, Has_File_Read_Writer>::
          _l_itt != _a_pair_iterators.second;
          ++_l_itt)
     {
-        _m_file_writers.push_back(
-            file_writer_t<typename T::generator_type>(*_l_itt)
-        );
+        _m_file_writers.push_back(file_line_writer_with_optional_rw_info_t<
+                                  typename T::generator_type>(*_l_itt));
     }
 }
 
@@ -316,7 +320,8 @@ __constexpr ds::dg_memoized_element_t
                 // file_writer_t<generator_type>
                 //_m_object. T.
                 // File writiers take a T. Turn it into a string?
-                for (file_writer_t<typename T::generator_type>& _l_writer :
+                for (file_line_writer_with_optional_rw_info_t<
+                         typename T::generator_type>& _l_writer :
                      _m_file_writers)
                 {
                     if (_l_writer.has_printer_parser())

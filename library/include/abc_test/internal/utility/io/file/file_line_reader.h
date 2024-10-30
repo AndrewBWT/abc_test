@@ -1,6 +1,5 @@
 #pragma once
 #include "abc_test/internal/options/test_options_base.h"
-#include "abc_test/internal/utility/io/file/file_name_with_extension.h"
 
 #include <fmt/std.h>
 #include <fstream>
@@ -8,11 +7,12 @@
 #include <string>
 
 _BEGIN_ABC_UTILITY_IO_NS
-
+/*!
+ * @brief Object used to encapsulate the logic required to read a file line by line.
+ */
 struct file_line_reader_t
 {
 public:
-    __no_constexpr ~file_line_reader_t();
     __no_constexpr
         file_line_reader_t(const std::filesystem::path& _a_file_name);
     __no_constexpr
@@ -36,13 +36,9 @@ _END_ABC_UTILITY_IO_NS
 
 _BEGIN_ABC_UTILITY_IO_NS
 __no_constexpr_imp
-file_line_reader_t::~file_line_reader_t()
-{
-}
-__no_constexpr_imp
-    file_line_reader_t::file_line_reader_t(
-        const std::filesystem::path& _a_file_name
-    )
+file_line_reader_t::file_line_reader_t(
+    const std::filesystem::path& _a_file_name
+)
     : _m_current_line_idx(0)
     , _m_current_line("")
     , _m_file_handler(std::shared_ptr<std::ifstream>())
@@ -52,36 +48,27 @@ __no_constexpr_imp
     using namespace std;
     using namespace std::filesystem;
     using namespace errors;
-    //	if (_m_file_name.is_valid())
+    using std::filesystem::path;
+    if (not exists(_m_file_name))
     {
-        using std::filesystem::path;
-        if (not exists(_m_file_name))
-        {
-            throw test_library_exception_t(fmt::format(
-                "Unable to open file_line_reader_t object as file \"{0}\" does "
-                "not exist",
-                _m_file_name
-            ));
-        }
-        _m_file_handler = make_shared<ifstream>(_m_file_name);
-        if (_m_file_handler.get()->is_open())
-        {
-            get_next_line();
-        }
-        else
-        {
-            throw test_library_exception_t(fmt::format(
-                "Unable to open file_line_reader_t object as file \"{0}\", "
-                "even though file exists.",
-                _m_file_name
-            ));
-        }
+        throw test_library_exception_t(fmt::format(
+            "Unable to open file_line_reader_t object as file \"{0}\" does "
+            "not exist",
+            _m_file_name
+        ));
     }
-    // else
+    _m_file_handler = make_shared<ifstream>(_m_file_name);
+    if (_m_file_handler.get()->is_open())
     {
-        //	throw test_library_exception_t(
-        //		fmt::format("file name \"{0}\" has been flagged as being
-        //invalid.", 			_m_file_name.file_path()));
+        get_next_line();
+    }
+    else
+    {
+        throw test_library_exception_t(fmt::format(
+            "Unable to open file_line_reader_t object as file \"{0}\", "
+            "even though file exists.",
+            _m_file_name
+        ));
     }
 }
 
