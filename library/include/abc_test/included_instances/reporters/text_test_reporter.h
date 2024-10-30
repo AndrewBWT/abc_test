@@ -30,6 +30,7 @@
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_block.h"
 #include "abc_test/internal/reporters/test_reporter.h"
+#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/test_set_data_report.h"
 _BEGIN_ABC_REPORTERS_NS
 /*!
 * Object used to print data about tests to some text output - either the console or a file
@@ -58,11 +59,8 @@ public:
 		report_test(
 			const ds::invoked_test_data_t& _a_itd
 		) const override;
-	__constexpr_imp virtual void
-		final_report(ds::test_set_data_t& _a_test_set_data) const noexcept
-	{
-
-	}
+	__no_constexpr virtual void
+		final_report(ds::test_set_data_t& _a_test_set_data) const noexcept;
 private:
 	bool _m_has_colour_output;
 	print_config_t _m_print_config;
@@ -109,10 +107,6 @@ __no_constexpr_imp
 		using namespace utility::str;
 		using namespace reporters;
 		using namespace reports;
-		//list_formattable_t<int, char> _l_y;
-		//const size_t _l_line_len{ _m_print_config.line_len};
-		//const string _l_line_break{fmt::format("{0}\n",string(
-	//		_l_line_len, _m_print_config.line_len_char))};
 		const string _l_line_break{ _m_print_config.line_break() };
 		string_table_t _l_st({ 0 });
 		const vector<vector<string>> _l_strs = get_all_data<false>(_m_print_config.after_execution_test_report_fields(),
@@ -181,6 +175,31 @@ __no_constexpr_imp
 			}*/
 			_l_rv.append(fmt::format("{2}{1}{0}{1}", _l_st(), _l_line_break, "ASSERTION INFO\n"));
 		}
+		write(_l_rv);
+	}
+	__no_constexpr_imp void
+		text_test_reporter_t::final_report(ds::test_set_data_t& _a_test_set_data) const noexcept
+	{
+		using namespace std;
+		using namespace ds;
+		using namespace errors;
+		using namespace utility::str;
+		using namespace reporters;
+		using namespace reports;
+		const string _l_line_break{ _m_print_config.line_break() };
+		string_table_t _l_st({ 0 });
+		const vector<vector<string>> _l_strs = get_all_data<false>(_m_print_config.test_set_data_fields(),
+			_a_test_set_data, _m_print_config, test_set_data_list_formatter());
+		for (const vector<string>& _l_row : _l_strs)
+		{
+			for (const string& _l_cell : _l_row)
+			{
+				_l_st.push_back(_l_cell);
+			}
+			_l_st.new_line();
+		}
+		//Print the output
+		string _l_rv{ fmt::format("{0}{1}{0}{2}{0}",_l_line_break,"TEST SUITE RESULTS\n",_l_st()) };
 		write(_l_rv);
 	}
 __constexpr

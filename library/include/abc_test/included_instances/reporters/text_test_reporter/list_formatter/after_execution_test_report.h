@@ -156,7 +156,7 @@ __constexpr_imp std::vector<std::string>
     case ASSERTIONS_RECIEVED:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.assertions_recieved_str())),
-            _a_pc.assertions_recieved(_a_element.assertions_recieved())
+            _a_pc.print_integer(_a_element.assertions_recieved())
         };
     case ASSERTIONS_PASSED:
         return {

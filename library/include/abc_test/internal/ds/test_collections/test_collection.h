@@ -82,25 +82,31 @@ __constexpr_imp void
     using namespace ds;
     using namespace utility;
     using namespace errors;
-    for (std::reference_wrapper<const test_list_t> _l_test_list_element : _a_test_list_collection)
+    for (std::reference_wrapper<const test_list_t> _l_test_list_element :
+         _a_test_list_collection)
     {
-        for (const test_list_element_t& _l_test_element : _l_test_list_element.get())
+        for (const test_list_element_t& _l_test_element :
+             _l_test_list_element.get())
         {
             const tdg_collection_stack_trie_t* _l_reps{
-                _m_options.map_of_unique_ids_and_for_loop_stack_tries.map().contains(
-                    _m_test_discovery_id
-                )
-                    ? &_m_options.map_of_unique_ids_and_for_loop_stack_tries.map().at(
-                          _m_test_discovery_id
-                      )
+                _m_options.map_of_unique_ids_and_for_loop_stack_tries.map()
+                        .contains(_m_test_discovery_id)
+                    ? &_m_options.map_of_unique_ids_and_for_loop_stack_tries
+                           .map()
+                           .at(_m_test_discovery_id)
                     : nullptr
+            };
+            // If size zero or force running, set to true.
+            const bool _l_test_ran_override{
+                _m_options.map_of_unique_ids_and_for_loop_stack_tries.size()
+                    == 0
+                || global::get_global_test_options().force_run_all_tests
             };
             _m_post_setup_tests.push_back(post_setup_test_data_t(
                 _l_test_element,
                 _m_options.path_delimiter,
                 _m_test_discovery_id,
-                true,
-                // _m_options.check_if_test_is_to_be_ran(_m_test_discovery_id),
+                _l_test_ran_override || (_l_reps != nullptr),
                 _l_reps,
                 _m_options.threads
             ));

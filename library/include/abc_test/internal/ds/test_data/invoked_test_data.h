@@ -43,7 +43,7 @@ public:
             const utility::seed_t&        _a_seed_seq,
             const post_setup_test_data_t& _a_test_info,
             const size_t                  _a_order_ran_id,
-            const std::filesystem::path& _a_root_path
+            const std::filesystem::path&  _a_root_path
         ) noexcept;
     /*!
      * @brief Returns the path of the invoked_test_data_t test to the caller.
@@ -63,7 +63,7 @@ public:
      * @return Cref to the invoked_test_data_t's utility::rng object.
      */
     __constexpr utility::rng&
-                      get_random_generator() noexcept;
+                get_random_generator() noexcept;
     /*!
      * @brief Returns a cref to the invoked_test_data_t's post_setup_tst_data_t
      * object.
@@ -277,16 +277,17 @@ public:
         add_warning(reports::unexpected_non_terminating_report_ptr_t&& _a_pstr
         ) noexcept;
 private:
-    const post_setup_test_data_t&        _m_post_setup_test_data;
-    ds::tdg_collection_stack_trie_t            _m_tests_for_loop_stack_trie;
-    ds::tdg_collection_stack_t                 _m_for_loop_data_collection;
-    std::size_t                          _m_order_ran_id;
-    utility::rng                         _m_this_tests_random_generator;
-    std::filesystem::path                _m_path;
-    enum_test_status_t                   _m_test_status = enum_test_status_t::NO_TERMINATION_TEST_PASSED;
-    std::size_t                          _m_total_number_assertions_recieved = 0;
-    std::size_t                          _m_total_number_assertions_passed = 0;
-    std::size_t                          _m_total_number_assertions_failed = 0;
+    const post_setup_test_data_t&   _m_post_setup_test_data;
+    ds::tdg_collection_stack_trie_t _m_tests_for_loop_stack_trie;
+    ds::tdg_collection_stack_t      _m_for_loop_data_collection;
+    std::size_t                     _m_order_ran_id;
+    utility::rng                    _m_this_tests_random_generator;
+    std::filesystem::path           _m_path;
+    enum_test_status_t              _m_test_status
+        = enum_test_status_t::NO_TERMINATION_TEST_PASSED;
+    std::size_t _m_total_number_assertions_recieved = 0;
+    std::size_t _m_total_number_assertions_passed   = 0;
+    std::size_t _m_total_number_assertions_failed   = 0;
     reports::assertion_base_collection_t _m_assertions;
     reports::opt_unexpected_report_t     _m_termination_report;
     reports::unexpected_non_terminating_report_collection_t _m_warnings;
@@ -297,7 +298,7 @@ namespace
 __no_constexpr std::filesystem::path
                create_test_path(
                    const post_setup_test_data_t& _a_test_info,
-                   const std::filesystem::path& _a_root_path
+                   const std::filesystem::path&  _a_root_path
                ) noexcept;
 } // namespace
 
@@ -323,7 +324,7 @@ __no_constexpr_imp
         const utility::seed_t&        _a_seed_seq,
         const post_setup_test_data_t& _a_post_setup_test_data,
         const size_t                  _a_order_ran_id,
-        const std::filesystem::path& _a_root_path
+        const std::filesystem::path&  _a_root_path
     ) noexcept
     : _m_post_setup_test_data(_a_post_setup_test_data)
     , _m_for_loop_data_collection(ds::tdg_collection_stack_t())
@@ -340,7 +341,7 @@ __constexpr_imp const std::filesystem::path&
 }
 
 __constexpr_imp utility::rng&
-                      invoked_test_data_t::get_random_generator() noexcept
+                invoked_test_data_t::get_random_generator() noexcept
 {
     return _m_this_tests_random_generator;
 }
@@ -591,12 +592,12 @@ namespace
 __no_constexpr_imp std::filesystem::path
                    create_test_path(
                        const post_setup_test_data_t& _a_test_info,
-                       const std::filesystem::path& _a_root_path
+                       const std::filesystem::path&  _a_root_path
                    ) noexcept
 {
     using namespace std::filesystem;
     using namespace utility;
-    path_t _l_path{ _a_root_path };
+    path_t _l_path{_a_root_path};
     for (const test_path_element_ref_t& _a_test_path_component :
          _a_test_info.test_path_hierarchy())
     {
@@ -616,7 +617,7 @@ _END_ABC_DS_NS
 __no_constexpr_imp auto
     fmt::formatter<_ABC_NS_DS::invoked_test_data_t>::format(
         _ABC_NS_DS::invoked_test_data_t _a_iti,
-        format_context&              _a_ctx
+        format_context&                 _a_ctx
     ) const -> format_context::iterator
 {
     using namespace std;

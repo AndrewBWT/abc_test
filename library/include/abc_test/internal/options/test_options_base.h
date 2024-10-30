@@ -118,6 +118,17 @@ public:
      */
     std::vector<std::shared_ptr<_ABC_NS_DS::test_list_t>> test_lists;
     /*!
+     * @brief If this is set to true ,the following happens:
+     * - All tests are ran. If there is no data corresponding to a test in
+     * map_of_unique_ids_and_for_loop_stack_tries then the test is ran with no
+     * repetition data. If there is repetition data then it is used for that
+     * test. If set to false:
+     * - If there is any repetition data, then only those tests with repetition
+     * data are ran.
+     * - If there is no reptition dta, then all tests are ran.
+     */
+    bool force_run_all_tests = false;
+    /*!
      * @brief Function to validate the input.
      *
      * Any errors are written to the optional string outout.
@@ -144,9 +155,9 @@ __constexpr std::vector<std::size_t>
 } // namespace
 
 __no_constexpr std::string
-            make_test_options_base_member_variables_fmt(
-                const test_options_base_t& _a_opts
-            ) noexcept;
+               make_test_options_base_member_variables_fmt(
+                   const test_options_base_t& _a_opts
+               ) noexcept;
 
 _END_ABC_NS
 
@@ -329,13 +340,14 @@ __constexpr_imp std::vector<std::size_t>
     return _l_indexes_of_nullptrs;
 }
 } // namespace
+
 __no_constexpr_imp std::string
-make_test_options_base_member_variables_fmt(
-    const test_options_base_t& _a_opts
-) noexcept
+                   make_test_options_base_member_variables_fmt(
+                       const test_options_base_t& _a_opts
+                   ) noexcept
 {
     using namespace std;
-    const string _l_rv{ fmt::format(
+    const string _l_rv{fmt::format(
         "{0} = {1}"
         ", {2} = {3}"
         ", {4} = {5}"
@@ -369,7 +381,7 @@ make_test_options_base_member_variables_fmt(
         //"test_reporters", _a_rtd.test_reporters,
         // "error_reporters", _a_rtd.error_reporters,
         // "test_lists", _a_rtd.test_lists
-    ) };
+    )};
     return _l_rv;
 }
 

@@ -22,6 +22,7 @@ int
     CLI::App& _l_app{*build_command_line_parser(_l_iito) };
     CLI11_PARSE(_l_app, argc, argv);
     _l_iito.threads = 1;
+    _l_iito.force_run_all_tests = true;
     auto _l_validated_test_options{validated_test_options_t<
         included_instances_test_options_t>::validate_test_options(_l_iito)};
     if (_l_validated_test_options.has_value())

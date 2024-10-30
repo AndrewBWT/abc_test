@@ -171,7 +171,7 @@ public:
                                    _a_ptr,
             const std::string_view _a_warning
         ) noexcept;
-    __constexpr void
+    __no_constexpr void
         set_data_process_test() noexcept;
 private:
     _ABC_NS_LOGGING::log_msg_ptrs_t _m_current_log_msgs;
@@ -320,7 +320,7 @@ __constexpr_imp void
     );
 }
 
-__constexpr_imp void
+__no_constexpr_imp void
     test_runner_t::set_data_process_test() noexcept
 {
     _m_test_data.process_invoked_test(*_m_current_test);
