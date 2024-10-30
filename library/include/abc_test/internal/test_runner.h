@@ -212,7 +212,7 @@ __no_constexpr_imp
     : _m_trc(_a_trc)
     , _m_current_test(nullptr)
     , _m_random_generator(_ABC_NS_UTILITY::rng(
-          _a_test_options.global_seed,
+          global::get_global_seed(),
           _a_test_options.number_of_integers_used_to_seed_random_generators
       ))
     // , _m_test_options(_a_test_options)

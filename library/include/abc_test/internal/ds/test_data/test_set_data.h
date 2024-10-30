@@ -1,5 +1,6 @@
 #pragma once
 #include "abc_test/internal/ds/test_data/invoked_test_data.h"
+#include "abc_test/internal/global.h"
 #include "abc_test/internal/ds/data_generator_memoization/map_unique_id_to_tdg_collection_stack_trie.h"
 
 _BEGIN_ABC_DS_NS
@@ -17,8 +18,6 @@ public:
     __no_constexpr
     test_set_data_t()
         = default;
-    __no_constexpr void
-        process_final_report(const test_set_data_t& _a_test_set_data) noexcept;
     /*!
      * @brief This function processes a single invoked_test_data_t object,
      * updating its internal variabels based on how the test ran.
@@ -27,10 +26,6 @@ public:
      */
     __no_constexpr void
         process_invoked_test(ds::invoked_test_data_t& _a_invoked_test) noexcept;
-    __constexpr
-        std::size_t
-        total_tests_ran(
-        ) const noexcept;
 private:
     abc::ds::map_unique_id_to_tdg_collection_stack_trie_t
         _m_map_ids_to_tdg_collection_stack_tries;
@@ -70,37 +65,12 @@ private:
     std::size_t _m_total_assertions_ran{0};
     std::size_t _m_total_assertions_passed{0};
     std::size_t _m_total_assertions_failed{0};
+    friend class finalised_test_set_data_t;
 };
 
 _END_ABC_DS_NS
 
 _BEGIN_ABC_DS_NS
-__no_constexpr_imp void
-    test_set_data_t::process_final_report(
-        const test_set_data_t& _a_test_set_data
-    ) noexcept
-{
-    using namespace std;
-    for (const pair<size_t, tdg_collection_stack_trie_t>& _l_element :
-         _a_test_set_data._m_map_ids_to_tdg_collection_stack_tries.map())
-    {
-        _m_map_ids_to_tdg_collection_stack_tries.insert(
-            _l_element.first, _l_element.second
-        );
-    }
-    _m_total_tests_ran    += _a_test_set_data._m_total_tests_ran;
-    _m_total_tests_passed += _a_test_set_data._m_total_tests_passed;
-    _m_total_tests_failed += _a_test_set_data._m_total_tests_failed;
-    _m_total_tests_failed_and_terminated
-        += _a_test_set_data._m_total_tests_failed_and_terminated;
-    _m_total_tests_failed_but_not_terminated
-        += _a_test_set_data._m_total_tests_failed_but_not_terminated;
-    _m_total_tests_designated_failure_due_to_exception
-        += _a_test_set_data._m_total_tests_designated_failure_due_to_exception;
-    _m_total_assertions_ran    += _a_test_set_data._m_total_assertions_ran;
-    _m_total_assertions_passed += _a_test_set_data._m_total_assertions_passed;
-    _m_total_assertions_failed += _a_test_set_data._m_total_assertions_failed;
-}
 
 __no_constexpr_imp void
     test_set_data_t::process_invoked_test(
@@ -126,12 +96,5 @@ __no_constexpr_imp void
     _m_total_assertions_ran    += _a_invoked_test.assertions_recieved();
     _m_total_assertions_passed += _a_invoked_test.assertions_passed();
     _m_total_assertions_failed += _a_invoked_test.assertions_failed();
-}
-__constexpr
-std::size_t
-test_set_data_t::total_tests_ran(
-) const noexcept
-{
-    return _m_total_tests_ran;
 }
 _END_ABC_DS_NS

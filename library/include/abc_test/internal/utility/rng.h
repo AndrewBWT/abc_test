@@ -1,12 +1,15 @@
 #pragma once
 
 #include "abc_test/internal/utility/internal/macros.h"
+#include "abc_test/internal/errors/test_library_exception.h"
 
 #include <random>
 
 _BEGIN_ABC_UTILITY_NS
 using global_seed_t
     = std::variant<std::monostate, unsigned int, std::vector<uint32_t>>;
+using complete_global_seed_t
+= std::variant<unsigned int, std::vector<uint32_t>>;
 using seed_t = std::vector<uint32_t>;
 
 struct rng
@@ -61,25 +64,13 @@ public:
     {}
 
     inline rng(
-        const global_seed_t& _a_global_seed,
+        const complete_global_seed_t& _a_global_seed,
         const std::size_t _a_seed_to_create_size
     )
         : _m_rnd(), _m_seed({}), _m_calls(0)
     {
         using namespace std;
-        if (auto _l_ptr{get_if<monostate>(&_a_global_seed)}; _l_ptr != nullptr)
-        {
-            _m_seed.resize(_a_seed_to_create_size);
-            std::srand(std::time(0));
-            for (size_t _l_idx{0};
-                 _l_idx
-                 < _a_seed_to_create_size;
-                 ++_l_idx)
-            {
-                _m_seed[_l_idx] = std::rand();
-            }
-        }
-        else if (auto _l_ptr{ get_if<unsigned int>(&_a_global_seed) }; _l_ptr != nullptr)
+        if (auto _l_ptr{ get_if<unsigned int>(&_a_global_seed) }; _l_ptr != nullptr)
         {
             _m_seed.resize(_a_seed_to_create_size);
             std::srand(*_l_ptr);
@@ -97,7 +88,7 @@ public:
         }
         else
         {
-            
+            throw errors::unaccounted_for_variant_exception(_a_global_seed);
         }
         std::seed_seq _l_seed_seq(_m_seed.begin(), _m_seed.end());
         _m_rnd = std::mt19937_64(_l_seed_seq);

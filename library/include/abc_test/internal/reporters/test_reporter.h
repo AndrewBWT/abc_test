@@ -26,7 +26,7 @@ public:
      * performed.
      */
     __constexpr virtual void
-        final_report(ds::test_set_data_t& _a_test_set_data) const noexcept
+        final_report(ds::finalised_test_set_data_t& _a_test_set_data) const noexcept
         = 0;
 };
 

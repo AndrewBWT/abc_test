@@ -142,7 +142,7 @@ __no_constexpr_imp void
     const test_options_base_t& _l_global_test_options{get_global_test_options()
     };
     setup_global_variables(_m_options);
-
+    set_global_seed();
     _LIBRARY_LOG(MAIN_INFO, "Setting up global error reporter controller...");
     error_reporter_controller_t& _l_erc{get_global_error_reporter_controller()};
     _l_erc.add_reporters(_m_error_reporters);
@@ -265,7 +265,7 @@ __no_constexpr_imp void
         _l_erc.hard_exit();
     }
     _LIBRARY_LOG(MAIN_INFO, "Finalising reports.");
-    test_set_data_t _l_final_report;
+    finalised_test_set_data_t _l_final_report;
     for (auto& _l_test_runner : _m_test_runners)
     {
         _l_final_report.process_final_report(_l_test_runner.test_set_data());

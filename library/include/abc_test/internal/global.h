@@ -102,7 +102,10 @@ __no_constexpr_or_inline std::size_t
 // Can't be constexpr due to use of calling et_mutable_test_list
 __no_constexpr_or_inline void
     clear_test_list() noexcept;
-
+__no_constexpr_or_inline void
+set_global_seed();
+__no_constexpr_or_inline const utility::complete_global_seed_t&
+get_global_seed();
 namespace
 {
 // Can't be constexpr due to use of static var.
@@ -112,6 +115,7 @@ __no_constexpr_or_inline test_options_base_t&
                          get_inner_global_test_options() noexcept;
 __no_constexpr_or_inline reporters::error_reporter_controller_t&
                          get_inner_global_error_reporter_controller() noexcept;
+__no_constexpr_or_inline utility::complete_global_seed_t& get_inner_global_seed() noexcept;
 } // namespace
 
 _END_ABC_GLOBAL_NS

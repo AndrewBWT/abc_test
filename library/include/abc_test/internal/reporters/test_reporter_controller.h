@@ -24,7 +24,7 @@ public:
      * @return
      */
     __no_constexpr void
-        finalise_reports(ds::test_set_data_t& _a_test_set_data) noexcept;
+        finalise_reports(ds::finalised_test_set_data_t& _a_test_set_data) noexcept;
     /*!
      * @brief Function to call when reporting a test's results.
      * @param _a_aetr the invoked_test_data_t test to report.
@@ -52,7 +52,7 @@ __no_constexpr_imp
 
 __no_constexpr_imp void
     test_reporter_controller_t::finalise_reports(
-        ds::test_set_data_t& _a_test_set_data
+        ds::finalised_test_set_data_t& _a_test_set_data
     ) noexcept
 {
     using namespace std;

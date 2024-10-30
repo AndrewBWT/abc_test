@@ -3,6 +3,8 @@
 #include "abc_test/internal/options/test_options_base.h"
 #include "abc_test/internal/test_runner.h"
 
+#include <variant>
+
 // Implementation
 _BEGIN_ABC_GLOBAL_NS
 __no_constexpr_or_inline_imp test_options_base_t&
@@ -38,7 +40,6 @@ __no_constexpr_or_inline_imp void
     test_runner_t*& _l_tr{get_this_threads_test_runner_ptr()};
     _l_tr = _a_test_runner_t;
 }
-
 
 __no_constexpr_or_inline_imp const test_options_base_t&
     get_global_test_options() noexcept
@@ -97,6 +98,14 @@ __no_constexpr_or_inline_imp reporters::error_reporter_controller_t&
     static error_reporter_controller_t _s_erc;
     return _s_erc;
 }
+
+__no_constexpr_or_inline_imp utility::complete_global_seed_t&
+                         get_inner_global_seed() noexcept
+{
+    using namespace utility;
+    static complete_global_seed_t _s_complete_global_seed;
+    return _s_complete_global_seed;
+}
 } // namespace
 
 __no_constexpr_or_inline_imp const ds::test_list_t&
@@ -124,6 +133,39 @@ __no_constexpr_or_inline_imp void
     _l_test_list.clear();
 }
 
+__no_constexpr_or_inline_imp void
+    set_global_seed()
+{
+    using namespace std;
+    using namespace utility;
+    complete_global_seed_t& _l_complete_global_seed{get_inner_global_seed()};
+    const global_seed_t&    _l_global_seed{
+        global::get_global_test_options().global_seed
+    };
+    if (auto _l_ptr{get_if<monostate>(&_l_global_seed)}; _l_ptr != nullptr)
+    {
+        _l_complete_global_seed = static_cast<unsigned int>(std::time(0));
+    }
+    else if (auto _l_ptr{get_if<unsigned int>(&_l_global_seed)};
+             _l_ptr != nullptr)
+    {
+        _l_complete_global_seed = *_l_ptr;
+    }
+    else if (auto _l_ptr{get_if<vector<uint32_t>>(&_l_global_seed)};
+             _l_ptr != nullptr)
+    {
+        _l_complete_global_seed = *_l_ptr;
+    }
+    else
+    {
+        throw errors::unaccounted_for_variant_exception(_l_global_seed);
+    }
+}
+__no_constexpr_or_inline_imp const utility::complete_global_seed_t&
+get_global_seed()
+{
+    return get_inner_global_seed();
+}
 namespace
 {
 __no_constexpr_or_inline_imp ds::test_list_t&
