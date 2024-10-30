@@ -184,7 +184,7 @@ read_data_from_file(
 {
     using namespace std;
     using namespace _ABC_NS_DG;
-    return unary_collection<T>(make_shared<data_generator_single_t<file_data_t<T>, false>>(
+    return unary_collection<T>(make_shared<data_generator_with_file_support_t<file_data_t<T>, false>>(
         file_data_t<T>(_a_general_data_file, _a_init_list)
     ));
 }
@@ -199,7 +199,7 @@ __constexpr_imp
 {
     using namespace std;
     using namespace _ABC_NS_DG;
-    return unary_collection<T>(make_shared<data_generator_single_t<file_data_t<T>, false>>(
+    return unary_collection<T>(make_shared<data_generator_with_file_support_t<file_data_t<T>, false>>(
         file_data_t<T>(_a_general_data_file, _a_init_list)
     ));
 }

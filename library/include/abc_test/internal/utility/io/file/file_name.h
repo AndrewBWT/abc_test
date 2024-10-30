@@ -1,128 +1,80 @@
 #pragma once
 #include "abc_test/internal/global.h"
+#include "abc_test/internal/utility/io/file/general_data.h"
+#include "abc_test/internal/utility/io/file/general_data_with_rw_info.h"
+#include "abc_test/internal/utility/io/file/tertiary_data.h"
 
 _BEGIN_ABC_UTILITY_IO_NS
+template <typename T>
+using file_name_t = std::
+    variant<general_data_with_rw_info_t<T>, general_data_t, tertiary_data_t>;
+template<typename T>
+using file_names_t = std::vector<file_name_t<T>>;
+template <typename T>
+__constexpr const std::filesystem::path&
+                  path(const file_name_t<T>& _a_file_name);
 
-/*!
- * Object for holding file_names. Can be given a folder as well to create a
- * specific file object.
- */
-struct file_name_t
-{
-public:
-    __constexpr
-    file_name_t() noexcept;
-    __constexpr
-    file_name_t(
-        const std::string_view                  _a_str,
-        const std::filesystem::path& _a_folder = std::filesystem::path()
-    ) noexcept;
-    __constexpr
-        file_name_t(
-            const char*                  _a_str,
-            const std::filesystem::path& _a_folder = std::filesystem::path()
-        ) noexcept;
-    /*!
-     * Checks if the file name is valid. Specificallly checks for things like an
-     * empty string, or characters not allowed in a file name.
-     */
-    __no_constexpr bool
-        is_valid() const noexcept;
-    /*!
-     * Gets the internal file path.
-     */
-    __constexpr const std::filesystem::path&
-                      file_path() const noexcept;
-protected:
-    std::filesystem::path _m_file_path;
-    __constexpr
-    file_name_t(const std::filesystem::path& _a_file_path) noexcept;
-};
-
-using opt_file_name_t = std::optional<file_name_t>;
+template <typename T>
+__constexpr std::optional<abc::utility::str::rw_info_t<T>>
+            opt_rw_info(const file_name_t<T>& _a_file_name);
 _END_ABC_UTILITY_IO_NS
 
-/*!
- * formatter for post_setup_test_ata object.
- */
-template <>
-struct fmt::formatter<_ABC_NS_UTILITY::io::file_name_t> : formatter<string_view>
-{
-    /*!
-     * Provides a formatter for a poset_setup_test_data_t object
-     */
-    __no_constexpr auto
-        format(_ABC_NS_UTILITY::io::file_name_t _a_fnwe, format_context& _a_cxt)
-            const -> format_context::iterator;
-};
-
 _BEGIN_ABC_UTILITY_IO_NS
-__constexpr_imp
-    file_name_t::file_name_t() noexcept
-    : file_name_t(std::string_view{}, std::filesystem::path())
-{}
-
-__constexpr_imp
-    file_name_t::file_name_t(
-        const std::string_view                  _a_str,
-        const std::filesystem::path& _a_folder
-    ) noexcept
-    : file_name_t(
-        _a_str.empty()
-              ? std::filesystem::path{}
-              : std::filesystem::path(_a_folder) / (_a_str)
-      )
-{}
-
-__constexpr_imp
-file_name_t::file_name_t(
-    const char*                  _a_str,
-    const std::filesystem::path& _a_folder
-) noexcept
-    : file_name_t(
-        _a_str == nullptr
-        ? std::filesystem::path{}
-        : std::filesystem::path(_a_folder) / (_a_str)
-    )
-{}
-
-__no_constexpr_imp bool
-    file_name_t::is_valid() const noexcept
-{
-    if (_m_file_path.empty())
-    {
-        return false;
-    }
-    return true;
-}
-
+template <typename T>
 __constexpr_imp const std::filesystem::path&
-                      file_name_t::file_path() const noexcept
-{
-    return _m_file_path;
-}
-
-__constexpr_imp
-    file_name_t::file_name_t(
-        const std::filesystem::path& _a_file_path
-    ) noexcept
-    : _m_file_path(_a_file_path)
-{}
-
-_END_ABC_UTILITY_IO_NS
-
-__no_constexpr_imp auto
-    fmt::formatter<_ABC_NS_UTILITY::io::file_name_t>::format(
-        _ABC_NS_UTILITY::io::file_name_t _a_fn,
-        format_context&                  _a_ctx
-    ) const -> format_context::iterator
+                      path(
+                          const file_name_t<T>& _a_file_name
+                      )
 {
     using namespace std;
-    using namespace _ABC_NS_UTILITY::io;
-    string _l_rv{fmt::format(
-        "{0}{{_m_file_path = {1}}}",
-        typeid(file_name_t).name(),
-        _a_fn.file_path().string()
-    )};
-    return formatter<string_view>::format(_l_rv, _a_ctx);
+    if (auto _l_ptr{get_if<general_data_with_rw_info_t<T>>(&_a_file_name)};
+        _l_ptr != nullptr)
+    {
+        return _l_ptr->path();
+    }
+    else if (auto _l_ptr{get_if<general_data_t>(&_a_file_name)};
+             _l_ptr != nullptr)
+    {
+        return _l_ptr->path();
+    }
+    else if (auto _l_ptr{get_if<tertiary_data_t>(&_a_file_name)};
+             _l_ptr != nullptr)
+    {
+        return _l_ptr->path();
+    }
+    else
+    {
+        throw errors::unaccounted_for_variant_exception(_a_file_name);
+    }
 }
+
+template <typename T>
+__constexpr_imp std::optional<abc::utility::str::rw_info_t<T>>
+                opt_rw_info(
+                    const file_name_t<T>& _a_file_name
+                )
+{
+    using namespace std;
+    using namespace abc::utility::str;
+    if (auto _l_ptr{get_if<general_data_with_rw_info_t<T>>(&_a_file_name)};
+        _l_ptr != nullptr)
+    {
+        return optional<rw_info_t<T>>(_l_ptr->rw_info());
+    }
+    else if (auto _l_ptr{get_if<general_data_t>(&_a_file_name)};
+             _l_ptr != nullptr)
+    {
+        return optional<rw_info_t<T>>(rw_info_t<T>{});
+    }
+    else if (auto _l_ptr{get_if<tertiary_data_t>(&_a_file_name)};
+             _l_ptr != nullptr)
+    {
+        return optional<rw_info_t<T>>();
+    }
+    else
+    {
+        throw errors::unaccounted_for_variant_exception(_a_file_name);
+    }
+}
+
+_END_ABC_UTILITY_IO_NS

@@ -119,7 +119,7 @@ template <typename T>
 __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
                 generate_data_randomly_internal(
                     std::shared_ptr<_ABC_NS_DG::random_generator_t<T>> _a_rnd_base,
-                    const file_names_t<T>& _a_file_reader_writers
+                    const utility::io::file_names_t<T>& _a_file_reader_writers
                     // const file_names_t<T>&             _a_file_reader_writers
                 )
 {
@@ -128,7 +128,7 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
     if (_a_file_reader_writers.size() == 0)
     {
 		return unary_collection<T>(
-			make_shared<data_generator_single_t<random_data_t<T>, false>>(
+			make_shared<data_generator_with_file_support_t<random_data_t<T>, false>>(
 				random_data_t<T>(_a_rnd_base)
 			)
 		);
@@ -136,7 +136,7 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
 	else if (_a_file_reader_writers.size() == 1)
 	{
 		return unary_collection<T>(
-			make_shared<data_generator_single_t<random_data_t<T>, true>>(
+			make_shared<data_generator_with_file_support_t<random_data_t<T>, true>>(
 				random_data_t<T>(_a_rnd_base), _a_file_reader_writers[0]
 			)
 		);
@@ -144,10 +144,10 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
     else
     {
         return unary_collection<T>(
-            make_shared<data_generator_single_t<random_data_t<T>, true>>(
+            make_shared<data_generator_with_file_support_t<random_data_t<T>, true>>(
                 random_data_t<T>(_a_rnd_base), _a_file_reader_writers[0],
-				std::pair<typename file_names_t<T>::const_iterator,
-				typename file_names_t<T>::const_iterator>(_a_file_reader_writers.begin() + 1,
+				std::pair<typename utility::io::file_names_t<T>::const_iterator,
+				typename utility::io::file_names_t<T>::const_iterator>(_a_file_reader_writers.begin() + 1,
 					_a_file_reader_writers.end())
             )
         );
@@ -157,8 +157,17 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
 template <typename T, typename... Args>
 __constexpr void
 process_args_internal(
-	file_names_t<T>& _a_fns,
-	const file_name_t<T>& _a_fn_no_type,
+	utility::io::file_names_t<T>& _a_fns
+) noexcept
+{
+
+}
+
+template <typename T, typename... Args>
+__constexpr void
+process_args_internal(
+	utility::io::file_names_t<T>& _a_fns,
+	const utility::io::file_name_t<T>& _a_fn_no_type,
 	Args... _a_elements
 ) noexcept
 {
@@ -169,29 +178,20 @@ process_args_internal(
 template <typename T, typename... Args>
 __constexpr void
 process_args_internal(
-	file_names_t<T>& _a_fns,
-	const file_name_t<T>& _a_fn_no_type
+	utility::io::file_names_t<T>& _a_fns,
+	const utility::io::file_name_t<T>& _a_fn_no_type
 ) noexcept
 {
 	_a_fns.push_back(_a_fn_no_type);
 }
 
 template <typename T, typename... Args>
-__constexpr void
-process_args_internal(
-	file_names_t<T>& _a_fns
-) noexcept
-{
-
-}
-
-template <typename T, typename... Args>
-__constexpr file_names_t<T>
+__constexpr utility::io::file_names_t<T>
             process_args(
                 Args... _a_elements
             ) noexcept
 {
-	file_names_t<T> _l_rv{};
+	utility::io::file_names_t<T> _l_rv{};
 	process_args_internal<T>(_l_rv, _a_elements...);
 	return _l_rv;
 }

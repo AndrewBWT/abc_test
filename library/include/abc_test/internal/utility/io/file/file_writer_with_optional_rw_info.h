@@ -1,0 +1,55 @@
+#pragma once
+#include "abc_test/internal/utility/internal/macros.h"
+#include "abc_test/internal/utility/str/rw_info.h"
+#include "abc_test/internal/utility/io/file/file_writer.h"
+
+_BEGIN_ABC_UTILITY_IO_NS
+
+template <typename T>
+class file_writer_t : public file_line_writer_t
+{
+private:
+    std::optional<abc::utility::str::rw_info_t<T>> _m_opt_rw_info;
+public:
+    __no_constexpr
+        file_writer_t(
+            const utility::io::file_name_t<T>& _a_frw
+        );
+    __constexpr bool
+        has_printer_parser() const noexcept;
+    __no_constexpr_imp void
+        write_line_using_rw_info(
+            const T& _a_element
+        );
+};
+_END_ABC_UTILITY_IO_NS
+
+_BEGIN_ABC_UTILITY_IO_NS
+template <typename T>
+__no_constexpr_imp
+file_writer_t<T>::file_writer_t(
+    const utility::io::file_name_t<T>& _a_frw
+)
+    : file_line_writer_t(path(_a_frw))
+    , _m_opt_rw_info(opt_rw_info(_a_frw))
+{}
+template <typename T>
+__constexpr_imp bool
+file_writer_t<T>::has_printer_parser() const noexcept
+{
+    return _m_opt_rw_info.has_value();
+}
+template <typename T>
+__no_constexpr_imp void
+file_writer_t<T>::write_line_using_rw_info(
+    const T& _a_element
+)
+{
+    if (_m_opt_rw_info.has_value())
+    {
+        return write_line(
+            _m_opt_rw_info.value().printer().run_printer(_a_element)
+        );
+    }
+}
+_END_ABC_UTILITY_IO_NS

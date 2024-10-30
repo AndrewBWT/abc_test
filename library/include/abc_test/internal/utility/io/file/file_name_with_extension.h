@@ -1,6 +1,6 @@
 #pragma once
 #include "abc_test/internal/utility/io/file/file_name.h"
-
+#if 0
 _BEGIN_ABC_UTILITY_IO_NS
 	struct file_name_with_extension_t : public file_name_t
 	{
@@ -79,3 +79,4 @@ fmt::formatter<_ABC_NS_UTILITY::io::file_name_with_extension_t>::format(
 		typeid(file_name_with_extension_t).name(), _a_fn.file_path().string()) };
 	return formatter<string_view>::format(_l_rv, _a_ctx);
 }
+#endif

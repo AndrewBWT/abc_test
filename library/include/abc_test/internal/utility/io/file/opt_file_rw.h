@@ -2,6 +2,7 @@
 
 #include "abc_test/internal/utility/io/file/file_rw.h"
 
+#if 0
 _BEGIN_ABC_UTILITY_IO_NS
 template<
 	typename T,
@@ -174,3 +175,4 @@ __constexpr_imp
 	return _m_file_rw.has_value() ? _m_file_rw.value().elements_read() : 0;
 }
 _END_ABC_UTILITY_IO_NS
+#endif

@@ -301,7 +301,7 @@ __constexpr_imp
     using namespace std;
     using namespace _ABC_NS_DG;
     return unary_collection<T>(
-        make_shared<data_generator_single_t<static_data_t<T>, false>>(
+        make_shared<data_generator_with_file_support_t<static_data_t<T>, false>>(
             static_data_t<T>(_a_init_list)
         )
     );

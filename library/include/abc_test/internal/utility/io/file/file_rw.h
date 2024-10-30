@@ -4,6 +4,7 @@
 #include "abc_test/internal/utility/io/file/file_reader.h"
 #include "abc_test/internal/utility/io/file/file_writer.h"
 
+#if 0
 _BEGIN_ABC_UTILITY_IO_NS
 	template<
 		typename T
@@ -288,3 +289,4 @@ _BEGIN_ABC_UTILITY_IO_NS
 		_m_element = _m_parser.run_parser_with_exception(_m_reader.current_line());
 	}
 	_END_ABC_UTILITY_IO_NS
+#endif

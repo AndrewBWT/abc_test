@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/internal/utility/str/rw_info.h"
 #include "abc_test/internal/utility/io/file/file_name.h"
-
+#if 0
 _BEGIN_ABC_UTILITY_IO_NS
 	template<
 		typename T
@@ -82,3 +82,4 @@ _BEGIN_ABC_UTILITY_IO_NS
 		return _m_rw_info.printer();
 	}
 	_END_ABC_UTILITY_IO_NS
+#endif
