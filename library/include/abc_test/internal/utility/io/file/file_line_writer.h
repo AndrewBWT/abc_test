@@ -93,8 +93,11 @@ __no_constexpr_imp void
     ) noexcept
 {
     using namespace std;
-    ofstream& _l_out{*_m_file_handler.get()};
-    _l_out << _a_str_to_write << std::endl;
+    if (global::get_global_test_options().write_data_to_files)
+    {
+        ofstream& _l_out{ *_m_file_handler.get() };
+        _l_out << _a_str_to_write << std::endl;
+    }
 }
 
 _END_ABC_UTILITY_IO_NS

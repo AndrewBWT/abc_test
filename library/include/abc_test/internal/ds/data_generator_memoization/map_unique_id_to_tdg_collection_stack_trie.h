@@ -19,14 +19,16 @@ public:
             const std::size_t                  _a_id,
             const tdg_collection_stack_trie_t& _a_trie
         ) noexcept;
-    __no_constexpr
-        const std::map<std::size_t, tdg_collection_stack_trie_t>&
-        map(
-        ) const noexcept;
+    __no_constexpr const std::map<std::size_t, tdg_collection_stack_trie_t>&
+                         map() const noexcept;
     friend __no_constexpr
         parse_map_unique_id_to_tdg_collection_stack_trie_result_t
         parse_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
             const std::string_view _a_str
+        ) noexcept;
+    friend __no_constexpr std::string
+        print_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
+            const map_unique_id_to_tdg_collection_stack_trie_t& _a_map
         ) noexcept;
     __no_constexpr std::size_t
                    size() const noexcept;
@@ -66,16 +68,15 @@ __no_constexpr_imp bool
         return true;
     }
 }
-__no_constexpr_imp
-const std::map<std::size_t, tdg_collection_stack_trie_t>&
-map_unique_id_to_tdg_collection_stack_trie_t::map(
-) const noexcept
+
+__no_constexpr_imp const std::map<std::size_t, tdg_collection_stack_trie_t>&
+    map_unique_id_to_tdg_collection_stack_trie_t::map() const noexcept
 {
     return _m_internal_map;
 }
 
 __no_constexpr_imp std::size_t
-map_unique_id_to_tdg_collection_stack_trie_t::size() const noexcept
+    map_unique_id_to_tdg_collection_stack_trie_t::size() const noexcept
 {
     return _m_internal_map.size();
 }
@@ -178,20 +179,41 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
     return _l_map;
 }
 
+__no_constexpr_imp std::string
+    print_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
+        const map_unique_id_to_tdg_collection_stack_trie_t& _a_map
+    ) noexcept
+{
+    using namespace std;
+    string _l_rv;
+    for (const pair<size_t, tdg_collection_stack_trie_t>& _l_element :
+         _a_map.map())
+    {
+        _l_rv.append(fmt::format(
+            "{0}:{1}:",
+            _l_element.first,
+            _l_element.second.print_for_loop_stack_trie_compressed()
+        ));
+    }
+    _l_rv.erase(_l_rv.end()-1);
+    return _l_rv;
+}
+
 _END_ABC_DS_NS
 
 __no_constexpr_imp auto
-fmt::formatter<_ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t>::format(
-    _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t _a_rtd,
-    format_context& _a_ctx
-) const -> format_context::iterator
+    fmt::formatter<_ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t>::
+        format(
+            _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t _a_rtd,
+            format_context&                                          _a_ctx
+        ) const -> format_context::iterator
 {
     using namespace std;
-    const string _l_rv{ fmt::format(
+    const string _l_rv{fmt::format(
         "{0}{{{1} = {2}}}",
         typeid(_a_rtd).name(),
         "_m_internal_map",
         _a_rtd.map()
-    ) };
+    )};
     return formatter<string_view>::format(_l_rv, _a_ctx);
 }

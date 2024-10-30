@@ -1,9 +1,9 @@
 #pragma once
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/after_execution_test_report.h"
+#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/finalised_test_set_data_report.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion_block.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion_single_line.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/static_assertion.h"
-#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/finalised_test_set_data_report.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_thrown_exception.h"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_thrown_non_descript_entity.h"
 #include "abc_test/internal/test_reports/assertion_status/fail.h"
@@ -32,32 +32,32 @@ public:
                       test_path_str() const noexcept;
     __constexpr const std::string_view
                       str_total_tests_ran() const noexcept;
-    __no_constexpr std::string
-        print_tdg_collection_stack_tries_map(
-            const abc::ds::map_unique_id_to_tdg_collection_stack_trie_t& _a_map
-        ) const noexcept;
+    __no_constexpr    std::string
+                      print_tdg_collection_stack_tries_map(
+                          const abc::ds::map_unique_id_to_tdg_collection_stack_trie_t& _a_map
+                      ) const noexcept;
     __no_constexpr std::string
         print_seed(const utility::complete_global_seed_t& _a_seed) const;
     __constexpr const std::string_view
-        str_total_tests_passed() const noexcept;
+                      str_total_tests_passed() const noexcept;
     __constexpr const std::string_view
-        str_total_tests_failed() const noexcept;
+                      str_total_tests_failed() const noexcept;
     __constexpr const std::string_view
-        str_total_tests_failed_and_terminated() const noexcept;
+                      str_total_tests_failed_and_terminated() const noexcept;
     __constexpr const std::string_view
         str_total_tests_failed_but_not_terminated() const noexcept;
     __constexpr const std::string_view
         str_total_tests_designated_failure_due_to_exception() const noexcept;
     __constexpr const std::string_view
-        str_total_assertions_ran() const noexcept;
+                      str_total_assertions_ran() const noexcept;
     __constexpr const std::string_view
-        str_total_assertions_passed() const noexcept;
+                      str_total_assertions_passed() const noexcept;
     __constexpr const std::string_view
-        str_total_assertions_failed() const noexcept;
+                      str_total_assertions_failed() const noexcept;
     __constexpr const std::string_view
-        str_seed() const noexcept;
+                      str_seed() const noexcept;
     __constexpr const std::string_view
-        str_tdg_collection_stack_tries_map() const noexcept;
+                      str_tdg_collection_stack_tries_map() const noexcept;
     __constexpr       std::string
         test_path(const std::string_view _a_passed) const noexcept;
     __constexpr const std::string_view
@@ -128,8 +128,9 @@ public:
     __constexpr
         enum_print_pair_collection_t<enum_after_execution_test_report_fields_t>
         after_execution_test_report_fields() const noexcept;
-    __constexpr enum_print_pair_collection_t<enum_finalised_test_set_data_fields_t>
-                finalised_test_set_data_fields() const noexcept;
+    __constexpr
+        enum_print_pair_collection_t<enum_finalised_test_set_data_fields_t>
+        finalised_test_set_data_fields() const noexcept;
     __constexpr enum_print_pair_collection_t<combined_enum_assertion_fields_t>
                 static_assertion_fields() const noexcept;
     __constexpr enum_print_pair_collection_t<
@@ -179,6 +180,9 @@ public:
         ) const noexcept;*/
     __constexpr std::string
         message_str(const std::optional<std::string>& _a_str) const noexcept;
+    __constexpr std::string
+                message_str(const std::optional<std::string_view>& _a_str
+                ) const noexcept;
     enum_print_pair_collection_t<enum_after_execution_test_report_fields_t>
         _m_after_execution_test_report_fields_t;
     enum_print_pair_collection_t<enum_finalised_test_set_data_fields_t>
@@ -270,7 +274,8 @@ __constexpr_imp
           default_unexpected_thrown_non_descript_entity_fields()
       )
     , _m_thrown_exception_fields(default_unexpected_exception_fields())
-    , _m_finalised_test_set_data_fields(default_finalised_test_set_data_fields())
+    , _m_finalised_test_set_data_fields(default_finalised_test_set_data_fields()
+      )
 {}
 
 __constexpr_imp std::string
@@ -307,43 +312,35 @@ __constexpr_imp const std::string_view
 }
 
 __constexpr_imp const std::string_view
-                  print_config_t::str_total_tests_ran() const noexcept
+                      print_config_t::str_total_tests_ran() const noexcept
 {
     return "Total tests ran";
 }
+
 __no_constexpr_imp std::string
-print_config_t::print_tdg_collection_stack_tries_map(
-    const ds::map_unique_id_to_tdg_collection_stack_trie_t& _a_map
-) const noexcept
+                   print_config_t::print_tdg_collection_stack_tries_map(
+        const ds::map_unique_id_to_tdg_collection_stack_trie_t& _a_map
+    ) const noexcept
 {
-    using namespace std;
-    using namespace ds;
-    string _l_rv;
-    map<size_t, string> _l_map_str;
-    for (const pair<size_t, tdg_collection_stack_trie_t>& _l_element : _a_map.map())
-    {
-        _l_map_str.insert({ _l_element.first,_l_element.second.print_for_loop_stack_trie() });
-    }
-    _l_rv = fmt::format("{0}", _l_map_str);
-    string _l_rv2;
-    for (auto& _l_char : _l_rv)
-    {
-        _l_rv2.append(fmt::format("{:x}", _l_char));
-    }
-    return quote(_l_rv2);
+    return quote(
+        print_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(_a_map)
+    );
 }
+
 __no_constexpr std::string
-print_config_t::print_seed(const utility::complete_global_seed_t& _a_seed) const
+               print_config_t::print_seed(
+        const utility::complete_global_seed_t& _a_seed
+    ) const
 {
     std::variant<unsigned int, std::vector<uint32_t>>;
     using namespace std;
     string _l_rv;
-    if (auto _l_ptr{ get_if<unsigned int>(&_a_seed) }; _l_ptr != nullptr)
+    if (auto _l_ptr{get_if<unsigned int>(&_a_seed)}; _l_ptr != nullptr)
     {
         _l_rv.append("0");
         _l_rv.append(fmt::format("{:x}", *_l_ptr));
     }
-    else if (auto _l_ptr{ get_if<vector<uint32_t>>(&_a_seed) }; _l_ptr != nullptr)
+    else if (auto _l_ptr{get_if<vector<uint32_t>>(&_a_seed)}; _l_ptr != nullptr)
     {
         _l_rv.append("1");
         for (const uint32_t& _l_seed_val : *_l_ptr)
@@ -357,56 +354,68 @@ print_config_t::print_seed(const utility::complete_global_seed_t& _a_seed) const
     }
     return quote(_l_rv);
 }
+
 __constexpr_imp const std::string_view
-print_config_t::str_total_tests_passed() const noexcept
+                      print_config_t::str_total_tests_passed() const noexcept
 {
     return "Total tests passed";
 }
+
 __constexpr_imp const std::string_view
-print_config_t::str_total_tests_failed() const noexcept
+                      print_config_t::str_total_tests_failed() const noexcept
 {
     return "Total tests failed";
 }
+
 __constexpr_imp const std::string_view
-print_config_t::str_total_tests_failed_and_terminated() const noexcept
+    print_config_t::str_total_tests_failed_and_terminated() const noexcept
 {
     return "Total tests failed and terminated";
 }
+
 __constexpr_imp const std::string_view
-print_config_t::str_total_tests_failed_but_not_terminated() const noexcept
+    print_config_t::str_total_tests_failed_but_not_terminated() const noexcept
 {
     return "Total tests failed (but not terminated)";
 }
+
 __constexpr_imp const std::string_view
-print_config_t::str_total_tests_designated_failure_due_to_exception() const noexcept
+    print_config_t::str_total_tests_designated_failure_due_to_exception(
+    ) const noexcept
 {
     return "Total tests which threw unexpected exception";
 }
+
 __constexpr_imp const std::string_view
-print_config_t::str_total_assertions_ran() const noexcept
+                      print_config_t::str_total_assertions_ran() const noexcept
 {
     return "Total assertions ran";
 }
+
 __constexpr_imp const std::string_view
-print_config_t::str_total_assertions_passed() const noexcept
+    print_config_t::str_total_assertions_passed() const noexcept
 {
     return "Total assertions passed";
 }
+
 __constexpr_imp const std::string_view
-print_config_t::str_total_assertions_failed() const noexcept
+    print_config_t::str_total_assertions_failed() const noexcept
 {
     return "Total assertions failed";
 }
+
 __constexpr_imp const std::string_view
-print_config_t::str_seed() const noexcept
+                      print_config_t::str_seed() const noexcept
 {
     return "Global random seed";
 }
+
 __constexpr const std::string_view
-print_config_t::str_tdg_collection_stack_tries_map() const noexcept
+    print_config_t::str_tdg_collection_stack_tries_map() const noexcept
 {
     return "Repetition loop stack seed";
 }
+
 __constexpr_imp std::string
                 print_config_t::test_path(
         const std::string_view _a_passed
@@ -864,6 +873,18 @@ __constexpr_imp std::string
 {
     return slight_highlight(
         _a_str.has_value() ? quote(_a_str.value()) : "<no message>"
+    );
+}
+
+__constexpr_imp std::string
+                print_config_t::message_str(
+        const std::optional<std::string_view>& _a_str
+    ) const noexcept
+{
+    using namespace std;
+    return message_str(
+        _a_str.has_value() ? optional<string>(string(_a_str.value()))
+                           : optional<string>{}
     );
 }
 

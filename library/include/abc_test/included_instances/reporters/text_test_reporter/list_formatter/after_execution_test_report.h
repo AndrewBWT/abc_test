@@ -52,6 +52,10 @@ __constexpr_imp bool
     case COMPACT_ASSERTION_DATA:
     case TERMINATION_STATUS:
         return true;
+    case DESCRIPTION:
+        return _a_element.post_setup_test_data()
+            .registered_test_data()
+            ._m_user_data.description.has_value();
     default:
         throw errors::unaccounted_for_enum_exception(_a_fid);
     }
@@ -68,6 +72,15 @@ __constexpr_imp std::vector<std::string>
     using enum enum_after_execution_test_report_fields_t;
     switch (_a_fid)
     {
+    case DESCRIPTION:
+        return {
+            _a_pc.space(_a_pc.colon(_a_pc.test_description_str())),
+            _a_pc.slight_highlight(
+                _a_pc.message_str(_a_element.post_setup_test_data()
+                                      .registered_test_data()
+                                      ._m_user_data.description)
+            )
+        };
     case STR_STATUS:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.str_status_str())),
@@ -82,15 +95,15 @@ __constexpr_imp std::vector<std::string>
         return {
             _a_pc.space(_a_pc.colon(_a_pc.name_str())),
             _a_pc.name(_a_element.post_setup_test_data()
-                    .registered_test_data()
-                    ._m_user_data.name)
+                           .registered_test_data()
+                           ._m_user_data.name)
         };
     case SOURCE_LOCATION:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.source_location_str())),
             _a_pc.source_location(_a_element.post_setup_test_data()
-                    .registered_test_data()
-                    ._m_source.source_location())
+                                      .registered_test_data()
+                                      ._m_source.source_location())
         };
     case SOURCE_REPRESENTATION:
         return {

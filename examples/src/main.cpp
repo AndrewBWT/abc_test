@@ -23,6 +23,7 @@ int
     CLI11_PARSE(_l_app, argc, argv);
     _l_iito.threads = 1;
     _l_iito.force_run_all_tests = true;
+    _l_iito.write_data_to_files = false;
     auto _l_validated_test_options{validated_test_options_t<
         included_instances_test_options_t>::validate_test_options(_l_iito)};
     if (_l_validated_test_options.has_value())
@@ -40,13 +41,13 @@ int
             _l_st.push_back(_l_error);
             _l_st.new_line();
         }
-       // std::cout << fmt::format(
-       //     "Error(s) encountered when validating test_options_t. "
-        //    "The following errors were returned from the validation "
-        //    "function:\n{0}\n"
-        //    "The program will now terminate. test_options_base_t = {1}",
-        //    _l_st(),
-       //     _l_to
-       // );
+        std::cout << fmt::format(
+            "Error(s) encountered when validating test_options_t. "
+            "The following errors were returned from the validation "
+            "function:\n{0}\n"
+            "The program will now terminate. included_instances_test_options_t = {1}",
+            _l_st(),
+            _l_iito
+        );
     }
 }

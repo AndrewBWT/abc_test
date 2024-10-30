@@ -34,6 +34,15 @@ __no_constexpr std::vector<std::filesystem::path>
 } // namespace
 
 _END_ABC_NS
+template <>
+struct fmt::formatter<abc::included_instances_test_options_t> : formatter<string_view>
+{
+    // parse is inherited from formatter<string_view>.
+    // Can'tbe constexpr due to use of fmt::format
+    __no_constexpr auto
+        format(abc::included_instances_test_options_t _a_rtd, format_context& _a_ctx) const
+        ->format_context::iterator;
+};
 
 _BEGIN_ABC_NS
 __no_constexpr void
@@ -156,3 +165,27 @@ __no_constexpr_imp std::vector<std::filesystem::path>
 } // namespace
 
 _END_ABC_NS
+
+__no_constexpr_imp auto
+fmt::formatter<abc::included_instances_test_options_t>::format(
+    abc::included_instances_test_options_t _a_rtd,
+    format_context& _a_ctx
+) const -> format_context::iterator
+{
+    using namespace std;
+    const string _l_rv{ fmt::format(
+        "{0}{{{1}"
+        ", {2} = {3}"
+        ", {4} = {5}"
+        ", {6} = {7}"
+        ", {8} = {9}"
+        "}}",
+        typeid(_a_rtd).name(),
+        make_test_options_base_member_variables_fmt(_a_rtd),
+        "use_text_test_reporter_to_cout", _a_rtd.use_text_test_reporter_to_cout,
+        "use_text_error_reporter_to_cout", _a_rtd.use_text_error_reporter_to_cout,
+        "text_test_reporter_file_names", _a_rtd.text_test_reporter_file_names,
+        "text_error_reporter_file_names", _a_rtd.text_error_reporter_file_names
+    ) };
+    return formatter<string_view>::format(_l_rv, _a_ctx);
+}
