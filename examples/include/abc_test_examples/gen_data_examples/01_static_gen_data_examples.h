@@ -15,8 +15,7 @@ _TEST_CASE(
         {.name             = "file_01_example_01",
          .description      = "Simpe data generator example using static_data.",
          .path             = "examples::gen_data_examples::static_gen_data",
-         .threads_required = 2,
-         .UID              = "f01e01"}
+         .threads_required = 2}
     )
 )
 {

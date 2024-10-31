@@ -32,6 +32,8 @@ public:
     __constexpr bool
         operator==(const user_defined_test_data_t& _a_rhs) const noexcept
         = default;
+    __constexpr std::string
+        make_uid() const noexcept;
     /*!
      * @brief The name of the test. There are some conditions on the name of the
      * test, however these are only relevant when considering groups of tests.
@@ -52,13 +54,6 @@ public:
      * is set at 1.
      */
     std::size_t threads_required = 1;
-    /*!
-     * @brief The UID is a unique identifer. These are checked when the system
-     * is started up. In the event that two (or more) tests have the same UID,
-     * the duplicate is removed. We offer no guarantees about which one will be
-     * remoed.
-     */
-    std::optional<std::string_view> UID;
 };
 
 _END_ABC_DS_NS
@@ -90,6 +85,12 @@ struct fmt::formatter<_ABC_NS_DS::user_defined_test_data_t>
 };
 
 _BEGIN_ABC_DS_NS
+__constexpr std::string
+user_defined_test_data_t::make_uid() const noexcept
+{
+    using namespace std;
+    return string{}.append(this->name).append(this->path);
+}
 _END_ABC_DS_NS
 
 __no_constexpr_imp auto

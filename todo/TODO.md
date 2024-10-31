@@ -18,7 +18,8 @@ No items.
 ## Priority 2
 
 Added 31/12/24:
-- [ ] Change repetition map to allow key of EITHER unique id OR a source_location. This can allow us to circumvent the issues we are having in running code using repetitions when we may be adding/removing elements from the code base.
+- [x] Change repetition map to allow key of EITHER unique id OR a source_location. This can allow us to circumvent the issues we are having in running code using repetitions when we may be adding/removing elements from the code base.
+- [ ] Fix parsing function for repetition map elements.
 - [ ] Create enumeration examples. 
 - [ ] Create manual for loop examples.
 - [ ] Create examples showing tests being re-ran with seeds.
@@ -53,3 +54,6 @@ Added 31/12/24:
 - [ ] Consider an inline namespace containing the version. We removed this because instantiating specialised templates/structs for some of the derived gen_data classes, when using this keyword, wouldn't allow us to create them in named namespaces; we had to define them in a format similar to how fmt does it (see commented out example in examples/include/abc_test_examples/enumeration/enum_enumeration_examples.h. This may be something only done in visual studio, or may be part of the standard. We should investigate further to find the reasoning. Then decide whether including the versioned namespace is worth the trade off, or if there are any workarounds.
 - [ ] In abc_test/gen_data/enumeration/specializations/fundamental_types.h, there are several specializations which cannot have separate definitions and implementations (as in, we cannot separate them without an error being encountered). We believe this to be an error with Visual Studio, however we will need to investigate further.
 - [ ] Change text_test_reporter_t and its associated printers to not print information that is not important.
+- [ ] Consider alternate, more space-effecient methods for storing seeds. Hex seems a bit wasteful.
+
+## Completed

@@ -7,7 +7,7 @@ _BEGIN_ABC_DS_NS
 struct map_unique_id_to_tdg_collection_stack_trie_t;
 using parse_map_unique_id_to_tdg_collection_stack_trie_result_t
     = std::expected<map_unique_id_to_tdg_collection_stack_trie_t, std::string>;
-using key_t = std::variant<std::size_t, std::string > ;
+using key_t = std::string;
 
 class map_unique_id_to_tdg_collection_stack_trie_t
 {
@@ -131,18 +131,8 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
     map_unique_id_to_tdg_collection_stack_trie_t _l_map;
     for (size_t _l_idx{0}; _l_idx < _l_strs.size(); ++_l_idx)
     {
-        auto& [_l_number, _l_compressed_str]{_l_strs[_l_idx]};
-        size_t _l_size;
-        if (auto result = scn::scan<std::size_t>(_l_number, "{}"))
-        {
-            _l_size = result->value();
-        }
-        else
-        {
-            return unexpected(fmt::format(
-                "Could not read string into integer. String = {0}", _l_number
-            ));
-        }
+        auto& [_l_str_hex, _l_compressed_str]{_l_strs[_l_idx]};
+        string _l_str = abc::utility::str::from_hex_with_exception(_l_str_hex);
         const parse_for_loop_stack_trie_result_t _l_compressed_scan_result{
             parse_compressed_repetition_tree_node(_l_compressed_str)
         };
@@ -152,7 +142,7 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
                 _l_compressed_scan_result.value()
             };
             const bool _l_result{
-                _l_map.insert(_l_size, _l_compressed_scan_result.value())
+                _l_map.insert(_l_str, _l_compressed_scan_result.value())
             };
             if (not _l_result)
             {
@@ -161,7 +151,7 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
                     "because there is already an element with that unique ID "
                     "in the map. Unique ID = {1}",
                     (_l_idx + 1),
-                    _l_size
+                    _l_str
                 ));
             }
         }
@@ -190,9 +180,18 @@ __no_constexpr_imp std::string
     for (const pair<key_t, tdg_collection_stack_trie_t>& _l_element :
          _a_map.map())
     {
+        string _l_key_compressed, _l_key_compressed_2;
+        for (char _l_char : _l_element.first)
+        {
+            _l_key_compressed.push_back(static_cast<unsigned char>(_l_char));
+        }
+        for (unsigned char _l_char : _l_key_compressed)
+        {
+            _l_key_compressed_2.append(fmt::format("{:x}", _l_char));
+        }
         _l_rv.append(fmt::format(
             "{0}:{1}:",
-            _l_element.first,
+            _l_key_compressed_2,
             _l_element.second.print_for_loop_stack_trie_compressed()
         ));
     }

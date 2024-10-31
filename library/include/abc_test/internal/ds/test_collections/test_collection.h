@@ -35,9 +35,8 @@ public:
      *
      * @param _a_test_lists The list of lists of tests which are to be added to
      * the object.
-     * @return
      */
-    __constexpr void
+    __no_constexpr void
         add_tests(const test_lists_t& _a_test_lists) noexcept;
     /*!
      * @brief Builds a post_setup_test_list_t for the caller.
@@ -73,7 +72,7 @@ __no_constexpr_imp
     , _m_options(_a_test_options)
 {}
 
-__constexpr_imp void
+__no_constexpr_imp void
     test_collection_t::add_tests(
         const test_lists_t& _a_test_list_collection
     ) noexcept
@@ -82,19 +81,18 @@ __constexpr_imp void
     using namespace ds;
     using namespace utility;
     using namespace errors;
+    const std::map<key_t, tdg_collection_stack_trie_t>& _l_map{
+        _m_options.map_of_unique_ids_and_for_loop_stack_tries.map()
+    };
     for (std::reference_wrapper<const test_list_t> _l_test_list_element :
          _a_test_list_collection)
     {
         for (const test_list_element_t& _l_test_element :
              _l_test_list_element.get())
         {
+            const string _l_id{_l_test_element._m_user_data.make_uid()};
             const tdg_collection_stack_trie_t* _l_reps{
-                _m_options.map_of_unique_ids_and_for_loop_stack_tries.map()
-                        .contains(_m_test_discovery_id)
-                    ? &_m_options.map_of_unique_ids_and_for_loop_stack_tries
-                           .map()
-                           .at(_m_test_discovery_id)
-                    : nullptr
+                _l_map.contains(_l_id) ? &_l_map.at(_l_id) : nullptr
             };
             // If size zero or force running, set to true.
             const bool _l_test_ran_override{

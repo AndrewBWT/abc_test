@@ -79,7 +79,7 @@ __no_constexpr_imp void
 {
     using enum enum_test_status_t;
     _m_map_ids_to_tdg_collection_stack_tries.insert(
-        _a_invoked_test.post_setup_test_data().discovery_id(),
+        _a_invoked_test.post_setup_test_data().registered_test_data()._m_user_data.make_uid(),
         _a_invoked_test.for_loop_stack_trie()
     );
     const enum_test_status_t _l_test_status{_a_invoked_test.test_status()};

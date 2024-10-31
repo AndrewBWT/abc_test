@@ -284,17 +284,7 @@ typeless_data_generator_collection_stack_trie_t::print_for_loop_stack_trie_compr
 {
     using namespace std;
     string                _l_rv{print_for_loop_stack_trie()};
-    vector<unsigned char> _l_chars;
-    for (char _l_char : _l_rv)
-    {
-        _l_chars.push_back(static_cast<unsigned char>(_l_char));
-    }
-    _l_rv.clear();
-    for (unsigned char _l_char : _l_chars)
-    {
-        _l_rv.append(fmt::format("{:x}", _l_char));
-    }
-    return _l_rv;
+    return abc::utility::str::to_hex(_l_rv);
 }
 
 __no_constexpr_imp std::string
@@ -580,47 +570,14 @@ __constexpr_imp parse_for_loop_stack_trie_result_t
     using namespace utility::str;
     using namespace std;
     using enum utility::internal::internal_log_enum_t;
-    if ((_a_str.size() % 2) != 0)
+    expected<string, string> _l_hex_result{ abc::utility::str::from_hex(_a_str) };
+    if (not _l_hex_result.has_value())
     {
-        return unexpected(
-            fmt::format("Compressed repetition_tree_t is in the form a "
-                        "string in hex. As "
-                        "each hex digit requires two bytes, the total size "
-                        "of the string "
-                        "must be divisble by 2. This string is not")
-        );
+        return unexpected(_l_hex_result.error());
     }
     else
-    {
-        std::string _l_str{};
-
-        // Parse the bytes.
-        const char*           _l_position = _a_str.data();
-        vector<unsigned char> _l_chars;
-        for (size_t _l_idx{0}; _l_idx < (_a_str.size() / 2); ++_l_idx)
-        {
-            unsigned char value;
-            auto [_l_ptr, _l_ec]
-                = from_chars(_l_position, _l_position + 2, value, 16);
-            _l_position += 2;
-            // If no error, pass the byte to the list of chars
-            if (_l_ec == errc())
-            {
-                _l_chars.push_back(value);
-            }
-            else
-            {
-                // Else return failure
-                return unexpected{fmt::format(
-                    "Could not parse byte pair {0}{1}",
-                    *_l_position,
-                    *(_l_position + 1)
-                )};
-            }
-        }
-
-        // Add all the chars to the string.
-        _l_str = string(_l_chars.begin(), _l_chars.end());
+    { 
+        string _l_str = _l_hex_result.value();
         _LIBRARY_LOG(
             PARSING_SEED,
             fmt::format(
