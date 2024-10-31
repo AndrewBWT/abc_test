@@ -332,27 +332,7 @@ __no_constexpr std::string
         const utility::complete_global_seed_t& _a_seed
     ) const
 {
-    std::variant<unsigned int, std::vector<uint32_t>>;
-    using namespace std;
-    string _l_rv;
-    if (auto _l_ptr{get_if<unsigned int>(&_a_seed)}; _l_ptr != nullptr)
-    {
-        _l_rv.append("0");
-        _l_rv.append(fmt::format("{:x}", *_l_ptr));
-    }
-    else if (auto _l_ptr{get_if<vector<uint32_t>>(&_a_seed)}; _l_ptr != nullptr)
-    {
-        _l_rv.append("1");
-        for (const uint32_t& _l_seed_val : *_l_ptr)
-        {
-            _l_rv.append(fmt::format("{:x}", _l_seed_val));
-        }
-    }
-    else
-    {
-        throw errors::unaccounted_for_variant_exception(_a_seed);
-    }
-    return quote(_l_rv);
+    return quote(_a_seed.print_in_hex());
 }
 
 __constexpr_imp const std::string_view

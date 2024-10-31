@@ -10,6 +10,13 @@ __no_constexpr bool
         map_unique_id_to_tdg_collection_stack_trie_t& _a_param
     );
 _END_ABC_DS_NS
+_BEGIN_ABC_UTILITY_NS
+__no_constexpr bool
+lexical_cast(
+    const std::string& _a_input,
+    global_seed_t& _a_param
+);
+_END_ABC_UTILITY_NS
 _BEGIN_ABC_NS
 
 __no_constexpr_imp CLI::App*
@@ -81,6 +88,11 @@ __no_constexpr_imp CLI::App*
         _a_opts.map_of_unique_ids_and_for_loop_stack_tries,
         "Map of repetition trees"
     );
+    _l_app.add_option(
+        "--global_seed",
+        _a_opts.global_seed,
+        "Set the global seed"
+    );
     _l_app.set_config("--config");
 
     return _l_app_ptr;
@@ -111,3 +123,22 @@ __no_constexpr_imp bool
 }
 
 _END_ABC_DS_NS
+_BEGIN_ABC_UTILITY_NS
+__no_constexpr_imp bool
+lexical_cast(
+    const std::string& _a_input,
+    global_seed_t& _a_param
+)
+{
+    // Annoyingly we can't parse and validate at the same time (or atleast I've
+// not been able to find a way to).
+    using namespace _ABC_NS_DS;
+    std::expected<complete_global_seed_t, std::string> _l_parse_result{ abc::utility::parse_complete_global_string_in_hex(_a_input) };
+    if (_l_parse_result.has_value())
+    {
+        _a_param = _l_parse_result.value();
+        return true;
+    }
+    return true;
+}
+_END_ABC_UTILITY_NS

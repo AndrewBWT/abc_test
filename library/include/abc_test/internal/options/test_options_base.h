@@ -43,7 +43,7 @@ public:
     /*!
      * @brief The seed used for the random data structures.
      */
-    _ABC_NS_UTILITY::global_seed_t global_seed               = std::monostate{};
+    _ABC_NS_UTILITY::global_seed_t global_seed               = abc::utility::global_seed_t();
     /*!
      * @brief The number of elements used to seed the random generators.
      *

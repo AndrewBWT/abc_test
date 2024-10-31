@@ -139,27 +139,7 @@ __no_constexpr_or_inline_imp void
     using namespace std;
     using namespace utility;
     complete_global_seed_t& _l_complete_global_seed{get_inner_global_seed()};
-    const global_seed_t&    _l_global_seed{
-        global::get_global_test_options().global_seed
-    };
-    if (auto _l_ptr{get_if<monostate>(&_l_global_seed)}; _l_ptr != nullptr)
-    {
-        _l_complete_global_seed = static_cast<unsigned int>(std::time(0));
-    }
-    else if (auto _l_ptr{get_if<unsigned int>(&_l_global_seed)};
-             _l_ptr != nullptr)
-    {
-        _l_complete_global_seed = *_l_ptr;
-    }
-    else if (auto _l_ptr{get_if<vector<uint32_t>>(&_l_global_seed)};
-             _l_ptr != nullptr)
-    {
-        _l_complete_global_seed = *_l_ptr;
-    }
-    else
-    {
-        throw errors::unaccounted_for_variant_exception(_l_global_seed);
-    }
+    global::get_global_test_options().global_seed.set_complete_seed(_l_complete_global_seed);
 }
 __no_constexpr_or_inline_imp const utility::complete_global_seed_t&
 get_global_seed()

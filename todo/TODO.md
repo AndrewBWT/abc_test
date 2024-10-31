@@ -18,7 +18,7 @@ No items.
 ## Priority 2
 
 Added 31/12/24:
-- [ ] Add configuration file-loading using CLI11 to library.
+- [x] Fix parsing of seeds from the command line/configuration files.
 - [ ] Fix parsing function for repetition map elements.
 - [ ] Create enumeration examples. 
 - [ ] Create manual for loop examples.
@@ -58,6 +58,7 @@ Added 31/12/24:
 
 ## Completed
 
-Priority 1:
+Priority 2:
 31/10/24:
 - Change repetition map to allow key of EITHER unique id OR a source_location. This can allow us to circumvent the issues we are having in running code using repetitions when we may be adding/removing elements from the code base.
+- Add configuration file-loading using CLI11 to library.

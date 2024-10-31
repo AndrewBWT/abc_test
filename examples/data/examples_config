@@ -6,3 +6,4 @@ threads = 1
 general_data_file_extension = gd
 n_integers_used_for_rng_generation = 100
 #repetition_config = 
+global_seed = 067239336
