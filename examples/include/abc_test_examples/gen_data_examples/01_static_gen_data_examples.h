@@ -1,9 +1,9 @@
 #pragma once
 #include "abc_test/core.h"
-#include "abc_test/internal/data_generator/data_generator_collection_iterator.h"
 #include "abc_test/included_instances/data_generator/enumerable/specializations/enum.h"
 #include "abc_test/included_instances/data_generator/static_data.h"
 #include "abc_test/included_instances/matchers/ranges.h"
+#include "abc_test/internal/data_generator/data_generator_collection_iterator.h"
 
 #include <numeric>
 #include <ranges>
@@ -15,7 +15,8 @@ _TEST_CASE(
         {.name             = "file_01_example_01",
          .description      = "Simpe data generator example using static_data.",
          .path             = "examples::gen_data_examples::static_gen_data",
-         .threads_required = 2}
+         .threads_required = 2,
+         .UID              = "f01e01"}
     )
 )
 {
@@ -92,7 +93,7 @@ _TEST_CASE(
         ));
     }
     /*
-    * These tests can be freely mixed with normal tests
-    */
+     * These tests can be freely mixed with normal tests
+     */
     _CHECK(_EXPR(1 == 2));
 }

@@ -52,6 +52,13 @@ public:
      * is set at 1.
      */
     std::size_t threads_required = 1;
+    /*!
+     * @brief The UID is a unique identifer. These are checked when the system
+     * is started up. In the event that two (or more) tests have the same UID,
+     * the duplicate is removed. We offer no guarantees about which one will be
+     * remoed.
+     */
+    std::optional<std::string_view> UID;
 };
 
 _END_ABC_DS_NS
@@ -76,8 +83,10 @@ struct fmt::formatter<_ABC_NS_DS::user_defined_test_data_t>
      * @return The formatted string.
      */
     __no_constexpr auto
-        format(_ABC_NS_DS::user_defined_test_data_t _a_rtd, format_context& _a_ctx)
-            const -> format_context::iterator;
+        format(
+            _ABC_NS_DS::user_defined_test_data_t _a_rtd,
+            format_context&                      _a_ctx
+        ) const -> format_context::iterator;
 };
 
 _BEGIN_ABC_DS_NS
@@ -86,7 +95,7 @@ _END_ABC_DS_NS
 __no_constexpr_imp auto
     fmt::formatter<_ABC_NS_DS::user_defined_test_data_t>::format(
         _ABC_NS_DS::user_defined_test_data_t _a_rtd,
-        format_context&                   _a_ctx
+        format_context&                      _a_ctx
     ) const -> format_context::iterator
 {
     using namespace std;

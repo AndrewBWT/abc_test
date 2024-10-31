@@ -7,6 +7,7 @@ _BEGIN_ABC_DS_NS
 struct map_unique_id_to_tdg_collection_stack_trie_t;
 using parse_map_unique_id_to_tdg_collection_stack_trie_result_t
     = std::expected<map_unique_id_to_tdg_collection_stack_trie_t, std::string>;
+using key_t = std::variant<std::size_t, std::string > ;
 
 class map_unique_id_to_tdg_collection_stack_trie_t
 {
@@ -16,10 +17,10 @@ public:
         = default;
     __no_constexpr bool
         insert(
-            const std::size_t                  _a_id,
+            const key_t&                  _a_id,
             const tdg_collection_stack_trie_t& _a_trie
         ) noexcept;
-    __no_constexpr const std::map<std::size_t, tdg_collection_stack_trie_t>&
+    __no_constexpr const std::map<key_t, tdg_collection_stack_trie_t>&
                          map() const noexcept;
     friend __no_constexpr
         parse_map_unique_id_to_tdg_collection_stack_trie_result_t
@@ -33,7 +34,7 @@ public:
     __no_constexpr std::size_t
                    size() const noexcept;
 private:
-    std::map<std::size_t, tdg_collection_stack_trie_t> _m_internal_map;
+    std::map<key_t, tdg_collection_stack_trie_t> _m_internal_map;
 };
 
 _END_ABC_DS_NS
@@ -54,7 +55,7 @@ struct fmt::formatter<_ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t>
 _BEGIN_ABC_DS_NS
 __no_constexpr_imp bool
     map_unique_id_to_tdg_collection_stack_trie_t::insert(
-        const std::size_t                  _a_id,
+        const key_t&                  _a_id,
         const tdg_collection_stack_trie_t& _a_trie
     ) noexcept
 {
@@ -69,7 +70,7 @@ __no_constexpr_imp bool
     }
 }
 
-__no_constexpr_imp const std::map<std::size_t, tdg_collection_stack_trie_t>&
+__no_constexpr_imp const std::map<key_t, tdg_collection_stack_trie_t>&
     map_unique_id_to_tdg_collection_stack_trie_t::map() const noexcept
 {
     return _m_internal_map;
@@ -186,7 +187,7 @@ __no_constexpr_imp std::string
 {
     using namespace std;
     string _l_rv;
-    for (const pair<size_t, tdg_collection_stack_trie_t>& _l_element :
+    for (const pair<key_t, tdg_collection_stack_trie_t>& _l_element :
          _a_map.map())
     {
         _l_rv.append(fmt::format(
