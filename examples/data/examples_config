@@ -1,0 +1,8 @@
+use_global_test_list = true
+write_data_to_files = false
+# path_delimiter = default
+root_path = ../../examples/data/test_data
+threads = 1
+general_data_file_extension = gd
+n_integers_used_for_rng_generation = 100
+#repetition_config = 

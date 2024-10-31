@@ -25,19 +25,19 @@ __no_constexpr_imp CLI::App*
     string _l_repetition_str;
     _a_opts.map_of_unique_ids_and_for_loop_stack_tries;
     _l_app.add_flag(
-        "-g",
+        "-g,--use_global_test_list",
         _a_opts.use_global_test_list,
         "Use the global test list as the set of tests"
     );
     _l_app.add_flag(
-        "-w",
+        "-w,--write_data_to_files",
         _a_opts.write_data_to_files,
         "Denotes that data can be written to files"
     );
-    _l_app.add_option("--pd", _a_opts.path_delimiter, "Path delimiter used");
-    _l_app.add_option("-r", _a_opts.root_path, "root path used");
+    _l_app.add_option("--path_delimiter", _a_opts.path_delimiter, "Path delimiter used");
+    _l_app.add_option("-r,--root_path", _a_opts.root_path, "root path used");
     _l_app.add_option(
-        "-t",
+        "-t,--threads",
         _a_opts.threads,
         "Number of threads allocated to the testing library"
     );
@@ -47,9 +47,14 @@ __no_constexpr_imp CLI::App*
         "The string used at the start of files to signify a comment"
     );
     _l_app.add_option(
-        "--gd-file_extension",
+        "--general_data_file_extension",
         _a_opts.general_data_extension,
         "The extension used for general data files"
+    );
+    _l_app.add_option(
+        "--tertiary_data_file_extension",
+        _a_opts.tertiary_data_file_extension,
+        "The extension used for tertiary data files"
     );
     _l_app.add_option(
         "--n_integers_used_for_rng_generation",
@@ -72,10 +77,12 @@ __no_constexpr_imp CLI::App*
         "The elements to use to set the global seed"
     );
     _l_app.add_option(
-        "--repetition-config",
+        "--repetition_config",
         _a_opts.map_of_unique_ids_and_for_loop_stack_tries,
         "Map of repetition trees"
     );
+    _l_app.set_config("--config");
+
     return _l_app_ptr;
 }
 

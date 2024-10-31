@@ -63,6 +63,7 @@ public:
      * writer uses fmt::format and scn::scan.
      */
     std::string general_data_extension                       = "dg";
+    std::string tertiary_data_file_extension = "td";
     /*!
      * @brief The comment line string.
      *
