@@ -10,6 +10,7 @@
 #include <charconv>
 #include <exception>
 #include <functional>
+#include <scn/scan.h>
 
 _BEGIN_ABC_DS_NS
 // Forward declare
@@ -19,8 +20,8 @@ class typeless_data_generator_collection_stack_trie_t;
  * for_loop_stack_trie_t object.
  */
 
-using parse_for_loop_stack_trie_result_t
-    = std::expected<typeless_data_generator_collection_stack_trie_t, std::string>;
+using parse_for_loop_stack_trie_result_t = std::
+    expected<typeless_data_generator_collection_stack_trie_t, std::string>;
 
 namespace
 {
@@ -71,6 +72,12 @@ using opt_itt_and_end_t = std::optional<std::pair<
  * loop index. We use a 2D vector as the outer contains all the data indexed by
  * the for loop index.
  */
+__constexpr parse_for_loop_stack_trie_result_t
+    parse_repetition_tree_node(
+        const std::string_view _a_str,
+        const bool             _a_head_node
+    ) noexcept;
+
 class typeless_data_generator_collection_stack_trie_t
 {
 public:
@@ -80,7 +87,7 @@ public:
      * Only available public constructor.
      */
     __constexpr
-        typeless_data_generator_collection_stack_trie_t() noexcept
+    typeless_data_generator_collection_stack_trie_t() noexcept
         = default;
     /*!
      * @brief Returns a string representing the for_loop_stack_trie_t object in
@@ -204,6 +211,11 @@ public:
     friend __constexpr parse_for_loop_stack_trie_result_t
         parse_compressed_repetition_tree_node(const std::string_view _a_str
         ) noexcept;
+    friend __constexpr parse_for_loop_stack_trie_result_t
+        parse_repetition_tree_node(
+            const std::string_view _a_str,
+            const bool             _a_head_node
+        ) noexcept;
 private:
     /*!
      * @brief Conditional variable used to hold node data.
@@ -220,7 +232,9 @@ private:
      * as the root has no _m_for_loop_data member variable to set.
      */
     __constexpr
-        typeless_data_generator_collection_stack_trie_t(const dgc_memoized_element_t& _a_flid) noexcept;
+    typeless_data_generator_collection_stack_trie_t(
+        const dgc_memoized_element_t& _a_flid
+    ) noexcept;
     /*!
      * @brief Finds the element represented by the argument _a_flcds, as well as
      * that element's end iterator element.
@@ -258,11 +272,13 @@ private:
             const noexcept;
 };
 
-using tdg_collection_stack_trie_t = typeless_data_generator_collection_stack_trie_t;
+using tdg_collection_stack_trie_t
+    = typeless_data_generator_collection_stack_trie_t;
 _END_ABC_DS_NS
 
 template <>
-struct fmt::formatter<_ABC_NS_DS::typeless_data_generator_collection_stack_trie_t>
+struct fmt::formatter<
+    _ABC_NS_DS::typeless_data_generator_collection_stack_trie_t>
     : formatter<string_view>
 {
     /*!
@@ -272,29 +288,30 @@ struct fmt::formatter<_ABC_NS_DS::typeless_data_generator_collection_stack_trie_
     __no_constexpr auto
         format(
             _ABC_NS_DS::typeless_data_generator_collection_stack_trie_t _a_rt,
-            format_context&                      _a_cxt
+            format_context&                                             _a_cxt
         ) const -> format_context::iterator;
 };
 
 _BEGIN_ABC_DS_NS
 
 __no_constexpr_imp std::string
-typeless_data_generator_collection_stack_trie_t::print_for_loop_stack_trie_compressed(
-    ) const noexcept
+                   typeless_data_generator_collection_stack_trie_t::
+        print_for_loop_stack_trie_compressed() const noexcept
 {
     using namespace std;
-    string                _l_rv{print_for_loop_stack_trie()};
+    string _l_rv{print_for_loop_stack_trie()};
     return abc::utility::str::to_hex(_l_rv);
 }
 
 __no_constexpr_imp std::string
-typeless_data_generator_collection_stack_trie_t::print_for_loop_stack_trie() const noexcept
+    typeless_data_generator_collection_stack_trie_t::print_for_loop_stack_trie(
+    ) const noexcept
 {
     return inner_print_for_loop_stack_trie(true);
 }
 
 __constexpr_imp opt_idgc_memoized_element_t
-typeless_data_generator_collection_stack_trie_t::increment_last_index(
+    typeless_data_generator_collection_stack_trie_t::increment_last_index(
         const idgc_memoized_element_sequence_t& _a_rds
     ) const noexcept
 {
@@ -331,7 +348,7 @@ typeless_data_generator_collection_stack_trie_t::increment_last_index(
 }
 
 __constexpr_imp bool
-typeless_data_generator_collection_stack_trie_t::is_sequence_in_trie(
+    typeless_data_generator_collection_stack_trie_t::is_sequence_in_trie(
         const idgc_memoized_element_sequence_t& _a_rds
     ) const noexcept
 {
@@ -339,9 +356,10 @@ typeless_data_generator_collection_stack_trie_t::is_sequence_in_trie(
 }
 
 __constexpr_imp void
-typeless_data_generator_collection_stack_trie_t::add_for_loop_creation_data_sequence(
-        const idgc_memoized_element_sequence_t& _a_flcds
-    ) noexcept
+    typeless_data_generator_collection_stack_trie_t::
+        add_for_loop_creation_data_sequence(
+            const idgc_memoized_element_sequence_t& _a_flcds
+        ) noexcept
 {
     using namespace std;
     std::reference_wrapper<tdg_collection_stack_trie_t> _l_current_ref{*this};
@@ -360,13 +378,12 @@ typeless_data_generator_collection_stack_trie_t::add_for_loop_creation_data_sequ
         for_loop_stack_trie_children_t& _l_children{
             _l_for_loop_children[_l_for_loop_idx]
         };
-        if (_l_children.size() == 0 || _l_children.back()->_m_for_loop_data !=
-            _l_flcd.for_loop_iteration_data)
+        if (_l_children.size() == 0
+            || _l_children.back()->_m_for_loop_data
+                   != _l_flcd.for_loop_iteration_data)
         {
             _l_children.push_back(make_unique<tdg_collection_stack_trie_t>(
-                tdg_collection_stack_trie_t(
-                    _l_flcd.for_loop_iteration_data
-                )
+                tdg_collection_stack_trie_t(_l_flcd.for_loop_iteration_data)
             ));
             _l_current_ref = ref(*_l_children.back());
         }
@@ -413,9 +430,10 @@ typeless_data_generator_collection_stack_trie_t::add_for_loop_creation_data_sequ
 }
 
 __constexpr_imp opt_idgc_memoized_element_t
-typeless_data_generator_collection_stack_trie_t::find_first_child_of_sequence_in_trie(
-        const idgc_memoized_element_sequence_t& _a_rds
-    ) const noexcept
+    typeless_data_generator_collection_stack_trie_t::
+        find_first_child_of_sequence_in_trie(
+            const idgc_memoized_element_sequence_t& _a_rds
+        ) const noexcept
 {
     if (const opt_itt_t _l_opt_itt{find_iterator(_a_rds)};
         _l_opt_itt.has_value())
@@ -444,14 +462,15 @@ typeless_data_generator_collection_stack_trie_t::find_first_child_of_sequence_in
 }
 
 __constexpr_imp
-typeless_data_generator_collection_stack_trie_t::typeless_data_generator_collection_stack_trie_t(
-        const dgc_memoized_element_t& _a_flid
-    ) noexcept
+    typeless_data_generator_collection_stack_trie_t::
+        typeless_data_generator_collection_stack_trie_t(
+            const dgc_memoized_element_t& _a_flid
+        ) noexcept
     : _m_for_loop_data(_a_flid)
 {}
 
 __constexpr_imp opt_itt_and_end_t
-typeless_data_generator_collection_stack_trie_t::find_iterator_and_end(
+    typeless_data_generator_collection_stack_trie_t::find_iterator_and_end(
         const idgc_memoized_element_sequence_t& _a_flcds
     ) const noexcept
 {
@@ -504,7 +523,7 @@ typeless_data_generator_collection_stack_trie_t::find_iterator_and_end(
 }
 
 __constexpr_imp opt_itt_t
-typeless_data_generator_collection_stack_trie_t::find_iterator(
+    typeless_data_generator_collection_stack_trie_t::find_iterator(
         const idgc_memoized_element_sequence_t& _a_flcds
     ) const noexcept
 {
@@ -520,9 +539,10 @@ typeless_data_generator_collection_stack_trie_t::find_iterator(
 }
 
 __no_constexpr_imp std::string
-typeless_data_generator_collection_stack_trie_t::inner_print_for_loop_stack_trie(
-        const bool _a_is_root
-    ) const noexcept
+                   typeless_data_generator_collection_stack_trie_t::
+        inner_print_for_loop_stack_trie(
+            const bool _a_is_root
+        ) const noexcept
 {
     using namespace std;
     using namespace utility::str;
@@ -570,123 +590,307 @@ __constexpr_imp parse_for_loop_stack_trie_result_t
     using namespace utility::str;
     using namespace std;
     using enum utility::internal::internal_log_enum_t;
-    expected<string, string> _l_hex_result{ abc::utility::str::from_hex(_a_str) };
-    if (not _l_hex_result.has_value())
+    expected<string, string> _l_hex_result{abc::utility::str::from_hex(_a_str)};
+    if (_l_hex_result.has_value())
+    {
+        return parse_repetition_tree_node(_l_hex_result.value(), true);
+    }
+    else
     {
         return unexpected(_l_hex_result.error());
     }
-    else
-    { 
-        string _l_str = _l_hex_result.value();
-        _LIBRARY_LOG(
-            PARSING_SEED,
-            fmt::format(
-                "Depth {0}. Repetition tree after conversion from hex is "
-                "in "
-                "form \"{1}\"",
-                _a_depth,
-                _l_str
-            )
-        );
+}
 
-        // Separete the string into strings...
-        size_t                 _l_current_pos{0};
-        size_t                 _l_mode{0};
-        size_t                 _l_start{0};
-        vector<vector<string>> _l_strs;
-        size_t                 _l_depth;
-        size_t                 _l_found_pos;
-        bool                   _l_end;
-        char                   _l_char;
-        size_t                 _l_previous_mode;
-        string                 _l_error_string;
-        size_t                 _l_old_pos;
-        constexpr std::size_t  _l_mode_zero_next_mode = 1;
-        while (_l_current_pos < _l_str.size())
-        {
-            _l_previous_mode = _l_mode;
-            _l_old_pos       = _l_current_pos;
-            switch (_l_mode)
-            {
-            case 0:
-                // Searching for opening bracket
-                locate_relevant_character(
-                    _l_str, _c_l_square_bracket, _l_current_pos, _l_error_string
-                );
-                process_mode(_l_mode, _l_current_pos, _l_mode_zero_next_mode);
-                break;
-            case 1:
-                // Mode 1, searhicng for a round bracket to begin a tuple of
-                // data.
-                locate_relevant_character(
-                    _l_str, _c_l_round_bracket, _l_current_pos, _l_error_string
-                );
-                process_mode(_l_mode, _l_current_pos, 2);
-                _l_start = _l_current_pos;
-                _l_depth = 1;
-                _l_start = _l_current_pos;
-                break;
-            case 2:
-                process_list_elements(
-                    _l_str,
-                    _l_current_pos,
-                    _l_error_string,
-                    _l_depth,
-                    _l_strs[0],
-                    _l_start,
-                    _l_mode,
-                    3,
-                    4
-                );
-                // Check for end brackets, commas and begin next brackets.
-                break;
-            case 3:
-                // Escaping quotes
-                process_string(
-                    _l_str, _l_current_pos, _l_error_string, _l_mode, 2
-                );
-                break;
-            case 4:
-                // Searching for next comma or end square bracket (, or ])
-                process_end_of_list(
-                    _l_str, _l_current_pos, _l_error_string, _l_mode, 1
-                );
-                break;
-            default:
-                return unexpected("default case");
-            }
-            if (not _l_error_string.empty())
-            {
-                return unexpected(_l_error_string);
-            }
-            _l_current_pos++;
-        }
+__constexpr_imp parse_for_loop_stack_trie_result_t
+    parse_repetition_tree_node(
+        const std::string_view _a_str,
+        const bool             _a_head_node
+    ) noexcept
+{
+    using namespace utility::str;
+    using namespace std;
+    using enum utility::internal::internal_log_enum_t;
 
-        // Put it all together
-        tdg_collection_stack_trie_t _l_rv;
-        for (const vector<string>& _l_str : _l_strs)
+    string _l_str = string(_a_str);
+    _LIBRARY_LOG(
+        PARSING_SEED,
+        fmt::format(
+            "Depth {0}. Repetition tree after conversion from hex is "
+            "in "
+            "form \"{1}\"",
+            _a_depth,
+            _l_str
+        )
+    );
+
+    // Separete the string into strings...
+    size_t                 _l_current_pos{0};
+    size_t                 _l_mode{_a_head_node ? size_t{6} : size_t{0}};
+    size_t                 _l_start{0};
+    vector<vector<string>> _l_strs;
+    size_t                 _l_depth;
+    size_t                 _l_found_pos;
+    bool                   _l_end;
+    char                   _l_char;
+    size_t                 _l_previous_mode;
+    string                 _l_error_string;
+    size_t                 _l_old_pos;
+    vector<string>         _l_current_strs;
+    tuple<string, string, string, string> _l_node;
+    std::size_t _l_mode_zero_next_mode = _a_head_node ? 1 : 0;
+    while (_l_current_pos < _l_str.size())
+    {
+        _l_previous_mode = _l_mode;
+        _l_old_pos       = _l_current_pos;
+        switch (_l_mode)
         {
-            vector<shared_ptr<tdg_collection_stack_trie_t>> _l_kids;
-            for (const string& _l_st : _l_str)
+        case 0:
+            // Searching for opening curly bracket
+            locate_relevant_characters_and_change_mode(
+                _l_str,
+                _l_current_pos,
+                {
+                    {'(', 1}
+            },
+                _l_error_string,
+                _l_mode
+            );
+            break;
+        case 1:
+            // Up to first comma
+            locate_relevant_characters_and_change_mode(
+                _l_str,
+                _l_current_pos,
+                {
+                    {',', 2}
+            },
+                _l_error_string,
+                _l_mode
+            );
+            if (_l_error_string.empty())
             {
-                const expected<tdg_collection_stack_trie_t, string> _l_op{
-                    parse_compressed_repetition_tree_node(_l_st)
-                };
-                if (_l_op.has_value())
-                {
-                    _l_kids.push_back(shared_ptr<tdg_collection_stack_trie_t>(
-                        new tdg_collection_stack_trie_t(_l_op.value())
-                    ));
-                }
-                else
-                {
-                    return unexpected("");
-                }
+                get<0>(_l_node)
+                    = _l_str.substr(_l_old_pos, _l_current_pos - _l_old_pos);
             }
-            _l_rv._m_children.push_back(_l_kids);
+            break;
+        case 2:
+            locate_relevant_characters_and_change_mode(
+                _l_str,
+                _l_current_pos,
+                {
+                    {',', 3}
+            },
+                _l_error_string,
+                _l_mode
+            );
+            if (_l_error_string.empty())
+            {
+                get<1>(_l_node)
+                    = _l_str.substr(_l_old_pos, _l_current_pos - _l_old_pos);
+            }
+            break;
+        case 3:
+            locate_relevant_characters_and_change_mode(
+                _l_str,
+                _l_current_pos,
+                {
+                    {'"', 4}
+            },
+                _l_error_string,
+                _l_mode
+            );
+            if (_l_error_string.empty())
+            {
+                _l_start = _l_current_pos;
+            }
+            break;
+        case 4:
+            // Escaping quotes
+            process_string(_l_str, _l_current_pos, _l_error_string, _l_mode, 5);
+            if (_l_error_string.empty())
+            {
+                get<2>(_l_node)
+                    = _l_str.substr(_l_old_pos, _l_current_pos - _l_old_pos);
+            }
+            break;
+        case 5:
+            locate_relevant_characters_and_change_mode(
+                _l_str,
+                _l_current_pos,
+                {
+                    {',', 6}
+            },
+                _l_error_string,
+                _l_mode
+            );
+            break;
+        case 6:
+            locate_relevant_characters_and_change_mode(
+                _l_str,
+                _l_current_pos,
+                {
+                    {'[', 7}
+            },
+                _l_error_string,
+                _l_mode
+            );
+            break;
+        case 7:
+            // Mini loop. Search for either a [ (signifying new set) or ]
+            // (ending set)
+            locate_relevant_characters_and_change_mode(
+                _l_str,
+                _l_current_pos,
+                {
+                    {'[', 8 },
+                    {']', 12}
+            },
+                _l_error_string,
+                _l_mode
+            );
+            _l_start = _l_current_pos + 1;
+            break;
+        case 8:
+            locate_relevant_characters_and_change_mode(
+                _l_str,
+                _l_current_pos,
+                {
+                    {'(', 9}
+            },
+                _l_error_string,
+                _l_mode
+            );
+            break;
+        case 9:
+            // Skip everything until a round bracket is found, signifying
+            // the ending of this element.
+            skip_chars_and_strings_until_found(
+                _l_str,
+                _l_current_pos,
+                {
+                    {'"', '"'},
+                    {'[', ']'}
+            },
+                '(',
+                ')',
+                10,
+                1,
+                _l_error_string,
+                _l_mode
+            );
+            // Add element to list
+            _l_current_strs.push_back(
+                string(_l_str.substr(_l_start, (_l_current_pos - _l_start + 1)))
+            );
+            break;
+        case 10:
+            // Looking for comma or end bracket.
+            locate_relevant_characters_and_change_mode(
+                _l_str,
+                _l_current_pos,
+                {
+                    {',', 8 },
+                    {']', 11}
+            },
+                _l_error_string,
+                _l_mode
+            );
+            _l_strs.push_back(_l_current_strs);
+            _l_current_strs.clear();
+            if (_l_mode == 8)
+            {
+                _l_start = _l_current_pos + 1;
+            }
+            break;
+        case 11:
+            // Looking for comma on upper level of 2d vector, or ending
+            // bracket
+            locate_relevant_characters_and_change_mode(
+                _l_str,
+                _l_current_pos,
+                {
+                    {',', 7                     },
+                    {']', _a_head_node ? 13 : 12}
+            },
+                _l_error_string,
+                _l_mode
+            );
+            break;
+        case 12:
+            locate_relevant_characters_and_change_mode(
+                _l_str,
+                _l_current_pos,
+                {
+                    {')', 13},
+            },
+                _l_error_string,
+                _l_mode
+            );
+            break;
+        case 13:
+            if (_l_current_pos != _a_str.size())
+            {
+                return unexpected("Should have been at end. Not");
+            }
+            break;
+        default:
+            return unexpected("default case");
         }
-        return _l_rv;
+        if (not _l_error_string.empty())
+        {
+            return unexpected(_l_error_string);
+        }
+        _l_current_pos++;
     }
+
+    // Put it all together
+    tdg_collection_stack_trie_t _l_rv;
+    if (not _a_head_node)
+    {
+        auto _l_result_1{scn::scan<std::size_t>(get<0>(_l_node),"{0}")};
+        if (not _l_result_1.has_value())
+        {
+            return unexpected(fmt::format(
+                "Could not parse generation_collection_index using string "
+                "\"{0}\"",
+                get<0>(_l_node)
+            ));
+        }
+        auto _l_result_2{ scn::scan<std::size_t>(get<1>(_l_node), "{0}") };
+        if (not _l_result_2.has_value())
+        {
+            return unexpected(fmt::format(
+                "Could not parse generation_collection_index using string "
+                "\"{0}\"",
+                get<1>(_l_node)
+            ));
+        }
+        _l_rv._m_for_loop_data.generation_collection_index = _l_result_1->value();
+        _l_rv._m_for_loop_data.flied.mode = _l_result_2->value();
+        _l_rv._m_for_loop_data.flied.additional_data = get<2>(_l_node);
+    }
+    for (const vector<string>& _l_str : _l_strs)
+    {
+        vector<shared_ptr<tdg_collection_stack_trie_t>> _l_kids;
+        for (const string& _l_st : _l_str)
+        {
+            const expected<tdg_collection_stack_trie_t, string> _l_op{
+                parse_repetition_tree_node(_l_st, false)
+            };
+            if (_l_op.has_value())
+            {
+                _l_kids.push_back(shared_ptr<tdg_collection_stack_trie_t>(
+                    new tdg_collection_stack_trie_t(_l_op.value())
+                ));
+            }
+            else
+            {
+                return unexpected(_l_op.error());
+            }
+        }
+        _l_rv._m_children.push_back(_l_kids);
+    }
+    return _l_rv;
 }
 
 _END_ABC_DS_NS
@@ -694,7 +898,7 @@ _END_ABC_DS_NS
 __no_constexpr_imp auto
     fmt::formatter<_ABC_NS_DS::tdg_collection_stack_trie_t>::format(
         _ABC_NS_DS::tdg_collection_stack_trie_t _a_rt,
-        format_context&                      _a_cxt
+        format_context&                         _a_cxt
     ) const -> format_context::iterator
 {
     using namespace std;

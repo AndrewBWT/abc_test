@@ -50,12 +50,11 @@ __no_constexpr_or_inline_imp void
     catch (const exception& _l_exception)
     {
         _l_current_test.set_unexpected_termination(
-            make_unique<const unexpected_report_t<true>>(
-                unexpected_thrown_exception_t(
+            make_unique<unexpected_thrown_exception_t >(
                     most_recent_source(),
                     typeid(_l_exception).name(),
                     _l_exception.what()
-                )
+                
             )
         );
     }

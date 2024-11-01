@@ -223,6 +223,8 @@ __constexpr
 	}
 	else
 	{
+	//	return get_all_data(_m_print_config.unexpected_thrown_non_descript_entity_fields(), *_l_ptr,
+	//		_m_print_config, unexpected_thrown_non_descript_entity_list_formatter_t());
 		throw errors::test_library_exception_t(fmt::format(
 			"Could not find function to format item of abstract class {0}. ",
 			typeid(_a_unexpected_report).name()

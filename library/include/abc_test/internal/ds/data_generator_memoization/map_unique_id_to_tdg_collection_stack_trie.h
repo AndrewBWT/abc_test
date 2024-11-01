@@ -95,7 +95,7 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
     size_t                                 _l_idx{0};
     while (_l_idx < _a_str.size())
     {
-        size_t _l_next_colon{_a_str.find(_l_idx, ':')};
+        size_t _l_next_colon{_a_str.find(':', _l_idx)};
         if (_l_next_colon == string::npos)
         {
             return unexpected(fmt::format(
@@ -116,7 +116,7 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
             };
             _l_idx = _l_next_colon + 1;
             // Finding the next colon. This one doesn't have to exist.
-            size_t            _l_next_colon{_a_str.find(_l_idx, ':')};
+            size_t            _l_next_colon{_a_str.find(':', _l_idx)};
             const string_view _l_hex_numbers{_a_str.substr(
                 _l_idx,
                 _l_next_colon == string::npos ? _a_str.size() - _l_idx

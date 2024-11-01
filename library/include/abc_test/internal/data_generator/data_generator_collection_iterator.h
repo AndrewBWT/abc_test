@@ -72,7 +72,8 @@ public:
     /*!
      * @brief Equality comparison operator.
      * @param _a_rhs The sentinel to compare this element to.
-     * @return True if this iterator is at the end of its range; false otherwise.
+     * @return True if this iterator is at the end of its range; false
+     * otherwise.
      */
     __constexpr bool
         operator==(const data_generator_collection_sentinel_t& _a_rhs
@@ -90,13 +91,14 @@ private:
     bool                            _m_add_repeatable_test_config;
     test_runner_t*                  _m_test_runner;
     std::size_t                     _m_iterator_length;
-    //std::size_t                     _m_iterator_index;
+    // std::size_t                     _m_iterator_index;
     /*!
      * Increment iterator using an optional set of repetition data.
      */
     __constexpr void
-        increment_iterator(const std::optional<ds::idgc_memoized_element_t>&
-                               _a_opt_repetition_data);
+        increment_iterator(
+            const ds::idgc_memoized_element_t& _a_opt_repetition_data
+        );
     __constexpr virtual ds::dg_memoized_element_t
         generate_data_generator_memoized_element(
             const bool _a_get_original_dg_memoized_element_data
@@ -114,11 +116,11 @@ __constexpr_imp
         data_generator_collection_iterator_t(
             dgc_internal_itt_t<T> _a_begin_iterator,
             const std::size_t     _a_iterator_length,
-            test_runner_t* _a_test_runner
+            test_runner_t*        _a_test_runner
         )
     : _m_this_iterator(_a_begin_iterator)
     , _m_iterator_length(_a_iterator_length)
-   // , _m_iterator_index(0)
+    // , _m_iterator_index(0)
     , _m_this_iterators_index{0}
     , _m_test_runner(_a_test_runner)
 {
@@ -130,9 +132,23 @@ __constexpr_imp
     {
         // Get the first element in the for loop stack and move the iterator to
         // that element.
-        increment_iterator(
+        const opt_idgc_memoized_element_t _l_initial_idgc_element{
             _l_current_test.get_first_child_of_current_for_loop_stack()
-        );
+        };
+        if (_l_initial_idgc_element.has_value())
+        {
+            increment_iterator(
+                _l_initial_idgc_element.value()
+            );
+        }
+        else
+        {
+            throw errors::test_library_exception_t(fmt::format(
+                "Could not initialise tests for loop stack. For loop stack = "
+                "{0}",
+                _l_current_test.for_loop_stack_trie()
+            ));
+        }
     }
     // If not at the end, increment the current test's CURRENT for loop stack
     // too.
@@ -158,9 +174,21 @@ __constexpr_imp data_generator_collection_iterator_t<T>&
     // If we're in a repetition, get the next element in the for loop stack...
     if (_l_current_test.post_setup_test_data().has_for_loop_stack_trie())
     {
-        increment_iterator(
+        const opt_idgc_memoized_element_t _l_opt_idgcme{
             _l_current_test.increment_last_value_of_current_for_loop_stack()
-        );
+        };
+        if (_l_opt_idgcme.has_value())
+        {
+            increment_iterator(_l_opt_idgcme.value());
+        }
+        else
+        {
+            throw errors::test_library_exception_t(fmt::format(
+                "Could not increment tests for loop stack. For loop stack = "
+                "{0}",
+                _l_current_test.for_loop_stack_trie()
+            ));
+        }
     }
     else
     {
@@ -239,31 +267,40 @@ __constexpr_imp data_generator_collection_iterator_t<T>::reference
 template <typename T>
 __constexpr_imp void
     data_generator_collection_iterator_t<T>::increment_iterator(
-        const std::optional<ds::idgc_memoized_element_t>& _a_opt_repetition_data
+        const ds::idgc_memoized_element_t& _a_opt_repetition_data
     )
 {
     using namespace ds;
-    const idgc_memoized_element_t& _l_rd{_a_opt_repetition_data.value()};
-    size_t                         _l_generation_collection_index{
-        _l_rd.for_loop_iteration_data.generation_collection_index
-    };
-    // If less than the element, move forewards.
-    while (this->_m_generation_collection_index < _l_generation_collection_index)
+    // if (not _a_opt_repetition_data.has_value())
+    // {
+    //     throw errors::test_library_exception_t("");
+    // }
+    // else
     {
-        ++this->_m_generation_collection_index;
-        ++_m_this_iterator;
+        const idgc_memoized_element_t& _l_rd{_a_opt_repetition_data};
+        size_t                         _l_generation_collection_index{
+            _l_rd.for_loop_iteration_data.generation_collection_index
+        };
+        // If less than the element, move forewards.
+        while (this->_m_generation_collection_index
+               < _l_generation_collection_index)
+        {
+            ++this->_m_generation_collection_index;
+            ++_m_this_iterator;
+        }
+        // If greater than the element move backwards.
+        while (this->_m_generation_collection_index
+               > _l_generation_collection_index)
+        {
+            --this->_m_generation_collection_index;
+            --++_m_this_iterator;
+        }
+        dgc_element_t<T>& _l_this_iterator_ref{*_m_this_iterator};
+        _l_this_iterator_ref
+            ->set_data_generator_using_data_generator_memoized_element(
+                _l_rd.for_loop_iteration_data.flied
+            );
     }
-    // If greater than the element move backwards.
-    while (this->_m_generation_collection_index > _l_generation_collection_index)
-    {
-        --this->_m_generation_collection_index;
-        --++_m_this_iterator;
-    }
-    dgc_element_t<T>& _l_this_iterator_ref{*_m_this_iterator};
-    _l_this_iterator_ref
-        ->set_data_generator_using_data_generator_memoized_element(
-            _l_rd.for_loop_iteration_data.flied
-        );
 }
 
 template <typename T>
@@ -274,7 +311,9 @@ __constexpr_imp ds::dg_memoized_element_t
         ) const noexcept
 {
     return (*_m_this_iterator)
-        ->get_data_generator_memoized_element(_a_get_original_dg_memoized_element_data);
+        ->get_data_generator_memoized_element(
+            _a_get_original_dg_memoized_element_data
+        );
 }
 
 template <typename T>

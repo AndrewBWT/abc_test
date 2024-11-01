@@ -69,20 +69,6 @@ __no_constexpr_imp CLI::App*
         "Number of integers used to seed each individual random generator from "
         "the global random generator"
     );
-    unsigned int _l_srand;
-    _l_app.add_option(
-        "--seed_srand",
-        _l_srand,
-        "Srand to set the global seed at. The system will take "
-        "number_of_integers_used_to_seed_random_generators elements from "
-        "rand() to initialise the seed"
-    );
-    vector<uint32_t> _l_seeds;
-    _l_app.add_option(
-        "--seed_sequence",
-        _l_seeds,
-        "The elements to use to set the global seed"
-    );
     _l_app.add_option(
         "--repetition_config",
         _a_opts.map_of_unique_ids_and_for_loop_stack_tries,
