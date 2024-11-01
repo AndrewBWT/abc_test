@@ -183,11 +183,12 @@ __constexpr_imp data_generator_collection_iterator_t<T>&
         }
         else
         {
-            throw errors::test_library_exception_t(fmt::format(
-                "Could not increment tests for loop stack. For loop stack = "
-                "{0}",
-                _l_current_test.for_loop_stack_trie()
-            ));
+            ++_m_generation_collection_index;
+       //     throw errors::test_library_exception_t(fmt::format(
+      //          "Could not increment tests for loop stack. For loop stack = "
+       //         "{0}",
+      //          _l_current_test.for_loop_stack_trie()
+       //     ));
         }
     }
     else

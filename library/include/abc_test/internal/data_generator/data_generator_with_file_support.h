@@ -90,7 +90,10 @@ data_generator_with_file_support_t<T, Has_File_Read_Writer>::
     , _m_file_read_writer(data_generator_file_reader_and_writer_t<T>(
           _a_element,
           _a_file_read_writer,
-        generate_comment_str(_a_file_read_writer,typeid(typename T::tertiary_type))
+          generate_comment_str(
+              _a_file_read_writer,
+              typeid(typename T::tertiary_type)
+          )
       ))
 {
     if (not _m_file_read_writer.has_current_element())
@@ -147,7 +150,9 @@ __constexpr void
         {
         case 0:
             _m_file_read_writer.set_data_generator_using_additional_data(
-                _a_dgme.additional_data
+                utility::str::parser_t<std::size_t>().run_parser_with_exception(
+                    _a_dgme.additional_data
+                )
             );
             break;
         case 1:
@@ -319,10 +324,17 @@ __constexpr ds::dg_memoized_element_t
                 );
                 break;
             case 1:
-                _l_mode = 0;
-                _l_rv = abc::utility::str::printer_t<std::size_t>().run_printer(
-                    _m_file_read_writer.write_data_to_file(_m_object)
-                );
+                if (global::get_global_test_options().write_data_to_files)
+                {
+                    _l_mode = 0;
+                    _l_rv = abc::utility::str::printer_t<std::size_t>().run_printer(
+                        _m_file_read_writer.write_data_to_file(_m_object)
+                    );
+                }
+                else
+                {
+                    _l_rv = _m_object.get_additional_data();
+                }
                 // file_writer_t<generator_type>
                 //_m_object. T.
                 // File writiers take a T. Turn it into a string?
@@ -389,10 +401,10 @@ __constexpr void
                 _m_mode = _a_new_mode;
             }
         }
-    }
-    else
-    {
-        throw std::exception("coudln't");
+        else
+        {
+            throw std::exception("coudln't");
+        }
     }
 }
 

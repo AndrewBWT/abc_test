@@ -27,7 +27,8 @@ public:
     __constexpr void
         reset();
     __constexpr
-    random_data_generator_t(const std::shared_ptr<random_generator_object_t<T>>& _a_rnd
+    random_data_generator_t(
+        const std::shared_ptr<random_generator_object_t<T>>& _a_rnd
     );
     __constexpr bool
         has_current_element() const;
@@ -41,11 +42,9 @@ private:
     using random_rep_data_t = std::pair<std::size_t, std::size_t>;
     tertiary_type _m_random_calls_before_after;
     abc::utility::str::rw_info_t<random_rep_data_t> _m_rep_data;
-    std::shared_ptr<random_generator_object_t<T>>          _m_random_generator;
+    std::shared_ptr<random_generator_object_t<T>>   _m_random_generator;
     size_t      _m_elemnets_to_randomly_generate{10};
     std::size_t _l_elements_generated{0};
-    std::size_t _m_random_gen_calls_before;
-    std::size_t _m_random_gen_calls_after;
     T           _m_element;
 };
 
@@ -141,9 +140,17 @@ __constexpr bool
 {
     if (_l_elements_generated + 1 < _m_elemnets_to_randomly_generate)
     {
+        _m_random_calls_before_after.first
+            = global::get_this_threads_current_test()
+                  .get_random_generator()
+                  .calls();
         _m_element = (*_m_random_generator)(
             global::get_this_threads_current_test().get_random_generator()
         );
+        _m_random_calls_before_after.second
+            = global::get_this_threads_current_test()
+                  .get_random_generator()
+                  .calls();
         _l_elements_generated++;
         return true;
     }
@@ -164,9 +171,7 @@ template <typename T>
 __constexpr const std::string
                   random_data_generator_t<T>::get_additional_data() const
 {
-    return _m_rep_data.printer().run_printer(
-        {_m_random_gen_calls_before, _m_random_gen_calls_after}
-    );
+    return _m_rep_data.printer().run_printer(_m_random_calls_before_after);
 }
 
 _END_ABC_DG_NS

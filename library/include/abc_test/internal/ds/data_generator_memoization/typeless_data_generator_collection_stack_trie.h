@@ -72,7 +72,7 @@ using opt_itt_and_end_t = std::optional<std::pair<
  * loop index. We use a 2D vector as the outer contains all the data indexed by
  * the for loop index.
  */
-__constexpr parse_for_loop_stack_trie_result_t
+__no_constexpr parse_for_loop_stack_trie_result_t
     parse_repetition_tree_node(
         const std::string_view _a_str,
         const bool             _a_head_node
@@ -211,7 +211,7 @@ public:
     friend __constexpr parse_for_loop_stack_trie_result_t
         parse_compressed_repetition_tree_node(const std::string_view _a_str
         ) noexcept;
-    friend __constexpr parse_for_loop_stack_trie_result_t
+    friend __no_constexpr parse_for_loop_stack_trie_result_t
         parse_repetition_tree_node(
             const std::string_view _a_str,
             const bool             _a_head_node
@@ -435,6 +435,12 @@ __constexpr_imp opt_idgc_memoized_element_t
             const idgc_memoized_element_sequence_t& _a_rds
         ) const noexcept
 {
+    if (_a_rds.size() == 0)
+    {
+        return opt_idgc_memoized_element_t{
+            idgc_memoized_element_t{0, _m_children[0][0]->_m_for_loop_data}
+        };
+    }
     if (const opt_itt_t _l_opt_itt{find_iterator(_a_rds)};
         _l_opt_itt.has_value())
     {
@@ -475,9 +481,17 @@ __constexpr_imp opt_itt_and_end_t
     ) const noexcept
 {
     using namespace std;
+    pair<
+        for_loop_stack_trie_children_t::const_iterator,
+        for_loop_stack_trie_children_t::const_iterator>
+                                                              _l_rv;
     std::reference_wrapper<const tdg_collection_stack_trie_t> _l_current_ref{
         *this
     };
+    if (_a_flcds.size() == 0)
+    {
+        return opt_itt_and_end_t{};
+    }
     // Go through each flcd, either creating or navigating as we go.
     for (const idgc_memoized_element_t& _l_flcd : _a_flcds)
     {
@@ -495,15 +509,25 @@ __constexpr_imp opt_itt_and_end_t
             const for_loop_stack_trie_children_t& _l_children{
                 _l_for_loop_children[_l_for_loop_idx]
             };
-            // Find the equal element; or the subragne around them.
+            // This narrows down the range. every element within the bounds of
+            // the begin and end has a generation_collection_index and mode
+            // which is the same as the target.
             ranges::subrange<for_loop_stack_trie_children_t::const_iterator>
                 _l_equal_subrange{ranges::equal_range(
                     _l_children,
-                    _l_flcd.for_loop_iteration_data,
+                    make_pair(
+                        _l_flcd.for_loop_iteration_data
+                            .generation_collection_index,
+                        _l_flcd.for_loop_iteration_data.flied.mode
+                    ),
                     ranges::less{},
                     [](const for_loop_stack_trie_child_t& _a_flstc)
                     {
-                        return _a_flstc->_m_for_loop_data;
+                        return make_pair(
+                            _a_flstc->_m_for_loop_data
+                                .generation_collection_index,
+                            _a_flstc->_m_for_loop_data.flied.mode
+                        );
                     }
                 )};
             // If they are equal (both greater than the element - no element in
@@ -514,12 +538,32 @@ __constexpr_imp opt_itt_and_end_t
             }
             else
             {
-                // Element is in, just navigate to it!
-                _l_current_ref = ref(*((*_l_equal_subrange.begin()).get()));
+                bool _l_found{ false };
+                _l_rv.second = _l_children.end();
+                for (for_loop_stack_trie_children_t::const_iterator _l_itt
+                     = _l_equal_subrange.begin();
+                     _l_itt != _l_equal_subrange.end();
+                     ++_l_itt)
+                {
+                    const for_loop_stack_trie_child_t& _l_element = *_l_itt;
+                    if (_l_element.get()->_m_for_loop_data.flied.additional_data
+                        == _l_flcd.for_loop_iteration_data.flied
+                               .additional_data)
+                    {
+                        _l_rv.first = _l_itt;
+                        _l_current_ref = ref(*_l_element);
+                        _l_found = true;
+                        break;
+                    }
+                }
+                if (not _l_found)
+                {
+                    return opt_itt_and_end_t{};
+                }
             }
         }
     }
-    return opt_itt_and_end_t{};
+    return _l_rv;
 }
 
 __constexpr_imp opt_itt_t
@@ -601,7 +645,7 @@ __constexpr_imp parse_for_loop_stack_trie_result_t
     }
 }
 
-__constexpr_imp parse_for_loop_stack_trie_result_t
+__no_constexpr_imp parse_for_loop_stack_trie_result_t
     parse_repetition_tree_node(
         const std::string_view _a_str,
         const bool             _a_head_node
@@ -638,6 +682,7 @@ __constexpr_imp parse_for_loop_stack_trie_result_t
     vector<string>         _l_current_strs;
     tuple<string, string, string, string> _l_node;
     std::size_t _l_mode_zero_next_mode = _a_head_node ? 1 : 0;
+    std::cout << _a_str << std::endl;
     while (_l_current_pos < _l_str.size())
     {
         _l_previous_mode = _l_mode;
@@ -789,14 +834,18 @@ __constexpr_imp parse_for_loop_stack_trie_result_t
                 _l_str,
                 _l_current_pos,
                 {
+                    {']',11},
                     {',', 8 },
-                    {']', 11}
+                  //  {']', 11}
             },
                 _l_error_string,
                 _l_mode
             );
-            _l_strs.push_back(_l_current_strs);
-            _l_current_strs.clear();
+            if (_a_str[_l_current_pos] == ']')
+            {
+                _l_strs.push_back(_l_current_strs);
+                _l_current_strs.clear();
+            }
             if (_l_mode == 8)
             {
                 _l_start = _l_current_pos + 1;
@@ -847,7 +896,7 @@ __constexpr_imp parse_for_loop_stack_trie_result_t
     tdg_collection_stack_trie_t _l_rv;
     if (not _a_head_node)
     {
-        auto _l_result_1{scn::scan<std::size_t>(get<0>(_l_node),"{0}")};
+        auto _l_result_1{scn::scan<std::size_t>(get<0>(_l_node), "{0}")};
         if (not _l_result_1.has_value())
         {
             return unexpected(fmt::format(
@@ -856,7 +905,7 @@ __constexpr_imp parse_for_loop_stack_trie_result_t
                 get<0>(_l_node)
             ));
         }
-        auto _l_result_2{ scn::scan<std::size_t>(get<1>(_l_node), "{0}") };
+        auto _l_result_2{scn::scan<std::size_t>(get<1>(_l_node), "{0}")};
         if (not _l_result_2.has_value())
         {
             return unexpected(fmt::format(
@@ -865,8 +914,9 @@ __constexpr_imp parse_for_loop_stack_trie_result_t
                 get<1>(_l_node)
             ));
         }
-        _l_rv._m_for_loop_data.generation_collection_index = _l_result_1->value();
-        _l_rv._m_for_loop_data.flied.mode = _l_result_2->value();
+        _l_rv._m_for_loop_data.generation_collection_index
+            = _l_result_1->value();
+        _l_rv._m_for_loop_data.flied.mode            = _l_result_2->value();
         _l_rv._m_for_loop_data.flied.additional_data = get<2>(_l_node);
     }
     for (const vector<string>& _l_str : _l_strs)

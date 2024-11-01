@@ -23,7 +23,7 @@ public:
     __constexpr std::size_t
                 get_file_position() const noexcept;
     __constexpr void
-        set_data_generator_using_additional_data(const std::string_view _a_str
+        set_data_generator_using_additional_data(const std::size_t _a_idx
         ) noexcept;
     __constexpr void
         set_to_write();
@@ -118,9 +118,18 @@ requires data_gen::concept_for_data_generator_with_file_support<T>
 __constexpr void
     data_generator_file_reader_and_writer_t<T>::
         set_data_generator_using_additional_data(
-            const std::string_view _a_str
+            const std::size_t _a_idx
         ) noexcept
-{}
+{
+    while (_m_elements_read_or_written < _a_idx)
+    {
+        const bool _l_has_next_line{ generate_next() };
+        if (not _l_has_next_line)
+        {
+
+        }
+    }
+}
 
 template <typename T>
 requires data_gen::concept_for_data_generator_with_file_support<T>

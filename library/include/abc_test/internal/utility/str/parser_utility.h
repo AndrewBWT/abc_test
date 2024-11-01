@@ -47,7 +47,7 @@ constexpr void
         std::size_t&           _a_current_pos_ref,
         std::string&           _a_error_string
     ) noexcept;
-__constexpr void
+__no_constexpr void
     locate_relevant_characters_and_change_mode(
         const std::string_view _a_str,
         std::size_t&           _a_current_pos_ref,
@@ -191,7 +191,7 @@ constexpr void
                 );
 }
 
-__constexpr void
+__no_constexpr_imp void
     locate_relevant_characters_and_change_mode(
         const std::string_view _a_str,
         std::size_t&           _a_current_pos_ref,
@@ -203,28 +203,33 @@ __constexpr void
 {
     using namespace std;
     const size_t _l_old_current_pos{_a_current_pos_ref};
-    string       _l_error_string;
+    map<char, size_t> _l_map;
+    string _l_strs_to_search;
     for (const pair<char, size_t>& _a_char_and_mode : _a_char_and_mode_list)
     {
-        const size_t _l_new_pos
-            = _a_str.find(_a_char_and_mode.first, _a_current_pos_ref);
-        if (_l_new_pos != string::npos)
-        {
-            _a_mode_ref        = _a_char_and_mode.second;
-            _a_current_pos_ref = _l_new_pos;
-            return;
-        }
-        _l_error_string.push_back(_a_char_and_mode.first);
+        _l_map.insert(_a_char_and_mode);
+        _l_strs_to_search.push_back(_a_char_and_mode.first);
     }
-    _a_error_string = fmt::format(
-        "Expecting one of \"{0}\", but unable to find in string "
-        "\"{1}\". "
-        "Searching from position {2} (substring \"{3}\")",
-        _l_error_string,
-        _a_str,
-        _l_old_current_pos,
-        _a_str.substr(_l_old_current_pos)
-    );
+    const size_t _l_new_pos
+        = _a_str.find_first_of(_l_strs_to_search, _a_current_pos_ref);
+    if (_l_new_pos != string::npos)
+    {
+        char _l_char{ _a_str[_l_new_pos] };
+        _a_mode_ref = _l_map.at(_l_char);
+        _a_current_pos_ref = _l_new_pos;
+    }
+    else
+    {
+        _a_error_string = fmt::format(
+            "Expecting one of \"{0}\", but unable to find in string "
+            "\"{1}\". "
+            "Searching from position {2} (substring \"{3}\")",
+            _l_strs_to_search,
+            _a_str,
+            _l_old_current_pos,
+            _a_str.substr(_l_old_current_pos)
+        );
+    }
 }
 __no_constexpr_imp void
 skip_chars_and_strings_until_found(

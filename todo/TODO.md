@@ -13,13 +13,12 @@ Each todo item has a date associated with it. We will try to address the element
 
 ## Priority 1
 
-No items.
+Added 1/11/24:
+- [ ] Check repetition logic when using static_generator and file_generator to ascertain whether the incorrect repetition data is from repetition logic, or from random_data_generator_t.
 
 ## Priority 2
 
 Added 31/12/24:
-- [x] Fix parsing of seeds from the command line/configuration files.
-- [ ] Fix parsing function for repetition map elements.
 - [ ] Create enumeration examples. 
 - [ ] Create manual for loop examples.
 - [ ] Create examples showing tests being re-ran with seeds.
@@ -61,8 +60,10 @@ Added 31/12/24:
 
 ## Completed
 
-Priority 2:
 31/10/24:
 - Change repetition map to allow key of EITHER unique id OR a source_location. This can allow us to circumvent the issues we are having in running code using repetitions when we may be adding/removing elements from the code base.
 -- This was changed to just allowing a UID, created from a test's name and path.
 - Add configuration file-loading using CLI11 to library.
+- Fix parsing of seeds from the command line/configuration files.
+1/11/24:
+- Fix parsing function for repetition map elements.
