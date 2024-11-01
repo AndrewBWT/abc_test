@@ -119,7 +119,10 @@ public:
      * sequence of elements in a sequence of gen_data_t elements.
      */
     __constexpr idgc_memoized_element_sequence_t
-        create_data_sequence() const noexcept;
+        create_data_sequence(
+            const bool _a_write_data,
+            const bool _a_get_original_dg_memoized_element_data
+        ) const noexcept;
     /*!
      * @brief Returns the current for lopo index to the caller.
      *
@@ -213,7 +216,7 @@ __constexpr_imp ds::idgc_memoized_element_sequence_t
     {
         _l_rds.push_back(idgc_memoized_element_t{
             _m_current_for_loop_indexes[_l_idx++],
-            _l_element.get().get_data_generator_memoized_element(false)
+            _l_element.get().get_data_generator_memoized_element(false, false)
         });
     }
     return _l_rds;
@@ -221,6 +224,8 @@ __constexpr_imp ds::idgc_memoized_element_sequence_t
 
 __constexpr_imp idgc_memoized_element_sequence_t
     typeless_data_generator_collection_stack_t::create_data_sequence(
+        const bool _a_write_data,
+        const bool _a_get_original_dg_memoized_element_data
     ) const noexcept
 {
     idgc_memoized_element_sequence_t _l_rds{};
@@ -228,7 +233,9 @@ __constexpr_imp idgc_memoized_element_sequence_t
     {
         _l_rds.push_back(idgc_memoized_element_t{
             _m_current_for_loop_indexes[_l_idx++],
-            _l_element.get().get_data_generator_memoized_element(false)
+            _l_element.get().get_data_generator_memoized_element(
+                _a_write_data, _a_get_original_dg_memoized_element_data
+            )
         });
     }
     return _l_rds;

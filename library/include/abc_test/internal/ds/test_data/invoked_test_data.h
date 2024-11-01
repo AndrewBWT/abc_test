@@ -391,7 +391,7 @@ __constexpr_imp opt_idgc_memoized_element_t
             ? opt_idgc_memoized_element_t{}
             : _m_post_setup_test_data.for_loop_stack_trie()
                   .find_first_child_of_sequence_in_trie(
-                      _m_for_loop_data_collection.create_data_sequence()
+                      _m_for_loop_data_collection.create_data_sequence(false,true)
                   )
     };
     return _l_rv;
@@ -409,7 +409,7 @@ __constexpr_imp opt_idgc_memoized_element_t
             ? opt_idgc_memoized_element_t{}
             : _m_post_setup_test_data.for_loop_stack_trie()
                   .increment_last_index(
-                      _m_for_loop_data_collection.create_data_sequence()
+                      _m_for_loop_data_collection.create_data_sequence(false,true)
                   )
     };
     return _l_rv;
@@ -422,7 +422,7 @@ __constexpr_imp bool
                ? true
                : _m_post_setup_test_data.for_loop_stack_trie()
                      .is_sequence_in_trie(
-                         _m_for_loop_data_collection.create_data_sequence()
+                         _m_for_loop_data_collection.create_data_sequence(true,true)
                      );
 }
 
@@ -436,7 +436,7 @@ __constexpr_imp void
     invoked_test_data_t::add_current_for_loop_stack_to_trie() noexcept
 {
     _m_tests_for_loop_stack_trie.add_for_loop_creation_data_sequence(
-        _m_for_loop_data_collection.create_data_sequence()
+        _m_for_loop_data_collection.create_data_sequence(true,false)
     );
 }
 

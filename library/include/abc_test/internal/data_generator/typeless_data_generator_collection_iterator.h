@@ -26,8 +26,10 @@ public:
      * point.
      */
     __constexpr ds::dgc_memoized_element_t
-        get_data_generator_memoized_element(const bool _a_get_data_for_repeating
-        ) noexcept;
+                get_data_generator_memoized_element(
+                    const bool _a_write_data,
+                    const bool _a_get_data_for_repeating
+                ) noexcept;
     __constexpr void
         reset() noexcept;
 protected:
@@ -37,7 +39,7 @@ protected:
         ) const noexcept
         = 0;
 protected:
-    std::size_t                   _m_generation_collection_index{ 0 };
+    std::size_t                   _m_generation_collection_index{0};
     ds::opt_dg_memoized_element_t _m_flid;
     ds::opt_dg_memoized_element_t _m_repeat_flid;
 };
@@ -57,22 +59,35 @@ __constexpr_imp void
 __constexpr_imp ds::dgc_memoized_element_t
                 typeless_data_generator_collection_iterator_t::
         get_data_generator_memoized_element(
+            const bool _a_write_data,
             const bool _a_get_original_dg_memoized_element_data
         ) noexcept
 {
     using namespace ds;
-    opt_dg_memoized_element_t& _l_opt_dg{
-        _a_get_original_dg_memoized_element_data ? _m_flid : _m_repeat_flid
-    };
-    if (not _l_opt_dg.has_value())
+    if (_a_write_data)
     {
-        _l_opt_dg = generate_data_generator_memoized_element(
+        opt_dg_memoized_element_t& _l_opt_dg{
+            _a_get_original_dg_memoized_element_data ? _m_flid : _m_repeat_flid
+        };
+        if (not _l_opt_dg.has_value())
+        {
+            _l_opt_dg = generate_data_generator_memoized_element(
+                _a_get_original_dg_memoized_element_data
+            );
+        }
+        return dgc_memoized_element_t{
+            _m_generation_collection_index, _l_opt_dg.value()
+        };
+    }
+    else
+    {
+        dg_memoized_element_t _l_dg = generate_data_generator_memoized_element(
             _a_get_original_dg_memoized_element_data
         );
+        return dgc_memoized_element_t{
+    _m_generation_collection_index, _l_dg
+        };
     }
-    return dgc_memoized_element_t{
-        _m_generation_collection_index, _l_opt_dg.value()
-    };
 }
 
 _END_ABC_DG_NS

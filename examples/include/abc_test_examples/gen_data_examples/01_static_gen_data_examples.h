@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/core.h"
 #include "abc_test/included_instances/data_generator/enumerable/specializations/enum.h"
-#include "abc_test/included_instances/data_generator/static_data.h"
+#include "abc_test/included_instances.h"
 #include "abc_test/included_instances/matchers/ranges.h"
 #include "abc_test/internal/data_generator/data_generator_collection_iterator.h"
 

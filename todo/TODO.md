@@ -57,6 +57,7 @@ Added 31/12/24:
 - [ ] Consider alternate, more space-efficient methods for storing seeds. Hex seems a bit wasteful.
 - [ ] Check through CLI11 docs, and look for way of displaying user-defined error message when a string fails to parse.
 - [ ] Rename all header files (.h) to .hpp. This was seen on a tip regarding a code review; using this makes it easier to see that the language is C++.
+- [ ] Change create_data_sequence in typeless_data_generator_collection_stack.h into two different functions; one memoized, one not. This will make the code clearer.
 
 ## Completed
 
