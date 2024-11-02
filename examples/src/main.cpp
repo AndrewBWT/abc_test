@@ -4,7 +4,7 @@
 #include "abc_test/core.h"
 
 //#include "abc_test_examples/basic_examples.h"
-#include "abc_test_examples/gen_data_examples.h"
+#include "abc_test_examples/data_generator_examples.h"
 
 int
     main(

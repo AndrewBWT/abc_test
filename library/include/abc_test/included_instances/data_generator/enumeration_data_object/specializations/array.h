@@ -1,9 +1,11 @@
 #pragma once
 
-#include "abc_test/data_generator/enumeration.h"
+#include "abc_test/included_instances/data_generator/enumeration_data_object.h"
+#include "abc_test/included_instances/data_generator/enumeration_data_object/max_value_concept.h"
+#include "abc_test/included_instances/data_generator/enumeration_data_object/min_value_concept.h"
 #include <array>
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_DG_NS
 	template<
 		typename T,
 		std::size_t N
@@ -50,10 +52,10 @@ _BEGIN_ABC_NS
 		typename T,
 		std::size_t N
 	>
-	struct enumerable_t<std::array<T, N>>
+	struct enumeration_data_object_t<std::array<T, N>>
 	{
 	private:
-		enumerate_t<T> _m_enumerate;
+		enumeration_data_object_t<T> _m_enumerate;
 		std::size_t _m_n_jumps;
 	public:
 		__constexpr_imp
@@ -99,9 +101,9 @@ _BEGIN_ABC_NS
 			return true;
 		}
 		__constexpr_imp
-			enumerable_t(
+			enumeration_data_object_t(
 				const std::size_t _a_n_jumps = std::size_t{ 1 },
-				enumerate_t<T> _a_enumerate = all_values<T>()
+				enumeration_data_object_t<T> _a_enumerate = all_values<T>()
 			)
 			: _m_enumerate(_a_enumerate)
 			, _m_n_jumps(_a_n_jumps)
@@ -238,4 +240,4 @@ _BEGIN_ABC_NS
 			return (_a_array >= _a_max_value);
 		}
 	};
-	_END_ABC_NS
+	_END_ABC_DG_NS

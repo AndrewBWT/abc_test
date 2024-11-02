@@ -64,6 +64,39 @@ private:
     abc::utility::str::rw_info_t<typename T::tertiary_type> _m_tertiary_rw_info;
 };
 
+template <typename T, typename... Args>
+requires concept_for_data_generator_with_file_support<T>
+__constexpr
+    _ABC_NS_DG::data_generator_collection_t<typename T::generator_type, true>
+    make_data_generator_with_file_support(
+        const T& _a_generator,
+        Args... _a_file_reader_writers
+    ) noexcept;
+
+namespace
+{
+template <typename T>
+__constexpr_imp void
+    process_args_internal(utility::io::file_names_t<T>& _a_fns) noexcept;
+template <typename T, typename... Args>
+__constexpr_imp void
+    process_args_internal(
+        utility::io::file_names_t<T>&      _a_fns,
+        const utility::io::file_name_t<T>& _a_fn_no_type,
+        Args... _a_elements
+    ) noexcept;
+template <typename T>
+__constexpr_imp void
+    process_args_internal(
+        utility::io::file_names_t<T>&      _a_fns,
+        const utility::io::file_name_t<T>& _a_fn_no_type
+    ) noexcept;
+
+template <typename T, typename... Args>
+__constexpr utility::io::file_names_t<T>
+            process_args(Args... _a_elements) noexcept;
+} // namespace
+
 _END_ABC_DG_NS
 
 _BEGIN_ABC_DG_NS
@@ -305,7 +338,7 @@ __constexpr ds::dg_memoized_element_t
                 );
                 break;
             case 1:
-                _l_rv = _m_object.get_additional_data();
+                _l_rv = _m_tertiary_rw_info.printer().run_printer(_m_object.tertiary_data());
                 break;
             default:
                 throw std::exception("Couldn't work");
@@ -327,13 +360,14 @@ __constexpr ds::dg_memoized_element_t
                 if (global::get_global_test_options().write_data_to_files)
                 {
                     _l_mode = 0;
-                    _l_rv = abc::utility::str::printer_t<std::size_t>().run_printer(
-                        _m_file_read_writer.write_data_to_file(_m_object)
-                    );
+                    _l_rv
+                        = abc::utility::str::printer_t<std::size_t>()
+                              .run_printer(_m_file_read_writer
+                                               .write_data_to_file(_m_object));
                 }
                 else
                 {
-                    _l_rv = _m_object.get_additional_data();
+                    _l_rv = _m_tertiary_rw_info.printer().run_printer(_m_object.tertiary_data());
                 }
                 // file_writer_t<generator_type>
                 //_m_object. T.
@@ -407,5 +441,96 @@ __constexpr void
         }
     }
 }
+
+template <typename T, typename... Args>
+requires concept_for_data_generator_with_file_support<T>
+__constexpr_imp
+    _ABC_NS_DG::data_generator_collection_t<typename T::generator_type, true>
+    make_data_generator_with_file_support(
+        const T& _a_generator,
+        Args... _a_file_reader_writers
+    ) noexcept
+{
+    using namespace _ABC_NS_DG;
+    using namespace std;
+    using namespace utility::io;
+    const file_names_t<typename T::generator_type>& _l_file_reader_writers{
+        process_args<typename T::generator_type>(_a_file_reader_writers...)
+    };
+    if (_l_file_reader_writers.size() == 0)
+    {
+        return unary_collection<typename T::generator_type>(
+            make_shared<data_generator_with_file_support_t<T, false>>(
+                _a_generator
+            )
+        );
+    }
+    else if (_l_file_reader_writers.size() == 1)
+    {
+        return unary_collection<typename T::generator_type>(
+            make_shared<data_generator_with_file_support_t<T, true>>(
+                _a_generator, _l_file_reader_writers[0]
+            )
+        );
+    }
+    else
+    {
+        return unary_collection<typename T::generator_type>(
+            make_shared<data_generator_with_file_support_t<T, true>>(
+                _a_generator,
+                _l_file_reader_writers[0],
+                pair<
+                    typename file_names_t<typename T::generator_type>::const_iterator,
+                    typename file_names_t<typename T::generator_type>::const_iterator>(
+                    _l_file_reader_writers.begin() + 1,
+                    _l_file_reader_writers.end()
+                )
+            )
+        );
+    }
+}
+
+namespace
+{
+template <typename T>
+__constexpr_imp void
+    process_args_internal(
+        utility::io::file_names_t<T>& _a_fns
+    ) noexcept
+{}
+
+template <typename T, typename... Args>
+__constexpr_imp void
+    process_args_internal(
+        utility::io::file_names_t<T>&      _a_fns,
+        const utility::io::file_name_t<T>& _a_fn_no_type,
+        Args... _a_elements
+    ) noexcept
+{
+    _a_fns.push_back(_a_fn_no_type);
+    process_args_internal<T>(_a_fns, _a_elements...);
+}
+
+template <typename T>
+__constexpr_imp void
+    process_args_internal(
+        utility::io::file_names_t<T>&      _a_fns,
+        const utility::io::file_name_t<T>& _a_fn_no_type
+    ) noexcept
+{
+    _a_fns.push_back(_a_fn_no_type);
+}
+
+template <typename T, typename... Args>
+__constexpr_imp utility::io::file_names_t<T>
+                process_args(
+                    Args... _a_elements
+                ) noexcept
+{
+    utility::io::file_names_t<T> _l_rv{};
+    process_args_internal<T>(_l_rv, _a_elements...);
+    return _l_rv;
+}
+} // namespace
 
 _END_ABC_DG_NS

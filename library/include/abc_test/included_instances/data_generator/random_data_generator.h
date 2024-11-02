@@ -36,13 +36,9 @@ public:
         generate_next();
     __constexpr const T&
                       current_element() const;
-    __constexpr const std::string
-                      get_additional_data() const;
 private:
-    using random_rep_data_t = std::pair<std::size_t, std::size_t>;
-    tertiary_type _m_random_calls_before_after;
-    abc::utility::str::rw_info_t<random_rep_data_t> _m_rep_data;
-    std::shared_ptr<random_generator_object_t<T>>   _m_random_generator;
+    tertiary_type                                 _m_random_calls_before_after;
+    std::shared_ptr<random_generator_object_t<T>> _m_random_generator;
     size_t      _m_elemnets_to_randomly_generate{10};
     std::size_t _l_elements_generated{0};
     T           _m_element;
@@ -61,36 +57,6 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
 template <typename T, typename... Args>
 __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
                 generate_data_randomly(Args... _a_file_reader_writers);
-
-namespace
-{
-template <typename T>
-__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
-                generate_data_randomly_internal(
-                    std::shared_ptr<_ABC_NS_DG::random_generator_object_t<T>> _a_rnd_base,
-                    const utility::io::file_names_t<T>& _a_file_reader_writers
-                );
-template <typename T>
-__constexpr_imp void
-    process_args_internal(utility::io::file_names_t<T>& _a_fns) noexcept;
-template <typename T, typename... Args>
-__constexpr_imp void
-    process_args_internal(
-        utility::io::file_names_t<T>&      _a_fns,
-        const utility::io::file_name_t<T>& _a_fn_no_type,
-        Args... _a_elements
-    ) noexcept;
-template <typename T>
-__constexpr_imp void
-    process_args_internal(
-        utility::io::file_names_t<T>&      _a_fns,
-        const utility::io::file_name_t<T>& _a_fn_no_type
-    ) noexcept;
-
-template <typename T, typename... Args>
-__constexpr utility::io::file_names_t<T>
-            process_args(Args... _a_elements) noexcept;
-} // namespace
 
 _END_ABC_NS
 
@@ -167,13 +133,6 @@ __constexpr const T&
     return _m_element;
 }
 
-template <typename T>
-__constexpr const std::string
-                  random_data_generator_t<T>::get_additional_data() const
-{
-    return _m_rep_data.printer().run_printer(_m_random_calls_before_after);
-}
-
 _END_ABC_DG_NS
 
 _BEGIN_ABC_NS
@@ -184,8 +143,9 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
                     Args... _a_file_reader_writers
                 )
 {
-    return generate_data_randomly_internal(
-        _a_rnd_base, process_args<T>(_a_file_reader_writers...)
+    using namespace _ABC_NS_DG;
+    return make_data_generator_with_file_support<random_data_generator_t<T>>(
+        random_data_generator_t<T>(_a_rnd_base), _a_file_reader_writers...
     );
 }
 
@@ -197,101 +157,9 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
 {
     using namespace _ABC_NS_DG;
     using namespace std;
-    return generate_data_randomly_internal<T>(
-        (make_shared<random_generator_object_t<T>>()),
-        process_args<T>(_a_file_reader_writers...)
+    return generate_data_randomly<T>(
+        make_shared<random_generator_object_t<T>>(), _a_file_reader_writers...
     );
 }
-
-namespace
-{
-template <typename T>
-__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
-                generate_data_randomly_internal(
-                    std::shared_ptr<_ABC_NS_DG::random_generator_object_t<T>> _a_rnd_base,
-                    const utility::io::file_names_t<T>& _a_file_reader_writers
-                    // const file_names_t<T>&             _a_file_reader_writers
-                )
-{
-    using namespace _ABC_NS_DG;
-    using namespace std;
-    if (_a_file_reader_writers.size() == 0)
-    {
-        return unary_collection<T>(
-            make_shared<data_generator_with_file_support_t<
-                random_data_generator_t<T>,
-                false>>(random_data_generator_t<T>(_a_rnd_base))
-        );
-    }
-    else if (_a_file_reader_writers.size() == 1)
-    {
-        return unary_collection<T>(
-            make_shared<data_generator_with_file_support_t<
-                random_data_generator_t<T>,
-                true>>(
-                random_data_generator_t<T>(_a_rnd_base),
-                _a_file_reader_writers[0]
-            )
-        );
-    }
-    else
-    {
-        return unary_collection<T>(
-            make_shared<data_generator_with_file_support_t<
-                random_data_generator_t<T>,
-                true>>(
-                random_data_generator_t<T>(_a_rnd_base),
-                _a_file_reader_writers[0],
-                std::pair<
-                    typename utility::io::file_names_t<T>::const_iterator,
-                    typename utility::io::file_names_t<T>::const_iterator>(
-                    _a_file_reader_writers.begin() + 1,
-                    _a_file_reader_writers.end()
-                )
-            )
-        );
-    }
-}
-
-template <typename T>
-__constexpr_imp void
-    process_args_internal(
-        utility::io::file_names_t<T>& _a_fns
-    ) noexcept
-{}
-
-template <typename T, typename... Args>
-__constexpr_imp void
-    process_args_internal(
-        utility::io::file_names_t<T>&      _a_fns,
-        const utility::io::file_name_t<T>& _a_fn_no_type,
-        Args... _a_elements
-    ) noexcept
-{
-    _a_fns.push_back(_a_fn_no_type);
-    process_args_internal<T>(_a_fns, _a_elements...);
-}
-
-template <typename T>
-__constexpr_imp void
-    process_args_internal(
-        utility::io::file_names_t<T>&      _a_fns,
-        const utility::io::file_name_t<T>& _a_fn_no_type
-    ) noexcept
-{
-    _a_fns.push_back(_a_fn_no_type);
-}
-
-template <typename T, typename... Args>
-__constexpr_imp utility::io::file_names_t<T>
-                process_args(
-                    Args... _a_elements
-                ) noexcept
-{
-    utility::io::file_names_t<T> _l_rv{};
-    process_args_internal<T>(_l_rv, _a_elements...);
-    return _l_rv;
-}
-} // namespace
 
 _END_ABC_NS

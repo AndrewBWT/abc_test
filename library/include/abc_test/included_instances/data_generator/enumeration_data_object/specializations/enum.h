@@ -1,10 +1,12 @@
 #pragma once
 
-#include "abc_test/included_instances/data_generator/enumerable.h"
+#include "abc_test/included_instances/data_generator/enumeration_data_object.h"
+#include "abc_test/included_instances/data_generator/enumeration_data_object/max_value_concept.h"
+#include "abc_test/included_instances/data_generator/enumeration_data_object/min_value_concept.h"
 
 #include <map>
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_DG_NS
 template <typename T>
 using enum_list_t = std::vector<T>;
 template <typename T>
@@ -81,7 +83,7 @@ struct max_value_t<T>
 
 template <typename T>
 requires enum_has_list_c<T>
-struct enumerable_t<T>
+struct enumeration_data_object_t<T>
 {
     __constexpr_imp virtual bool
         less_than(
@@ -104,7 +106,7 @@ struct enumerable_t<T>
     }
 
     __constexpr_imp
-        enumerable_t(
+        enumeration_data_object_t(
             const std::size_t _a_difference = std::size_t(1)
         ) noexcept
         : _m_difference(_a_difference)
@@ -137,13 +139,13 @@ private:
     std::size_t _m_difference;
 };
 
-_END_ABC_NS
+_END_ABC_DG_NS
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_DG_NS
 template <typename T>
 requires enum_has_list_c<T>
 __constexpr_imp
-    enumerate_enum_helper_t<T>::enumerate_enum_helper_t(
+enumerate_enum_helper_t<T>::enumerate_enum_helper_t(
         enum_list_t<T>&& _a_enum_list
     )
     : _m_idx_to_elements(std::map<std::size_t, T>())
@@ -316,4 +318,4 @@ __constexpr_imp
 {
     return get_thread_local_enumerate_enum_helper<T>().decrement(_a_element);
 }*/
-_END_ABC_NS
+_END_ABC_DG_NS

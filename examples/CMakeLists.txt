@@ -15,10 +15,11 @@ set(EXAMPLE_FILES
   include/abc_test_examples/basic_examples/05_user_defined_matcher.h
   include/abc_test_examples/basic_examples/06_block_assertions_and_exception_handling.h
   include/abc_test_examples/basic_examples/exceptions.h
-  include/abc_test_examples/gen_data_examples.h
-  include/abc_test_examples/gen_data_examples/01_static_gen_data_examples.h
-  include/abc_test_examples/gen_data_examples/02_generate_data_from_file_examples.h
-  include/abc_test_examples/gen_data_examples/03_generate_data_randomly.h
+  include/abc_test_examples/data_generator_examples.h
+  include/abc_test_examples/data_generator_examples/01_static_gen_data_examples.h
+  include/abc_test_examples/data_generator_examples/02_generate_data_from_file_examples.h
+  include/abc_test_examples/data_generator_examples/03_generate_data_randomly.h
+  include/abc_test_examples/data_generator_examples/04_enumerating_data_examples.h
 )
 
 # These are the libs required for the examples executable.

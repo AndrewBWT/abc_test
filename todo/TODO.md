@@ -8,13 +8,13 @@ Entities in the todo list are organised by priority from 1 to 5
 - 3 is medium priority. It should be planned for, however it is only actively worked on when there is nothing of a higher priority.
 - 4 low priority. It is not planned for, and it being addressed will realistically not change the trajectory of the project. However, it should be addressed at some point.
 - 5 lowest priority. These issues would be nice, and will help the project. However generally low-hanging fruit goes here.
+- U Elements which have not had a priority set to them. We found that we were either adding elements to priority 2 because it was required for what we are working towards, or priority 5 because we didn't think the issue needed to be done now. By having a "U" group (short for unorganised), we can store new entities. At a later point we can find the correct place for them in the priority list.
 
 Each todo item has a date associated with it. We will try to address the elements in date order, though this may not always be possible.
 
 ## Priority 1
 
-Added 1/11/24:
-- [ ] Check repetition logic when using static_generator and file_generator to ascertain whether the incorrect repetition data is from repetition logic, or from random_data_generator_t.
+None
 
 ## Priority 2
 
@@ -23,7 +23,8 @@ Added 31/12/24:
 - [ ] Create manual for loop examples.
 - [ ] Create examples showing tests being re-ran with seeds.
 - [ ] Work on README.md, showing an introduction to abc_test.
-- [ ] Fix random data generator's seed values not being set correctly.
+Added 1/11/24:
+- [ ] Rewrite enumeration code.
 
 ## Priority 3
 
@@ -36,13 +37,14 @@ Added 31/12/24:
 - [ ] Add random_generator_object specialisations for arrays, vectors and enums.
 - [ ] Run clang-tidy on the code.
 - [ ] Check if code compiles using g++ and clang.
+Added 1/11/24:
+- [ ] We have moved away from testing, as the code was changing quickly. We should think about revisiting it, as certain parts of the code-base are becoming more static, and we are moving towards sharing the library with others.
 
 ## Priority 4
 
 Added 31/12/24:
 - [ ] Add functionality for per-test options object. It should be able to be set via either a name (e.g. string), an object or a file.
-- [ ] Add functionality allowing data_generator_t objects to have their code filtered.
-- [ ] Investigate use of configuration files through CLI11, or our own type.
+- [ ] Add functionality allowing data_generator_t objects to have their elements filtered.
 - [ ] Change master CMakeLists.txt file so that examples subfolder is only built when specified. 
 
 
@@ -59,6 +61,10 @@ Added 31/12/24:
 - [ ] Rename all header files (.h) to .hpp. This was seen on a tip regarding a code review; using this makes it easier to see that the language is C++.
 - [ ] Change create_data_sequence in typeless_data_generator_collection_stack.h into two different functions; one memoized, one not. This will make the code clearer.
 
+## Unorganised (Priority U)
+
+- [ ] Add enumeration constructor which takes a start, end, and size-like operator. The size-like operator denotes how many enumeration values should be produced. The start and end values are what the first and last values should be (though end value is not set in stone). The algorithm then computes how many jumps to perform per generate_next. This is so we can say "generate 7 values between 0 and 50". 50/(7-1) = 8R2. The values [0,8,16,24,32,40,48] are then produced. This could be difficult as we would need be able to calculate how many values are between two points. This isn't just straight subtraction as it will have to take into account any values in enumerate_object_t for that object. 
+
 ## Completed
 
 31/10/24:
@@ -68,3 +74,7 @@ Added 31/12/24:
 - Fix parsing of seeds from the command line/configuration files.
 1/11/24:
 - Fix parsing function for repetition map elements.
+- Check repetition logic when using static_generator and file_generator to ascertain whether the incorrect repetition data is from repetition logic, or from random_data_generator_t. (It was the repetition logic).
+- Investigate use of configuration files through CLI11, or our own type.
+- Move processing file args from random to data_generator_with_file_support.
+- Fix random data generator's seed values not being set correctly.

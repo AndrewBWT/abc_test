@@ -682,7 +682,6 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
     vector<string>         _l_current_strs;
     tuple<string, string, string, string> _l_node;
     std::size_t _l_mode_zero_next_mode = _a_head_node ? 1 : 0;
-    std::cout << _a_str << std::endl;
     while (_l_current_pos < _l_str.size())
     {
         _l_previous_mode = _l_mode;

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "abc_test/data_generator/enumerable.h"
+#include "abc_test/included_instances/data_generator/enumeration_data_object.h"
 #include <limits>
 
 #include "abc_test/internal/errors/test_library_exception.h"
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_DG_NS
 template<
 	typename T
 >
@@ -73,7 +73,7 @@ template<
 	typename T
 >
 requires has_addition_c<T>&& has_subtraction_c<T>&& has_less_than_c<T>&& has_equal_c<T>
-struct enumerable_t<T>
+struct enumeration_data_object_t<T>
 {
 	__constexpr_imp
 		virtual
@@ -96,7 +96,7 @@ struct enumerable_t<T>
 		return _a_l == _a_r;
 	}
 	__constexpr
-		enumerable_t(
+		enumeration_data_object_t(
 			const T _a_difference = T(1)
 		) noexcept
 		: _m_difference(_a_difference)
@@ -188,7 +188,7 @@ private:
 };
 template<
 >
-struct enumerable_t<bool>
+struct enumeration_data_object_t<bool>
 {
 	__constexpr_imp
 		virtual
@@ -225,9 +225,9 @@ struct enumerable_t<bool>
 			const std::optional<bool>& _a_max_value
 		);
 };
-_END_ABC_NS
+_END_ABC_DG_NS
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_DG_NS
 /*template<
 	typename T
 >
@@ -252,7 +252,7 @@ max_value_t<T>::max_value(
 }*/
 __constexpr_imp
 	bool
-	enumerable_t<bool>::increment(
+	enumeration_data_object_t<bool>::increment(
 		bool& _a_element,
 		std::size_t& _a_n_times_to_increment,
 		const std::optional<bool>& _a_max_value
@@ -271,7 +271,7 @@ __constexpr_imp
 }
 __constexpr_imp
 bool
-	enumerable_t<bool>::decrement(
+enumeration_data_object_t<bool>::decrement(
 		bool& _a_element,
 		std::size_t& _a_n_times_to_increment,
 		const std::optional<bool>& _a_max_value
@@ -388,4 +388,4 @@ enumerable_t<T>::decrement(
 		return true;
 	}
 }*/
-_END_ABC_NS
+_END_ABC_DG_NS

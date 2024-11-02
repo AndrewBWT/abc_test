@@ -126,16 +126,21 @@ set(LIBRARY_FILES
   # Static data files
   include/abc_test/included_instances/data_generator/static_data_generator.h
   # Enumeration files
-  include/abc_test/included_instances/data_generator/enumeration.h
-  include/abc_test/included_instances/data_generator/enumerable.h
-  include/abc_test/included_instances/data_generator/enumerable/min_value.h
-  include/abc_test/included_instances/data_generator/enumerable/max_value.h
-  include/abc_test/included_instances/data_generator/enumerable/specializations.h
+  include/abc_test/included_instances/data_generator/enumeration_schema.h
+  include/abc_test/included_instances/data_generator/enumeration_schema/from_m_to_n.h
+  include/abc_test/included_instances/data_generator/enumeration_schema/from_m_move_k_elements.h
+  include/abc_test/included_instances/data_generator/enumeration_data_generator.h
+  include/abc_test/included_instances/data_generator/enumeration_data_object.h
+  include/abc_test/included_instances/data_generator/enumeration_data_object/min_value_object.h
+  include/abc_test/included_instances/data_generator/enumeration_data_object/max_value_object.h
+  include/abc_test/included_instances/data_generator/enumeration_data_object/min_value_concept.h
+  include/abc_test/included_instances/data_generator/enumeration_data_object/max_value_concept.h
+  include/abc_test/included_instances/data_generator/enumeration_data_object/specializations.h
   # Folder containing random data specializations for std types.
-  include/abc_test/included_instances/data_generator/enumerable/specializations/fundamental_types.h
-  include/abc_test/included_instances/data_generator/enumerable/specializations/enum.h
-  include/abc_test/included_instances/data_generator/enumerable/specializations/array.h
-  include/abc_test/included_instances/data_generator/enumerable/specializations/vector.h
+  include/abc_test/included_instances/data_generator/enumeration_data_object/specializations/fundamental_types.h
+  include/abc_test/included_instances/data_generator/enumeration_data_object/specializations/enum.h
+  include/abc_test/included_instances/data_generator/enumeration_data_object/specializations/array.h
+  include/abc_test/included_instances/data_generator/enumeration_data_object/specializations/vector.h
   # utility subfolder. Contains axillary helper classes and functions not necessary
   # related to the core testing framework.
   include/abc_test/internal/utility/ptr_utility.h

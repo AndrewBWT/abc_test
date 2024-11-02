@@ -1,9 +1,6 @@
 #pragma once
 #include "abc_test/core.h"
-#include "abc_test/included_instances/data_generator/random_data_generator.h"
-#include "abc_test/included_instances/data_generator/random_generator_object/specializations/fundamental_types.h"
-#include "abc_test/included_instances/matchers/ranges.h"
-#include "abc_test/internal/data_generator/data_generator_collection_iterator.h"
+#include "abc_test/included_instances.h"
 
 #include <numeric>
 #include <ranges>

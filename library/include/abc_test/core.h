@@ -11,3 +11,4 @@
 #include "abc_test/internal/reporters/test_reporter_controller.h"
 #include "abc_test/internal/test_assertions/macros.h"
 #include "abc_test/internal/test_main.h"
+#include "abc_test/internal/data_generator/data_generator_collection_iterator.h"
