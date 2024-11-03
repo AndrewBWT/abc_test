@@ -13,6 +13,7 @@
 #include "abc_test/internal/matchers/matcher_wrapper.h"
 #include "abc_test/internal/utility/str/string_utility.h"
 #include "abc_test/internal/test_reports/matcher_based_assertion_single_line.h"
+#include "abc_test/internal/test_runner.h"
 
 #include <concepts>
 

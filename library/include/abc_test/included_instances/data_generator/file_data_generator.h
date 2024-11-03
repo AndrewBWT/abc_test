@@ -123,7 +123,7 @@ __constexpr_imp
         const utility::io::general_data_t& _a_gdf,
         R&&                                _a_elements
     )
-    : _m_path(_a_gdf._m_path)
+    : _m_path(_a_gdf.path())
 {
     using namespace abc::utility::io;
     using namespace std::filesystem;

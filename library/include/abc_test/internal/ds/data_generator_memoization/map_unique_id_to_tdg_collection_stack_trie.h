@@ -195,7 +195,10 @@ __no_constexpr_imp std::string
             _l_element.second.print_for_loop_stack_trie_compressed()
         ));
     }
-    _l_rv.erase(_l_rv.end()-1);
+    if (_l_rv.size() > 0)
+    {
+        _l_rv.erase(_l_rv.end() - 1);
+    }
     return _l_rv;
 }
 

@@ -2,6 +2,7 @@
 
 #include "abc_test/internal/utility/internal/macros.h"
 #include "abc_test/internal/utility/str/rw_info.h"
+#include "abc_test/internal/ds/test_data/invoked_test_data.h"
 
 #include <filesystem>
 
@@ -52,7 +53,8 @@ general_data_file(
 {
     using namespace std;
     using namespace abc::utility::io;
-    return general_data_t(_a_str);
+    using namespace std::filesystem;
+    return general_data_t(global::get_this_threads_current_test().path() / _a_str);
 }
 
 _END_ABC_NS
