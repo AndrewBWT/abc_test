@@ -50,7 +50,7 @@ Let us talk through each part of the code:
 
 Below is the output from this test.
 
-[Contribution guidelines for this project](docs/output1.png)
+[Test output](docs/output1.png)
 
 In the remaining examples in this README, we will omit the ```main``` portion of the code.
 
