@@ -112,7 +112,7 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/matchers/ranges.h
   include/abc_test/included_instances/matchers/function_wrapper.h
   # gen_data subfolder. Contains the logic that allow the gen_data for loops to work.
-  include/abc_test/included_instances/data_generator/manual_for_loop.h
+  include/abc_test/included_instances/data_generator/manual_data_generator.h
   include/abc_test/included_instances/data_generator/file_data_generator.h
   include/abc_test/included_instances/data_generator/random_data_generator.h
   # Subfolder contains logic specifically to do with random data generation.

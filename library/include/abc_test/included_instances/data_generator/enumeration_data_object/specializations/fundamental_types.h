@@ -16,7 +16,10 @@ requires has_limits_c<T>
 struct min_value_t<T>
 {
     __constexpr T
-        min_value() const noexcept;
+        min_value() const noexcept
+    {
+        return std::numeric_limits<T>::min();
+    }
 };
 
 template <typename T>
@@ -24,7 +27,10 @@ requires has_limits_c<T>
 struct max_value_t<T>
 {
     __constexpr T
-        max_value() const noexcept;
+        max_value() const noexcept
+    {
+        return std::numeric_limits<T>::max();
+    }
 };
 
 template <typename T>
@@ -46,27 +52,107 @@ concept has_equal_c = requires (const T& _a_element) {
 
 template <typename T>
 requires has_addition_c<T> && has_subtraction_c<T> && has_less_than_c<T>
-         && has_equal_c<T>
+         && has_equal_c<T> && (not std::is_enum_v<T>)
 struct enumeration_data_object_t<T>
 {
     __constexpr
-    enumeration_data_object_t(const T _a_difference = T(1)) noexcept;
+        enumeration_data_object_t(const T _a_difference = T(1)) noexcept
+        : _m_difference(_a_difference)
+    {
+
+    }
     __constexpr_imp virtual bool
-        less_than(const T& _a_l, const T& _a_r) const noexcept;
+        less_than(const T& _a_l, const T& _a_r) const noexcept
+    {
+        return _a_l < _a_r;
+    }
     __constexpr_imp virtual bool
-        equal(const T& _a_l, const T& _a_r) const noexcept;
+        equal(const T& _a_l, const T& _a_r) const noexcept
+    {
+        return _a_l == _a_r;
+    }
     __constexpr bool
         increment(
-            T&                      _a_element,
-            std::size_t&            _a_times_called,
+            T& _a_element,
+            std::size_t& _a_times_called,
             const std::optional<T>& _a_max_value = std::optional<T>{}
-        );
+        )
+    {
+        using namespace std;
+        const T _l_current_idx{ _a_element };
+        if (_a_max_value.has_value())
+        {
+            const T _l_max_times_called{ static_cast<T>(
+                (_a_max_value.value() - _l_current_idx) / _m_difference
+            ) };
+            if (_a_times_called > _l_max_times_called)
+            {
+                if (_l_max_times_called == 0)
+                {
+                    return false;
+                }
+                else
+                {
+                    _a_element = _a_element + _m_difference * _l_max_times_called;
+                    _a_times_called -= _l_max_times_called;
+                    return true;
+                }
+            }
+            else
+            {
+                _a_element = _a_element + _m_difference * _a_times_called;
+                _a_times_called = 0;
+                return true;
+            }
+        }
+        else
+        {
+            _a_element = _a_element + _m_difference * _a_times_called;
+            _a_times_called = 0;
+            return true;
+        }
+    }
     __constexpr bool
         decrement(
-            T&                      _a_element,
-            std::size_t&            _a_times_called,
+            T& _a_element,
+            std::size_t& _a_times_called,
             const std::optional<T>& _a_max_value = std::optional<T>{}
-        );
+        )
+    {
+        using namespace std;
+        const T _l_current_idx{ _a_element };
+        if (_a_max_value.has_value())
+        {
+            const T _l_max_times_called{ static_cast<T>(
+                (_l_current_idx - _a_max_value.value()) / _m_difference
+            ) };
+            if (_a_times_called > _l_max_times_called)
+            {
+                if (_l_max_times_called == 0)
+                {
+                    return false;
+                }
+                else
+                {
+                    _a_element = _a_element - _m_difference * _l_max_times_called;
+                    _a_times_called += _l_max_times_called;
+                    return true;
+                }
+            }
+            else
+            {
+                _a_element = _a_element - _m_difference * _a_times_called;
+                _a_times_called = 0;
+                return true;
+            }
+        }
+        else
+        {
+            _a_element = _a_element - _m_difference * _a_times_called;
+            _a_times_called = 0;
+            return true;
+        }
+    }
 private:
     T _m_difference;
 };
@@ -96,9 +182,10 @@ _END_ABC_DG_NS
 
 _BEGIN_ABC_DG_NS
 
-template <typename T>
+//For some reason, it appears that MSVC rejects this code when it shouldn't.
+/*template <typename T>
 requires has_limits_c<T>
-__constexpr T
+__constexpr_imp T
     min_value_t<T>::min_value() const noexcept
 {
     return std::numeric_limits<T>::min();
@@ -113,8 +200,8 @@ __constexpr_imp T
 }
 
 template <typename T>
-requires has_addition_c<T> && has_subtraction_c<T> && has_less_than_c<T>
-         && has_equal_c<T>
+    requires has_addition_c<T>&& has_subtraction_c<T>&& has_less_than_c<T>
+&& has_equal_c<T> && (not std::is_enum_v<T>)
 __constexpr_imp
     enumeration_data_object_t<T>::enumeration_data_object_t(
         const T _a_difference
@@ -123,8 +210,8 @@ __constexpr_imp
 {}
 
 template <typename T>
-requires has_addition_c<T> && has_subtraction_c<T> && has_less_than_c<T>
-         && has_equal_c<T>
+    requires has_addition_c<T>&& has_subtraction_c<T>&& has_less_than_c<T>
+&& has_equal_c<T> && (not std::is_enum_v<T>)
 __constexpr_imp bool
     enumeration_data_object_t<T>::less_than(
         const T& _a_l,
@@ -135,8 +222,8 @@ __constexpr_imp bool
 }
 
 template <typename T>
-requires has_addition_c<T> && has_subtraction_c<T> && has_less_than_c<T>
-         && has_equal_c<T>
+    requires has_addition_c<T>&& has_subtraction_c<T>&& has_less_than_c<T>
+&& has_equal_c<T> && (not std::is_enum_v<T>)
 __constexpr_imp bool
     enumeration_data_object_t<T>::equal(
         const T& _a_l,
@@ -147,8 +234,8 @@ __constexpr_imp bool
 }
 
 template <typename T>
-requires has_addition_c<T> && has_subtraction_c<T> && has_less_than_c<T>
-         && has_equal_c<T>
+    requires has_addition_c<T>&& has_subtraction_c<T>&& has_less_than_c<T>
+&& has_equal_c<T> && (not std::is_enum_v<T>)
 __constexpr bool
     enumeration_data_object_t<T>::increment(
         T&                      _a_element,
@@ -192,8 +279,8 @@ __constexpr bool
 }
 
 template <typename T>
-requires has_addition_c<T> && has_subtraction_c<T> && has_less_than_c<T>
-         && has_equal_c<T>
+    requires has_addition_c<T>&& has_subtraction_c<T>&& has_less_than_c<T>
+&& has_equal_c<T> && (not std::is_enum_v<T>)
 __constexpr bool
     enumeration_data_object_t<T>::decrement(
         T&                      _a_element,
@@ -234,7 +321,7 @@ __constexpr bool
         _a_times_called = 0;
         return true;
     }
-}
+}*/
 
 __constexpr_imp bool
     enumeration_data_object_t<bool>::less_than(

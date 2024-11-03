@@ -13,12 +13,7 @@ requires min_value_c<T>
 struct min_value_t<std::vector<T>>
 {
     __constexpr_imp std::vector<T>
-                    min_value() const noexcept
-    {
-        using namespace std;
-        vector<T> _l_rv;
-        return _l_rv;
-    }
+                    min_value() const noexcept;
 };
 
 template <typename T>
@@ -69,8 +64,9 @@ _END_ABC_DG_NS
 _BEGIN_ABC_DG_NS
 
 template <typename T>
-__constexpr_imp std::vector<T> min_value_t<std::vector<T>>::
-                               min_value() const noexcept
+    requires min_value_c<T>
+__constexpr_imp std::vector<T>
+                min_value_t<std::vector<T>>::min_value() const noexcept
 {
     using namespace std;
     vector<T> _l_rv;

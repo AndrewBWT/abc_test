@@ -1,8 +1,6 @@
 #pragma once
 
 #include "abc_test/included_instances/data_generator/enumeration_data_object.h"
-#include "abc_test/included_instances/data_generator/enumeration_data_object/max_value_concept.h"
-#include "abc_test/included_instances/data_generator/enumeration_data_object/min_value_concept.h"
 
 #include <map>
 
@@ -56,7 +54,7 @@ template <typename T>
 requires enum_has_list_c<T>
 struct min_value_t<T>
 {
-    __constexpr_imp T
+    __constexpr T
         min_value() const noexcept;
 };
 
@@ -75,29 +73,21 @@ struct enumeration_data_object_t<T>
     __constexpr_imp
         enumeration_data_object_t(
             const std::size_t _a_difference = std::size_t(1)
-        ) noexcept
-        : _m_difference(_a_difference)
-    {}
+        ) noexcept;
     __constexpr_imp virtual bool
-        less_than(
-            const T& _a_l,
-            const T& _a_r
-        ) const noexcept;
+        less_than(const T& _a_l, const T& _a_r) const noexcept;
     __constexpr_imp virtual bool
-        equal(
-            const T& _a_l,
-            const T& _a_r
-        ) const noexcept;
+        equal(const T& _a_l, const T& _a_r) const noexcept;
     __constexpr_imp bool
         increment(
-            T& _a_element,
-            std::size_t& _a_times_called,
+            T&                      _a_element,
+            std::size_t&            _a_times_called,
             const std::optional<T>& _a_max_value
         );
     __constexpr_imp bool
         decrement(
-            T& _a_element,
-            std::size_t& _a_times_called,
+            T&                      _a_element,
+            std::size_t&            _a_times_called,
             const std::optional<T>& _a_max_value
         );
 private:
@@ -251,60 +241,64 @@ __constexpr_imp T
 {
     return get_thread_local_enumerate_enum_helper<T>().max();
 }
+
 template <typename T>
-    requires enum_has_list_c<T>
+requires enum_has_list_c<T>
 __constexpr_imp
-enumeration_data_object_t<T>::enumeration_data_object_t(
-    const std::size_t _a_difference
-) noexcept
+    enumeration_data_object_t<T>::enumeration_data_object_t(
+        const std::size_t _a_difference
+    ) noexcept
     : _m_difference(_a_difference)
 {}
+
 template <typename T>
-    requires enum_has_list_c<T>
+requires enum_has_list_c<T>
 __constexpr_imp bool
-enumeration_data_object_t<T>::less_than(
-    const T& _a_l,
-    const T& _a_r
-) const noexcept
+    enumeration_data_object_t<T>::less_than(
+        const T& _a_l,
+        const T& _a_r
+    ) const noexcept
 {
-    return get_thread_local_enumerate_enum_helper<T>().less_than(
-        _a_l, _a_r
-    );
+    return get_thread_local_enumerate_enum_helper<T>().less_than(_a_l, _a_r);
 }
+
 template <typename T>
-    requires enum_has_list_c<T>
+requires enum_has_list_c<T>
 __constexpr_imp bool
-enumeration_data_object_t<T>::equal(
-    const T& _a_l,
-    const T& _a_r
-) const noexcept
+    enumeration_data_object_t<T>::equal(
+        const T& _a_l,
+        const T& _a_r
+    ) const noexcept
 {
     return _a_l == _a_r;
 }
+
 template <typename T>
-    requires enum_has_list_c<T>
+requires enum_has_list_c<T>
 __constexpr_imp bool
-enumeration_data_object_t<T>::increment(
-    T& _a_element,
-    std::size_t& _a_times_called,
-    const std::optional<T>& _a_max_value
-)
+    enumeration_data_object_t<T>::increment(
+        T&                      _a_element,
+        std::size_t&            _a_times_called,
+        const std::optional<T>& _a_max_value
+    )
 {
     return get_thread_local_enumerate_enum_helper<T>().increment(
         _a_element, _a_times_called, _a_max_value
     );
 }
+
 template <typename T>
-    requires enum_has_list_c<T>
+requires enum_has_list_c<T>
 __constexpr_imp bool
-enumeration_data_object_t<T>::decrement(
-    T& _a_element,
-    std::size_t& _a_times_called,
-    const std::optional<T>& _a_max_value
-)
+    enumeration_data_object_t<T>::decrement(
+        T&                      _a_element,
+        std::size_t&            _a_times_called,
+        const std::optional<T>& _a_max_value
+    )
 {
     return get_thread_local_enumerate_enum_helper<T>().decrement(
         _a_element, _a_times_called, _a_max_value
     );
 }
+
 _END_ABC_DG_NS

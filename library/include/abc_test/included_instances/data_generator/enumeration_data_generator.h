@@ -41,13 +41,9 @@ private:
     bool                                          _m_forward_direction;
 
     __constexpr bool
-        next_element(
-            const enumerate_index_t& _a_times_called
-        ) noexcept;
+        next_element(const enumerate_index_t& _a_times_called) noexcept;
     __constexpr bool
-        next_element(
-            enumerate_index_t& _a_times_called
-        ) noexcept;
+        next_element(enumerate_index_t& _a_times_called) noexcept;
 };
 
 _END_ABC_DG_NS
@@ -64,7 +60,7 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T, true>
 template <typename T, typename... Args>
 __constexpr _ABC_NS_DG::data_generator_collection_t<T, true>
             enumerate_data(
-                const _ABC_NS_DG::enumeration_schema_t<T>& _a_es,
+                const std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>& _a_es,
                 Args... _a_file_reader_writers
             );
 template <typename T, typename... Args>
@@ -197,11 +193,12 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
 template <typename T, typename... Args>
 __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
                 enumerate_data(
-                    const _ABC_NS_DG::enumeration_schema_t<T>& _a_es,
+                    const std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>& _a_es,
                     Args... _a_file_reader_writers
                 )
 {
     using namespace _ABC_NS_DG;
+    using namespace std;
     return make_data_generator_with_file_support<
         enumeration_data_generator_t<T>>(
         enumeration_data_generator_t<T>(

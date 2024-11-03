@@ -10,7 +10,7 @@ Entities in the todo list are organised by priority from 1 to 5
 - 5 lowest priority. These issues would be nice, and will help the project. However generally low-hanging fruit goes here.
 - U Elements which have not had a priority set to them. We found that we were either adding elements to priority 2 because it was required for what we are working towards, or priority 5 because we didn't think the issue needed to be done now. By having a "U" group (short for unorganised), we can store new entities. At a later point we can find the correct place for them in the priority list.
 
-Each todo item has a date associated with it. We will try to address the elements in date order, though this may not always be possible.
+Each list of todo's is given in the order which represents when they are to be completed.
 
 ## Priority 1
 
@@ -18,39 +18,29 @@ None
 
 ## Priority 2
 
-Added 31/12/24:
-- [ ] Create enumeration examples. 
-- [ ] Create manual for loop examples.
-- [ ] Create examples showing tests being re-ran with seeds.
 - [ ] Work on README.md, showing an introduction to abc_test.
-Added 1/11/24:
-- [ ] Rewrite enumeration code.
 
 ## Priority 3
 
-Added 31/12/24:
-- [ ] Documentation of code. Currently generally we have a good percentage of the code commented. However it has not been proof-read, and there are parts of it where the names of classes or the nomenclature we use has changed.
 - [ ] Add combinatorics generator. 
 - [ ] Add examples showing use of combinatorics generator.
 - [ ] Add random generator using enumeration.
 - [ ] Add examples showing random generator using enumeration.
 - [ ] Add random_generator_object specialisations for arrays, vectors and enums.
+- [ ] Documentation of code. Currently generally we have a good percentage of the code commented. However it has not been proof-read, and there are parts of it where the names of classes or the nomenclature we use has changed.
 - [ ] Run clang-tidy on the code.
 - [ ] Check if code compiles using g++ and clang.
-Added 1/11/24:
 - [ ] We have moved away from testing, as the code was changing quickly. We should think about revisiting it, as certain parts of the code-base are becoming more static, and we are moving towards sharing the library with others.
+- [ ] Go through examples folder and show more detailed examples.
 
 ## Priority 4
 
-Added 31/12/24:
 - [ ] Add functionality for per-test options object. It should be able to be set via either a name (e.g. string), an object or a file.
 - [ ] Add functionality allowing data_generator_t objects to have their elements filtered.
 - [ ] Change master CMakeLists.txt file so that examples subfolder is only built when specified. 
 
-
 ## Priority 5
 
-Added 31/12/24:
 - [ ] Terminology and documentation is inconsistent and confusing. It needs to be improved drastically.
 - [ ] Consider supporting different versions of CMake, VS, C++ etc.
 - [ ] Consider an inline namespace containing the version. We removed this because instantiating specialised templates/structs for some of the derived gen_data classes, when using this keyword, wouldn't allow us to create them in named namespaces; we had to define them in a format similar to how fmt does it (see commented out example in examples/include/abc_test_examples/enumeration/enum_enumeration_examples.h. This may be something only done in visual studio, or may be part of the standard. We should investigate further to find the reasoning. Then decide whether including the versioned namespace is worth the trade off, or if there are any workarounds.
@@ -78,3 +68,8 @@ Added 31/12/24:
 - Investigate use of configuration files through CLI11, or our own type.
 - Move processing file args from random to data_generator_with_file_support.
 - Fix random data generator's seed values not being set correctly.
+02/11/24:
+- Rewrite enumeration code.
+- Create enumeration examples. 
+- Ensure manual data generator code works with updated code-base.
+- Create manual for loop examples.
