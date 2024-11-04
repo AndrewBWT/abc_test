@@ -108,7 +108,7 @@ _BEGIN_ABC_UTILITY_NS
 				{
 					increment_combinations();
 				}
-			}
+			} 
 			else
 			{
 				increment_combinations();

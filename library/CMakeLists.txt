@@ -115,6 +115,8 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/data_generator/manual_data_generator.h
   include/abc_test/included_instances/data_generator/file_data_generator.h
   include/abc_test/included_instances/data_generator/random_data_generator.h
+  include/abc_test/included_instances/data_generator/combinatorics_data_generator.h
+  include/abc_test/included_instances/data_generator/combinatorics_data_generator/permutations_generator.h
   # Subfolder contains logic specifically to do with random data generation.
   include/abc_test/included_instances/data_generator/random_generator_object.h
   include/abc_test/included_instances/data_generator/random_generator_object/specializations.h

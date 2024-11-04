@@ -18,12 +18,10 @@ None
 
 ## Priority 2
 
-- [ ] Work on README.md, showing an introduction to abc_test.
+- None
 
 ## Priority 3
 
-- [ ] Add combinatorics generator. 
-- [ ] Add examples showing use of combinatorics generator.
 - [ ] Add random generator using enumeration.
 - [ ] Add examples showing random generator using enumeration.
 - [ ] Add random_generator_object specialisations for arrays, vectors and enums.
@@ -31,13 +29,15 @@ None
 - [ ] Run clang-tidy on the code.
 - [ ] Check if code compiles using g++ and clang.
 - [ ] We have moved away from testing, as the code was changing quickly. We should think about revisiting it, as certain parts of the code-base are becoming more static, and we are moving towards sharing the library with others.
-- [ ] Go through examples folder and show more detailed examples.
+- [ ] Go through examples folder and ensure correctness. Also ensure all features are being shown off completely.
+- Go through README.md and check spelling, tidy up code, potentially highlight additional features.
 
 ## Priority 4
 
 - [ ] Add functionality for per-test options object. It should be able to be set via either a name (e.g. string), an object or a file.
 - [ ] Add functionality allowing data_generator_t objects to have their elements filtered.
 - [ ] Change master CMakeLists.txt file so that examples subfolder is only built when specified. 
+- Investigate test_reporter which can be used with data generators to ONLY provide feedback after all elements have been generated. In a similar fashion to how quickcheck reports 98/100 tests passed. This is because some tests become unwieldly very quickly, due to the amount of output produced.
 
 ## Priority 5
 
@@ -55,6 +55,7 @@ None
 
 - [ ] Add enumeration constructor which takes a start, end, and size-like operator. The size-like operator denotes how many enumeration values should be produced. The start and end values are what the first and last values should be (though end value is not set in stone). The algorithm then computes how many jumps to perform per generate_next. This is so we can say "generate 7 values between 0 and 50". 50/(7-1) = 8R2. The values [0,8,16,24,32,40,48] are then produced. This could be difficult as we would need be able to calculate how many values are between two points. This isn't just straight subtraction as it will have to take into account any values in enumerate_object_t for that object. 
 - Add different ways of creating data files; e.g. general_data should check for a file extension. If there isn't one, use the one given in the options. There should be a general_data_exact which provides an exact location, not using any part of the test options to initialise it.
+- Write examples showing how logging works.
 
 ## Completed
 
@@ -74,3 +75,8 @@ None
 - Create enumeration examples. 
 - Ensure manual data generator code works with updated code-base.
 - Create manual for loop examples.
+03/11/24:
+- Work on README.md, showing an introduction to abc_test.
+04/11/24:
+- Add combinatorics generator. 
+- Add examples showing use of combinatorics generator.
