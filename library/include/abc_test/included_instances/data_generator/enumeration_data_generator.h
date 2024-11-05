@@ -77,7 +77,6 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T, true>
 template <typename T, typename... Args>
 __constexpr _ABC_NS_DG::data_generator_collection_t<T, true>
             enumerate_data(Args... _a_file_reader_writers);
-
 _END_ABC_NS
 
 _BEGIN_ABC_DG_NS

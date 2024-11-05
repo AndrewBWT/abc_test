@@ -1,6 +1,7 @@
 #pragma once
 #include "abc_test/core.h"
 #include "abc_test/included_instances.h"
+#include "abc_test/included_instances/data_generator/random_generator_object/enumeration_based_random_generator_object.h"
 
 _TEST_CASE(
     abc::test_data_t(
@@ -35,28 +36,44 @@ _TEST_CASE(
             fmt::format("Testing _l_f({0}) == {1}", _l_input, _l_output)
         ));
     }
-    for (auto&& _l_input : enumerate_data<test_data_t>(all_values<test_data_t>()))
+    for (auto&& _l_input :
+         enumerate_data<test_data_t>(all_values<test_data_t>()))
     {
         _CHECK(annotate(
             _EXPR(_l_f(_l_input) == _l_output),
             fmt::format("Testing _l_f({0}) == {1}", _l_input, _l_output)
         ));
     }
-    for (auto&& _l_input : enumerate_data<test_data_t>(all_values_moving_forward<test_data_t>()))
+    for (auto&& _l_input :
+         enumerate_data<test_data_t>(all_values_moving_forward<test_data_t>()))
     {
         _CHECK(annotate(
             _EXPR(_l_f(_l_input) == _l_output),
             fmt::format("Testing _l_f({0}) == {1}", _l_input, _l_output)
         ));
     }
-    for (auto&& _l_input : enumerate_data<test_data_t>(all_values_moving_backward<test_data_t>()))
+    for (auto&& _l_input :
+         enumerate_data<test_data_t>(all_values_moving_backward<test_data_t>()))
     {
         _CHECK(annotate(
             _EXPR(_l_f(_l_input) == _l_output),
             fmt::format("Testing _l_f({0}) == {1}", _l_input, _l_output)
         ));
     }
-    for (auto&& _l_input : enumerate_data<test_data_t>(from_m_to_n_using_k_values<test_data_t>(1, 100, 7)))
+    for (auto&& _l_input : enumerate_data<test_data_t>(
+             from_m_to_n_using_k_values<test_data_t>(1, 100, 7)
+         ))
+    {
+        _CHECK(annotate(
+            _EXPR(_l_f(_l_input) == _l_output),
+            fmt::format("Testing _l_f({0}) == {1}", _l_input, _l_output)
+        ));
+    }
+    for (auto&& _l_input : generate_data_randomly<test_data_t>(
+        using_enumeration_generator<test_data_t>(),
+             tertiary_data_file("file5"),
+             general_data_file("file6")
+         ))
     {
         _CHECK(annotate(
             _EXPR(_l_f(_l_input) == _l_output),

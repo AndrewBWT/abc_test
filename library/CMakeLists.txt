@@ -120,6 +120,7 @@ set(LIBRARY_FILES
   # Subfolder contains logic specifically to do with random data generation.
   include/abc_test/included_instances/data_generator/random_generator_object.h
   include/abc_test/included_instances/data_generator/random_generator_object/specializations.h
+  include/abc_test/included_instances/data_generator/random_generator_object/enumeration_based_random_generator_object.h
   # Folder containing random data specializations for std types.
   include/abc_test/included_instances/data_generator/random_generator_object/specializations/fundamental_types.h
   include/abc_test/included_instances/data_generator/random_generator_object/specializations/enum.h
