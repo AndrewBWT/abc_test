@@ -24,6 +24,7 @@ None
 
 - [ ] Add random generator using enumeration.
 - [ ] Add examples showing random generator using enumeration.
+- Test combinatorics generator with file IO and reset - we haven't written the logic for this yet.
 - [ ] Add random_generator_object specialisations for arrays, vectors and enums.
 - [ ] Documentation of code. Currently generally we have a good percentage of the code commented. However it has not been proof-read, and there are parts of it where the names of classes or the nomenclature we use has changed.
 - [ ] Run clang-tidy on the code.
@@ -53,7 +54,6 @@ None
 
 ## Unorganised (Priority U)
 
-- [ ] Add enumeration constructor which takes a start, end, and size-like operator. The size-like operator denotes how many enumeration values should be produced. The start and end values are what the first and last values should be (though end value is not set in stone). The algorithm then computes how many jumps to perform per generate_next. This is so we can say "generate 7 values between 0 and 50". 50/(7-1) = 8R2. The values [0,8,16,24,32,40,48] are then produced. This could be difficult as we would need be able to calculate how many values are between two points. This isn't just straight subtraction as it will have to take into account any values in enumerate_object_t for that object. 
 - Add different ways of creating data files; e.g. general_data should check for a file extension. If there isn't one, use the one given in the options. There should be a general_data_exact which provides an exact location, not using any part of the test options to initialise it.
 - Write examples showing how logging works.
 
@@ -80,3 +80,5 @@ None
 04/11/24:
 - Add combinatorics generator. 
 - Add examples showing use of combinatorics generator.
+-5/11/24:
+- Add enumeration constructor which takes a start, end, and size-like operator. The size-like operator denotes how many enumeration values should be produced. The start and end values are what the first and last values should be (though end value is not set in stone). The algorithm then computes how many jumps to perform per generate_next. This is so we can say "generate 7 values between 0 and 50". 50/(7-1) = 8R2. The values [0,8,16,24,32,40,48] are then produced. This could be difficult as we would need be able to calculate how many values are between two points. This isn't just straight subtraction as it will have to take into account any values in enumerate_object_t for that object. 

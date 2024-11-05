@@ -39,11 +39,14 @@ private:
     T                                             _m_start_value;
     T                                             _m_end_value;
     bool                                          _m_forward_direction;
+    std::size_t _m_number_of_complete_advancements_to_end;
+    std::size_t _m_remainder_after_all_advancements;
+    std::size_t _m_n_advancements_per_generate_next;
 
     __constexpr bool
         next_element(const enumerate_index_t& _a_times_called) noexcept;
     __constexpr bool
-        next_element(enumerate_index_t& _a_times_called) noexcept;
+        next_element_reference_arg(enumerate_index_t& _a_times_called) noexcept;
 };
 
 _END_ABC_DG_NS
@@ -91,6 +94,9 @@ __constexpr_imp
     , _m_current_element(_a_es->start_value())
     , _m_end_value(_a_es->end_value(_a_edo))
     , _m_forward_direction(_a_es->is_direction_forward(_a_edo))
+    , _m_number_of_complete_advancements_to_end(_a_es->number_of_complete_advancements(_a_edo))
+    , _m_remainder_after_all_advancements(_a_es->remaining_entities_after_maximum_advancements(_a_edo))
+    , _m_n_advancements_per_generate_next(_a_es->n_advancements_per_advancement(_a_edo))
 {}
 
 template <typename T>
@@ -107,7 +113,7 @@ __constexpr_imp bool
     if (_m_has_current_element)
     {
         _m_tertiary_data++;
-        _m_has_current_element = next_element(1);
+        _m_has_current_element = next_element(_m_n_advancements_per_generate_next);
     }
     return _m_has_current_element;
 }
@@ -152,12 +158,12 @@ __constexpr_imp bool
     ) noexcept
 {
     enumerate_index_t _l_times_called{_a_times_called};
-    return next_element(_l_times_called);
+    return next_element_reference_arg(_l_times_called);
 }
 
 template <typename T>
 __constexpr_imp bool
-    enumeration_data_generator_t<T>::next_element(
+    enumeration_data_generator_t<T>::next_element_reference_arg(
         enumerate_index_t& _a_times_called
     ) noexcept
 {

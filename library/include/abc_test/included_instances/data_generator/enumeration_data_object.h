@@ -22,6 +22,7 @@ private:
         _m_increment_func;
     std::function<bool(T&, enumerate_index_t&, const std::optional<T>&)>
         _m_decrement_func;
+    std::function<std::size_t(const T&, const T&)> _m_difference_func;
 public:
     __constexpr enumeration_data_object_t() = delete;
     __constexpr_imp virtual bool
@@ -41,7 +42,6 @@ public:
     {
         return _m_equal_func(_a_l, _a_r);
     }
-
     __constexpr virtual bool
         increment(
             T&                      _a_element,
@@ -54,6 +54,13 @@ public:
             enumerate_index_t&      _a_n_times_to_increment,
             const std::optional<T>& _a_max_value
         );
+    __constexpr virtual std::size_t difference(
+        const T& _a_arg1,
+        const T& _a_arg2
+    ) noexcept
+    {
+        return _m_difference_func(_a_arg1, _a_arg2);
+    }
 };
 
 _END_ABC_DG_NS

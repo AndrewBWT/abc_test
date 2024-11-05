@@ -55,36 +55,63 @@ requires has_addition_c<T> && has_subtraction_c<T> && has_less_than_c<T>
          && has_equal_c<T> && (not std::is_enum_v<T>)
 struct enumeration_data_object_t<T>
 {
-    __constexpr
-        enumeration_data_object_t(const T _a_difference = T(1)) noexcept
-        : _m_difference(_a_difference)
+    __constexpr virtual std::pair<std::size_t, std::size_t>
+        difference(
+            const T& _a_arg1,
+            const T& _a_arg2
+        ) noexcept
     {
-
+        const T _l_straight_difference{
+            less_than(_a_arg1, _a_arg2) ? static_cast<T>(_a_arg2 - _a_arg1)
+                                        : static_cast<T>(_a_arg1 - _a_arg2)
+        };
+        const T _l_divisor{static_cast<T>(_l_straight_difference / _m_difference)};
+        const T _l_remainder{static_cast<T>(_l_straight_difference % _m_difference)};
+        return {
+            static_cast<std::size_t>(_l_divisor),
+            static_cast<std::size_t>(_l_remainder)
+        };
     }
+
+    __constexpr
+    enumeration_data_object_t(
+        const T _a_difference = T(1)
+    ) noexcept
+        : _m_difference(_a_difference)
+    {}
+
     __constexpr_imp virtual bool
-        less_than(const T& _a_l, const T& _a_r) const noexcept
+        less_than(
+            const T& _a_l,
+            const T& _a_r
+        ) const noexcept
     {
         return _a_l < _a_r;
     }
+
     __constexpr_imp virtual bool
-        equal(const T& _a_l, const T& _a_r) const noexcept
+        equal(
+            const T& _a_l,
+            const T& _a_r
+        ) const noexcept
     {
         return _a_l == _a_r;
     }
+
     __constexpr bool
         increment(
-            T& _a_element,
-            std::size_t& _a_times_called,
+            T&                      _a_element,
+            std::size_t&            _a_times_called,
             const std::optional<T>& _a_max_value = std::optional<T>{}
         )
     {
         using namespace std;
-        const T _l_current_idx{ _a_element };
+        const T _l_current_idx{_a_element};
         if (_a_max_value.has_value())
         {
-            const T _l_max_times_called{ static_cast<T>(
+            const T _l_max_times_called{static_cast<T>(
                 (_a_max_value.value() - _l_current_idx) / _m_difference
-            ) };
+            )};
             if (_a_times_called > _l_max_times_called)
             {
                 if (_l_max_times_called == 0)
@@ -93,39 +120,41 @@ struct enumeration_data_object_t<T>
                 }
                 else
                 {
-                    _a_element = _a_element + _m_difference * _l_max_times_called;
+                    _a_element
+                        = _a_element + _m_difference * _l_max_times_called;
                     _a_times_called -= _l_max_times_called;
                     return true;
                 }
             }
             else
             {
-                _a_element = _a_element + _m_difference * _a_times_called;
+                _a_element      = _a_element + _m_difference * _a_times_called;
                 _a_times_called = 0;
                 return true;
             }
         }
         else
         {
-            _a_element = _a_element + _m_difference * _a_times_called;
+            _a_element      = _a_element + _m_difference * _a_times_called;
             _a_times_called = 0;
             return true;
         }
     }
+
     __constexpr bool
         decrement(
-            T& _a_element,
-            std::size_t& _a_times_called,
+            T&                      _a_element,
+            std::size_t&            _a_times_called,
             const std::optional<T>& _a_max_value = std::optional<T>{}
         )
     {
         using namespace std;
-        const T _l_current_idx{ _a_element };
+        const T _l_current_idx{_a_element};
         if (_a_max_value.has_value())
         {
-            const T _l_max_times_called{ static_cast<T>(
+            const T _l_max_times_called{static_cast<T>(
                 (_l_current_idx - _a_max_value.value()) / _m_difference
-            ) };
+            )};
             if (_a_times_called > _l_max_times_called)
             {
                 if (_l_max_times_called == 0)
@@ -134,21 +163,22 @@ struct enumeration_data_object_t<T>
                 }
                 else
                 {
-                    _a_element = _a_element - _m_difference * _l_max_times_called;
+                    _a_element
+                        = _a_element - _m_difference * _l_max_times_called;
                     _a_times_called += _l_max_times_called;
                     return true;
                 }
             }
             else
             {
-                _a_element = _a_element - _m_difference * _a_times_called;
+                _a_element      = _a_element - _m_difference * _a_times_called;
                 _a_times_called = 0;
                 return true;
             }
         }
         else
         {
-            _a_element = _a_element - _m_difference * _a_times_called;
+            _a_element      = _a_element - _m_difference * _a_times_called;
             _a_times_called = 0;
             return true;
         }
@@ -182,7 +212,7 @@ _END_ABC_DG_NS
 
 _BEGIN_ABC_DG_NS
 
-//For some reason, it appears that MSVC rejects this code when it shouldn't.
+// For some reason, it appears that MSVC rejects this code when it shouldn't.
 /*template <typename T>
 requires has_limits_c<T>
 __constexpr_imp T

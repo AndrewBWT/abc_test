@@ -56,4 +56,11 @@ _TEST_CASE(
             fmt::format("Testing _l_f({0}) == {1}", _l_input, _l_output)
         ));
     }
+    for (auto&& _l_input : enumerate_data<test_data_t>(from_m_to_n_using_k_values<test_data_t>(1, 100, 7)))
+    {
+        _CHECK(annotate(
+            _EXPR(_l_f(_l_input) == _l_output),
+            fmt::format("Testing _l_f({0}) == {1}", _l_input, _l_output)
+        ));
+    }
 }
