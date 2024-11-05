@@ -1,10 +1,10 @@
-#include "abc_test/internal/test_runner.h"
+#include "abc_test/internal/test_runner.hpp"
 
-#include "abc_test/internal/errors/test_assertion_exception.h"
-#include "abc_test/internal/errors/test_library_exception.h"
-#include "abc_test/internal/logging/log_msg.h"
-#include "abc_test/internal/test_reports//unexpected_thrown_exception.h"
-#include "abc_test/internal/utility/internal/log.h"
+#include "abc_test/internal/errors/test_assertion_exception.hpp"
+#include "abc_test/internal/errors/test_library_exception.hpp"
+#include "abc_test/internal/logging/log_msg.hpp"
+#include "abc_test/internal/test_reports//unexpected_thrown_exception.hpp"
+#include "abc_test/internal/utility/internal/log.hpp"
 
 _BEGIN_ABC_NS
 __no_constexpr_or_inline_imp void

@@ -1,5 +1,5 @@
-#include "abc_test/internal/matchers/source_map.h"
-#include "abc_test/internal/global.h"
+#include "abc_test/internal/matchers/source_map.hpp"
+#include "abc_test/internal/global.hpp"
 
 _BEGIN_ABC_MATCHER_NS
 __no_constexpr_or_inline_imp

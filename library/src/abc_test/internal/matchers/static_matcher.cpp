@@ -1,6 +1,6 @@
-#include "abc_test/internal/matchers/static_matcher.h"
+#include "abc_test/internal/matchers/static_matcher.hpp"
 
-#include "abc_test/internal/matchers/matcher_wrapper.h"
+#include "abc_test/internal/matchers/matcher_wrapper.hpp"
 
 _BEGIN_ABC_NS
 __no_constexpr_or_inline_imp matcher_t

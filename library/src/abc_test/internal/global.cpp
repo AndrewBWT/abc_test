@@ -1,7 +1,7 @@
-#include "abc_test/internal/global.h"
+#include "abc_test/internal/global.hpp"
 
-#include "abc_test/internal/options/test_options_base.h"
-#include "abc_test/internal/test_runner.h"
+#include "abc_test/internal/options/test_options_base.hpp"
+#include "abc_test/internal/test_runner.hpp"
 
 #include <variant>
 

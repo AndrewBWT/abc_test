@@ -1,4 +1,4 @@
-#include "abc_test/external/bigint/BigUnsignedInABase.h"
+#include "abc_test/external/bigint/BigUnsignedInABase.hpp"
 
 BigUnsignedInABase::BigUnsignedInABase(const Digit *d, Index l, Base base)
 	: NumberlikeArray<Digit>(d, l), base(base) {

@@ -1,4 +1,4 @@
-#include "abc_test/external/bigint/BigIntegerAlgorithms.h"
+#include "abc_test/external/bigint/BigIntegerAlgorithms.hpp"
 
 BigUnsigned gcd(BigUnsigned a, BigUnsigned b) {
 	BigUnsigned trash;

@@ -1,4 +1,4 @@
-#include "abc_test/external/bigint/BigInteger.h"
+#include "abc_test/external/bigint/BigInteger.hpp"
 
 void BigInteger::operator =(const BigInteger &x) {
 	// Calls like a = a have no effect

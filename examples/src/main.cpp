@@ -1,10 +1,10 @@
 #pragma once
 
-#include "abc_test/core.h"
-#include "abc_test/included_instances.h"
+#include "abc_test/core.hpp"
+#include "abc_test/included_instances.hpp"
 
 // #include "abc_test_examples/basic_examples.h"
- #include "abc_test_examples/data_generator_examples.h"
+ #include "abc_test_examples/data_generator_examples.hpp"
 
 /*constexpr int
     fib(

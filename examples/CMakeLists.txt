@@ -3,25 +3,25 @@ set(EXAMPLE_EXECUTABLE_NAME abc_test_examples)
 
 # The set of all example files.
 set(EXAMPLE_FILES
-  include/abc_test_examples/example_001.h
+  include/abc_test_examples/example_001.hpp
       src/main.cpp
-  include/abc_test_examples/enumeration.h
-  include/abc_test_examples/enumeration/enum_enumeration_examples.h
-  include/abc_test_examples/basic_examples.h
-  include/abc_test_examples/basic_examples/01_assertions.h
-  include/abc_test_examples/basic_examples/02_basic_matchers.h
-  include/abc_test_examples/basic_examples/03_matchers_and_logical_operators.h
-  include/abc_test_examples/basic_examples/04_matchers_and_comparison_operators.h
-  include/abc_test_examples/basic_examples/05_user_defined_matcher.h
-  include/abc_test_examples/basic_examples/06_block_assertions_and_exception_handling.h
-  include/abc_test_examples/basic_examples/exceptions.h
-  include/abc_test_examples/data_generator_examples.h
-  include/abc_test_examples/data_generator_examples/01_static_gen_data_examples.h
-  include/abc_test_examples/data_generator_examples/02_generate_data_from_file_examples.h
-  include/abc_test_examples/data_generator_examples/03_generate_data_randomly.h
-  include/abc_test_examples/data_generator_examples/04_enumerating_data_examples.h
-  include/abc_test_examples/data_generator_examples/05_manual_data_generator_examples.h
-  include/abc_test_examples/data_generator_examples/06_combinatorics_data_generator_examples.h
+  include/abc_test_examples/enumeration.hpp
+  include/abc_test_examples/enumeration/enum_enumeration_examples.hpp
+  include/abc_test_examples/basic_examples.hpp
+  include/abc_test_examples/basic_examples/01_assertions.hpp
+  include/abc_test_examples/basic_examples/02_basic_matchers.hpp
+  include/abc_test_examples/basic_examples/03_matchers_and_logical_operators.hpp
+  include/abc_test_examples/basic_examples/04_matchers_and_comparison_operators.hpp
+  include/abc_test_examples/basic_examples/05_user_defined_matcher.hpp
+  include/abc_test_examples/basic_examples/06_block_assertions_and_exception_handling.hpp
+  include/abc_test_examples/basic_examples/exceptions.hpp
+  include/abc_test_examples/data_generator_examples.hpp
+  include/abc_test_examples/data_generator_examples/01_static_gen_data_examples.hpp
+  include/abc_test_examples/data_generator_examples/02_generate_data_from_file_examples.hpp
+  include/abc_test_examples/data_generator_examples/03_generate_data_randomly.hpp
+  include/abc_test_examples/data_generator_examples/04_enumerating_data_examples.hpp
+  include/abc_test_examples/data_generator_examples/05_manual_data_generator_examples.hpp
+  include/abc_test_examples/data_generator_examples/06_combinatorics_data_generator_examples.hpp
 )
 
 # These are the libs required for the examples executable.

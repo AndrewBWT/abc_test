@@ -1,5 +1,5 @@
-#include "abc_test/external/bigint/BigIntegerUtils.h"
-#include "abc_test/external/bigint/BigUnsignedInABase.h"
+#include "abc_test/external/bigint/BigIntegerUtils.hpp"
+#include "abc_test/external/bigint/BigUnsignedInABase.hpp"
 
 std::string bigUnsignedToString(const BigUnsigned &x) {
 	return std::string(BigUnsignedInABase(x, 10));
