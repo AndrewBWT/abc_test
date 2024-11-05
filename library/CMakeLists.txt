@@ -134,10 +134,6 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/data_generator/enumeration_schema/from_m_move_k_elements.h
   include/abc_test/included_instances/data_generator/enumeration_data_generator.h
   include/abc_test/included_instances/data_generator/enumeration_data_object.h
-  include/abc_test/included_instances/data_generator/enumeration_data_object/min_value_object.h
-  include/abc_test/included_instances/data_generator/enumeration_data_object/max_value_object.h
-  include/abc_test/included_instances/data_generator/enumeration_data_object/min_value_concept.h
-  include/abc_test/included_instances/data_generator/enumeration_data_object/max_value_concept.h
   include/abc_test/included_instances/data_generator/enumeration_data_object/specializations.h
   # Folder containing random data specializations for std types.
   include/abc_test/included_instances/data_generator/enumeration_data_object/specializations/fundamental_types.h
@@ -178,6 +174,16 @@ set(LIBRARY_FILES
   include/abc_test/internal/utility/str/string_table.h
   include/abc_test/internal/utility/str.h
   include/abc_test/internal/utility/str/rw_info.h
+  include/abc_test/internal/utility/enum.h
+  include/abc_test/internal/utility/limits/min_value_object.h
+  include/abc_test/internal/utility/limits/max_value_object.h
+  include/abc_test/internal/utility/limits/min_value_concept.h
+  include/abc_test/internal/utility/limits/max_value_concept.h
+  #Included instances utility files  include/abc_test/internal/utility/limits/min_value_object.h
+  include/abc_test/included_instances/utility/limits/array.h
+  include/abc_test/included_instances/utility/limits/enum.h
+  include/abc_test/included_instances/utility/limits/fundamental_types.h
+  include/abc_test/included_instances/utility/limits/vector.h
   # Included instances
   # Text test reporter
   include/abc_test/included_instances/reporters/text_test_reporter.h

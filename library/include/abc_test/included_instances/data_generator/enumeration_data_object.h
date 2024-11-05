@@ -1,6 +1,4 @@
 #pragma once
-#include "abc_test/included_instances/data_generator/enumeration_data_object/max_value_concept.h"
-#include "abc_test/included_instances/data_generator/enumeration_data_object/min_value_concept.h"
 #include "abc_test/internal/errors/test_library_exception.h"
 #include "abc_test/internal/utility/internal/macros.h"
 

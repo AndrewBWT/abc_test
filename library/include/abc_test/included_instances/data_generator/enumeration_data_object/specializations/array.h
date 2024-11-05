@@ -1,29 +1,11 @@
 #pragma once
 
 #include "abc_test/included_instances/data_generator/enumeration_data_object.h"
-#include "abc_test/included_instances/data_generator/enumeration_data_object/max_value_concept.h"
-#include "abc_test/included_instances/data_generator/enumeration_data_object/min_value_concept.h"
+#include "abc_test/included_instances/utility/limits/array.h"
 
 #include <array>
 
 _BEGIN_ABC_DG_NS
-
-template <typename T, std::size_t N>
-requires min_value_c<T>
-struct min_value_t<std::array<T, N>>
-{
-    __constexpr_imp std::array<T, N>
-                    min_value() const noexcept;
-};
-
-template <typename T, std::size_t N>
-requires max_value_c<T>
-struct max_value_t<std::array<T, N>>
-{
-    __constexpr_imp std::array<T, N>
-                    max_value() const noexcept;
-};
-
 template <typename T, std::size_t N>
 struct enumeration_data_object_t<std::array<T, N>>
 {
@@ -63,34 +45,6 @@ public:
 _END_ABC_DG_NS
 
 _BEGIN_ABC_DG_NS
-
-template <typename T, std::size_t N>
-requires min_value_c<T>
-__constexpr_imp std::array<T, N>
-                min_value_t<std::array<T, N>>::min_value() const noexcept
-{
-    using namespace std;
-    array<T, N> _l_rv;
-    for (size_t _l_idx{0}; _l_idx < N; ++_l_idx)
-    {
-        _l_rv[_l_idx] = min_value_t<T>().min_value();
-    }
-    return _l_rv;
-}
-
-template <typename T, std::size_t N>
-requires max_value_c<T>
-__constexpr_imp std::array<T, N>
-                max_value_t<std::array<T, N>>::max_value() const noexcept
-{
-    using namespace std;
-    array<T, N> _l_rv;
-    for (size_t _l_idx{0}; _l_idx < N; ++_l_idx)
-    {
-        _l_rv[_l_idx] = max_value_t<T>().max_value();
-    }
-    return _l_rv;
-}
 template <typename T, std::size_t N>
 __constexpr_imp
 enumeration_data_object_t<std::array<T,N>>::enumeration_data_object_t(

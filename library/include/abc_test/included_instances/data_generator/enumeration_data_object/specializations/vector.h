@@ -1,20 +1,11 @@
 #pragma once
 
 #include "abc_test/included_instances/data_generator/enumeration_data_object.h"
-#include "abc_test/included_instances/data_generator/enumeration_data_object/max_value_concept.h"
-#include "abc_test/included_instances/data_generator/enumeration_data_object/min_value_concept.h"
+#include "abc_test/included_instances/utility/limits/vector.h"
 
 #include <array>
 
 _BEGIN_ABC_DG_NS
-
-template <typename T>
-requires min_value_c<T>
-struct min_value_t<std::vector<T>>
-{
-    __constexpr_imp std::vector<T>
-                    min_value() const noexcept;
-};
 
 template <typename T>
 struct enumeration_data_object_t<std::vector<T>>
@@ -62,16 +53,6 @@ public:
 _END_ABC_DG_NS
 
 _BEGIN_ABC_DG_NS
-
-template <typename T>
-    requires min_value_c<T>
-__constexpr_imp std::vector<T>
-                min_value_t<std::vector<T>>::min_value() const noexcept
-{
-    using namespace std;
-    vector<T> _l_rv;
-    return _l_rv;
-}
 
 template <typename T>
 __constexpr_imp

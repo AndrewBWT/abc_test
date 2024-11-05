@@ -1,0 +1,5 @@
+#struct std::pair<int,int>
+(0, 0)
+(1, 2)
+(2, 4)
+(4, 7)

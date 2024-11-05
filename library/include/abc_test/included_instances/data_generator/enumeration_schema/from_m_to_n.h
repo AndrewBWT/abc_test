@@ -1,6 +1,8 @@
 #pragma once
 
 #include "abc_test/included_instances/data_generator/enumeration_schema.h"
+#include "abc_test/internal/utility/limits/max_value_concept.h"
+#include "abc_test/internal/utility/limits/min_value_concept.h"
 // #include
 // "abc_test/included_instances/data_generator/enumeration_data_object/max_value_concept.h"
 // #include
@@ -39,34 +41,34 @@ private:
 _END_ABC_DG_NS
 _BEGIN_ABC_NS
 template <typename T>
-requires _ABC_NS_DG::max_value_c<T> && _ABC_NS_DG::min_value_c<T>
+requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
 __constexpr std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
             all_values() noexcept;
 template <typename T>
 __constexpr std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
             from_m_to_n(const T& _a_lower, const T& _a_upper) noexcept;
 template <typename T>
-requires _ABC_NS_DG::max_value_c<T>
+requires _ABC_NS_UTILITY::max_value_c<T>
 __constexpr std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
             from_val_to_max(const T& _a_value) noexcept;
 template <typename T>
-requires _ABC_NS_DG::max_value_c<T>
+requires _ABC_NS_UTILITY::max_value_c<T>
 __constexpr std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
             from_max_to_val(const T& _a_value) noexcept;
 template <typename T>
-requires _ABC_NS_DG::min_value_c<T>
+requires _ABC_NS_UTILITY::min_value_c<T>
 __constexpr std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
             from_val_to_min(const T& _a_value) noexcept;
 template <typename T>
-requires _ABC_NS_DG::min_value_c<T>
+requires _ABC_NS_UTILITY::min_value_c<T>
 __constexpr std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
             from_min_to_val(const T& _a_value) noexcept;
 template <typename T>
-requires _ABC_NS_DG::max_value_c<T> && _ABC_NS_DG::min_value_c<T>
+requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
 __constexpr std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
             all_values_moving_forward() noexcept;
 template <typename T>
-requires _ABC_NS_DG::max_value_c<T> && _ABC_NS_DG::min_value_c<T>
+requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
 __constexpr std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
             all_values_moving_backward() noexcept;
 template <typename T>
@@ -144,7 +146,7 @@ _END_ABC_DG_NS
 
 _BEGIN_ABC_NS
 template <typename T>
-requires _ABC_NS_DG::max_value_c<T> && _ABC_NS_DG::min_value_c<T>
+requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
 __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
                 all_values() noexcept
 {
@@ -164,7 +166,7 @@ __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
 }
 
 template <typename T>
-requires _ABC_NS_DG::max_value_c<T>
+requires _ABC_NS_UTILITY::max_value_c<T>
 __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
                 from_val_to_max(
                     const T& _a_value
@@ -175,7 +177,7 @@ __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
 }
 
 template <typename T>
-requires _ABC_NS_DG::max_value_c<T>
+requires _ABC_NS_UTILITY::max_value_c<T>
 __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
                 from_max_to_val(
                     const T& _a_value
@@ -186,7 +188,7 @@ __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
 }
 
 template <typename T>
-requires _ABC_NS_DG::min_value_c<T>
+requires _ABC_NS_UTILITY::min_value_c<T>
 __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
                 from_val_to_min(
                     const T& _a_value
@@ -197,7 +199,7 @@ __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
 }
 
 template <typename T>
-requires _ABC_NS_DG::min_value_c<T>
+requires _ABC_NS_UTILITY::min_value_c<T>
 __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
                 from_min_to_val(
                     const T& _a_value
@@ -208,22 +210,24 @@ __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
 }
 
 template <typename T>
-requires _ABC_NS_DG::max_value_c<T> && _ABC_NS_DG::min_value_c<T>
+requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
 __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
                 all_values_moving_forward() noexcept
 {
     using namespace _ABC_NS_DG;
+    using namespace _ABC_NS_UTILITY;
     return from_m_to_n(
         min_value_t<T>().min_value(), max_value_t<T>().max_value()
     );
 }
 
 template <typename T>
-requires _ABC_NS_DG::max_value_c<T> && _ABC_NS_DG::min_value_c<T>
+requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
 __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
                 all_values_moving_backward() noexcept
 {
     using namespace _ABC_NS_DG;
+    using namespace _ABC_NS_UTILITY;
     return from_m_to_n(
         max_value_t<T>().max_value(), min_value_t<T>().min_value()
     );

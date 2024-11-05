@@ -239,6 +239,7 @@ __constexpr_imp bool
     {
         if (_m_permutation_combinator.generate_next(_m_current_size_bound))
         {
+            ++_m_tertiary_data;
             return true;
         }
     }
@@ -246,8 +247,7 @@ __constexpr_imp bool
     {
         if (_m_current_size_bound == 0)
         {
-            setup_next_index<true>();
-            return true;
+            return setup_next_index<true>();
         }
         else
         {
@@ -290,6 +290,7 @@ __constexpr_imp bool
                     _m_current_size_bound, _m_current_element
                 );
             }
+            ++_m_tertiary_data;
             return true;
         }
     }
@@ -376,6 +377,7 @@ __constexpr_imp bool
             // initialise_permutation<false>();
         }
     }
+    ++_m_tertiary_data;
     return true;
 }
 
@@ -439,7 +441,14 @@ __constexpr_imp void
             const tertiary_type& _a_tertiary_data
         )
 {
-    _m_tertiary_data = _a_tertiary_data;
+    while (_m_tertiary_data < _a_tertiary_data)
+    {
+        const bool _l_res{ generate_next() };
+        if (not _l_res)
+        {
+            return;
+        }
+    }
 }
 
 template <
@@ -548,6 +557,7 @@ __constexpr_imp
           _a_starting_combination
       ))
     , _m_has_current_element(true)
+    , _m_tertiary_data(0)
 {}
 
 template <
@@ -689,6 +699,7 @@ __constexpr_imp bool
             _m_current_size_bound, _m_current_element
         );
     }
+    ++_m_tertiary_data;
     return true;
 }
 

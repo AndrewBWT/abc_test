@@ -1,6 +1,6 @@
 # Current CMake version. We have not tested with other versions.
 cmake_minimum_required(VERSION 3.30)
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 #FetchContent needed to get fmt, scn and Catch2.
 include(FetchContent)
  

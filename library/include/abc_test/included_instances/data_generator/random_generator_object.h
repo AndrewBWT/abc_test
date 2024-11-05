@@ -19,7 +19,7 @@ public:
     __constexpr_imp
         random_generator_object_t(random_func_t<T>& _a_rnd_func) noexcept;
     __constexpr_imp virtual T
-        operator()(utility::rng& _a_rnd_generator);
+        operator()(utility::rng& _a_rnd_generator, const std::size_t _a_index);
 };
 
 _END_ABC_DG_NS
@@ -43,7 +43,8 @@ __constexpr_imp
 template <typename T>
 __constexpr_imp T
     random_generator_object_t<T>::operator()(
-        utility::rng& _a_rnd_generator
+        utility::rng& _a_rnd_generator,
+        const std::size_t _a_index
     )
 {
     return _m_rnd_gen(_a_rnd_generator);

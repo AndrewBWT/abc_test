@@ -9,7 +9,7 @@ template <>
 struct random_generator_object_t<bool>
 {
     __no_constexpr virtual bool
-        operator()(utility::rng& _a_rnd_generator);
+        operator()(utility::rng& _a_rnd_generator, const std::size_t _a_index);
 };
 
 template <typename T>
@@ -21,9 +21,17 @@ public:
     random_generator_object_t(
         const T& _a_min = std::numeric_limits<T>::min(),
         const T& _a_max = std::numeric_limits<T>::max()
-    ) noexcept;
+    ) noexcept
+        : _m_min(_a_min), _m_max(_a_max), _m_range(_m_max - _m_min)
+    {}
     __no_constexpr virtual T
-        operator()(utility::rng& _a_rnd_generator);
+        operator()(utility::rng& _a_rnd_generator,
+            const std::size_t _a_index)
+    {
+        using namespace std;
+        T _l_val{ static_cast<T>(_a_rnd_generator() % _m_range) };
+        return _m_min + _l_val;
+    }
 private:
     T _m_min;
     T _m_max;
@@ -35,7 +43,8 @@ _END_ABC_DG_NS
 _BEGIN_ABC_DG_NS
 __no_constexpr_imp bool
     random_generator_object_t<bool>::operator()(
-        utility::rng& _a_rnd_generator
+        utility::rng& _a_rnd_generator,
+        const std::size_t _a_index
     )
 {
     using namespace std;
@@ -43,7 +52,7 @@ __no_constexpr_imp bool
     return _l_val == 0 ? false : true;
 }
 
-template <typename T>
+/*template <typename T>
 requires std::integral<T>
 __constexpr_imp
     random_generator_object_t<T>::random_generator_object_t(
@@ -64,5 +73,5 @@ __no_constexpr_imp T
     T _l_val{static_cast<T>(_a_rnd_generator() % _m_range)};
     return _m_min + _l_val;
 }
-
+*/
 _END_ABC_DG_NS

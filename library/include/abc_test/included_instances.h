@@ -15,3 +15,7 @@
 #include "abc_test/included_instances/data_generator/enumeration_data_object/specializations.h"
 #include "abc_test/included_instances/data_generator/manual_data_generator.h"
 #include "abc_test/included_instances/data_generator/combinatorics_data_generator.h"
+#include "abc_test/included_instances/utility/limits/array.h"
+#include "abc_test/included_instances/utility/limits/enum.h"
+#include "abc_test/included_instances/utility/limits/fundamental_types.h"
+#include "abc_test/included_instances/utility/limits/vector.h"

@@ -22,13 +22,11 @@ None
 
 ## Priority 3
 
-- Test combinatorics generator with file IO and reset - we haven't written the logic for this yet.
-- [ ] Add random_generator_object specialisations for arrays, vectors and enums.
-- [ ] Documentation of code. Currently generally we have a good percentage of the code commented. However it has not been proof-read, and there are parts of it where the names of classes or the nomenclature we use has changed.
-- [ ] Run clang-tidy on the code.
-- [ ] Check if code compiles using g++ and clang.
-- [ ] We have moved away from testing, as the code was changing quickly. We should think about revisiting it, as certain parts of the code-base are becoming more static, and we are moving towards sharing the library with others. We want to do our due dilligence when it comes to providing a library that works as we describe.
-- [ ] Go through examples folder and ensure correctness. Also ensure all features are being shown off completely.
+- Documentation of code. Currently generally we have a good percentage of the code commented. However it has not been proof-read, and there are parts of it where the names of classes or the nomenclature we use has changed.
+- Run clang-tidy on the code.
+- Check if code compiles using g++ and clang.
+- We have moved away from testing, as the code was changing quickly. We should think about revisiting it, as certain parts of the code-base are becoming more static, and we are moving towards sharing the library with others. We want to do our due dilligence when it comes to providing a library that works as we describe.
+- Go through examples folder and ensure correctness. Also ensure all features are being shown off completely.
 - Go through README.md and check spelling, tidy up code, potentially highlight additional features.
 
 ## Priority 4
@@ -37,6 +35,7 @@ None
 - [ ] Add functionality allowing data_generator_t objects to have their elements filtered.
 - [ ] Change master CMakeLists.txt file so that examples subfolder is only built when specified. 
 - Investigate test_reporter which can be used with data generators to ONLY provide feedback after all elements have been generated. In a similar fashion to how quickcheck reports 98/100 tests passed. This is because some tests become unwieldly very quickly, due to the amount of output produced.
+- Improve combinatorics algorithm for dealing with file IO; at the moment we just go through the elements in order. We want an algorithm which can hone in on the exact value in an O(log n)-like method. This would mean being able to calculate the size of permutations/combinations, as well as partial-combinations/permutations (e.g. the size of we leave the first element in its place). This may get particularly difficult for permutations, as we used an algorithm which only makes a single change for that one.
 
 ## Priority 5
 
@@ -82,3 +81,5 @@ None
 - Add enumeration constructor which takes a start, end, and size-like operator. The size-like operator denotes how many enumeration values should be produced. The start and end values are what the first and last values should be (though end value is not set in stone). The algorithm then computes how many jumps to perform per generate_next. This is so we can say "generate 7 values between 0 and 50". 50/(7-1) = 8R2. The values [0,8,16,24,32,40,48] are then produced. This could be difficult as we would need be able to calculate how many values are between two points. This isn't just straight subtraction as it will have to take into account any values in enumerate_object_t for that object. 
 - Add random generator using enumeration.
 - Add examples showing random generator using enumeration.
+- Test combinatorics generator with file IO and reset - we haven't written the logic for this yet. Rewrote logic, works correctly though it is inefficient.
+- Add random_generator_object specialisations for arrays, vectors and enums.

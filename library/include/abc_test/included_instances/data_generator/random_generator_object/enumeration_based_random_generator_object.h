@@ -18,7 +18,7 @@ public:
         const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
     ) noexcept;
     __no_constexpr virtual T
-        operator()(utility::rng& _a_rnd_generator);
+        operator()(utility::rng& _a_rnd_generator, const std::size_t _a_index);
 private:
     std::shared_ptr<enumeration_data_object_t<T>> _m_enum_object;
     T                                             _m_start_value;
@@ -81,7 +81,8 @@ __constexpr_imp
 template <typename T>
 __no_constexpr T
     enumeration_based_random_generator_object_t<T>::operator()(
-        utility::rng& _a_rnd_generator
+        utility::rng&     _a_rnd_generator,
+        const std::size_t _a_index
     )
 {
     size_t _l_times_called{
@@ -89,10 +90,8 @@ __no_constexpr T
     };
     T _l_rv{_m_start_value};
     _m_forward_direction
-               ? _m_enum_object->increment(_l_rv, _l_times_called, _m_end_value)
-               : _m_enum_object->decrement(
-                     _l_rv, _l_times_called, _m_end_value
-                 );
+        ? _m_enum_object->increment(_l_rv, _l_times_called, _m_end_value)
+        : _m_enum_object->decrement(_l_rv, _l_times_called, _m_end_value);
     return _l_rv;
 }
 
@@ -109,7 +108,9 @@ __constexpr_imp std::shared_ptr<abc::data_gen::random_generator_object_t<T>>
 {
     using namespace std;
     using namespace _ABC_NS_DG;
-    return make_shared<enumeration_based_random_generator_object_t<T>>(_a_es, _a_enumerate_base);
+    return make_shared<enumeration_based_random_generator_object_t<T>>(
+        _a_es, _a_enumerate_base
+    );
 }
 
 template <typename T>

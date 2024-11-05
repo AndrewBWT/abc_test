@@ -18,7 +18,7 @@ class random_data_generator_t
 {
 public:
     using generator_type = T;
-    using tertiary_type  = std::pair<std::size_t, std::size_t>;
+    using tertiary_type  = std::tuple<std::size_t, std::size_t,std::size_t>;
     __constexpr const tertiary_type&
         tertiary_data() const;
     __constexpr void
@@ -106,14 +106,15 @@ __constexpr bool
 {
     if (_l_elements_generated + 1 < _m_elemnets_to_randomly_generate)
     {
-        _m_random_calls_before_after.first
+        get<0>(_m_random_calls_before_after)
             = global::get_this_threads_current_test()
                   .get_random_generator()
                   .calls();
+        get<2>(_m_random_calls_before_after) = _l_elements_generated;
         _m_element = (*_m_random_generator)(
-            global::get_this_threads_current_test().get_random_generator()
+            global::get_this_threads_current_test().get_random_generator(), _l_elements_generated
         );
-        _m_random_calls_before_after.second
+        get<1>(_m_random_calls_before_after)
             = global::get_this_threads_current_test()
                   .get_random_generator()
                   .calls();
