@@ -9,6 +9,9 @@ Finally, if the reader is looking to learn how to use `abc_test`, we point the r
 ## General Framework
 [This document](@ref overview_of_framework) provides a high-level overview of how `abc_test` works.
 
+## Declaring Tests
+Each test ran by `abc_test` must be defined in some form, registered with `abc_test` and ran. In this file, we show every way that a test can be registered with the overarching system.
+
 # Organisation of `abc_test`
 
 `abc_test` has three high-level folders:
