@@ -14,11 +14,10 @@ Each list of todo's is given in the order which represents when they are to be c
 
 ## Priority 1
 
-The following are large, on-going projects which we should aim to work on. These will never be "complete", but always a work in progress.
-- Code documentation. See DOCUMENTATION_PLAN.md for details.
-- Write and extend examples. See EXAMPLES.md for details.
-- Write tests. We are going to use the library itself. This will also serve as a form of "testing", allowing us to see how it performs as a testing library. See TESTING.md for details.
-- Proof-read and consider improvements to README.md.
+- Code documentation. See docs/internal/DOCUMENTATION.md for details.
+- Tutorials and examples. See docs/internal/tutorials_and_examples.md for details.
+- Tests. See docs/internal/tests.md for details.
+- README. See docs/internal/readme.md for details.
 
 ## Priority 2
 
@@ -53,6 +52,9 @@ The following are large, on-going projects which we should aim to work on. These
 - Add different ways of creating data files; e.g. general_data should check for a file extension. If there isn't one, use the one given in the options. There should be a general_data_exact which provides an exact location, not using any part of the test options to initialise it.
 - Write examples showing how logging works.
 - Implement the ability to write a seed to a file. Give it re-write mode or only write mode. Read only mode too.
+- Should we perform checks on a test's name to ensure it can be used as a file/folder name.
+- Add functionality to allow the user to filter tests based on a path. When this is addressed, update DECLARING_TESTS.md.
+- Check that same pairs of test paths and test names are dealt with properly. Update DECLARING_TESTS.md when this is addressed.
 
 ## Completed
 

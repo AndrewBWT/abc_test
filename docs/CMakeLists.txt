@@ -4,7 +4,17 @@
 get_target_property(PROJECT_HEADER_FILES abc_test INTERFACE_INCLUDE_DIRECTORIES)
 
 # Probably not a great idea. But unsure how else to get this information.
-file(GLOB_RECURSE PROJECT_PUBLIC_HEADERS ${PROJECT_HEADER_FILES}/*.h)
+file(GLOB_RECURSE PROJECT_PUBLIC_HEADERS ${PROJECT_HEADER_FILES}/*.hpp)
+
+set(ADDITIONAL_FILES
+  # README.md
+  ${PROJECT_SOURCE_DIR}/docs/user_written_docs/documentation_overview.md
+  ${PROJECT_SOURCE_DIR}/docs/user_written_docs/overview_of_framework.md
+  ${PROJECT_SOURCE_DIR}/docs/user_written_docs/declaring_tests.md
+  ${PROJECT_SOURCE_DIR}/docs/user_written_docs/test_assertions.md
+)
+
+#list(APPEND PROJECT_PUBLIC_HEADERS ${PROJECT_SOURCE_DIR}/docs/additional_docs/DECLARING_TESTS.md)
 # Set where output is written to.
 #set(DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/docs/doxygen)
 
@@ -36,12 +46,13 @@ file(GLOB_RECURSE PROJECT_PUBLIC_HEADERS ${PROJECT_HEADER_FILES}/*.h)
 #add_custom_target(Doxygen ALL DEPENDS ${DOXYGEN_INDEX_FILE})
 
 
-
+#set(DOXYGEN_INPUT                  ${PROJECT_SOURCE_DIR}/docs/additional_docs)
+set(DOXYGEN_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/docs/additional_docs)
 set(DOXYGEN_HTML_OUTPUT            ${PROJECT_BINARY_DIR}/docs/html)
 set(DOXYGEN_JAVADOC_AUTOBRIEF      YES)
 set(DOXYGEN_GENERATE_HTML          YES)
 set(DOXYGEN_HAVE_DOT               NO)
-set(DOXYGEN_USE_MDFILE_AS_MAINPAGE README.md)  # requires a README.md in /myproject/
+set(DOXYGEN_USE_MDFILE_AS_MAINPAGE Documentation_Overview.md)  # requires a README.md in /myproject/
 set(DOXYGEN_GENERATE_TREEVIEW               YES)
 set(DOXYGEN_DISABLE_INDEX               NO)
 set(DOXYGEN_FULL_SIDEBAR               NO)
@@ -50,9 +61,9 @@ set(DOXYGEN_HTML_COLORSTYLE               LIGHT)
 
 # other DOXYGEN_... options
 
-message(${PROJECT_SOURCE_DIR})
 doxygen_add_docs(docs_target
   ${PROJECT_PUBLIC_HEADERS}
+  ${ADDITIONAL_FILES}
   ALL  # does not seem to work
   COMMENT "Generate HTML documentation"
 #  CONFIG_FILE "Doxy_Config.txt"

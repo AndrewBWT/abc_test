@@ -9,6 +9,24 @@
 
 _TEST_CASE(
     abc::test_data_t(
+        {.name        = "A simple test",
+         .description = "A brilliant description, describing wonderful things",
+         .path        = "simple_test::simplest_test::so_simple",
+         .threads_required = 4}
+    )
+)
+{
+    // Testing code.
+}
+
+_NAMED_TEST_CASE(
+    named,
+    abc::test_data_t({.name = "A named test"})
+)
+{}
+
+_TEST_CASE(
+    abc::test_data_t(
         {.name             = "file_01_example_01",
          .description      = "Simpe data generator example using static_data.",
          .path             = "examples::gen_data_examples::static_gen_data",
