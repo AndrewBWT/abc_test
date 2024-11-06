@@ -1,9 +1,12 @@
-#include <catch2/catch_session.hpp>
-#include "abc_test_test/internal/errors/test_assertion_exception.h"
-#include "abc_test_test/test_utilities/basic_example_test_script.h"
-#include <iostream>
+#pragma once
+#include "abc_test/core.hpp"
+#include "abc_test/included_instances.hpp"
+#include "abc_test_test/internal/ds/test_data/user_defined_test_data.hpp"
 
-int main(int argc, char* argv[]) {
-    int result = Catch::Session().run(argc, argv);
-    return result;
+int main(
+        int   argc,
+        char* argv[]
+    )
+{
+    return abc::run_test_suite_using_command_line_args(argc, argv);
 }

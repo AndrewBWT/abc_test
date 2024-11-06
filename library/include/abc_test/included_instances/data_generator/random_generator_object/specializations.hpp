@@ -3,3 +3,7 @@
 #include "abc_test/included_instances/data_generator/random_generator_object/specializations/enum.hpp"
 #include "abc_test/included_instances/data_generator/random_generator_object/specializations/fundamental_types.hpp"
 #include "abc_test/included_instances/data_generator/random_generator_object/specializations/vector.hpp"
+#include "abc_test/included_instances/data_generator/random_generator_object/specializations/std.hpp"
+#include "abc_test/included_instances/data_generator/random_generator_object/specializations/std_11.hpp"
+#include "abc_test/included_instances/data_generator/random_generator_object/specializations/std_14.hpp"
+#include "abc_test/included_instances/data_generator/random_generator_object/specializations/std_17.hpp"

@@ -73,6 +73,14 @@ __constexpr
         Args... _a_file_reader_writers
     ) noexcept;
 
+template <typename T>
+    requires concept_for_data_generator_with_file_support<T>
+__constexpr
+_ABC_NS_DG::data_generator_collection_t<typename T::generator_type, true>
+make_data_generator_with_file_support(
+    const T& _a_generator
+) noexcept;
+
 namespace
 {
 template <typename T>
@@ -489,7 +497,23 @@ __constexpr_imp
         );
     }
 }
-
+template <typename T>
+    requires concept_for_data_generator_with_file_support<T>
+__constexpr
+_ABC_NS_DG::data_generator_collection_t<typename T::generator_type, true>
+make_data_generator_with_file_support(
+    const T& _a_generator
+) noexcept
+{
+    using namespace _ABC_NS_DG;
+    using namespace std;
+    using namespace utility::io;
+    return unary_collection<typename T::generator_type>(
+        make_shared<data_generator_with_file_support_t<T, false>>(
+            _a_generator
+        )
+    );
+}
 namespace
 {
 template <typename T>

@@ -122,6 +122,10 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/data_generator/random_generator_object/specializations.hpp
   include/abc_test/included_instances/data_generator/random_generator_object/enumeration_based_random_generator_object.hpp
   # Folder containing random data specializations for std types.
+  include/abc_test/included_instances/data_generator/random_generator_object/specializations/std.hpp
+  include/abc_test/included_instances/data_generator/random_generator_object/specializations/std_11.hpp
+  include/abc_test/included_instances/data_generator/random_generator_object/specializations/std_14.hpp
+  include/abc_test/included_instances/data_generator/random_generator_object/specializations/std_17.hpp
   include/abc_test/included_instances/data_generator/random_generator_object/specializations/fundamental_types.hpp
   include/abc_test/included_instances/data_generator/random_generator_object/specializations/enum.hpp
   include/abc_test/included_instances/data_generator/random_generator_object/specializations/array.hpp
