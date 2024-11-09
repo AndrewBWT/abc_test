@@ -33,7 +33,7 @@ public:
         operator==(const user_defined_test_data_t& _a_rhs) const noexcept
         = default;
     __constexpr std::string
-        make_uid() const noexcept;
+        make_uid(const std::string_view _a_delimiter) const noexcept;
     /*!
      * @brief The name of the test. There are some conditions on the name of the
      * test, however these are only relevant when considering groups of tests.
@@ -62,7 +62,7 @@ _BEGIN_ABC_NS
 /*!
  * @brief A type synonym expoed to the user, used to make writing tests easier.
  */
-using test_data_t = _ABC_NS_DS::user_defined_test_data_t;
+using test_case_t = _ABC_NS_DS::user_defined_test_data_t;
 _END_ABC_NS
 
 template <>
@@ -86,10 +86,10 @@ struct fmt::formatter<_ABC_NS_DS::user_defined_test_data_t>
 
 _BEGIN_ABC_DS_NS
 __constexpr std::string
-user_defined_test_data_t::make_uid() const noexcept
+user_defined_test_data_t::make_uid(const std::string_view _a_delimiter) const noexcept
 {
     using namespace std;
-    return string{}.append(this->name).append(this->path);
+    return string{}.append(this->name).append(_a_delimiter).append(this->path);
 }
 _END_ABC_DS_NS
 

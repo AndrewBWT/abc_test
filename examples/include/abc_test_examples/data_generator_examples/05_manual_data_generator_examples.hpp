@@ -16,7 +16,7 @@ namespace t1
 }
 
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         { .name = "file_05_example_01",
          .description = "Manual data generator examples.",
          .path = "examples::gen_data_examples::manual_data_generator",

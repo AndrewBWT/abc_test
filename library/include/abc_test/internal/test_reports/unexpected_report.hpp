@@ -33,7 +33,7 @@ public:
      * @brief Returns the source of the object to the caller.
      * @return A cref to the single_source_t component of the object.
      */
-    __constexpr const ds::single_source_t&
+    __constexpr const std::optional<_ABC_NS_DS::single_source_t>&
                       source() const noexcept;
     /*!
      * @brief Bool denoting whether this report has an exact location for its
@@ -59,10 +59,16 @@ protected:
      * @return 
      */
     __constexpr
+        unexpected_report_t(
+            const _ABC_NS_DS::single_source_t& _a_source,
+            const bool                 _a_exact_source
+        ) noexcept;
+    __constexpr
     unexpected_report_t(
-        const ds::single_source_t& _a_source,
+        const std::optional<_ABC_NS_DS::single_source_t>& _a_source,
         const bool                 _a_exact_source
     ) noexcept;
+
     /*!
      * @brief Constructor
      * @param _a_sources If the source is a source pair, this is used.
@@ -75,7 +81,7 @@ protected:
         const bool               _a_exact_source
     ) noexcept;
 protected:
-    ds::single_source_t _m_last_source;
+    std::optional<_ABC_NS_DS::single_source_t> _m_last_source;
     bool                _m_exact_source;
 };
 /*!
@@ -98,8 +104,16 @@ _END_ABC_REPORTS_NS
 _BEGIN_ABC_REPORTS_NS
 template <bool Terminate>
 __constexpr_imp
+unexpected_report_t<Terminate>::unexpected_report_t(
+    const _ABC_NS_DS::single_source_t& _a_source,
+    const bool                 _a_exact_source
+) noexcept
+    : _m_last_source(_a_source), _m_exact_source(_a_exact_source)
+{}
+template <bool Terminate>
+__constexpr_imp
     unexpected_report_t<Terminate>::unexpected_report_t(
-        const ds::single_source_t& _a_source,
+        const std::optional<_ABC_NS_DS::single_source_t>& _a_source,
         const bool                 _a_exact_source
     ) noexcept
     : _m_last_source(_a_source), _m_exact_source(_a_exact_source)
@@ -120,7 +134,7 @@ __constexpr_imp unexpected_report_t<Terminate>::~unexpected_report_t() noexcept
 {}
 
 template <bool Terminate>
-__constexpr_imp const ds::single_source_t&
+__constexpr_imp const std::optional<_ABC_NS_DS::single_source_t>&
                       unexpected_report_t<Terminate>::source() const noexcept
 {
     return _m_last_source;

@@ -106,6 +106,8 @@ __no_constexpr_or_inline void
 set_global_seed();
 __no_constexpr_or_inline const utility::complete_global_seed_t&
 get_global_seed();
+__no_constexpr_or_inline _ABC_NS_UTILITY::volatilte_volatile_void_ptr_t&
+get_threads_volatie_ptr_ref();
 namespace
 {
 // Can't be constexpr due to use of static var.

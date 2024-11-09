@@ -90,7 +90,7 @@ __no_constexpr_imp void
         for (const test_list_element_t& _l_test_element :
              _l_test_list_element.get())
         {
-            const string _l_id{_l_test_element._m_user_data.make_uid()};
+            const string _l_id{_l_test_element._m_user_data.make_uid(global::get_global_test_options().path_delimiter)};
             const tdg_collection_stack_trie_t* _l_reps{
                 _l_map.contains(_l_id) ? &_l_map.at(_l_id) : nullptr
             };

@@ -3,7 +3,7 @@
 #include "abc_test/included_instances.hpp"
 
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         {.name        = "file_06_example_01",
          .description = "Combinatoris examples.",
          .path        = "examples::gen_data_examples::manual_data_generator",

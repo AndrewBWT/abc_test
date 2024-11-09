@@ -139,7 +139,7 @@ public:
      * @brief Returns to the caller this test_runner_t's most recent source.
      * @return The object's most recent source.
      */
-    __constexpr const _ABC_NS_DS::single_source_t&
+    __constexpr const std::optional<_ABC_NS_DS::single_source_t>&
                       most_recent_source() const noexcept;
     /*!
      * @brief Adds an assertion to the underlying test_runner_t.
@@ -183,7 +183,7 @@ private:
     _ABC_NS_UTILITY::rng                             _m_random_generator;
     // const test_options_base_t&                       _m_test_options;
     _ABC_NS_DS::test_set_data_t _m_test_data;
-    _ABC_NS_DS::single_source_t _m_tests_most_recent_source;
+    std::optional<_ABC_NS_DS::single_source_t> _m_tests_most_recent_source;
     template <bool Single_Source, typename Assertion_Status>
     __constexpr void
         add_assertion_and_optional_warning(
@@ -289,7 +289,7 @@ __no_constexpr_imp _ABC_NS_UTILITY::seed_t
     return _l_seed;
 }
 
-__constexpr_imp const _ABC_NS_DS::single_source_t&
+__constexpr_imp const std::optional<_ABC_NS_DS::single_source_t>&
                       test_runner_t::most_recent_source() const noexcept
 {
     return _m_tests_most_recent_source;

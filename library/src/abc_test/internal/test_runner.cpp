@@ -39,7 +39,7 @@ __no_constexpr_or_inline_imp void
     _m_tests_most_recent_source = _l_rtd._m_source;
     try
     {
-        (_l_rtd._m_test_function)();
+        _l_rtd._m_test_function->run();
     }
     catch (const test_assertion_exception_t& _l_assertion)
     {}

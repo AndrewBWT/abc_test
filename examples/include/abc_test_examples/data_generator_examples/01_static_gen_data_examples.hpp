@@ -8,7 +8,7 @@
 #include <vector>
 
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         {.name        = "A simple test",
          .description = "A brilliant description, describing wonderful things",
          .path        = "simple_test::simplest_test::so_simple",
@@ -21,12 +21,12 @@ _TEST_CASE(
 
 _NAMED_TEST_CASE(
     named,
-    abc::test_data_t({.name = "A named test"})
+    abc::test_case_t({.name = "A named test"})
 )
 {}
 
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         {.name             = "file_01_example_01",
          .description      = "Simpe data generator example using static_data.",
          .path             = "examples::gen_data_examples::static_gen_data",
@@ -68,7 +68,7 @@ _TEST_CASE(
 }
 
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         {.name        = "file_01_example_02",
          .description = "Showing how to define collections of data generators.",
          .path        = "examples::gen_data_examples::static_gen_data",

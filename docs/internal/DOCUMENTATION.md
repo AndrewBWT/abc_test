@@ -23,11 +23,11 @@ Status: Incomplete
 
 ## Declaring Tests
 Status: Incomplete
-- [ ] Write introduction
-- [ ] Show how to declare tests.
-- [ ] Explain what the GLOT is.
+- [x] Write introduction
+- [x] Show how to declare tests.
+- [x] Explain what the GLOT is.
 - [ ] Show how to add non-GLOT tests to test framework.
-- [ ] Discuss when tests may fail or not be added.
+- [x] Discuss when tests may fail or not be added.
 
 ## Assertions
 Status: Incomplete

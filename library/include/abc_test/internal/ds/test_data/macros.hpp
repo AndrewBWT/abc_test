@@ -75,7 +75,7 @@
         );                                                                    \
     auto __ABC_TEST_NAMED_COUNTER(__ABC_TEST_FUNCTION_PREFIX                  \
     ){_ABC_NS_GLOBAL::add_test(registered_test_data_t(                        \
-        _a_function_name,                                                     \
+        mk_function(_a_function_name),                                                     \
         _a_user_defined_test_data_name,                                       \
         _ABC_NS_DS::single_source_t(                                          \
             _a_str_representation, std::source_location::current()            \

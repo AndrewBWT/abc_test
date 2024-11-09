@@ -19,7 +19,7 @@ public:
      */
     __constexpr
     unexpected_thrown_not_derived_from_std_exception_t(
-        const ds::single_source_t& _a_source
+        const std::optional<_ABC_NS_DS::single_source_t>& _a_source
     ) noexcept;
 };
 
@@ -29,7 +29,7 @@ _BEGIN_ABC_REPORTS_NS
 __constexpr_imp
     unexpected_thrown_not_derived_from_std_exception_t::
         unexpected_thrown_not_derived_from_std_exception_t(
-            const ds::single_source_t& _a_source
+            const std::optional<_ABC_NS_DS::single_source_t>& _a_source
         ) noexcept
     : unexpected_report_t<true>(_a_source, false)
 {}

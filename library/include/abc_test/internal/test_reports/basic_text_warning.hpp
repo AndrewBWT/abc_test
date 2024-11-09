@@ -20,7 +20,7 @@ public:
      */
     __constexpr
     basic_text_warning_t(
-        const ds::single_source_t& _a_source,
+        const std::optional<_ABC_NS_DS::single_source_t>& _a_source,
         const bool                 _a_exact_source,
         const std::string_view     _a_str
     ) noexcept;
@@ -33,7 +33,7 @@ _END_ABC_REPORTS_NS
 _BEGIN_ABC_REPORTS_NS
 __constexpr_imp
     basic_text_warning_t::basic_text_warning_t(
-        const ds::single_source_t& _a_source,
+        const std::optional<_ABC_NS_DS::single_source_t>& _a_source,
         const bool                 _a_exact_source,
         const std::string_view     _a_str
     ) noexcept

@@ -9,7 +9,7 @@
 #include <vector>
 
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         {.name             = "file_03_example_01",
          .description      = "Random data generator examples.",
          .path             = "examples::gen_data_examples::random_data",

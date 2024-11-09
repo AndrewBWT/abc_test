@@ -37,9 +37,12 @@ set(LIBRARY_FILES
   include/abc_test/internal/ds/test_data/post_setup_test_data.hpp
   include/abc_test/internal/ds/test_data/user_defined_test_data.hpp
   include/abc_test/internal/ds/test_data/checked_user_defined_test_data.hpp
+  include/abc_test/internal/ds/test_data/test_function_object.hpp
+  include/abc_test/internal/ds/test_data/test_function_callable_object.hpp
   include/abc_test/internal/ds/test_data/enum_test_status.hpp
   include/abc_test/internal/ds/test_data/macros.hpp
   include/abc_test/internal/ds/test_data/test_set_data.hpp
+      src/abc_test/internal/ds/test_data/test_set_data.cpp
   include/abc_test/internal/ds/test_data/finalised_test_set_data.hpp
   # Bespoke data structures for the library for storing tests in various forms.
   include/abc_test/internal/ds/test_collections/test_collection.hpp
@@ -147,6 +150,7 @@ set(LIBRARY_FILES
   # utility subfolder. Contains axillary helper classes and functions not necessary
   # related to the core testing framework.
   include/abc_test/internal/utility/ptr_utility.hpp
+  include/abc_test/internal/utility/do_not_optimise.hpp
   include/abc_test/internal/utility/rng.hpp
   # BigInteger files. Currently we do not use these. We should determine whether we will
   # need these and, if not, remove them from the library.

@@ -55,6 +55,7 @@ Each list of todo's is given in the order which represents when they are to be c
 - Should we perform checks on a test's name to ensure it can be used as a file/folder name.
 - Add functionality to allow the user to filter tests based on a path. When this is addressed, update DECLARING_TESTS.md.
 - Check that same pairs of test paths and test names are dealt with properly. Update DECLARING_TESTS.md when this is addressed.
+- We're using a function from Google Benchmark, who use an apache licence. Need to look into whether we need to include the original licence when providing our library.
 
 ## Completed
 

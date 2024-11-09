@@ -146,8 +146,16 @@ get_global_seed()
 {
     return get_inner_global_seed();
 }
+__no_constexpr_or_inline_imp _ABC_NS_UTILITY::volatilte_volatile_void_ptr_t&
+get_threads_volatie_ptr_ref()
+{
+    using namespace _ABC_NS_UTILITY;
+    thread_local volatilte_volatile_void_ptr_t _tl_tr{ nullptr };
+    return _tl_tr;
+}
 namespace
 {
+
 __no_constexpr_or_inline_imp ds::test_list_t&
                              get_mutable_test_list() noexcept
 {

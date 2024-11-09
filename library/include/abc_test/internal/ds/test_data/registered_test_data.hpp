@@ -10,6 +10,7 @@
 #include <optional>
 #include <source_location>
 #include <string>
+#include "abc_test/internal/ds/test_data/test_function_object.hpp"
 
 _BEGIN_ABC_DS_NS
 
@@ -33,7 +34,7 @@ public:
      * erronious values.
      * @param _a_source Source information about the test.
      */
-    __constexpr
+    __no_constexpr
     registered_test_data_t(
         const test_function_t                  _a_test_function,
         const checked_user_defined_test_data_t _a_user_data,
@@ -59,7 +60,7 @@ public:
      * @brief The location of the test. This includes the source code and a
      * string representation of the test.
      */
-    ds::single_source_t _m_source;
+    std::optional<ds::single_source_t> _m_source;
 };
 
 _END_ABC_DS_NS
@@ -78,7 +79,7 @@ struct fmt::formatter<_ABC_NS_DS::registered_test_data_t> : formatter<string_vie
 };
 
 _BEGIN_ABC_DS_NS
-__constexpr_imp
+__no_constexpr_imp
     registered_test_data_t::registered_test_data_t(
         const test_function_t                  _a_test_function,
         const checked_user_defined_test_data_t _a_user_data,
@@ -106,7 +107,8 @@ __no_constexpr_imp auto
         "}}",
         typeid(_a_rtd).name(),
         "_m_test_function",
-        fmt::format("{0}", static_cast<void*>(_a_rtd._m_test_function)),
+        "hello",
+        //fmt::format("{0}", static_cast<void*>(_a_rtd._m_test_function)),
         "_m_user_data",
         _a_rtd._m_user_data,
         "_m_source",

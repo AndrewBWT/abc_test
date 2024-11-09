@@ -156,9 +156,9 @@ public:
     __constexpr const std::string_view
                       source_code_str() const noexcept;
     __constexpr       std::string
-        source_location(const std::source_location& _a_sl) const noexcept;
+        source_location(const std::optional<std::source_location>& _a_sl) const noexcept;
     __constexpr std::string
-        source_representation(const std::string_view _a_str) const noexcept;
+        source_representation(const std::optional<std::string_view>& _a_str) const noexcept;
     __constexpr const std::string_view
                       log_info_str() const noexcept;
     __constexpr       std::string
@@ -751,19 +751,32 @@ __constexpr_imp const std::string_view
 
 __constexpr_imp std::string
                 print_config_t::source_location(
-        const std::source_location& _a_sl
+        const std::optional<std::source_location>& _a_sl
     ) const noexcept
 {
-    return highlight(fmt::format("{0}:{1}", _a_sl.file_name(), _a_sl.line()));
+    if (_a_sl.has_value())
+    {
+        return highlight(fmt::format("{0}:{1}", _a_sl.value().file_name(), _a_sl.value().line()));
+    }
+    else
+    {
+        return highlight("<no source location>");
+    }
 }
 
 __constexpr_imp std::string
                 print_config_t::source_representation(
-        const std::string_view _a_str
+        const std::optional<std::string_view>& _a_str
     ) const noexcept
 {
-    using namespace std;
-    return slight_highlight(quote(_a_str));
+    if (_a_str.has_value())
+    {
+        return slight_highlight(quote(_a_str.value()));
+    }
+    else
+    {
+        return highlight("<no source representation>");
+    }
 }
 
 __constexpr_imp const std::string_view

@@ -1,7 +1,8 @@
 #pragma once
-#include "abc_test/internal/ds/test_data/invoked_test_data.hpp"
-#include "abc_test/internal/global.hpp"
 #include "abc_test/internal/ds/data_generator_memoization/map_unique_id_to_tdg_collection_stack_trie.hpp"
+#include "abc_test/internal/ds/test_data/invoked_test_data.hpp"
+#include "abc_test/internal/ds/test_data/test_function_object.hpp"
+#include "abc_test/internal/global.hpp"
 
 _BEGIN_ABC_DS_NS
 
@@ -16,7 +17,7 @@ public:
      * @brief Default constructor.
      */
     __no_constexpr
-    test_set_data_t()
+        test_set_data_t()
         = default;
     /*!
      * @brief This function processes a single invoked_test_data_t object,
@@ -24,7 +25,7 @@ public:
      * @param _a_invoked_test The invoked_test_data_t entity used to update this
      * object.
      */
-    __no_constexpr void
+    __no_constexpr_or_inline void
         process_invoked_test(ds::invoked_test_data_t& _a_invoked_test) noexcept;
 private:
     abc::ds::map_unique_id_to_tdg_collection_stack_trie_t
@@ -72,29 +73,4 @@ _END_ABC_DS_NS
 
 _BEGIN_ABC_DS_NS
 
-__no_constexpr_imp void
-    test_set_data_t::process_invoked_test(
-        ds::invoked_test_data_t& _a_invoked_test
-    ) noexcept
-{
-    using enum enum_test_status_t;
-    _m_map_ids_to_tdg_collection_stack_tries.insert(
-        _a_invoked_test.post_setup_test_data().registered_test_data()._m_user_data.make_uid(),
-        _a_invoked_test.for_loop_stack_trie()
-    );
-    const enum_test_status_t _l_test_status{_a_invoked_test.test_status()};
-    const bool               _l_test_passed{test_passed(_l_test_status)};
-    _m_total_tests_ran    += 1;
-    _m_total_tests_passed += _l_test_passed ? 1 : 0;
-    _m_total_tests_failed += (not _l_test_passed) ? 1 : 0;
-    _m_total_tests_failed_and_terminated
-        += (_l_test_status == TERMINATION_OCCOURED_TEST_FAILED) ? 1 : 0;
-    _m_total_tests_failed_but_not_terminated
-        += (_l_test_status == NO_TERMINATION_TEST_FAILED) ? 1 : 0;
-    _m_total_tests_designated_failure_due_to_exception
-        += (_l_test_status == TERMINATION_OCCOURED_UNEXPECTED_THROW) ? 1 : 0;
-    _m_total_assertions_ran    += _a_invoked_test.assertions_recieved();
-    _m_total_assertions_passed += _a_invoked_test.assertions_passed();
-    _m_total_assertions_failed += _a_invoked_test.assertions_failed();
-}
 _END_ABC_DS_NS

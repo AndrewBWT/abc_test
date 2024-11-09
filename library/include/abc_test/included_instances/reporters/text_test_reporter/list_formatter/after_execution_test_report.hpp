@@ -69,6 +69,7 @@ __constexpr_imp std::vector<std::string>
     ) const
 {
     using namespace std;
+    using namespace _ABC_NS_DS;
     using enum enum_after_execution_test_report_fields_t;
     switch (_a_fid)
     {
@@ -98,23 +99,39 @@ __constexpr_imp std::vector<std::string>
                            .registered_test_data()
                            ._m_user_data.name)
         };
+
     case SOURCE_LOCATION:
+    {
+        const optional<single_source_t> _l_opt{
+            _a_element.post_setup_test_data().registered_test_data()._m_source
+        };
         return {
             _a_pc.space(_a_pc.colon(_a_pc.source_location_str())),
-            _a_pc.source_location(_a_element.post_setup_test_data()
-                                      .registered_test_data()
-                                      ._m_source.source_location())
+                        _a_pc.source_location(
+                _l_opt.has_value()
+                    ? optional<source_location>{_l_opt.value()
+                                                .source_location()}
+                    : optional<source_location>{}
+            )
         };
+    }
     case SOURCE_REPRESENTATION:
+    {
+        const optional<single_source_t> _l_opt{
+            _a_element.post_setup_test_data().registered_test_data()._m_source
+        };
         return {
             _a_pc.space(_a_pc.colon(_a_pc.source_code_str())),
             _a_pc.source_representation(
-                _a_element.post_setup_test_data()
-                    .registered_test_data()
-                    ._m_source.source_code_representation()
+                _l_opt.has_value()
+                    ? optional<string_view>{_l_opt.value()
+                                                .source_code_representation()}
+                    : optional<string_view>{}
             )
         };
+    }
     case TEST_PATH:
+
         return {
             _a_pc.space(_a_pc.colon(_a_pc.test_path_str())),
             _a_pc.test_path(_a_element.post_setup_test_data()
