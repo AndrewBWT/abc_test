@@ -130,6 +130,10 @@ public:
      */
     bool force_run_all_tests = false;
     /*!
+    * Test paths to run
+    */
+    std::vector<ds::test_path_hierarchy_t> test_paths_to_run;
+    /*!
      * @brief Function to validate the input.
      *
      * Any errors are written to the optional string outout.
@@ -314,6 +318,11 @@ __no_constexpr_imp void
         _a_error_ref.push_back(
             fmt::format("Root folder \"{0}\" does not exist", root_path)
         );
+    }
+    if (test_paths_to_run.size() == 0)
+    {
+        using namespace ds;
+        test_paths_to_run = vector<test_path_hierarchy_t>(1, vector<test_path_element_t>());
     }
 }
 

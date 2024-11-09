@@ -81,16 +81,19 @@ __no_constexpr_imp void
     using namespace ds;
     using namespace utility;
     using namespace errors;
-    const std::map<key_t, tdg_collection_stack_trie_t>& _l_map{
+    const map<key_t, tdg_collection_stack_trie_t>& _l_map{
         _m_options.map_of_unique_ids_and_for_loop_stack_tries.map()
     };
+    const std::vector<test_path_hierarchy_t>& _l_test_paths_to_use = _m_options.test_paths_to_run;
     for (std::reference_wrapper<const test_list_t> _l_test_list_element :
          _a_test_list_collection)
     {
         for (const test_list_element_t& _l_test_element :
              _l_test_list_element.get())
         {
-            const string _l_id{_l_test_element._m_user_data.make_uid(global::get_global_test_options().path_delimiter)};
+            const string _l_id{
+                _l_test_element._m_user_data.make_uid(_m_options.path_delimiter)
+            };
             const tdg_collection_stack_trie_t* _l_reps{
                 _l_map.contains(_l_id) ? &_l_map.at(_l_id) : nullptr
             };
@@ -100,13 +103,23 @@ __no_constexpr_imp void
                     == 0
                 || global::get_global_test_options().force_run_all_tests
             };
+            const test_path_hierarchy_t _l_test_path_hierarchy{
+                abc::utility::str::split_string(
+                    _l_test_element._m_user_data.path, _m_options.path_delimiter
+                )
+            };
+            const bool _l_test_in_path_set{check_if_element_in_path_set(
+                _l_test_path_hierarchy, _l_test_paths_to_use
+            )};
             _m_post_setup_tests.push_back(post_setup_test_data_t(
                 _l_test_element,
-                _m_options.path_delimiter,
+                _l_test_path_hierarchy,
                 _m_test_discovery_id,
-                _l_test_ran_override || (_l_reps != nullptr),
+                _l_test_in_path_set
+                    && (_l_test_ran_override || (_l_reps != nullptr)),
                 _l_reps,
-                _m_options.threads
+                _m_options.threads,
+                _l_id
             ));
             const opt_setup_error_t _l_res{_m_test_tree.add_test(
                 std::cref(_m_post_setup_tests.back()), _m_options

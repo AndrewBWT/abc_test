@@ -108,3 +108,41 @@ The tests are then ran. After each test is ran, the set of `test_reporter_t`'s a
 # Termination
 
 Finally, the `test_main_t` is terminated. 
+
+# Running Tests
+
+There are severl ways of running tests:
+
+- A set of repetition data for several tests.
+- A set of path used to determine which sets to run.
+- An override for running all tests in path set even if theres no repetition data for it.
+- If the input path is empty, then it becomes a singleton with "" in it.
+
+- Take all tests which are filtered by the paths:
+- (If the input path is empty, this is all tests)
+    - If repetition data set has elements in
+        - Override is off, then filter the set to only run those members which have repetition members.
+        - Override is on, run all tests in the set. Those elemnets with repeittion data are ran with that repetition data.
+    - If repetition data set has no elements in.
+        - All tests in the set are ran.
+
+- Default value 
+
+the input paths are empty, and the test has no repetition data, then the test is ran normally.
+- If the override is off, hte input paths are empty, and the test has repetition data with an entry for the test, then the test is ran with repetition data.
+- If the override is off, the input paths are empty, and the test has repetition data but no entry for the test, then the test is not ran.
+- If the override is off, the input paths are not empty and the test is in the set described by them, and the test has no repetition data, then the test is ran normally.
+- If the override is off, the input paths are not empty and the test is in the set described by them, and the test has repetition data and the test is in that set, then the test is ran with repetition data.
+- If the override is off, the input paths are not empty and the test is in the set described by them, and the test has repetition data but its not in the set, then the test is ran normally.
+
+- If the override is off, the input paths are empty, and the test has repetition data, with an entry associated with this test, then the test is ran with the repetition data.
+- If the override is off, the input paths are empty, and the test has repetition data but no entries associated with this test, then the test is not ran.
+- If the override is off, the input paths are not-empty and one matches with this test, and the test has repetition data associatd with this test, then the test is ran with the repetition data.
+- If the 
+
+- If the override is on, and a test has repetition data, that test is ran with the repetition data.
+- If the test override is on, the test has repetition data 
+
+- If the override is off, and the test's path matches with the input path, and the test has repetition data, then the test is ran with the repetition data.
+- If the override is on, the test's path does not match the repetition data, and the test has repetition data associated with it, then the test is not ran.
+- 

@@ -153,7 +153,7 @@ _END_ABC_DS_NS
 _BEGIN_ABC_DS_NS
 __no_constexpr_imp errors::opt_setup_error_t
                    test_tree_t::add_test(
-        const node_t&         _a_test,
+        const node_t&              _a_test,
         const test_options_base_t& _a_options
     ) noexcept
 {
@@ -178,7 +178,35 @@ __no_constexpr_imp errors::opt_setup_error_t
     }
     else
     {
-        return static_add_test(std::ref(*this), _a_test, _l_test);
+        vector<size_t> _l_empty_indexes{};
+        for (size_t            _l_idx{0};
+             const string_view _l_element : _l_test.test_path_hierarchy())
+        {
+            if (_l_element.empty())
+            {
+                _l_empty_indexes.push_back(_l_idx);
+            }
+            ++_l_idx;
+        }
+        if (_l_empty_indexes.size() > 0)
+        {
+            return opt_setup_error_t(setup_error_t(
+                fmt::format(
+                    "setup_test_error: post_setup_test_data_t's "
+                    "test_path_hierarchy contains empty strings. Specifically "
+                    "at indexes {0}. Complete test_path_hierarchy = {1}. "
+                    "post_setup_test_data_t = {2}",
+                    _l_empty_indexes,
+                    _l_test.test_path_hierarchy(),
+                    _l_test
+                ),
+                false
+            ));
+        }
+        else
+        {
+            return static_add_test(std::ref(*this), _a_test, _l_test);
+        }
     }
 }
 
@@ -293,7 +321,7 @@ __no_constexpr_imp errors::opt_setup_error_t
             return opt_setup_error_t(setup_error_t(
                 fmt::format(
                     "setup_test_error: post_setup_test_data_t's "
-                    "registered_test_data has the same description as a "
+                    "registered_test_data has the same name as a "
                     "current entry in the test_tree_t object. "
                     "The post_setup_test_data object we are attempting to "
                     "insert is {0}, "

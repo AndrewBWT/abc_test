@@ -1,9 +1,9 @@
 #pragma once
 #include "abc_test/internal/ds/test_data/registered_test_data.hpp"
-//#include "abc_test/internal/test_options.hpp"
-#include "abc_test/internal/utility/str/string_utility.hpp"
-#include "abc_test/internal/ds/type_synonyms.hpp"
+// #include "abc_test/internal/test_options.hpp"
 #include "abc_test/internal/ds/data_generator_memoization/typeless_data_generator_collection_stack_trie.hpp"
+#include "abc_test/internal/ds/type_synonyms.hpp"
+#include "abc_test/internal/utility/str/string_utility.hpp"
 
 #include <vector>
 
@@ -46,12 +46,13 @@ public:
      */
     __constexpr
     post_setup_test_data_t(
-        const registered_test_data_t&    _a_registered_test_data,
-        const test_path_delimiter_ref    _a_test_hierarchy_delimiter,
-        const unique_id_t                _a_discovery_id,
-        const bool                       _a_is_test_to_be_ran,
+        const registered_test_data_t&          _a_registered_test_data,
+        const test_path_hierarchy_t&                 _a_test_path_hierarchy,
+        const unique_id_t                      _a_discovery_id,
+        const bool                             _a_is_test_to_be_ran,
         const ds::tdg_collection_stack_trie_t* _a_for_loop_stack_trie,
-        const size_t                     _a_maximum_threads_allowed
+        const size_t                           _a_maximum_threads_allowed,
+        const std::string_view _a_unique_id
     ) noexcept;
     /*!
      * @brief Returns a cref to the registered_test_data_t member variable.
@@ -109,6 +110,8 @@ public:
      */
     __constexpr std::size_t
                 thread_resourses_required() const noexcept;
+    __constexpr const std::string_view
+        unique_id() const noexcept;
     /*!
      * @brief Equality operator for post_setup_test_data_t objects.
      * @param _a_rhs The post_setup_test_data_t object to compare this object
@@ -131,39 +134,46 @@ private:
     size_t _m_thread_resourses_required;
     // A pointer to the trie associated with this test.
     const ds::tdg_collection_stack_trie_t* _m_for_loop_stack_trie;
+    // The tests unique ID
+    std::string _m_unique_id;
 };
 
+__constexpr bool check_if_element_in_path_set(
+    const test_path_hierarchy_t& _a_test_path_hierarchy,
+    const std::vector<test_path_hierarchy_t>& _a_test_path_set
+) noexcept;
 _END_ABC_DS_NS
 
 /*!
  * formatter for post_setup_test_ata object.
  */
 template <>
-struct fmt::formatter<_ABC_NS_DS::post_setup_test_data_t> : formatter<string_view>
+struct fmt::formatter<_ABC_NS_DS::post_setup_test_data_t>
+    : formatter<string_view>
 {
     /*!
      * Provides a formatter for a poset_setup_test_data_t object
      */
     __no_constexpr auto
-        format(_ABC_NS_DS::post_setup_test_data_t _a_pstd, format_context& _a_cxt)
-            const -> format_context::iterator;
+        format(
+            _ABC_NS_DS::post_setup_test_data_t _a_pstd,
+            format_context&                    _a_cxt
+        ) const -> format_context::iterator;
 };
 
 _BEGIN_ABC_DS_NS
 __constexpr_imp
     post_setup_test_data_t::post_setup_test_data_t(
-        const registered_test_data_t&    _a_registered_test_data,
-        const test_path_delimiter_ref    _a_test_hierarchy_delimiter,
-        const unique_id_t                _a_discovery_id,
-        const bool                       _a_is_test_to_be_ran,
+        const registered_test_data_t&          _a_registered_test_data,
+        const test_path_hierarchy_t& _a_test_path_hierarchy,
+        const unique_id_t                      _a_discovery_id,
+        const bool                             _a_is_test_to_be_ran,
         const ds::tdg_collection_stack_trie_t* _a_repetition_data,
-        const size_t                     _a_maximum_threads_allowed
+        const size_t                           _a_maximum_threads_allowed,
+        const std::string_view _a_unique_id
     ) noexcept
     : _m_registered_test_data(_a_registered_test_data)
-    , _m_test_path_hierarchy(utility::str::split_string(
-          _a_registered_test_data._m_user_data.path,
-          _a_test_hierarchy_delimiter
-      ))
+    , _m_test_path_hierarchy(_a_test_path_hierarchy)
     , _m_discovery_id(_a_discovery_id)
     , _m_is_test_to_be_ran(_a_is_test_to_be_ran)
     , _m_for_loop_stack_trie(_a_repetition_data)
@@ -175,6 +185,7 @@ __constexpr_imp
                     _a_registered_test_data._m_user_data.threads_required
                 )
       )
+    , _m_unique_id(_a_unique_id)
 {}
 
 __constexpr_imp const registered_test_data_t&
@@ -229,13 +240,47 @@ __constexpr_imp std::size_t
 {
     return _m_thread_resourses_required;
 }
-
+__constexpr_imp const std::string_view
+post_setup_test_data_t::unique_id() const noexcept
+{
+    return _m_unique_id;
+}
+__constexpr_imp bool check_if_element_in_path_set(
+    const test_path_hierarchy_t& _a_test_path_hierarchy,
+    const std::vector<test_path_hierarchy_t>& _a_test_path_set
+) noexcept
+{
+    using namespace std;
+    const size_t _l_test_path_hierarchy_size{ _a_test_path_hierarchy.size() };
+    for (const test_path_hierarchy_t& _l_path_set_element : _a_test_path_set)
+    {
+        bool _l_prefix_matches{ true };
+        for (size_t _l_idx{ 0 }; const string_view _l_str : _l_path_set_element)
+        {
+            if (_l_idx >= _l_test_path_hierarchy_size)
+            {
+                _l_prefix_matches = false;
+                break;
+            }
+            else if (_a_test_path_hierarchy[_l_idx] != _l_str)
+            {
+                _l_prefix_matches = false;
+                break;
+            }
+        }
+        if (_l_prefix_matches)
+        {
+            return true;
+        }
+    }
+    return false;
+}
 _END_ABC_DS_NS
 
 __no_constexpr_imp auto
     fmt::formatter<_ABC_NS_DS::post_setup_test_data_t>::format(
         _ABC_NS_DS::post_setup_test_data_t _a_pstd,
-        format_context&                 _a_ctx
+        format_context&                    _a_ctx
     ) const -> format_context::iterator
 {
     using namespace std;
