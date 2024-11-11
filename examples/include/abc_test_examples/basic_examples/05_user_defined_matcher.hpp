@@ -1,8 +1,6 @@
 #pragma once
-#include "abc_test/included_instances/data_generator/enumerable/specializations/enum.h"
-#include "abc_test/included_instances/matchers/function_wrapper.h"
-#include "abc_test/included_instances/matchers/ranges.h"
-#include "abc_test/core.h"
+#include "abc_test/core.hpp"
+#include "abc_test/included_instances.hpp"
 
 #include <numeric>
 #include <ranges>
@@ -10,22 +8,13 @@
 
 namespace test
 {
-template <typename T>
-class list_same_matcher_t : public abc::matcher::matcher_base_t
+namespace
 {
-public:
-    constexpr list_same_matcher_t(
-        const std::vector<T>& _a_vector
-    )
-        : _m_vector(_a_vector)
-    {}
-private:
-    std::vector<T> _m_vector;
-
-    constexpr virtual abc::matcher::matcher_result_t
+    template<typename T>
+    constexpr abc::matcher::matcher_result_t
         run(
-            abc::test_runner_t& _a_test_runner
-        ) override
+            const std::vector<T>& _a_vector
+        )
     {
         using namespace abc;
         using namespace std;
@@ -33,43 +22,52 @@ private:
         T      _l_bad_element{};
         size_t _l_bad_idx{0};
         bool   _l_all_same{true};
-        if (_m_vector.size() > 0)
+        if (_a_vector.size() > 0)
         {
-            const T& _l_check{_m_vector[0]};
-            for (size_t _l_idx{1}; _l_idx < _m_vector.size(); ++_l_idx)
+            const T& _l_check{ _a_vector[0]};
+            for (size_t _l_idx{1}; _l_idx < _a_vector.size(); ++_l_idx)
             {
-                if (_m_vector[_l_idx] != _l_check)
+                if (_a_vector[_l_idx] != _l_check)
                 {
                     _l_all_same    = false;
                     _l_bad_idx     = _l_idx;
-                    _l_bad_element = _m_vector[_l_idx];
+                    _l_bad_element = _a_vector[_l_idx];
                     break;
                 }
             }
         }
         if (_l_all_same)
         {
-            return matcher_result_t{true, true, ""};
+            return matcher_result_t{true, ""};
             //	fmt::format("Vector {0} contains all the same element.",
             //		_m_vector) };
         }
         else
         {
             return matcher_result_t{
-                true,
                 false,
                 fmt::format(
                     "Vector {0} does not contain all same element."
                     "First element which is not the same as all the previous "
                     "is at index {1}, "
                     "which contains the element {2}.",
-                    _m_vector,
+                    _a_vector,
                     _l_bad_idx,
                     _l_bad_element
                 )
             };
         }
     }
+}
+template <typename T>
+class list_same_matcher_t : public abc::matcher::matcher_base_t
+{
+public:
+    constexpr list_same_matcher_t(
+        const std::vector<T>& _a_vector
+    )
+        : abc::matcher::matcher_base_t(run(_a_vector))
+    {}
 };
 
 template <typename T>
@@ -83,7 +81,7 @@ abc::matcher_t
 } // namespace test
 
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         {.name        = "file_05_example_01",
          .description = "User-defined matchers",
          .path        = "examples::basic_examples::05_user_defined_matcher"}
@@ -128,7 +126,7 @@ _TEST_CASE(
 }
 
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         {.name        = "file_05_example_02",
          .description = "User-defined matchers using function_wrapper",
          .path        = "examples::basic_examples::05_user_defined_matcher"}
@@ -155,11 +153,11 @@ _TEST_CASE(
         using namespace abc::matcher;
         if (_l_x.size() == 0)
         {
-            return matcher_result_t(true, true, "Vector is empty");
+            return matcher_result_t(true, "Vector is empty");
         }
         else
         {
-            return matcher_result_t(true, false, "Vector is not empty");
+            return matcher_result_t(false, "Vector is not empty");
         }
     };
     _CHECK(matcher_t(new abc::matcher::function_wrapper_matcher_t(_l_f1)));
@@ -192,7 +190,6 @@ constexpr abc::matcher_t
         [&]()
         {
             return matcher_result_t(
-                true,
                 (_a_vect.size() == 0),
                 fmt::format(
                     "{0} is{1} empty",
@@ -206,7 +203,7 @@ constexpr abc::matcher_t
 } // namespace testing
 
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         {.name        = "file_05_example_03",
          .description = "A second user-defined matchers using function_wrapper",
          .path        = "examples::basic_examples::05_user_defined_matcher"}

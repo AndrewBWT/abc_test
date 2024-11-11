@@ -18,13 +18,13 @@ public:
 			function_wrapper_internal_t _a_function
 		) noexcept;
 private:
-	function_wrapper_internal_t _m_function;
-	__no_constexpr
-		virtual
-		matcher_result_t
-		run(
-			test_runner_t&
-		) override final;
+//	function_wrapper_internal_t _m_function;
+	//__no_constexpr
+	//	virtual
+	//	matcher_result_t
+	//	run(
+	//		test_runner_t&
+	//	) override final;
 };
 __no_constexpr_imp
 matcher_t
@@ -38,18 +38,19 @@ __no_constexpr_imp
 	function_wrapper_matcher_t::function_wrapper_matcher_t(
 		function_wrapper_internal_t _a_function
 	) noexcept
-	: _m_function(_a_function)
+	: matcher_base_t(_a_function())
+	//, _m_function(_a_function)
 {
 
 }
-__no_constexpr_imp
+/*__no_constexpr_imp
 	matcher_result_t
 	function_wrapper_matcher_t::run(
 		test_runner_t&
 )
 {
 	return _m_function();
-}
+}*/
 __no_constexpr_imp
 matcher_t
 function_wrapper(

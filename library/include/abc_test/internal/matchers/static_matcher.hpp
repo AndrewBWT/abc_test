@@ -4,7 +4,7 @@
 #include "abc_test/internal/test_reports/assertion_status/pass.hpp"
 
 _BEGIN_ABC_MATCHER_NS
-//Forward declaration
+// Forward declaration
 template <bool Is_Annotated>
 struct matcher_wrapper_t;
 _END_ABC_MATCHER_NS
@@ -13,6 +13,7 @@ _BEGIN_ABC_NS
 using matcher_t = _ABC_NS_MATCHER::matcher_wrapper_t<false>;
 _END_ABC_NS
 _BEGIN_ABC_MATCHER_NS
+
 /*!
  * @brief Matcher object which creates the matcher at compile time.
  *
@@ -31,11 +32,21 @@ public:
      * @brief Constructor.
      */
     __constexpr
-        static_matcher_t() noexcept = default;
+    static_matcher_t() noexcept;
 private:
-    __constexpr virtual matcher_result_t
-        run(test_runner_t& _a_test_runner) final override;
+    // __constexpr virtual matcher_result_t
+    // run(test_runner_t& _a_test_runner) final override;
 };
+
+namespace
+{
+template <typename Assertion_Status>
+requires std::same_as<Assertion_Status, _ABC_NS_REPORTS::pass_t>
+         || std::same_as<Assertion_Status, _ABC_NS_REPORTS::fail_t>
+__constexpr matcher_result_t
+    mk_matcher_result() noexcept;
+} // namespace
+
 _END_ABC_MATCHER_NS
 _BEGIN_ABC_NS
 /*!
@@ -58,6 +69,14 @@ _BEGIN_ABC_MATCHER_NS
 template <typename Assertion_Status>
 requires std::same_as<Assertion_Status, _ABC_NS_REPORTS::pass_t>
          || std::same_as<Assertion_Status, _ABC_NS_REPORTS::fail_t>
+__constexpr_imp
+    static_matcher_t<Assertion_Status>::static_matcher_t() noexcept
+    : matcher_base_t(mk_matcher_result<Assertion_Status>())
+{}
+
+/*template <typename Assertion_Status>
+requires std::same_as<Assertion_Status, _ABC_NS_REPORTS::pass_t>
+         || std::same_as<Assertion_Status, _ABC_NS_REPORTS::fail_t>
 __constexpr_imp matcher_result_t
     static_matcher_t<Assertion_Status>::run(
         test_runner_t& _a_test_runner
@@ -78,6 +97,31 @@ __constexpr_imp matcher_result_t
             Assertion_Status, "Cannot instnatiate run method for static_matcher"
         );
     }
+}*/
+namespace
+{
+template <typename Assertion_Status>
+requires std::same_as<Assertion_Status, _ABC_NS_REPORTS::pass_t>
+         || std::same_as<Assertion_Status, _ABC_NS_REPORTS::fail_t>
+__constexpr_imp matcher_result_t
+    mk_matcher_result() noexcept
+{
+    using namespace reports;
+    if constexpr (std::same_as<Assertion_Status, pass_t>)
+    {
+        return matcher_result_t(true, "true");
+    }
+    else if constexpr (std::same_as<Assertion_Status, fail_t>)
+    {
+        return matcher_result_t(false, "false");
+    }
+    else
+    {
+        __STATIC_ASSERT(
+            Assertion_Status, "Cannot instnatiate run method for static_matcher"
+        );
+    }
 }
+} // namespace
 
 _END_ABC_MATCHER_NS

@@ -1,12 +1,12 @@
 #pragma once
-#include "abc_test/included_instances/data_generator/enumerable/specializations/enum.h"
-#include "abc_test/core.h"
+#include "abc_test/core.hpp"
+#include "abc_test/included_instances.hpp"
 
 
 #include <ranges>
 #include <numeric>
 
-_TEST_CASE(abc::test_data_t({
+_TEST_CASE(abc::test_case_t({
 	.name = "file_02_example_01",
 	.description = "Examples concerning matchers",
 	.path = "examples::basic_examples::02_basic_matchers"
@@ -61,7 +61,7 @@ _TEST_CASE(abc::test_data_t({
 
 }
 
-_TEST_CASE(abc::test_data_t({
+_TEST_CASE(abc::test_case_t({
 	.name = "file_02_example_02",
 	.description = "Boolean-based matchers",
 	.path = "examples::basic_examples::02_basic_matchers"
@@ -86,7 +86,7 @@ _TEST_CASE(abc::test_data_t({
 	_REQUIRE(annotate(bool_matcher(b1), str));
 }
 
-_TEST_CASE(abc::test_data_t({
+_TEST_CASE(abc::test_case_t({
 	.name = "file_02_example_03",
 	.description = "Examples using the _MATCHER macro",
 	.path = "examples::basic_examples::02_basic_matchers"
@@ -129,7 +129,7 @@ _TEST_CASE(abc::test_data_t({
 	_CHECK(_MATCHER(l2));
 }
 
-_TEST_CASE(abc::test_data_t({
+_TEST_CASE(abc::test_case_t({
 	.name = "file_02_example_04",
 	.description = "Examples showing matcher's annotations",
 	.path = "examples::basic_examples::02_basic_matchers"

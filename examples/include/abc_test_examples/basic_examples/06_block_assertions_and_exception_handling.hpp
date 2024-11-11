@@ -1,17 +1,12 @@
 #pragma once
-#include "abc_test/included_instances/data_generator/enumerable/specializations/enum.h"
-#include "abc_test/core.h"
-
-#include "abc_test/included_instances/matchers/ranges.h"
-
-#include "abc_test/included_instances/test_assertions/macros.h"
+#include "abc_test/core.hpp"
+#include "abc_test/included_instances.hpp"
 
 #include <ranges>
 #include <numeric>
 #include <vector>
-#include "abc_test/included_instances/matchers/function_wrapper.h"
 
-_TEST_CASE(abc::test_data_t({
+_TEST_CASE(abc::test_case_t({
 	.name = "file_06_example_01",
 	.description = "Examples showing assertion blocks",
 	.path = "examples::basic_examples::06_manual_block_assertion"
@@ -150,7 +145,7 @@ namespace testing
 	}
 }
 
-_TEST_CASE(abc::test_data_t({
+_TEST_CASE(abc::test_case_t({
 	.name = "file_06_example_02",
 	.description = "Example Using assertion blocks to deal with excetpions",
 	.path = "examples::basic_examples::06_manual_block_assertion"
@@ -175,7 +170,7 @@ _TEST_CASE(abc::test_data_t({
 	test_handling_code(3);
 }
 
-_TEST_CASE(abc::test_data_t({
+_TEST_CASE(abc::test_case_t({
 	.name = "file_06_example_03",
 	.description = "Included macros using block assertions",
 	.path = "examples::basic_examples::06_manual_block_assertion"

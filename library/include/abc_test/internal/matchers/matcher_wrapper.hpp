@@ -277,7 +277,7 @@ __no_constexpr_imp bool
         test_runner_t&             _a_test_runner
     ) noexcept
 {
-    const bool _l_result{_m_matcher_internal->run_test(_a_test_runner).passed()
+    const bool _l_result{_m_matcher_internal->matcher_result().passed()
     };
     *this = make_matcher(new logic_matcher_t<OR>(
         this->internal_matcher(), std::shared_ptr<matcher_base_t>()
@@ -293,8 +293,7 @@ __no_constexpr_imp bool
         test_runner_t&             _a_test_runner
     ) noexcept
 {
-    const bool _l_result{_m_matcher_internal->run_test(_a_test_runner).passed()
-    };
+    const bool _l_result{ _m_matcher_internal->matcher_result().passed() };
     *this = make_matcher(new logic_matcher_t<AND>(
         this->internal_matcher(), std::shared_ptr<matcher_base_t>()
     ));

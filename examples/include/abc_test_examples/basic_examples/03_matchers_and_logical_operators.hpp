@@ -1,13 +1,11 @@
 #pragma once
-#include "abc_test/included_instances/data_generator/enumerable/specializations/enum.h"
-#include "abc_test/core.h"
-
-#include "abc_test/included_instances/matchers/ranges.h"
+#include "abc_test/core.hpp"
+#include "abc_test/included_instances.hpp"
 
 #include <ranges>
 #include <numeric>
 
-_TEST_CASE(abc::test_data_t({
+_TEST_CASE(abc::test_case_t({
 	.name = "file_03_example_01",
 	.description = "Basic logical operators examples",
 	.path = "examples::basic_examples::03_matchers_and_logical_operators"
@@ -36,7 +34,7 @@ _TEST_CASE(abc::test_data_t({
 	_CHECK(_l_1);
 }
 
-_TEST_CASE(abc::test_data_t({
+_TEST_CASE(abc::test_case_t({
 	.name = "file_03_example_02",
 	.description = "Short-circuiting logical operators",
 	.path = "examples::basic_examples::03_matchers_and_logical_operators"

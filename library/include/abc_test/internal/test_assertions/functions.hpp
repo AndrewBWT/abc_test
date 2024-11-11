@@ -157,7 +157,7 @@ create_assertion(
     else
     {
         matcher_base_t&       _l_matcher_base{_a_matcher.matcher_base()};
-        matcher_result_t     _l_mr{_l_matcher_base.run_test(_a_test_runner)};
+        matcher_result_t     _l_mr{ _l_matcher_base.matcher_result() };
         matcher_source_map_t _l_msm;
         _l_matcher_base.gather_map_source(_l_msm);
         _l_passed = _l_mr.passed();
@@ -229,7 +229,7 @@ create_assertion_block(
     using namespace _ABC_NS_MATCHER;
     assertion_ptr_t<false, T> _l_gur;
     bool                      _l_passed{true};
-    if (_a_test_block.matcher() == nullptr)
+   /* if (_a_test_block.matcher() == nullptr)
     {
         _l_gur = make_unique<matcher_based_assertion_block_t<T>>(
             _a_test_block.source(),
@@ -245,14 +245,14 @@ create_assertion_block(
             "true"
         );
     }
-    else
+    else*/
     {
-        matcher_base_t& _l_matcher_base{
-            *_a_test_block.matcher()
-        };
-        matcher_result_t     _l_mr{_l_matcher_base.run_test(_a_test_runner)};
-        matcher_source_map_t _l_msm;
-        _l_matcher_base.gather_map_source(_l_msm);
+       // matcher_base_t& _l_matcher_base{
+       //     *_a_test_block.matcher()
+       // };
+        matcher_result_t     _l_mr{_a_test_block.matcher_result()};
+        matcher_source_map_t _l_msm{ _a_test_block.map_source() };
+//        _l_matcher_base.gather_map_source(_l_msm);
         _l_passed = _l_mr.passed();
         _l_gur    = make_unique<matcher_based_assertion_block_t<T>>(
             _a_test_block.source(),
@@ -302,7 +302,7 @@ matcher_based_assertion_block(
     else
     {
         const matcher_base_t& _l_matcher_base{_a_matcher.matcher_base()};
-        matcher_result_t      _l_mr{_l_matcher_base.run_test(_a_test_runner)};
+        matcher_result_t      _l_mr{_l_matcher_base.matcher_result()};
         matcher_source_map_t  _l_msm;
         _l_matcher_base.gather_map_source(_l_msm);
         _l_passed = _l_mr.passed();

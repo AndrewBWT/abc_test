@@ -3,8 +3,8 @@
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
 
-// #include "abc_test_examples/basic_examples.h"
- #include "abc_test_examples/data_generator_examples.hpp"
+ #include "abc_test_examples/basic_examples.hpp"
+// #include "abc_test_examples/data_generator_examples.hpp"
 
 /*constexpr int
     fib(
@@ -19,7 +19,7 @@
 }
 
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         {.name = "Example 1", .path = "examples::basic_examples::001"}
     )
 )
@@ -29,7 +29,7 @@ _TEST_CASE(
 }
 
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         {.name = "Example 2", .path = "examples::basic_examples::001"}
     )
 )
@@ -51,7 +51,7 @@ _TEST_CASE(
 }
 
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         {.name = "Example 3", .path = "examples::basic_examples::001"}
     )
 )
@@ -98,7 +98,7 @@ inline std::set<int>
 }
 
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         {.name = "Example 4", .path = "examples::basic_examples::001"}
     )
 )
@@ -135,7 +135,7 @@ _TEST_CASE(
 }
 
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         { .name = "Example 5", .path = "examples::basic_examples::001" }
     )
 )

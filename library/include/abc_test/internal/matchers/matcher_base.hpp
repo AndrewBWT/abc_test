@@ -25,21 +25,28 @@ public:
      */
     __constexpr
     matcher_base_t() noexcept
-        = default;
+        = delete;
+    __constexpr
+        matcher_base_t(const matcher_result_t& _a_matcher_result) noexcept
+        : _m_test_result(_a_matcher_result)
+    {
+        
+    }
     /*!
      * @brief Function runs the test and returns a matcher_result_t to the
      * caller.
      * @param _a_test_runner The thread's test_runner_t object.
      * @return A cref to the matcher_result_t.
      */
-    __constexpr const matcher_result_t&
-        run_test(test_runner_t& _a_test_runner);
+  //  __constexpr const matcher_result_t&
+  //      run_test(test_runner_t& _a_test_runner);
     /*!
      * @brief Returns the object's matcher_result_t to the caller.
      * @return A cref to the object's matcher_result_t.
      */
     __constexpr const matcher_result_t&
         matcher_result() const noexcept;
+   // __constexpr virtual matcher_result_t generate_matcher_result() const noexcept = 0;
     /*!
      * @brief Fills the matcher_source_map_t argument with the object's sources.
      * @param _a_matcher_source_map The matcher_source_map_t which is filled
@@ -54,20 +61,22 @@ public:
      */
     __constexpr void
         add_source_info(const ds::single_source_t& _a_source) noexcept;
+    __constexpr const std::vector<ds::single_source_t>&
+        get_sources() const noexcept;
 protected:
     matcher_result_t                 _m_test_result;
     std::vector<ds::single_source_t> _m_sources;
 private:
-    __constexpr virtual matcher_result_t
-        run(test_runner_t& _a_test_runner)
-        = 0;
+  //  __constexpr virtual matcher_result_t
+  //      run(test_runner_t& _a_test_runner)
+  //      = 0;
 };
 
 _END_ABC_MATCHER_NS
 
 _BEGIN_ABC_MATCHER_NS
 
-__constexpr_imp const matcher_result_t&
+/*__constexpr_imp const matcher_result_t&
     matcher_base_t::run_test(
         test_runner_t& _a_test_runner
     )
@@ -77,7 +86,7 @@ __constexpr_imp const matcher_result_t&
         _m_test_result = run(_a_test_runner);
     }
     return _m_test_result;
-}
+}*/
 
 __constexpr_imp const matcher_result_t&
     matcher_base_t::matcher_result() const noexcept
@@ -103,6 +112,11 @@ __constexpr_imp void
     ) noexcept
 {
     _m_sources.push_back(_a_source);
+}
+__constexpr_imp const std::vector<ds::single_source_t>&
+matcher_base_t::get_sources() const noexcept
+{
+    return _m_sources;
 }
 
 _END_ABC_MATCHER_NS

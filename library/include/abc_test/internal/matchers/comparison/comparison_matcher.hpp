@@ -1,8 +1,8 @@
 #pragma once
 
 #include "abc_test/internal/matchers/comparison/comparison_enum.hpp"
-#include "abc_test/internal/matchers/operator_based_matcher.hpp"
 #include "abc_test/internal/matchers/matcher_wrapper.hpp"
+#include "abc_test/internal/matchers/operator_based_matcher.hpp"
 
 _BEGIN_ABC_MATCHER_NS
 
@@ -35,20 +35,21 @@ public:
     __constexpr precedence_t
         get_precedence() const noexcept;
 private:
-    T1 _m_l;
-    T2 _m_r;
-    __constexpr virtual matcher_result_t
-        run(test_runner_t&) noexcept;
 };
+
 namespace
 {
-    template <typename T>
-    __constexpr std::string
-        format_str(const T& _a_element) noexcept;
-    template <typename T1, typename T2, comparison_enum_t Cmp_Enum>
-    __constexpr matcher_t
-        make_cmp_matcher(T1&& _a_left_arg, T2&& _a_right_arg) noexcept;
+template <comparison_enum_t Cmp, typename T1, typename T2>
+__constexpr matcher_result_t
+    make_matcher_result(T1&& _a_t1, T2&& _a_t2) noexcept;
+template <typename T>
+__constexpr std::string
+            format_str(const T& _a_element) noexcept;
+template <typename T1, typename T2, comparison_enum_t Cmp_Enum>
+__constexpr matcher_t
+    make_cmp_matcher(T1&& _a_left_arg, T2&& _a_right_arg) noexcept;
 } // namespace
+
 _END_ABC_MATCHER_NS
 _BEGIN_ABC_NS
 /*!
@@ -127,7 +128,10 @@ __constexpr_imp
         T1&& _a_l,
         T2&& _a_r
     ) noexcept
-    : _m_l(_a_l), _m_r(_a_r)
+    : operator_based_matcher_t(make_matcher_result<Cmp>(
+          std::forward<T1>(_a_l),
+          std::forward<T2>(_a_r)
+    ))
 {}
 
 template <typename T1, typename T2, comparison_enum_t Cmp>
@@ -137,63 +141,61 @@ __constexpr_imp precedence_t
     return cmp_precedence<Cmp>();
 }
 
-template<
-	typename T1,
-	typename T2,
-	comparison_enum_t Cmp
->
-__constexpr_imp
-	matcher_result_t
-	comparison_matcher_t<T1, T2, Cmp>::run(
-		test_runner_t&
-	) noexcept
+
+namespace
+{
+template <comparison_enum_t Cmp, typename T1, typename T2>
+__constexpr matcher_result_t
+    make_matcher_result(
+        T1&& _a_t1,
+        T2&& _a_t2
+    ) noexcept
 {
     using namespace std;
-    string _l_left_str{format_str<T1>(_m_l)};
-    string _l_right_str{format_str<T1>(_m_r)};
+    string _l_left_str{ format_str<T1>(_a_t1) };
+    string _l_right_str{ format_str<T2>(_a_t2) };
     return matcher_result_t(
-        true,
-        cmp<T1, T2, Cmp>(forward<T1>(_m_l), forward<T2>(_m_r)),
+        cmp<T1, T2, Cmp>(forward<T1>(_a_t1), forward<T2>(_a_t2)),
         fmt::format("{0} {1} {2}", _l_left_str, cmp_str<Cmp>(), _l_right_str)
     );
 }
-namespace
-{
-    template <typename T>
-    __constexpr_imp std::string
-        format_str(
-            const T& _a_element
-        ) noexcept
-    {
-        using namespace std;
-        string _l_rv{ "[?]" };
-        if constexpr (fmt::formattable<T>)
-        {
-            if constexpr (same_as<T, string>)
-            {
-                _l_rv = fmt::format("\"{}\"", _a_element);
-            }
-            else
-            {
-                _l_rv = fmt::format("{}", _a_element);
-            }
-        }
-        return _l_rv;
-    }
 
-    template <typename T1, typename T2, comparison_enum_t Cmp_Enum>
-    __constexpr_imp matcher_t
-        make_cmp_matcher(
-            T1&& _a_left_arg,
-            T2&& _a_right_arg
-        ) noexcept
+template <typename T>
+__constexpr_imp std::string
+                format_str(
+                    const T& _a_element
+                ) noexcept
+{
+    using namespace std;
+    string _l_rv{"[?]"};
+    if constexpr (fmt::formattable<T>)
     {
-        using namespace std;
-        return make_matcher(new comparison_matcher_t<T1, T2, Cmp_Enum>(
-            forward<T1>(_a_left_arg), forward<T2>(_a_right_arg)
-        ));
+        if constexpr (same_as<T, string>)
+        {
+            _l_rv = fmt::format("\"{}\"", _a_element);
+        }
+        else
+        {
+            _l_rv = fmt::format("{}", _a_element);
+        }
     }
+    return _l_rv;
+}
+
+template <typename T1, typename T2, comparison_enum_t Cmp_Enum>
+__constexpr_imp matcher_t
+    make_cmp_matcher(
+        T1&& _a_left_arg,
+        T2&& _a_right_arg
+    ) noexcept
+{
+    using namespace std;
+    return make_matcher(new comparison_matcher_t<T1, T2, Cmp_Enum>(
+        forward<T1>(_a_left_arg), forward<T2>(_a_right_arg)
+    ));
+}
 } // namespace
+
 _END_ABC_MATCHER_NS
 _BEGIN_ABC_NS
 

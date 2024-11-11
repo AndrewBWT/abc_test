@@ -17,9 +17,9 @@ public:
     __constexpr
     bool_matcher_t(const bool _a_pass) noexcept;
 private:
-    bool _m_pass;
-    __constexpr virtual matcher_result_t
-        run(test_runner_t& _a_test_runner) final override;
+  //  bool _m_pass;
+   // __constexpr virtual matcher_result_t
+  //      run(test_runner_t& _a_test_runner) final override;
 };
 _END_ABC_MATCHER_NS
 _BEGIN_ABC_NS
@@ -38,16 +38,17 @@ __constexpr_imp
     bool_matcher_t::bool_matcher_t(
         const bool _a_pass
     ) noexcept
-    : _m_pass(_a_pass)
+    : matcher_base_t(matcher_result_t(_a_pass, fmt::format("{0}", _a_pass)))
+   // : _m_pass(_a_pass)
 {}
 
-__constexpr_imp matcher_result_t
+/*__constexpr_imp matcher_result_t
     bool_matcher_t::run(
         test_runner_t& _a_test_runner
     )
 {
     return matcher_result_t(true, _m_pass, fmt::format("{0}", _m_pass));
-}
+}*/
 _END_ABC_MATCHER_NS
 _BEGIN_ABC_NS
 

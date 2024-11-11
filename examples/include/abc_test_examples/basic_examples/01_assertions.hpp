@@ -1,21 +1,21 @@
 #pragma once
-#include "abc_test/core.h"
-#include "abc_test/included_instances.h"
+#include "abc_test/core.hpp"
+#include "abc_test/included_instances.hpp"
 
 #include <numeric>
 #include <ranges>
 
 /*!
- * Each test case we create is written using the abc::test_data_t object. It is
+ * Each test case we create is written using the abc::test_case_t object. It is
  * a synonym for the user_defined_test_data_t object. We use designiated
  * initializers to initialise the object.
  *
  * Note the abnoraml syntax; we need an extra bracket to escape the macro
  * separating via the commas in the data structure. We could move the second
- * bracket to before the abc::test_data_t, as shown in the next example.
+ * bracket to before the abc::test_case_t, as shown in the next example.
  */
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         {.name = "file_01_example_01",
          .description
          = "A simple test case with no assertions. It will alwyas pass",
@@ -31,11 +31,11 @@ _TEST_CASE(
  */
 
 _TEST_CASE(
-    abc::test_data_t{
+    abc::test_case_t({
         .name        = "file_01_example_02",
         .description = "Examples of basic static assertions",
         .path        = "examples::basic_examples::assertions"
-    }
+    })
 )
 {
     /*!
@@ -55,7 +55,7 @@ _TEST_CASE(
 }
 
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         {.name        = "file_01_example_03",
          .description = "Examples of static assertions with messages",
          .path        = "examples::basic_examples::assertions"}
@@ -75,7 +75,7 @@ _TEST_CASE(
 }
 
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         {.name = "file_01_example_04",
          .description
          = "Examples showing how to get the result of a static assertion",
@@ -97,7 +97,7 @@ _TEST_CASE(
 }
 
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         {.name        = "file_01_example_05",
          .description = "Examples of matcher-based assertions",
          .path        = "examples::basic_examples::assertions"}
@@ -142,7 +142,7 @@ _TEST_CASE(
 }
 
 _TEST_CASE(
-    abc::test_data_t(
+    abc::test_case_t(
         {.name        = "file_01_example_06",
          .description = "Examples showing the simulationg of logical operators",
          .path        = "examples::basic_examples::assertions"}

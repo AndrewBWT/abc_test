@@ -67,6 +67,12 @@ public:
      */
     __no_constexpr_or_inline std::string
         gather_list_of_sources_and_representations() const noexcept;
+    __no_constexpr_imp void
+        clear()
+    {
+        _m_internal_map.clear();
+        _m_has_elements = false;
+    }
 private:
     bool _m_has_elements = false;
     std::map<

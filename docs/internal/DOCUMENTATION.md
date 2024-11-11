@@ -22,11 +22,11 @@ Status: Incomplete
 - [ ] Discuss global variables. Discuss what is required if the user wants to make their own test framework.
 
 ## Declaring Tests
-Status: Incomplete
+Status: First Draft Complete
 - [x] Write introduction
 - [x] Show how to declare tests.
 - [x] Explain what the GLOT is.
-- [ ] Show how to add non-GLOT tests to test framework.
+- [x] Show how to add non-GLOT tests to test framework.
 - [x] Discuss when tests may fail or not be added.
 
 ## Assertions

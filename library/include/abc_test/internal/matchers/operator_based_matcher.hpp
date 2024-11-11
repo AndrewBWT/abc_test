@@ -13,6 +13,7 @@ using precedence_t = std::size_t;
 struct operator_based_matcher_t : public matcher_base_t
 {
 public:
+	using matcher_base_t::matcher_base_t;
 	/*!
 	 * @brief Gets the objects precedence_t.
 	 * @return The object's precedence_t.

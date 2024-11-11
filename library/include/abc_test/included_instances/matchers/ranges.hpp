@@ -28,7 +28,6 @@ __constexpr matcher_t
         [&]()
         {
             return matcher_result_t(
-                true,
                 (ranges::find(_a_range, _a_value) != _a_range.end()),
                 fmt::format("{0} does not contain {1}", _a_range, _a_value)
             );

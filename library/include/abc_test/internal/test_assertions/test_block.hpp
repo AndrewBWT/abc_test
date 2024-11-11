@@ -57,8 +57,10 @@ public:
      * @brief Returns a cref to the object's matcher_base_ptr_t to the caller.
      * @return A cref to the object's matcher_base_ptr_t.
      */
-    __constexpr const _ABC_NS_MATCHER::matcher_base_ptr_t&
-                      matcher() const noexcept;
+    __constexpr const _ABC_NS_MATCHER::matcher_result_t
+                      matcher_result() const noexcept;
+    __constexpr const _ABC_NS_MATCHER::matcher_source_map_t&
+                      map_source() const noexcept;
     /*!
      * @brief Returns a cref to the object's optional test annotation.
      * @return A cref to the object's optional test annotation.
@@ -94,11 +96,13 @@ public:
     __constexpr void
         set_processed() noexcept;
 private:
-    _ABC_NS_DS::source_pair_t           _m_source;
-    std::optional<std::string>          _m_test_annotation;
-    std::optional<std::string>          _m_matcher_annotation;
-    _ABC_NS_MATCHER::matcher_base_ptr_t _m_matcher;
-    bool                                _m_processed;
+    _ABC_NS_DS::source_pair_t             _m_source;
+    std::optional<std::string>            _m_test_annotation;
+    std::optional<std::string>            _m_matcher_annotation;
+    _ABC_NS_MATCHER::matcher_result_t     _m_matcher_result;
+    _ABC_NS_MATCHER::matcher_source_map_t _m_map_source;
+    //_ABC_NS_MATCHER::matcher_base_ptr_t _m_matcher;
+    bool _m_processed;
 };
 
 _END_ABC_NS
@@ -114,9 +118,10 @@ __constexpr_imp
     : _m_source(_ABC_NS_DS::source_pair_t(_a_source))
     , _m_test_annotation(_a_test_annotation)
     , _m_processed(false)
-    , _m_matcher(_ABC_NS_MATCHER::matcher_base_ptr_t(
-          new _ABC_NS_MATCHER::static_matcher_t<_ABC_NS_REPORTS::pass_t>()
-      ))
+    , _m_matcher_result(
+          _ABC_NS_MATCHER::static_matcher_t<_ABC_NS_REPORTS::pass_t>()
+              .matcher_result()
+      )
 {}
 
 template <typename Assertion_Type>
@@ -139,11 +144,13 @@ template <typename Assertion_Type>
 requires std::derived_from<Assertion_Type, _ABC_NS_REPORTS::dynamic_status_t>
 template <bool Has_Annotation>
 __constexpr_imp test_block_t<Assertion_Type>&
-                test_block_t<Assertion_Type>::operator=(
-        const _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>& _a_element
+test_block_t<Assertion_Type>::operator=(
+    const _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>& _a_element
     ) noexcept
 {
-    this->_m_matcher = _a_element.internal_matcher();
+    _m_map_source.clear();
+    _a_element.internal_matcher()->gather_map_source(_m_map_source);
+    _m_matcher_result = _a_element.internal_matcher()->matcher_result();
     if constexpr (Has_Annotation)
     {
         this->_m_matcher_annotation
@@ -158,10 +165,18 @@ __constexpr_imp test_block_t<Assertion_Type>&
 
 template <typename Assertion_Type>
 requires std::derived_from<Assertion_Type, _ABC_NS_REPORTS::dynamic_status_t>
-__constexpr_imp const _ABC_NS_MATCHER::matcher_base_ptr_t&
-                      test_block_t<Assertion_Type>::matcher() const noexcept
+__constexpr_imp const _ABC_NS_MATCHER::matcher_result_t
+    test_block_t<Assertion_Type>::matcher_result() const noexcept
 {
-    return _m_matcher;
+    return _m_matcher_result;
+}
+
+template <typename Assertion_Type>
+requires std::derived_from<Assertion_Type, _ABC_NS_REPORTS::dynamic_status_t>
+__constexpr_imp const _ABC_NS_MATCHER::matcher_source_map_t&
+                      test_block_t<Assertion_Type>::map_source() const noexcept
+{
+    return _m_map_source;
 }
 
 template <typename Assertion_Type>

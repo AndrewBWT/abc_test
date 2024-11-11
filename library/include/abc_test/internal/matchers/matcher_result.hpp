@@ -24,7 +24,7 @@ public:
      */
     __constexpr
     matcher_result_t(
-        const bool             _a_ran,
+        // const bool             _a_ran,
         const bool             _a_passed,
         const std::string_view _a_str
     ) noexcept;
@@ -33,7 +33,7 @@ public:
      * @return True if the matcher_t passed; false otherwise.
      */
     __constexpr bool
-                      passed() const noexcept;
+        passed() const noexcept;
     /*!
      * @brief Gets a cref to the string associated with this matcher_result_t.
      * @return A cref to the internal object's string.
@@ -45,10 +45,10 @@ public:
      * associated with has been ran.
      * @return True if the matcher_t has been ran; false otherwise.
      */
-    __constexpr bool
-        ran() const noexcept;
+    //__constexpr bool
+    // ran() const noexcept;
 private:
-    bool        _m_ran    = false;
+    // bool        _m_ran    = false;
     bool        _m_passed = false;
     std::string _m_str;
 };
@@ -58,11 +58,12 @@ _END_ABC_MATCHER_NS
 _BEGIN_ABC_MATCHER_NS
 __constexpr_imp
     matcher_result_t::matcher_result_t(
-        const bool             _a_ran,
+        // const bool             _a_ran,
         const bool             _a_passed,
         const std::string_view _a_str
     ) noexcept
-    : _m_ran(_a_ran), _m_passed(_a_passed), _m_str(_a_str)
+    //: _m_ran(_a_ran)
+    : _m_passed(_a_passed), _m_str(_a_str)
 {}
 
 __constexpr_imp bool
@@ -77,10 +78,10 @@ __constexpr_imp const std::string_view
     return _m_str;
 }
 
-__constexpr_imp bool
-    matcher_result_t::ran() const noexcept
-{
-    return _m_ran;
-}
+//__constexpr_imp bool
+ //   matcher_result_t::ran() const noexcept
+//{
+ //   return _m_ran;
+//}
 
 _END_ABC_MATCHER_NS

@@ -1,11 +1,10 @@
 #pragma once
-#include "abc_test/included_instances/data_generator/enumerable/specializations/enum.h"
-#include "abc_test/core.h"
-#include "abc_test/included_instances/matchers/ranges.h"
+#include "abc_test/core.hpp"
+#include "abc_test/included_instances.hpp"
 #include <ranges>
 #include <numeric>
 
-_TEST_CASE(abc::test_data_t({
+_TEST_CASE(abc::test_case_t({
 	.name = "file_04_example_01",
 	.description = "Examples revisiting comparision matchers",
 	.path = "examples::basic_examples::04_matchers_and_comparison_operators"
@@ -28,7 +27,7 @@ _TEST_CASE(abc::test_data_t({
 	_CHECK(annotate(neq(1, 1), "These two numbers aren't equal!"));
 }
 
-_TEST_CASE(abc::test_data_t({
+_TEST_CASE(abc::test_case_t({
 	.name = "file_04_example_02",
 	.description = "Examples showing comparison matchers using operators",
 	.path = "examples::basic_examples::04_matchers_and_comparison_operators"
@@ -106,7 +105,7 @@ struct fmt::formatter<testing::Test2> : formatter<string_view>
 	}
 };
 
-_TEST_CASE(abc::test_data_t({
+_TEST_CASE(abc::test_case_t({
 	.name = "file_04_example_03",
 	.description = "Using own types with comparison operators",
 	.path = "examples::basic_examples::04_matchers_and_comparison_operators"
