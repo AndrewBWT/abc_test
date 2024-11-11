@@ -27,8 +27,10 @@ public:
     matcher_base_t() noexcept
         = delete;
     __constexpr
-        matcher_base_t(const matcher_result_t& _a_matcher_result) noexcept
+        matcher_base_t(const matcher_result_t& _a_matcher_result,
+            const std::vector<ds::single_source_t>& _a_sources = std::vector<ds::single_source_t>()) noexcept
         : _m_test_result(_a_matcher_result)
+        , _m_sources(_a_sources)
     {
         
     }

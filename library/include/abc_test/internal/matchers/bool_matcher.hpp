@@ -7,20 +7,20 @@ _BEGIN_ABC_MATCHER_NS
  * @brief Matcher object which takes a single boolean and considers that to be
  * the matcher's result.
  */
-class bool_matcher_t : public matcher_base_t
-{
-public:
+//class bool_matcher_t : public matcher_base_t
+//{
+//public:
     /*!
      * @brief Constructor.
      * @param _a_pass The result of the matcher.
      */
-    __constexpr
-    bool_matcher_t(const bool _a_pass) noexcept;
-private:
+  //  __constexpr
+   // bool_matcher_t(const bool _a_pass) noexcept;
+//private:
   //  bool _m_pass;
    // __constexpr virtual matcher_result_t
   //      run(test_runner_t& _a_test_runner) final override;
-};
+//};
 _END_ABC_MATCHER_NS
 _BEGIN_ABC_NS
 /*!
@@ -34,13 +34,13 @@ __no_constexpr_imp matcher_t
 _END_ABC_NS
 
 _BEGIN_ABC_MATCHER_NS
-__constexpr_imp
-    bool_matcher_t::bool_matcher_t(
-        const bool _a_pass
-    ) noexcept
-    : matcher_base_t(matcher_result_t(_a_pass, fmt::format("{0}", _a_pass)))
+//__constexpr_imp
+ //   bool_matcher_t::bool_matcher_t(
+  //      const bool _a_pass
+   // ) noexcept
+    //: matcher_base_t(matcher_result_t(_a_pass, fmt::format("{0}", _a_pass)))
    // : _m_pass(_a_pass)
-{}
+//{}
 
 /*__constexpr_imp matcher_result_t
     bool_matcher_t::run(
@@ -58,7 +58,9 @@ __no_constexpr_imp matcher_t
     ) noexcept
 {
     using namespace _ABC_NS_MATCHER;
-    return make_matcher(new bool_matcher_t(_a_bool));
+    return make_matcher(new matcher_base_t(
+        matcher_result_t(_a_bool,
+            fmt::format("{0}", _a_bool))));
 }
 
 _END_ABC_NS

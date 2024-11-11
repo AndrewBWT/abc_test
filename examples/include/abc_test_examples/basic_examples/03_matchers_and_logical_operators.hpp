@@ -33,7 +33,6 @@ _TEST_CASE(abc::test_case_t({
 	_l_1 = _MATCHER(true_matcher() && false_matcher());
 	_CHECK(_l_1);
 }
-
 _TEST_CASE(abc::test_case_t({
 	.name = "file_03_example_02",
 	.description = "Short-circuiting logical operators",
@@ -69,10 +68,10 @@ _TEST_CASE(abc::test_case_t({
 	_IF_OR_STATEMENT(_l_1)
 	{
 		//Computationaly expensive matcher which will never be evaluated.
-		_PROCESS(_l_1, true_matcher() && false_matcher());
+	//	_PROCESS(_l_1, true_matcher() && false_matcher());
 	}
 	_CHECK(annotate(_l_1, "Unevaluated right branch"));
-	_l_1 = _MATCHER(false_matcher());
+	/*_l_1 = _MATCHER(false_matcher());
 	_IF_OR_STATEMENT(_l_1)
 	{
 		//Computationaly expensive matcher which will never be evaluated.
@@ -85,5 +84,5 @@ _TEST_CASE(abc::test_case_t({
 		//Computationaly expensive matcher which will never be evaluated.
 		_PROCESS(_l_1, true_matcher() && false_matcher());
 	}
-	_REQUIRE(annotate(_l_1, "This one will terminate!"));
+	_REQUIRE(annotate(_l_1, "This one will terminate!"));*/
 }

@@ -65,6 +65,9 @@ __constexpr bool
 template <comparison_enum_t Comparison_Enum>
 __constexpr const char*
     cmp_str() noexcept;
+template<comparison_enum_t Comparison_Enum>
+__constexpr const char*
+not_cmp_str() noexcept;
 _END_ABC_MATCHER_NS
 
 _BEGIN_ABC_MATCHER_NS
@@ -172,5 +175,42 @@ __constexpr_imp const char*
         return "";
     }
 }
-
+template<comparison_enum_t Comparison_Enum>
+__constexpr_imp const char*
+not_cmp_str() noexcept
+{
+    using enum comparison_enum_t;
+    if constexpr (Comparison_Enum == EQ)
+    {
+        return "!=";
+    }
+    else if constexpr (Comparison_Enum == NEQ)
+    {
+        return "==";
+    }
+    else if constexpr (Comparison_Enum == LT)
+    {
+        return ">=";
+    }
+    else if constexpr (Comparison_Enum == LEQ)
+    {
+        return ">";
+    }
+    else if constexpr (Comparison_Enum == GT)
+    {
+        return "<=";
+    }
+    else if constexpr (Comparison_Enum == GEQ)
+    {
+        return "<";
+    }
+    else
+    {
+        __STATIC_ASSERT(
+            Comparison_Enum,
+            "not_cmp_str function does not have value for given template type."
+        );
+        return "";
+    }
+}
 _END_ABC_MATCHER_NS

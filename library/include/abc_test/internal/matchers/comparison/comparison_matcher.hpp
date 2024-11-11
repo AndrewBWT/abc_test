@@ -16,17 +16,20 @@ _BEGIN_ABC_MATCHER_NS
  * @tparam T2 The parameter of the second argument.
  * @tparam Cmp The enum used to compare T1 and T2.
  */
-template <typename T1, typename T2, comparison_enum_t Cmp>
+template <comparison_enum_t Cmp>
 struct comparison_matcher_t : public operator_based_matcher_t
 {
 public:
+    using operator_based_matcher_t::operator_based_matcher_t;
     /*!
      * @brief Constructor.
      * @param _a_l The T1 entity.
      * @param _a_r The T2 entity.
      */
-    __constexpr
-    comparison_matcher_t(T1&& _a_l, T2&& _a_r) noexcept;
+    //__constexpr
+    // comparison_matcher_t(
+
+    // T1&& _a_l, T2&& _a_r) noexcept;
     /*!
      * @brief Returns the precedence_t of the tempalted comparison type.
      * @return precedence_t representing the tempalted comparison_enum's
@@ -122,7 +125,8 @@ __constexpr matcher_t
 _END_ABC_NS
 
 _BEGIN_ABC_MATCHER_NS
-template <typename T1, typename T2, comparison_enum_t Cmp>
+
+/*template <typename T1, typename T2, comparison_enum_t Cmp>
 __constexpr_imp
     comparison_matcher_t<T1, T2, Cmp>::comparison_matcher_t(
         T1&& _a_l,
@@ -132,15 +136,14 @@ __constexpr_imp
           std::forward<T1>(_a_l),
           std::forward<T2>(_a_r)
     ))
-{}
+{}*/
 
-template <typename T1, typename T2, comparison_enum_t Cmp>
+template <comparison_enum_t Cmp>
 __constexpr_imp precedence_t
-    comparison_matcher_t<T1, T2, Cmp>::get_precedence() const noexcept
+    comparison_matcher_t<Cmp>::get_precedence() const noexcept
 {
     return cmp_precedence<Cmp>();
 }
-
 
 namespace
 {
@@ -152,11 +155,13 @@ __constexpr matcher_result_t
     ) noexcept
 {
     using namespace std;
-    string _l_left_str{ format_str<T1>(_a_t1) };
-    string _l_right_str{ format_str<T2>(_a_t2) };
+    string _l_left_str{format_str<T1>(_a_t1)};
+    string _l_right_str{format_str<T2>(_a_t2)};
+    const bool _l_result{ cmp<T1, T2, Cmp>(forward<T1>(_a_t1), forward<T2>(_a_t2)) };
     return matcher_result_t(
-        cmp<T1, T2, Cmp>(forward<T1>(_a_t1), forward<T2>(_a_t2)),
-        fmt::format("{0} {1} {2}", _l_left_str, cmp_str<Cmp>(), _l_right_str)
+        _l_result,
+        fmt::format("{0} {1} {2}", _l_left_str, 
+            (_l_result ? cmp_str<Cmp>() : not_cmp_str<Cmp>()), _l_right_str)
     );
 }
 
@@ -190,10 +195,12 @@ __constexpr_imp matcher_t
     ) noexcept
 {
     using namespace std;
-    return make_matcher(new comparison_matcher_t<T1, T2, Cmp_Enum>(
-        forward<T1>(_a_left_arg), forward<T2>(_a_right_arg)
-    ));
-}
+    return make_matcher(
+        new comparison_matcher_t<Cmp_Enum>(make_matcher_result<Cmp_Enum>(
+            std::forward<T1>(_a_left_arg), std::forward<T2>(_a_right_arg)
+        ))
+    );
+} // namespace
 } // namespace
 
 _END_ABC_MATCHER_NS

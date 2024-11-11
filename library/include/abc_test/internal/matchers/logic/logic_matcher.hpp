@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <type_traits>
+#include "abc_test/internal/utility/ranges.hpp"
 
 _BEGIN_ABC_MATCHER_NS
 
@@ -65,28 +66,16 @@ public:
     __constexpr void
         set_right_child(const std::shared_ptr<matcher_base_t>& _a_matcher
         ) noexcept;
-    /*!
-     * @brief Adds the object's sources (and its childrens) to the reference
-     * argument.
-     * @param _a_matcher_source_map The entity to add the object's sources to.
-     */
-    __constexpr virtual void
-        gather_map_source(matcher_source_map_t& _a_matcher_source_map
-        ) const noexcept override final;
 private:
-    std::optional<matcher_result_t>                 _m_matcher_result_l;
-    std::optional<matcher_result_t>                 _m_matcher_result_r;
+    std::optional<matcher_result_t>  _m_matcher_result_l;
+    std::optional<matcher_result_t>  _m_matcher_result_r;
     bool                             _m_left_precedence_less_than_logic_enum;
     bool                             _m_right_precedence_less_than_logic_enum;
-    std::vector<ds::single_source_t> _m_sources_l;
-    std::vector<ds::single_source_t> _m_sources_r;
+    std::size_t _m_boundary_of_sources;
     // std::shared_ptr<matcher_base_t> _m_matcher_l;
     // std::shared_ptr<matcher_base_t> _m_matcher_r;
     // __constexpr virtual matcher_result_t
     //    run(test_runner_t& _a_test_runner) override;
-    template <bool Result_On_First_Mathcer_To_Move_Into_If>
-    __constexpr matcher_result_t
-        run_binary_logic_matcher(test_runner_t& _a_test_runner);
     template <
         typename = typename std::enable_if_t<
             Logic_Enum == logic_enum_t::AND || Logic_Enum == logic_enum_t::OR>>
@@ -148,7 +137,6 @@ __constexpr_imp
         const std::shared_ptr<matcher_base_t>& _a_matcher
     ) noexcept
     : operator_based_matcher_t(make_matcher_result<Logic_Enum>(_a_matcher))
-    , _m_sources_l(_a_matcher->get_sources())
 {}
 
 template <logic_enum_t Logic_Enum>
@@ -159,14 +147,16 @@ __constexpr_imp
         const std::shared_ptr<matcher_base_t>& _a_matcher_r
     ) noexcept
     : logic_matcher_t<Logic_Enum>(
-          _a_matcher_l == nullptr ? _a_matcher_r->matcher_result()
-                                  : std::optional<matcher_result_t>(),
-          _a_matcher_r == nullptr ? _a_matcher_r->matcher_result()
-                                  : std::optional<matcher_result_t>(),
+          _a_matcher_l == nullptr ? std::optional<matcher_result_t>()
+                                  : _a_matcher_l->matcher_result(),
+          _a_matcher_r == nullptr ? std::optional<matcher_result_t>()
+                                  : _a_matcher_r->matcher_result(),
           is_precdence_less_than_child<Logic_Enum>(_a_matcher_l),
           is_precdence_less_than_child<Logic_Enum>(_a_matcher_r),
-        _a_matcher_l->get_sources(),
-        _a_matcher_r->get_sources()
+          _a_matcher_l == nullptr ? std::vector<ds::single_source_t>{}
+                                  : _a_matcher_l->get_sources(),
+          _a_matcher_r == nullptr ? std::vector<ds::single_source_t>{}
+                                  : _a_matcher_r->get_sources()
       )
 {}
 
@@ -184,6 +174,7 @@ __constexpr_imp void
         const std::shared_ptr<matcher_base_t>& _a_matcher
     ) noexcept
 {
+    using namespace std;
     if constexpr (Logic_Enum == NOT)
     {
         __STATIC_ASSERT(
@@ -195,39 +186,17 @@ __constexpr_imp void
         _m_matcher_result_r = _a_matcher->matcher_result();
         _m_right_precedence_less_than_logic_enum
             = is_precdence_less_than_child<Logic_Enum>(_a_matcher);
-        this->_m_test_result = make_matcher_result<Logic_Enum,Logic_Enum == logic_enum_t::OR>(
-            _m_left_precedence_less_than_logic_enum,
-            _m_right_precedence_less_than_logic_enum,
-            _m_matcher_result_l,
-            _m_matcher_result_r
-        );
+        this->_m_sources.erase(this->_m_sources.begin() + _m_boundary_of_sources,
+            this->_m_sources.end());
+        this->_m_sources.append_range(_a_matcher->get_sources());
+        this->_m_test_result = make_matcher_result < Logic_Enum,
+        Logic_Enum
+            == logic_enum_t::OR
+                   > (_m_left_precedence_less_than_logic_enum,
+                      _m_right_precedence_less_than_logic_enum,
+                      _m_matcher_result_l,
+                      _m_matcher_result_r);
     }
-}
-
-template <logic_enum_t Logic_Enum>
-__constexpr_imp void
-    logic_matcher_t<Logic_Enum>::gather_map_source(
-        matcher_source_map_t& _a_matcher_source_map
-    ) const noexcept
-{
-    using namespace ds;
-    matcher_base_t::gather_map_source(_a_matcher_source_map);
-    for (const single_source_t& _l_ss : _m_sources_l)
-    {
-        _a_matcher_source_map.insert(_l_ss);
-    }
-    for (const single_source_t& _l_ss : _m_sources_r)
-    {
-        _a_matcher_source_map.insert(_l_ss);
-    }
-    // if (_m_matcher_l != nullptr)
-    //{
-    // _m_matcher_l->gather_map_source(_a_matcher_source_map);
-    // }
-    // if (_m_matcher_r != nullptr)
-    // {
-    //     _m_matcher_r->gather_map_source(_a_matcher_source_map);
-    // }
 }
 
 template <logic_enum_t Logic_Enum>
@@ -247,8 +216,9 @@ __constexpr_imp
               _a_right_precedence_less_than_logic_enum,
               _a_matcher_result_l,
               _a_matcher_result_r
-          )
-      )
+          ),
+        abc::utility::join(_a_sources_l, _a_sources_r)
+    )
     , _m_matcher_result_l(_a_matcher_result_l)
     , _m_matcher_result_r(_a_matcher_result_r)
     , _m_left_precedence_less_than_logic_enum(
@@ -257,9 +227,8 @@ __constexpr_imp
     , _m_right_precedence_less_than_logic_enum(
           _a_right_precedence_less_than_logic_enum
       )
-    , _m_sources_l(_a_sources_l)
-    , _m_sources_r(_a_sources_r)
-{}
+{
+}
 
 namespace
 {
@@ -317,7 +286,7 @@ __constexpr matcher_result_t
     if (not _a_matcher_result_l.has_value())
     {
         matcher_source_map_t _l_msm{};
-       // this->gather_map_source(_l_msm);
+        // this->gather_map_source(_l_msm);
         reporters::error_reporter_controller_t& _l_erc{
             global::get_global_error_reporter_controller()
         };
@@ -343,7 +312,7 @@ __constexpr matcher_result_t
         if (not _a_matcher_result_r.has_value())
         {
             matcher_source_map_t _l_msm{};
-            //this->gather_map_source(_l_msm);
+            // this->gather_map_source(_l_msm);
             reporters::error_reporter_controller_t& _l_erc{
                 global::get_global_error_reporter_controller()
             };
@@ -365,16 +334,16 @@ __constexpr matcher_result_t
         {
             const matcher_result_t& _l_child_res_r{_a_matcher_result_r.value()};
             _l_right_passed = _l_child_res_r.passed();
-            _l_right_str = _l_child_res_r.str();
+            _l_right_str    = _l_child_res_r.str();
         }
     }
     pair<const char*, const char*>& _l_str_pair_l{
         _a_left_precedence_less_than_logic_enum ? _c_normal_bracket_pair
-                                               : _c_normal_bracket_pair
+                                                : _c_normal_bracket_pair
     };
     pair<const char*, const char*>& _l_str_pair_r{
         _a_right_precedence_less_than_logic_enum ? _c_normal_bracket_pair
-                                                : _c_normal_bracket_pair
+                                                 : _c_normal_bracket_pair
     };
     return matcher_result_t(
         compute_logic_result<Logic_Enum>(_l_left_passed, _l_right_passed),
@@ -398,13 +367,16 @@ __constexpr bool
     ) noexcept
 {
     using namespace std;
+    if (_a_matcher == nullptr)
+    {
+        return true;
+    }
     operator_based_matcher_t* _l_ptr{
         dynamic_cast<operator_based_matcher_t*>(_a_matcher.get())
     };
     return _l_ptr != nullptr
            && logic_precedence<Logic_Enum>() <= _l_ptr->get_precedence();
 }
-
 
 template <logic_enum_t Logic_Enum>
 __constexpr_imp std::string

@@ -17,20 +17,42 @@ All of the functionality shown in this document  requires the following include 
 
 # What are Assertions?
 
-In `abc_test` assertions are entities provided to the user which interact with the `abc_test` framework. Every assertion provided by `abc_test` is a macro.
+In `abc_test`, assertions are statements which check whether some user-defined condition is true or false. We say that if the condition is true, then the assertion passes, and if the condition is false, then the assertion fails. Below we show an example of an assertion which checks that the variable `i` is equal to `2`.
 
-At runtime, an assertion registers its result with the overarching `abc` test framework. The result is either the assertion passes or the assertion fails. The user can define an assertion in such a manner so that, if it fails, it can terminate the test function early, moving to the next function in the test-suite.
+```cpp
+_TEST_CASE(abc::test_case_t({.name = "Assertion example"}))
+{
+    _CHECK(_EXPR(i == 2));
+}
+```
+
+In `abc_test` assertions are created using a set of entities provided to the user. This document contains the documentation for these entities. 
+
+There are two basic types of assertion in `abc_test`; *check-based* assertions and *termination-based* assertions. The only difference between the two assertion types is that termination-based assertions will terminate the test function they are being ran in if they fail. The previous example showed a check-based assertion. Below we show an example of a termination-based assertion.
+
+```cpp
+_TEST_CASE(abc::test_case_t({.name = "Terminating test"}))
+{
+    int i = 2;
+
+    //This assertion will fail and the test will terminate.
+    _REQUIRE(_EXPR(i==1));
+
+    //This assertion will never be ran.
+    _CHECK(_EXPR(i==2));
+}
+```
 
 # Static Assertions
 Static assertions are the simplest assertions in `abc_test`. They do no runtime checks; instead they only pass, fail or fail and terminate the test. 
 
 An overview of the three basic static assertion macros is shown below.
 
-| Macro | Description |
-|--|--|
-| `_FAIL()` | Represents failure. It will register as an assertion failing in the test it is contained in. The overarching test will continue running. |
-| `_TERMINATE()`| Represents failure and termination. It will register as an assertion failing in the test it is contained in. The overarching test will terminate. |
-| `_SUCCEED()` | Represents success. This will register as an assertion passing in the test it is contained in.  The overarching test will continue running. |
+| Macro | Check-based or Termination-based | Description |
+|--|--|--| 
+| `_FAIL()` | Check-based. | Represents failure. It will register as an assertion failing in the test it is contained in. The overarching test will continue running. |
+| `_TERMINATE()`| Termination-based. | Represents failure and termination. It will register as an assertion failing in the test it is contained in. The overarching test will terminate. |
+| `_SUCCEED()` | Check-based. | Represents success. This will register as an assertion passing in the test it is contained in.  The overarching test will continue running. |
 
 Here is a simple example test using these assertion macros.
 
@@ -39,7 +61,7 @@ _TEST_CASE(abc::test_case_t({.name = "Simple assertions"}))
 {
     //Will register a success.
     _SUCCEED();
-    //Will register a failure
+    //Will register a failure.
     _FAIL();
     //Will terminate the test.
     _TERMINATE();
@@ -48,59 +70,106 @@ _TEST_CASE(abc::test_case_t({.name = "Simple assertions"}))
 }
 ```
 
-We include three additional macros which take a single `string_view` argument. These act as messages, which are contained in the output from the test. The three macros are `_SUCCEED_WITH_MSG`, `_FAIL_WITH_MSG` and `_TERMINATE_WITH_MSG`. An example of their use is shown below.
+We include three additional macros which take a single `string_view` argument. These act as messages, which are contained in the output from the test. The three macros are `_SUCCEED_WITH_MSG`, `_FAIL_WITH_MSG` and `_TERMINATE_WITH_MSG`. `_SUCCEED_WITH_MSG` and `_FAIL_WITH_MSG` are check-based assertions, while `_TERMINATE_WITH_MSG` is a termination-based assertion.
+
+An example of their use is shown below.
 
 ```cpp
 _TEST_CASE(abc::test_case_t({.name = "Simple assertions with output"}))
 {
     //Will register a success.
-    _SUCCEED_WITH_MSG("This message probably won't be seen");
-    //Will register a failure
-    _FAIL_WITH_MSG("This one will though");
+    _SUCCEED_WITH_MSG("This message will be seen");
+    //Will register a failure.
+    _FAIL_WITH_MSG("As will this one");
     //Will terminate the test.
-    _TERMINATE_WITH_MSG("This one definitely will");
+    _TERMINATE_WITH_MSG("This one will too!");
     //Will never be reached.
     _SUCCEED_WITH_MSG("This one won't");
 }
 ```
 
 # A Brief Introduction To Matchers
-Every other assertion macro included with `abc_test` uses matchers in their construction. This section serves as a brief introduction for the user, allowing them to gain enough information to understand the examples shown in this document.
 
-Matchers are objects in `abc_test`. 
+Apart from those static assertions described in the previous section, every other assertion entity included with `abc_test` uses *matchers* in their construction. In `abc_test`, a matcher is a user-defined entity which performs some runtime check. It usually contains some generic logic, which allows it to be re-used across the user's test suite. For example, a matcher could be defined that checks if a `string` is empty. This matcher could then be re-used by the user whenever this check needs to be performed.
 
-# Single-line, matcher-based assertions
-Every other matcher included in `abc_test` is a matcher based assertion
+Assertions use the result of a matcher to determine whether the assertion should pass or fail. 
 
-## Matchers
+To understand the logic pertaining to the assertion entities described in the rest of this document, it is beneficial for the reader to have a basic understanding of what a matcher is.
 
-Matchers are closely related to assertions. A matcher is an object which performs some generic logic. Many assertions take matchers as arguments. The assertion entities then run the matcher's logic, allowing the result to be reported to the `abc` test framework.
-
-In [this document]() we provide the user with documentation concerning matchers. For now, we will introduce a simple set of matchers, which will allow the user to understand the examples in this document.
-
-Objects of type `matcher_t` are the types of arguments used by assertions in `abc_test`. Below we show two examples of `matcher_t` objects which will evaluate to `true` and `false` respectively.
+Below we show some basic matcher examples.
 
 ```cpp
-matcher_t true_matcher = bool_matcher(true);
-matcher_t false_matcher = bool_matcher(false);
+// matcher_t is the object which holds the matcher entity itself. All matchers have a result. A default matcher has a result of true.
+matcher_t matcher_1;
+// matcher_2 is a basic matcher whose result is true.
+matcher_t matcher_2 = bool_matcher(true);
+// matcher_3 has a result of false.
+matcher_t matcher_3 = bool_matcher(false);
+int i = 2;
+// Expressions can be encoded in matchers using the macro _EXPR. matcher_4 matcher will return true, as it checks if i==2 (which it does).
+matcher_t matcher_4 = _EXPR(i==2);
+i = 8;
+// matcher_5 will return false, as i <=7 is false.
+matcher_t matcher_5 = _EXPR(i <= 7);
 ```
 
-The following code represents more complicated `matcher_t` objects, whose results are based on how `i` compares to `j`.
-
-```cpp
-int i = 1;
-int j = 2;
-matcher_t m1 = _EXPR(i==j);
-matcher_t m2 = _EXPR(i!=j);
-matcher_t m3 = _EXPR(i < j);
-matcher_t m4 = _EXPR(i >= j);
-```
+The code above introduces two core matcher mechanics; the `bool_matcher` and the expression-encoded matcher. The `bool_matcher` matcher object has a result that is equal to its `bool` argument. The expression-encoded matcher has a result that is equal to the comparison-based expression used as its argument. In [this document]() we provide more detailed documentation for both of these constructs.
 
 # Single-line, matcher-based assertions
 
-There are two other single-line matchers in `abc_test`. One is called `_CHECK` and the other is called `_REQUIRE`. Both take a matcher as their argument. If `_CHECK`'s matcher fails, then a failed assertion is registered with the test, otherwise a passed assertion is registered with the test. If `_REQUIRE`'s matcher passes, then a passed assertion is registerd with the test. Otherwise, a failed assertion is raised, and the test function terminates. 
+In the previous section we gave the reader a brief introduction to the matcher. In this section we introduce the two most commonly used assertion macros; the `_CHECK` assertion and the `_REQUIRE` assertion.
 
-Here are some examples.
+Below 
+| Macro | Check-based or Termination-based | Description |
+|--|--|--| 
+| `_CHECK(matcher)` | Check-based. | If the result of the matcher is `true` the assertion passes. If false it fails. |
+| `_REQUIRE(matcher)`| Termination-based. | If the result of the matcher is `true` the assertion passes. If false it fails, and the overarching test will terminate. |
+
+Below we show some examples of the use of these macros.
+
+```cpp
+_TEST_CASE(abc::test_case_t({.name = "Testing assertions"}))
+{
+    // This will register as a passed assertion.
+    _CHECK(bool_matcher(true));
+    // This will register as a failed assertion.
+    _CHECK(bool_matcher(false));
+    int i = 2;
+    // This will register as a passed assertion.
+    _CHECK(_EXPR(i==2));
+    // This will register as a failed assertion.
+    _CHECK(_EXPR(i==3));
+    // This will register as a passed assertion.
+    _REQUIRE(_EXPR(i<3));
+    // This will register as fa failed assertion, and the test will terminate.
+    _REQUIRE(_EXPR(i>=3));
+    // This test won't be ran.
+    _CHECK(_EXPR(i==2));
+}
+```
+
+We include two other, closely related, assertions called `_CHECK_EXPR` and `_REQUIRE_EXPR`. These macros can be defined as follows:
+
+```cpp
+_CHECK_EXPR(expression) = _CHECK(_EXPR(expression));
+_REQUIRE_EXPR(expression) = _REQUIRE(_EXPR(expression));
+```
+
+These are essentially used when the user wants to write expressions. The upside is that the code is clearer; the downside is that the user cannot do anything to the internal matchers.
+
+Below is an example.
+
+```cpp
+_TEST_CASE(abc::test_case_t({.name = "Testing assertions again"}))
+{
+    int i = 2;
+    _CHECK_EXPR(i==2);
+    _CHECK_EXPR(i==3);
+    _REQUIRE_EXPR(i<3);
+    _REQUIRE_EXPR(i>=3);
+    _CHECK_EXPR(i==2);
+}
+```
 
 # Multi-line, matcher based assertions
 

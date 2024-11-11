@@ -181,6 +181,7 @@ set(LIBRARY_FILES
   include/abc_test/internal/utility/str/string_utility.hpp
   include/abc_test/internal/utility/str/string_table.hpp
   include/abc_test/internal/utility/str.hpp
+  include/abc_test/internal/utility/ranges.hpp
   include/abc_test/internal/utility/str/rw_info.hpp
   include/abc_test/internal/utility/enum.hpp
   include/abc_test/internal/utility/limits/min_value_object.hpp
