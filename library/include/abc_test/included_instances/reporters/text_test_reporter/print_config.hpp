@@ -167,7 +167,10 @@ public:
                       status_str() const noexcept;
     template <typename T>
     __constexpr       std::string
-                      status(const T& _a_status) const noexcept;
+                      status(const bool _a_status) const noexcept;
+    template <typename T>
+    __constexpr       std::string
+        status() const noexcept;
     __constexpr const std::string_view
                       test_description_str() const noexcept;
     /*__constexpr
@@ -178,6 +181,10 @@ public:
         const std::string_view
         pass_message_str(
         ) const noexcept;*/
+    __constexpr std::string
+        message_str(const std::string& _a_str) const noexcept;
+    __constexpr std::string
+        message_str(const std::string_view& _a_str) const noexcept;
     __constexpr std::string
         message_str(const std::optional<std::string>& _a_str) const noexcept;
     __constexpr std::string
@@ -802,7 +809,7 @@ __constexpr_imp const std::string_view
 template <typename T>
 __constexpr_imp std::string
                 print_config_t::status(
-        const T& _a_status
+        const bool _a_status
     ) const noexcept
 {
     using namespace std;
@@ -823,14 +830,14 @@ __constexpr_imp std::string
     {
         return fmt::format(
             "Assertion will either pass or fail. This assertion {0}.",
-            _a_status.pass() ? "passes" : "fails"
+            _a_status ? "passes" : "fails"
         );
     }
     else if constexpr (same_as<T, pass_or_terminate_t>)
     {
         return fmt::format(
             "Assertion will either pass or terminate. This assertion {0}.",
-            _a_status.pass() ? "passes" : "terminates"
+            _a_status ? "passes" : "terminates"
         );
     }
     else
@@ -838,6 +845,32 @@ __constexpr_imp std::string
         __STATIC_ASSERT(T, "Cannot instantiate");
     }
 }
+
+template <typename T>
+__constexpr_imp std::string
+print_config_t::status(
+) const noexcept
+{
+    using namespace std;
+    using namespace reports;
+    if constexpr (same_as<T, pass_t>)
+    {
+        return "Assertion always passes.";
+    }
+    else if constexpr (same_as<T, fail_t>)
+    {
+        return "Assertion always fails.";
+    }
+    else if constexpr (same_as<T, terminate_t>)
+    {
+        return "Assertion always fails and terminates the function.";
+    }
+    else
+    {
+        __STATIC_ASSERT(T, "Cannot instantiate");
+    }
+}
+
 
 __constexpr_imp const std::string_view
                       print_config_t::test_description_str() const noexcept
@@ -859,6 +892,16 @@ print_config_t::pass_message_str(
 {
     return "Pass message";
 }*/
+__constexpr std::string
+print_config_t::message_str(const std::string& _a_str) const noexcept
+{
+    return slight_highlight(quote(_a_str));
+}
+__constexpr std::string
+print_config_t::message_str(const std::string_view& _a_str) const noexcept
+{
+    return slight_highlight(quote(_a_str));
+}
 __constexpr_imp std::string
                 print_config_t::message_str(
         const std::optional<std::string>& _a_str

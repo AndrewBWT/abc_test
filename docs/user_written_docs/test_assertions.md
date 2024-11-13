@@ -173,6 +173,12 @@ _TEST_CASE(abc::test_case_t({.name = "Testing assertions again"}))
 
 # Multi-line, matcher based assertions
 
+A multi-line assertion is a pair of macros which declare an object. This object can then have matchers attached to it.
+
+They can have two modes:
+- Pass/fail mode. The assertion block continues to take in elements. When it is destroyed, everything is sent to the controller.
+- Pass/fail and terminate mode. Same as above, except it terminates at the end.
+
 We also include what are best described as multi-line assertions in `abc_test`. These are control structures which create some controlling object which matchers can be registered to. 
 
 We include three types of multi-line matchers:
@@ -180,6 +186,17 @@ We include three types of multi-line matchers:
 - single_write_multi_line_matcher. This matcher has an initial value, and can only be written to once after that. The assertion can register its matcher either when its set, or on the objects destruction. This can effect when a matcher terminates a function.
 - multi_write_multi_line_matcher. This matcher has an initial value, and can be re-written to multiple times. It can again, eitehr be set to register its matcher when its set, or when the object is destroyed.
 - multi_write_multi_line_counter_matcher. This matcher does the same as the above, but also keeps track of all its results. So at the end it can write things like "97/98 test assertions passed. Last assertion terminated the test." or "95/100 test assertions passed. 5 failed."
+
+```cpp
+{
+    _TERMINATE_BLOCK(matcher_block);
+    for (i=0; i < 3; ++i)
+    {
+        matcher_block = _EXPR(i==2);
+    }
+    //Evaluated and runs on description.
+}
+```
 
 # Exception handling
 

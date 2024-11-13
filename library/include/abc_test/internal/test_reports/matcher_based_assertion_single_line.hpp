@@ -21,16 +21,16 @@ public:
      * @param _a_matcher_result The matcher's result.
      * @param _a_matcher_source_map The matcher's source map.
      * @param _a_annotation The matcher's annotation.
-     * 
+     *
      * Note that the test annotation is not set by this function.
      */
     __constexpr
     matcher_based_assertion_single_line_t(
         const user_initialised_report_t<true>::source_t& _a_source,
         const ds::log_infos_t&                           _a_log_infos,
-        const _ABC_NS_MATCHER::matcher_result_t&                          _a_matcher_result,
-        const _ABC_NS_MATCHER::matcher_source_map_t&                      _a_matcher_source_map,
-        const std::optional<std::string_view>&           _a_annotation
+        const typename matcher_based_assertion_t<true, Assertion_Status>::
+            matcher_based_assertion_matchers_t&      _a_matcher_and_annotation,
+        const _ABC_NS_MATCHER::matcher_source_map_t& _a_matcher_source_map
     ) noexcept;
 };
 
@@ -44,17 +44,18 @@ __constexpr_imp
         matcher_based_assertion_single_line_t(
             const user_initialised_report_t<true>::source_t& _a_source,
             const ds::log_infos_t&                           _a_log_infos,
-            const _ABC_NS_MATCHER::matcher_result_t&                          _a_matcher_result,
-            const _ABC_NS_MATCHER::matcher_source_map_t&            _a_matcher_source_map,
-            const std::optional<std::string_view>& _a_annotation
+            const typename matcher_based_assertion_t<true, Assertion_Status>::
+                matcher_based_assertion_matchers_t& _a_matcher_and_annotation,
+            const _ABC_NS_MATCHER::matcher_source_map_t& _a_matcher_source_map
         ) noexcept
+
     : matcher_based_assertion_t<true, Assertion_Status>(
+          _a_matcher_and_annotation.first.passed(),
           _a_source,
           _a_log_infos,
-          std::optional<std::string>{},
-          _a_matcher_result,
+          _a_matcher_and_annotation,
           _a_matcher_source_map,
-          _a_annotation
+          std::monostate{}
       )
 {}
 

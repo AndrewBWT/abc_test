@@ -449,7 +449,7 @@ __constexpr_imp std::size_t
 template <bool Single_Source, typename Assertion_Status>
 __constexpr_imp void
     invoked_test_data_t::add_assertion(
-        reports::assertion_ptr_t<Single_Source, Assertion_Status>& _a_ptr
+        reports::assertion_ptr_t<Single_Source,Assertion_Status>& _a_ptr
     )
 {
     using namespace reports;

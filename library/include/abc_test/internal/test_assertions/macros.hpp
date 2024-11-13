@@ -74,7 +74,7 @@
  */
 #define _FAIL()                                                              \
     __ABC_TEST_INTERNAL_STATIC_ASSERTION(                                    \
-        _ABC_NS_REPORTS::fail_t, std::optional<std::string_view>(), "FAIL()" \
+        _ABC_NS_REPORTS::fail_t, std::optional<std::string>(), "FAIL()" \
     )
 /*!
  * @brief Macro used to raise a static termination assertion.
@@ -85,7 +85,7 @@
 #define _TERMINATE()                       \
     __ABC_TEST_INTERNAL_STATIC_ASSERTION(  \
         _ABC_NS_REPORTS::terminate_t,      \
-        std::optional<std::string_view>(), \
+        std::optional<std::string>(), \
         "_TERMINATE()"                     \
     )
 /*!
@@ -96,7 +96,7 @@
 #define _SUCCEED()                         \
     __ABC_TEST_INTERNAL_STATIC_ASSERTION(  \
         _ABC_NS_REPORTS::pass_t,           \
-        std::optional<std::string_view>(), \
+        std::optional<std::string>(), \
         "_SUCCEED()"                       \
     )
 /*!
@@ -111,7 +111,7 @@
 #define _FAIL_WITH_MSG(_a_msg)                                                 \
     __ABC_TEST_INTERNAL_STATIC_ASSERTION(                                      \
         _ABC_NS_REPORTS::fail_t,                                               \
-        std::optional<std::string_view>(_a_msg),                               \
+        std::optional<std::string>(_a_msg),                               \
         _ABC_NS_UTILITY::str::create_string({"_FAIL_WITH_MSG(", #_a_msg, ")"}) \
     )
 /*!
@@ -126,7 +126,7 @@
 #define _TERMINATE_WITH_MSG(_a_msg)                \
     __ABC_TEST_INTERNAL_STATIC_ASSERTION(          \
         _ABC_NS_REPORTS::terminate_t,              \
-        std::optional<std::string_view>(_a_msg),   \
+        std::optional<std::string>(_a_msg),   \
         _ABC_NS_UTILITY::str::create_string(       \
             {"_TERMINATE_WITH_MSG(", #_a_msg, ")"} \
         )                                          \
@@ -142,7 +142,7 @@
 #define _SUCCEED_WITH_MSG(_a_msg)                \
     __ABC_TEST_INTERNAL_STATIC_ASSERTION(        \
         _ABC_NS_REPORTS::pass_t,                 \
-        std::optional<std::string_view>(_a_msg), \
+        std::optional<std::string>(_a_msg), \
         _ABC_NS_UTILITY::str::create_string(     \
             {"_SUCCEED_WITH_MSG(", #_a_msg, ")"} \
         )                                        \

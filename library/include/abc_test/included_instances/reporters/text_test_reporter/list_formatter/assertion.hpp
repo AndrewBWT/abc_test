@@ -75,7 +75,7 @@ assertion_list_formatter_t<Single_Source, Assertion_Status>::check_data(
 		case STR_REPRESENTATION:
 			return true;
 		case TEST_DESCRIPTION:
-			return _a_element.test_description().has_value();
+			return true;// _a_element.test_description().has_value();
 		default:
 			throw errors::unaccounted_for_enum_exception(*_l_ptr);
 		}
@@ -110,17 +110,35 @@ assertion_list_formatter_t<Single_Source, Assertion_Status>::get_data(
 		switch (*_l_ptr)
 		{
 		case STATUS:
-			return
+			if constexpr (std::derived_from<Assertion_Status, abc::reports::dynamic_status_t>)
 			{
-				_a_pc.colon(_a_pc.status_str()),
-				_a_pc.indent(_a_pc.status(_a_element.status()))
-			};
+				return
+				{
+					_a_pc.colon(_a_pc.status_str()),
+					_a_pc.indent(_a_pc.status< Assertion_Status>(_a_element.status()))
+				};
+			}
+			else
+			{
+				return
+				{
+					_a_pc.colon(_a_pc.status_str()),
+					_a_pc.indent(_a_pc.status<Assertion_Status>())
+				};
+			}
 		case TEST_DESCRIPTION:
-			return
+			if constexpr (not Single_Source)
 			{
-				_a_pc.colon(_a_pc.test_description_str()),
-				_a_pc.indent(_a_pc.message_str(_a_element.test_description()))
-			};
+				return
+				{
+					_a_pc.colon(_a_pc.test_description_str()),
+					_a_pc.indent(_a_pc.message_str(_a_element.test_description()))
+				};
+			}
+			else
+			{
+				return {};
+			}
 		case STR_REPRESENTATION:
 			return
 			{
