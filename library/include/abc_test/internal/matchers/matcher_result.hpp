@@ -1,6 +1,7 @@
 #pragma once
 
 #include "abc_test/internal/utility/internal/macros.hpp"
+#include "abc_test/internal/matchers/source_map.hpp"
 #include <vector>
 
 _BEGIN_ABC_MATCHER_NS
@@ -53,8 +54,8 @@ private:
     bool        _m_passed = false;
     std::string _m_str;
 };
-using matcher_res_with_opt_annotation_t = std::pair<matcher_result_t, std::optional<std::string>>;
-using matcher_res_with_opt_annotation_collection_t = std::vector<matcher_res_with_opt_annotation_t>;
+using matcher_res_info_t = std::tuple<matcher_result_t, std::optional<std::string>,matcher_source_map_t>;
+using matcher_res_infos_t = std::vector<matcher_res_info_t>;
 _END_ABC_MATCHER_NS
 
 _BEGIN_ABC_MATCHER_NS

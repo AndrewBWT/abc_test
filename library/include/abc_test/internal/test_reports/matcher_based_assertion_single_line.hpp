@@ -29,8 +29,7 @@ public:
         const user_initialised_report_t<true>::source_t& _a_source,
         const ds::log_infos_t&                           _a_log_infos,
         const typename matcher_based_assertion_t<true, Assertion_Status>::
-            matcher_based_assertion_matchers_t&      _a_matcher_and_annotation,
-        const _ABC_NS_MATCHER::matcher_source_map_t& _a_matcher_source_map
+            matcher_based_assertion_matchers_t&      _a_matcher_and_annotation
     ) noexcept;
 };
 
@@ -45,16 +44,14 @@ __constexpr_imp
             const user_initialised_report_t<true>::source_t& _a_source,
             const ds::log_infos_t&                           _a_log_infos,
             const typename matcher_based_assertion_t<true, Assertion_Status>::
-                matcher_based_assertion_matchers_t& _a_matcher_and_annotation,
-            const _ABC_NS_MATCHER::matcher_source_map_t& _a_matcher_source_map
+                matcher_based_assertion_matchers_t& _a_matcher_and_annotation
         ) noexcept
 
     : matcher_based_assertion_t<true, Assertion_Status>(
-          _a_matcher_and_annotation.first.passed(),
+          get<0>(_a_matcher_and_annotation).passed(),
           _a_source,
           _a_log_infos,
           _a_matcher_and_annotation,
-          _a_matcher_source_map,
           std::monostate{}
       )
 {}

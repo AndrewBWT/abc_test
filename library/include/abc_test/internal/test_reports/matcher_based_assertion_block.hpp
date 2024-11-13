@@ -37,7 +37,6 @@ public:
         const ds::log_infos_t&                                     _a_log_infos,
         typename const matcher_based_assertion_t<false, Assertion_Status>::
             matcher_based_assertion_matchers_t& _a_matchers_and_annotations,
-        const _ABC_NS_MATCHER::matcher_source_map_t& _a_matcher_source_map,
         const opt_description_t<false>&              _a_opt_description
     ) noexcept;
 };
@@ -56,7 +55,6 @@ __constexpr_imp
             const ds::log_infos_t& _a_log_infos,
             typename const matcher_based_assertion_t<false, Assertion_Status>::
                 matcher_based_assertion_matchers_t& _a_matchers_and_annotations,
-            const _ABC_NS_MATCHER::matcher_source_map_t& _a_matcher_source_map,
             const opt_description_t<false>&              _a_opt_description
         ) noexcept
     : matcher_based_assertion_t<false, Assertion_Status>(
@@ -64,7 +62,6 @@ __constexpr_imp
           _a_source,
           _a_log_infos,
           _a_matchers_and_annotations,
-          _a_matcher_source_map,
           _a_opt_description
       )
 {}

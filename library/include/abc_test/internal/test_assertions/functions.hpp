@@ -132,21 +132,20 @@ create_assertion(
     using namespace std;
     assertion_ptr_t<true, T> _l_gur;
     bool                     _l_passed{true};
-    optional<string_view>    _l_matcher_annotation{};
+    optional<string>    _l_matcher_annotation{};
     if constexpr (Has_Annotation)
     {
-        _l_matcher_annotation = optional<string_view>(_a_matcher.annotation());
+        _l_matcher_annotation = optional<string>(_a_matcher.annotation());
     }
     if (not _a_matcher.has_matcher_base())
     {
-        _l_gur = make_unique<matcher_based_assertion_single_line_t<T>>(
+         _l_gur = make_unique<matcher_based_assertion_single_line_t<T>>(
             matcher_based_assertion_single_line_t<T>(
                 _a_source,
                 _a_test_runner.get_log_infos(false),
-                matcher_res_with_opt_annotation_t(matcher_result_t(),_l_matcher_annotation),
-                matcher_source_map_t()
+                make_tuple(matcher_result_t(),_l_matcher_annotation, matcher_source_map_t())
             )
-        );
+       );
         _a_test_runner.add_assertion_and_warning(
             _l_gur,
             "Matcher_t object has not been initialised. Assertion is set to "
@@ -164,8 +163,7 @@ create_assertion(
             matcher_based_assertion_single_line_t<T>(
                 _a_source,
                 _a_test_runner.get_log_infos(false),
-                matcher_res_with_opt_annotation_t(_l_mr, _l_matcher_annotation),
-                _l_msm
+                make_tuple(_l_mr, _l_matcher_annotation, _l_msm)
             )
         );
         _a_test_runner.add_assertion(_l_gur);
@@ -237,13 +235,12 @@ create_assertion_block(
         }
     }
     _l_passed = _l_total_passed == _l_mtr.size();
-    _ABC_NS_MATCHER::matcher_res_with_opt_annotation_collection_t _l_matchers_and_annotations;
+    _ABC_NS_MATCHER::matcher_res_infos_t _l_matchers_and_annotations;
     _l_gur    = make_unique<matcher_based_assertion_block_t<T>>(
         _l_passed,
         _a_test_block.source(),
         _a_test_runner.get_log_infos(false),
         _l_matchers_and_annotations,
-       _l_msm,
         _a_test_block.test_annotation()
     );
     _a_test_runner.add_assertion(_l_gur);

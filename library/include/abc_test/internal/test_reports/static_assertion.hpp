@@ -51,8 +51,7 @@ __constexpr_imp
           std::monostate{},
           _a_source,
           _a_log_infos,
-          make_pair(_ABC_NS_MATCHER::matcher_result_t(), _a_annotation),
-          _ABC_NS_MATCHER::matcher_source_map_t{},
+          make_tuple(_ABC_NS_MATCHER::matcher_result_t(), _a_annotation, _ABC_NS_MATCHER::matcher_source_map_t{}),
         std::monostate{}
       )
 {}

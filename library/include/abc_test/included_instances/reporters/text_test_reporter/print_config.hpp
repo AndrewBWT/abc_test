@@ -131,7 +131,7 @@ public:
     __constexpr
         enum_print_pair_collection_t<enum_finalised_test_set_data_fields_t>
         finalised_test_set_data_fields() const noexcept;
-    __constexpr enum_print_pair_collection_t<combined_enum_assertion_fields_t>
+    __constexpr enum_print_pair_collection_t<combined_enum_matcher_based_assertion_fields_t>
                 static_assertion_fields() const noexcept;
     __constexpr enum_print_pair_collection_t<
         combined_enum_unexpected_thrown_non_descript_entity_fields_t>
@@ -200,7 +200,7 @@ public:
     enum_print_pair_collection_t<
         combined_enum_matcher_based_assertion_block_fields_t>
         _m_matcher_assertion_block_fields;
-    enum_print_pair_collection_t<combined_enum_assertion_fields_t>
+    enum_print_pair_collection_t<combined_enum_matcher_based_assertion_fields_t>
         _m_static_assertion_fields;
     enum_print_pair_collection_t<
         combined_enum_unexpected_thrown_non_descript_entity_fields_t>
@@ -668,7 +668,7 @@ __constexpr enum_print_pair_collection_t<enum_finalised_test_set_data_fields_t>
     return _m_finalised_test_set_data_fields;
 }
 
-__constexpr_imp enum_print_pair_collection_t<combined_enum_assertion_fields_t>
+__constexpr_imp enum_print_pair_collection_t<combined_enum_matcher_based_assertion_fields_t>
                 print_config_t::static_assertion_fields() const noexcept
 {
     return _m_static_assertion_fields;

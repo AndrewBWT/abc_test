@@ -69,11 +69,18 @@ __constexpr_imp bool
         case MATCHER_OUTPUT:
             return true;
         case MATCHER_SOURCE_MAP:
-            return _a_element.source_map().has_elements();
+            if constexpr (Single_Source)
+            {
+                return get<2>(_a_element.matcher_result()).has_elements();
+            }
+            else
+            {
+                return true;
+            }
         case MATCHER_ANNOTATION:
             if constexpr (Single_Source)
             {
-                return _a_element.matcher_result().second.has_value();
+                return get<1>(_a_element.matcher_result()).has_value();
             }
             else
             {
@@ -120,7 +127,7 @@ __constexpr_imp std::vector<std::string>
                 return {
                     _a_pc.colon(_a_pc.matcher_output_str()),
                     _a_pc.indent(_a_pc.matcher_output(
-                        _a_element.matcher_result().first.str()
+                        get<0>(_a_element.matcher_result()).str()
                     ))
                 };
             }
@@ -130,26 +137,33 @@ __constexpr_imp std::vector<std::string>
             }
         case MATCHER_SOURCE_MAP:
         {
-            vector<string> _l_rv{_a_pc.colon(_a_pc.matcher_source_map_str())};
-            for (const pair<std::source_location, vector<string>>& _l_element :
-                 _a_element.source_map().map())
+            if constexpr (Single_Source)
             {
-                _l_rv.push_back(
-                    _a_pc.indent(_a_pc.colon(_a_pc.source_location_str()))
-                );
-                _l_rv.push_back(
-                    _a_pc.indent(_a_pc.source_location(_l_element.first), 2)
-                );
-                _l_rv.push_back(_a_pc.indent(_a_pc.colon(_a_pc.source_code_str()
-                )));
-                for (const string_view _l_str : _l_element.second)
+                vector<string> _l_rv{ _a_pc.colon(_a_pc.matcher_source_map_str()) };
+                for (const pair<std::source_location, vector<string>>& _l_element :
+                    get<2>(_a_element.matcher_result()).map())
                 {
                     _l_rv.push_back(
-                        _a_pc.indent(_a_pc.source_representation(_l_str), 2)
+                        _a_pc.indent(_a_pc.colon(_a_pc.source_location_str()))
                     );
+                    _l_rv.push_back(
+                        _a_pc.indent(_a_pc.source_location(_l_element.first), 2)
+                    );
+                    _l_rv.push_back(_a_pc.indent(_a_pc.colon(_a_pc.source_code_str()
+                    )));
+                    for (const string_view _l_str : _l_element.second)
+                    {
+                        _l_rv.push_back(
+                            _a_pc.indent(_a_pc.source_representation(_l_str), 2)
+                        );
+                    }
                 }
+                return _l_rv;
             }
-            return _l_rv;
+            else
+            {
+                return {};
+            }
         }
         case MATCHER_ANNOTATION:
             if constexpr (Single_Source)
@@ -157,7 +171,7 @@ __constexpr_imp std::vector<std::string>
                 return {
                     _a_pc.colon(_a_pc.matcher_annotation()),
                     _a_pc.indent(
-                        _a_pc.message_str(_a_element.matcher_result().second)
+                        _a_pc.message_str(get<1>(_a_element.matcher_result()))
                     )
                 };
             }

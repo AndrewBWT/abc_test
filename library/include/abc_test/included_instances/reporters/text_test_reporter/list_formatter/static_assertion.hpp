@@ -1,5 +1,5 @@
 #pragma once
-#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/assertion.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion.hpp"
 #include "abc_test/internal/test_reports/assertion_status/pass_or_terminate.hpp"
 #include "abc_test/internal/test_reports/assertion_status/terminate.hpp"
 #include "abc_test/internal/test_reports/static_assertion.hpp"
@@ -9,22 +9,22 @@ template<
 >
 struct static_assertion_list_formatter_t
 	: public list_formattable_t< reports::static_assertion_t<Assertion_Status>,
-	combined_enum_assertion_fields_t, print_config_t>,
-	public assertion_list_formatter_t<true, Assertion_Status>
+	combined_enum_matcher_based_assertion_fields_t, print_config_t>,
+	public matcher_based_assertion_list_formatter_t<true, Assertion_Status>
 {
 public:
 	__constexpr
 		virtual
 		bool
 		check_data(
-			const combined_enum_assertion_fields_t& _a_fid,
+			const combined_enum_matcher_based_assertion_fields_t& _a_fid,
 			const reports::static_assertion_t<Assertion_Status>& _a_element
 		) const override;
 	__constexpr
 		virtual
 		std::vector<std::string>
 		get_data(
-			const combined_enum_assertion_fields_t& _a_fid,
+			const combined_enum_matcher_based_assertion_fields_t& _a_fid,
 			const reports::static_assertion_t<Assertion_Status>& _a_element,
 			const print_config_t& _a_pc
 		) const override;
@@ -47,11 +47,11 @@ template<
 __constexpr_imp
 bool
 static_assertion_list_formatter_t<Assertion_Status>::check_data(
-	const combined_enum_assertion_fields_t& _a_fid,
+	const combined_enum_matcher_based_assertion_fields_t& _a_fid,
 	const reports::static_assertion_t<Assertion_Status>& _a_element
 ) const
 {
-	return assertion_list_formatter_t<true, Assertion_Status>::check_data(_a_fid, _a_element);
+	return matcher_based_assertion_list_formatter_t<true, Assertion_Status>::check_data(_a_fid, _a_element);
 }
 template<
 	typename Assertion_Status
@@ -59,12 +59,12 @@ template<
 __constexpr_imp
 std::vector<std::string>
 static_assertion_list_formatter_t<Assertion_Status>::get_data(
-	const combined_enum_assertion_fields_t& _a_fid,
+	const combined_enum_matcher_based_assertion_fields_t& _a_fid,
 	const reports::static_assertion_t<Assertion_Status>& _a_element,
 	const print_config_t& _a_pc
 ) const
 {
-	return assertion_list_formatter_t<true, Assertion_Status>::get_data(_a_fid, _a_element, _a_pc);
+	return matcher_based_assertion_list_formatter_t<true, Assertion_Status>::get_data(_a_fid, _a_element, _a_pc);
 }
 template<
 	typename Assertion_Status

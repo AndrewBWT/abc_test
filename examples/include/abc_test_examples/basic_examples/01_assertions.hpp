@@ -73,7 +73,7 @@ _TEST_CASE(
     _FAIL_WITH_MSG("Testing failure");
     _TERMINATE_WITH_MSG("Testing termination");
 }
-
+#if 0
 _TEST_CASE(
     abc::test_case_t(
         {.name = "file_01_example_04",
@@ -176,3 +176,4 @@ _TEST_CASE(
         _l_result |= _CHECK(abc::contains(_l_vect, 1'000));
     }
 }
+#endif

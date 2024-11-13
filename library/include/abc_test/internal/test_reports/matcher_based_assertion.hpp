@@ -23,8 +23,8 @@ struct matcher_based_assertion_t
 public:
     using matcher_based_assertion_matchers_t = std::conditional_t<
         Single_Source,
-        _ABC_NS_MATCHER::matcher_res_with_opt_annotation_t,
-        _ABC_NS_MATCHER::matcher_res_with_opt_annotation_collection_t>;
+        _ABC_NS_MATCHER::matcher_res_info_t,
+        _ABC_NS_MATCHER::matcher_res_infos_t>;
     /*!
      * @brief Returns the assertion's matcher_result_t to the caller.
      * @return The assertion's matcher_result_t.
@@ -35,8 +35,8 @@ public:
      * @brief Returns the assertion's matcher_source_map_t to the caller.
      * @return The assertion's matcher_source_map_t.
      */
-    __constexpr const _ABC_NS_MATCHER::matcher_source_map_t&
-                      source_map() const noexcept;
+    //__constexpr const _ABC_NS_MATCHER::matcher_source_map_t&
+    //                  source_map() const noexcept;
     /*!
      * @brief Returns the matcher's annotation to the caller.
      * @return A cref to the matcher's annotation.
@@ -45,7 +45,7 @@ public:
     //                  annotation() const noexcept;
 protected:
     matcher_based_assertion_matchers_t    _m_matcher_result;
-    _ABC_NS_MATCHER::matcher_source_map_t _m_matcher_map;
+   // _ABC_NS_MATCHER::matcher_source_map_t _m_matcher_map;
     // std::optional<std::string>            _m_annotation;
     /*!
      * @brief Constructor.
@@ -70,7 +70,7 @@ protected:
                                                   _a_source,
         const ds::log_infos_t&                    _a_log_infos,
         const matcher_based_assertion_matchers_t& _a_matchers_and_annotations,
-        const _ABC_NS_MATCHER::matcher_source_map_t& _a_matcher_source_map,
+     //   const _ABC_NS_MATCHER::matcher_source_map_t& _a_matcher_source_map,
         const opt_description_t<Single_Source>& _a_opt_description
     ) noexcept;
 };
@@ -90,14 +90,14 @@ __constexpr_imp const
     return _m_matcher_result;
 }
 
-template <bool Single_Source, typename Assertion_Status>
+/*template <bool Single_Source, typename Assertion_Status>
 requires std::derived_from<Assertion_Status, assertion_status_base_t>
 __constexpr_imp const _ABC_NS_MATCHER::matcher_source_map_t&
     matcher_based_assertion_t<Single_Source, Assertion_Status>::source_map(
     ) const noexcept
 {
     return _m_matcher_map;
-}
+}*/
 
 /*template <bool Single_Source, typename Assertion_Status>
 requires std::derived_from<Assertion_Status, dynamic_status_t>
@@ -117,7 +117,7 @@ matcher_based_assertion_t<Single_Source, Assertion_Status>::
                                                   _a_source,
         const ds::log_infos_t&                    _a_log_infos,
         const matcher_based_assertion_matchers_t& _a_matchers_and_annotations,
-        const _ABC_NS_MATCHER::matcher_source_map_t& _a_matcher_source_map,
+      //  const _ABC_NS_MATCHER::matcher_source_map_t& _a_matcher_source_map,
         const opt_description_t<Single_Source>& _a_opt_description
     ) noexcept
     : assertion_t<Single_Source, Assertion_Status>(
@@ -127,7 +127,7 @@ matcher_based_assertion_t<Single_Source, Assertion_Status>::
         _a_opt_description
       )
     , _m_matcher_result(_a_matchers_and_annotations)
-    , _m_matcher_map(_a_matcher_source_map)
+  //  , _m_matcher_map(_a_matcher_source_map)
 {}
 
 /*
