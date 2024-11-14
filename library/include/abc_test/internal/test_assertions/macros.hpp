@@ -72,8 +72,8 @@
  * This macro will register a failed assertion for the test it is used in. It
  * will not terminate the test function.
  */
-#define _FAIL()                                                              \
-    __ABC_TEST_INTERNAL_STATIC_ASSERTION(                                    \
+#define _FAIL()                                                         \
+    __ABC_TEST_INTERNAL_STATIC_ASSERTION(                               \
         _ABC_NS_REPORTS::fail_t, std::optional<std::string>(), "FAIL()" \
     )
 /*!
@@ -82,22 +82,20 @@
  * This macro will register a failed assertion for the test it is used in, and
  * terminate the test.
  */
-#define _TERMINATE()                       \
-    __ABC_TEST_INTERNAL_STATIC_ASSERTION(  \
-        _ABC_NS_REPORTS::terminate_t,      \
-        std::optional<std::string>(), \
-        "_TERMINATE()"                     \
+#define _TERMINATE()                      \
+    __ABC_TEST_INTERNAL_STATIC_ASSERTION( \
+        _ABC_NS_REPORTS::terminate_t,     \
+        std::optional<std::string>(),     \
+        "_TERMINATE()"                    \
     )
 /*!
  * @brief Macro used to raise a succeeded assertion.
  *
  * This macro will register a passed assertion with the test_runner_t.
  */
-#define _SUCCEED()                         \
-    __ABC_TEST_INTERNAL_STATIC_ASSERTION(  \
-        _ABC_NS_REPORTS::pass_t,           \
-        std::optional<std::string>(), \
-        "_SUCCEED()"                       \
+#define _SUCCEED()                                                          \
+    __ABC_TEST_INTERNAL_STATIC_ASSERTION(                                   \
+        _ABC_NS_REPORTS::pass_t, std::optional<std::string>(), "_SUCCEED()" \
     )
 /*!
  * @brief Macro used to raise a static failure assertion with a message used as
@@ -111,7 +109,7 @@
 #define _FAIL_WITH_MSG(_a_msg)                                                 \
     __ABC_TEST_INTERNAL_STATIC_ASSERTION(                                      \
         _ABC_NS_REPORTS::fail_t,                                               \
-        std::optional<std::string>(_a_msg),                               \
+        std::optional<std::string>(_a_msg),                                    \
         _ABC_NS_UTILITY::str::create_string({"_FAIL_WITH_MSG(", #_a_msg, ")"}) \
     )
 /*!
@@ -126,7 +124,7 @@
 #define _TERMINATE_WITH_MSG(_a_msg)                \
     __ABC_TEST_INTERNAL_STATIC_ASSERTION(          \
         _ABC_NS_REPORTS::terminate_t,              \
-        std::optional<std::string>(_a_msg),   \
+        std::optional<std::string>(_a_msg),        \
         _ABC_NS_UTILITY::str::create_string(       \
             {"_TERMINATE_WITH_MSG(", #_a_msg, ")"} \
         )                                          \
@@ -142,7 +140,7 @@
 #define _SUCCEED_WITH_MSG(_a_msg)                \
     __ABC_TEST_INTERNAL_STATIC_ASSERTION(        \
         _ABC_NS_REPORTS::pass_t,                 \
-        std::optional<std::string>(_a_msg), \
+        std::optional<std::string>(_a_msg),      \
         _ABC_NS_UTILITY::str::create_string(     \
             {"_SUCCEED_WITH_MSG(", #_a_msg, ")"} \
         )                                        \
@@ -223,15 +221,28 @@
  * @param _a_str_representation The string representation of the macro.
  */
 #define __ABC_TEST_INNER_BEGIN_BLOCK(                                  \
-    _a_name, _a_description, _a_assertion_type, _a_str_representation  \
+    _a_class,                                                          \
+    _a_name,                                                           \
+    _a_description,                                                    \
+    _a_assertion_type,                                                 \
+    _a_str_representation                                              \
 )                                                                      \
     {                                                                  \
-        abc::test_block_t<_a_assertion_type> _a_name(                  \
+        _a_class<_a_assertion_type> _a_name(                           \
             _a_description,                                            \
             _ABC_NS_DS::single_source_t(                               \
                 _a_str_representation, std::source_location::current() \
             )                                                          \
         );
+
+#define _BLOCK_CHECK(_a_matcher)                \
+    abc::make_block_check_matcher(              \
+        _a_matcher,                             \
+        _ABC_NS_UTILITY::str::create_string(    \
+            {"_BLOCK_CHECK(", #_a_matcher, ")"} \
+        ),                                      \
+        std::source_location::current()         \
+    )
 
 /*!
  * @brief Macro to end a testing block.
@@ -257,6 +268,7 @@
  */
 #define _BEGIN_CHECK_ASSERTION_BLOCK(_a_name, _a_description) \
     __ABC_TEST_INNER_BEGIN_BLOCK(                             \
+        abc::single_element_test_block_t,                     \
         _a_name,                                              \
         _a_description,                                       \
         _ABC_NS_REPORTS::pass_or_fail_t,                      \
@@ -273,6 +285,7 @@
  */
 #define _BEGIN_REQUIRE_ASSERTION_BLOCK(_a_name, _a_description) \
     __ABC_TEST_INNER_BEGIN_BLOCK(                               \
+        abc::single_element_test_block_t,                       \
         _a_name,                                                \
         _a_description,                                         \
         _ABC_NS_REPORTS::pass_or_terminate_t,                   \

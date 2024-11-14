@@ -30,6 +30,7 @@ struct matcher_based_assertion_block_list_formatter_t
           combined_enum_matcher_based_assertion_block_fields_t,
           print_config_t>
     , public assertion_list_formatter_t<false, Assertion_Status>
+    , public matcher_based_assertion_block_assertion_list_list_formatter_t
 {
 public:
     __constexpr virtual bool
@@ -66,27 +67,20 @@ __constexpr_imp bool
         ) const
 {
     using namespace std;
-    if (auto _l_ptr{get_if<enum_matcher_based_assertion_block_fields_t>(&_a_fid)
+    if (auto _l_ptr{
+            get_if<enum_matcher_assertion_block_assertion_fields_t>(&_a_fid)
         };
         _l_ptr != nullptr)
     {
-        using enum enum_matcher_based_assertion_block_fields_t;
-        switch (*_l_ptr)
-        {
-        case SHOW_ALL_ASSERTIONS:
-            return (_a_element.get_matchers()).size() > 0;
-        default:
-            throw errors::unaccounted_for_enum_exception(*_l_ptr);
-        }
+        return matcher_based_assertion_block_assertion_list_list_formatter_t::
+            check_data(*_l_ptr, _a_element.get_matcher());
     }
-    else if (auto _l_ptr{
-                 get_if<combined_enum_assertion_fields_t>(&_a_fid)
-             };
+    else if (auto _l_ptr{get_if<combined_enum_assertion_fields_t>(&_a_fid)};
              _l_ptr != nullptr)
     {
-        return assertion_list_formatter_t<
-            false,
-            Assertion_Status>::check_data(*_l_ptr, _a_element);
+        return assertion_list_formatter_t<false, Assertion_Status>::check_data(
+            *_l_ptr, _a_element
+        );
     }
     else
     {
@@ -104,41 +98,19 @@ __constexpr_imp std::vector<std::string>
     ) const
 {
     using namespace std;
-    if (auto _l_ptr{get_if<enum_matcher_based_assertion_block_fields_t>(&_a_fid)
+    if (auto _l_ptr{get_if<enum_matcher_assertion_block_assertion_fields_t>(&_a_fid)
         };
         _l_ptr != nullptr)
     {
-        using enum enum_matcher_based_assertion_block_fields_t;
-        switch (*_l_ptr)
-        {
-        case SHOW_ALL_ASSERTIONS:
-        {
-            using namespace _ABC_NS_MATCHER;
-            vector<string> _l_rv;
-            for (const matcher_res_info_t& _l_matcher_info : _a_element.get_matchers())
-            {
-                _l_rv.append_range(get_all_data(
-                    _a_pc._m_matcher_assertion_block_assertion_list_fields,
-                    _l_matcher_info,
-                    _a_pc,
-                    matcher_based_assertion_block_assertion_list_list_formatter_t{
-                    }
-                ));
-            }
-            return _l_rv;
-        }
-        default:
-            throw errors::unaccounted_for_enum_exception(*_l_ptr);
-        }
+        return matcher_based_assertion_block_assertion_list_list_formatter_t::
+            get_data(*_l_ptr, _a_element.get_matcher(), _a_pc);
     }
-    else if (auto _l_ptr{
-                 get_if<combined_enum_assertion_fields_t>(&_a_fid)
-             };
+    else if (auto _l_ptr{get_if<combined_enum_assertion_fields_t>(&_a_fid)};
              _l_ptr != nullptr)
     {
-        return assertion_list_formatter_t<
-            false,
-            Assertion_Status>::get_data(*_l_ptr, _a_element, _a_pc);
+        return assertion_list_formatter_t<false, Assertion_Status>::get_data(
+            *_l_ptr, _a_element, _a_pc
+        );
     }
     else
     {
@@ -191,7 +163,7 @@ __constexpr std::vector<std::string>
     {
     case MATCHER_ANNOTATION:
         return {
-            _a_pc.indent(_a_pc.matcher_annotation()),
+            _a_pc.colon(_a_pc.matcher_annotation()),
             _a_pc.indent(_a_pc.message_str(get<1>(_a_element)))
         };
     case MATCHER_RESULT_STRING:

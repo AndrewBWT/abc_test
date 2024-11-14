@@ -56,6 +56,28 @@ private:
 };
 using matcher_res_info_t = std::tuple<matcher_result_t, std::optional<std::string>,matcher_source_map_t>;
 using matcher_res_infos_t = std::vector<matcher_res_info_t>;
+/*class assertion_wrapper_pc_t
+{
+
+};
+
+template<typename T>
+    requires std::derived_from < T, _ABC_NS_REPORTS::dynamic_status_t>
+class assertion_wrapper_t : public assertion_wrapper_pc_t
+{
+
+};
+
+using assertion_wp_t = std::shared_ptr<assertion_wrapper_pc_t>;
+
+template<bool Annotated>
+__constexpr assertion_wp_t make_block_check_matcher(
+    const _ABC_NS_MATCHER::matcher_wrapper_t <Annotated>& _a_matcher,
+    const std::string_view _a_str_representation
+)
+{
+    return assertion_wp_t();
+}*/
 _END_ABC_MATCHER_NS
 
 _BEGIN_ABC_MATCHER_NS

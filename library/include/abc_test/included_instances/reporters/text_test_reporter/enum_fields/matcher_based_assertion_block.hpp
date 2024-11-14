@@ -14,7 +14,7 @@ enum class enum_matcher_assertion_block_assertion_fields_t
 	MATCHER_SOURCE_MAP
 };
 using combined_enum_matcher_based_assertion_block_fields_t =
-std::variant< enum_matcher_based_assertion_block_fields_t, combined_enum_assertion_fields_t>;
+std::variant< enum_matcher_assertion_block_assertion_fields_t, combined_enum_assertion_fields_t>;
 __constexpr
 enum_print_pair_collection_t< combined_enum_matcher_based_assertion_block_fields_t>
 default_matcher_based_assertion_block_fields(
@@ -34,7 +34,7 @@ default_matcher_based_assertion_block_fields(
 	using enum enum_assertion_fields_t;
 	using enum enum_user_initialised_report_fields_t;
 	using enum reporters::enum_print_data_t;
-	using enum enum_matcher_based_assertion_block_fields_t;
+	using enum enum_matcher_assertion_block_assertion_fields_t;
 	return
 	{
 		{STR_REPRESENTATION,CONTEXTUAL_PRINT},
@@ -42,7 +42,9 @@ default_matcher_based_assertion_block_fields(
 		{SOURCE,CONTEXTUAL_PRINT},
 		{LOG_INFOS, CONTEXTUAL_PRINT},
 		{STATUS,DONT_PRINT},
-		{SHOW_ALL_ASSERTIONS, CONTEXTUAL_PRINT},
+		{MATCHER_ANNOTATION, CONTEXTUAL_PRINT},
+		{MATCHER_RESULT_STRING, CONTEXTUAL_PRINT},
+		{MATCHER_SOURCE_MAP, CONTEXTUAL_PRINT},
 	};
 }
 __constexpr_imp

@@ -171,7 +171,35 @@ _TEST_CASE(abc::test_case_t({.name = "Testing assertions again"}))
 }
 ```
 
-# Multi-line, matcher based assertions
+# Block-based assertions
+
+A block-based assertion is an assertion which is tied to an object. It is able to process matchers while it exists. When it is destroyed, the result of the block-based assertion is given to the `abc` test framework.
+
+`abc_test` provides the user with a set of macros to use when creating block-based assertions. Each element in the set has a begin and end macro. 
+
+```cpp
+_BEGIN_MACRO(_l_check1);
+_l_check1 = _BLOCK_CHECK(_EXPR(1==2));
+_l_check1 = _BLOCK_REQUIRE(EXPR(2==3));
+_l_check1 = _BLOCK_HARD_REQUIRE(EXPR(4==5));
+_END_CHECK_MACRO(_l_check1);
+```
+
+```cpp
+_BEGIN_REQUIRE_MACRO(_l_check1);
+_l_check1 = _EXPR(1==2);
+_l_check1 = _EXPR(2==3);
+_END_CHECK_MACRO(_l_check1);
+```
+
+- `_BEGIN_CHECK_BLOCK` / `_END_CHECK_BLOCK`. These process results as checks.
+- 
+
+has a begin and end macro. Below is an overview of them.
+
+| Macro names | Check or termination-based | Description |
+|--|--|--|
+`_BEGIN_CHECK_BLOCK` / `END_CHECK_BLOCK` | Check. | Here is a description of the things which work
 
 A multi-line assertion is a pair of macros which declare an object. This object can then have matchers attached to it.
 
@@ -218,3 +246,86 @@ void main()
     TERMINATE();
 }
 ```
+
+
+
+Hierarhcy:
+user_initialised_report_t<bool Single_Source>
+conditional<Single_Source,source,source_pair>;
+log_infos_t;
+
+assertion_t<Single_Source,Assertion_Status> : public user_initialised_report_t<Single_Source>
+    Assertion_Status           _m_status;
+conditional_t<not Single_Source,string,monostage> description;
+//std::optional<std::string> _m_test_description;
+
+
+matcher_based_assertion_t<Single_Source,Assertion_Status> : public assertion_t<Single_Source,Assertion_Status>
+conditional<matcher_res_with_annotation,vector<matcher_res_with_annotation>>;
+matcher_source_map_t
+
+static_assertion_t<Assertion_Status> : public matcher_based_assertion_t<true,Assertion_Status>
+
+matcher_based_assertion_single_line_t<Assertion_Status> : public matcher_based_assertion_t<true, Assertion_Status>
+
+matcher_based_assertion_block_t<Assertion_Status> : public matcher_based_assertion<false,Assertion_Status>
+
+
+
+
+
+unexpected_report<bool Terminate>
+optional<single_source_t>;
+bool exact_source;
+
+basic_text_warning_t : unexpected_report_t<false>
+
+ 1)  Assertion passed.
+     Assertion's description:
+       "hello"
+    Assertion's output:
+      "true"
+    Assertion's annotation:
+      "
+     Source location:
+       G:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples/basic_examples/01_assertions.hpp:72
+     Source code representation:
+       "_SUCCEED_WITH_MSG("Testing success")"
+     Matcher's output:
+       ""
+     Matcher's annotation:
+       "Testing success"
+ 2)  Static assertion failed.
+     Source location:
+       G:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples/basic_examples/01_assertions.hpp:73
+     Source code representation:
+       "_FAIL_WITH_MSG("Testing failure")"
+     Matcher's output:
+       ""
+     Matcher's annotation:
+       "Testing failure"
+ 3)  Assertion failed. Assertion terminated test function.
+ 3)  Static assertion failed. Assertion terminated function.
+     Source location:
+       G:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples/basic_examples/01_assertions.hpp:74
+     Source code representation:
+       "_TERMINATE_WITH_MSG("Testing termination")"
+     Matcher's output:
+       ""
+     Matcher's annotation:
+       "Testing termination"
+ 4) Multi-line assertion failed.
+    Assertion description:
+    Assertion's processed:
+    1)  Assertion's output:
+        "helllo"
+      Assertion's annotation:
+    2) 
+      
+
+Test blocks:
+
+t = _CHECK_BLOCK(_EXPR(1==2)); //Fine just adds the matcher.
+t = _REQUIRE(_EXPR(1==2)); //Checks right here and now, will throw an exception if its bad.
+_BEGIN_BLOCK(true/false,"writing");
+

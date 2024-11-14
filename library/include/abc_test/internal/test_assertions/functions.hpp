@@ -89,7 +89,7 @@ template <typename T>
 requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
 __constexpr void
     create_assertion_block(
-        const test_block_t<T>& _a_test_block,
+        const single_element_test_block_t<T>& _a_test_block,
         test_runner_t&         _a_test_runner
     ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>);
 
@@ -215,32 +215,20 @@ template<
 __constexpr_imp
 void
 create_assertion_block(
-    const test_block_t<T>& _a_test_block,
+    const single_element_test_block_t<T>& _a_test_block,
     test_runner_t& _a_test_runner
 ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>)
 {
     using namespace _ABC_NS_REPORTS;
     using namespace _ABC_NS_MATCHER;
     assertion_ptr_t<false, T>     _l_gur;
-    bool                          _l_passed{true};
-    test_block_matcher_elements_t _l_mtr{_a_test_block.get_results()};
-    matcher_source_map_t          _l_msm{_a_test_block.map_source()};
-    // _l_matcher_base.gather_map_source(_l_msm);
-    size_t _l_total_passed{ 0 };
-    for (const test_block_matcher_element_t& _l_tbme : _l_mtr)
-    {
-        if (_l_tbme.second.passed())
-        {
-            ++_l_total_passed;
-        }
-    }
-    _l_passed = _l_total_passed == _l_mtr.size();
-    _ABC_NS_MATCHER::matcher_res_infos_t _l_matchers_and_annotations;
+    bool                          _l_passed{ get<0>(_a_test_block.get_matcher()).passed()};
+    matcher_res_info_t _l_mtr{_a_test_block.get_matcher()};
     _l_gur    = make_unique<matcher_based_assertion_block_t<T>>(
         _l_passed,
         _a_test_block.source(),
         _a_test_runner.get_log_infos(false),
-        _l_matchers_and_annotations,
+        _l_mtr,
         _a_test_block.test_annotation()
     );
     _a_test_runner.add_assertion(_l_gur);
