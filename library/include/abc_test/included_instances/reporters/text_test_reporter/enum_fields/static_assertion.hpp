@@ -13,6 +13,7 @@ __constexpr_imp enum_print_pair_collection_t<combined_enum_matcher_based_asserti
     using enum enum_assertion_fields_t;
     using enum enum_matcher_based_assertion_fields_t;
     using enum enum_user_initialised_report_fields_t;
+    using enum enum_matcher_based_assertion_single_line_fields_t;
     using enum reporters::enum_print_data_t;
     return {
         {STR_REPRESENTATION, CONTEXTUAL_PRINT},
@@ -20,9 +21,6 @@ __constexpr_imp enum_print_pair_collection_t<combined_enum_matcher_based_asserti
         {SOURCE,             CONTEXTUAL_PRINT},
         {LOG_INFOS,          CONTEXTUAL_PRINT},
         {STATUS,             DONT_PRINT      },
-        {MATCHER_SOURCE_MAP, CONTEXTUAL_PRINT},
-        {MATCHER_OUTPUT,     CONTEXTUAL_PRINT},
-        {MATCHER_ANNOTATION, CONTEXTUAL_PRINT},
     };
 }
 

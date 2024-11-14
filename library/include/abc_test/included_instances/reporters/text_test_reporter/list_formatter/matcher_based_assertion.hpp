@@ -66,7 +66,7 @@ __constexpr_imp bool
         using enum enum_matcher_based_assertion_fields_t;
         switch (*_l_ptr)
         {
-        case MATCHER_OUTPUT:
+        /*case MATCHER_OUTPUT:
             return true;
         case MATCHER_SOURCE_MAP:
             if constexpr (Single_Source)
@@ -85,7 +85,7 @@ __constexpr_imp bool
             else
             {
                 return true;
-            }
+            }*/
         default:
             throw errors::unaccounted_for_enum_exception(*_l_ptr);
         }
@@ -121,7 +121,7 @@ __constexpr_imp std::vector<std::string>
         using enum enum_matcher_based_assertion_fields_t;
         switch (*_l_ptr)
         {
-        case MATCHER_OUTPUT:
+        /*case MATCHER_OUTPUT:
             if constexpr (Single_Source)
             {
                 return {
@@ -178,7 +178,7 @@ __constexpr_imp std::vector<std::string>
             else
             {
                 return {};
-            }
+            }*/
         default:
             throw errors::unaccounted_for_enum_exception(*_l_ptr);
         }

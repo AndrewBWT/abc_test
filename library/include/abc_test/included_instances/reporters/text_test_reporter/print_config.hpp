@@ -6,6 +6,8 @@
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/static_assertion.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_thrown_exception.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_thrown_non_descript_entity.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter.hpp"
+#include "abc_test/internal/matchers/matcher_result.hpp"
 #include "abc_test/internal/test_reports/assertion_status/fail.hpp"
 #include "abc_test/internal/test_reports/assertion_status/pass.hpp"
 #include "abc_test/internal/test_reports/assertion_status/pass_or_fail.hpp"
@@ -131,7 +133,8 @@ public:
     __constexpr
         enum_print_pair_collection_t<enum_finalised_test_set_data_fields_t>
         finalised_test_set_data_fields() const noexcept;
-    __constexpr enum_print_pair_collection_t<combined_enum_matcher_based_assertion_fields_t>
+    __constexpr
+    enum_print_pair_collection_t<combined_enum_matcher_based_assertion_fields_t>
                 static_assertion_fields() const noexcept;
     __constexpr enum_print_pair_collection_t<
         combined_enum_unexpected_thrown_non_descript_entity_fields_t>
@@ -156,9 +159,11 @@ public:
     __constexpr const std::string_view
                       source_code_str() const noexcept;
     __constexpr       std::string
-        source_location(const std::optional<std::source_location>& _a_sl) const noexcept;
+                source_location(const std::optional<std::source_location>& _a_sl
+                ) const noexcept;
     __constexpr std::string
-        source_representation(const std::optional<std::string_view>& _a_str) const noexcept;
+        source_representation(const std::optional<std::string_view>& _a_str
+        ) const noexcept;
     __constexpr const std::string_view
                       log_info_str() const noexcept;
     __constexpr       std::string
@@ -166,11 +171,11 @@ public:
     __constexpr const std::string_view
                       status_str() const noexcept;
     template <typename T>
-    __constexpr       std::string
-                      status(const bool _a_status) const noexcept;
+    __constexpr std::string
+                status(const bool _a_status) const noexcept;
     template <typename T>
     __constexpr       std::string
-        status() const noexcept;
+                      status() const noexcept;
     __constexpr const std::string_view
                       test_description_str() const noexcept;
     /*__constexpr
@@ -182,9 +187,9 @@ public:
         pass_message_str(
         ) const noexcept;*/
     __constexpr std::string
-        message_str(const std::string& _a_str) const noexcept;
+                message_str(const std::string& _a_str) const noexcept;
     __constexpr std::string
-        message_str(const std::string_view& _a_str) const noexcept;
+                message_str(const std::string_view& _a_str) const noexcept;
     __constexpr std::string
         message_str(const std::optional<std::string>& _a_str) const noexcept;
     __constexpr std::string
@@ -206,7 +211,10 @@ public:
         combined_enum_unexpected_thrown_non_descript_entity_fields_t>
         _m_unexpected_thrown_non_descript_entity_fields;
     enum_print_pair_collection_t<combined_enum_unexpected_exception_fields_t>
-         _m_thrown_exception_fields;
+        _m_thrown_exception_fields;
+    enum_print_pair_collection_t<
+        enum_matcher_assertion_block_assertion_fields_t>
+         _m_matcher_assertion_block_assertion_list_fields;
     bool _m_colours_enabled                   = true;
     //! The failure style used when highlighting information in text output.
     fmt::text_style _m_failure_style          = fmt::fg(fmt::color::red);
@@ -282,6 +290,9 @@ __constexpr_imp
       )
     , _m_thrown_exception_fields(default_unexpected_exception_fields())
     , _m_finalised_test_set_data_fields(default_finalised_test_set_data_fields()
+      )
+    , _m_matcher_assertion_block_assertion_list_fields(
+          default_matcher_based_assertion_block_assertion_fields()
       )
 {}
 
@@ -668,8 +679,9 @@ __constexpr enum_print_pair_collection_t<enum_finalised_test_set_data_fields_t>
     return _m_finalised_test_set_data_fields;
 }
 
-__constexpr_imp enum_print_pair_collection_t<combined_enum_matcher_based_assertion_fields_t>
-                print_config_t::static_assertion_fields() const noexcept
+__constexpr_imp
+    enum_print_pair_collection_t<combined_enum_matcher_based_assertion_fields_t>
+    print_config_t::static_assertion_fields() const noexcept
 {
     return _m_static_assertion_fields;
 }
@@ -763,7 +775,9 @@ __constexpr_imp std::string
 {
     if (_a_sl.has_value())
     {
-        return highlight(fmt::format("{0}:{1}", _a_sl.value().file_name(), _a_sl.value().line()));
+        return highlight(fmt::format(
+            "{0}:{1}", _a_sl.value().file_name(), _a_sl.value().line()
+        ));
     }
     else
     {
@@ -848,8 +862,7 @@ __constexpr_imp std::string
 
 template <typename T>
 __constexpr_imp std::string
-print_config_t::status(
-) const noexcept
+                print_config_t::status() const noexcept
 {
     using namespace std;
     using namespace reports;
@@ -870,7 +883,6 @@ print_config_t::status(
         __STATIC_ASSERT(T, "Cannot instantiate");
     }
 }
-
 
 __constexpr_imp const std::string_view
                       print_config_t::test_description_str() const noexcept
@@ -893,15 +905,21 @@ print_config_t::pass_message_str(
     return "Pass message";
 }*/
 __constexpr std::string
-print_config_t::message_str(const std::string& _a_str) const noexcept
+            print_config_t::message_str(
+        const std::string& _a_str
+    ) const noexcept
 {
     return slight_highlight(quote(_a_str));
 }
+
 __constexpr std::string
-print_config_t::message_str(const std::string_view& _a_str) const noexcept
+            print_config_t::message_str(
+        const std::string_view& _a_str
+    ) const noexcept
 {
     return slight_highlight(quote(_a_str));
 }
+
 __constexpr_imp std::string
                 print_config_t::message_str(
         const std::optional<std::string>& _a_str

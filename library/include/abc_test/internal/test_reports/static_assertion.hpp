@@ -34,6 +34,8 @@ public:
         const user_initialised_report_t<true>::source_t& _a_source,
         const ds::log_infos_t&                           _a_log_infos
     ) noexcept;
+private:
+    std::optional<std::string> _m_static_assertion_annotation;
 };
 
 _END_ABC_REPORTS_NS
@@ -51,9 +53,10 @@ __constexpr_imp
           std::monostate{},
           _a_source,
           _a_log_infos,
-          make_tuple(_ABC_NS_MATCHER::matcher_result_t(), _a_annotation, _ABC_NS_MATCHER::matcher_source_map_t{}),
+        //  make_tuple(_ABC_NS_MATCHER::matcher_result_t(), _a_annotation, _ABC_NS_MATCHER::matcher_source_map_t{}),
         std::monostate{}
-      )
+      ),
+    _m_static_assertion_annotation(_a_annotation)
 {}
 
 template <typename Assertion_Status>
@@ -67,11 +70,6 @@ __constexpr_imp
           std::monostate{},
           _a_source,
           _a_log_infos,
-          make_pair(
-              _ABC_NS_MATCHER::matcher_result_t(),
-              std::optional<std::string>{}
-          ),
-          _ABC_NS_MATCHER::matcher_source_map_t{},
           std::monostate{}
       )
 {}

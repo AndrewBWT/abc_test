@@ -52,8 +52,15 @@ matcher_based_assertion_single_line_list_formatter_t<Assertion_Status>::check_da
 	if (auto _l_ptr{ get_if< enum_matcher_based_assertion_single_line_fields_t>(&_a_fid) };
 		_l_ptr != nullptr)
 	{
+		using enum enum_matcher_based_assertion_single_line_fields_t;
 		switch (*_l_ptr)
 		{
+		case MATCHER_SOURCE_MAP:
+			return get<2>(_a_element.matcher_info()).has_elements();
+		case MATCHER_OUTPUT:
+			return true;
+		case MATCHER_ANNOTATION:
+			return get<1>(_a_element.matcher_info()).has_value();
 		default:
 			throw errors::unaccounted_for_enum_exception(*_l_ptr);
 		}
@@ -83,8 +90,46 @@ matcher_based_assertion_single_line_list_formatter_t<Assertion_Status>::get_data
 	if (auto _l_ptr{ get_if< enum_matcher_based_assertion_single_line_fields_t>(&_a_fid) };
 		_l_ptr != nullptr)
 	{
+		using enum enum_matcher_based_assertion_single_line_fields_t;
 		switch (*_l_ptr)
 		{
+		case MATCHER_SOURCE_MAP:
+		{
+			vector<string> _l_rv{ _a_pc.colon(_a_pc.matcher_source_map_str()) };
+			for (const pair<std::source_location, vector<string>>& _l_element :
+				get<2>(_a_element.matcher_info()).map())
+			{
+				_l_rv.push_back(
+					_a_pc.indent(_a_pc.colon(_a_pc.source_location_str()))
+				);
+				_l_rv.push_back(
+					_a_pc.indent(_a_pc.source_location(_l_element.first), 2)
+				);
+				_l_rv.push_back(_a_pc.indent(_a_pc.colon(_a_pc.source_code_str()
+				)));
+				for (const string_view _l_str : _l_element.second)
+				{
+					_l_rv.push_back(
+						_a_pc.indent(_a_pc.source_representation(_l_str), 2)
+					);
+				}
+			}
+			return _l_rv;
+		}
+		case MATCHER_OUTPUT:
+			return {
+				_a_pc.colon(_a_pc.matcher_output_str()),
+				_a_pc.indent(_a_pc.matcher_output(
+					get<0>(_a_element.matcher_info()).str()
+				))
+			};
+		case MATCHER_ANNOTATION:
+			return {
+				_a_pc.colon(_a_pc.matcher_annotation()),
+				_a_pc.indent(
+					_a_pc.message_str(get<1>(_a_element.matcher_info()))
+				)
+			};
 		default:
 			throw errors::unaccounted_for_enum_exception(*_l_ptr);
 		}

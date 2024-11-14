@@ -5,9 +5,9 @@ _BEGIN_ABC_REPORTERS_NS
 
 enum class enum_matcher_based_assertion_fields_t
 {
-	MATCHER_SOURCE_MAP,
-	MATCHER_OUTPUT,
-	MATCHER_ANNOTATION
+	//MATCHER_SOURCE_MAP,
+	//MATCHER_OUTPUT,
+	//MATCHER_ANNOTATION
 };
 using combined_enum_matcher_based_assertion_fields_t =
 std::variant< enum_matcher_based_assertion_fields_t, combined_enum_assertion_fields_t>;
