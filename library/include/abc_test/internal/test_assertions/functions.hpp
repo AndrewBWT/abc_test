@@ -8,7 +8,7 @@
 #include "abc_test/internal/test_reports/assertion_status/pass_or_fail.hpp"
 #include "abc_test/internal/test_reports/assertion_status/pass_or_terminate.hpp"
 #include "abc_test/internal/test_reports/assertion_status/terminate.hpp"
-#include "abc_test/internal/test_reports/matcher_based_assertion.hpp"
+#include "abc_test/internal/test_reports/assertion.hpp"
 #include "abc_test/internal/test_reports/matcher_based_assertion_block.hpp"
 #include "abc_test/internal/test_reports/matcher_based_assertion_single_line.hpp"
 #include "abc_test/internal/test_reports/static_assertion.hpp"
@@ -286,7 +286,7 @@ matcher_based_assertion_block(
         matcher_source_map_t  _l_msm;
         _l_matcher_base.gather_map_source(_l_msm);
         _l_passed = _l_mr.passed();
-        _l_gur    = new matcher_based_assertion_t<T>(
+        _l_gur    = new assertion_t<T>(
             _a_source,
             _a_test_runner.get_log_infos(false),
             _a_str_to_print,

@@ -1,6 +1,7 @@
 #pragma once
 #include "abc_test/internal/test_reports/matcher_based_assertion_single_line.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion_single_line.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/assertion.hpp"
 _BEGIN_ABC_REPORTERS_NS
 template<
 	typename Assertion_Status
@@ -8,7 +9,7 @@ template<
 struct matcher_based_assertion_single_line_list_formatter_t
 	: public list_formattable_t< reports::matcher_based_assertion_single_line_t<Assertion_Status>,
 	combined_enum_matcher_based_assertion_single_line_fields_t, print_config_t>,
-	public matcher_based_assertion_list_formatter_t<true, Assertion_Status>
+	public assertion_list_formatter_t<true, Assertion_Status>
 {
 public:
 	__constexpr
@@ -65,10 +66,10 @@ matcher_based_assertion_single_line_list_formatter_t<Assertion_Status>::check_da
 			throw errors::unaccounted_for_enum_exception(*_l_ptr);
 		}
 	}
-	else if (auto _l_ptr{ get_if< combined_enum_matcher_based_assertion_fields_t>(&_a_fid) };
+	else if (auto _l_ptr{ get_if< combined_enum_assertion_fields_t>(&_a_fid) };
 		_l_ptr != nullptr)
 	{
-		return matcher_based_assertion_list_formatter_t<true, Assertion_Status>::check_data(*_l_ptr, _a_element);
+		return assertion_list_formatter_t<true, Assertion_Status>::check_data(*_l_ptr, _a_element);
 	}
 	else
 	{
@@ -134,10 +135,10 @@ matcher_based_assertion_single_line_list_formatter_t<Assertion_Status>::get_data
 			throw errors::unaccounted_for_enum_exception(*_l_ptr);
 		}
 	}
-	else if (auto _l_ptr{ get_if< combined_enum_matcher_based_assertion_fields_t>(&_a_fid) };
+	else if (auto _l_ptr{ get_if< combined_enum_assertion_fields_t>(&_a_fid) };
 		_l_ptr != nullptr)
 	{
-		return matcher_based_assertion_list_formatter_t<true, Assertion_Status>::get_data(*_l_ptr, _a_element, _a_pc);
+		return assertion_list_formatter_t<true, Assertion_Status>::get_data(*_l_ptr, _a_element, _a_pc);
 	}
 	else
 	{

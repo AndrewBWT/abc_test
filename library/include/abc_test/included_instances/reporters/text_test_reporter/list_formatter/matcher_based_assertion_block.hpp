@@ -29,7 +29,7 @@ struct matcher_based_assertion_block_list_formatter_t
           reports::matcher_based_assertion_block_t<Assertion_Status>,
           combined_enum_matcher_based_assertion_block_fields_t,
           print_config_t>
-    , public matcher_based_assertion_list_formatter_t<false, Assertion_Status>
+    , public assertion_list_formatter_t<false, Assertion_Status>
 {
 public:
     __constexpr virtual bool
@@ -80,11 +80,11 @@ __constexpr_imp bool
         }
     }
     else if (auto _l_ptr{
-                 get_if<combined_enum_matcher_based_assertion_fields_t>(&_a_fid)
+                 get_if<combined_enum_assertion_fields_t>(&_a_fid)
              };
              _l_ptr != nullptr)
     {
-        return matcher_based_assertion_list_formatter_t<
+        return assertion_list_formatter_t<
             false,
             Assertion_Status>::check_data(*_l_ptr, _a_element);
     }
@@ -132,11 +132,11 @@ __constexpr_imp std::vector<std::string>
         }
     }
     else if (auto _l_ptr{
-                 get_if<combined_enum_matcher_based_assertion_fields_t>(&_a_fid)
+                 get_if<combined_enum_assertion_fields_t>(&_a_fid)
              };
              _l_ptr != nullptr)
     {
-        return matcher_based_assertion_list_formatter_t<
+        return assertion_list_formatter_t<
             false,
             Assertion_Status>::get_data(*_l_ptr, _a_element, _a_pc);
     }

@@ -82,7 +82,6 @@ set(LIBRARY_FILES
   include/abc_test/internal/test_reports/assertion_status/pass_or_fail.hpp
   include/abc_test/internal/test_reports/assertion_status/pass_or_terminate.hpp
   include/abc_test/internal/test_reports/matcher_based_assertion_block.hpp
-  include/abc_test/internal/test_reports/matcher_based_assertion.hpp
   # The core logic for the data generators. There are no objects here, only abstract objects and iterators.
   include/abc_test/internal/data_generator/data_generator.hpp
   include/abc_test/internal/data_generator/data_generator_with_file_support_concept.hpp
@@ -205,8 +204,6 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/assertion.hpp
   include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_single_line.hpp
   include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion_single_line.hpp
-  include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion.hpp
-  include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion.hpp
   include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_block.hpp
   include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion_block.hpp
   include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/static_assertion.hpp

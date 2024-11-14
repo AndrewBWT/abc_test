@@ -11,8 +11,6 @@
 #include "abc_test/internal/ds/test_data/invoked_test_data.hpp"
 
 #include "abc_test/internal/utility/str/string_table.hpp"
-
-#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_single_line.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_block.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/static_assertion.hpp"
@@ -27,7 +25,6 @@
 #include "abc_test/internal/test_reports/unexpected_thrown_non_descript_entity.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_thrown_exception.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_thrown_non_descript_entity.hpp"
-#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_block.hpp"
 #include "abc_test/internal/reporters/test_reporter.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/finalised_test_set_data_report.hpp"

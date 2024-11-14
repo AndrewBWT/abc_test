@@ -1,5 +1,5 @@
 #pragma once
-#include "abc_test/internal/test_reports/matcher_based_assertion.hpp"
+#include "abc_test/internal/test_reports/assertion.hpp"
 
 _BEGIN_ABC_REPORTS_NS
 
@@ -11,7 +11,7 @@ _BEGIN_ABC_REPORTS_NS
 template <typename Assertion_Status>
 requires std::derived_from<Assertion_Status, dynamic_status_t>
 struct matcher_based_assertion_single_line_t
-    : public matcher_based_assertion_t<true, Assertion_Status>
+    : public assertion_t<true, Assertion_Status>
 {
 public:
     /*!
@@ -50,7 +50,7 @@ __constexpr_imp
             const _ABC_NS_MATCHER::matcher_res_info_t& _a_matcher_info
         ) noexcept
 
-    : matcher_based_assertion_t<true, Assertion_Status>(
+    : assertion_t<true, Assertion_Status>(
           get<0>(_a_matcher_info).passed(),
           _a_source,
           _a_log_infos,
