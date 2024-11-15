@@ -14,13 +14,13 @@
     try                                                      \
     {
 #define _END_NO_THROW_BLOCK(_a_name)                                      \
-    _a_name = _BLOCK_CHECK(abc::annotate(                                 \
+    _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(                       \
         "Code block does not throw any exceptions.", true_matcher()       \
     ));                                                                   \
     }                                                                     \
     catch (...)                                                           \
     {                                                                     \
-        _a_name = _BLOCK_CHECK(                                           \
+        _a_name = _BLOCK_CHECK_NO_SOURCE(                                 \
             abc::annotate("Code block threw an entity.", false_matcher()) \
         );                                                                \
     }                                                                     \
@@ -30,7 +30,7 @@
     _BEGIN_CHECK_ASSERTION_BLOCK(                                      \
         _a_name, "Checking code does throw an exception"               \
     );                                                                 \
-    _a_name = _BLOCK_CHECK(                                            \
+    _a_name = _BLOCK_CHECK_NO_SOURCE(                                  \
         annotate("Code does not throw any excpetion", false_matcher()) \
     );                                                                 \
     try                                                                \
@@ -39,7 +39,7 @@
     _BEGIN_REQUIRE_ASSERTION_BLOCK(                                   \
         _a_name, "Checking code does throw an exception"              \
     );                                                                \
-    _a_name = _BLOCK_CHECK(                                           \
+    _a_name = _BLOCK_CHECK_NO_SOURCE(                                 \
         annotate("Code does not throw an excpetion", false_matcher()) \
     );                                                                \
     try                                                               \
@@ -48,7 +48,7 @@
     }                                                                    \
     catch (...)                                                          \
     {                                                                    \
-        _a_name = _BLOCK_CHECK(                                          \
+        _a_name = _BLOCK_CHECK_NO_SOURCE(                                \
             abc::annotate("Code block threw an entity.", true_matcher()) \
         );                                                               \
     }                                                                    \
@@ -58,7 +58,7 @@
     _BEGIN_CHECK_ASSERTION_BLOCK(                                      \
         _a_name, "Checking code throws a specific exception type"      \
     );                                                                 \
-    _a_name = _BLOCK_CHECK(                                            \
+    _a_name = _BLOCK_CHECK_NO_SOURCE(                                  \
         annotate("Code does not throw any excpetion", false_matcher()) \
     );                                                                 \
     try                                                                \
@@ -67,7 +67,7 @@
     _BEGIN_REQUIRE_ASSERTION_BLOCK(                                    \
         _a_name, "Checking code throws a specific exception type"      \
     );                                                                 \
-    _a_name = _BLOCK_CHECK(                                            \
+    _a_name = _BLOCK_CHECK_NO_SOURCE(                                  \
         annotate("Code does not throw any excpetion", false_matcher()) \
     );                                                                 \
     try                                                                \
@@ -76,13 +76,13 @@
     }                                                               \
     catch (const _a_exception_type& _l_et)                          \
     {                                                               \
-        _a_name = _BLOCK_CHECK(abc::annotate(                       \
+        _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(             \
             "Code block threw the required entity.", true_matcher() \
         ));                                                         \
     }                                                               \
     catch (...)                                                     \
     {                                                               \
-        _a_name = _BLOCK_CHECK(annotate(                            \
+        _a_name = _BLOCK_CHECK_NO_SOURCE(annotate(                  \
             "Code throws an exception not of the correct type",     \
             false_matcher()                                         \
         ));                                                         \
@@ -96,7 +96,7 @@
         "Checking code throws an exception who's what() message shows a " \
         "specific message"                                                \
     );                                                                    \
-    _a_name = _BLOCK_CHECK(                                               \
+    _a_name = _BLOCK_CHECK_NO_SOURCE(                                     \
         annotate("Code does not throw any excpetion", false_matcher())    \
     );                                                                    \
     try                                                                   \
@@ -107,7 +107,7 @@
         "Checking code throws an exception who's what() message shows a " \
         "specific message"                                                \
     );                                                                    \
-    _a_name = _BLOCK_CHECK(                                               \
+    _a_name = _BLOCK_CHECK_NO_SOURCE(                                     \
         annotate("Code does not throw any excpetion", false_matcher())    \
     );                                                                    \
     try                                                                   \
@@ -116,14 +116,14 @@
     }                                                                   \
     catch (const std::exception& _l_et)                                 \
     {                                                                   \
-        _a_name = _BLOCK_CHECK(abc::annotate(                           \
+        _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(                 \
             "Code block threw the required entity.",                    \
             abc::eq<std::string, std::string>(_a_msg, _l_et.what())     \
         ));                                                             \
     }                                                                   \
     catch (...)                                                         \
     {                                                                   \
-        _a_name = _BLOCK_CHECK(annotate(                                \
+        _a_name = _BLOCK_CHECK_NO_SOURCE(annotate(                      \
             "Code throws an exception not derived from std::exception", \
             false_matcher()                                             \
         ));                                                             \
@@ -136,7 +136,7 @@
         "Checking code throws an exception who's what() message shows a " \
         "specific message"                                                \
     );                                                                    \
-    _a_name = _BLOCK_CHECK(                                               \
+    _a_name = _BLOCK_CHECK_NO_SOURCE(                                     \
         annotate("Code does not throw any excpetion", false_matcher())    \
     );                                                                    \
     try                                                                   \
@@ -147,7 +147,7 @@
         "Checking code throws an exception who's what() message shows a " \
         "specific message"                                                \
     );                                                                    \
-    _a_name = _BLOCK_CHECK(                                               \
+    _a_name = _BLOCK_CHECK_NO_SOURCE(                                     \
         annotate("Code does not throw any excpetion", false_matcher())    \
     );                                                                    \
     try                                                                   \
@@ -156,14 +156,14 @@
     }                                                                   \
     catch (const _a_type& _l_et)                                        \
     {                                                                   \
-        _a_name = _BLOCK_CHECK(abc::annotate(                           \
+        _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(                 \
             "Code block threw the required entity.",                    \
             abc::eq<std::string, std::string>(_a_msg, _l_et.what())     \
         ));                                                             \
     }                                                                   \
     catch (...)                                                         \
     {                                                                   \
-        _a_name = _BLOCK_CHECK(annotate(                                \
+        _a_name = _BLOCK_CHECK_NO_SOURCE(annotate(                      \
             "Code throws an exception not derived from std::exception", \
             false_matcher()                                             \
         ));                                                             \

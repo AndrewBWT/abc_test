@@ -24,7 +24,7 @@ template <typename T>
 requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
 struct assertion_wp_t
 {
-    _ABC_NS_MATCHER::matcher_res_info_t _m_matcher_info;
+    _ABC_NS_MATCHER::matcher_res_info_with_caller_t _m_matcher_info;
 };
 
 template <typename T>
@@ -127,14 +127,33 @@ public:
         return *this;
     }
 
-    __constexpr_imp const _ABC_NS_MATCHER::matcher_res_info_t&
+    __constexpr_imp const _ABC_NS_MATCHER::matcher_res_info_with_caller_t&
                           get_matcher() const noexcept
     {
         return _m_assertion;
     }
 private:
-    _ABC_NS_MATCHER::matcher_res_info_t _m_assertion;
+    _ABC_NS_MATCHER::matcher_res_info_with_caller_t _m_assertion;
 };
+
+template <bool Annotated>
+__constexpr assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>
+make_block_check_matcher(
+    const _ABC_NS_MATCHER::matcher_wrapper_t<Annotated>& _a_matcher
+)
+{
+    using namespace _ABC_NS_MATCHER;
+
+    matcher_res_info_with_caller_t
+        _l_tuple;
+    get<0>(_l_tuple.second) = _a_matcher.internal_matcher().get()->matcher_result();
+    if constexpr (Annotated)
+    {
+        get<1>(_l_tuple.second) = _a_matcher.annotation();
+    }
+    _a_matcher.internal_matcher()->gather_map_source(get<2>(_l_tuple.second));
+    return assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>{_l_tuple};
+}
 
 template <bool Annotated>
 __constexpr assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>
@@ -145,18 +164,16 @@ __constexpr assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>
             )
 {
     using namespace _ABC_NS_MATCHER;
-    std::tuple<
-        matcher_result_t,
-        std::optional<std::string>,
-        matcher_source_map_t>
+
+    matcher_res_info_with_caller_t
         _l_tuple;
-    get<0>(_l_tuple) = _a_matcher.internal_matcher().get()->matcher_result();
+    _l_tuple.first = ds::single_source_t(_a_str_representation, _a_source_location);
+    get<0>(_l_tuple.second) = _a_matcher.internal_matcher().get()->matcher_result();
     if constexpr (Annotated)
     {
-        get<1>(_l_tuple) = _a_matcher.annotation();
+        get<1>(_l_tuple.second) = _a_matcher.annotation();
     }
-    _a_matcher.internal_matcher()->add_source_info(abc::ds::single_source_t(_a_str_representation, _a_source_location));
-    _a_matcher.internal_matcher()->gather_map_source(get<2>(_l_tuple));
+    _a_matcher.internal_matcher()->gather_map_source(get<2>(_l_tuple.second));
     return assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>{_l_tuple};
 }
 

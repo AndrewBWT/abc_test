@@ -11,7 +11,9 @@ enum class enum_matcher_assertion_block_assertion_fields_t
 {
 	MATCHER_ANNOTATION,
 	MATCHER_RESULT_STRING,
-	MATCHER_SOURCE_MAP
+	MATCHER_SOURCE_MAP,
+	MATCHER_MAIN_SOURCE_REP,
+	MATCHER_MAIN_SOURCE_LOCATION
 };
 using combined_enum_matcher_based_assertion_block_fields_t =
 std::variant< enum_matcher_assertion_block_assertion_fields_t, combined_enum_assertion_fields_t>;
@@ -45,6 +47,8 @@ default_matcher_based_assertion_block_fields(
 		{MATCHER_ANNOTATION, CONTEXTUAL_PRINT},
 		{MATCHER_RESULT_STRING, CONTEXTUAL_PRINT},
 		{MATCHER_SOURCE_MAP, CONTEXTUAL_PRINT},
+		{MATCHER_MAIN_SOURCE_REP, CONTEXTUAL_PRINT},
+		{MATCHER_MAIN_SOURCE_LOCATION, CONTEXTUAL_PRINT},
 	};
 }
 __constexpr_imp

@@ -243,7 +243,8 @@
         ),                                      \
         std::source_location::current()         \
     )
-
+#define _BLOCK_CHECK_NO_SOURCE(_a_matcher) \
+abc::make_block_check_matcher(_a_matcher);
 /*!
  * @brief Macro to end a testing block.
  * @param _a_name The name of the macro being ended.

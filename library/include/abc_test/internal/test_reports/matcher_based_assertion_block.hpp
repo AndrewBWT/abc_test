@@ -35,14 +35,14 @@ public:
         const status_t<Assertion_Status>&                          _a_status,
         typename const user_initialised_report_t<false>::source_t& _a_source,
         const ds::log_infos_t&                                     _a_log_infos,
-        const _ABC_NS_MATCHER::matcher_res_info_t& _a_matcher_info,
+        const _ABC_NS_MATCHER::matcher_res_info_with_caller_t& _a_matcher_info,
         const opt_description_t<false>&              _a_opt_description
     ) noexcept;
     __constexpr
-        const _ABC_NS_MATCHER::matcher_res_info_t&
+        const _ABC_NS_MATCHER::matcher_res_info_with_caller_t&
         get_matcher() const noexcept;
 private:
-    _ABC_NS_MATCHER::matcher_res_info_t _m_matcher_info;
+    _ABC_NS_MATCHER::matcher_res_info_with_caller_t _m_matcher_info;
 };
 
 _END_ABC_REPORTS_NS
@@ -57,7 +57,7 @@ __constexpr_imp
             typename const user_initialised_report_t<false>::source_t&
                                    _a_source,
             const ds::log_infos_t& _a_log_infos,
-            const _ABC_NS_MATCHER::matcher_res_info_t& _a_matcher_info,
+            const _ABC_NS_MATCHER::matcher_res_info_with_caller_t& _a_matcher_info,
             const opt_description_t<false>&              _a_opt_description
         ) noexcept
     : assertion_t<false, Assertion_Status>(
@@ -71,7 +71,7 @@ __constexpr_imp
 template <typename Assertion_Status>
     requires std::derived_from<Assertion_Status, dynamic_status_t>
 __constexpr_imp
-const _ABC_NS_MATCHER::matcher_res_info_t&
+const _ABC_NS_MATCHER::matcher_res_info_with_caller_t&
 matcher_based_assertion_block_t<Assertion_Status>::get_matcher() const noexcept
 {
     return _m_matcher_info;
