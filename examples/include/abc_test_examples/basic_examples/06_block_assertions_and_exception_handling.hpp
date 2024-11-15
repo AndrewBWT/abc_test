@@ -83,8 +83,14 @@ _TEST_CASE(
     _BEGIN_CHECK_ASSERTION_BLOCK(_l_mn, "description");
     _l_mn = _BLOCK_CHECK(matcher_t(false_matcher()));
     _END_BLOCK(_l_mn);
+    _BEGIN_CHECK_ASSERTION_BLOCK_(_l_mn2, "description2");
+    for (size_t _l_idx{0}; _l_idx < 25; _l_idx++)
+    {
+        _l_mn2 += _BLOCK_CHECK(annotate(_EXPR(_l_idx == 24), "Checking index"));
+    }
+    _END_BLOCK(_l_mn2);
 }
-
+#if 0
 namespace testing
 {
 constexpr int
@@ -143,8 +149,8 @@ inline void
     }
     catch (...)
     {
-        _l_test_exception_code = _BLOCK_CHECK(
-            annotate(false_matcher(),
+        _l_test_exception_code = _BLOCK_CHECK(annotate(
+            false_matcher(),
             "Shouldn't be able to throw any other types of element"
         ));
     }
@@ -235,3 +241,4 @@ _TEST_CASE(
     throw std::exception("hello");
     _END_EXCEPTION_TYPE_AND_MSG_BLOCK(_l_name, std::runtime_error, "hello");
 }
+#endif

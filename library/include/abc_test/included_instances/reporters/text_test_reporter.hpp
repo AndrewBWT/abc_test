@@ -28,6 +28,8 @@
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_block.hpp"
 #include "abc_test/internal/reporters/test_reporter.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/finalised_test_set_data_report.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/multi_element_assertion_block.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/multi_element_assertion_block.hpp"
 _BEGIN_ABC_REPORTERS_NS
 /*!
 * Object used to print data about tests to some text output - either the console or a file
@@ -259,6 +261,18 @@ __constexpr_imp
 	{
 		return get_all_data(_m_print_config.matcher_based_assertion_block_fields(), *_l_ptr,
 			_m_print_config, matcher_based_assertion_block_list_formatter_t<pass_or_terminate_t>());
+	}
+	else if (auto _l_ptr{ dynamic_cast<const multi_element_assertion_block_t<pass_or_fail_t>*>(_a_gur) };
+		_l_ptr != nullptr)
+	{
+		return get_all_data(_m_print_config.multi_element_test_block_fields(), *_l_ptr,
+			_m_print_config, multi_element_test_block_list_formatter_t<pass_or_fail_t>());
+	}
+	else if (auto _l_ptr{ dynamic_cast<const multi_element_assertion_block_t<pass_or_terminate_t>*>(_a_gur) };
+		_l_ptr != nullptr)
+	{
+		return get_all_data(_m_print_config.multi_element_test_block_fields(), *_l_ptr,
+			_m_print_config, multi_element_test_block_list_formatter_t<pass_or_terminate_t>());
 	}
 	else if (auto _l_ptr{ dynamic_cast<const static_assertion_t<pass_t>*>(_a_gur) };
 		_l_ptr != nullptr)

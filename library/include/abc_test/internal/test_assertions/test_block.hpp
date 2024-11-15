@@ -191,7 +191,13 @@ public:
             const assertion_wp_t<T2>& _a_element
         ) noexcept
     {
+        _m_assertions.push_back(_a_element._m_matcher_info);
         return *this;
+    }
+    __constexpr_imp const _ABC_NS_MATCHER::matcher_res_infos_t&
+        get_matcher() const noexcept
+    {
+        return _m_assertions;
     }
 private:
     _ABC_NS_MATCHER::matcher_res_infos_t _m_assertions;

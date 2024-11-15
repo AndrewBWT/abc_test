@@ -68,6 +68,7 @@ set(LIBRARY_FILES
   include/abc_test/internal/test_reports/assertion.hpp
   include/abc_test/internal/test_reports/assertion_base.hpp
   include/abc_test/internal/test_reports/matcher_based_assertion_single_line.hpp
+  include/abc_test/internal/test_reports/multi_element_assertion_block.hpp
   include/abc_test/internal/test_reports/static_assertion.hpp
   include/abc_test/internal/test_reports/unexpected_report.hpp
   include/abc_test/internal/test_reports/basic_text_warning.hpp
@@ -204,7 +205,11 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/assertion.hpp
   include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_single_line.hpp
   include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion_single_line.hpp
+  include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/multi_element_assertion_block.hpp
+  include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/multi_element_assertion_block.hpp
   include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_block.hpp
+  include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/assertion_block_matcher_data.hpp
+  include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/assertion_block_matcher_data.hpp
   include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion_block.hpp
   include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/static_assertion.hpp
   include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/static_assertion.hpp

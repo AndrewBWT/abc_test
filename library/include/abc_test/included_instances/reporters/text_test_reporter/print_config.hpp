@@ -13,6 +13,7 @@
 #include "abc_test/internal/test_reports/assertion_status/pass_or_fail.hpp"
 #include "abc_test/internal/test_reports/assertion_status/pass_or_terminate.hpp"
 #include "abc_test/internal/test_reports/assertion_status/terminate.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/multi_element_assertion_block.hpp"
 
 #include <fmt/color.h>
 _BEGIN_ABC_REPORTERS_NS
@@ -127,6 +128,11 @@ public:
     __constexpr enum_print_pair_collection_t<
         combined_enum_matcher_based_assertion_block_fields_t>
         matcher_based_assertion_block_fields() const noexcept;
+    __constexpr_imp enum_print_pair_collection_t<
+        enum_assertion_block_matcher_data_fields_t>
+        matcher_assertion_block_assertion_list_fields() const noexcept;
+    __constexpr enum_print_pair_collection_t<combined_enum_multi_element_assertion_block_fields_t>
+        multi_element_test_block_fields() const noexcept;
     __constexpr
         enum_print_pair_collection_t<enum_after_execution_test_report_fields_t>
         after_execution_test_report_fields() const noexcept;
@@ -207,6 +213,9 @@ public:
     enum_print_pair_collection_t<
         combined_enum_matcher_based_assertion_block_fields_t>
         _m_matcher_assertion_block_fields;
+    enum_print_pair_collection_t<
+        combined_enum_multi_element_assertion_block_fields_t>
+        _m_multi_element_test_block_fields;
     enum_print_pair_collection_t<combined_enum_static_assertion_fields_t>
         _m_static_assertion_fields;
     enum_print_pair_collection_t<
@@ -215,7 +224,7 @@ public:
     enum_print_pair_collection_t<combined_enum_unexpected_exception_fields_t>
         _m_thrown_exception_fields;
     enum_print_pair_collection_t<
-        enum_matcher_assertion_block_assertion_fields_t>
+        enum_assertion_block_matcher_data_fields_t>
          _m_matcher_assertion_block_assertion_list_fields;
     bool _m_colours_enabled                   = true;
     //! The failure style used when highlighting information in text output.
@@ -296,6 +305,7 @@ __constexpr_imp
     , _m_matcher_assertion_block_assertion_list_fields(
           default_matcher_based_assertion_block_assertion_fields()
       )
+    , _m_multi_element_test_block_fields(default_multi_element_assertion_block_fields())
 {}
 
 __constexpr_imp std::string
@@ -667,7 +677,17 @@ __constexpr_imp enum_print_pair_collection_t<
 {
     return _m_matcher_assertion_block_fields;
 }
-
+__constexpr_imp enum_print_pair_collection_t<
+    enum_assertion_block_matcher_data_fields_t>
+    print_config_t::matcher_assertion_block_assertion_list_fields() const noexcept
+{
+    return _m_matcher_assertion_block_assertion_list_fields;
+}
+__constexpr enum_print_pair_collection_t<combined_enum_multi_element_assertion_block_fields_t>
+print_config_t::multi_element_test_block_fields() const noexcept
+{
+    return _m_multi_element_test_block_fields;
+}
 __constexpr_imp
     enum_print_pair_collection_t<enum_after_execution_test_report_fields_t>
     print_config_t::after_execution_test_report_fields() const noexcept
