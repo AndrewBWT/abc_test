@@ -5,7 +5,7 @@ This page contains documentation concerning matchers in `abc_test`. It covers th
 - A Proper Introduction To Matchers
 - Basic matchers.
 - Comparison operators.
-- The _EXPR, _CHECK_EXPR and _REQUIRE_EXPR macros.
+- Expression-encoded Matchers.
 - Included matchers.
 - Annotating Matchers.
 - Matchers and logic operators.
@@ -32,3 +32,5 @@ In the remainder of this document we introduce the reader to the core concepts c
 # Basic Matchers
 
 A `matcher_t` is the basic type of object we include. In reality, it is a type synonym for an unannotated `matcher_wrapper_t`. For more information regarding the design of matchers, see [this section]().
+
+

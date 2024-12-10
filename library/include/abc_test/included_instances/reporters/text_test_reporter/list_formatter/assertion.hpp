@@ -43,7 +43,9 @@ template<
 __constexpr
 std::string
 construct_str_representation(
-	const reports::assertion_t<Single_Source, Assertion_Status>& _a_element
+	const reports::assertion_t<Single_Source, Assertion_Status>& _a_element,
+	const std::string_view _a_str,
+	const std::string_view _a_suffix_str = ""
 ) noexcept;
 _END_ABC_REPORTERS_NS
 
@@ -163,7 +165,8 @@ __constexpr_imp
 std::string
 construct_str_representation(
 	const reports::assertion_t<Single_Source, Assertion_Status>& _a_element,
-	const std::string_view _a_str
+	const std::string_view _a_str,
+	const std::string_view _a_suffix_str
 ) noexcept
 {
 	using namespace std;
@@ -174,9 +177,10 @@ construct_str_representation(
 			same_as<Assertion_Status,terminate_t>) ?
 		" Assertion terminated function." : "" };
 	const string _l_status_str{ _l_passed ? "passed" : "failed" };
-	return fmt::format("{0} {1}.{2}",
+	return fmt::format("{0} {1}.{2}{3}",
 		_a_str,
 		_l_status_str,
+		_a_suffix_str,
 		_l_terminate_function_str);
 }
 _END_ABC_REPORTERS_NS

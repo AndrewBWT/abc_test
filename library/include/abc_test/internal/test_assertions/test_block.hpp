@@ -27,8 +27,8 @@ struct assertion_wp_t
     _ABC_NS_MATCHER::matcher_res_info_with_caller_t _m_matcher_info;
 };
 
-template <typename T>
-requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
+//template <typename T>
+//requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
 class test_block_t
 {
 public:
@@ -86,6 +86,7 @@ public:
      *
      * @param _a_end_source The source location being registered to this object.
      */
+
     __constexpr void
         register_end(const _ABC_NS_DS::single_source_t& _a_end_source) noexcept;
     /*!
@@ -109,16 +110,16 @@ private:
     bool _m_processed;
 };
 
-template <typename T>
-requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
-class single_element_test_block_t : public test_block_t<T>
+//template <typename T>
+//requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
+class single_element_test_block_t : public test_block_t
 {
 public:
-    using test_block_t<T>::test_block_t;
+    using test_block_t::test_block_t;
 
     template <typename T2>
     requires std::derived_from<T2, _ABC_NS_REPORTS::dynamic_status_t>
-    __constexpr_imp test_block_t<T>&
+    __constexpr_imp test_block_t&
                     operator=(
             const assertion_wp_t<T2>& _a_element
         ) noexcept
@@ -136,9 +137,30 @@ private:
     _ABC_NS_MATCHER::matcher_res_info_with_caller_t _m_assertion;
 };
 
-template <bool Annotated>
+template <typename T>
+    requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
 __constexpr assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>
-make_block_check_matcher(
+make_entity_bba_cmpatable(
+    const test_block_t& _a_matcher
+)
+{
+    using namespace _ABC_NS_MATCHER;
+
+    matcher_res_info_with_caller_t
+        _l_tuple;
+  //  get<0>(_l_tuple.second) = _a_matcher.internal_matcher().get()->matcher_result();
+   // if constexpr (Annotated)
+  //  {
+   //     get<1>(_l_tuple.second) = _a_matcher.annotation();
+  //  }
+  //  _a_matcher.internal_matcher()->gather_map_source(get<2>(_l_tuple.second));
+    return assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>{_l_tuple};
+}
+
+template <typename T, bool Annotated>
+    requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
+__constexpr assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>
+make_entity_bba_compatable(
     const _ABC_NS_MATCHER::matcher_wrapper_t<Annotated>& _a_matcher
 )
 {
@@ -155,9 +177,10 @@ make_block_check_matcher(
     return assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>{_l_tuple};
 }
 
-template <bool Annotated>
+template <typename T, bool Annotated>
+    requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
 __constexpr assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>
-            make_block_check_matcher(
+make_entity_bba_compatable(
                 const _ABC_NS_MATCHER::matcher_wrapper_t<Annotated>& _a_matcher,
                 const std::string_view _a_str_representation,
                 const std::source_location& _a_source_location
@@ -177,16 +200,16 @@ __constexpr assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>
     return assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>{_l_tuple};
 }
 
-template <typename T>
-requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
-class multi_element_test_block_t : public test_block_t<T>
+//template <typename T>
+//requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
+class multi_element_test_block_t : public test_block_t//<T>
 {
 public:
-    using test_block_t<T>::test_block_t;
+    using test_block_t::test_block_t;
 
     template <typename T2>
-    requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
-    __constexpr_imp test_block_t<T>&
+    requires std::derived_from<T2, _ABC_NS_REPORTS::dynamic_status_t>
+    __constexpr_imp test_block_t&
                     operator+=(
             const assertion_wp_t<T2>& _a_element
         ) noexcept
@@ -206,10 +229,9 @@ private:
 _END_ABC_NS
 
 _BEGIN_ABC_NS
-template <typename T>
-requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
+
 __constexpr_imp
-    test_block_t<T>::test_block_t(
+    test_block_t::test_block_t(
         const std::string_view             _a_test_annotation,
         const _ABC_NS_DS::single_source_t& _a_source
     ) noexcept
@@ -218,19 +240,18 @@ __constexpr_imp
     , _m_processed(false)
 {}
 
-template <typename T>
-requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
-__constexpr_imp test_block_t<T>::~test_block_t() noexcept
+
+__constexpr_imp test_block_t::~test_block_t() noexcept
 {
     using namespace _ABC_NS_GLOBAL;
     using namespace std;
     using namespace _ABC_NS_REPORTS;
     if (not _m_processed)
     {
-        get_this_threads_test_runner_ref().add_text_warning(fmt::format(
-            "test_block_t is being deleted, however it has not been "
-            "processed for its true or false status. "
-        ));
+      //  get_this_threads_test_runner_ref().add_text_warning(fmt::format(
+      //      "test_block_t is being deleted, however it has not been "
+     //       "processed for its true or false status. "
+     //   ));
     }
 }
 
@@ -266,36 +287,30 @@ __constexpr_imp const _ABC_NS_MATCHER::matcher_source_map_t&
 {
     return _m_map_source;
 }*/
-template <typename T>
-requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
+
 __constexpr_imp const std::string&
-                      test_block_t<T>::test_annotation() const noexcept
+                      test_block_t::test_annotation() const noexcept
 {
     return _m_test_annotation;
 }
 
-template <typename T>
-requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
 __constexpr_imp void
-    test_block_t<T>::register_end(
+    test_block_t::register_end(
         const _ABC_NS_DS::single_source_t& _a_end_source
     ) noexcept
 {
     _m_source.set_end_source(_a_end_source);
 }
 
-template <typename T>
-requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
+
 __constexpr_imp const _ABC_NS_DS::source_pair_t&
-                      test_block_t<T>::source() const noexcept
+                      test_block_t::source() const noexcept
 {
     return _m_source;
 }
 
-template <typename T>
-requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
 __constexpr_imp void
-    test_block_t<T>::set_processed() noexcept
+    test_block_t::set_processed() noexcept
 {
     _m_processed = true;
 }

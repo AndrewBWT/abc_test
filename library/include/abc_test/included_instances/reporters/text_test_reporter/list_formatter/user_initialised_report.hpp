@@ -88,7 +88,8 @@ user_initialised_report_list_formatter_t<Single_Source>::get_data(
 		}
 		else
 		{
-			vector<string> _l_rv =
+			vector<string> _l_rv;
+			vector<string> _l_rv2 =
 			{
 				_a_pc.colon(_a_pc.source_location_pair_begin_str()),
 				_a_pc.indent(_a_pc.colon(_a_pc.source_location_str())),
@@ -99,10 +100,18 @@ user_initialised_report_list_formatter_t<Single_Source>::get_data(
 			};
 			if (not _a_element.source().end_source().has_value())
 			{
-				_l_rv.push_back(_a_pc.indent(_a_pc.highlight_fail(std::string(_a_pc.no_end_source()))));
+				return
+				{
+					_a_pc.colon(_a_pc.source_location_str()),
+					_a_pc.indent(_a_pc.source_location(_a_element.source().begin_source().source_location())),
+					_a_pc.colon(_a_pc.source_code_str()),
+					_a_pc.indent(_a_pc.source_representation(_a_element.source().begin_source().source_code_representation()))
+				};
+			//	_l_rv.push_back(_a_pc.indent(_a_pc.highlight_fail(std::string(_a_pc.no_end_source()))));
 			}
 			else
 			{
+				_l_rv.append_range(_l_rv2);
 				const ds::single_source_t _l_end{ _a_element.source().end_source().value()};
 				_l_rv.append_range(
 					std::vector<std::string>({

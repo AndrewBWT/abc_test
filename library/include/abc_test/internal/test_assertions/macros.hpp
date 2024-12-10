@@ -211,7 +211,100 @@
             ),                                                \
             std::source_location::current()                   \
         )                                                     \
-    );
+    )
+
+#define __GENERIC_MATCHER_BBA_TRANSFORM(                                   \
+    _a_matcher, _a_assertion_status, _a_str_representation                 \
+)                                                                          \
+    abc::make_entity_bba_compatable<_a_assertion_status>(                  \
+        _a_matcher, _a_str_representation, std::source_location::current() \
+    )
+
+#define _BLOCK_REQUIRE(_a_matcher)                \
+    __GENERIC_MATCHER_BBA_TRANSFORM(              \
+        _a_matcher,                               \
+        _ABC_NS_REPORTS::pass_or_terminate_t,     \
+        _ABC_NS_UTILITY::str::create_string(      \
+            {"_BLOCK_REQUIRE(", #_a_matcher, ")"} \
+        )                                         \
+    )
+
+#define _BLOCK_CHECK(_a_matcher)                \
+    __GENERIC_MATCHER_BBA_TRANSFORM(            \
+        _a_matcher,                             \
+        _ABC_NS_REPORTS::pass_or_fail_t,        \
+        _ABC_NS_UTILITY::str::create_string(    \
+            {"_BLOCK_CHECK(", #_a_matcher, ")"} \
+        )                                       \
+    )
+
+#define __GENERIC_MATCHER_BBA_TRANSFORM_NO_SOURCE( \
+    _a_matcher, _a_assertion_status                \
+)                                                  \
+    abc::make_entity_bba_compatable<_a_assertion_status>(_a_matcher)
+
+#define _BLOCK_CHECK_NO_SOURCE(_a_matcher)          \
+    __GENERIC_MATCHER_BBA_TRANSFORM_NO_SOURCE(      \
+        _a_matcher, _ABC_NS_REPORTS::pass_or_fail_t \
+    )
+
+#define _BLOCK_REQUIRE_NO_SOURCE(_a_matcher)             \
+    __GENERIC_MATCHER_BBA_TRANSFORM_NO_SOURCE(           \
+        _a_matcher, _ABC_NS_REPORTS::pass_or_terminate_t \
+    )
+
+
+#define __INTERNAL_BBA_NO_SOURCE(_a_name, _a_assertion_type)        \
+    abc::create_assertion_block<_a_assertion_type>(                 \
+        _a_name, _ABC_NS_GLOBAL::get_this_threads_test_runner_ref() \
+    );                                                              \
+    }
+/*!
+ * @brief Macro to end a testing block.
+ * @param _a_name The name of the macro being ended.
+ */
+#define _END_BBA_CHECK_NO_SOURCE(_a_name) \
+    __INTERNAL_BBA_NO_SOURCE(_a_name, abc::reports::pass_or_fail_t)
+
+#define _END_BBA_REQUIRE_NO_SOURCE(_a_name) \
+    __INTERNAL_BBA_NO_SOURCE(_a_name, abc::reports::pass_or_terminate_t)
+
+#define __INTERNAL_BBA_CUSTOM_SOURCE(                       \
+    _a_name, _a_assertion_type, _a_source_representation    \
+)                                                           \
+    abc::create_assertion_block<_a_assertion_type>(         \
+        _a_name,                                            \
+        _ABC_NS_GLOBAL::get_this_threads_test_runner_ref(), \
+        _a_source_representation,                           \
+        std::source_location::current()                     \
+    );                                                      \
+    }
+
+
+#define _END_BBA_CHECK_CUSTOM_SOURCE(_a_name, _a_source_representation) \
+    __INTERNAL_BBA_CUSTOM_SOURCE(                                       \
+        _a_name, abc::reports::pass_or_fail_t, _a_source_representation \
+    )
+
+#define _END_BBA_REQUIRE_CUSTOM_SOURCE(_a_name, _a_source_representation)    \
+    __INTERNAL_BBA_CUSTOM_SOURCE(                                            \
+        _a_name, abc::reports::pass_or_terminate_t, _a_source_representation \
+    )
+
+#define _END_BBA_CHECK(_a_name)                                                \
+    _END_BBA_CHECK_CUSTOM_SOURCE(                                              \
+        _a_name,                                                               \
+        _ABC_NS_UTILITY::str::create_string({"_END_BBA_CHECK(", #_a_name, ")"} \
+        )                                                                      \
+    )
+
+#define _END_BBA_REQUIRE(_a_name)                                              \
+    _END_BBA_REQUIRE_CUSTOM_SOURCE(                                            \
+        _a_name,                                                               \
+        _ABC_NS_UTILITY::str::create_string({"_END_BBA_CHECK(", #_a_name, ")"} \
+        )                                                                      \
+    )
+
 /*!
  * @brief Inner macro which creates test blocks.
  *
@@ -221,44 +314,22 @@
  * @param _a_str_representation The string representation of the macro.
  */
 #define __ABC_TEST_INNER_BEGIN_BLOCK(                                  \
-    _a_class,                                                          \
-    _a_name,                                                           \
-    _a_description,                                                    \
-    _a_assertion_type,                                                 \
-    _a_str_representation                                              \
+    _a_class, _a_name, _a_description, _a_str_representation           \
 )                                                                      \
     {                                                                  \
-        _a_class<_a_assertion_type> _a_name(                           \
+        _a_class _a_name(                                              \
             _a_description,                                            \
             _ABC_NS_DS::single_source_t(                               \
                 _a_str_representation, std::source_location::current() \
             )                                                          \
         );
 
-#define _BLOCK_CHECK(_a_matcher)                \
-    abc::make_block_check_matcher(              \
-        _a_matcher,                             \
-        _ABC_NS_UTILITY::str::create_string(    \
-            {"_BLOCK_CHECK(", #_a_matcher, ")"} \
-        ),                                      \
-        std::source_location::current()         \
+#define _BEGIN_SINGLE_ELEMENT_BBA_CUSTOM_SOURCE(                             \
+    _a_name, _a_description, _a_source                                       \
+)                                                                            \
+    __ABC_TEST_INNER_BEGIN_BLOCK(                                            \
+        abc::single_element_test_block_t, _a_name, _a_description, _a_source \
     )
-#define _BLOCK_CHECK_NO_SOURCE(_a_matcher) \
-    abc::make_block_check_matcher(_a_matcher);
-/*!
- * @brief Macro to end a testing block.
- * @param _a_name The name of the macro being ended.
- */
-#define _END_BLOCK(_a_name)                                                  \
-    _a_name.register_end(_ABC_NS_DS::single_source_t(                        \
-        _ABC_NS_UTILITY::str::create_string({"_END_BLOCK(", #_a_name, ")"}), \
-        std::source_location::current()                                      \
-    ));                                                                      \
-    _a_name.set_processed();                                                 \
-    abc::create_assertion_block(                                             \
-        _a_name, _ABC_NS_GLOBAL::get_this_threads_test_runner_ref()          \
-    );                                                                       \
-    }
 
 /*!
  * @brief Macro to begin a testing block, which can either pass or fail (but not
@@ -267,39 +338,34 @@
  * @param _a_name The name of the testing block.
  * @param _a_description The annotation of the block assertion.
  */
-#define _BEGIN_CHECK_ASSERTION_BLOCK(_a_name, _a_description) \
-    __ABC_TEST_INNER_BEGIN_BLOCK(                             \
-        abc::single_element_test_block_t,                     \
-        _a_name,                                              \
-        _a_description,                                       \
-        _ABC_NS_REPORTS::pass_or_fail_t,                      \
-        _ABC_NS_UTILITY::str::create_string(                  \
-            {"_BEGIN_CHECK_ASSERTION_BLOCK(", #_a_name, ")"}  \
-        )                                                     \
-    );
-#define _BEGIN_CHECK_ASSERTION_BLOCK_(_a_name, _a_description) \
-    __ABC_TEST_INNER_BEGIN_BLOCK(                               \
-        abc::multi_element_test_block_t,                       \
-        _a_name,                                               \
-        _a_description,                                        \
-        _ABC_NS_REPORTS::pass_or_fail_t,                       \
-        _ABC_NS_UTILITY::str::create_string(                   \
-            {"_BEGIN_CHECK_ASSERTION_BLOCK_(", #_a_name, ")"}  \
-        )                                                      \
-    );
+#define _BEGIN_SINGLE_ELEMENT_BBA(_a_name, _a_description) \
+    _BEGIN_SINGLE_ELEMENT_BBA_CUSTOM_SOURCE(               \
+        _a_name,                                           \
+        _a_description,                                    \
+        _ABC_NS_UTILITY::str::create_string(               \
+            {"_BEGIN_SINGLE_ELEMENT_BBA(", #_a_name, ")"}  \
+        )                                                  \
+    )
+#define _BEGIN_MULTI_ELEMENT_BBA_CUSTOM_SOURCE(                             \
+    _a_name, _a_description, _a_source                                      \
+)                                                                           \
+    __ABC_TEST_INNER_BEGIN_BLOCK(                                           \
+        abc::multi_element_test_block_t, _a_name, _a_description, _a_source \
+    )
+
+#define _BEGIN_MULTI_ELEMENT_BBA(_a_name, _a_description) \
+    _BEGIN_MULTI_ELEMENT_BBA_CUSTOM_SOURCE(               \
+        _a_name,                                          \
+        _a_description,                                   \
+        _ABC_NS_UTILITY::str::create_string(              \
+            {"_BEGIN_MULTI_ELEMENT_BBA(", #_a_name, ")"}  \
+        )                                                 \
+    )
+
 /*!
- * @brief Macro to begin a testing block, which can either pass or terminate.
+ * @brief Macro to begin a testing block, which can either pass or fail (but not
+ * terminate).
  *
  * @param _a_name The name of the testing block.
  * @param _a_description The annotation of the block assertion.
  */
-#define _BEGIN_REQUIRE_ASSERTION_BLOCK(_a_name, _a_description) \
-    __ABC_TEST_INNER_BEGIN_BLOCK(                               \
-        abc::single_element_test_block_t,                       \
-        _a_name,                                                \
-        _a_description,                                         \
-        _ABC_NS_REPORTS::pass_or_terminate_t,                   \
-        _ABC_NS_UTILITY::str::create_string(                    \
-            {"_BEGIN_CHECK_ASSERTION_BLOCK(", #_a_name, ")"}    \
-        )                                                       \
-    );

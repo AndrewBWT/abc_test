@@ -103,6 +103,17 @@ __no_constexpr_imp test_tree_iterator_t&
             if (_m_current_text_itt == _l_element._m_nodes_tests.end())
             {
                 _m_stack.pop();
+                test_tree_child_nodes::const_reverse_iterator _l_end{
+                    std::rend(_l_element._m_nodes_child_nodes)
+                };
+                for (test_tree_child_nodes::const_reverse_iterator _l_itt{
+                         std::rbegin(_l_element._m_nodes_child_nodes)
+                    };
+                    _l_itt != _l_end;
+                    ++_l_itt)
+                {
+                    _m_stack.push({ *_l_itt->get() });
+                }
                 if (_m_stack.size() > 0)
                 {
                     find_next_test();

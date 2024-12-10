@@ -14,6 +14,7 @@ public:
 	__constexpr
 		std::string
 		operator()() const noexcept;
+	__constexpr std::vector<std::string> as_lines() const noexcept;
 	__no_constexpr
 		void
 		push_back(
@@ -76,6 +77,29 @@ __constexpr_imp
 			++_l_column;
 		}
 		_l_rv.append("\n");
+	}
+	return _l_rv;
+}
+__constexpr std::vector<std::string> string_table_t::as_lines() const noexcept
+{
+	using namespace std;
+	vector<string> _l_rv{};
+	for (const vector<string>& _l_row : _m_str_table)
+	{
+		size_t _l_column{ 0 };
+		string _l_str;
+		for (const std::string& _l_table_element : _l_row)
+		{
+			_l_str.append(_l_table_element);
+			if (_m_columns_to_largest_str.contains(_l_column))
+			{
+				_l_str.append(string(
+					_m_columns_to_largest_str.at(_l_column) -
+					_l_table_element.size(), ' '));
+			}
+			++_l_column;
+		}
+		_l_rv.push_back(_l_str);
 	}
 	return _l_rv;
 }

@@ -1,19 +1,19 @@
 #pragma once
 #include "abc_test/internal/test_assertions/macros.hpp"
 
-#define _BEGIN_CHECK_NO_THROW_BLOCK(_a_name)                 \
+#define _BEGIN_CHECK_NO_THROW(_a_name)                       \
     _BEGIN_CHECK_ASSERTION_BLOCK(                            \
         _a_name, "Checking code does not throw an exception" \
     );                                                       \
     try                                                      \
     {
-#define _BEGIN_REQUIRE_NO_THROW_BLOCK(_a_name)               \
+#define _BEGIN_REQUIRE_NO_THROW(_a_name)                     \
     _BEGIN_REQUIRE_ASSERTION_BLOCK(                          \
         _a_name, "Checking code does not throw an exception" \
     );                                                       \
     try                                                      \
     {
-#define _END_NO_THROW_BLOCK(_a_name)                                      \
+#define _END_NO_THROW(_a_name)                                            \
     _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(                       \
         "Code block does not throw any exceptions.", true_matcher()       \
     ));                                                                   \
@@ -44,7 +44,7 @@
     );                                                                \
     try                                                               \
     {
-#define _END_THROW_BLOCK(_a_name)                                        \
+#define _END_THROW_ANY(_a_name)                                          \
     }                                                                    \
     catch (...)                                                          \
     {                                                                    \
@@ -72,7 +72,7 @@
     );                                                                 \
     try                                                                \
     {
-#define _END_EXCEPTION_TYPE_BLOCK(_a_name, _a_exception_type)       \
+#define _END_EXCEPTION_TYPE(_a_name, _a_exception_type)             \
     }                                                               \
     catch (const _a_exception_type& _l_et)                          \
     {                                                               \
@@ -112,7 +112,7 @@
     );                                                                    \
     try                                                                   \
     {
-#define _END_EXCEPTION_MSG_BLOCK(_a_name, _a_msg)                       \
+#define _END_EXCEPTION_MSG(_a_name, _a_msg)                             \
     }                                                                   \
     catch (const std::exception& _l_et)                                 \
     {                                                                   \
@@ -152,7 +152,7 @@
     );                                                                    \
     try                                                                   \
     {
-#define _END_EXCEPTION_TYPE_AND_MSG_BLOCK(_a_name, _a_type, _a_msg)     \
+#define _END_EXCEPTION_TYPE_AND_MSG(_a_name, _a_type, _a_msg)           \
     }                                                                   \
     catch (const _a_type& _l_et)                                        \
     {                                                                   \

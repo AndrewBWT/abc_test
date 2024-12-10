@@ -119,7 +119,7 @@ matcher_based_assertion_single_line_list_formatter_t<Assertion_Status>::get_data
 		}
 		case MATCHER_OUTPUT:
 			return {
-				_a_pc.colon(_a_pc.matcher_output_str()),
+				_a_pc.colon(_a_pc.matcher_output_str(_a_element.get_pass_status())),
 				_a_pc.indent(_a_pc.matcher_output(
 					get<0>(_a_element.matcher_info()).str()
 				))
@@ -155,6 +155,6 @@ matcher_based_assertion_single_line_list_formatter_t<Assertion_Status>::get_str_
 	const print_config_t& _a_pc
 ) const
 {
-	return construct_str_representation(_a_element, "Matcher-based assertion");
+	return construct_str_representation(_a_element, "Single-line assertion");
 }
 _END_ABC_REPORTERS_NS

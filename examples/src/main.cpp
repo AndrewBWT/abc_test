@@ -177,5 +177,8 @@ int
         char* argv[]
     )
 {
+    using namespace std;
+    vector<int> x(10);
+    std::iota(x.begin(), x.begin() + 10, 100);
     return abc::run_test_suite_using_command_line_args(argc, argv);
 }

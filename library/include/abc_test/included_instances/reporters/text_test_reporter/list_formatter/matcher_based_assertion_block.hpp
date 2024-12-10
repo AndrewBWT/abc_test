@@ -49,12 +49,18 @@ __constexpr_imp bool
 {
     using namespace std;
     if (auto _l_ptr{
-            get_if<enum_assertion_block_matcher_data_fields_t>(&_a_fid)
+            get_if<enum_single_element_assertion_block_fields_t>(&_a_fid)
         };
         _l_ptr != nullptr)
     {
-        return assertion_block_matcher_data_list_formatter_t::
-            check_data(*_l_ptr, _a_element.get_matcher());
+        using enum enum_single_element_assertion_block_fields_t;
+        switch (*_l_ptr)
+        {
+        case SHOW_ASSERTION_DATA:
+            return true;
+        default:
+            throw errors::unaccounted_for_enum_exception(*_l_ptr);
+        }
     }
     else if (auto _l_ptr{get_if<combined_enum_assertion_fields_t>(&_a_fid)};
              _l_ptr != nullptr)
@@ -80,12 +86,23 @@ __constexpr_imp std::vector<std::string>
 {
     using namespace std;
     if (auto _l_ptr{
-            get_if<enum_assertion_block_matcher_data_fields_t>(&_a_fid)
+            get_if<enum_single_element_assertion_block_fields_t>(&_a_fid)
         };
         _l_ptr != nullptr)
     {
-        return assertion_block_matcher_data_list_formatter_t::
-            get_data(*_l_ptr, _a_element.get_matcher(), _a_pc);
+        using enum enum_single_element_assertion_block_fields_t;
+        switch (*_l_ptr)
+        {
+        case SHOW_ASSERTION_DATA:
+            return get_all_data(
+                _a_pc.matcher_assertion_single_block_assertion_list_fields(),
+                _a_element.get_matcher(),
+                _a_pc,
+                assertion_block_matcher_data_list_formatter_t()
+            );
+        default:
+            throw errors::unaccounted_for_enum_exception(*_l_ptr);
+        }
     }
     else if (auto _l_ptr{get_if<combined_enum_assertion_fields_t>(&_a_fid)};
              _l_ptr != nullptr)
@@ -109,7 +126,8 @@ __constexpr_imp std::string
         ) const
 {
     return construct_str_representation(
-        _a_element, "Matcher-based assertion block"
+        _a_element,
+        "Single-element block-based assertion"
     );
 }
 _END_ABC_REPORTERS_NS

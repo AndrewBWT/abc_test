@@ -3,6 +3,7 @@
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/finalised_test_set_data_report.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion_block.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion_single_line.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/multi_element_assertion_block.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/static_assertion.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_thrown_exception.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_thrown_non_descript_entity.hpp"
@@ -13,7 +14,6 @@
 #include "abc_test/internal/test_reports/assertion_status/pass_or_fail.hpp"
 #include "abc_test/internal/test_reports/assertion_status/pass_or_terminate.hpp"
 #include "abc_test/internal/test_reports/assertion_status/terminate.hpp"
-#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/multi_element_assertion_block.hpp"
 
 #include <fmt/color.h>
 _BEGIN_ABC_REPORTERS_NS
@@ -25,8 +25,8 @@ public:
                       print_config_t(const bool _a_colours_enabled) noexcept;
     __constexpr       std::string
                       line_break() const noexcept;
-    __constexpr const std::string_view
-                      matcher_output_str() const noexcept;
+    __constexpr const std::string
+                      matcher_output_str(const bool _a_passed) const noexcept;
     __constexpr const std::string_view
                       matcher_source_map_str() const noexcept;
     __constexpr       std::string
@@ -128,10 +128,14 @@ public:
     __constexpr enum_print_pair_collection_t<
         combined_enum_matcher_based_assertion_block_fields_t>
         matcher_based_assertion_block_fields() const noexcept;
-    __constexpr_imp enum_print_pair_collection_t<
-        enum_assertion_block_matcher_data_fields_t>
-        matcher_assertion_block_assertion_list_fields() const noexcept;
-    __constexpr enum_print_pair_collection_t<combined_enum_multi_element_assertion_block_fields_t>
+    __constexpr_imp
+        enum_print_pair_collection_t<enum_assertion_block_matcher_data_fields_t>
+        matcher_assertion_single_block_assertion_list_fields() const noexcept;
+    __constexpr_imp
+        enum_print_pair_collection_t<enum_assertion_block_matcher_data_fields_t>
+        matcher_assertion_multi_block_assertion_list_fields() const noexcept;
+    __constexpr enum_print_pair_collection_t<
+        combined_enum_multi_element_assertion_block_fields_t>
         multi_element_test_block_fields() const noexcept;
     __constexpr
         enum_print_pair_collection_t<enum_after_execution_test_report_fields_t>
@@ -140,8 +144,8 @@ public:
         enum_print_pair_collection_t<enum_finalised_test_set_data_fields_t>
         finalised_test_set_data_fields() const noexcept;
     __constexpr
-    enum_print_pair_collection_t<combined_enum_static_assertion_fields_t>
-                static_assertion_fields() const noexcept;
+        enum_print_pair_collection_t<combined_enum_static_assertion_fields_t>
+        static_assertion_fields() const noexcept;
     __constexpr enum_print_pair_collection_t<
         combined_enum_unexpected_thrown_non_descript_entity_fields_t>
         unexpected_thrown_non_descript_entity_fields() const noexcept;
@@ -185,7 +189,7 @@ public:
     __constexpr const std::string_view
                       test_description_str() const noexcept;
     __constexpr const std::string_view
-        static_test_annotation_str() const noexcept;
+                      static_test_annotation_str() const noexcept;
     /*__constexpr
         const std::string_view
         fail_message_str(
@@ -223,9 +227,10 @@ public:
         _m_unexpected_thrown_non_descript_entity_fields;
     enum_print_pair_collection_t<combined_enum_unexpected_exception_fields_t>
         _m_thrown_exception_fields;
-    enum_print_pair_collection_t<
-        enum_assertion_block_matcher_data_fields_t>
-         _m_matcher_assertion_block_assertion_list_fields;
+    enum_print_pair_collection_t<enum_assertion_block_matcher_data_fields_t>
+        _m_matcher_assertion_single_block_assertion_list_fields;
+    enum_print_pair_collection_t<enum_assertion_block_matcher_data_fields_t>
+         _m_matcher_assertion_multi_block_assertion_list_fields;
     bool _m_colours_enabled                   = true;
     //! The failure style used when highlighting information in text output.
     fmt::text_style _m_failure_style          = fmt::fg(fmt::color::red);
@@ -259,6 +264,10 @@ public:
     __constexpr    std::string
         indent(const std::string_view _a_str, const std::size_t _a_n_indent = 1)
             const noexcept;
+    __constexpr       std::string
+                      multi_element_collection_str() const noexcept;
+    __constexpr       std::string
+                      multi_element_collection_grouped_str() const noexcept;
     __constexpr const std::string_view
                       exception_type_str() const noexcept;
     __constexpr       std::string
@@ -302,10 +311,15 @@ __constexpr_imp
     , _m_thrown_exception_fields(default_unexpected_exception_fields())
     , _m_finalised_test_set_data_fields(default_finalised_test_set_data_fields()
       )
-    , _m_matcher_assertion_block_assertion_list_fields(
-          default_matcher_based_assertion_block_assertion_fields()
+    , _m_matcher_assertion_single_block_assertion_list_fields(
+          default_matcher_based_assertion_single_block_assertion_fields()
       )
-    , _m_multi_element_test_block_fields(default_multi_element_assertion_block_fields())
+    , _m_matcher_assertion_multi_block_assertion_list_fields(
+          default_matcher_based_assertion_multi_block_assertion_fields()
+      )
+    , _m_multi_element_test_block_fields(
+          default_multi_element_assertion_block_fields()
+      )
 {}
 
 __constexpr_imp std::string
@@ -315,10 +329,13 @@ __constexpr_imp std::string
     return string(_m_line_break_len, _m_line_break_char).append("\n");
 }
 
-__constexpr_imp const std::string_view
-                      print_config_t::matcher_output_str() const noexcept
+__constexpr_imp const std::string
+                      print_config_t::matcher_output_str(
+        const bool _a_passed
+    ) const noexcept
 {
-    return "Matcher's output";
+    return _a_passed ? highlight_pass(colon("Matcher passed with output"))
+                     : highlight_fail(colon("Matcher failed with output"));
 }
 
 __constexpr_imp const std::string_view
@@ -677,17 +694,30 @@ __constexpr_imp enum_print_pair_collection_t<
 {
     return _m_matcher_assertion_block_fields;
 }
-__constexpr_imp enum_print_pair_collection_t<
-    enum_assertion_block_matcher_data_fields_t>
-    print_config_t::matcher_assertion_block_assertion_list_fields() const noexcept
+
+__constexpr_imp
+    enum_print_pair_collection_t<enum_assertion_block_matcher_data_fields_t>
+    print_config_t::matcher_assertion_single_block_assertion_list_fields(
+    ) const noexcept
 {
-    return _m_matcher_assertion_block_assertion_list_fields;
+    return _m_matcher_assertion_single_block_assertion_list_fields;
 }
-__constexpr enum_print_pair_collection_t<combined_enum_multi_element_assertion_block_fields_t>
-print_config_t::multi_element_test_block_fields() const noexcept
+
+__constexpr_imp
+    enum_print_pair_collection_t<enum_assertion_block_matcher_data_fields_t>
+    print_config_t::matcher_assertion_multi_block_assertion_list_fields(
+    ) const noexcept
+{
+    return _m_matcher_assertion_multi_block_assertion_list_fields;
+}
+
+__constexpr enum_print_pair_collection_t<
+    combined_enum_multi_element_assertion_block_fields_t>
+    print_config_t::multi_element_test_block_fields() const noexcept
 {
     return _m_multi_element_test_block_fields;
 }
+
 __constexpr_imp
     enum_print_pair_collection_t<enum_after_execution_test_report_fields_t>
     print_config_t::after_execution_test_report_fields() const noexcept
@@ -702,7 +732,7 @@ __constexpr enum_print_pair_collection_t<enum_finalised_test_set_data_fields_t>
 }
 
 __constexpr_imp
-enum_print_pair_collection_t<combined_enum_static_assertion_fields_t>
+    enum_print_pair_collection_t<combined_enum_static_assertion_fields_t>
     print_config_t::static_assertion_fields() const noexcept
 {
     return _m_static_assertion_fields;
@@ -909,13 +939,15 @@ __constexpr_imp std::string
 __constexpr_imp const std::string_view
                       print_config_t::test_description_str() const noexcept
 {
-    return "Test description";
+    return "Assertion description";
 }
+
 __constexpr const std::string_view
-print_config_t::static_test_annotation_str() const noexcept
+                  print_config_t::static_test_annotation_str() const noexcept
 {
     return "Test annotation";
 }
+
 /*__constexpr_imp
 const std::string_view
 print_config_t::fail_message_str(
@@ -1043,6 +1075,18 @@ __constexpr_imp std::string
 {
     using namespace std;
     return string(_a_n_indents * _m_indent_size, ' ').append(_a_str);
+}
+
+__constexpr_imp std::string
+                print_config_t::multi_element_collection_str() const noexcept
+{
+    return "Matchers data";
+}
+
+__constexpr_imp std::string
+    print_config_t::multi_element_collection_grouped_str() const noexcept
+{
+    return "Matchers data (grouped by source)";
 }
 
 __constexpr const std::string_view

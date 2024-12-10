@@ -67,12 +67,16 @@ public:
      */
     __no_constexpr_or_inline std::string
         gather_list_of_sources_and_representations() const noexcept;
+
     __no_constexpr_imp void
         clear()
     {
         _m_internal_map.clear();
         _m_has_elements = false;
     }
+
+    __no_constexpr bool
+        operator==(const matcher_source_map_t& _a_msm) const noexcept;
 private:
     bool _m_has_elements = false;
     std::map<
@@ -91,15 +95,18 @@ _END_ABC_MATCHER_NS
  * formatter for post_setup_test_ata object.
  */
 template <>
-struct fmt::formatter<_ABC_NS_MATCHER::matcher_source_map_t> : formatter<string_view>
+struct fmt::formatter<_ABC_NS_MATCHER::matcher_source_map_t>
+    : formatter<string_view>
 {
     /*!
      * Provides a formatter for a poset_setup_test_data_t object
      */
     // Can't be constexpr due to fmt.
     __no_constexpr auto
-        format(_ABC_NS_MATCHER::matcher_source_map_t _a_iti, format_context& _a_cxt) const
-        -> format_context::iterator;
+        format(
+            _ABC_NS_MATCHER::matcher_source_map_t _a_iti,
+            format_context&                       _a_cxt
+        ) const -> format_context::iterator;
 };
 
 _BEGIN_ABC_MATCHER_NS
@@ -165,6 +172,43 @@ __constexpr_imp bool
     return _m_has_elements;
 }
 
+__no_constexpr_imp bool
+    matcher_source_map_t::operator==(
+        const matcher_source_map_t& _a_msm
+    ) const noexcept
+{
+    using namespace std;
+
+    std::map<source_location, vector<string>, source_location_lt_t> _l_msm_map{
+        _a_msm.map()
+    };
+    if (_m_internal_map.size() != _l_msm_map.size())
+    {
+        return false;
+    }
+    else
+    {
+        for (const pair<source_location, vector<string>>& _l_element :
+             _m_internal_map)
+        {
+            if (not _l_msm_map.contains(_l_element.first))
+            {
+                return false;
+            }
+            else
+            {
+                const vector<string>& _l_msm_element{ _l_msm_map.find(_l_element.first)->second };
+                if (_l_msm_element != _l_element.second)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    return true;
+}
+
 __no_constexpr_imp void
     matcher_source_map_t::insert_source(
         const std::source_location& _a_sl
@@ -181,7 +225,7 @@ _END_ABC_MATCHER_NS
 __no_constexpr_imp auto
     fmt::formatter<_ABC_NS_MATCHER::matcher_source_map_t>::format(
         _ABC_NS_MATCHER::matcher_source_map_t _a_rtd,
-        format_context&           _a_ctx
+        format_context&                       _a_ctx
     ) const -> format_context::iterator
 {
     size_t _m_thread_resourses_required;
