@@ -130,25 +130,24 @@ __constexpr_imp std::vector<std::string>
                 vector<tuple<size_t, matcher_result_t, optional<string>>>>>
                    _l_info;
             size_t _l_idx{1};
-            for (const matcher_res_info_with_caller_t& _l_matcher :
-                 _a_element.get_matcher())
+            for (const matcher_result_with_annotation_and_source_info_t&
+                     _l_matcher : _a_element.get_matcher())
             {
                 pair<optional<ds::single_source_t>, matcher_source_map_t>
                     _l_first
-                    = make_pair(_l_matcher.first, get<2>(_l_matcher.second));
+                    = make_pair(_l_matcher.source(), _l_matcher.source_map());
                 tuple<size_t, matcher_result_t, optional<string>>
                     _l_single_element = make_tuple(
                         _l_idx++,
-                        get<0>(_l_matcher.second),
-                        get<1>(_l_matcher.second)
+                        _l_matcher.matcher_result(),_l_matcher.annotation()
                     );
                 if (_l_info.size() == 0 || _l_first != _l_info.back().first)
                 {
                     _l_info.push_back(make_pair(
                         _l_first,
                         vector<
-                            tuple<size_t, matcher_result_t, optional<string>>>(1,
-                            _l_single_element
+                            tuple<size_t, matcher_result_t, optional<string>>>(
+                            1, _l_single_element
                         )
                     ));
                 }
@@ -169,15 +168,12 @@ __constexpr_imp std::vector<std::string>
                         matcher_result_t,
                         std::optional<std::string>,
                         matcher_source_map_t>;
-                    pair<optional<ds::single_source_t>, matcher_res_info_t>
-                        _l_matcher = make_pair(
-                            _l_element.first.first,
-                            make_tuple(
-                                get<1>(_l_element.second[0]),
-                                get<2>(_l_element.second[0]),
-                                _l_element.first.second
-                            )
-                        );
+                    matcher_result_with_annotation_and_source_info_t _l_matcher(
+                    get<1>(_l_element.second[0]),
+                        _l_element.first.first,
+                        get<2>(_l_element.second[0]),
+                        _l_element.first.second
+                    );
                     vector<string> _l_data = get_all_data(
                         _a_pc
                             .matcher_assertion_multi_block_assertion_list_fields(
@@ -211,22 +207,19 @@ __constexpr_imp std::vector<std::string>
                 {
                     _l_rv.push_back(_a_pc.indent(fmt::format(
                         "The following {0} matchers have the same source data, "
-                        "which is as follows",
+                        "which is as follows:",
                         _l_element.second.size()
                     )));
                     std::tuple<
                         matcher_result_t,
                         std::optional<std::string>,
                         matcher_source_map_t>;
-                    pair<optional<ds::single_source_t>, matcher_res_info_t>
-                        _l_matcher = make_pair(
-                            _l_element.first.first,
-                            make_tuple(
-                                get<1>(_l_element.second[0]),
-                                get<2>(_l_element.second[0]),
-                                _l_element.first.second
-                            )
-                        );
+                    matcher_result_with_annotation_and_source_info_t _l_matcher(
+                        get<1>(_l_element.second[0]),
+                        _l_element.first.first,
+                        get<2>(_l_element.second[0]),
+                        _l_element.first.second
+                    );
                     vector<string> _l_data = get_all_data(
                         _l_shared_data,
                         _l_matcher,
@@ -235,36 +228,37 @@ __constexpr_imp std::vector<std::string>
                     );
                     _l_rv.append_range(_l_data);
 
-                    _l_rv.push_back(_a_pc.indent(fmt::format("The data of the {0} mathcers",_l_element.second.size()),1));
-                    str::string_table_t _l_st({ 0 });
+                    _l_rv.push_back(_a_pc.indent(
+                        fmt::format(
+                            "The data of the {0} matchers:",
+                            _l_element.second.size()
+                        ),
+                        1
+                    ));
+                    str::string_table_t _l_st({0});
                     for (auto& _l_ki : _l_element.second)
                     {
-                        pair<optional<ds::single_source_t>, matcher_res_info_t>
-                            _l_matcher = make_pair(
-                                _l_element.first.first,
-                                make_tuple(
-                                    get<1>(_l_ki),
-                                    get<2>(_l_ki),
-                                    _l_element.first.second
-                                )
-                            );
+                        matcher_result_with_annotation_and_source_info_t _l_matcher(
+                            get<1>(_l_ki),
+                            _l_element.first.first,
+                            get<2>(_l_ki),
+                            _l_element.first.second
+                        );
                         vector<string> _l_data = get_all_data(
                             _l_individual_data,
                             _l_matcher,
                             _a_pc,
                             assertion_block_matcher_data_list_formatter_t(0)
                         );
-                        size_t _l_data_idx{ 0 };
+                        size_t _l_data_idx{0};
                         if (_l_data.size() != 0)
                         {
                             for (const string_view _l_sv : _l_data)
                             {
                                 _l_st.push_back(
                                     _l_data_idx++ == 0
-                                    ? fmt::format(
-                                        "{0}) ", get<0>(_l_ki)
-                                    )
-                                    : ""
+                                        ? fmt::format("{0}) ", get<0>(_l_ki))
+                                        : ""
                                 );
                                 _l_st.push_back(_l_sv);
                                 _l_st.new_line();
@@ -273,7 +267,7 @@ __constexpr_imp std::vector<std::string>
                     }
                     for (string _l_s : _l_st.as_lines())
                     {
-                        _l_rv.push_back(_a_pc.indent(_l_s,2));
+                        _l_rv.push_back(_a_pc.indent(_l_s, 2));
                     }
                 }
             }
@@ -340,22 +334,29 @@ __constexpr_imp std::string
             const print_config_t&                                _a_pc
         ) const
 {
-
-    const reports::multi_element_assertion_block_t<Assertion_Status>& _l_element{
-        dynamic_cast<const reports::multi_element_assertion_block_t<Assertion_Status>&>(_a_element)
-    };
-    std::size_t _l_passed{ 0 };
-    for (auto& _l_ki : _l_element.get_matcher())
+    using namespace _ABC_NS_MATCHER;
+    const reports::multi_element_assertion_block_t<Assertion_Status>&
+                _l_element{dynamic_cast<
+                    const reports::multi_element_assertion_block_t<Assertion_Status>&>(
+            _a_element
+        )};
+    std::size_t _l_passed{0};
+    for (const matcher_result_with_annotation_and_source_info_t& _l_ki : _l_element.get_matcher())
     {
-        if (get<0>(_l_ki.second).passed())
+        if (_l_ki.matcher_result().passed())
         {
             _l_passed++;
         }
     }
     return construct_str_representation(
-        _a_element, "Multi-element block-based assertion",
-        fmt::format(" {0}/{1} matchers passed.", _l_passed,
-            _l_element.get_matcher().size()));
+        _a_element,
+        "Multi-element block-based assertion",
+        fmt::format(
+            " {0}/{1} matchers passed.",
+            _l_passed,
+            _l_element.get_matcher().size()
+        )
+    );
 }
 
 _END_ABC_REPORTERS_NS

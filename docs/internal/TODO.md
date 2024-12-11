@@ -33,7 +33,6 @@ Each list of todo's is given in the order which represents when they are to be c
 - [ ] Add functionality for per-test options object. It should be able to be set via either a name (e.g. string), an object or a file.
 - [ ] Add functionality allowing data_generator_t objects to have their elements filtered.
 - [ ] Change master CMakeLists.txt file so that examples subfolder is only built when specified. 
-- Investigate test_reporter which can be used with data generators to ONLY provide feedback after all elements have been generated. In a similar fashion to how quickcheck reports 98/100 tests passed. This is because some tests become unwieldly very quickly, due to the amount of output produced.
 - Improve combinatorics algorithm for dealing with file IO; at the moment we just go through the elements in order. We want an algorithm which can hone in on the exact value in an O(log n)-like method. This would mean being able to calculate the size of permutations/combinations, as well as partial-combinations/permutations (e.g. the size of we leave the first element in its place). This may get particularly difficult for permutations, as we used an algorithm which only makes a single change for that one.
 
 ## Priority 5
@@ -56,6 +55,7 @@ Each list of todo's is given in the order which represents when they are to be c
 - Add functionality to allow the user to filter tests based on a path. When this is addressed, update DECLARING_TESTS.md.
 - Check that same pairs of test paths and test names are dealt with properly. Update DECLARING_TESTS.md when this is addressed.
 - We're using a function from Google Benchmark, who use an apache licence. Need to look into whether we need to include the original licence when providing our library.
+- An idea worth investigating; a version where all assertions are built up as a tree. Assertions either have group nodes, or assertion children (assertion children can't have any more children).
 
 ## Completed
 

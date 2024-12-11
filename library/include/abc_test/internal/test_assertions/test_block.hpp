@@ -24,7 +24,7 @@ template <typename T>
 requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
 struct assertion_wp_t
 {
-    _ABC_NS_MATCHER::matcher_res_info_with_caller_t _m_matcher_info;
+    _ABC_NS_MATCHER::matcher_result_with_annotation_and_source_info_t _m_matcher_info;
 };
 
 //template <typename T>
@@ -40,7 +40,7 @@ public:
      * @param _a_test_annotation The block's annotation.
      * @param _a_source The blocks' beginning source.
      */
-    __constexpr
+    __no_constexpr
     test_block_t(
         const std::string_view             _a_test_annotation,
         const _ABC_NS_DS::single_source_t& _a_source
@@ -119,7 +119,7 @@ public:
 
     template <typename T2>
     requires std::derived_from<T2, _ABC_NS_REPORTS::dynamic_status_t>
-    __constexpr_imp test_block_t&
+    __no_constexpr_imp test_block_t&
                     operator=(
             const assertion_wp_t<T2>& _a_element
         ) noexcept
@@ -128,13 +128,13 @@ public:
         return *this;
     }
 
-    __constexpr_imp const _ABC_NS_MATCHER::matcher_res_info_with_caller_t&
+    __constexpr_imp const _ABC_NS_MATCHER::matcher_result_with_annotation_and_source_info_t&
                           get_matcher() const noexcept
     {
         return _m_assertion;
     }
 private:
-    _ABC_NS_MATCHER::matcher_res_info_with_caller_t _m_assertion;
+    _ABC_NS_MATCHER::matcher_result_with_annotation_and_source_info_t _m_assertion;
 };
 
 template <typename T>
@@ -146,7 +146,7 @@ make_entity_bba_cmpatable(
 {
     using namespace _ABC_NS_MATCHER;
 
-    matcher_res_info_with_caller_t
+    matcher_result_with_annotation_and_source_info_t
         _l_tuple;
   //  get<0>(_l_tuple.second) = _a_matcher.internal_matcher().get()->matcher_result();
    // if constexpr (Annotated)
@@ -165,16 +165,26 @@ make_entity_bba_compatable(
 )
 {
     using namespace _ABC_NS_MATCHER;
-
-    matcher_res_info_with_caller_t
-        _l_tuple;
-    get<0>(_l_tuple.second) = _a_matcher.internal_matcher().get()->matcher_result();
+    matcher_source_map_t _l_msm;
+    _a_matcher.internal_matcher()->gather_map_source(_l_msm);
     if constexpr (Annotated)
     {
-        get<1>(_l_tuple.second) = _a_matcher.annotation();
+        matcher_result_with_annotation_and_source_info_t
+            _l_tuple(_a_matcher.internal_matcher().get()->matcher_result(),
+                std::optional<ds::single_source_t>{},
+                std::optional<std::string>(_a_matcher.annotation()),
+                _l_msm);
+        return assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>{_l_tuple};
     }
-    _a_matcher.internal_matcher()->gather_map_source(get<2>(_l_tuple.second));
-    return assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>{_l_tuple};
+    else
+    {
+        matcher_result_with_annotation_and_source_info_t
+            _l_tuple(_a_matcher.internal_matcher().get()->matcher_result(),
+                std::optional<ds::single_source_t>{},
+                std::optional<std::string>{},
+                _l_msm);
+        return assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>{_l_tuple};
+    }
 }
 
 template <typename T, bool Annotated>
@@ -187,17 +197,26 @@ make_entity_bba_compatable(
             )
 {
     using namespace _ABC_NS_MATCHER;
-
-    matcher_res_info_with_caller_t
-        _l_tuple;
-    _l_tuple.first = ds::single_source_t(_a_str_representation, _a_source_location);
-    get<0>(_l_tuple.second) = _a_matcher.internal_matcher().get()->matcher_result();
+    matcher_source_map_t _l_msm;
+    _a_matcher.internal_matcher().get()->gather_map_source(_l_msm);
     if constexpr (Annotated)
     {
-        get<1>(_l_tuple.second) = _a_matcher.annotation();
+        matcher_result_with_annotation_and_source_info_t
+            _l_tuple(_a_matcher.internal_matcher().get()->matcher_result(),
+                ds::single_source_t(_a_str_representation, _a_source_location),
+                std::optional<std::string>(_a_matcher.annotation()),
+                _l_msm);
+        return assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>{_l_tuple};
     }
-    _a_matcher.internal_matcher()->gather_map_source(get<2>(_l_tuple.second));
-    return assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>{_l_tuple};
+    else
+    {
+        matcher_result_with_annotation_and_source_info_t
+            _l_tuple(_a_matcher.internal_matcher().get()->matcher_result(),
+                ds::single_source_t(_a_str_representation, _a_source_location),
+                std::optional<std::string>{},
+                _l_msm);
+        return assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>{_l_tuple};
+    }
 }
 
 //template <typename T>
@@ -230,7 +249,7 @@ _END_ABC_NS
 
 _BEGIN_ABC_NS
 
-__constexpr_imp
+__no_constexpr_imp
     test_block_t::test_block_t(
         const std::string_view             _a_test_annotation,
         const _ABC_NS_DS::single_source_t& _a_source

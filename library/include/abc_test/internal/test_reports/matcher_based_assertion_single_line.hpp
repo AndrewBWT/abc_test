@@ -28,13 +28,13 @@ public:
     matcher_based_assertion_single_line_t(
         const user_initialised_report_t<true>::source_t& _a_source,
         const ds::log_infos_t&                           _a_log_infos,
-        const _ABC_NS_MATCHER::matcher_res_info_t& _a_matcher_info
+        const _ABC_NS_MATCHER::matcher_result_with_annotation_and_source_info_t& _a_matcher_info
     ) noexcept;
     __constexpr
-        const _ABC_NS_MATCHER::matcher_res_info_t&
+        const _ABC_NS_MATCHER::matcher_result_with_annotation_and_source_info_t&
         matcher_info() const noexcept;
 private:
-    _ABC_NS_MATCHER::matcher_res_info_t _m_matcher_info;
+    _ABC_NS_MATCHER::matcher_result_with_annotation_and_source_info_t _m_matcher_info;
 };
 
 _END_ABC_REPORTS_NS
@@ -47,11 +47,11 @@ __constexpr_imp
         matcher_based_assertion_single_line_t(
             const user_initialised_report_t<true>::source_t& _a_source,
             const ds::log_infos_t&                           _a_log_infos,
-            const _ABC_NS_MATCHER::matcher_res_info_t& _a_matcher_info
+            const _ABC_NS_MATCHER::matcher_result_with_annotation_and_source_info_t& _a_matcher_info
         ) noexcept
 
     : assertion_t<true, Assertion_Status>(
-          get<0>(_a_matcher_info).passed(),
+          _a_matcher_info.matcher_result().passed(),
           _a_source,
           _a_log_infos,
           std::monostate{}
@@ -61,7 +61,7 @@ __constexpr_imp
 template <typename Assertion_Status>
     requires std::derived_from<Assertion_Status, dynamic_status_t>
 __constexpr_imp
-const _ABC_NS_MATCHER::matcher_res_info_t&
+const _ABC_NS_MATCHER::matcher_result_with_annotation_and_source_info_t&
 matcher_based_assertion_single_line_t<Assertion_Status>::matcher_info() const noexcept
 {
     return _m_matcher_info;

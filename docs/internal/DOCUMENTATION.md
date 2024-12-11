@@ -31,12 +31,12 @@ Status: First Draft Complete
 
 ## Assertions
 Status: Incomplete
-- [ ] Introduction
-- [ ] Matchers introduction
-- [ ] Single-line assertions. Annotations, adding source code.
-- [ ] Static assertions.
-- [ ] Multi-line assertions.
-- [ ] Exceptions.
+- [x] Introduction
+- [x] Matchers introduction
+- [x] Single-line assertions. Annotations, adding source code.
+- [x] Static assertions.
+- [x] Multi-line assertions.
+- [x] Exceptions.
 
 ## Matchers
 Status: Incomplete

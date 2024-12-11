@@ -57,11 +57,11 @@ matcher_based_assertion_single_line_list_formatter_t<Assertion_Status>::check_da
 		switch (*_l_ptr)
 		{
 		case MATCHER_SOURCE_MAP:
-			return get<2>(_a_element.matcher_info()).has_elements();
+			return _a_element.matcher_info().source_map().has_elements();
 		case MATCHER_OUTPUT:
 			return true;
 		case MATCHER_ANNOTATION:
-			return get<1>(_a_element.matcher_info()).has_value();
+			return _a_element.matcher_info().annotation().has_value();
 		default:
 			throw errors::unaccounted_for_enum_exception(*_l_ptr);
 		}
@@ -98,7 +98,7 @@ matcher_based_assertion_single_line_list_formatter_t<Assertion_Status>::get_data
 		{
 			vector<string> _l_rv{ _a_pc.colon(_a_pc.matcher_source_map_str()) };
 			for (const pair<std::source_location, vector<string>>& _l_element :
-				get<2>(_a_element.matcher_info()).map())
+				_a_element.matcher_info().source_map().map())
 			{
 				_l_rv.push_back(
 					_a_pc.indent(_a_pc.colon(_a_pc.source_location_str()))
@@ -119,16 +119,16 @@ matcher_based_assertion_single_line_list_formatter_t<Assertion_Status>::get_data
 		}
 		case MATCHER_OUTPUT:
 			return {
-				_a_pc.colon(_a_pc.matcher_output_str(_a_element.get_pass_status())),
+				_a_pc.matcher_output_str(_a_element.get_pass_status()),
 				_a_pc.indent(_a_pc.matcher_output(
-					get<0>(_a_element.matcher_info()).str()
+					_a_element.matcher_info().matcher_result().str()
 				))
 			};
 		case MATCHER_ANNOTATION:
 			return {
 				_a_pc.colon(_a_pc.matcher_annotation()),
 				_a_pc.indent(
-					_a_pc.message_str(get<1>(_a_element.matcher_info()))
+					_a_pc.message_str(_a_element.matcher_info().annotation())
 				)
 			};
 		default:

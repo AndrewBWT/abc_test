@@ -53,15 +53,61 @@ public:
 private:
     // bool        _m_ran    = false;
     bool        _m_passed = false;
-    std::string _m_str;
+    std::string _m_str = "false";
 };
 
-using matcher_res_info_t = std::tuple<
-    matcher_result_t,
-    std::optional<std::string>,
-    matcher_source_map_t>;
-using matcher_res_info_with_caller_t = std::pair<std::optional<ds::single_source_t>, matcher_res_info_t>;
-using matcher_res_infos_t = std::vector<matcher_res_info_with_caller_t>;
+class matcher_result_with_annotation_and_source_info_t
+{
+public:
+    __no_constexpr_imp matcher_result_with_annotation_and_source_info_t() noexcept
+        : matcher_result_with_annotation_and_source_info_t(
+            matcher_result_t(),
+            std::optional<ds::single_source_t>(),
+            std::optional<std::string>(),
+            matcher_source_map_t())
+    {}
+    __no_constexpr_imp matcher_result_with_annotation_and_source_info_t(
+        const matcher_result_t& _a_matcher_result,
+        const std::optional<ds::single_source_t>& _a_source = std::optional<ds::single_source_t>{},
+        const std::optional<std::string>& _a_annotation = std::optional<std::string>{},
+        const matcher_source_map_t& _a_matcher_source_map = matcher_source_map_t()
+    ) noexcept
+        : _m_matcher_result(_a_matcher_result)
+        , _m_annotation(_a_annotation)
+        , _m_source(_a_source)
+        , _m_source_map(_a_matcher_source_map)
+    {
+
+    }
+    __constexpr_imp const matcher_result_t& matcher_result() const noexcept
+    {
+        return _m_matcher_result;
+    }
+    __constexpr_imp const std::optional<std::string>& annotation() const noexcept
+    {
+        return _m_annotation;
+    }
+    __constexpr_imp const matcher_source_map_t& source_map() const noexcept
+    {
+        return _m_source_map;
+    }
+    __constexpr_imp const std::optional<ds::single_source_t>& source() const noexcept
+    {
+        return _m_source;
+    }
+private:
+    matcher_result_t _m_matcher_result;
+    std::optional<std::string> _m_annotation;
+    matcher_source_map_t _m_source_map;
+    std::optional<ds::single_source_t> _m_source;
+};
+
+//using matcher_result_with_annotation_and_source_info_t = std::tuple<
+ //   matcher_result_t,
+  //  std::optional<std::string>,
+   // matcher_source_map_t>;
+//using matcher_res_info_with_caller_t = std::pair<std::optional<ds::single_source_t>, matcher_result_with_annotation_and_source_info_t>;
+using matcher_res_infos_t = std::vector<matcher_result_with_annotation_and_source_info_t>;
 /*class assertion_wrapper_pc_t
 {
 

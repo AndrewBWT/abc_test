@@ -276,6 +276,14 @@ test2 += _BLOCK_CHECK(_EXPR(3==4));
 _END_BBA_CHECK(test2);
 ```
 
+## Default BBAs
+
+The reader may question what happens if we were to evaluate any of the BBAs when no matcher has been assigned to them. In this subsection we explicitly explain what happens in these edge cases.
+
+If an SA-BBA which has not had an element assigned to it is evaluated, then it will register as a failed assertion. Internally, all SA-BBA entities have matchers which are initialised using `bool_matcher(false)`, but with no source information associated to them.
+
+If an MA-BBA has no matchers assigned to it and is then evaluated, it will register as a passed assertion. Internally, our criteria for an MA-BBA entity passing is that *all* of its elements must pass - as there are no elements, it passes automatically.
+
 ## Source-Modification BBA-Based Macros
 
 There are a set of BBA-related macros included with `abc_test` which can be used to provide custom source code information for a BBA. In this subsection we will introduce them. However, before we do so, we will illustrate the motivation behind their inclusion in `abc_test`. Consider the following example.
@@ -302,12 +310,13 @@ Below is some possible output this BBA could produce. This output was created us
          ..\docs\assertion_examples.hpp:3
        Source code representation:
          "_END_BBA_CHECK(test1)"
-     Matcher failed with output:
-       "false"
-     Source code representation:
-       "_BLOCK_CHECK(bool_matcher(false))"
-     Source location:
-       ..\docs\assertion_examples.hpp:2
+     Matcher's data
+       Matcher failed with output:
+         "false"
+       Source code representation:
+         "_BLOCK_CHECK(abc::bool_matcher(false))"
+       Source location:
+         ..\docs\assertion_examples.hpp:2
 ```
 
 Let us now see what would happen if we create our own macros which internally use a BBA, as shown below.
@@ -343,12 +352,13 @@ Then the following output could be produced.
          ..\docs\assertion_examples.hpp:2
        Source code representation:
          "_END_BBA_CHECK(test1)"
-     Matcher failed with output:
-       "false"
-     Source code representation:
-       "_BLOCK_CHECK(abc::bool_matcher(false))"
-     Source location:
-       ..\docs\assertion_examples.hpp:1
+     Matcher's data
+       Matcher failed with output:
+         "false"
+       Source code representation:
+         "_BLOCK_CHECK(abc::bool_matcher(false))"
+       Source location:
+         ..\docs\assertion_examples.hpp:1
 ```
 
 When reading this output, the user may be confused, as the source code representations and locations do not match the original source code's. To resolve these issues, `abc_test` includes a set of macros which allow the user to change the source code representation's associated with a BBA.
@@ -403,19 +413,20 @@ The output from using these macros with the argument `test1` is as follows.
 ```
  1)  Single-element block-based assertion failed.
      Assertion description:
-       "test1 description"
+       "test2 description"
      Source block begin:
        Source location:
          ..\docs\assertion_examples.hpp:1
        Source code representation:
-         "__USER_DEFINED_BBA_1_BEGIN(test1)"
+         "__USER_DEFINED_BBA_1_BEGIN(test2)"
      Source block end:
        Source location:
          ..\docs\assertion_examples.hpp:2
        Source code representation:
-         "__USER_DEFINED_BBA_1_END(test1)"
-     Matcher failed with output:
-       "false"
+         "__USER_DEFINED_BBA_1_END(test2)"
+     Matcher's data
+       Matcher failed with output:
+         "false"
 ```
 
 This output now directly mirrors the code the user wrote. Below we show a macro which contains both begin and end BBA macros.
@@ -441,15 +452,16 @@ __USER_DEFINED_BBA_2(test1);
 Then the following is an example of the output which could be produced. Note that the internal `abc` test framework is aware that there is no end source for this assertion.
 
 ```cpp
- 1)  Single-element block-based assertion failed.
+Single-element block-based assertion failed.
      Assertion description:
-       "test1 description"
+       "test3 description"
      Source location:
        ..\docs\assertion_examples.hpp:1
      Source code representation:
-       "__USER_DEFINED_BBA_2(test1)"
-     Matcher failed with output:
-       "false"
+       "__USER_DEFINED_BBA_2(test3)"
+     Matcher's data
+       Matcher failed with output:
+         "false"
 ```
 
 These examples illustrate the purpose of these macros; they give the user fine-grained control over the output generated from user-created macros. The macros introduced in this subsection were used to create the included [exception handling macros](#exception-handling-using-assertions), whose documentation can be found in the next section.
@@ -502,12 +514,12 @@ _TEST_CASE(
 }
 ```
 
-The output from this code is shown below.
+The output from this code is shown below. Note that we changed the configuration of `text_test_reporter` so that the passed test data is shown in the output.
 
 
 ```
- 1)  Block-based assertion passed.
-     Test description:
+ 1)  Single-element block-based assertion passed.
+     Assertion description:
        "Testing std::stoi function using "1""
      Source block begin:
        Source location:
@@ -519,16 +531,17 @@ The output from this code is shown below.
          ..\docs\assertion_examples.hpp:18
        Source code representation:
          "_END_BBA_CHECK(exception_test)"
-     Matcher's annotation:
-       "Checking i > 0"
-     Matcher passed with output:
-       "1 > 0"
-     Source code representation:
-       "_BLOCK_CHECK(annotate("Checking i > 0", _EXPR(i > 0)))"
-     Source location:
-       ..\docs\assertion_examples.hpp:4
- 2)  Block-based assertion failed.
-     Test description:
+     Matcher's data
+       Matcher's annotation:
+         "Checking i > 0"
+       Matcher passed with output:
+         "1 > 0"
+       Source code representation:
+         "_BLOCK_CHECK(annotate("Checking i > 0", _EXPR(i > 0)))"
+       Source location:
+         ..\docs\assertion_examples.hpp:4
+ 2)  Single-element block-based assertion failed.
+     Assertion description:
        "Testing std::stoi function using "-1""
      Source block begin:
        Source location:
@@ -540,16 +553,17 @@ The output from this code is shown below.
          ..\docs\assertion_examples.hpp:18
        Source code representation:
          "_END_BBA_CHECK(exception_test)"
-     Matcher's annotation:
-       "Checking i > 0"
-     Matcher failed with output:
-       "-1 <= 0"
-     Source code representation:
-       "_BLOCK_CHECK(annotate("Checking i > 0", _EXPR(i > 0)))"
-     Source location:
-       ..\docs\assertion_examples.hpp:4
- 3)  Block-based assertion failed.
-     Test description:
+     Matcher's data
+       Matcher's annotation:
+         "Checking i > 0"
+       Matcher failed with output:
+         "-1 <= 0"
+       Source code representation:
+         "_BLOCK_CHECK(annotate("Checking i > 0", _EXPR(i > 0)))"
+       Source location:
+         ..\docs\assertion_examples.hpp:4
+ 3)  Single-element block-based assertion failed.
+     Assertion description:
        "Testing std::stoi function using "hello""
      Source block begin:
        Source location:
@@ -561,16 +575,17 @@ The output from this code is shown below.
          ..\docs\assertion_examples.hpp:18
        Source code representation:
          "_END_BBA_CHECK(exception_test)"
-     Matcher's annotation:
-       "Invalid argument exception thrown"
-     Matcher failed with output:
-       "false"
-     Source code representation:
-       "_BLOCK_CHECK(annotate("Invalid argument exception thrown", bool_matcher(false)))"
-     Source location:
-       ..\docs\assertion_examples.hpp:8
- 4)  Block-based assertion failed.
-     Test description:
+     Matcher's data
+       Matcher's annotation:
+         "Invalid argument exception thrown"
+       Matcher failed with output:
+         "false"
+       Source code representation:
+         "_BLOCK_CHECK(annotate("Invalid argument exception thrown", bool_matcher(false)))"
+       Source location:
+         ..\docs\assertion_examples.hpp:8
+ 4)  Single-element block-based assertion failed.
+     Assertion description:
        "Testing std::stoi function using "9999999999999999999999999999999999999""
      Source block begin:
        Source location:
@@ -582,45 +597,184 @@ The output from this code is shown below.
          ..\docs\assertion_examples.hpp:18
        Source code representation:
          "_END_BBA_CHECK(exception_test)"
-     Matcher's annotation:
-       "Integer out of range exception"
-     Matcher failed with output:
-       "false"
-     Source code representation:
-       "_BLOCK_CHECK(annotate("Integer out of range exception", bool_matcher(false)))"
-     Source location:
-       ..\docs\assertion_examples.hpp:14
+     Matcher's data
+       Matcher's annotation:
+         "Integer out of range exception"
+       Matcher failed with output:
+         "false"
+       Source code representation:
+         "_BLOCK_CHECK(annotate("Integer out of range exception", bool_matcher(false)))"
+       Source location:
+         ..\docs\assertion_examples.hpp:14
 ```
-
-
 
 Another motivational example is shown below. In this code, we are testing our own midpoint function (represented by `f`) against `std::midpoint`. A for-loop is used to iterate over testing values, and the results are collected in a BBA.
 
 ```cpp
-function<int(int,int)> f = [](int x, int y) {
-    return (x+y) / 2;
-}
-_BEGIN_CHECK_MULTI_ELEMENT_BBA(mid_point_test, "Testing mid point function")
-for (auto&& [integer1, integer2] : 
-    {
-        {0,1},
-        {100,200},
-        {500,200},
-        {700,1234},
-        {9223372036854775807 ,1}}
+_TEST_CASE(
+    abc::test_case_t({.name = "Testing midpoint"})
+)
 {
-    mid_point_test += _BLOCK_CHECK(_EXPR(f(integer1,integer2) == std::midpoint(integer1,integer2)));
+    using namespace std;
+    function<int(int, int)> f = [](int x, int y)
+    {
+        return (x + y) / 2;
+    };
+    _BEGIN_MULTI_ELEMENT_BBA(mid_point_test, "Testing mid point function");
+    for (auto&& [integer1, integer2] : initializer_list<pair<int, int>>{
+             {0,                         1    },
+             {100,                       200  },
+             {500,                       200  },
+             {700,                       1'234},
+             {2147483647, 1141481537    }
+    })
+    {
+        mid_point_test += _BLOCK_CHECK(
+            _EXPR(f(integer1, integer2) == std::midpoint(integer1, integer2))
+        );
+    }
+    _END_BBA_CHECK(mid_point_test);
 }
-_END_BBA(mid_point_test);
 ```
 
-In [this document about data generators]() we will show the reader many examples which use BBAs in this manner.
+The output from this test case is shown below.
+
+```
+ 1)  Multi-element block-based assertion failed. 4/5 matchers passed.
+     Assertion description:
+       "Testing mid point function"
+     Source block begin:
+       Source location:
+         ..\docs\assertion_examples.hpp:10
+       Source code representation:
+         "_BEGIN_MULTI_ELEMENT_BBA(mid_point_test)"
+     Source block end:
+       Source location:
+         ..\docs\assertion_examples.hpp:23
+       Source code representation:
+         "_END_BBA_CHECK(mid_point_test)"
+     Matchers data (grouped by source):
+       The following 5 matchers have the same source data, which is as follows:
+         Source code representation:
+           "_BLOCK_CHECK(_EXPR(f(integer1, integer2) == std::midpoint(integer1, integer2)))"
+         Source location:
+           ..\docs\assertion_examples.hpp:19
+       The data of the 5 matchers:
+         1) Matcher passed with output:
+              "0 == 0"
+         2) Matcher passed with output:
+              "150 == 150"
+         3) Matcher passed with output:
+              "350 == 350"
+         4) Matcher passed with output:
+              "967 == 967"
+         5) Matcher failed with output:
+              "-503001056 != 1644482592"
+```
+
+Our final example, shown below, takes the first example shown in this subsection and re-writes it using a MA-BBA.
+
+```cpp
+void
+test2(
+    const std::string str,
+    abc::multi_element_test_block_t& _a_metb
+)
+{
+    using namespace abc;
+    try
+    {
+        int i = std::stoi(str);
+        _a_metb += _BLOCK_CHECK(annotate("Checking i > 0", _EXPR(i > 0)));
+    }
+    catch (std::invalid_argument const& ex)
+    {
+        _a_metb += _BLOCK_CHECK(
+            annotate("Invalid argument exception thrown", bool_matcher(false))
+        );
+    }
+    catch (std::out_of_range const& ex)
+    {
+        _a_metb += _BLOCK_CHECK(
+            annotate("Integer out of range exception", bool_matcher(false))
+        );
+    }
+}
+
+_TEST_CASE(
+    abc::test_case_t({ .name = "Testing stoi again" })
+)
+{
+    using namespace std;
+    _BEGIN_MULTI_ELEMENT_BBA(stoi_test, "Testing std::stoi function again");
+    for (auto&& str : initializer_list<string>{
+             "1","-1","hello","999999999999999999999999999999999999999999999"
+        })
+    {
+        test2(str, stoi_test);
+    }
+    _END_BBA_CHECK(stoi_test);
+}
+```
+
+Which produces the following output. The reader should note that this output is much clearer than the initial example's output.
+
+```
+ 1)  Multi-element block-based assertion failed. 1/4 matchers passed.
+     Assertion description:
+       "Testing std::stoi function again"
+     Source block begin:
+       Source location:
+         ..\docs\assertion_examples.hpp:32
+       Source code representation:
+         "_BEGIN_MULTI_ELEMENT_BBA(stoi_test)"
+     Source block end:
+       Source location:
+         ..\docs\assertion_examples.hpp:39
+       Source code representation:
+         "_END_BBA_CHECK(stoi_test)"
+     Matchers data (grouped by source):
+       The following 2 matchers have the same source data, which is as follows:
+         Source code representation:
+           "_BLOCK_CHECK(annotate("Checking i > 0", _EXPR(i > 0)))"
+         Source location:
+           ..\docs\assertion_examples.hpp:11
+       The data of the 2 matchers:
+         1) Matcher's annotation:
+              "Checking i > 0"
+            Matcher passed with output:
+              "1 > 0"
+         2) Matcher's annotation:
+              "Checking i > 0"
+            Matcher failed with output:
+              "-1 <= 0"
+     3) Matcher's annotation:
+          "Invalid argument exception thrown"
+        Matcher failed with output:
+          "false"
+        Source code representation:
+          "_BLOCK_CHECK(annotate("Invalid argument exception thrown", bool_matcher(false)))"
+        Source location:
+          ..\docs\assertion_examples.hpp:15
+     4) Matcher's annotation:
+          "Integer out of range exception"
+        Matcher failed with output:
+          "false"
+        Source code representation:
+          "_BLOCK_CHECK(annotate("Integer out of range exception", bool_matcher(false)))"
+        Source location:
+          ..\docs\assertion_examples.hpp:21
+```
+
+The reader may question which type of BBA to use when wanting to test a function such as that shown above. For a single data value, we would suggest using an SA-BBA. However if testing a set of data values, we would use an MA-BBA instead.
 
 # Exception Handling Using Assertions
 
-`abc_test` is designed in such a manner that there is no need to have specialised functions or macros for testing code which can throw an exception. Instead, using the BBAs introduced in the previous section, the user should be able to write their own code to do so.
+`abc_test` does not include specialised functions or macros for testing code which can throw an exception. Instead, by using a BBA, the user should be able to write their own tests which check code for exceptions.
 
-However, we recognise that there are several commonly seen patterns found when testing for exceptions. To that end, we have included a set of macros which perform these common tests. They have all been created using BBAs. 
+However, we recognise that when writing tests for exception-throwing code, there are several patterns which continually re-emerge. So that the user does not have to re-engineer a solution each time one of these patterns is encountered, we have included a small set of macros for such use-cases. In this section we provide the documentation for these macros.
+
+Each macro has been created using the BBAs included with `abc_test`, and could be re-engineered by the user if required.
 
 The user must use the following include directive to have access to these macros.
 
@@ -628,49 +782,65 @@ The user must use the following include directive to have access to these macros
 #include "abc_test/included_instances.hpp"
 ```
 
-In the set of exception-handling macros included with `abc_test`, they can be grouped together in three's; a check-based begin macro, a termination-based begin macro, and a single end macro.
+The macros can be partitioned into groups according to their use case. Each partition contains three macros; a begin macro, a check-based end macro and a termination-based end macro. Each begin macro requires a single argument, `name`, which is the name of the BBA to be created by the macro. Each end macro's first argument is `name`, the name of this previously created BBA.
 
-Below we show all of the exception-handling macros included with `abc_test`. 
+In the table below we provide the reader with documentation for each of the macros. They are separated into the previously mentioned groups of three. For each group we list the begin and end macros, detail the additional arguments the group's end macros require, and provide an overview of the functionality of the macros within that group.
 
-Every begin macro takes a single argument; a `name`, which indicates the name of the internal object which holds the logic for the test.
-
-| Check-based Begin Macro, Termination-based Begin Macro & End Macro | End Macro Arguments | Description | 
+| Begin Macro, Check-based End Macro & Termination-based End Macro | Additional End Macro Arguments | Description | 
 |--|--|--|
-`_BEGIN_CHECK_NO_THROW`, `_BEGIN_REQUIRE_NO_THROW`, `_END_NO_THROW` | `name`. The name of the object which holds the logic for the test. | These macros are used to check that code does not throw an exception. If it does, then the macros either fail or fail and terminate. Otherwise they pass.
-`_BEGIN_CHECK_THROW_ANY`, `_BEGIN_REQUIRE_THROW_ANY`, `_END_THROW_ANY` | `name`. The name of the object which holds the logic for the test. | These macros are used to check that the code does throw an exception. The exception does not need to be derived from `std::exception`. If no exception is thrown then the macros either fail or fail and terminate. Otherwise they pass. |
-`_BEGIN_CHECK_EXCEPTION_TYPE`,  `_BEGIN_REQUIRE_EXCEPTION_TYPE`, `_END_EXCEPTION_TYPE` | `name`. The name of the object which holds the logic for the test. `exception_type` The type of exception to check for. | These macros are used to check that the code throws an exception of a specific type. The exception does not need to be derived from `std::exception`. If no exception is thrown, or the exception thrown is not of the correct type (or derived from the correct type) then the macros either fail or fail and terminate. Otherwise they pass. |
-`_BEGIN_CHECK_EXCEPTION_MSG`, `_BEGIN_REQUIRE_EXCEPTION_MSG`, `_END_EXCEPTION_MSG` | `name`. The name of the object which holds the logic for the test. `str` The `std::string` to check the exception's `what()` function against. | These macros are used to check that the code throws an exception which has a `what()` message that contains a specific `std::string`. The exception must be derived from `std::exception`. If no exception is thrown, or the exception's `what()` message does not contain the argument string, then the macros either fail or fail and terminate. Otherwise they pass. |
-`_BEGIN_CHECK_EXCEPTION_TYPE_AND_MSG`, `_BEGIN_REQUIRE_EXCEPTION_TYPE_AND_MSG`, `_END_EXCEPTION_TYPE_AND_MSG` | `name`. The name of the object which holds the logic for the test. `exception_type` The type of exception to check for. `str` The `std::string` to check the exception's `what()` function against. | These macros are used to check that the code throws an exception which has a `what()` message that contains a specific `std::string`. The exception must be derived from `std::exception`. If no exception is thrown, or the exception's `what()` message does not contain the argument string, then the macros either fail or fail and terminate. Otherwise they pass. |
+`_BEGIN_NO_THROW`,  `_END_CHECK_NO_THROW`, `_END_REQUIRE_NO_THROW` | None. | These macros are used to check that code does not throw an exception. If it does, then the macro either fails or fails and terminates (depending on which end macro is used). Otherwise the macro passes.
+`_BEGIN_THROW_ANY`, `_BEGIN_REQUIRE_THROW_ANY`, `_END_THROW_ANY` | None. | These macros are used to check that some code throws an exception. The exception does not need to be derived from `std::exception`. If no exception is thrown then the macro either fails or fails and terminates (depending on which end macro is used). Otherwise the macro passes. |
+`_BEGIN_EXCEPTION_TYPE`,  `_END_CHECK_EXCEPTION_TYPE`, `_END_REQUIRE_EXCEPTION_TYPE` | `T exception_type` | These macros are used to check that some code throws an exception of type `T`. `T` does not need to be derived from `std::exception`. If no exception is thrown, or the exception thrown is not of type `T` (or a subclass of `T`) then the macro either fails or fails and terminates (depending on which end macro is used). Otherwise the macro passes. |
+`_BEGIN_EXCEPTION_MSG`, `_END_CHECK_EXCEPTION_MSG`, `_END_REQUIRE_EXCEPTION_MSG` | `std::string_view str`. | These macros are used to check that some code throws an exception which has a `what()` message that contains `str`. The exception type must be derived from `std::exception`. If no exception is thrown, or the exception's `what()` message does not contain `str`, then the macro either fails or fails and terminates (depending on which end macro is used). Otherwise the macro passes. |
+`_BEGIN_EXCEPTION_TYPE_AND_MSG`, `_END_CHECK_EXCEPTION_TYPE_AND_MSG`, `_END_REQUIRE_EXCEPTION_TYPE_AND_MSG` | `T exception_type`, `str std::string_view`. | These macros are used to check that some code throws an exception of type `T` which has a `what()` message that contains `str`. `T` must be derived from `std::exception`. If no exception is thrown, the exception thrown is not of type `T` (or a subclass of `T`), or the exception's `what()` message does not contain `str`, then the macro either fails or fails and terminates (depending on which end macro is used). Otherwise the macro passes. |
 
 
 
-Below we show some example uses of each of the sets of macros shown above.
+Below we show some example code using each of the macros shown above.
 
 
 ```cpp
-//Checks that std::stoi throws no exception.
-_BEGIN_CHECK_NO_THROW(t1)
+//Checks that std::stoi throws no exception. This test will pass.
+_BEGIN_NO_THROW(t1)
 int i = stoi("3");
-_END_NO_THROW(t1);
+_END_REQUIRE_NO_THROW(t1);
 
-//Checks that stoi does throw an exception
-_BEGIN_CHECK_THROW_ANY(t2)
-int i = stoi("hi");
-_END_THROW_ANY(t2);
+//Same check as above. This test will fail. Note that the name of the internal BBA is re-used.
+_BEGIN_NO_THROW(t1)
+int i = stoi("up");
+_END_CHECK_NO_THROW(t1);
 
-_BEGIN_CHECK_EXCEPTION_TYPE(t3, std::invalid_argument)
-int i = stoi("hi");
-_END_EXCEPTION_TYPE(t3);
+//This test will pass.
+_BEGIN_THROW_ANY(t1)
+int i = stoi("up");
+_END_CHECK_THROW_ANY(t1);
 
-//Checks the what() function return value for a string. Note it is only that it contains the string, not matches the string.
-_BEGIN_CHECK_EXCEPTION_MSG(t4, std::invalid_argument, "sto")
+//This test will pass.
+_BEGIN_EXCEPTION_TYPE(t1)
 int i = stoi("hi");
-_END_EXCEPTION_MSG(t4);
+_END_CHECK_EXCEPTION_TYPE(t1, std::invalid_argument);
 
-//Checks the what() function return value for a string. Note it is only that it contains the string, not matches the string.
-_BEGIN_CHECK_EXCEPTION_TYPE_AND_MSG(t5, "sto")
+//As will this. The exception returned is derived from logic error.
+_BEGIN_EXCEPTION_TYPE(t1)
 int i = stoi("hi");
-_END_EXCEPTION_TYPE_AND_MSG(t5);
+_END_CHECK_EXCEPTION_TYPE(t1,std::logic_error);
+
+auto f = [](){throw int(1);};
+
+//This will also pass. The thrown type does not need to be derived from exception.
+_BEGIN_EXCEPTION_TYPE(t1)
+f();
+_END_CHECK_EXCEPTION_TYPE(t1,int);
+
+//This will pass
+_BEGIN_EXCEPTION_MSG(t1);
+int i = stoi("hi");
+_END_CHECK_EXCEPTION_MSG(t1,"invalid");
+
+//This will also pass
+_BEGIN_EXCEPTION_TYPE_AND_MSG(t1);
+int i = stoi("hi");
+_END_CHECK_EXCEPTION_TYPE_AND_MSG(t1,std::logic_error, "invalid");
 ```
 
 

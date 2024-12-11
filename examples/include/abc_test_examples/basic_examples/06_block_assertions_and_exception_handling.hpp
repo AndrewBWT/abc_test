@@ -87,38 +87,73 @@ _TEST_CASE(
 
 namespace test
 {
-    void
-        test(
-            const std::string str
-        )
+void
+    test(
+        const std::string str
+    )
+{
+    using namespace abc;
+    _BEGIN_SINGLE_ELEMENT_BBA(
+        exception_test,
+        fmt::format("Testing std::stoi function using \"{0}\"", str)
+    );
+    try
     {
-        using namespace abc;
-        _BEGIN_SINGLE_ELEMENT_BBA(
-            exception_test,
-            fmt::format("Testing std::stoi function using \"{0}\"", str)
+        int i          = std::stoi(str);
+        exception_test = _BLOCK_CHECK(annotate("Checking i > 0", _EXPR(i > 0)));
+    }
+    catch (std::invalid_argument const & ex)
+    {
+        exception_test = _BLOCK_CHECK(
+            annotate("Invalid argument exception thrown", bool_matcher(false))
         );
-        try
-        {
-            int i = std::stoi(str);
-            exception_test = _BLOCK_CHECK(annotate("Checking i > 0", _EXPR(i > 0)));
-        }
-        catch (std::invalid_argument const& ex)
-        {
-            exception_test = _BLOCK_CHECK(
-                annotate("Invalid argument exception thrown", bool_matcher(false))
-            );
-        }
-        catch (std::out_of_range const& ex)
-        {
-            exception_test = _BLOCK_CHECK(
-                annotate("Integer out of range exception", bool_matcher(false))
-            );
-        }
-        _END_BBA_CHECK(exception_test);
+    }
+    catch (std::out_of_range const & ex)
+    {
+        exception_test = _BLOCK_CHECK(
+            annotate("Integer out of range exception", bool_matcher(false))
+        );
+    }
+    _END_BBA_CHECK(exception_test);
+}
+void
+test2(
+    const std::string str,
+    abc::multi_element_test_block_t& _a_metb
+)
+{
+    using namespace abc;
+    try
+    {
+        int i = std::stoi(str);
+        _a_metb += _BLOCK_CHECK(annotate("Checking i > 0", _EXPR(i > 0)));
+    }
+    catch (std::invalid_argument const& ex)
+    {
+        _a_metb += _BLOCK_CHECK(
+            annotate("Invalid argument exception thrown", bool_matcher(false))
+        );
+    }
+    catch (std::out_of_range const& ex)
+    {
+        _a_metb += _BLOCK_CHECK(
+            annotate("Integer out of range exception", bool_matcher(false))
+        );
     }
 }
+} // namespace test
 
 // This serves as the testing code.
+_TEST_CASE(
+    abc::test_case_t({ .name = "Empty BBAs" })
+)
+{
+    _BEGIN_SINGLE_ELEMENT_BBA(test1, "An empty SE-BBA");
+    _END_BBA_CHECK(test1);
+
+    _BEGIN_MULTI_ELEMENT_BBA(test2, "An empty ME-BBA");
+    _END_BBA_CHECK(test2);
+}
 _TEST_CASE(
     abc::test_case_t({.name = "Testing stoi"})
 )
@@ -128,7 +163,20 @@ _TEST_CASE(
     test::test("hello");
     test::test("9999999999999999999999999999999999999");
 }
-
+_TEST_CASE(
+    abc::test_case_t({ .name = "Testing stoi again" })
+)
+{
+    using namespace std;
+    _BEGIN_MULTI_ELEMENT_BBA(stoi_test, "Testing mid point function");
+    for (auto&& str : initializer_list<string>{
+             "1","-1","hello","999999999999999999999999999999999999999999999"
+        })
+    {
+        test::test2(str, stoi_test);
+    }
+    _END_BBA_CHECK(stoi_test);
+}
 _TEST_CASE(
     abc::test_case_t({.name = "Testing midpoint"})
 )
@@ -140,31 +188,70 @@ _TEST_CASE(
     };
     _BEGIN_MULTI_ELEMENT_BBA(mid_point_test, "Testing mid point function");
     for (auto&& [integer1, integer2] : initializer_list<pair<int, int>>{
-             {0,                         1    },
-             {100,                       200  },
-             {500,                       200  },
-             {700,                       1'234},
-             {2147483647, 1141481537    }
+             {0,             1            },
+             {100,           200          },
+             {500,           200          },
+             {700,           1'234        },
+             {2'147'483'647, 1'141'481'537}
     })
     {
         mid_point_test += _BLOCK_CHECK(
             _EXPR(f(integer1, integer2) == std::midpoint(integer1, integer2))
         );
     }
-    mid_point_test += _BLOCK_CHECK(_EXPR(1 == 2));
-    for (auto&& [integer1, integer2] : initializer_list<pair<int, int>>{
-         {0,                         1    },
-         {100,                       200  },
-         {500,                       200  },
-         {700,                       1'234},
-         {2147483647, 1141481537    }
-        })
-    {
-        mid_point_test += _BLOCK_CHECK(
-            _EXPR(f(integer1, integer2) == std::midpoint(integer1, integer2))
-        );
-    }
     _END_BBA_CHECK(mid_point_test);
+}
+
+_TEST_CASE(
+    abc::test_case_t(
+        { .name = "file_06_example_03",
+         .description = "Included macros using block assertions",
+         .path = "examples::basic_examples::06_manual_block_assertion" }
+    )
+)
+{
+    using namespace abc;
+    using namespace std;
+    _BEGIN_NO_THROW(t1)
+        int i = stoi("3");
+    _END_REQUIRE_NO_THROW(t1);
+
+    //Same check as above. This test will fail. Note that the name of the internal BBA is re-used.
+    _BEGIN_NO_THROW(t1)
+        int i = stoi("up");
+    _END_CHECK_NO_THROW(t1);
+
+    //This test will pass.
+    _BEGIN_THROW_ANY(t1)
+        int i = stoi("up");
+    _END_CHECK_THROW_ANY(t1);
+
+    //This test will pass.
+    _BEGIN_EXCEPTION_TYPE(t1)
+        int i = stoi("hi");
+    _END_CHECK_EXCEPTION_TYPE(t1, std::invalid_argument);
+
+    //As will this. The exception returned is derived from logic error.
+    _BEGIN_EXCEPTION_TYPE(t1)
+        int i = stoi("hi");
+    _END_CHECK_EXCEPTION_TYPE(t1, std::logic_error);
+
+    auto f = []() {throw int(1); };
+
+    //This will also pass. The thrown type does not need to be derived from exception.
+    _BEGIN_EXCEPTION_TYPE(t1)
+        f();
+    _END_CHECK_EXCEPTION_TYPE(t1, int);
+
+    //This will pass
+    _BEGIN_EXCEPTION_MSG(t1);
+    int i = stoi("hi");
+    _END_CHECK_EXCEPTION_MSG(t1,"invalid");
+
+    //This will also pass
+    _BEGIN_EXCEPTION_TYPE_AND_MSG(t1);
+    int i = stoi("hi");
+    _END_CHECK_EXCEPTION_TYPE_AND_MSG(t1,std::logic_error, "invalid");
 }
 
 #if 0

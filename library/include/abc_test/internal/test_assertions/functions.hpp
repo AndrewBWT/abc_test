@@ -259,8 +259,8 @@ create_assertion_block(
     ));
     _a_test_block.set_processed();
     assertion_ptr_t<false, T>     _l_gur;
-    bool                          _l_passed{ get<0>(_a_test_block.get_matcher().second).passed()};
-    matcher_res_info_with_caller_t _l_mtr{_a_test_block.get_matcher()};
+    bool                          _l_passed{_a_test_block.get_matcher().matcher_result().passed()};
+    matcher_result_with_annotation_and_source_info_t _l_mtr{_a_test_block.get_matcher()};
     _l_gur    = make_unique<matcher_based_assertion_block_t<T>>(
         _l_passed,
         _a_test_block.source(),
@@ -285,8 +285,8 @@ create_assertion_block(
     using namespace _ABC_NS_REPORTS;
     using namespace _ABC_NS_MATCHER;
     assertion_ptr_t<false, T>     _l_gur;
-    bool                          _l_passed{ get<0>(_a_test_block.get_matcher().second).passed() };
-    matcher_res_info_with_caller_t _l_mtr{ _a_test_block.get_matcher() };
+    bool                          _l_passed{ _a_test_block.get_matcher().matcher_result().passed()};
+    matcher_result_with_annotation_and_source_info_t _l_mtr{ _a_test_block.get_matcher() };
     _l_gur = make_unique<matcher_based_assertion_block_t<T>>(
         _l_passed,
         _a_test_block.source(),
@@ -318,9 +318,9 @@ create_assertion_block(
     _a_test_block.set_processed();
     assertion_ptr_t<false, T>     _l_gur;
     bool                          _l_passed{ true };
-    for (auto& _l_ki : _a_test_block.get_matcher())
+    for (const matcher_result_with_annotation_and_source_info_t& _l_ki : _a_test_block.get_matcher())
     {
-        if (not get<0>(_l_ki.second).passed())
+        if (not _l_ki.matcher_result().passed())
         {
             _l_passed = false;
         }

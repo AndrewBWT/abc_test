@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion_block.hpp"
-#include "abc_test/internal/test_reports/matcher_based_assertion_block.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/assertion_block_matcher_data.hpp"
+#include "abc_test/internal/test_reports/matcher_based_assertion_block.hpp"
 _BEGIN_ABC_REPORTERS_NS
 
 template <typename Assertion_Status>
@@ -48,9 +48,8 @@ __constexpr_imp bool
         ) const
 {
     using namespace std;
-    if (auto _l_ptr{
-            get_if<enum_single_element_assertion_block_fields_t>(&_a_fid)
-        };
+    if (auto _l_ptr{get_if<enum_single_element_assertion_block_fields_t>(&_a_fid
+        )};
         _l_ptr != nullptr)
     {
         using enum enum_single_element_assertion_block_fields_t;
@@ -85,21 +84,25 @@ __constexpr_imp std::vector<std::string>
     ) const
 {
     using namespace std;
-    if (auto _l_ptr{
-            get_if<enum_single_element_assertion_block_fields_t>(&_a_fid)
-        };
+    if (auto _l_ptr{get_if<enum_single_element_assertion_block_fields_t>(&_a_fid
+        )};
         _l_ptr != nullptr)
     {
         using enum enum_single_element_assertion_block_fields_t;
         switch (*_l_ptr)
         {
         case SHOW_ASSERTION_DATA:
-            return get_all_data(
+        {
+            vector<string> _l_rv;
+            _l_rv.push_back("Matcher's data:");
+            _l_rv.append_range(get_all_data(
                 _a_pc.matcher_assertion_single_block_assertion_list_fields(),
                 _a_element.get_matcher(),
                 _a_pc,
-                assertion_block_matcher_data_list_formatter_t()
-            );
+                assertion_block_matcher_data_list_formatter_t(1)
+            ));
+            return _l_rv;
+        }
         default:
             throw errors::unaccounted_for_enum_exception(*_l_ptr);
         }
@@ -126,8 +129,8 @@ __constexpr_imp std::string
         ) const
 {
     return construct_str_representation(
-        _a_element,
-        "Single-element block-based assertion"
+        _a_element, "Single-element block-based assertion"
     );
 }
+
 _END_ABC_REPORTERS_NS
