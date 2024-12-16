@@ -30,7 +30,7 @@ Status: First Draft Complete
 - [x] Discuss when tests may fail or not be added.
 
 ## Assertions
-Status: Incomplete
+Status: First Draft Complete
 - [x] Introduction
 - [x] Matchers introduction
 - [x] Single-line assertions. Annotations, adding source code.

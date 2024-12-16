@@ -15,7 +15,7 @@ All of the functionality shown in this document  requires the following include 
 #include "abc_test/core.hpp"
 ```
 
-Some functionality requires the following include directive.
+Some functionality also requires the following include directive.
 
 ```cpp
 #include "abc_test/included_instances.hpp"
@@ -25,19 +25,28 @@ We will make it clear to the reader when this is required.
 
 # What are Assertions?
 
-In `abc_test`, assertions are entities which check whether some user-defined condition is true or false. We say that if the condition is true, then the assertion passes, and if the condition is false, then the assertion fails. Below we show an example of an assertion which checks that the variable `i` is equal to `2`.
+In `abc_test` assertions are entities whose purpose is to *register* the result of some test condition(s) with the `abc_test` framework - essentially assertions act as bridges between the user-defined logic and the overarching `abc_test` framework. All assertions have a *pass status* associated with them, denoting whether the assertion registers as passing or failing with the `abc_test` framework. An assertion's pass status can be thought of as a Boolean variable; if its `true` the assertion passes, and if its `false` the assertion fails.
+
+There are three core types of assertion in `abc_test`, described as follows:
+
+- Static assertions. These entities have a pass status which is encoded at compile time and cannot be changed by any run-time value.
+- Single-line assertions. These entities have a single user-defined test condition assigned to them and use it to determine their pass status. This test condition can depend on run-time value(s).
+- Block-based assertions. These entities can have multiple user-defined test conditions assigned to them, which are used to determine the entity's pass status. These test conditions can depend on run-time value(s).
+
+In [this section](#a-brief-introduction-to-matchers) we describe explicitly what a "user-defined test condition" is. However for now, the reader can assume it is an abstract concept used to encode some logic into an assertion.
+
+Below we show an example of an assertion which registers a user-defined test condition with the `abc_test` framework. The user-defined test condition checks if the variable `i` is equal to `2`, the macro `_EXPR` creates and evaluates the test condition, and the macro `_CHECK` creates the assertion which registers the result of the test condition with the `abc_test` framework.
 
 ```cpp
 _TEST_CASE(abc::test_case_t({.name = "Assertion example"}))
 {
     int i = 2;
+    //The assertion below passes.
     _CHECK(_EXPR(i == 2));
 }
 ```
 
-In `abc_test` assertions are created using a set of macros provided to the user. This document contains the documentation for these macros. 
-
-There are two basic types of assertion in `abc_test`; *check-based* assertions and *termination-based* assertions. The only difference between the two assertion types is that termination-based assertions, if they fail, will immediately terminate the test function they are being ran in. The previous example showed a check-based assertion. Below we show an example of a termination-based assertion.
+Previously we stated that there are three core types of assertion in `abc_test`. An assertion can also be categorized to be either a *check-based* assertion or a *termination-based* assertion. The only difference between these two assertion types is that termination-based assertions will immediately terminate the test function they are being ran in if their pass status is `false`. The example above showed a macro which created a check-based assertion. Below we show an example of a macro which creates a termination-based assertion.
 
 ```cpp
 _TEST_CASE(abc::test_case_t({.name = "Terminating test"}))
@@ -52,10 +61,10 @@ _TEST_CASE(abc::test_case_t({.name = "Terminating test"}))
 }
 ```
 
-# Static Assertions
-Static assertions are the simplest assertions in `abc_test`. Unlike all other assertions in `abc_test`, they process no user-defined data; instead they only pass, fail or fail and terminate the test. 
+`abc_test` contains a set of macros that create assertions. `abc_test` is designed so that, in most cases, it is only these macros which the user will require when working with assertions. This document contains the documentation for these macros.
 
-Below we show an overview of the three basic static assertion macros.
+# Static Assertions
+Static assertions are the simplest assertion type in `abc_test`. As stated previously, their pass status is encoded at compile time. Unlike all other assertion types, they cannot be assigned a user-defined test condition. Three basic static assertions are included with `abc_test`; one which always passes, and two which always fail. Of the two failing static assertions, one is check-based and one is termination-based. Below we show an overview of the macros used to create these static assertions:
 
 | Macro | Check-based or Termination-based? | Description |
 |--|--|--| 
@@ -79,7 +88,7 @@ _TEST_CASE(abc::test_case_t({.name = "Simple assertions"}))
 }
 ```
 
-There are an additional three static assertion macros included with `abc_test`. They are identical to the three static assertion macros introduced previously, except they take a `string_view` argument. This argument acts as a message which will be displayed in the output for the assertion. The three macros are `_SUCCEED_WITH_MSG`, `_FAIL_WITH_MSG` and `_TERMINATE_WITH_MSG`. They mirror  `_SUCCEED`, `_FAIL` and `_TERMINATE` respectively in their behaviour.
+There are an additional three static assertion macros included with `abc_test`. They are identical to the three static assertion macros introduced previously, except they take an `std::string_view` variable as an argument. This argument acts as a message which will be displayed in the output for the assertion. The three macros are `_SUCCEED_WITH_MSG`, `_FAIL_WITH_MSG` and `_TERMINATE_WITH_MSG`. They mirror  `_SUCCEED`, `_FAIL` and `_TERMINATE` respectively in their behaviour.
 
 An example of their use is shown below.
 
@@ -99,16 +108,16 @@ _TEST_CASE(abc::test_case_t({.name = "Simple assertions with output"}))
 
 # A Brief Introduction To Matchers
 
-Apart from the static assertion macros described in the previous section, every other assertion macro included with `abc_test` encodes their test logic in *matchers*. In `abc_test`, a matcher is a user-defined object which performs some runtime check. It usually contains some generic logic, which allows it to be re-used across the user's test suite. For example, a matcher could be defined that checks if a `string` is empty. This matcher could then be re-used by the user whenever this check needs to be performed.
+Two of the three assertion types [described previously]() use "user-defined test conditions" to determine their pass status. We described a user-defined test condition as "an abstract concept used to encode some logic into an assertion". In reality all user-defined test conditions in `abc_test` are *matchers*. In this section we provide a brief introduction to matchers, and in [this document]() we provide the reader with a complete overview of matchers.
 
-Assertion macros use the result of a matcher to determine whether the assertion should pass or fail. 
+A matcher represents some already evaluated user-defined logic. Every matcher has a Boolean `result` member variable, which represents whether the evaluated logic passed or failed. `abc_test` contains a set of objects and functions which allow the user to encode test logic into a matcher. Matchers are assigned to assertion macros, which then register the matcher's results with the overarching `abc_test` framework.
 
-To understand the logic pertaining to the assertion macros described in the rest of this document, it is beneficial for the reader to have a basic understanding of what a matcher is.
+In `abc_test` the term "matcher" is used to refer to two specific object types; these are `matcher_t` and `annotated_matcher_t`. An object of type `annotated_matcher_t` is identical to an object of type `matcher_t`, except that it has an additional `std::string` member variable which represents a user-supplied annotation. More detail regarding `annotated_matcher_t` objects can be found [here](). Throughout the rest of this document we will show several macros which require a matcher as one of their arguments. We also provide example code to the reader. In these examples we almost exclusively use objects of type `matcher_t`. We want to be clear to the reader that whenever we state that a macro takes a matcher as an argument, that argument's type can either be `matcher_t` or `annotated_matcher_t`. 
 
-Below we show some basic examples.
+Below we show some example code which uses `matcher_t` objects. Through these examples, and the comments around them, the user should gain a basic understanding of how matchers work.
 
 ```cpp
-// matcher_t is the object which holds the matcher entity itself. All matchers have a boolean result value, denoting whether they pass or fail. A default matcher has a result value of true.
+// matcher_t is the object which holds the result of a user-defined test. A default matcher has a result value of true.
 matcher_t matcher_1;
 // The function bool_matcher creates a matcher_t whose result is the bool argument given to bool_matcher. matcher_2 has a result value of true.
 matcher_t matcher_2 = bool_matcher(true);
@@ -122,7 +131,7 @@ i = 8;
 matcher_t matcher_5 = _EXPR(i <= 7);
 ```
 
-The code above introduces two core matchers to the reader; the `bool_matcher` and the expression-encoded matcher (EEM). The `bool_matcher` has a result that is equal to its `bool` argument. The EEM has a result that is equal to the comparison-based expression used as its argument. In [this document]() we provide detailed documentation for both of these constructs.
+The code above introduces two core matchers to the reader; the Boolean matcher and the expression-encoded matcher (EEM). They are encoded using the `bool_matcher` function and the `_EXPR` macro respectively. The Boolean matcher's `result` member variable is equal to the `bool` argument used in the `bool_matcher` function to create it, while the EEM's `result` member variable is equal to the result of the comparison-based expression argument used in the `_EXPR` macro to create it. In [this document]() we provide more detail about both of these constructs.
 
 We will use these matchers throughout the rest of this document to aid the reader's understanding of the introduced concepts.
 
@@ -132,8 +141,8 @@ In the previous section we provided the reader with a brief introduction to matc
 
 | Macro | Check-based or Termination-based? | Description |
 |--|--|--| 
-| `_CHECK(matcher)` | Check. | If the result of the matcher is `true` the assertion passes. If `false` it fails. |
-| `_REQUIRE(matcher)`| Termination. | If the result of the matcher is `true` the assertion passes. If `false` it fails, and the overarching test will terminate. |
+| `_CHECK` | Check. | If the `result` value of the matcher is `true` the assertion passes. If `false` it fails. |
+| `_REQUIRE`| Termination. | If the `result` value of the matcher is `true` the assertion passes. If `false` it fails, and the overarching test will terminate. |
 
 Below we show an example test case which uses both of these SLA macros.
 
@@ -165,7 +174,7 @@ _CHECK_EXPR(expression) = _CHECK(_EXPR(expression));
 _REQUIRE_EXPR(expression) = _REQUIRE(_EXPR(expression));
 ```
 
-These macros are used as shorthand for when the user wants to write an SLA which uses an EEM in its construction. However if using them, the user is unable to access the internal `matcher_t` object.
+These macros are used as shorthand for when the user wants to write an SLA which uses an EEM in its construction. However if using them, the user is unable to access the internal matcher object.
 
 Below we show an example test case using these macros.
 
@@ -224,7 +233,7 @@ In the next subsection we show the full set of BBAME macros in `abc_test`. We al
 
 In this subsection we provide documentation for all of the core BBA-related macros available in `abc_test`. The remaining non-core macros are almost identical to those introduced  in this section, except that they allow the user to modify the internal source location and representation used by the BBAs. We discuss these in greater detail in the [next subsection]().
 
-The following table contains details about BBAME macros available in `abc_test`. Each macro takes a single argument of type `matcher_t`.
+The following table contains details about BBAME macros available in `abc_test`. Each macro takes a single matcher argument.
 
 |Macro | Check-based or Termination-based? |Description |
 |--|--|--|
@@ -386,7 +395,7 @@ Below is the set of end BBA macros that allow the user to edit the representatio
 `_END_BBA_CHECK_NO_SOURCE` |  This macro is identical to `_END_BBA_CHECK`, except it registers no source representation to the BBA. It is useful when writing a macro which contains both a begin and end BBA macro. |
 `_END_BBA_REQUIRE_NO_SOURCE` |  This macro is identical to `_END_BBA_REQUIRE`, except it registers no source representation to the BBA. It is useful when writing a macro which contains both a begin and end BBA macro. |
 
-Below we show `__USER_DEFINED_BBA_1_BEGIN` and `__USER_DEFINED_BBA_1_END` rewritten using the macros described above. The function `abc::utility::str::create_string` takes a list of `string`s and concatenates them together. 
+Below we show `__USER_DEFINED_BBA_1_BEGIN` and `__USER_DEFINED_BBA_1_END` rewritten using the macros described above. The function `abc::utility::str::create_string` takes a `const std::vector<std::string>&` argument called `_a_arg` and returns an `std::string` containing all the elements in `_a_arg` concatenated together. 
 
 ```cpp
 #define __USER_DEFINED_BBA_1_BEGIN(name)                \
@@ -470,7 +479,7 @@ These examples illustrate the purpose of these macros; they give the user fine-g
 
 In this final subsection concerning BBAs, we show the reader useful, real-world examples of how they can be used in testing code.
 
-Below we show some code which tests if an `std::string` can be parsed by the function `std::stoi`. The test is able to check for different types of exception, and that the parsed value `i` is `> 0`. Note that in this example we use the function `abc::annotate`, which is introduced in [the documentation for matchers](). For now, the reader can assume that `annotate` simply adds an annotation to the output.
+Below we show some code which tests if an `std::string` entity `str` can be parsed by the function `std::stoi`. The test is able to check for different types of exception, and that the parsed value `i` is `> 0`. Note that in this example we use the function `abc::annotate`, which is introduced in [the documentation for matchers](). For now, the reader can assume that `annotate` simply adds an annotation to the output.
 
 ```cpp
 void

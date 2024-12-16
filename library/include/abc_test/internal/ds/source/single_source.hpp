@@ -52,6 +52,8 @@ public:
      */
     __constexpr bool
         operator==(const single_source_t& _a_rhs) const noexcept;
+    __constexpr bool
+        operator<(const single_source_t& _a_rhs) const noexcept;
 private:
     std::string          _m_str;
     std::source_location _m_sl;
@@ -101,10 +103,37 @@ __constexpr_imp bool
 {
     __cmp_test(_m_str);
     __cmp_test(_m_sl.column());
-    __cmp_test(_m_sl.file_name());
-    __cmp_test(_m_sl.function_name());
+    if (std::strcmp(_m_sl.file_name(), _a_rhs._m_sl.file_name()) == 0)
+    {
+        return true;
+    }
+    if (std::strcmp(_m_sl.function_name(), _a_rhs._m_sl.function_name()) == 0)
+    {
+        return true;
+    }
     __cmp_test(_m_sl.line());
     return true;
+}
+__constexpr_imp bool
+single_source_t::operator<(const single_source_t& _a_rhs) const noexcept
+{
+    if (_m_str < _a_rhs._m_str)
+    {
+        return true;
+    }
+    else if (_m_sl.column() < _a_rhs._m_sl.column())
+    {
+        return true;
+    }
+    else if (std::strcmp(_m_sl.file_name(), _a_rhs._m_sl.file_name()) == -1)
+    {
+        return true;
+    }
+    if (std::strcmp(_m_sl.function_name(), _a_rhs._m_sl.function_name()) == -1)
+    {
+        return true;
+    }
+    return _m_sl.line() < _a_rhs._m_sl.line();
 }
 
 _END_ABC_DS_NS

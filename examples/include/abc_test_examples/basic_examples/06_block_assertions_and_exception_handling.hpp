@@ -5,7 +5,7 @@
 #include <numeric>
 #include <ranges>
 #include <vector>
-
+#if 0
 #define __BAD_USER_DEFINED_BBA_1_BEGIN(name)                               \
     _BEGIN_SINGLE_ELEMENT_BBA(name, fmt::format("{} description", #name)); \
     name = _BLOCK_CHECK(abc::bool_matcher(false));
@@ -249,11 +249,28 @@ _TEST_CASE(
     _END_CHECK_EXCEPTION_MSG(t1,"invalid");
 
     //This will also pass
-    _BEGIN_EXCEPTION_TYPE_AND_MSG(t1);
+    { abc::single_element_test_block_t t1("Checking code throws an exception who's what() message shows a " "specific message", abc::ds::single_source_t(abc::utility::str::create_string({ "_BEGIN_EXCEPTION_TYPE_AND_MSG(", "t1", ")" }), std::source_location::current()));; t1 = abc::make_entity_bba_compatable<abc::reports::pass_or_fail_t>(annotate("Code does not throw any excpetion", false_matcher())); try {;
     int i = stoi("hi");
     _END_CHECK_EXCEPTION_TYPE_AND_MSG(t1,std::logic_error, "invalid");
 }
+#endif
 
+    _TEST_CASE(
+        abc::test_case_t(
+            { .name = "time",
+             .description = "Simple",
+             .path = "examples::basic_examples::06_manual_block_assertion" }
+        )
+    )
+    {
+        using namespace abc;
+        _CHECK(_EXPR(1 == 2));
+        matcher_t t1 = _EXPR(2 == 3);
+        _CHECK(t1);
+        t1 = _MATCHER(_EXPR(2 == 3));
+        _CHECK(t1);
+        _CHECK(_MATCHER(_EXPR(1 == 2)));
+    }
 #if 0
 _TEST_CASE(
     abc::test_case_t(
