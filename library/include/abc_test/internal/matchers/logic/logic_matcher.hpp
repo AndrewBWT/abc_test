@@ -3,10 +3,10 @@
 #include "abc_test/internal/global.hpp"
 #include "abc_test/internal/matchers/logic/logic_enum.hpp"
 #include "abc_test/internal/reporters/error_reporter_controller.hpp"
+#include "abc_test/internal/utility/ranges.hpp"
 
 #include <memory>
 #include <type_traits>
-#include "abc_test/internal/utility/ranges.hpp"
 
 _BEGIN_ABC_MATCHER_NS
 
@@ -67,11 +67,11 @@ public:
         set_right_child(const std::shared_ptr<matcher_base_t>& _a_matcher
         ) noexcept;
 private:
-    std::optional<matcher_result_t>  _m_matcher_result_l;
-    std::optional<matcher_result_t>  _m_matcher_result_r;
-    bool                             _m_left_precedence_less_than_logic_enum;
-    bool                             _m_right_precedence_less_than_logic_enum;
-    std::size_t _m_boundary_of_sources;
+    std::optional<matcher_result_t> _m_matcher_result_l;
+    std::optional<matcher_result_t> _m_matcher_result_r;
+    bool                            _m_left_precedence_less_than_logic_enum;
+    bool                            _m_right_precedence_less_than_logic_enum;
+    std::size_t                     _m_boundary_of_sources;
     // std::shared_ptr<matcher_base_t> _m_matcher_l;
     // std::shared_ptr<matcher_base_t> _m_matcher_r;
     // __constexpr virtual matcher_result_t
@@ -85,8 +85,10 @@ private:
         const std::optional<matcher_result_t>& _a_matcher_result_r,
         const bool _a_left_precdence_less_than_logic_enum,
         const bool _a_right_precedence_less_than_logic_enum,
-        const std::vector<ds::single_source_t>& _a_sources_l,
-        const std::vector<ds::single_source_t>& _a_sources_r
+        const std::vector<ds::single_source_t>&   _a_sources_l,
+        const std::vector<ds::single_source_t>&   _a_sources_r,
+        const std::optional<ds::single_source_t>& _a_primary_source_l,
+        const std::optional<ds::single_source_t>& _a_primary_source_r
     ) noexcept;
 };
 
@@ -98,6 +100,11 @@ template <
 __constexpr matcher_result_t
     make_matcher_result(const std::shared_ptr<matcher_base_t>& _a_matcher
     ) noexcept;
+__constexpr std::vector<ds::single_source_t>
+            make_matcher_vector(
+                const std::vector<ds::single_source_t>&   _a_sources,
+                const std::optional<ds::single_source_t>& _a_primary_source
+            ) noexcept;
 template <
     logic_enum_t Logic_Enum,
     bool         Result_On_First_Mathcer_To_Move_Into_If,
@@ -136,7 +143,15 @@ __constexpr_imp
     logic_matcher_t<Logic_Enum>::logic_matcher_t(
         const std::shared_ptr<matcher_base_t>& _a_matcher
     ) noexcept
-    : operator_based_matcher_t(make_matcher_result<Logic_Enum>(_a_matcher))
+    : operator_based_matcher_t(
+          make_matcher_result<Logic_Enum>(_a_matcher),
+          make_matcher_vector(
+              _a_matcher == nullptr ? std::vector<ds::single_source_t>{}
+                                    : _a_matcher->get_sources(),
+              _a_matcher == nullptr ? std::optional<ds::single_source_t>{}
+                                    : _a_matcher->primary_source()
+          )
+      )
 {}
 
 template <logic_enum_t Logic_Enum>
@@ -156,7 +171,11 @@ __constexpr_imp
           _a_matcher_l == nullptr ? std::vector<ds::single_source_t>{}
                                   : _a_matcher_l->get_sources(),
           _a_matcher_r == nullptr ? std::vector<ds::single_source_t>{}
-                                  : _a_matcher_r->get_sources()
+                                  : _a_matcher_r->get_sources(),
+          _a_matcher_l == nullptr ? std::optional<ds::single_source_t>{}
+                                  : _a_matcher_l->primary_source(),
+          _a_matcher_r == nullptr ? std::optional<ds::single_source_t>{}
+                                  : _a_matcher_r->primary_source()
       )
 {}
 
@@ -186,8 +205,10 @@ __constexpr_imp void
         _m_matcher_result_r = _a_matcher->matcher_result();
         _m_right_precedence_less_than_logic_enum
             = is_precdence_less_than_child<Logic_Enum>(_a_matcher);
-        this->_m_sources.erase(this->_m_sources.begin() + _m_boundary_of_sources,
-            this->_m_sources.end());
+        this->_m_sources.erase(
+            this->_m_sources.begin() + _m_boundary_of_sources,
+            this->_m_sources.end()
+        );
         this->_m_sources.append_range(_a_matcher->get_sources());
         this->_m_test_result = make_matcher_result < Logic_Enum,
         Logic_Enum
@@ -207,8 +228,10 @@ __constexpr_imp
         const std::optional<matcher_result_t>& _a_matcher_result_r,
         const bool _a_left_precedence_less_than_logic_enum,
         const bool _a_right_precedence_less_than_logic_enum,
-        const std::vector<ds::single_source_t>& _a_sources_l,
-        const std::vector<ds::single_source_t>& _a_sources_r
+        const std::vector<ds::single_source_t>&   _a_sources_l,
+        const std::vector<ds::single_source_t>&   _a_sources_r,
+        const std::optional<ds::single_source_t>& _a_primary_source_l,
+        const std::optional<ds::single_source_t>& _a_primary_source_r
     ) noexcept
     : operator_based_matcher_t(
           make_matcher_result<Logic_Enum, Logic_Enum == logic_enum_t::OR>(
@@ -217,8 +240,11 @@ __constexpr_imp
               _a_matcher_result_l,
               _a_matcher_result_r
           ),
-        abc::utility::join(_a_sources_l, _a_sources_r)
-    )
+          abc::utility::join(
+              make_matcher_vector(_a_sources_l, _a_primary_source_l),
+              make_matcher_vector(_a_sources_r, _a_primary_source_r)
+          )
+      )
     , _m_matcher_result_l(_a_matcher_result_l)
     , _m_matcher_result_r(_a_matcher_result_r)
     , _m_left_precedence_less_than_logic_enum(
@@ -227,8 +253,7 @@ __constexpr_imp
     , _m_right_precedence_less_than_logic_enum(
           _a_right_precedence_less_than_logic_enum
       )
-{
-}
+{}
 
 namespace
 {
@@ -264,6 +289,22 @@ __constexpr matcher_result_t
             _l_str_pair.second
         )
     );
+}
+
+__constexpr_imp std::vector<ds::single_source_t>
+                make_matcher_vector(
+                    const std::vector<ds::single_source_t>&   _a_sources,
+                    const std::optional<ds::single_source_t>& _a_primary_source
+                ) noexcept
+{
+    using namespace std;
+    using namespace ds;
+    vector<single_source_t> _l_rv{_a_sources};
+    if (_a_primary_source.has_value())
+    {
+        _l_rv.push_back(_a_primary_source.value());
+    }
+    return _l_rv;
 }
 
 template <

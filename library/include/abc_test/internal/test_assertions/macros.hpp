@@ -7,13 +7,11 @@
  * @param _a_str_representation_of_line The string representation of the line
  */
 #define __ABC_TEST_INTERNAL_CREATE_ASSERTION(                              \
-    _a_matcher, _a_assertion_type, _a_str_representation_of_line           \
+    _a_matcher, _a_assertion_type, _a_macro_str,_a_matcher_str           \
 )                                                                          \
     abc::create_assertion<_a_assertion_type>(                              \
         _a_matcher,                                                        \
-        _ABC_NS_DS::single_source_t(                                       \
-            _a_str_representation_of_line, std::source_location::current() \
-        ),                                                                 \
+        _a_macro_str,_a_matcher_str,std::source_location::current(),\
         _ABC_NS_GLOBAL::get_this_threads_test_runner_ref()                 \
     )
 /*!
@@ -31,7 +29,7 @@
     __ABC_TEST_INTERNAL_CREATE_ASSERTION(                                  \
         _a_matcher,                                                        \
         _ABC_NS_REPORTS::pass_or_fail_t,                                   \
-        _ABC_NS_UTILITY::str::create_string({"_CHECK(", #_a_matcher, ")"}) \
+        "_CHECK",#_a_matcher\
     )
 /*!
  * @brief The REQUIRE macro.

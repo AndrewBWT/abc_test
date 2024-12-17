@@ -158,7 +158,6 @@ private:
     std::conditional_t<Has_Annotation, std::string, std::monostate>
                        _m_annotation;
     matcher_base_ptr_t _m_matcher_internal;
-    bool               _m_initialised_with_source;
     template <logic_enum_t Logic_Enum>
     __constexpr bool
         process_(const matcher_wrapper_t& _a_matcher) noexcept;
@@ -207,7 +206,6 @@ __no_constexpr_imp
         matcher_base_ptr_t _a_matcher_internal
     ) noexcept
     : _m_matcher_internal(_a_matcher_internal)
-    , _m_initialised_with_source(false)
 {}
 
 template <bool Has_Annotation>
@@ -218,7 +216,6 @@ __constexpr_imp
         const std::string_view          _a_annotation
     ) noexcept
     : _m_matcher_internal(_a_matcher.internal_matcher())
-    , _m_initialised_with_source(_a_matcher._m_initialised_with_source)
     , _m_annotation(_a_annotation)
 {}
 
@@ -229,16 +226,8 @@ __no_constexpr_imp
         const ds::single_source_t&               _a_single_source
     )
     : _m_matcher_internal(_a_matcher.internal_matcher())
-    , _m_initialised_with_source(true)
 {
-    if (not _a_matcher._m_initialised_with_source)
-    {
         _m_matcher_internal->add_source_info(_a_single_source);
-    }
-    else
-    {
-        std::cout << "Issued warning" << std::endl;
-    }
 }
 
 template <bool Has_Annotation>

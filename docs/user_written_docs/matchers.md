@@ -151,7 +151,17 @@ The reader should note that code in this form.
 _CHECK(_MATCHER(_EXPR(1 == 2)));
 ```
 
-Will not produce an additional source code representation attributed to the matcher.
+Will not produce an additional source code representation attributed to the matcher. The following output is instead produced.
+
+```
+ 1)  Single-line assertion failed.
+     Source location:
+       ..\docs\assertion_examples.hpp:1
+     Source code representation:
+       "_CHECK(_MATCHER(_EXPR(1 == 2)))"
+     Matcher failed with output:
+       "1 != 2"
+```
 
 ## Annotating Matchers
 

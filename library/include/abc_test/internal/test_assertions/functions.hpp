@@ -55,7 +55,9 @@ requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
 __constexpr bool
     create_assertion(
         const _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>& _a_matcher,
-        const _ABC_NS_DS::single_source_t&                        _a_source,
+        const std::string_view _a_macro_str,
+        const std::string_view _a_matcher_str,
+        const std::source_location& _a_sl,
         test_runner_t&                                            _a_test_runner
     ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>);
 /*!
@@ -149,7 +151,9 @@ __constexpr_imp
 bool
 create_assertion(
     const _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>& _a_matcher,
-    const _ABC_NS_DS::single_source_t& _a_source,
+    const std::string_view _a_macro_str,
+    const std::string_view _a_matcher_str,
+    const std::source_location& _a_sl,
     test_runner_t& _a_test_runner
 ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>)
 {
@@ -159,6 +163,8 @@ create_assertion(
     assertion_ptr_t<true, T> _l_gur;
     bool                     _l_passed{true};
     optional<string>         _l_matcher_annotation{};
+    ds::single_source_t _l_source = _a_matcher.internal_matcher()->add_source_info(
+        _a_macro_str, _a_matcher_str, _a_sl);
     if constexpr (Has_Annotation)
     {
         _l_matcher_annotation = optional<string>(_a_matcher.annotation());
@@ -166,11 +172,11 @@ create_assertion(
     if (not _a_matcher.has_matcher_base())
     {
         _l_gur = make_unique<matcher_based_assertion_single_line_t<T>>(
-            _a_source,
+            _l_source,
             _a_test_runner.get_log_infos(false),
             matcher_result_with_annotation_and_source_info_t(
                 matcher_result_t(),
-                _a_source,
+                _l_source,
                 _l_matcher_annotation,
                 matcher_source_map_t()
             )
@@ -186,15 +192,14 @@ create_assertion(
         matcher_base_t&      _l_matcher_base{_a_matcher.matcher_base()};
         matcher_result_t     _l_mr{_l_matcher_base.matcher_result()};
         matcher_source_map_t _l_msm;
-        std::optional<std::tuple<std::source_location,std::string_view,std::string_view>> _l_macro_name = make_tuple(_a_source.source_location(), "_CHECK", _a_source.source_code_representation());
-        _l_matcher_base.gather_map_source(_l_msm, _l_macro_name);
+        _l_matcher_base.gather_map_source(_l_msm);
         _l_passed = _l_mr.passed();
         _l_gur    = make_unique<const matcher_based_assertion_single_line_t<T>>(
-            _a_source,
+            _l_source,
             _a_test_runner.get_log_infos(false),
             matcher_result_with_annotation_and_source_info_t(
                 _l_mr,
-                _a_source,
+                _l_source,
                 _l_matcher_annotation,
                 _l_msm
             )

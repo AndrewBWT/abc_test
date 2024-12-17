@@ -5,6 +5,7 @@
 #include <numeric>
 #include <ranges>
 #include <vector>
+
 #if 0
 #define __BAD_USER_DEFINED_BBA_1_BEGIN(name)                               \
     _BEGIN_SINGLE_ELEMENT_BBA(name, fmt::format("{} description", #name)); \
@@ -267,8 +268,15 @@ _TEST_CASE(
         _CHECK(_EXPR(1 == 2));
         matcher_t t1 = _EXPR(2 == 3);
         _CHECK(t1);
+        int i = 0;
+        //t1's main source is "_MATCHER", <std::source_location>,internal.
         t1 = _MATCHER(_EXPR(2 == 3));
+        //Given _CHECK and expression, create "_CHECK(expression).
+        //If "_CHECK(expression) == _CHECK(main source) then replace main source,
+        //add this as main source.
         _CHECK(t1);
+        //initially main source is "_MATCHER(internal).
+        //Check then creates source as "_CHECK(_MATCHER(internal)). if same then replace
         _CHECK(_MATCHER(_EXPR(1 == 2)));
     }
 #if 0

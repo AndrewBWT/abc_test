@@ -60,23 +60,28 @@ public:
      * with the object's sources.
      */
     __no_constexpr virtual void
-        gather_map_source(
-            matcher_source_map_t& _a_matcher_source_map,
-            const std::optional<std::tuple<std::source_location, std::string_view, std::string_view>>&
-                _a_sl_and_str
-            = std::optional<std::tuple<std::source_location, std::string_view, std::string_view>>{}
+        gather_map_source(matcher_source_map_t& _a_matcher_source_map
         ) const noexcept;
     /*!
      * @brief Adds a source to this matcher.
      * @param _a_source The source to add to the matcher.
      */
     __constexpr void
-        add_source_info(const ds::single_source_t& _a_source) noexcept;
+                add_source_info(const ds::single_source_t& _a_source) noexcept;
+    __constexpr abc::ds::single_source_t
+                add_source_info(
+                    const std::string_view      _a_macro_str,
+                    const std::string_view      _a_matcher_str,
+                    const std::source_location& _a_sl
+                ) noexcept;
     __constexpr const std::vector<ds::single_source_t>&
                       get_sources() const noexcept;
+    __constexpr const std::optional<ds::single_source_t>&
+                      primary_source() const noexcept;
 protected:
-    matcher_result_t                 _m_test_result;
-    std::vector<ds::single_source_t> _m_sources;
+    matcher_result_t                   _m_test_result;
+    std::vector<ds::single_source_t>   _m_sources;
+    std::optional<ds::single_source_t> _m_primary_source;
 private:
     // __constexpr virtual matcher_result_t
     //     run(test_runner_t& _a_test_runner)
@@ -120,43 +125,14 @@ __constexpr_imp const matcher_result_t&
 
 __no_constexpr_imp void
     matcher_base_t::gather_map_source(
-        matcher_source_map_t& _a_matcher_source_map,
-        const std::optional<std::tuple<std::source_location, std::string_view,std::string_view>>&
-            _a_sl_and_str
+        matcher_source_map_t& _a_matcher_source_map
     ) const noexcept
 {
     using namespace ds;
     using namespace std;
     for (const single_source_t& _l_source : _m_sources)
     {
-        if (_a_sl_and_str.has_value())
-        {
-            auto& _l_sl{get<0>(_a_sl_and_str.value())};
-            auto& _l_sl2{_l_source.source_location()};
-            if (_l_sl2.column() == _l_sl.column()
-                && (std::strcmp(_l_sl2.file_name(), _l_sl.file_name()) == 0)
-                && (std::strcmp(_l_sl2.function_name(), _l_sl.function_name())
-                    == 0)
-                && _l_sl2.line() == _l_sl.line())
-            {
-                string _l_slcmp{
-                    string(get<1>(_a_sl_and_str.value())) + "("
-                    + string(_l_source.source_code_representation()) + ")"
-                };
-                if (_l_slcmp != get<2>(_a_sl_and_str.value()))
-                {
-                    _a_matcher_source_map.insert(_l_source);
-                }
-            }
-            else
-            {
-                _a_matcher_source_map.insert(_l_source);
-            }
-        }
-        else
-        {
-            _a_matcher_source_map.insert(_l_source);
-        }
+        _a_matcher_source_map.insert(_l_source);
     }
 }
 
@@ -165,13 +141,43 @@ __constexpr_imp void
         const ds::single_source_t& _a_source
     ) noexcept
 {
-    _m_sources.push_back(_a_source);
+    _m_primary_source = _a_source;
+}
+
+__constexpr abc::ds::single_source_t
+            matcher_base_t::add_source_info(
+        const std::string_view      _a_macro_str,
+        const std::string_view      _a_matcher_str,
+        const std::source_location& _a_sl
+    ) noexcept
+{
+    using namespace std;
+    using namespace ds;
+    if (_m_primary_source.has_value()
+        && _a_matcher_str
+               != _m_primary_source.value().source_code_representation())
+    {
+        _m_sources.push_back(_m_primary_source.value());
+    }
+    _m_primary_source = ds::single_source_t(
+        abc::utility::str::create_string(
+            {_a_macro_str, "(", _a_matcher_str, ")"}
+        ),
+        _a_sl
+    );
+    return _m_primary_source.value();
 }
 
 __constexpr_imp const std::vector<ds::single_source_t>&
                       matcher_base_t::get_sources() const noexcept
 {
     return _m_sources;
+}
+
+__constexpr_imp const std::optional<ds::single_source_t>&
+                      matcher_base_t::primary_source() const noexcept
+{
+    return _m_primary_source;
 }
 
 _END_ABC_MATCHER_NS
