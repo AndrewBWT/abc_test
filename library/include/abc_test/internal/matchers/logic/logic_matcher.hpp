@@ -16,7 +16,7 @@ _BEGIN_ABC_MATCHER_NS
  * @tparam Logic_Enum
  */
 template <logic_enum_t Logic_Enum>
-class logic_matcher_t : public operator_based_matcher_t
+class logic_matcher_t : public matcher_base_t
 {
 public:
     __constexpr
@@ -54,8 +54,6 @@ public:
      * caller.
      * @return precedence_t of the object's type parameter.
      */
-    __constexpr virtual precedence_t
-        get_precedence() const noexcept override final;
     /*!
      * @brief Sets the right sub-child of the object using the given argument.
      * @param _a_matcher The entity to be made the right-child of this object.
@@ -143,8 +141,9 @@ __constexpr_imp
     logic_matcher_t<Logic_Enum>::logic_matcher_t(
         const std::shared_ptr<matcher_base_t>& _a_matcher
     ) noexcept
-    : operator_based_matcher_t(
+    : matcher_base_t(
           make_matcher_result<Logic_Enum>(_a_matcher),
+          logic_precedence<Logic_Enum>(),
           make_matcher_vector(
               _a_matcher == nullptr ? std::vector<ds::single_source_t>{}
                                     : _a_matcher->get_sources(),
@@ -179,12 +178,6 @@ __constexpr_imp
       )
 {}
 
-template <logic_enum_t Logic_Enum>
-__constexpr_imp precedence_t
-    logic_matcher_t<Logic_Enum>::get_precedence() const noexcept
-{
-    return logic_precedence<Logic_Enum>();
-}
 
 template <logic_enum_t Logic_Enum>
 template <typename>
@@ -233,13 +226,14 @@ __constexpr_imp
         const std::optional<ds::single_source_t>& _a_primary_source_l,
         const std::optional<ds::single_source_t>& _a_primary_source_r
     ) noexcept
-    : operator_based_matcher_t(
+    : matcher_base_t(
           make_matcher_result<Logic_Enum, Logic_Enum == logic_enum_t::OR>(
               _a_left_precedence_less_than_logic_enum,
               _a_right_precedence_less_than_logic_enum,
               _a_matcher_result_l,
               _a_matcher_result_r
           ),
+          logic_precedence<Logic_Enum>(),
           abc::utility::join(
               make_matcher_vector(_a_sources_l, _a_primary_source_l),
               make_matcher_vector(_a_sources_r, _a_primary_source_r)
@@ -321,7 +315,8 @@ __constexpr matcher_result_t
 {
     using namespace std;
     string _l_left_str{"<false>"};
-    string _l_right_str{"<unevaluated>"};
+    string _l_right_str{ _a_matcher_result_r.has_value() ?
+        _a_matcher_result_r.value().str() : "<unevaluated>"};
     bool   _l_left_passed{Result_On_First_Mathcer_To_Move_Into_If};
     bool   _l_right_passed{false};
     if (not _a_matcher_result_l.has_value())
@@ -348,7 +343,7 @@ __constexpr matcher_result_t
         _l_left_str    = _l_child_res_l.str();
         _l_left_passed = _l_child_res_l.passed();
     }
-    if (_l_left_passed == Result_On_First_Mathcer_To_Move_Into_If)
+    if (_l_left_passed != Result_On_First_Mathcer_To_Move_Into_If)
     {
         if (not _a_matcher_result_r.has_value())
         {
@@ -408,15 +403,8 @@ __constexpr bool
     ) noexcept
 {
     using namespace std;
-    if (_a_matcher == nullptr)
-    {
-        return true;
-    }
-    operator_based_matcher_t* _l_ptr{
-        dynamic_cast<operator_based_matcher_t*>(_a_matcher.get())
-    };
-    return _l_ptr != nullptr
-           && logic_precedence<Logic_Enum>() <= _l_ptr->get_precedence();
+    return _a_matcher->precedence().has_value()
+           && logic_precedence<Logic_Enum>() <= _a_matcher->precedence().value();
 }
 
 template <logic_enum_t Logic_Enum>
@@ -427,12 +415,9 @@ __constexpr_imp std::string
                 ) noexcept
 {
     using namespace std;
-    operator_based_matcher_t* _l_ptr{
-        dynamic_cast<operator_based_matcher_t*>(_a_ptr.get())
-    };
     const pair<const char*, const char*>& _l_bracket_pair{
-        _l_ptr != nullptr
-                && logic_precedence<Logic_Enum>() <= _l_ptr->get_precedence()
+        _a_ptr->precedence().has_value(
+        ) && logic_precedence<Logic_Enum>() <= _a_ptr->precedence().value()
             ? _c_normal_bracket_pair
             : _c_empty_bracket_pair
     };

@@ -6,13 +6,15 @@
  * @param _a_assertion_type The assertion status type.
  * @param _a_str_representation_of_line The string representation of the line
  */
-#define __ABC_TEST_INTERNAL_CREATE_ASSERTION(                              \
-    _a_matcher, _a_assertion_type, _a_macro_str,_a_matcher_str           \
-)                                                                          \
-    abc::create_assertion<_a_assertion_type>(                              \
-        _a_matcher,                                                        \
-        _a_macro_str,_a_matcher_str,std::source_location::current(),\
-        _ABC_NS_GLOBAL::get_this_threads_test_runner_ref()                 \
+#define __ABC_TEST_INTERNAL_CREATE_ASSERTION(                   \
+    _a_matcher, _a_assertion_type, _a_macro_str, _a_matcher_str \
+)                                                               \
+    abc::create_assertion<_a_assertion_type>(                   \
+        _a_matcher,                                             \
+        _a_macro_str,                                           \
+        _a_matcher_str,                                         \
+        std::source_location::current(),                        \
+        _ABC_NS_GLOBAL::get_this_threads_test_runner_ref()      \
     )
 /*!
  * @brief The check macro.
@@ -27,9 +29,7 @@
  */
 #define _CHECK(_a_matcher)                                                 \
     __ABC_TEST_INTERNAL_CREATE_ASSERTION(                                  \
-        _a_matcher,                                                        \
-        _ABC_NS_REPORTS::pass_or_fail_t,                                   \
-        "_CHECK",#_a_matcher\
+        _a_matcher, _ABC_NS_REPORTS::pass_or_fail_t, "_CHECK", #_a_matcher \
     )
 /*!
  * @brief The REQUIRE macro.
@@ -152,15 +152,9 @@
  * @param _a_matcher The matcher_t (or annotated_matcher_t) to annotate.
  * @return matcher_t (or annotated_matcher_t) with a source.
  */
-#define _MATCHER(_a_matcher)                     \
-    abc::matcher_macro(                          \
-        _a_matcher,                              \
-        _ABC_NS_DS::single_source_t(             \
-            _ABC_NS_UTILITY::str::create_string( \
-                {"_MATCHER(", #_a_matcher, ")"}  \
-            ),                                   \
-            std::source_location::current()      \
-        )                                        \
+#define _MATCHER(_a_matcher)                                                 \
+    abc::matcher_macro(                                                      \
+        _a_matcher, "_MATCHER", #_a_matcher, std::source_location::current() \
     )
 
 /*!

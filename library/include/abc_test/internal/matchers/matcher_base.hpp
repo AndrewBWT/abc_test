@@ -15,6 +15,7 @@ _BEGIN_ABC_NS
 struct test_runner_t;
 _END_ABC_NS
 _BEGIN_ABC_MATCHER_NS
+using precedence_t = std::size_t;
 
 /*!
  * @brief The abstract class for all matchers.
@@ -22,6 +23,16 @@ _BEGIN_ABC_MATCHER_NS
 struct matcher_base_t
 {
 public:
+    __no_constexpr
+        matcher_base_t(
+            const std::shared_ptr<matcher_base_t>& _a_matcher
+        ) noexcept
+        : _m_test_result(_a_matcher->_m_test_result)
+        , _m_sources(_a_matcher->_m_sources)
+        , _m_primary_source(_a_matcher->_m_primary_source)
+        , _m_precedence(_a_matcher->_m_precedence)
+    {
+    }
     /*!
      * @brief Default constructor.
      */
@@ -31,11 +42,23 @@ public:
 
     __constexpr
     matcher_base_t(
+        const matcher_result_t& _a_matcher_result,
+        const std::optional<precedence_t>&      _m_precedence =
+        std::optional<precedence_t>{}
+    ) noexcept
+        : _m_test_result(_a_matcher_result), _m_precedence(_m_precedence)
+    {}
+
+    __constexpr
+    matcher_base_t(
         const matcher_result_t&                 _a_matcher_result,
+        const precedence_t                       _m_precdence,
         const std::vector<ds::single_source_t>& _a_sources
         = std::vector<ds::single_source_t>()
     ) noexcept
-        : _m_test_result(_a_matcher_result), _m_sources(_a_sources)
+        : _m_test_result(_a_matcher_result)
+        , _m_precedence(_m_precedence)
+        , _m_sources(_a_sources)
     {}
 
     /*!
@@ -78,10 +101,15 @@ public:
                       get_sources() const noexcept;
     __constexpr const std::optional<ds::single_source_t>&
                       primary_source() const noexcept;
+    __constexpr void
+                      remove_primary_source() noexcept;
+    __constexpr const std::optional<std::size_t>&
+                      precedence() const noexcept;
 protected:
     matcher_result_t                   _m_test_result;
     std::vector<ds::single_source_t>   _m_sources;
     std::optional<ds::single_source_t> _m_primary_source;
+    std::optional<std::size_t>         _m_precedence;
 private:
     // __constexpr virtual matcher_result_t
     //     run(test_runner_t& _a_test_runner)
@@ -141,6 +169,10 @@ __constexpr_imp void
         const ds::single_source_t& _a_source
     ) noexcept
 {
+    if (_m_primary_source.has_value())
+    {
+        _m_sources.push_back(_m_primary_source.value());
+    }
     _m_primary_source = _a_source;
 }
 
@@ -178,6 +210,20 @@ __constexpr_imp const std::optional<ds::single_source_t>&
                       matcher_base_t::primary_source() const noexcept
 {
     return _m_primary_source;
+}
+
+__constexpr_imp void
+    matcher_base_t::remove_primary_source() noexcept
+{
+    using namespace std;
+    using namespace ds;
+    _m_primary_source = optional<single_source_t>{};
+}
+
+__constexpr_imp const std::optional<std::size_t>&
+                      matcher_base_t::precedence() const noexcept
+{
+    return _m_precedence;
 }
 
 _END_ABC_MATCHER_NS

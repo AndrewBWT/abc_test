@@ -3,12 +3,14 @@
 This page contains documentation concerning matchers in `abc_test`. It covers the following topics:
 
 - Matcher Basics
-- Included Matchers.
 - Encoding Logic Into Matchers.
 - User-defined Matchers.
+- Included Matchers.
 - The Design of Matchers.
 
-We saw [in this document]() how to write test assertions using `abc_test`. This section will assume familiarity with assertions in `abc_test`, and how matchers interact with them.
+This document will assume the reader is familiar with the following documents:
+
+- [Test Assertions]()
 
 All of the functionality shown in this document  requires the following include directive.
 
@@ -24,128 +26,390 @@ Some functionality also requires the following include directive.
 
 We will make it clear to the reader when this is required.
 
+At various points in this document we will show the reader some output from `abc_test`. In all instances the output we will show has been created using the `text_test_reporter_t` object, initialized using the object's default constructor. The test suite used to create the output has been configured to show both passed and failed assertions, and passed and failed matchers. We have also ammended the output slightly to make the source locations easier to read.
+
 # Matcher Basics
-In this section we document the basic use of matchers in `abc_test`.
 
-## What is a Matcher?
+In `abc_test` a matcher is an abstract entity that provides a standardized way of encoding test logic. A matcher entity contains the result of some already-evaluated test. They are used as arguments in assertion macros, which then report the result of the user-defined test to the overarching `abc_test` framework. `abc_test` contains a set of functions which allow the user to encode their own test logic into a matcher. `abc_test` also allows the user to write their own generalized functions for encoding test logic.
 
-In `abc_test`, a matcher is an abstract object which provides a uniform way of encoding testing logic for use with assertions. To be clear to the reader, matchers only contain the **result** of some already evaluated test logic. `abc_test` contains a set of functions which allow the user to encode their tests, and also provides functionality to allow the user to write their own tests.
+In `abc_test` the term "matcher" can refer to any object of either type `matcher_t` or type `annotated_matcher_t`. Internally, both types are type synonyms for the type `matcher_wrapper_t`, but use different template parameters. The core difference between the two types is that entities of type `annotated_matcher_t` contain an additional user-provided `std::string`, which represents a matcher's *annotation*. We discuss the other differences between the two types in [this subsection](). All assertion macros in `abc_test` are designed to accept objects of either type `matcher_t` or type `annotated_matcher_t`.
 
-In `abc_test` the term "matcher" can refer to one of two objects; either the `matcher_t` object or the `annotated_matcher_t` object. Internally, both are type synonyms for the `matcher_wrapper_t` object, but with different template parameters. The only difference between the two objects is that the `annotated_matcher_t` object contains a user-provided annotation represented as a `std::string`. All assertion macros in `abc_test` are designed to accept either `matcher_t` objects or `annotated_matcher_t` objects.
+Internally, a matcher object holds information about the test performed. The data held by the matcher can be summarised as follows:
 
-Internally, a matcher object holds information about the test performed. The most important of these is the Boolean `result` variable, which holds the result of the performed test. 
+- `bool result`. The result of the test logic; `true` means the test passed, `false` means the test failed.
+- `std::string result_str`. A text representation of the test performed.
+- `std::string annotation`. The previously mentioned optional user-provided annotation. It can be used to provide clarification on what is being tested.
 
-Below we show some simple examples of matchers in `abc_test`.
+We conclude this section by showing the user some code examples of matchers in `abc_test`.
 
 ```cpp
-// matcher_t is the object which holds the result of a user-defined test. A default matcher has a result value of true.
-matcher_t matcher_1;
-// The function bool_matcher creates a matcher_t whose result is the bool argument given to bool_matcher. matcher_2 has a result value of true.
-matcher_t matcher_2 = bool_matcher(true);
-// matcher_3 has a result value of false.
-matcher_t matcher_3 = bool_matcher(false);
-int i = 2;
-// Expressions can be encoded in matchers using the macro _EXPR. matcher_4 has a result value of true, as it checks if i==2 (which it does).
-matcher_t matcher_4 = _EXPR(i==2);
-i = 8;
-// matcher_5 has a result value of false, as i <=7 is false.
-matcher_t matcher_5 = _EXPR(i <= 7);
+_TEST_CASE(
+    abc::test_case_t({.name = "Matcher examples"})
+)
+{
+    using namespace abc;
+    // matcher_t is the object which holds the result of a user-defined test. A
+    // default matcher has a result value of true, and an empty result_str value.
+    matcher_t matcher_1;
+    _CHECK(matcher_1);
+    // The function bool_matcher creates a matcher_t whose result is the bool
+    // argument given to bool_matcher. matcher_2 has a result value of true, and
+    // a result_str value of "true".
+    matcher_t matcher_2 = bool_matcher(true);
+    // matcher_3 has a result value of false and a result_str value of "false".
+    matcher_t matcher_3 = bool_matcher(false);
+    // Below is an example showing how to annotate a matcher.
+    annotated_matcher_t annotated_matcher_2(
+        annotate(matcher_3, "Testing bool_matcher(false)")
+    );
+    _CHECK(matcher_2);
+    _CHECK(matcher_3);
+    _CHECK(annotated_matcher_2);
+    int i               = 2;
+    // Expressions can be encoded in matchers using the macro _EXPR. matcher_4
+    // has a result value of true, as it checks if i==2 (which it does). Its
+    // result_str value is "i == 2".
+    matcher_t matcher_4 = _EXPR(i == 2);
+    i                   = 8;
+    // matcher_5 has a result value of false, as i<=7 is false. Its result_str
+    // value is "i >= 7", showing the failure of the original expression.
+    matcher_t matcher_5 = _EXPR(i <= 7);
+    _CHECK(matcher_4);
+    _CHECK(matcher_5);
+    // Another example of annotating a matcher. Note the annotate function is
+    // different to that used previously.
+    annotated_matcher_t annotated_matcher_3(
+        annotate(fmt::format("Checking i <= {}", 7), matcher_5)
+    );
+    _CHECK(annotated_matcher_3);
+}
+```
+
+Below is the text output from the test case shown above.
+
+```
+ 1)  Single-line assertion passed.
+     Source location:
+       ..\docs\assertion_examples.hpp:9
+     Source code representation:
+       "_CHECK(matcher_1)"
+     Matcher passed with output:
+       "true"
+ 2)  Single-line assertion passed.
+     Source location:
+       ..\docs\assertion_examples.hpp:23
+     Source code representation:
+       "_CHECK(matcher_2)"
+     Matcher passed with output:
+       "true"
+ 3)  Single-line assertion failed.
+     Source location:
+       ..\docs\assertion_examples.hpp:24
+     Source code representation:
+       "_CHECK(matcher_3)"
+     Matcher failed with output:
+       "false"
+ 4)  Single-line assertion failed.
+     Source location:
+       ..\docs\assertion_examples.hpp:26
+     Source code representation:
+       "_CHECK(annotated_matcher_2)"
+     Matcher failed with output:
+       "false"
+     Matcher's annotation:
+       "Testing bool_matcher(false)"
+ 5)  Single-line assertion passed.
+     Source location:
+       ..\docs\assertion_examples.hpp:36
+     Source code representation:
+       "_CHECK(matcher_4)"
+     Matcher passed with output:
+       "2 == 2"
+ 6)  Single-line assertion failed.
+     Source location:
+       ..\docs\assertion_examples.hpp:37
+     Source code representation:
+       "_CHECK(matcher_5)"
+     Matcher failed with output:
+       "8 > 7"
+ 7)  Single-line assertion failed.
+     Source location:
+       ..\docs\assertion_examples.hpp:43
+     Source code representation:
+       "_CHECK(annotated_matcher_3)"
+     Matcher failed with output:
+       "8 > 7"
+     Matcher's annotation:
+       "Checking i <= 7"
 ```
 
 ## Bool Matchers
 
-In the previous subsection we showed the reader some examples of how to create matchers. One of these examples created a simple matcher whose `result` value is equal to the argument provided to the function `bool_matcher`. This is called the Boolean matcher, and is one of two core matchers provided by `abc_test`. Boolean matchers can be created using the function `bool_matcher`, which has a type signature as follows:
+In the previous section we provided some example code which showed the user how to create matchers in several different ways. In some of those examples a simple function called `bool_matcher` was used to construct a matcher whose `result` value was equal to the argument provided to `bool_matcher`. Matchers created in this way are called Boolean matchers. The Boolean matcher is one of two core matchers provided by `abc_test`. Boolean matchers can be created using the function `bool_matcher`, which has the following type signature.
 
 ```cpp
 matcher_t bool_matcher(const bool arg);
 ```
 
-An important note about the `bool_matcher` is that it is used in the default constructor for `matcher_t` (and `annotated_matcher_t`). It is written as follows:
+A Boolean matcher's `result_str` value is always equal to `fmt::format("{}",arg)`. 
 
-```cpp
-matcher_t() : matcher_t(bool_matcher(true))
-{}
-```
-
-From this definition, any `matcher_t` object not assigned a value will automatically pass.
+The reader should note that the Boolean matcher created from `bool_matcher(true)` is used to initialise the variables in default constructed `matcher_t`s and `annotated_matcher_t`s. From this, it should be clear to the reader that default constructed `matcher_t` and `annotated_matcher_t` objects will always pass.
 
 ## Expression-Encoded Matchers
 
-In [this subsection]() we showed the reader some examples of how to create matchers. One of these examples created a simple matcher whose `result` value is equal to the result of a comparison-based expression. This is called the expression-encoded matcher (EEM), and is one of two core matchers provided by `abc_test`. EEMs can be created using the function macro `_EXPR`. The macro can be thought of having a type signature as follows:
+In a [previous section]() we provided some example code which showed the user how to create matchers in several different ways. In some of those examples a macro called `_EXPR` was used to construct a matcher whose `result` value was equal to the result of the comparison-based expression used as the argument to `_EXPR`. Matchers created using this macro are called expression-encoded matchers (EEMs). The EEM is one of the two core matchers provided by `abc_test`. In `abc_test` EEMs are usually created using the macro `_EXPR`, which can be thought of as having the following type signature.
 
 ```cpp
 matcher_t _EXPR(expression arg)
 ```
 
-The `_EXPR` macro is designed to work with `==`, `!=`, `>`, `>=`, `<` and `<=`. Internally it works as follows:
+If the reader is unfamiliar with the `_CHECK_EXPR` and `_REQUIRE_EXPR`, two assertion macros closely related to the `_EXPR` macro, we would advise them to read [this subsection in the document about assertions]().
 
-- The `_EXPR(expression)` macro is expanded to become `abc::comparison_placeholder_t() < expression`.
-- The object `abc::comparison_placeholder_t()` contains no member variables. It has an overloaded `<` operator in the form `template<typename T> abc::comparison_wrapper_t<T> operator<(const comparison_placeholder_t&, T&& _a_wrapper) noexcept`. This is designed to consume the first argument of `_EXPR`'s argument `expression`, creating an object of type `abc::comparison_wrapper_t<T>`.
-    - `<` was used due to its low operator precedence.
-- `abc::comparison_wrapper_t<T>` has a single member variable of type `T`, created from the `T` element consumed from `expression`. `abc::comparison_wrapper_t<T>` has operator overloads for `==`, `!=`, `>`, `>=`, `<` and `<=`, which take an argument in the form `T2 arg2` and return a `matcher_t` with the result of the comparison encoded in it. Internally, of the overlaoded operators for `abc::comparison_wrapper_t` call the "default" comparison expression using the internal argument of `abc::comparison_wrapper_t<T>` and `arg` as its arguments.
+The `_EXPR` macro is designed around the assumption that its `arg` argument is in the form `a op b`, where `a` is of type `T1`, `b` is of type `T2`, and `op` is one of `==`, `!=`, `>`, `>=`, `<` or `<=`. For the `_EXPR` macro to work properly, the expression `a op b` must be valid. By this we mean, there must be an operator function in the form `bool operator op(const T1& a, const T2& b)` which can be used. Below we show some example code which adheres to this requirement.
 
-For example, `_EXPR(1==2)` is expanded in the following ways:
+```cpp
+struct type_y
+{
+    std::vector<int> is;
 
-- `_EXPR(1==2)` is expanded to `abc::comparison_placeholder_t() < 1 == 2`.
-- `abc::comparison_placeholder_t() < 1` becomes `abc::comparison_wrapper_t<T>(1)`, and the expression becomes `abc::comparison_wrapper_t<T>(1) == 2`.
-- `abc::comparison_wrapper_t`'s `operator==` is called, which simply evaluates `1 == 2`. The returned `matcher_t` object encodes the result of the `1==2` expression.
+    inline bool
+        operator==(
+            const type_x& rhs
+        ) const
+    {
+        return is.size() == 2 && is[0] == rhs.i && is[1] == rhs.j;
+    }
+
+    inline bool
+        operator==(
+            const type_y& rhs
+        ) const
+    {
+        return is == rhs.is;
+    }
+};
+
+template <>
+struct fmt::formatter<type_y> : formatter<string_view>
+{
+    inline auto
+        format(
+            type_y               arg_y,
+            format_context& _a_ctx
+        ) const -> format_context::iterator
+    {
+        using namespace std;
+        const string _l_rv{fmt::format("y {{{0}}}", arg_y.is)};
+        return formatter<string_view>::format(_l_rv, _a_ctx);
+    }
+};
+
+_TEST_CASE(
+    abc::test_case_t({.name = "X example"})
+)
+{
+    type_x xi{1, 2};
+    type_x xj{3, 4};
+    _CHECK(_EXPR(xi == xj));
+    type_y yi{
+        {1, 2}
+    };
+    type_y yj{
+        {4, 5, 6}
+    };
+    _CHECK(_EXPR(yi == yj));
+    _CHECK(_EXPR(xi == yi));
+}
+```
+
+In the `matcher_t` object created by the `_EXPR` macro, the value of the `result_str` variable is constructed from a textual representation of `a`, `b` and `op`. As `op` can only be a certain number of values, its textual representation is pre-determined by `abc_test`. The textual representation of either `a` or `b` is dependant upon whether `T1` or `T2` adheres to the `fmt::formattable` concept. For an arbitrary argument `arg` of type `T`, if `T` adheres to `fmt::formattable`, then `fmt::format("{}",arg)` is used as the textual representation. If `T` does not adhere to `fmt::formattable`, then a textual representation of `"[?]"` is used to represent `arg`. Below we show output from the test case shown above. This output illustrates to the reader how the `result_str` variable is constructed.
+
+```
+ 1)  Single-line assertion failed.
+     Source location:
+       ..\docs\assertion_examples.hpp:43
+     Source code representation:
+       "_CHECK(_EXPR(xi == xj))"
+     Matcher failed with output:
+       "[?] != [?]"
+ 2)  Single-line assertion failed.
+     Source location:
+       ..\docs\assertion_examples.hpp:50
+     Source code representation:
+       "_CHECK(_EXPR(yi == yj))"
+     Matcher failed with output:
+       "y {[1, 2]} != y {[4, 5, 6]}"
+ 3)  Single-line assertion passed.
+     Source location:
+       ..\docs\assertion_examples.hpp:51
+     Source code representation:
+       "_CHECK(_EXPR(xi == yi))"
+     Matcher passed with output:
+       "[?] == y {[1, 2]}"
+```
+
+We finish this subsection by discussing explicitly how the `_EXPR` macro works. The macro is expanded and evaluated as follows:
+
+- The `_EXPR(a op b)` macro is expanded to become `abc::comparison_placeholder_t() < a op b`.
+- The object `abc::comparison_placeholder_t()` contains no member variables. It has an overloaded `<` operator in the form `template<typename T> abc::comparison_wrapper_t<T> operator<(const comparison_placeholder_t&, T&& _a_wrapper) noexcept`.
+- `abc::comparison_wrapper_t` is a simple object with a single member variable of type `T`, and one constructor. `abc::comparison_placeholder_t()`'s `operator<` function calls this constructor, giving it `a` as its argument.
+  - The operator `<` was chosen due to its low operator precedence.
+- Using the `abc::comparison_placeholder_t()`'s `operator<` function, the expression is evaluated to become `abc::comparison_wrapper_t<T1>{a} op b`.
+- `abc::comparison_wrapper_t` has operator overloads for `==`, `!=`, `>`, `>=`, `<` and `<=`. All of these operators take an argument `arg2` of type `T2`, and return a `matcher_t` object with the result of the binary expression encoded in it.
+- `abc::comparison_wrapper_t<T1>{a}` consumes the `op` and `b` arguments, calling the relevant operator from `abc::comparison_wrapper_t`, and returns the created `matcher_t` object in the form `abc::matcher_t{.result = a op b, ...}`. 
+
+As an example, `_EXPR(1==2)` is evaluated as follows:
+
+- `_EXPR(1==2)` is expanded to become `abc::comparison_placeholder_t() < 1 == 2`.
+- The subexpression `abc::comparison_placeholder_t() < 1` is evaluated to become `abc::comparison_wrapper_t<T>(1)`, and the whole expression becomes `abc::comparison_wrapper_t<T>(1) == 2`.
+- `abc::comparison_wrapper_t`'s `operator==` is called, which constructs a `matcher_t` object. This `matcher_t` object's `result` value is `false` (as the expression is false), and its `result_str` value is  `"1 != 2"`. Thus, the entire expression becomes `matcher_t{.result = false, .result_str = "1 != 2"}`.
+
 
 ## _MATCHER macro
 
-In this subsection we introduce the `_MATCHER` macro to the reader. However before we do so, we will first provide some intuition as to why the reader may want to use it.
-
-Consider the following code. For those unfamilar with assertions, the `_CHECK` macro simply reports the `matcher_t` test result to the `abc_test` framework. 
+The `_MATCHER` macro can be thought of as a function with the following type signature.
 
 ```cpp
-_CHECK(1==2);
-matcher_t t1 = _EXPR(2==3);
-_CHECK(t1);
+matcher_t _MATCHER(const matcher_t& matcher);
 ```
 
-The following shows the output produced from the above code.
+The `_MATCHER` returns a copy of the input argument `matcher`, except that this copy has additional source code information encoded within it. This source code information can be seen in the test results for the assertion the matcher is assigned to.
+
+As an example, let us revisit the test case shown at the [beginning of this section](). We saw in its output that each `_CHECK` macro had a single source attributed to it. Below we show that test case re-written using the `_MATCHER` macro.
 
 ```cpp
- 1)  Single-line assertion failed.
-     Source location:
-       ..\docs\assertion_examples.hpp:1
-     Source code representation:
-       "_CHECK(_EXPR(1 == 2))"
-     Matcher failed with output:
-       "1 != 2"
- 2)  Single-line assertion failed.
-     Source location:
-       ..\docs\assertion_examples.hpp:3
-     Source code representation:
-       "_CHECK(t1)"
-     Matcher failed with output:
-       "2 != 3"
+_TEST_CASE(
+    abc::test_case_t({.name = "Matcher examples, revisited"})
+)
+{
+    using namespace abc;
+    matcher_t matcher_1 = _MATCHER(matcher_t());
+    _CHECK(matcher_1);
+    matcher_t matcher_2 = _MATCHER(bool_matcher(true));
+    matcher_t matcher_3 = _MATCHER(bool_matcher(false));
+    annotated_matcher_t annotated_matcher_2(_MATCHER(
+        annotate(matcher_3, "Testing bool_matcher(false)")
+    ));
+    _CHECK(matcher_2);
+    _CHECK(matcher_3);
+    _CHECK(annotated_matcher_2);
+    int i               = 2;
+    matcher_t matcher_4 = _MATCHER(_EXPR(i == 2));
+    i                   = 8;
+    matcher_t matcher_5 = _MATCHER(_EXPR(i <= 7));
+    _CHECK(matcher_4);
+    _CHECK(matcher_5);
+    annotated_matcher_t annotated_matcher_3(_MATCHER(
+        annotate(fmt::format("Checking i <= {}", 7), matcher_5)
+    ));
+    _CHECK(annotated_matcher_3);
+}
 ```
 
-However, the user may notice that for `t1`, the source information is not complete. This is because the `matcher_t` element `t1` does not have all its source information associated with it. To this end, the `_MATCHER` macro encodes source information into a `matcher_t` (or `annotated_matcher_t`) entity.
+Below we show the output from this rewritten test case.
 
 ```cpp
-matcher_t t1 = _MATCHER(_EXPR(2==3));
-_CHECK(t1);
-```
-
-```
- 1)  Single-line assertion failed.
+ 1)  Single-line assertion passed.
      Source location:
-       ..\docs\assertion_examples.hpp:2
+       ..\docs\assertion_examples.hpp:7
      Source code representation:
-       "_CHECK(t1)"
+       "_CHECK(matcher_1)"
      Matcher's other sources:
        Source location:
-         ..\docs\assertion_examples.hpp:1
+         ..\docs\assertion_examples.hpp:6
        Source code representation:
-         "_MATCHER(_EXPR(2 == 3))"
+         "_MATCHER(matcher_t())"
+     Matcher passed with output:
+       "true"
+ 2)  Single-line assertion passed.
+     Source location:
+       ..\docs\assertion_examples.hpp:15
+     Source code representation:
+       "_CHECK(matcher_2)"
+     Matcher's other sources:
+       Source location:
+         ..\docs\assertion_examples.hpp:10
+       Source code representation:
+         "_MATCHER(bool_matcher(true))"
+     Matcher passed with output:
+       "true"
+ 3)  Single-line assertion failed.
+     Source location:
+       ..\docs\assertion_examples.hpp:16
+     Source code representation:
+       "_CHECK(matcher_3)"
+     Matcher's other sources:
+       Source location:
+         ..\docs\assertion_examples.hpp:11
+       Source code representation:
+         "_MATCHER(bool_matcher(false))"
      Matcher failed with output:
-       "2 != 3"
+       "false"
+ 4)  Single-line assertion failed.
+     Source location:
+       ..\docs\assertion_examples.hpp:17
+     Source code representation:
+       "_CHECK(annotated_matcher_2)"
+     Matcher's other sources:
+       Source location:
+         ..\docs\assertion_examples.hpp:11
+       Source code representation:
+         "_MATCHER(bool_matcher(false))"
+       Source location:
+         ..\docs\assertion_examples.hpp:12
+       Source code representation:
+         "_MATCHER(annotate(matcher_3, "Testing bool_matcher(false)"))"
+     Matcher failed with output:
+       "false"
+     Matcher's annotation:
+       "Testing bool_matcher(false)"
+ 5)  Single-line assertion passed.
+     Source location:
+       ..\docs\assertion_examples.hpp:22
+     Source code representation:
+       "_CHECK(matcher_4)"
+     Matcher's other sources:
+       Source location:
+         ..\docs\assertion_examples.hpp:19
+       Source code representation:
+         "_MATCHER(_EXPR(i == 2))"
+     Matcher passed with output:
+       "2 == 2"
+ 6)  Single-line assertion failed.
+     Source location:
+       ..\docs\assertion_examples.hpp:23
+     Source code representation:
+       "_CHECK(matcher_5)"
+     Matcher's other sources:
+       Source location:
+         ..\docs\assertion_examples.hpp:21
+       Source code representation:
+         "_MATCHER(_EXPR(i <= 7))"
+     Matcher failed with output:
+       "8 > 7"
+ 7)  Single-line assertion failed.
+     Source location:
+       ..\docs\assertion_examples.hpp:27
+     Source code representation:
+       "_CHECK(annotated_matcher_3)"
+     Matcher's other sources:
+       Source location:
+         ..\docs\assertion_examples.hpp:21
+       Source code representation:
+         "_MATCHER(_EXPR(i <= 7))"
+       Source location:
+         ..\docs\assertion_examples.hpp:24
+       Source code representation:
+         "_MATCHER(annotate(fmt::format("Checking i <= {}", 7), matcher_5))"
+     Matcher failed with output:
+       "8 > 7"
+     Matcher's annotation:
+       "Checking i <= 7"
 ```
 
-In [this section]() we will see how logical operators can be used to compose matchers together. The `_MATCHER` macro allows us to record source information when using logical operators.
+The reader can clearly see that by using the `_MATCHER` macro, the output shows all of each matcher's source code information. This information can be invaluable when trying to diagnose why a test case has failed, especially in cases where the control flow of a program is not immediately clear. We will also see in the [next section]() how the `_MATCHER` macro is useful when encoding Boolean logic into matchers.
 
-The reader should note that code in this form.
+As a final point, the reader should note that code in this form.
 
 ```cpp
 _CHECK(_MATCHER(_EXPR(1 == 2)));
@@ -165,47 +429,37 @@ Will not produce an additional source code representation attributed to the matc
 
 ## Annotating Matchers
 
-As we have discussed previously, there are two types of matcher in `abc_test`; objects of type `matcher_t`, and objects of type `annotated_matcher_t`. 
+In this subsection we provide the complete documentation concerning the annotation of matchers. This includes documentation for the object `annotated_matcher_t` and the function `abc::annotate`. 
 
-`annotated_matcher_t` entities have an additional `std::string` associated with them. This allows the user to specify an additional anntoation to a matcher. However entites of type `annotated_matcher_t` are not as readily used as those of `matcher_t`. 
-
-Specifically, all functions that encode a matcher return a `matcher_t` object. The functionality of matchers which allows logical operators to be used on them are only allowed on `matcher_t` objects.
-
-The only publicly facing way to create an `annotated_matcher_t` entity is to use the two functions `abc::annotate`. They have the following type signatures.
+As we discussed [at the start of this section](), internally the matcher objects `matcher_t` and `annotated_matcher_t` are almost identical type synonyms for the same object. This object is `template<bool Annotated> abc::matcher_wrapper_t`. The template parameter `Annotated` is used to control whether instances of `matcher_wrapper_t` include an `std::string` member variable called `annotation`; if `true` they do, if `false` they do not. Below we show the type synonyms for `matcher_t` and `annotated_matcher_t`.
 
 ```cpp
-annotated_matcher_t
-annotate(
-    const matcher_t& _a_matcher,
-    const std::string_view          _a_annotation
-) noexcept;
-
-annotated_matcher_t
-annotate(
-    const std::string_view          _a_annotation,
-    const matcher_t& _a_matcher
-) noexcept;
+using annotated_matcher_t = abc::matcher_wrapper_t<true>;
+using matcher_t = abc::matcher_wrapper_t<false>;
 ```
 
-They are designed in this manner so that they are the "final" part added to a matcher before it is given to an assertion macro. An example of their use is shown below.
+Earlier we stated that the core difference between the two matcher types is that `annotated_matcher_t` has an additional member variable, as shown above. However this is not the only difference. `abc_test` constrains how the user is able to use `annotated_matcher_t` objects. The only way to create `annotated_matcher_t` objects is through using the two `abc::annotate` functions. These have the following type signatures. 
 
 ```cpp
-_CHECK(annotate(_EXPR(i <= 7), "Checking the index is within range"));
+annotated_matcher_t annotate(const matcher_t& _a_matcher, const std::string_view _a_annotation) noexcept;
+annotated_matcher_t annotate(const std::string_view _a_annotation, const matcher_t& _a_matcher) noexcept;
 ```
 
-This produces output such as the following.
+There are no constructors available for the `annotated_matcher_t` object - other than the default copy and move constructors - and no default constructor. 
 
-However, there are other uses for `annotated_matcher_t` elements.
+In the [next section]() we will see how `matcher_t` objects can be composed together using the logical operators `operator&&`, `operator||` and `operator!`. `annotated_matcher_t` objects cannot be composed using these operators. The macros introduced in [this section]() - `_IF_OR_STATEMENT`, `_IF_AND_STATEMENT` and `_PROCESS` - allow the user to simulate lazily evaluated logical operators. These are not defined for `annotated_matcher_t` objects.
 
-The following shows a way of checking an exception type using an `annotated_matcher_t` object.
+The reader may question why `abc_test` constrains the use of annotations so much. We wanted to encourage the user to think carefully about when to use an annotation. By having only one way of constructing an annotated matcher, it was felt that the user would have to be deliberate in creating such entities. In addition to this, we felt that adding annotations to groups of matchers - which would be required if we allowed `annotated_matcher_t`s to be used with the logical operators introduced in the next section - could become confusing for the user. For example, if we had a large number of annotated matchers composed together using logical operators, it may become difficult to discern which matcher an annotation was assigned to.
 
 # Encoding Logic Into Matchers
 
-In this section we show the reader how logic can be encoded into the `matcher_t` object. This can be done in one of two ways; either using the logical operators, or using a set of specially designed macros.
+In this section we show the reader how logic can be encoded into `matcher_t` objects using logical operators and specially designed macros. 
 
-## Logic Operators And the _MATCHER macro
+The reader should note that none of the functionality discussed in this section will work with objects of type `annotated_matcher_t`.
 
-`matcher_t` has `operator` definitions for `!`, `&&` and `||` encoded in it. The functions are defined as follows:
+## Logical Operators
+
+The `matcher_t` object has `operator` definitions for `!`, `&&` and `||`. The operators are defined as follows:
 
 ```cpp
 matcher_t operator!() const noexcept;
@@ -213,21 +467,97 @@ matcher_t operator&&(const matcher_t& _a_matcher) const noexcept;
 matcher_t operator||(const matcher_t& _a_matcher) const noexcept;
 ```
 
-These allow the user to build up more checks on their written code. However, the reader should note that these operators are **not** evaluated lazily. By this we mean the expression `matcher_t t1 = t2 || t3` will evaluate both `t2` and `t3` even if `t2` passes. See [this section]() if the user requires functionality that emulates lazily evaluated operators.
+These operators can be used to encode verbose test logic into a single `matcher_t` object. The reader should note that the `matcher_t` objects created by these operators are not evaluated lazily. For example the expression `_EXPR(1 < 2) || _EXPR(2 < 3)` will always evaluate both subexpressions `_EXPR(1 < 2)` and `_EXPR(2 < 3)`. This contrasts with how the `||` operator behaves with `bool` values. In [this subsection]() we consider an alternative way of encoding logic into matchers, which allows us to simulate lazily evaluated logical operators.
 
-Internally, these operators are relatively simple; the unary operator (`!`) works by "not"ing the result of the original `matcher_t`, and adding a "!" to its text output. The binary operators work in a similar way; the Boolean result of the two `matcher_t` arguments is calculated, and a text representation of the two outputs is created.
-
-When using these matchers with assertions, we recomend using the `_MATCHER` macro so that source code representations are retained for the assertions. Below we show some examples.
+To conclude this subsection, below we show an example test case which uses the matcher's logical operators. Through this example, and the output shown underneith, the reader should gain an understanding of how these operators can be used.
 
 ```cpp
-matcher_t m1 = _MATCHER(bool_matcher(true));
-matcher_t m2 = _MATCHER(bool_matcher(false));
-//Will evaluate to false. Text output will be "true && false".
-matcher_t m3 = _MATCHER(m1 && m2);
-_CHECK(m3);
-//Will evaluate to true. Text output will be "!(true && false)"
-matcher_t m4 = _MATCHER(!m3);
-_REQUIRE(m4);
+_TEST_CASE(
+    abc::test_case_t({.name = "Logical operators"})
+)
+{
+    using namespace abc;
+    matcher_t m1 = _MATCHER(_EXPR(1 < 2));
+    matcher_t m2 = _MATCHER(_EXPR(2 == 2));
+    _CHECK(m1 && m2);
+    _CHECK(m2 || m1);
+    _CHECK(m1 || m2);
+    matcher_t m3 = _MATCHER(m1 && m2);
+    _CHECK(! m3);
+}
+```
+
+Below we show the output for the above test case.
+
+```
+ 1)  Single-line assertion failed.
+     Source location:
+       ..\docs\assertion_examples.hpp:8
+     Source code representation:
+       "_CHECK(m1 && m2)"
+     Matcher's other sources:
+       Source location:
+         ..\docs\assertion_examples.hpp:6
+       Source code representation:
+         "_MATCHER(_EXPR(1 < 2))"
+       Source location:
+         ..\docs\assertion_examples.hpp:7
+       Source code representation:
+         "_MATCHER(_EXPR(2 == 2))"
+     Matcher passed with output:
+       "(1 < 2) && (2 == 2)"
+ 2)  Single-line assertion passed.
+     Source location:
+       ..\docs\assertion_examples.hpp:9
+     Source code representation:
+       "_CHECK(m2 || m1)"
+     Matcher's other sources:
+       Source location:
+         ..\docs\assertion_examples.hpp:6
+       Source code representation:
+         "_MATCHER(_EXPR(1 < 2))"
+       Source location:
+         ..\docs\assertion_examples.hpp:7
+       Source code representation:
+         "_MATCHER(_EXPR(2 == 2))"
+     Matcher passed with output:
+       "(2 == 2) || (1 < 2)"
+ 3)  Single-line assertion passed.
+     Source location:
+       ..\docs\assertion_examples.hpp:10
+     Source code representation:
+       "_CHECK(m1 || m2)"
+     Matcher's other sources:
+       Source location:
+         ..\docs\assertion_examples.hpp:6
+       Source code representation:
+         "_MATCHER(_EXPR(1 < 2))"
+       Source location:
+         ..\docs\assertion_examples.hpp:7
+       Source code representation:
+         "_MATCHER(_EXPR(2 == 2))"
+     Matcher passed with output:
+       "(1 < 2) || (2 == 2)"
+ 4)  Single-line assertion passed.
+     Source location:
+       ..\docs\assertion_examples.hpp:12
+     Source code representation:
+       "_CHECK(! m3)"
+     Matcher's other sources:
+       Source location:
+         ..\docs\assertion_examples.hpp:6
+       Source code representation:
+         "_MATCHER(_EXPR(1 < 2))"
+       Source location:
+         ..\docs\assertion_examples.hpp:7
+       Source code representation:
+         "_MATCHER(_EXPR(2 == 2))"
+       Source location:
+         ..\docs\assertion_examples.hpp:11
+       Source code representation:
+         "_MATCHER(m1 && m2)"
+     Matcher failed with output:
+       "!((1 < 2) && (2 == 2))"
 ```
 
 ## Simulating Lazily Evaluated Logic Operators

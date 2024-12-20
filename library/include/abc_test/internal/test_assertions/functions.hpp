@@ -35,7 +35,9 @@ template <bool Has_Annotation>
 __constexpr _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>
             matcher_macro(
                 const _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>& _a_element,
-                const _ABC_NS_DS::single_source_t&                        _a_source
+                const std::string_view      _a_macro_str,
+                const std::string_view      _a_matcher_str,
+                const std::source_location& _a_sl
             ) noexcept;
 /*!
  * @brief function to create an assertion.
@@ -136,11 +138,13 @@ template <bool Has_Annotation>
 __constexpr_imp _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>
                 matcher_macro(
                     const _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>& _a_element,
-                    const _ABC_NS_DS::single_source_t&                        _a_source
+                    const std::string_view      _a_macro_str,
+                    const std::string_view      _a_matcher_str,
+                    const std::source_location& _a_sl
                 ) noexcept
 {
     using namespace _ABC_NS_MATCHER;
-    return matcher_wrapper_t<Has_Annotation>(_a_element, _a_source);
+    return run_matcher_macro<Has_Annotation>(_a_element, _a_macro_str, _a_matcher_str, _a_sl);
 }
 
 template<
@@ -206,6 +210,7 @@ create_assertion(
         );
         _a_test_runner.add_assertion(_l_gur);
     }
+    _a_matcher.internal_matcher()->remove_primary_source();
     return return_result<T>(_l_passed);
 }
 

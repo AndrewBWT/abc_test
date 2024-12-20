@@ -25,46 +25,9 @@ public:
      *
      * Builds a matcher_wrapper_t containing an element which is always true.
      */
+    template <typename = typename std::enable_if_t<not Has_Annotation>>
     __no_constexpr
         matcher_wrapper_t() noexcept;
-    /*!
-     * @brief Constructor.
-     *
-     * Buidls a matcher_t containing an element which either passes or fails
-     * depending on the bool argument.
-     *
-     * @param _a_bool Denotes whether the matcher_t passes or fails.
-     */
-    __no_constexpr explicit matcher_wrapper_t(const bool _a_bool) noexcept;
-    /*!
-     * @brief Constructor.
-     * @param _a_matcher_internal The internal matcher_base_ptr_t to set this
-     * element at.
-     */
-    __no_constexpr
-        matcher_wrapper_t(matcher_base_ptr_t _a_matcher_internal) noexcept;
-    /*!
-     * @brief Constructor.
-     * @param _a_matcher The matcher_wrapper_t which is used to build an object
-     * with an annotation.
-     * @param _a_annotation The annotation itself
-     */
-    template <typename = typename std::enable_if<Has_Annotation>::type>
-    __constexpr
-    matcher_wrapper_t(
-        const matcher_wrapper_t<false>& _a_matcher,
-        const std::string_view          _a_annotation
-    ) noexcept;
-    /*!
-     * @brief Constructor.
-     * @param _a_matcher The matcher to use as this element.
-     * @param _a_single_source The source to use to set this element.
-     */
-    __no_constexpr_imp
-        matcher_wrapper_t(
-            const matcher_wrapper_t<Has_Annotation>& _a_matcher,
-            const ds::single_source_t&               _a_single_source
-        );
     /*!
      * @brief Returns a cref of the element's annotation
      *
@@ -154,6 +117,22 @@ public:
     __no_constexpr matcher_wrapper_t
         operator||(const matcher_wrapper_t& _a_matcher) const noexcept;
     friend matcher_wrapper_t<not Has_Annotation>;
+    __no_constexpr_imp friend matcher_wrapper_t<false>
+        make_matcher(matcher_base_t* _a_generic_matcher_ptr) noexcept;
+    template <bool Has_Annotation>
+    __constexpr friend _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>
+        run_matcher_macro(
+            const _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>&
+                                        _a_element,
+            const std::string_view      _a_macro_str,
+            const std::string_view      _a_matcher_str,
+            const std::source_location& _a_sl
+        ) noexcept;
+    __no_constexpr friend matcher_wrapper_t<true>
+        annotate_matcher(
+            const matcher_wrapper_t<false>&       _a_matcher,
+            const std::string_view _a_annotation
+        ) noexcept;
 private:
     std::conditional_t<Has_Annotation, std::string, std::monostate>
                        _m_annotation;
@@ -161,42 +140,55 @@ private:
     template <logic_enum_t Logic_Enum>
     __constexpr bool
         process_(const matcher_wrapper_t& _a_matcher) noexcept;
+    /*!
+     * @brief Constructor.
+     * @param _a_matcher_internal The internal matcher_base_ptr_t to set this
+     * element at.
+     */
+    __no_constexpr
+        matcher_wrapper_t(matcher_base_ptr_t _a_matcher_internal) noexcept;
+    __no_constexpr_imp
+        matcher_wrapper_t(
+            const matcher_wrapper_t<Has_Annotation>& _a_matcher,
+            const std::string_view                   _a_macro_str,
+            const std::string_view                   _a_matcher_str,
+            const std::source_location&              _a_sl
+        );
+    /*!
+     * @brief Constructor.
+     * @param _a_matcher The matcher_wrapper_t which is used to build an object
+     * with an annotation.
+     * @param _a_annotation The annotation itself
+     */
+    template <typename = typename std::enable_if<Has_Annotation>::type>
+    __constexpr
+    matcher_wrapper_t(
+        const matcher_wrapper_t<false>& _a_matcher,
+        const std::string_view          _a_annotation
+    ) noexcept;
 };
-__no_constexpr_imp matcher_t
-make_matcher(matcher_base_t* _a_generic_matcher_ptr) noexcept;
+
 _END_ABC_MATCHER_NS
 _BEGIN_ABC_NS
 using matcher_t           = _ABC_NS_MATCHER::matcher_wrapper_t<false>;
 using annotated_matcher_t = _ABC_NS_MATCHER::matcher_wrapper_t<true>;
 
 __no_constexpr annotated_matcher_t
-annotate(
-    const matcher_t& _a_matcher,
-    const std::string_view          _a_annotation
-) noexcept;
+    annotate(const matcher_t& _a_matcher, const std::string_view _a_annotation)
+        noexcept;
 
 __no_constexpr annotated_matcher_t
-annotate(
-    const std::string_view          _a_annotation,
-    const matcher_t& _a_matcher
-) noexcept;
+    annotate(const std::string_view _a_annotation, const matcher_t& _a_matcher)
+        noexcept;
 _END_ABC_NS
 
 _BEGIN_ABC_MATCHER_NS
 template <bool Has_Annotation>
+template <typename>
 __no_constexpr_imp
     matcher_wrapper_t<Has_Annotation>::matcher_wrapper_t() noexcept
-    : matcher_wrapper_t(true)
-{}
-
-template <bool Has_Annotation>
-__no_constexpr_imp
-    matcher_wrapper_t<Has_Annotation>::matcher_wrapper_t(
-        const bool _a_bool
-    ) noexcept
     : matcher_wrapper_t<Has_Annotation>(
-          _a_bool ? matcher_base_ptr_t(new static_matcher_t<reports::pass_t>())
-                  : matcher_base_ptr_t(new static_matcher_t<reports::fail_t>())
+          matcher_base_ptr_t(new static_matcher_t<reports::pass_t>())
       )
 {}
 
@@ -215,7 +207,10 @@ __constexpr_imp
         const matcher_wrapper_t<false>& _a_matcher,
         const std::string_view          _a_annotation
     ) noexcept
-    : _m_matcher_internal(_a_matcher.internal_matcher())
+    : _m_matcher_internal(
+          std::make_shared<matcher_base_t>(_a_matcher.internal_matcher())
+
+      )
     , _m_annotation(_a_annotation)
 {}
 
@@ -223,11 +218,18 @@ template <bool Has_Annotation>
 __no_constexpr_imp
     matcher_wrapper_t<Has_Annotation>::matcher_wrapper_t(
         const matcher_wrapper_t<Has_Annotation>& _a_matcher,
-        const ds::single_source_t&               _a_single_source
+        const std::string_view                   _a_macro_str,
+        const std::string_view                   _a_matcher_str,
+        const std::source_location&              _a_sl
+        // const ds::single_source_t&               _a_single_source
     )
-    : _m_matcher_internal(_a_matcher.internal_matcher())
+    : _m_matcher_internal(
+          make_shared<matcher_base_t>(_a_matcher.internal_matcher())
+
+      )
+    , _m_annotation(_a_matcher._m_annotation)
 {
-        _m_matcher_internal->add_source_info(_a_single_source);
+    _m_matcher_internal->add_source_info(_a_macro_str, _a_matcher_str, _a_sl);
 }
 
 template <bool Has_Annotation>
@@ -266,8 +268,7 @@ __no_constexpr_imp bool
         test_runner_t&             _a_test_runner
     ) noexcept
 {
-    const bool _l_result{_m_matcher_internal->matcher_result().passed()
-    };
+    const bool _l_result{_m_matcher_internal->matcher_result().passed()};
     *this = make_matcher(new logic_matcher_t<OR>(
         this->internal_matcher(), std::shared_ptr<matcher_base_t>()
     ));
@@ -282,7 +283,7 @@ __no_constexpr_imp bool
         test_runner_t&             _a_test_runner
     ) noexcept
 {
-    const bool _l_result{ _m_matcher_internal->matcher_result().passed() };
+    const bool _l_result{_m_matcher_internal->matcher_result().passed()};
     *this = make_matcher(new logic_matcher_t<AND>(
         this->internal_matcher(), std::shared_ptr<matcher_base_t>()
     ));
@@ -365,6 +366,7 @@ __constexpr_imp bool
         return false;
     }
 }
+
 __no_constexpr_imp matcher_t
     make_matcher(
         matcher_base_t* _a_generic_matcher_ptr
@@ -372,23 +374,50 @@ __no_constexpr_imp matcher_t
 {
     return matcher_t(matcher_base_ptr_t(_a_generic_matcher_ptr));
 }
+
+template <bool Has_Annotation>
+__constexpr_imp _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>
+                run_matcher_macro(
+                    const _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>& _a_element,
+                    const std::string_view                                    _a_macro_str,
+                    const std::string_view      _a_matcher_str,
+                    const std::source_location& _a_sl
+                ) noexcept
+{
+    return matcher_wrapper_t<Has_Annotation>(
+        _a_element, _a_macro_str, _a_matcher_str, _a_sl
+    );
+}
+
+__no_constexpr_imp  matcher_wrapper_t<true>
+    annotate_matcher(
+        const  matcher_wrapper_t<false>&       _a_matcher,
+        const std::string_view _a_annotation
+    ) noexcept
+{
+    return matcher_wrapper_t<true>(_a_matcher, _a_annotation);
+}
+
+
 _END_ABC_MATCHER_NS
+
 _BEGIN_ABC_NS
 __no_constexpr_imp annotated_matcher_t
-annotate(
-    const matcher_t& _a_matcher,
-    const std::string_view          _a_annotation
-) noexcept
+    annotate(
+        const matcher_t&       _a_matcher,
+        const std::string_view _a_annotation
+    ) noexcept
 {
-    return annotated_matcher_t(_a_matcher, _a_annotation);
+    return annotate_matcher(_a_matcher, _a_annotation);
 }
 
 __no_constexpr_imp annotated_matcher_t
-annotate(
-    const std::string_view          _a_annotation,
-    const matcher_t& _a_matcher
-) noexcept
+    annotate(
+        const std::string_view _a_annotation,
+        const matcher_t&       _a_matcher
+    ) noexcept
 {
-    return annotated_matcher_t(_a_matcher, _a_annotation);
+    return annotate_matcher(_a_matcher, _a_annotation);
 }
+
 _END_ABC_NS

@@ -6,7 +6,7 @@
 #include <ranges>
 #include <vector>
 
-#if 0
+
 #define __BAD_USER_DEFINED_BBA_1_BEGIN(name)                               \
     _BEGIN_SINGLE_ELEMENT_BBA(name, fmt::format("{} description", #name)); \
     name = _BLOCK_CHECK(abc::bool_matcher(false));
@@ -117,25 +117,26 @@ void
     }
     _END_BBA_CHECK(exception_test);
 }
+
 void
-test2(
-    const std::string str,
-    abc::multi_element_test_block_t& _a_metb
-)
+    test2(
+        const std::string                str,
+        abc::multi_element_test_block_t& _a_metb
+    )
 {
     using namespace abc;
     try
     {
-        int i = std::stoi(str);
+        int i    = std::stoi(str);
         _a_metb += _BLOCK_CHECK(annotate("Checking i > 0", _EXPR(i > 0)));
     }
-    catch (std::invalid_argument const& ex)
+    catch (std::invalid_argument const & ex)
     {
         _a_metb += _BLOCK_CHECK(
             annotate("Invalid argument exception thrown", bool_matcher(false))
         );
     }
-    catch (std::out_of_range const& ex)
+    catch (std::out_of_range const & ex)
     {
         _a_metb += _BLOCK_CHECK(
             annotate("Integer out of range exception", bool_matcher(false))
@@ -146,7 +147,7 @@ test2(
 
 // This serves as the testing code.
 _TEST_CASE(
-    abc::test_case_t({ .name = "Empty BBAs" })
+    abc::test_case_t({.name = "Empty BBAs"})
 )
 {
     _BEGIN_SINGLE_ELEMENT_BBA(test1, "An empty SE-BBA");
@@ -155,6 +156,7 @@ _TEST_CASE(
     _BEGIN_MULTI_ELEMENT_BBA(test2, "An empty ME-BBA");
     _END_BBA_CHECK(test2);
 }
+
 _TEST_CASE(
     abc::test_case_t({.name = "Testing stoi"})
 )
@@ -164,20 +166,22 @@ _TEST_CASE(
     test::test("hello");
     test::test("9999999999999999999999999999999999999");
 }
+
 _TEST_CASE(
-    abc::test_case_t({ .name = "Testing stoi again" })
+    abc::test_case_t({.name = "Testing stoi again"})
 )
 {
     using namespace std;
     _BEGIN_MULTI_ELEMENT_BBA(stoi_test, "Testing mid point function");
     for (auto&& str : initializer_list<string>{
-             "1","-1","hello","999999999999999999999999999999999999999999999"
-        })
+             "1", "-1", "hello", "999999999999999999999999999999999999999999999"
+         })
     {
         test::test2(str, stoi_test);
     }
     _END_BBA_CHECK(stoi_test);
 }
+
 _TEST_CASE(
     abc::test_case_t({.name = "Testing midpoint"})
 )
@@ -203,82 +207,252 @@ _TEST_CASE(
     _END_BBA_CHECK(mid_point_test);
 }
 
+struct type_x
+{
+    int i;
+    int j;
+
+    inline bool
+        operator==(
+            const type_x& rhs
+        ) const
+    {
+        return i == rhs.i && j == rhs.j;
+    }
+};
+
+_TEST_CASE(
+    abc::test_case_t({.name = "Matchers example, revisited"})
+)
+{
+    using namespace abc;
+    matcher_t matcher_1 = _MATCHER(matcher_t());
+    _CHECK(matcher_1);
+    matcher_t           matcher_2 = _MATCHER(bool_matcher(true));
+    matcher_t           matcher_3 = _MATCHER(bool_matcher(false));
+    annotated_matcher_t annotated_matcher_2(
+        _MATCHER(annotate(matcher_3, "Testing bool_matcher(false)"))
+    );
+    _CHECK(matcher_2);
+    _CHECK(matcher_3);
+    _CHECK(annotated_matcher_2);
+    int       i         = 2;
+    matcher_t matcher_4 = _MATCHER(_EXPR(i == 2));
+    i                   = 8;
+    matcher_t matcher_5 = _MATCHER(_EXPR(i <= 7));
+    _CHECK(matcher_4);
+    _CHECK(matcher_5);
+    annotated_matcher_t annotated_matcher_3(_MATCHER(
+        _MATCHER(annotate(fmt::format("Checking i <= {}", 7), matcher_5))
+    ));
+    _CHECK(annotated_matcher_3);
+    _CHECK(_MATCHER(_MATCHER(_EXPR(1 == 2))));
+}
+
+struct type_y
+{
+    std::vector<int> is;
+
+    inline bool
+        operator==(
+            const type_x& rhs
+        ) const
+    {
+        return is.size() == 2 && is[0] == rhs.i && is[1] == rhs.j;
+    }
+
+    inline bool
+        operator==(
+            const type_y& rhs
+        ) const
+    {
+        return is == rhs.is;
+    }
+};
+
+template <>
+struct fmt::formatter<type_y> : formatter<string_view>
+{
+    inline auto
+        format(
+            type_y          arg_y,
+            format_context& _a_ctx
+        ) const -> format_context::iterator
+    {
+        using namespace std;
+        const string _l_rv{fmt::format("y {{{0}}}", arg_y.is)};
+        return formatter<string_view>::format(_l_rv, _a_ctx);
+    }
+};
+
+_TEST_CASE(
+    abc::test_case_t({.name = "X example"})
+)
+{
+    type_x xi{1, 2};
+    type_x xj{3, 4};
+    _CHECK(_EXPR(xi == xj));
+    type_y yi{
+        {1, 2}
+    };
+    type_y yj{
+        {4, 5, 6}
+    };
+    _CHECK(_EXPR(yi == yj));
+    _CHECK(_EXPR(xi == yi));
+}
+
+_TEST_CASE(
+    abc::test_case_t({.name = "Logical operators"})
+)
+{
+    using namespace abc;
+    matcher_t m1 = _MATCHER(_EXPR(1 < 2));
+    matcher_t m2 = _MATCHER(_EXPR(2 == 2));
+    _CHECK(m1 && m2);
+    _CHECK(m2 || m1);
+    _CHECK(m1 || m2);
+    matcher_t m3 = _MATCHER(m1 && m2);
+    _CHECK(! m3);
+}
+
+_TEST_CASE(
+    abc::test_case_t({.name = "Matchers example"})
+)
+{
+    using namespace abc;
+    // matcher_t is the object which holds the result of a user-defined test. A
+    // default matcher has a result value of true, and no result_str.
+    matcher_t matcher_1;
+    _CHECK(matcher_1);
+    // The function bool_matcher creates a matcher_t whose result is the bool
+    // argument given to bool_matcher. matcher_2 has a result value of true, and
+    // a result_str of "true".
+    matcher_t matcher_2 = bool_matcher(true);
+    // matcher_3 has a result value of false and a result_str of "false".
+    matcher_t matcher_3 = bool_matcher(false);
+    // Below is an example of annotating a matcher.
+    annotated_matcher_t annotated_matcher_2(
+        annotate(matcher_3, "Testing bool_matcher(false)")
+    );
+    _CHECK(matcher_2);
+    _CHECK(matcher_3);
+    _CHECK(annotated_matcher_2);
+    int i               = 2;
+    // Expressions can be encoded in matchers using the macro _EXPR. matcher_4
+    // has a result value of true, as it checks if i==2 (which it does). Its
+    // result_str = "i == 2".
+    matcher_t matcher_4 = _EXPR(i == 2);
+    i                   = 8;
+    // matcher_5 has a result value of false, as i <=7 is false. Its result_str
+    // is "i >= 7", showing the failure of the original expression.
+    matcher_t matcher_5 = _EXPR(i <= 7);
+    _CHECK(matcher_4);
+    _CHECK(matcher_5);
+    // Another example of annotating a matcher. Note the annotate function is
+    // different to that used previouslyi.
+    annotated_matcher_t annotated_matcher_3(
+        annotate(fmt::format("Checking i <= {}", 7), matcher_5)
+    );
+    _CHECK(annotated_matcher_3);
+}
+
 _TEST_CASE(
     abc::test_case_t(
-        { .name = "file_06_example_03",
+        {.name        = "file_06_example_03",
          .description = "Included macros using block assertions",
-         .path = "examples::basic_examples::06_manual_block_assertion" }
+         .path        = "examples::basic_examples::06_manual_block_assertion"}
     )
 )
 {
     using namespace abc;
     using namespace std;
     _BEGIN_NO_THROW(t1)
-        int i = stoi("3");
+    int i = stoi("3");
     _END_REQUIRE_NO_THROW(t1);
 
-    //Same check as above. This test will fail. Note that the name of the internal BBA is re-used.
+    // Same check as above. This test will fail. Note that the name of the
+    // internal BBA is re-used.
     _BEGIN_NO_THROW(t1)
-        int i = stoi("up");
+    int i = stoi("up");
     _END_CHECK_NO_THROW(t1);
 
-    //This test will pass.
+    // This test will pass.
     _BEGIN_THROW_ANY(t1)
-        int i = stoi("up");
+    int i = stoi("up");
     _END_CHECK_THROW_ANY(t1);
 
-    //This test will pass.
+    // This test will pass.
     _BEGIN_EXCEPTION_TYPE(t1)
-        int i = stoi("hi");
+    int i = stoi("hi");
     _END_CHECK_EXCEPTION_TYPE(t1, std::invalid_argument);
 
-    //As will this. The exception returned is derived from logic error.
+    // As will this. The exception returned is derived from logic error.
     _BEGIN_EXCEPTION_TYPE(t1)
-        int i = stoi("hi");
+    int i = stoi("hi");
     _END_CHECK_EXCEPTION_TYPE(t1, std::logic_error);
 
-    auto f = []() {throw int(1); };
+    auto f = []()
+    {
+        throw int(1);
+    };
 
-    //This will also pass. The thrown type does not need to be derived from exception.
+    // This will also pass. The thrown type does not need to be derived from
+    // exception.
     _BEGIN_EXCEPTION_TYPE(t1)
-        f();
+    f();
     _END_CHECK_EXCEPTION_TYPE(t1, int);
 
-    //This will pass
+    // This will pass
     _BEGIN_EXCEPTION_MSG(t1);
     int i = stoi("hi");
-    _END_CHECK_EXCEPTION_MSG(t1,"invalid");
+    _END_CHECK_EXCEPTION_MSG(t1, "invalid");
 
-    //This will also pass
-    { abc::single_element_test_block_t t1("Checking code throws an exception who's what() message shows a " "specific message", abc::ds::single_source_t(abc::utility::str::create_string({ "_BEGIN_EXCEPTION_TYPE_AND_MSG(", "t1", ")" }), std::source_location::current()));; t1 = abc::make_entity_bba_compatable<abc::reports::pass_or_fail_t>(annotate("Code does not throw any excpetion", false_matcher())); try {;
-    int i = stoi("hi");
-    _END_CHECK_EXCEPTION_TYPE_AND_MSG(t1,std::logic_error, "invalid");
-}
-#endif
-
-    _TEST_CASE(
-        abc::test_case_t(
-            { .name = "time",
-             .description = "Simple",
-             .path = "examples::basic_examples::06_manual_block_assertion" }
-        )
-    )
+    // This will also pass
     {
-        using namespace abc;
-        _CHECK(_EXPR(1 == 2));
-        matcher_t t1 = _EXPR(2 == 3);
-        _CHECK(t1);
-        int i = 0;
-        //t1's main source is "_MATCHER", <std::source_location>,internal.
-        t1 = _MATCHER(_EXPR(2 == 3));
-        //Given _CHECK and expression, create "_CHECK(expression).
-        //If "_CHECK(expression) == _CHECK(main source) then replace main source,
-        //add this as main source.
-        _CHECK(t1);
-        //initially main source is "_MATCHER(internal).
-        //Check then creates source as "_CHECK(_MATCHER(internal)). if same then replace
-        _CHECK(_MATCHER(_EXPR(1 == 2)));
-    }
+        abc::single_element_test_block_t t1(
+            "Checking code throws an exception who's what() message shows a "
+            "specific message",
+            abc::ds::single_source_t(
+                abc::utility::str::create_string(
+                    {"_BEGIN_EXCEPTION_TYPE_AND_MSG(", "t1", ")"}
+                ),
+                std::source_location::current()
+            )
+        );
+        ;
+        t1 = abc::make_entity_bba_compatable<abc::reports::pass_or_fail_t>(
+            annotate("Code does not throw any excpetion", false_matcher())
+        );
+        try
+        {
+            ;
+            int i = stoi("hi");
+            _END_CHECK_EXCEPTION_TYPE_AND_MSG(t1, std::logic_error, "invalid");
+        }
+
+        _TEST_CASE(abc::test_case_t(
+            {.name        = "time",
+             .description = "Simple",
+             .path = "examples::basic_examples::06_manual_block_assertion"}
+        ))
+        {
+            using namespace abc;
+            _CHECK(_EXPR(1 == 2));
+            matcher_t t1 = _EXPR(2 == 3);
+            _CHECK(t1);
+            int i = 0;
+            // t1's main source is "_MATCHER", <std::source_location>,internal.
+            t1    = _MATCHER(_EXPR(2 == 3));
+            // Given _CHECK and expression, create "_CHECK(expression).
+            // If "_CHECK(expression) == _CHECK(main source) then replace main
+            // source, add this as main source.
+            _CHECK(t1);
+            // initially main source is "_MATCHER(internal).
+            // Check then creates source as "_CHECK(_MATCHER(internal)). if same
+            // then replace
+            _CHECK(_MATCHER(_EXPR(1 == 2)));
+        }
 #if 0
 _TEST_CASE(
     abc::test_case_t(

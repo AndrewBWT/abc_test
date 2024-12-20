@@ -6,40 +6,6 @@
 
 _BEGIN_ABC_MATCHER_NS
 
-/*!
- * @brief Generic object used when creating comparison-based matchers.
- *
- * This class itself is not usually used; instead the macro _EXPR and the
- * factory methods in constructor.h are used.
- *
- * @tparam T1 The parameter of the first argument.
- * @tparam T2 The parameter of the second argument.
- * @tparam Cmp The enum used to compare T1 and T2.
- */
-template <comparison_enum_t Cmp>
-struct comparison_matcher_t : public operator_based_matcher_t
-{
-public:
-    using operator_based_matcher_t::operator_based_matcher_t;
-    /*!
-     * @brief Constructor.
-     * @param _a_l The T1 entity.
-     * @param _a_r The T2 entity.
-     */
-    //__constexpr
-    // comparison_matcher_t(
-
-    // T1&& _a_l, T2&& _a_r) noexcept;
-    /*!
-     * @brief Returns the precedence_t of the tempalted comparison type.
-     * @return precedence_t representing the tempalted comparison_enum's
-     * precedence.
-     */
-    __constexpr precedence_t
-        get_precedence() const noexcept;
-private:
-};
-
 namespace
 {
 template <comparison_enum_t Cmp, typename T1, typename T2>
@@ -126,24 +92,6 @@ _END_ABC_NS
 
 _BEGIN_ABC_MATCHER_NS
 
-/*template <typename T1, typename T2, comparison_enum_t Cmp>
-__constexpr_imp
-    comparison_matcher_t<T1, T2, Cmp>::comparison_matcher_t(
-        T1&& _a_l,
-        T2&& _a_r
-    ) noexcept
-    : operator_based_matcher_t(make_matcher_result<Cmp>(
-          std::forward<T1>(_a_l),
-          std::forward<T2>(_a_r)
-    ))
-{}*/
-
-template <comparison_enum_t Cmp>
-__constexpr_imp precedence_t
-    comparison_matcher_t<Cmp>::get_precedence() const noexcept
-{
-    return cmp_precedence<Cmp>();
-}
 
 namespace
 {
@@ -196,9 +144,10 @@ __constexpr_imp matcher_t
 {
     using namespace std;
     return make_matcher(
-        new comparison_matcher_t<Cmp_Enum>(make_matcher_result<Cmp_Enum>(
-            std::forward<T1>(_a_left_arg), std::forward<T2>(_a_right_arg)
-        ))
+        new matcher_base_t(make_matcher_result<Cmp_Enum>(
+            std::forward<T1>(_a_left_arg), std::forward<T2>(_a_right_arg)),
+            cmp_precedence<Cmp_Enum>()
+        )
     );
 } // namespace
 } // namespace

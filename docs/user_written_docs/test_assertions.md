@@ -23,6 +23,8 @@ Some functionality also requires the following include directive.
 
 We will make it clear to the reader when this is required.
 
+At various points in this document we will show the reader some output from `abc_test`. In all instances the output we will show has been created using the `text_test_reporter_t` object, initialized using the object's default constructor. The test suite used to create the output has been configured to show both passed and failed assertions, and passed and failed matchers. We have also ammended the output slightly to make the source locations easier to read.
+
 # What are Assertions?
 
 In `abc_test` assertions are entities whose purpose is to *register* the result of some test condition(s) with the `abc_test` framework - essentially assertions act as bridges between the user-defined logic and the overarching `abc_test` framework. All assertions have a *pass status* associated with them, denoting whether the assertion registers as passing or failing with the `abc_test` framework. An assertion's pass status can be thought of as a Boolean variable; if its `true` the assertion passes, and if its `false` the assertion fails.
