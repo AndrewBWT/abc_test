@@ -11,16 +11,16 @@
     );                                               \
     try                                              \
     {
-#define __INTERNAL_END_NO_THROW(_a_name)                                  \
-    _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(                       \
-        "Code block does not throw any exceptions.", true_matcher()       \
-    ));                                                                   \
-    }                                                                     \
-    catch (...)                                                           \
-    {                                                                     \
-        _a_name = _BLOCK_CHECK_NO_SOURCE(                                 \
-            abc::annotate("Code block threw an entity.", false_matcher()) \
-        );                                                                \
+#define __INTERNAL_END_NO_THROW(_a_name)                                       \
+    _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(                            \
+        "Code block does not throw any exceptions.", abc::true_matcher()       \
+    ));                                                                        \
+    }                                                                          \
+    catch (...)                                                                \
+    {                                                                          \
+        _a_name = _BLOCK_CHECK_NO_SOURCE(                                      \
+            abc::annotate("Code block threw an entity.", abc::false_matcher()) \
+        );                                                                     \
     }
 
 
@@ -41,26 +41,26 @@
         )                                             \
     )
 
-#define _BEGIN_THROW_ANY(_a_name)                                      \
-    _BEGIN_SINGLE_ELEMENT_BBA_CUSTOM_SOURCE(                           \
-        _a_name,                                                       \
-        "Checking code does throw an exception",                       \
-        _ABC_NS_UTILITY::str::create_string(                           \
-            {"_BEGIN_THROW_ANY(", #_a_name, ")"}                       \
-        )                                                              \
-    );                                                                 \
-    _a_name = _BLOCK_CHECK_NO_SOURCE(                                  \
-        annotate("Code does not throw any excpetion", false_matcher()) \
-    );                                                                 \
-    try                                                                \
+#define _BEGIN_THROW_ANY(_a_name)                                 \
+    _BEGIN_SINGLE_ELEMENT_BBA_CUSTOM_SOURCE(                      \
+        _a_name,                                                  \
+        "Checking code does throw an exception",                  \
+        _ABC_NS_UTILITY::str::create_string(                      \
+            {"_BEGIN_THROW_ANY(", #_a_name, ")"}                  \
+        )                                                         \
+    );                                                            \
+    _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(               \
+        "Code does not throw any excpetion", abc::false_matcher() \
+    ));                                                           \
+    try                                                           \
     {
-#define __INTERNAL_END_THROW_ANY(_a_name)                                \
-    }                                                                    \
-    catch (...)                                                          \
-    {                                                                    \
-        _a_name = _BLOCK_CHECK_NO_SOURCE(                                \
-            abc::annotate("Code block threw an entity.", true_matcher()) \
-        );                                                               \
+#define __INTERNAL_END_THROW_ANY(_a_name)                                     \
+    }                                                                         \
+    catch (...)                                                               \
+    {                                                                         \
+        _a_name = _BLOCK_CHECK_NO_SOURCE(                                     \
+            abc::annotate("Code block threw an entity.", abc::true_matcher()) \
+        );                                                                    \
     }
 
 
@@ -81,33 +81,33 @@
         )                                              \
     )
 
-#define _BEGIN_EXCEPTION_TYPE(_a_name)                                 \
-    _BEGIN_SINGLE_ELEMENT_BBA_CUSTOM_SOURCE(                           \
-        _a_name,                                                       \
-        "Checking code does throw an exception",                       \
-        _ABC_NS_UTILITY::str::create_string(                           \
-            {"_BEGIN_EXCEPTION_TYPE(", #_a_name, ")"}                  \
-        )                                                              \
-    );                                                                 \
-    _a_name = _BLOCK_CHECK_NO_SOURCE(                                  \
-        annotate("Code does not throw any excpetion", false_matcher()) \
-    );                                                                 \
-    try                                                                \
+#define _BEGIN_EXCEPTION_TYPE(_a_name)                            \
+    _BEGIN_SINGLE_ELEMENT_BBA_CUSTOM_SOURCE(                      \
+        _a_name,                                                  \
+        "Checking code does throw an exception",                  \
+        _ABC_NS_UTILITY::str::create_string(                      \
+            {"_BEGIN_EXCEPTION_TYPE(", #_a_name, ")"}             \
+        )                                                         \
+    );                                                            \
+    _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(               \
+        "Code does not throw any excpetion", abc::false_matcher() \
+    ));                                                           \
+    try                                                           \
     {
-#define __INTERNAL_END_EXCEPTION_TYPE(_a_name, _a_exception_type)   \
-    }                                                               \
-    catch (const _a_exception_type& _l_et)                          \
-    {                                                               \
-        _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(             \
-            "Code block threw the required entity.", true_matcher() \
-        ));                                                         \
-    }                                                               \
-    catch (...)                                                     \
-    {                                                               \
-        _a_name = _BLOCK_CHECK_NO_SOURCE(annotate(                  \
-            "Code throws an exception not of the correct type",     \
-            false_matcher()                                         \
-        ));                                                         \
+#define __INTERNAL_END_EXCEPTION_TYPE(_a_name, _a_exception_type)        \
+    }                                                                    \
+    catch (const _a_exception_type& _l_et)                               \
+    {                                                                    \
+        _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(                  \
+            "Code block threw the required entity.", abc::true_matcher() \
+        ));                                                              \
+    }                                                                    \
+    catch (...)                                                          \
+    {                                                                    \
+        _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(                  \
+            "Code throws an exception not of the correct type",          \
+            abc::false_matcher()                                         \
+        ));                                                              \
     }
 
 
@@ -144,9 +144,9 @@
             {"_BEGIN_EXCEPTION_MSG(", #_a_name, ")"}                      \
         )                                                                 \
     );                                                                    \
-    _a_name = _BLOCK_CHECK_NO_SOURCE(                                     \
-        annotate("Code does not throw any excpetion", false_matcher())    \
-    );                                                                    \
+    _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(                       \
+        "Code does not throw any excpetion", abc::false_matcher()         \
+    ));                                                                   \
     try                                                                   \
     {
 #define __INTERNAL_END_EXCEPTION_MSG(_a_name, _a_msg)                   \
@@ -160,9 +160,9 @@
     }                                                                   \
     catch (...)                                                         \
     {                                                                   \
-        _a_name = _BLOCK_CHECK_NO_SOURCE(annotate(                      \
+        _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(                 \
             "Code throws an exception not derived from std::exception", \
-            false_matcher()                                             \
+            abc::false_matcher()                                        \
         ));                                                             \
     }
 
@@ -192,9 +192,9 @@
             {"_BEGIN_EXCEPTION_TYPE_AND_MSG(", #_a_name, ")"}             \
         )                                                                 \
     );                                                                    \
-    _a_name = _BLOCK_CHECK_NO_SOURCE(                                     \
-        annotate("Code does not throw any excpetion", false_matcher())    \
-    );                                                                    \
+    _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(                       \
+        "Code does not throw any excpetion", abc::false_matcher()         \
+    ));                                                                   \
     try                                                                   \
     {
 #define __INTERNAL_END_EXCEPTION_TYPE_AND_MSG(_a_name, _a_type, _a_msg) \
@@ -208,9 +208,9 @@
     }                                                                   \
     catch (...)                                                         \
     {                                                                   \
-        _a_name = _BLOCK_CHECK_NO_SOURCE(annotate(                      \
+        _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(                 \
             "Code throws an exception not derived from std::exception", \
-            false_matcher()                                             \
+            abc::false_matcher()                                        \
         ));                                                             \
     }
 

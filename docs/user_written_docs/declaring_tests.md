@@ -43,9 +43,8 @@ As a general rule, if the user declares a `test_case_t` entity using an aggregat
 As an example, the following test declaration will not compile.
 ```cpp
 _TEST_CASE(
-    abc::test_case_t
-        {.name             = "A simple test",
-         .path             = "simple_test"}) 
+    abc::test_case_t({.name = "A simple test", .path = "simple_test"})
+)
 {}
 ```
 
@@ -56,7 +55,7 @@ _NAMED_TEST_CASE(
     nameless_function,
     abc::test_case_t({.name = "A named test"})
 )
-...
+{}
 ```
 
 # The test_case_t Object
@@ -248,13 +247,23 @@ Using this, the user is able to write runtime code which generates test function
 For example, the following code could be called before the `abc` test framework is setup and ran.
 
 ```cpp
-std::function<void()> _l_test_function = []()
+inline void
+    adding_test_at_runtime_1()
 {
-    //Test code
-};
-registered_test_data_t _l_test(mk_function(_l_test_function),
-    checked_user_defined_test_data_t::test_data(test_case_t{/*test case info*/}));
-global::add_test(_l_test);
+    using namespace abc;
+    using namespace abc::ds;
+    std::function<void()> _l_test_function = []()
+    {
+        // Test code
+    };
+    registered_test_data_t _l_test(
+        mk_function(_l_test_function),
+        checked_user_defined_test_data_t::test_data(
+            test_case_t{.name = "Test added at runtime"}
+        )
+    );
+    global::add_test(_l_test);
+}
 ```
 
 This code would add the funcion `_l_test_function` to the GLOT, which would be processed by the `abc` test framework when it is set up.
@@ -264,15 +273,26 @@ The reader may notice that the constructor for `registered_test_data_t` is diffe
 Below is another example of code showing how runtime generated tests can be created. In this example, a loop is used to generate a hundred test cases.
 
 ```cpp
-vector<registered_test_data_t> tests;
-for (size_t idx{0}; idx < 100; ++idx)
+inline void
+    adding_test_at_runtime_2()
 {
-    function<void()> f = []()
+    using namespace std;
+    using namespace abc;
+    using namespace abc::ds;
+    vector<registered_test_data_t> tests;
+    for (size_t idx{0}; idx < 100; ++idx)
     {
-        // Test code
-    };
-    tests.push_back(mk_function(f),
-    checked_user_defined_test_data_t::test_data(test_case_t{/*test case info*/});
+        function<void()> f = []()
+        {
+            // Test code
+        };
+        tests.push_back(registered_test_data_t(
+            mk_function(f),
+            checked_user_defined_test_data_t::test_data(test_case_t{
+                .name = fmt::format("Test {} added at runtime", idx),
+            })
+        ));
+    }
 }
 ```
 

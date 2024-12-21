@@ -445,6 +445,23 @@ annotated_matcher_t annotate(const matcher_t& _a_matcher, const std::string_view
 annotated_matcher_t annotate(const std::string_view _a_annotation, const matcher_t& _a_matcher) noexcept;
 ```
 
+An example of their use is shown in the test case below.
+
+```cpp
+_TEST_CASE(
+    abc::test_case_t({.name = "Annotation examples"})
+)
+{
+    using namespace abc;
+    matcher_t           m1  = _MATCHER(_EXPR(2 <= 3));
+    annotated_matcher_t am1 = _MATCHER(annotate("Annotating 1", m1));
+    annotated_matcher_t am2 = _MATCHER(annotate(m1, "Annotating 2"));
+    _CHECK(am1);
+    _CHECK(am2);
+    _CHECK(annotate("Annotating a final time", _EXPR(2 <= 3)));
+}
+```
+
 There are no constructors available for the `annotated_matcher_t` object - other than the default copy and move constructors - and no default constructor. 
 
 In the [next section]() we will see how `matcher_t` objects can be composed together using the logical operators `operator&&`, `operator||` and `operator!`. `annotated_matcher_t` objects cannot be composed using these operators. The macros introduced in [this section]() - `_IF_OR_STATEMENT`, `_IF_AND_STATEMENT` and `_PROCESS` - allow the user to simulate lazily evaluated logical operators. These are not defined for `annotated_matcher_t` objects.

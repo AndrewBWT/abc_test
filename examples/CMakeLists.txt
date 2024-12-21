@@ -22,6 +22,10 @@ set(EXAMPLE_FILES
   include/abc_test_examples/data_generator_examples/04_enumerating_data_examples.hpp
   include/abc_test_examples/data_generator_examples/05_manual_data_generator_examples.hpp
   include/abc_test_examples/data_generator_examples/06_combinatorics_data_generator_examples.hpp
+  include/abc_test_examples/documentation/matchers.hpp
+  include/abc_test_examples/documentation/test_assertions.hpp
+  include/abc_test_examples/documentation/declaring_tests.hpp
+  include/abc_test_examples/documentation.hpp
 )
 
 # These are the libs required for the examples executable.

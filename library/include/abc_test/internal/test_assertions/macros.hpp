@@ -42,11 +42,12 @@
  * @return True if the matcher passes. False if it fails (though it will also
  * throw an exception as well).
  */
-#define _REQUIRE(_a_matcher)                                                 \
-    __ABC_TEST_INTERNAL_CREATE_ASSERTION(                                    \
-        _a_matcher,                                                          \
-        _ABC_NS_REPORTS::pass_or_terminate_t,                                \
-        _ABC_NS_UTILITY::str::create_string({"_REQUIRE(", #_a_matcher, ")"}) \
+#define _REQUIRE(_a_matcher)                  \
+    __ABC_TEST_INTERNAL_CREATE_ASSERTION(     \
+        _a_matcher,                           \
+        _ABC_NS_REPORTS::pass_or_terminate_t, \
+        "_REQUIRE",                           \
+        #_a_matcher                           \
     )
 /*!
  * @brief Internal macro. Used when creating static assertions.

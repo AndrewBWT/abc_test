@@ -40,6 +40,11 @@ public:
         const checked_user_defined_test_data_t _a_user_data,
         const ds::single_source_t&             _a_source
     ) noexcept;
+    __no_constexpr
+        registered_test_data_t(
+            const test_function_t                  _a_test_function,
+            const checked_user_defined_test_data_t _a_user_data
+        ) noexcept;
     /*!
      * @brief Equality operator to test registered_test_data_t objects.
      * @arg _a_rhs registered_test_data_t object to compare this object to.
@@ -89,7 +94,16 @@ __no_constexpr_imp
     , _m_source(_a_source)
     , _m_test_function(_a_test_function)
 {}
+__no_constexpr_imp
+registered_test_data_t::registered_test_data_t(
+    const test_function_t                  _a_test_function,
+    const checked_user_defined_test_data_t _a_user_data
+) noexcept
+    : _m_user_data(_a_user_data.user_defined_test_data())
+    , _m_test_function(_a_test_function)
+{
 
+}
 _END_ABC_DS_NS
 
 __no_constexpr_imp auto

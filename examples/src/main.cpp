@@ -4,6 +4,7 @@
 #include "abc_test/included_instances.hpp"
 
  #include "abc_test_examples/basic_examples.hpp"
+#include "abc_test_examples/documentation.hpp"
 // #include "abc_test_examples/data_generator_examples.hpp"
 
 /*constexpr int
@@ -177,8 +178,6 @@ int
         char* argv[]
     )
 {
-    using namespace std;
-    vector<int> x(10);
-    std::iota(x.begin(), x.begin() + 10, 100);
-    return abc::run_test_suite_using_command_line_args(argc, argv);
+    using namespace abc;
+    return run_test_suite_using_command_line_args(argc, argv);
 }

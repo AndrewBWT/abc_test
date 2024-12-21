@@ -13,21 +13,21 @@
 
 #define __BAD_USER_DEFINED_BBA_1_END(name) _END_BBA_CHECK(name)
 
-#define __USER_DEFINED_BBA_1_BEGIN(name)                \
+#define __USER_DEFINED_BBA_1_BEGIN_(name)                \
     _BEGIN_SINGLE_ELEMENT_BBA_CUSTOM_SOURCE(            \
         name,                                           \
         fmt::format("{} description", #name),           \
         abc::utility::str::create_string(               \
-            {"__USER_DEFINED_BBA_1_BEGIN(", #name, ")"} \
+            {"__USER_DEFINED_BBA_1_BEGIN_(", #name, ")"} \
         )                                               \
     )                                                   \
     name = _BLOCK_CHECK_NO_SOURCE(abc::bool_matcher(false));
 
-#define __USER_DEFINED_BBA_1_END(name)                \
+#define __USER_DEFINED_BBA_1_END_(name)                \
     _END_BBA_CHECK_CUSTOM_SOURCE(                     \
         name,                                         \
         abc::utility::str::create_string(             \
-            {"__USER_DEFINED_BBA_1_END(", #name, ")"} \
+            {"__USER_DEFINED_BBA_1_END_(", #name, ")"} \
         )                                             \
     )
 
@@ -41,7 +41,7 @@
     name = _BLOCK_CHECK_NO_SOURCE(abc::bool_matcher(false));                   \
     _END_BBA_CHECK_NO_SOURCE(name)
 
-#define __USER_DEFINED_BBA_3(name)                                         \
+#define __USER_DEFINED_BBA_3_(name)                                         \
     _BEGIN_SINGLE_ELEMENT_BBA(name, fmt::format("{} description", #name)); \
     name = _BLOCK_CHECK_NO_SOURCE(abc::bool_matcher(false));               \
     _END_BBA_CHECK(name);
@@ -75,75 +75,17 @@ _TEST_CASE(
     using namespace abc;
     __BAD_USER_DEFINED_BBA_1_BEGIN(test1);
     __BAD_USER_DEFINED_BBA_1_END(test1);
-    __USER_DEFINED_BBA_1_BEGIN(test2);
-    __USER_DEFINED_BBA_1_END(test2);
+    __USER_DEFINED_BBA_1_BEGIN_(test2);
+    __USER_DEFINED_BBA_1_END_(test2);
 
     __USER_DEFINED_BBA_2(test3);
 
-    __USER_DEFINED_BBA_3(test4);
+    __USER_DEFINED_BBA_3_(test4);
 
     __USER_CREATED_BBA_2_BEGIN(test5);
     __USER_CREATED_BBA_2_END(test5);
 }
 
-namespace test
-{
-void
-    test(
-        const std::string str
-    )
-{
-    using namespace abc;
-    _BEGIN_SINGLE_ELEMENT_BBA(
-        exception_test,
-        fmt::format("Testing std::stoi function using \"{0}\"", str)
-    );
-    try
-    {
-        int i          = std::stoi(str);
-        exception_test = _BLOCK_CHECK(annotate("Checking i > 0", _EXPR(i > 0)));
-    }
-    catch (std::invalid_argument const & ex)
-    {
-        exception_test = _BLOCK_CHECK(
-            annotate("Invalid argument exception thrown", bool_matcher(false))
-        );
-    }
-    catch (std::out_of_range const & ex)
-    {
-        exception_test = _BLOCK_CHECK(
-            annotate("Integer out of range exception", bool_matcher(false))
-        );
-    }
-    _END_BBA_CHECK(exception_test);
-}
-
-void
-    test2(
-        const std::string                str,
-        abc::multi_element_test_block_t& _a_metb
-    )
-{
-    using namespace abc;
-    try
-    {
-        int i    = std::stoi(str);
-        _a_metb += _BLOCK_CHECK(annotate("Checking i > 0", _EXPR(i > 0)));
-    }
-    catch (std::invalid_argument const & ex)
-    {
-        _a_metb += _BLOCK_CHECK(
-            annotate("Invalid argument exception thrown", bool_matcher(false))
-        );
-    }
-    catch (std::out_of_range const & ex)
-    {
-        _a_metb += _BLOCK_CHECK(
-            annotate("Integer out of range exception", bool_matcher(false))
-        );
-    }
-}
-} // namespace test
 
 // This serves as the testing code.
 _TEST_CASE(
@@ -157,69 +99,7 @@ _TEST_CASE(
     _END_BBA_CHECK(test2);
 }
 
-_TEST_CASE(
-    abc::test_case_t({.name = "Testing stoi"})
-)
-{
-    test::test("1");
-    test::test("-1");
-    test::test("hello");
-    test::test("9999999999999999999999999999999999999");
-}
 
-_TEST_CASE(
-    abc::test_case_t({.name = "Testing stoi again"})
-)
-{
-    using namespace std;
-    _BEGIN_MULTI_ELEMENT_BBA(stoi_test, "Testing mid point function");
-    for (auto&& str : initializer_list<string>{
-             "1", "-1", "hello", "999999999999999999999999999999999999999999999"
-         })
-    {
-        test::test2(str, stoi_test);
-    }
-    _END_BBA_CHECK(stoi_test);
-}
-
-_TEST_CASE(
-    abc::test_case_t({.name = "Testing midpoint"})
-)
-{
-    using namespace std;
-    function<int(int, int)> f = [](int x, int y)
-    {
-        return (x + y) / 2;
-    };
-    _BEGIN_MULTI_ELEMENT_BBA(mid_point_test, "Testing mid point function");
-    for (auto&& [integer1, integer2] : initializer_list<pair<int, int>>{
-             {0,             1            },
-             {100,           200          },
-             {500,           200          },
-             {700,           1'234        },
-             {2'147'483'647, 1'141'481'537}
-    })
-    {
-        mid_point_test += _BLOCK_CHECK(
-            _EXPR(f(integer1, integer2) == std::midpoint(integer1, integer2))
-        );
-    }
-    _END_BBA_CHECK(mid_point_test);
-}
-
-struct type_x
-{
-    int i;
-    int j;
-
-    inline bool
-        operator==(
-            const type_x& rhs
-        ) const
-    {
-        return i == rhs.i && j == rhs.j;
-    }
-};
 
 _TEST_CASE(
     abc::test_case_t({.name = "Matchers example, revisited"})
@@ -249,58 +129,6 @@ _TEST_CASE(
     _CHECK(_MATCHER(_MATCHER(_EXPR(1 == 2))));
 }
 
-struct type_y
-{
-    std::vector<int> is;
-
-    inline bool
-        operator==(
-            const type_x& rhs
-        ) const
-    {
-        return is.size() == 2 && is[0] == rhs.i && is[1] == rhs.j;
-    }
-
-    inline bool
-        operator==(
-            const type_y& rhs
-        ) const
-    {
-        return is == rhs.is;
-    }
-};
-
-template <>
-struct fmt::formatter<type_y> : formatter<string_view>
-{
-    inline auto
-        format(
-            type_y          arg_y,
-            format_context& _a_ctx
-        ) const -> format_context::iterator
-    {
-        using namespace std;
-        const string _l_rv{fmt::format("y {{{0}}}", arg_y.is)};
-        return formatter<string_view>::format(_l_rv, _a_ctx);
-    }
-};
-
-_TEST_CASE(
-    abc::test_case_t({.name = "X example"})
-)
-{
-    type_x xi{1, 2};
-    type_x xj{3, 4};
-    _CHECK(_EXPR(xi == xj));
-    type_y yi{
-        {1, 2}
-    };
-    type_y yj{
-        {4, 5, 6}
-    };
-    _CHECK(_EXPR(yi == yj));
-    _CHECK(_EXPR(xi == yi));
-}
 
 _TEST_CASE(
     abc::test_case_t({.name = "Logical operators"})

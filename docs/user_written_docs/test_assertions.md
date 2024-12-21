@@ -40,10 +40,12 @@ In [this section](#a-brief-introduction-to-matchers) we describe explicitly what
 Below we show an example of an assertion which registers a user-defined test condition with the `abc_test` framework. The user-defined test condition checks if the variable `i` is equal to `2`, the macro `_EXPR` creates and evaluates the test condition, and the macro `_CHECK` creates the assertion which registers the result of the test condition with the `abc_test` framework.
 
 ```cpp
-_TEST_CASE(abc::test_case_t({.name = "Assertion example"}))
+_TEST_CASE(
+    abc::test_case_t({.name = "Assertion example"})
+)
 {
     int i = 2;
-    //The assertion below passes.
+    // The assertion below passes.
     _CHECK(_EXPR(i == 2));
 }
 ```
@@ -51,15 +53,17 @@ _TEST_CASE(abc::test_case_t({.name = "Assertion example"}))
 Previously we stated that there are three core types of assertion in `abc_test`. An assertion can also be categorized to be either a *check-based* assertion or a *termination-based* assertion. The only difference between these two assertion types is that termination-based assertions will immediately terminate the test function they are being ran in if their pass status is `false`. The example above showed a macro which created a check-based assertion. Below we show an example of a macro which creates a termination-based assertion.
 
 ```cpp
-_TEST_CASE(abc::test_case_t({.name = "Terminating test"}))
+_TEST_CASE(
+    abc::test_case_t({.name = "Terminating test"})
+)
 {
     int i = 2;
 
-    //This assertion will fail and the test will terminate.
-    _REQUIRE(_EXPR(i==1));
+    // This assertion will fail and the test will terminate.
+    _REQUIRE(_EXPR(i == 1));
 
-    //This assertion will never be ran. If it were to be ran, it would pass.
-    _CHECK(_EXPR(i==2));
+    // This assertion will never be ran. If it were to be ran, it would pass.
+    _CHECK(_EXPR(i == 2));
 }
 ```
 
@@ -77,15 +81,17 @@ Static assertions are the simplest assertion type in `abc_test`. As stated previ
 Below is a simple example test using these assertion macros.
 
 ```cpp
-_TEST_CASE(abc::test_case_t({.name = "Simple assertions"}))
+_TEST_CASE(
+    abc::test_case_t({.name = "Simple assertions"})
+)
 {
-    //Will register a success.
+    // Will register a success.
     _SUCCEED();
-    //Will register a failure.
+    // Will register a failure.
     _FAIL();
-    //Will terminate the test.
+    // Will terminate the test.
     _TERMINATE();
-    //Will never be reached.
+    // Will never be reached.
     _SUCCEED();
 }
 ```
@@ -95,15 +101,17 @@ There are an additional three static assertion macros included with `abc_test`. 
 An example of their use is shown below.
 
 ```cpp
-_TEST_CASE(abc::test_case_t({.name = "Simple assertions with output"}))
+_TEST_CASE(
+    abc::test_case_t({.name = "Simple assertions with output"})
+)
 {
-    //Will register a success.
+    // Will register a success.
     _SUCCEED_WITH_MSG("This message will be seen");
-    //Will register a failure.
+    // Will register a failure.
     _FAIL_WITH_MSG("As will this one");
-    //Will terminate the test.
+    // Will terminate the test.
     _TERMINATE_WITH_MSG("This one will too!");
-    //Will never be reached.
+    // Will never be reached.
     _SUCCEED_WITH_MSG("This one won't");
 }
 ```
@@ -119,18 +127,27 @@ In `abc_test` the term "matcher" is used to refer to two specific object types; 
 Below we show some example code which uses `matcher_t` objects. Through these examples, and the comments around them, the user should gain a basic understanding of how matchers work.
 
 ```cpp
-// matcher_t is the object which holds the result of a user-defined test. A default matcher has a result value of true.
-matcher_t matcher_1;
-// The function bool_matcher creates a matcher_t whose result is the bool argument given to bool_matcher. matcher_2 has a result value of true.
-matcher_t matcher_2 = bool_matcher(true);
-// matcher_3 has a result value of false.
-matcher_t matcher_3 = bool_matcher(false);
-int i = 2;
-// Expressions can be encoded in matchers using the macro _EXPR. matcher_4 has a result value of true, as it checks if i==2 (which it does).
-matcher_t matcher_4 = _EXPR(i==2);
-i = 8;
-// matcher_5 has a result value of false, as i <=7 is false.
-matcher_t matcher_5 = _EXPR(i <= 7);
+_TEST_CASE(
+    abc::test_case_t({.name = "Simple matcher examples"})
+)
+{
+    using namespace abc;
+    // matcher_t is the object which holds the result of a user-defined test. A
+    // default matcher has a result value of true.
+    matcher_t matcher_1;
+    // The function bool_matcher creates a matcher_t whose result is the bool
+    // argument given to bool_matcher. matcher_2 has a result value of true.
+    matcher_t matcher_2 = bool_matcher(true);
+    // matcher_3 has a result value of false.
+    matcher_t matcher_3 = bool_matcher(false);
+    int       i         = 2;
+    // Expressions can be encoded in matchers using the macro _EXPR. matcher_4
+    // has a result value of true, as it checks if i==2 (which it does).
+    matcher_t matcher_4 = _EXPR(i == 2);
+    i                   = 8;
+    // matcher_5 has a result value of false, as i <=7 is false.
+    matcher_t matcher_5 = _EXPR(i <= 7);
+}
 ```
 
 The code above introduces two core matchers to the reader; the Boolean matcher and the expression-encoded matcher (EEM). They are encoded using the `bool_matcher` function and the `_EXPR` macro respectively. The Boolean matcher's `result` member variable is equal to the `bool` argument used in the `bool_matcher` function to create it, while the EEM's `result` member variable is equal to the result of the comparison-based expression argument used in the `_EXPR` macro to create it. In [this document]() we provide more detail about both of these constructs.
@@ -149,23 +166,26 @@ In the previous section we provided the reader with a brief introduction to matc
 Below we show an example test case which uses both of these SLA macros.
 
 ```cpp
-_TEST_CASE(abc::test_case_t({.name = "Testing assertions"}))
+_TEST_CASE(
+    abc::test_case_t({.name = "Testing assertions"})
+)
 {
+    using namespace abc;
     // This will register as a passed assertion.
     _CHECK(bool_matcher(true));
     // This will register as a failed assertion.
     _CHECK(bool_matcher(false));
     int i = 2;
     // This will register as a passed assertion.
-    _CHECK(_EXPR(i==2));
+    _CHECK(_EXPR(i == 2));
     // This will register as a failed assertion.
-    _CHECK(_EXPR(i==3));
+    _CHECK(_EXPR(i == 3));
     // This will register as a passed assertion.
-    _REQUIRE(_EXPR(i<3));
+    _REQUIRE(_EXPR(i < 3));
     // This will register as a failed assertion, and the test will terminate.
-    _REQUIRE(_EXPR(i>=3));
+    _REQUIRE(_EXPR(i >= 3));
     // This test won't be ran.
-    _CHECK(_EXPR(i==2));
+    _CHECK(_EXPR(i == 2));
 }
 ```
 
@@ -181,14 +201,16 @@ These macros are used as shorthand for when the user wants to write an SLA which
 Below we show an example test case using these macros.
 
 ```cpp
-_TEST_CASE(abc::test_case_t({.name = "Testing assertions again"}))
+_TEST_CASE(
+    abc::test_case_t({.name = "Testing assertions again"})
+)
 {
     int i = 2;
-    _CHECK_EXPR(i==2);
-    _CHECK_EXPR(i==3);
-    _REQUIRE_EXPR(i<3);
-    _REQUIRE_EXPR(i>=3);
-    _CHECK_EXPR(i==2);
+    _CHECK_EXPR(i == 2);
+    _CHECK_EXPR(i == 3);
+    _REQUIRE_EXPR(i < 3);
+    _REQUIRE_EXPR(i >= 3);
+    _CHECK_EXPR(i == 2);
 }
 ```
 
@@ -207,10 +229,15 @@ In this subsection we familiarise the reader with BBAs through an example; we ex
 Below is the example we will discuss in this subsection.
 
 ```cpp
-_BEGIN_SINGLE_ELEMENT_BBA(block_example, "A descriptive description");
-block_example = _BLOCK_CHECK(_EXPR(1==2));
-block_example = _BLOCK_CHECK(_EXPR(2==2));
-_END_BBA_CHECK(block_example);
+_TEST_CASE(
+    abc::test_case_t({.name = "Simple BBA example"})
+)
+{
+    _BEGIN_SINGLE_ELEMENT_BBA(block_example, "A descriptive description");
+    block_example = _BLOCK_CHECK(_EXPR(1 == 2));
+    block_example = _BLOCK_CHECK(_EXPR(2 == 2));
+    _END_BBA_CHECK(block_example);
+}
 ```
 
 In the previous section we stated that, programmatically, BBAs are objects. While the user can use these objects themselves when declaring BBAs, we have also provided a set of macros which hide much of the internal logic for setting up BBAs correctly. The documentation in this section is for these macros, and we encourage the reader to use them.
@@ -268,23 +295,28 @@ The termination-based BBAME macros are designed to be used at points where it ma
 Below are some examples which show termination-based BBAME macros being used with BBAs. These examples should aid the reader in understanding their semantics.
 
 ```cpp
-_BEGIN_SINGLE_ELEMENT_BBA(test1);
-//This matcher will be assigned to the BBA.
-test1 = _BLOCK_CHECK(_EXPR(1==2));
-//But it is overridden by this matcher. After this line the test function will terminate.
-test1 = _BLOCK_REQUIRE(_EXPR(2==3));
-//And this matcher is never assigned to the BBA.
-test1 = _BLOCK_CHECK(_EXPR(3==4));
-_END_BBA_CHECK(test1);
+_TEST_CASE(
+    abc::test_case_t({ .name = "_BLOCK_REQUIRE example" })
+)
+{
+    _BEGIN_SINGLE_ELEMENT_BBA(test1, "Single-element BBA description");
+    //This matcher will be assigned to the BBA.
+    test1 = _BLOCK_CHECK(_EXPR(1 == 2));
+    //But it is overridden by this matcher. After this line the test function will terminate.
+    test1 = _BLOCK_REQUIRE(_EXPR(2 == 3));
+    //And this matcher is never assigned to the BBA.
+    test1 = _BLOCK_CHECK(_EXPR(3 == 4));
+    _END_BBA_CHECK(test1);
 
-_BEGIN_MULTI_ELEMENT_BBA(test2);
-//This matcher will be assigned to the BBA.
-test2 += _BLOCK_CHECK(_EXPR(1==1));
-//This matcher is also assigned to the BBA. However as its result is false, the test function is immediatley terminated. In the test results, the BBA will only have 2 matchers assigned to it.
-test2 += _BLOCK_REQUIRE(_EXPR(2==3));
-//And this matcher is never assigned to the BBA.
-test2 += _BLOCK_CHECK(_EXPR(3==4));
-_END_BBA_CHECK(test2);
+    _BEGIN_MULTI_ELEMENT_BBA(test2, "Multi-element BBA description");
+    //This matcher will be assigned to the BBA.
+    test2 += _BLOCK_CHECK(_EXPR(1 == 1));
+    //This matcher is also assigned to the BBA. However as its result is false, the test function is immediatley terminated. In the test results, the BBA will only have 2 matchers assigned to it.
+    test2 += _BLOCK_REQUIRE(_EXPR(2 == 3));
+    //And this matcher is never assigned to the BBA.
+    test2 += _BLOCK_CHECK(_EXPR(3 == 4));
+    _END_BBA_CHECK(test2);
+}
 ```
 
 ## Default BBAs
@@ -300,9 +332,14 @@ If an MA-BBA has no matchers assigned to it and is then evaluated, it will regis
 There are a set of BBA-related macros included with `abc_test` which can be used to provide custom source code information for a BBA. In this subsection we will introduce them. However, before we do so, we will illustrate the motivation behind their inclusion in `abc_test`. Consider the following example.
 
 ```cpp
-_BEGIN_SINGLE_ELEMENT_BBA(test1, "test1 description");
-test1 = _BLOCK_CHECK(abc::bool_matcher(false));
-_END_BBA_CHECK(test1);
+_TEST_CASE(
+    abc::test_case_t({ .name = "Source modification BBA macro example 1" })
+)
+{
+    _BEGIN_SINGLE_ELEMENT_BBA(test1, "test1 description");
+    test1 = _BLOCK_CHECK(abc::bool_matcher(false));
+    _END_BBA_CHECK(test1);
+}
 ```
 
 Below is some possible output this BBA could produce. This output was created using the `text_test_reporter` with default parameters. Note that we have changed the output slightly to make it easier to read. All the output shown in this section is created in this way.
@@ -343,8 +380,13 @@ Let us now see what would happen if we create our own macros which internally us
 If we were to use it in the following way.
 
 ```cpp
-__USER_DEFINED_BBA_1_BEGIN(test1);
-__USER_DEFINED_BBA_1_END(test1);
+_TEST_CASE(
+    abc::test_case_t({ .name = "USER_DEFINED_BBA_1 example" })
+)
+{
+    __USER_DEFINED_BBA_1_BEGIN(test1);
+    __USER_DEFINED_BBA_1_END(test1);
+}
 ```
 
 Then the following output could be produced.
@@ -397,29 +439,41 @@ Below is the set of end BBA macros that allow the user to edit the representatio
 `_END_BBA_CHECK_NO_SOURCE` |  This macro is identical to `_END_BBA_CHECK`, except it registers no source representation to the BBA. It is useful when writing a macro which contains both a begin and end BBA macro. |
 `_END_BBA_REQUIRE_NO_SOURCE` |  This macro is identical to `_END_BBA_REQUIRE`, except it registers no source representation to the BBA. It is useful when writing a macro which contains both a begin and end BBA macro. |
 
-Below we show `__USER_DEFINED_BBA_1_BEGIN` and `__USER_DEFINED_BBA_1_END` rewritten using the macros described above. The function `abc::utility::str::create_string` takes a `const std::vector<std::string>&` argument called `_a_arg` and returns an `std::string` containing all the elements in `_a_arg` concatenated together. 
+Below we show `__USER_DEFINED_BBA_2_BEGIN` and `__USER_DEFINED_BBA_2_END`, versions of `__USER_DEFINED_BBA_1_BEGIN` and `__USER_DEFINED_BBA_2_BEGIN` rewritten using the macros described above. The function `abc::utility::str::create_string` takes a `const std::vector<std::string>&` argument called `_a_arg` and returns an `std::string` containing all the elements in `_a_arg` concatenated together. 
 
 ```cpp
-#define __USER_DEFINED_BBA_1_BEGIN(name)                \
+#define __USER_DEFINED_BBA_2_BEGIN(name)                \
     _BEGIN_SINGLE_ELEMENT_BBA_CUSTOM_SOURCE(            \
         name,                                           \
         fmt::format("{} description", #name),           \
         abc::utility::str::create_string(               \
-            {"__USER_DEFINED_BBA_1_BEGIN(", #name, ")"} \
+            {"__USER_DEFINED_BBA_2_BEGIN(", #name, ")"} \
         )                                               \
     )                                                   \
     name = _BLOCK_CHECK_NO_SOURCE(abc::bool_matcher(false));
 
-#define __USER_DEFINED_BBA_1_END(name)                \
+#define __USER_DEFINED_BBA_2_END(name)                \
     _END_BBA_CHECK_CUSTOM_SOURCE(                     \
         name,                                         \
         abc::utility::str::create_string(             \
-            {"__USER_DEFINED_BBA_1_END(", #name, ")"} \
+            {"__USER_DEFINED_BBA_2_END(", #name, ")"} \
         )                                             \
     )
 ```
 
-The output from using these macros with the argument `test1` is as follows.
+If we now ran the following test.
+
+```cpp
+_TEST_CASE(
+    abc::test_case_t({ .name = "USER_DEFINED_BBA_2 example" })
+)
+{
+    __USER_DEFINED_BBA_2_BEGIN(test1);
+    __USER_DEFINED_BBA_2_END(test1);
+}
+```
+
+This would be the output from that test.
 
 ```
  1)  Single-element block-based assertion failed.
@@ -443,11 +497,11 @@ The output from using these macros with the argument `test1` is as follows.
 This output now directly mirrors the code the user wrote. Below we show a macro which contains both begin and end BBA macros.
 
 ```cpp
-#define __USER_DEFINED_BBA_2(name)                                             \
+#define __USER_DEFINED_BBA_3(name)                                             \
     _BEGIN_SINGLE_ELEMENT_BBA_CUSTOM_SOURCE(                                   \
         name,                                                                  \
         fmt::format("{} description", #name),                                  \
-        abc::utility::str::create_string({"__USER_DEFINED_BBA_2(", #name, ")"} \
+        abc::utility::str::create_string({"__USER_DEFINED_BBA_3(", #name, ")"} \
         )                                                                      \
     )                                                                          \
     name = _BLOCK_CHECK_NO_SOURCE(abc::bool_matcher(false));                   \
@@ -457,7 +511,12 @@ This output now directly mirrors the code the user wrote. Below we show a macro 
 If we call it using the following code.
 
 ```cpp
-__USER_DEFINED_BBA_2(test1);
+_TEST_CASE(
+    abc::test_case_t({ .name = "__USER_DEFINED_BBA_3 example" })
+)
+{
+    __USER_DEFINED_BBA_3(test1);
+}
 ```
 
 Then the following is an example of the output which could be produced. Note that the internal `abc` test framework is aware that there is no end source for this assertion.
@@ -484,38 +543,38 @@ In this final subsection concerning BBAs, we show the reader useful, real-world 
 Below we show some code which tests if an `std::string` entity `str` can be parsed by the function `std::stoi`. The test is able to check for different types of exception, and that the parsed value `i` is `> 0`. Note that in this example we use the function `abc::annotate`, which is introduced in [the documentation for matchers](). For now, the reader can assume that `annotate` simply adds an annotation to the output.
 
 ```cpp
-void
-    test(
-        const std::string str
-    )
+inline void
+test(
+    const std::string str
+)
 {
     using namespace abc;
-    _BEGIN_CHECK_SINGLE_ELEMENT_BBA(
+    _BEGIN_SINGLE_ELEMENT_BBA(
         exception_test, "Testing std::stoi function"
     )
-    try
+        try
     {
-        int i          = std::stoi(str);
+        int i = std::stoi(str);
         exception_test = _BLOCK_CHECK(annotate("Checking i > 0", _EXPR(i > 0)));
     }
-    catch (std::invalid_argument const & ex)
+    catch (std::invalid_argument const& ex)
     {
         exception_test = _BLOCK_CHECK(
             annotate("Invalid argument exception thrown", bool_matcher(false))
         );
     }
-    catch (std::out_of_range const & ex)
+    catch (std::out_of_range const& ex)
     {
         exception_test = _BLOCK_CHECK(
             annotate("Integer out of range exception", bool_matcher(false))
         );
     }
-    _END_BBA(exception_test);
+    _END_BBA_CHECK(exception_test);
 }
 
 // This serves as the testing code.
 _TEST_CASE(
-    abc::test_case_t({.name = "Testing stoi"})
+    abc::test_case_t({ .name = "Testing stoi" })
 )
 {
     test("1");
@@ -623,14 +682,14 @@ Another motivational example is shown below. In this code, we are testing our ow
 
 ```cpp
 _TEST_CASE(
-    abc::test_case_t({.name = "Testing midpoint"})
+    abc::test_case_t({ .name = "Testing midpoint" })
 )
 {
     using namespace std;
     function<int(int, int)> f = [](int x, int y)
-    {
-        return (x + y) / 2;
-    };
+        {
+            return (x + y) / 2;
+        };
     _BEGIN_MULTI_ELEMENT_BBA(mid_point_test, "Testing mid point function");
     for (auto&& [integer1, integer2] : initializer_list<pair<int, int>>{
              {0,                         1    },
@@ -638,7 +697,7 @@ _TEST_CASE(
              {500,                       200  },
              {700,                       1'234},
              {2147483647, 1141481537    }
-    })
+        })
     {
         mid_point_test += _BLOCK_CHECK(
             _EXPR(f(integer1, integer2) == std::midpoint(integer1, integer2))
@@ -686,25 +745,25 @@ The output from this test case is shown below.
 Our final example, shown below, takes the first example shown in this subsection and re-writes it using a MA-BBA.
 
 ```cpp
-void
-test2(
-    const std::string str,
-    abc::multi_element_test_block_t& _a_metb
-)
+inline void
+    test2(
+        const std::string                str,
+        abc::multi_element_test_block_t& _a_metb
+    )
 {
     using namespace abc;
     try
     {
-        int i = std::stoi(str);
+        int i    = std::stoi(str);
         _a_metb += _BLOCK_CHECK(annotate("Checking i > 0", _EXPR(i > 0)));
     }
-    catch (std::invalid_argument const& ex)
+    catch (std::invalid_argument const & ex)
     {
         _a_metb += _BLOCK_CHECK(
             annotate("Invalid argument exception thrown", bool_matcher(false))
         );
     }
-    catch (std::out_of_range const& ex)
+    catch (std::out_of_range const & ex)
     {
         _a_metb += _BLOCK_CHECK(
             annotate("Integer out of range exception", bool_matcher(false))
@@ -713,14 +772,14 @@ test2(
 }
 
 _TEST_CASE(
-    abc::test_case_t({ .name = "Testing stoi again" })
+    abc::test_case_t({.name = "Testing stoi again"})
 )
 {
     using namespace std;
     _BEGIN_MULTI_ELEMENT_BBA(stoi_test, "Testing std::stoi function again");
     for (auto&& str : initializer_list<string>{
-             "1","-1","hello","999999999999999999999999999999999999999999999"
-        })
+             "1", "-1", "hello", "999999999999999999999999999999999999999999999"
+         })
     {
         test2(str, stoi_test);
     }
@@ -811,47 +870,57 @@ Below we show some example code using each of the macros shown above.
 
 
 ```cpp
-//Checks that std::stoi throws no exception. This test will pass.
-_BEGIN_NO_THROW(t1)
-int i = stoi("3");
-_END_REQUIRE_NO_THROW(t1);
+_TEST_CASE(
+    abc::test_case_t({.name = "Testing exception macros"})
+)
+{
+    using namespace std;
+    _BEGIN_NO_THROW(t1)
+    int i = stoi("3");
+    _END_REQUIRE_NO_THROW(t1);
 
-//Same check as above. This test will fail. Note that the name of the internal BBA is re-used.
-_BEGIN_NO_THROW(t1)
-int i = stoi("up");
-_END_CHECK_NO_THROW(t1);
+    // Same check as above. This test will fail. Note that the name of the
+    // internal BBA is re-used.
+    _BEGIN_NO_THROW(t1)
+    int i = stoi("up");
+    _END_CHECK_NO_THROW(t1);
 
-//This test will pass.
-_BEGIN_THROW_ANY(t1)
-int i = stoi("up");
-_END_CHECK_THROW_ANY(t1);
+    // This test will pass.
+    _BEGIN_THROW_ANY(t1)
+    int i = stoi("up");
+    _END_CHECK_THROW_ANY(t1);
 
-//This test will pass.
-_BEGIN_EXCEPTION_TYPE(t1)
-int i = stoi("hi");
-_END_CHECK_EXCEPTION_TYPE(t1, std::invalid_argument);
+    // This test will pass.
+    _BEGIN_EXCEPTION_TYPE(t1)
+    int i = stoi("hi");
+    _END_CHECK_EXCEPTION_TYPE(t1, std::invalid_argument);
 
-//As will this. The exception returned is derived from logic error.
-_BEGIN_EXCEPTION_TYPE(t1)
-int i = stoi("hi");
-_END_CHECK_EXCEPTION_TYPE(t1,std::logic_error);
+    // As will this. The exception returned is derived from logic error.
+    _BEGIN_EXCEPTION_TYPE(t1)
+    int i = stoi("hi");
+    _END_CHECK_EXCEPTION_TYPE(t1, std::logic_error);
 
-auto f = [](){throw int(1);};
+    auto f = []()
+    {
+        throw int(1);
+    };
 
-//This will also pass. The thrown type does not need to be derived from exception.
-_BEGIN_EXCEPTION_TYPE(t1)
-f();
-_END_CHECK_EXCEPTION_TYPE(t1,int);
+    // This will also pass. The thrown type does not need to be derived from
+    // exception.
+    _BEGIN_EXCEPTION_TYPE(t1)
+    f();
+    _END_CHECK_EXCEPTION_TYPE(t1, int);
 
-//This will pass
-_BEGIN_EXCEPTION_MSG(t1);
-int i = stoi("hi");
-_END_CHECK_EXCEPTION_MSG(t1,"invalid");
+    // This will pass
+    _BEGIN_EXCEPTION_MSG(t1);
+    int i = stoi("hi");
+    _END_CHECK_EXCEPTION_MSG(t1, "invalid");
 
-//This will also pass
-_BEGIN_EXCEPTION_TYPE_AND_MSG(t1);
-int i = stoi("hi");
-_END_CHECK_EXCEPTION_TYPE_AND_MSG(t1,std::logic_error, "invalid");
+    // This will also pass
+    _BEGIN_EXCEPTION_TYPE_AND_MSG(t1);
+    int i = stoi("hi");
+    _END_CHECK_EXCEPTION_TYPE_AND_MSG(t1, std::logic_error, "invalid");
+}
 ```
 
 
