@@ -38,14 +38,12 @@ private:
     // run(test_runner_t& _a_test_runner) final override;
 };
 
-namespace
-{
 template <typename Assertion_Status>
 requires std::same_as<Assertion_Status, _ABC_NS_REPORTS::pass_t>
          || std::same_as<Assertion_Status, _ABC_NS_REPORTS::fail_t>
 __constexpr matcher_result_t
     mk_matcher_result() noexcept;
-} // namespace
+ // namespace
 
 _END_ABC_MATCHER_NS
 _BEGIN_ABC_NS
@@ -98,8 +96,6 @@ __constexpr_imp matcher_result_t
         );
     }
 }*/
-namespace
-{
 template <typename Assertion_Status>
 requires std::same_as<Assertion_Status, _ABC_NS_REPORTS::pass_t>
          || std::same_as<Assertion_Status, _ABC_NS_REPORTS::fail_t>
@@ -122,6 +118,6 @@ __constexpr_imp matcher_result_t
         );
     }
 }
-} // namespace
+ // namespace
 
 _END_ABC_MATCHER_NS

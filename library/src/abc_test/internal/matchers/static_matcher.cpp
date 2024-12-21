@@ -8,7 +8,8 @@ __no_constexpr_or_inline_imp matcher_t
 {
     using namespace _ABC_NS_MATCHER;
     using namespace _ABC_NS_REPORTS;
-    return make_matcher(new static_matcher_t<pass_t>());
+    using namespace std;
+    return make_matcher(mk_matcher_result<pass_t>());
 }
 
 __no_constexpr_or_inline_imp matcher_t
@@ -16,7 +17,8 @@ __no_constexpr_or_inline_imp matcher_t
 {
     using namespace _ABC_NS_MATCHER;
     using namespace _ABC_NS_REPORTS;
-    return make_matcher(new static_matcher_t<fail_t>());
+    using namespace std;
+    return make_matcher(mk_matcher_result<fail_t>());
 }
 
 _END_ABC_NS

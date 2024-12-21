@@ -22,7 +22,8 @@ enum logic_enum_t
     /*!
      * @brief Represents the and (&&) operator.
      */
-    AND
+    AND,
+    NONE
 };
 
 /*!
@@ -33,6 +34,22 @@ enum logic_enum_t
 template <logic_enum_t Logic_Enum>
 __constexpr precedence_t
     logic_precedence() noexcept;
+__constexpr precedence_t
+logic_precedence(const logic_enum_t _a_enum)
+{
+    using enum logic_enum_t;
+    switch (_a_enum)
+    {
+    case NOT:
+        return 3;
+    case AND:
+        return 14;
+    case OR:
+        return 15;
+    default:
+        throw abc::errors::unaccounted_for_enum_exception(_a_enum);
+    }
+}
 /*!
  * @brief Returns a string version of the operator given as a template.
  * @tparam The template used to create the string.
@@ -41,6 +58,21 @@ __constexpr precedence_t
 template <logic_enum_t Logic_Enum>
 __constexpr const char*
     logic_str() noexcept;
+__constexpr const char*
+logic_str(const logic_enum_t _a_enum)
+{
+    switch (_a_enum)
+    {
+    case NOT:
+        return "!";
+    case AND:
+        return "&&";
+    case OR:
+        return "||";
+    default:
+        throw abc::errors::unaccounted_for_enum_exception(_a_enum);
+    }
+}
 /*!
  * @brief Function which takes two booealn values and runs the given logical
  * operator, descirbed by the template paramter, on them.

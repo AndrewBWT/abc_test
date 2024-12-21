@@ -57,6 +57,6 @@ function_wrapper(
 	const function_wrapper_internal_t& _a_function
 ) noexcept
 {
-	return make_matcher(new function_wrapper_matcher_t(_a_function));
+	return make_matcher(_a_function());
 }
 _END_ABC_MATCHER_NS

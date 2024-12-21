@@ -92,7 +92,6 @@ _END_ABC_NS
 
 _BEGIN_ABC_MATCHER_NS
 
-
 namespace
 {
 template <comparison_enum_t Cmp, typename T1, typename T2>
@@ -103,13 +102,19 @@ __constexpr matcher_result_t
     ) noexcept
 {
     using namespace std;
-    string _l_left_str{format_str<T1>(_a_t1)};
-    string _l_right_str{format_str<T2>(_a_t2)};
-    const bool _l_result{ cmp<T1, T2, Cmp>(forward<T1>(_a_t1), forward<T2>(_a_t2)) };
+    string     _l_left_str{format_str<T1>(_a_t1)};
+    string     _l_right_str{format_str<T2>(_a_t2)};
+    const bool _l_result{
+        cmp<T1, T2, Cmp>(forward<T1>(_a_t1), forward<T2>(_a_t2))
+    };
     return matcher_result_t(
         _l_result,
-        fmt::format("{0} {1} {2}", _l_left_str, 
-            (_l_result ? cmp_str<Cmp>() : not_cmp_str<Cmp>()), _l_right_str)
+        fmt::format(
+            "{0} {1} {2}",
+            _l_left_str,
+            (_l_result ? cmp_str<Cmp>() : not_cmp_str<Cmp>()),
+            _l_right_str
+        )
     );
 }
 
@@ -143,11 +148,12 @@ __constexpr_imp matcher_t
     ) noexcept
 {
     using namespace std;
-    return make_matcher(
-        new matcher_base_t(make_matcher_result<Cmp_Enum>(
-            std::forward<T1>(_a_left_arg), std::forward<T2>(_a_right_arg)),
-            cmp_precedence<Cmp_Enum>()
-        )
+    return make_matcher_opt(
+        make_matcher_result<Cmp_Enum>(
+            std::forward<T1>(_a_left_arg), std::forward<T2>(_a_right_arg)
+        ),
+        cmp_precedence<Cmp_Enum>()
+
     );
 } // namespace
 } // namespace

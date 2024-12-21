@@ -40,9 +40,9 @@ Status: First Draft Complete
 
 ## Matchers
 Status: Incomplete
-- [ ] Introduction
-- [ ] Basic matchers.
-- [ ] Logical operators.
+- [x] Introduction
+- [x] Basic matchers.
+- [x] Logical operators.
 - [ ] Simulating logical operators.
 - [ ] Included matchers.
 

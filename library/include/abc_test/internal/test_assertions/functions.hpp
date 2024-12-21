@@ -35,7 +35,7 @@ template <bool Has_Annotation>
 __constexpr _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>
             matcher_macro(
                 const _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>& _a_element,
-                const std::string_view      _a_macro_str,
+                const std::string_view                                    _a_macro_str,
                 const std::string_view      _a_matcher_str,
                 const std::source_location& _a_sl
             ) noexcept;
@@ -56,11 +56,21 @@ template <typename T, bool Has_Annotation>
 requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
 __constexpr bool
     create_assertion(
-        const _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>& _a_matcher,
-        const std::string_view _a_macro_str,
-        const std::string_view _a_matcher_str,
-        const std::source_location& _a_sl,
-        test_runner_t&                                            _a_test_runner
+        _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>& _a_matcher,
+        const std::string_view                              _a_macro_str,
+        const std::string_view                              _a_matcher_str,
+        const std::source_location&                         _a_sl,
+        test_runner_t&                                      _a_test_runner
+    ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>);
+template <typename T, bool Has_Annotation>
+requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
+__constexpr bool
+    create_assertion(
+        _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>&& _a_matcher,
+        const std::string_view                               _a_macro_str,
+        const std::string_view                               _a_matcher_str,
+        const std::source_location&                          _a_sl,
+        test_runner_t&                                       _a_test_runner
     ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>);
 /*!
  * @brief Creates a static assertion in the test function.
@@ -138,13 +148,15 @@ template <bool Has_Annotation>
 __constexpr_imp _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>
                 matcher_macro(
                     const _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>& _a_element,
-                    const std::string_view      _a_macro_str,
+                    const std::string_view                                    _a_macro_str,
                     const std::string_view      _a_matcher_str,
                     const std::source_location& _a_sl
                 ) noexcept
 {
     using namespace _ABC_NS_MATCHER;
-    return run_matcher_macro<Has_Annotation>(_a_element, _a_macro_str, _a_matcher_str, _a_sl);
+    return run_matcher_macro<Has_Annotation>(
+        _a_element, _a_macro_str, _a_matcher_str, _a_sl
+    );
 }
 
 template<
@@ -154,7 +166,7 @@ template<
 __constexpr_imp
 bool
 create_assertion(
-    const _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>& _a_matcher,
+    _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>& _a_matcher,
     const std::string_view _a_macro_str,
     const std::string_view _a_matcher_str,
     const std::source_location& _a_sl,
@@ -167,50 +179,67 @@ create_assertion(
     assertion_ptr_t<true, T> _l_gur;
     bool                     _l_passed{true};
     optional<string>         _l_matcher_annotation{};
-    ds::single_source_t _l_source = _a_matcher.internal_matcher()->add_source_info(
-        _a_macro_str, _a_matcher_str, _a_sl);
+    ds::single_source_t      _l_source
+        = _a_matcher.add_source_info(_a_macro_str, _a_matcher_str, _a_sl);
     if constexpr (Has_Annotation)
     {
         _l_matcher_annotation = optional<string>(_a_matcher.annotation());
     }
-    if (not _a_matcher.has_matcher_base())
+    matcher_result_t     _l_mr{_a_matcher.matcher_result()};
+    matcher_source_map_t _l_msm;
+    _a_matcher.gather_map_source(_l_msm);
+    _l_passed = _l_mr.passed();
+    _l_gur    = make_unique<const matcher_based_assertion_single_line_t<T>>(
+        _l_source,
+        _a_test_runner.get_log_infos(false),
+        matcher_result_with_annotation_and_source_info_t(
+            _l_mr, _l_source, _l_matcher_annotation, _l_msm
+        )
+    );
+    _a_test_runner.add_assertion(_l_gur);
+    _a_matcher.remove_primary_source();
+    return return_result<T>(_l_passed);
+}
+
+template<
+    typename T, bool Has_Annotation
+>
+    requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
+__constexpr_imp
+bool
+create_assertion(
+    _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>&& _a_matcher,
+    const std::string_view _a_macro_str,
+    const std::string_view _a_matcher_str,
+    const std::source_location& _a_sl,
+    test_runner_t& _a_test_runner
+) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>)
+{
+    using namespace _ABC_NS_REPORTS;
+    using namespace _ABC_NS_MATCHER;
+    using namespace std;
+    assertion_ptr_t<true, T> _l_gur;
+    bool                     _l_passed{true};
+    optional<string>         _l_matcher_annotation{};
+    ds::single_source_t      _l_source
+        = _a_matcher.add_source_info(_a_macro_str, _a_matcher_str, _a_sl);
+    if constexpr (Has_Annotation)
     {
-        _l_gur = make_unique<matcher_based_assertion_single_line_t<T>>(
-            _l_source,
-            _a_test_runner.get_log_infos(false),
-            matcher_result_with_annotation_and_source_info_t(
-                matcher_result_t(),
-                _l_source,
-                _l_matcher_annotation,
-                matcher_source_map_t()
-            )
-        );
-        _a_test_runner.add_assertion_and_warning(
-            _l_gur,
-            "Matcher_t object has not been initialised. Assertion is set to "
-            "true"
-        );
+        _l_matcher_annotation = optional<string>(_a_matcher.annotation());
     }
-    else
-    {
-        matcher_base_t&      _l_matcher_base{_a_matcher.matcher_base()};
-        matcher_result_t     _l_mr{_l_matcher_base.matcher_result()};
-        matcher_source_map_t _l_msm;
-        _l_matcher_base.gather_map_source(_l_msm);
-        _l_passed = _l_mr.passed();
-        _l_gur    = make_unique<const matcher_based_assertion_single_line_t<T>>(
-            _l_source,
-            _a_test_runner.get_log_infos(false),
-            matcher_result_with_annotation_and_source_info_t(
-                _l_mr,
-                _l_source,
-                _l_matcher_annotation,
-                _l_msm
-            )
-        );
-        _a_test_runner.add_assertion(_l_gur);
-    }
-    _a_matcher.internal_matcher()->remove_primary_source();
+    matcher_result_t     _l_mr{_a_matcher.matcher_result()};
+    matcher_source_map_t _l_msm;
+    _a_matcher.gather_map_source(_l_msm);
+    _l_passed = _l_mr.passed();
+    _l_gur    = make_unique<const matcher_based_assertion_single_line_t<T>>(
+        _l_source,
+        _a_test_runner.get_log_infos(false),
+        matcher_result_with_annotation_and_source_info_t(
+            _l_mr, _l_source, _l_matcher_annotation, _l_msm
+        )
+    );
+    _a_test_runner.add_assertion(_l_gur);
+    _a_matcher.remove_primary_source();
     return return_result<T>(_l_passed);
 }
 
@@ -400,37 +429,18 @@ matcher_based_assertion_block(
     using namespace _ABC_NS_MATCHER;
     const assertion_t<true, T>* _l_gur;
     bool                        _l_passed{true};
-    if (not _a_matcher.has_matcher_base())
-    {
-        _l_gur = new matcher_based_assertion_block_t<T>(
-            _a_source,
-            _a_test_runner.get_log_infos(false),
-            _a_str_to_print,
-            matcher_result_t(),
-            matcher_source_map_t()
-        );
-        _a_test_runner.add_assertion_and_warning(
-            _l_gur,
-            "Matcher_t object has not been initialised. Assertion is set to "
-            "true"
-        );
-    }
-    else
-    {
-        const matcher_base_t& _l_matcher_base{_a_matcher.matcher_base()};
-        matcher_result_t      _l_mr{_l_matcher_base.matcher_result()};
-        matcher_source_map_t  _l_msm;
-        _l_matcher_base.gather_map_source(_l_msm);
-        _l_passed = _l_mr.passed();
-        _l_gur    = new assertion_t<T>(
-            _a_source,
-            _a_test_runner.get_log_infos(false),
-            _a_str_to_print,
-            _l_mr,
-            _l_msm
-        );
-        _a_test_runner.add_assertion(_l_gur);
-    }
+    matcher_result_t            _l_mr{_a_matcher.matcher_result()};
+    matcher_source_map_t        _l_msm;
+    _a_matcher.gather_map_source(_l_msm);
+    _l_passed = _l_mr.passed();
+    _l_gur    = new assertion_t<T>(
+        _a_source,
+        _a_test_runner.get_log_infos(false),
+        _a_str_to_print,
+        _l_mr,
+        _l_msm
+    );
+    _a_test_runner.add_assertion(_l_gur);
     return return_result<T>(_l_passed);
 }
 
