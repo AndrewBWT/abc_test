@@ -501,6 +501,10 @@ _TEST_CASE(
     _CHECK(m1 || m2);
     matcher_t m3 = _MATCHER(m1 && m2);
     _CHECK(! m3);
+    _CHECK(annotate(
+        "Checking this vitally important thing",
+        ! (_EXPR(1 < 2) && _EXPR(2 == 2))
+    ));
 }
 ```
 
@@ -575,6 +579,15 @@ Below we show the output for the above test case.
          "_MATCHER(m1 && m2)"
      Matcher failed with output:
        "!((1 < 2) && (2 == 2))"
+ 5)  Single-line assertion failed.
+     Source location:
+       ..\docs\assertion_examples.hpp:13
+     Source code representation:
+       "_CHECK(annotate( "Checking this vitally important thing", ! (_EXPR(1 < 2) && _EXPR(2 == 2)) ))"
+     Matcher failed with output:
+       "!((1 < 2) && (2 == 2))"
+     Matcher's annotation:
+       "Checking this vitally important thing"
 ```
 
 ## Simulating Lazily Evaluated Logic Operators

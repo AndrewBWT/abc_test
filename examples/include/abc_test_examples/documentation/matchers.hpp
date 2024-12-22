@@ -198,4 +198,35 @@ _TEST_CASE(
     _CHECK(m1 || m2);
     matcher_t m3 = _MATCHER(m1 && m2);
     _CHECK(! m3);
+    _CHECK(annotate(
+        "Checking this vitally important thing",
+        ! (_EXPR(1 < 2) && _EXPR(2 == 2))
+    ));
+}
+
+_TEST_CASE(
+    abc::test_case_t({ .name = "Simulating logical operators" })
+)
+{
+    using namespace abc;
+    simulated_and_expr_t m1(_MATCHER(_EXPR(1 < 2)));
+    if (m1)
+    {
+        matcher_t m2 = _MATCHER(_EXPR(2 == 2));
+        m1.set_right_child(_MATCHER(m2));
+    }
+    _CHECK(m1);
+    simulated_or_expr_t se1 = _MATCHER(_EXPR(1 < 2));
+    if (se1)
+    {
+        matcher_t m2 = _MATCHER(_EXPR(2 == 2));
+        se1.set_right_child(_MATCHER(m2));
+    }
+    _CHECK(se1);
+    m1 = _MATCHER(_EXPR(1 > 2));
+    if (m1)
+    {
+        m1 = _MATCHER(_EXPR(1 == 2));
+    }
+    _CHECK(m1);
 }

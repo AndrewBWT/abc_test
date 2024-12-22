@@ -72,6 +72,16 @@ __constexpr bool
         const std::source_location&                          _a_sl,
         test_runner_t&                                       _a_test_runner
     ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>);
+template <typename T, _ABC_NS_MATCHER::logic_enum_t Logic_Enum>
+requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
+__constexpr bool
+    create_assertion(
+        _ABC_NS_MATCHER::simulated_logic_expr_t<Logic_Enum>& _a_matcher,
+        const std::string_view                               _a_macro_str,
+        const std::string_view                               _a_matcher_str,
+        const std::source_location&                          _a_sl,
+        test_runner_t&                                       _a_test_runner
+    ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>);
 /*!
  * @brief Creates a static assertion in the test function.
  *
@@ -241,6 +251,30 @@ create_assertion(
     _a_test_runner.add_assertion(_l_gur);
     _a_matcher.remove_primary_source();
     return return_result<T>(_l_passed);
+}
+
+template <typename T, _ABC_NS_MATCHER::logic_enum_t Logic_Enum>
+    requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
+__constexpr_imp bool
+create_assertion(
+    _ABC_NS_MATCHER::simulated_logic_expr_t<Logic_Enum>& _a_matcher,
+    const std::string_view                               _a_macro_str,
+    const std::string_view                               _a_matcher_str,
+    const std::source_location& _a_sl,
+    test_runner_t& _a_test_runner
+) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>)
+{
+    using namespace _ABC_NS_MATCHER;
+    using namespace std;
+    return create_assertion<T, false>(
+        make_strict_logic_matcher_wrapper<false,Logic_Enum>(
+            _a_matcher.left_child(),_a_matcher.right_child(),"<unevaluated>"
+        ),
+        _a_macro_str,
+        _a_matcher_str,
+        _a_sl,
+        _a_test_runner
+    );
 }
 
 template<

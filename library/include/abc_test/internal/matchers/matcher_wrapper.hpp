@@ -14,10 +14,7 @@ struct simulated_binary_logic_expr_t
 {
     logic_enum_t     _m_logic_type_of_matcher;
     matcher_result_t _m_matcher_result_l;
-    matcher_result_t _m_matcher_result_r;
     bool             _m_left_precedence_less_than_logic_enum;
-    bool             _m_right_precedence_less_than_logic_enum;
-    std::size_t      _m_boundary_of_sources;
 };
 
 /*!
@@ -30,6 +27,13 @@ template <bool Has_Annotation>
 struct matcher_wrapper_t
 {
 public:
+    __constexpr
+    matcher_wrapper_t(
+        const matcher_wrapper_t<false>&                _a_matcher_l,
+        const std::optional<matcher_wrapper_t<false>>& _a_matcher_r
+    )
+    {}
+
     __constexpr_imp const std::vector<ds::single_source_t>&
                           get_sources() const noexcept
     {
@@ -173,15 +177,13 @@ public:
         operator||(const matcher_wrapper_t& _a_matcher) const noexcept;
     friend matcher_wrapper_t<not Has_Annotation>;
     __no_constexpr friend matcher_wrapper_t<false>
-        make_matcher(
-            const matcher_result_t& _a_generic_matcher_ptr
-        ) noexcept;
+        make_matcher(const matcher_result_t& _a_generic_matcher_ptr) noexcept;
     __no_constexpr friend matcher_wrapper_t<false>
         make_matcher_opt(
             const matcher_result_t&            _a_generic_matcher_ptr,
             const std::optional<precedence_t>& _a_precedence
         ) noexcept;
-    template<bool Has_Annotation>
+    template <bool Has_Annotation>
     __constexpr friend _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>
         run_matcher_macro(
             const _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>&
@@ -197,11 +199,22 @@ public:
         ) noexcept;
 
     template <bool Has_Annotation, logic_enum_t Logic_Enum>
-    __constexpr friend matcher_wrapper_t<Has_Annotation>
+    __constexpr_imp friend matcher_wrapper_t<Has_Annotation>
         make_strict_logic_matcher_wrapper(
-            const matcher_wrapper_t<Has_Annotation>& _a_matcher_l,
-            const matcher_wrapper_t<Has_Annotation>& _a_matcher_r
+            const std::optional<matcher_wrapper_t<Has_Annotation>>& _a_matcher_l,
+            const std::optional<matcher_wrapper_t<Has_Annotation>>& _a_matcher_r,
+            const std::string_view                                  _a_default_str
         );
+
+    __constexpr void
+        set_result_and_precedence(
+            const matcher_result_t& _a_mathcer_result,
+            const precedence_t      _a_precedence
+        ) noexcept
+    {
+        _m_test_result = _a_mathcer_result;
+        _m_precedence  = _a_precedence;
+    }
 
     __constexpr abc::ds::single_source_t
                 add_source_info(
@@ -226,6 +239,15 @@ public:
         );
         return _m_primary_source.value();
     }
+
+    template <logic_enum_t Logic_Enum>
+    requires (Logic_Enum == logic_enum_t::AND || Logic_Enum == logic_enum_t::OR)
+    __no_constexpr bool friend simulate_binary_logic_statement(
+        matcher_t&                  _a_matcher,
+        const std::string_view      _a_macro_str,
+        const std::string_view      _a_str_rep,
+        const std::source_location& _a_source_location
+    ) noexcept;
 private:
     std::conditional_t<Has_Annotation, std::string, std::monostate>
                                                  _m_annotation;
@@ -282,6 +304,78 @@ private:
     ) noexcept;
 };
 
+template <logic_enum_t Logic_Enum>
+struct simulated_logic_expr_t
+{
+    __constexpr
+    simulated_logic_expr_t(
+        const matcher_wrapper_t<false>& _a_matcher
+    )
+        : _m_matcher_l(_a_matcher)
+    {}
+
+    __constexpr void
+        reset()
+    {
+        using namespace std;
+        _m_matcher_l = optional<matcher_wrapper_t<false>>{};
+        _m_matcher_r = optional<matcher_wrapper_t<false>>{};
+    }
+
+    __constexpr const std::optional<matcher_wrapper_t<false>>&
+                      left_child() const noexcept
+    {
+        return _m_matcher_l;
+    }
+
+    __constexpr void
+        set_left_child(
+            const matcher_wrapper_t<false>& _a_matcher
+        ) noexcept
+    {
+        _m_matcher_l = _a_matcher;
+    }
+
+    __constexpr void
+        set_right_child(
+            const matcher_wrapper_t<false>& _a_matcher
+        ) noexcept
+    {
+        _m_matcher_r = _a_matcher;
+    }
+
+    __constexpr const std::optional<matcher_wrapper_t<false>>&
+                      right_child() const noexcept
+    {
+        return _m_matcher_r;
+    }
+
+    __constexpr explicit
+        operator bool()
+    {
+        if (not _m_matcher_l.has_value() && not _m_matcher_r.has_value())
+        {
+            return false;
+        }
+        // Atleast one is set. Prefer the left.
+        const matcher_wrapper_t<false>& _l_matcher_ref{
+            _m_matcher_l.has_value() ? _m_matcher_l.value()
+                                     : _m_matcher_r.value()
+        };
+        if constexpr (Logic_Enum == logic_enum_t::OR)
+        {
+            return not _l_matcher_ref.matcher_result().passed();
+        }
+        else
+        {
+            return _l_matcher_ref.matcher_result().passed();
+        }
+    }
+private:
+    std::optional<matcher_wrapper_t<false>> _m_matcher_l;
+    std::optional<matcher_wrapper_t<false>> _m_matcher_r;
+};
+
 namespace
 {
 } // namespace
@@ -301,7 +395,10 @@ _END_ABC_MATCHER_NS
 _BEGIN_ABC_NS
 using matcher_t           = _ABC_NS_MATCHER::matcher_wrapper_t<false>;
 using annotated_matcher_t = _ABC_NS_MATCHER::matcher_wrapper_t<true>;
-
+using simulated_or_expr_t = _ABC_NS_MATCHER::simulated_logic_expr_t<
+    _ABC_NS_MATCHER::logic_enum_t::OR>;
+using simulated_and_expr_t = _ABC_NS_MATCHER::simulated_logic_expr_t<
+    _ABC_NS_MATCHER::logic_enum_t::AND>;
 __no_constexpr annotated_matcher_t
     annotate(const matcher_t& _a_matcher, const std::string_view _a_annotation)
         noexcept;
@@ -437,7 +534,7 @@ __constexpr_imp void
     }
     else
     {
-        this->_m_matcher_internal->add_source_info(_a_single_source);
+        // add_source_info(_a_single_source);
     }
 }
 
@@ -477,7 +574,7 @@ __no_constexpr_imp matcher_wrapper_t<Has_Annotation>
     ) const noexcept
 {
     return make_strict_logic_matcher_wrapper<Has_Annotation, logic_enum_t::AND>(
-        *this, _a_matcher
+        *this, _a_matcher,""
     );
 }
 
@@ -488,8 +585,72 @@ __no_constexpr_imp matcher_wrapper_t<Has_Annotation>
     ) const noexcept
 {
     return make_strict_logic_matcher_wrapper<Has_Annotation, logic_enum_t::OR>(
-        *this, _a_matcher
+        *this, _a_matcher,""
     );
+}
+
+template <logic_enum_t Logic_Enum>
+requires (Logic_Enum == logic_enum_t::AND || Logic_Enum == logic_enum_t::OR)
+__no_constexpr_imp bool
+    simulate_binary_logic_statement(
+        matcher_t&                  _a_matcher,
+        const std::string_view      _a_macro_str,
+        const std::string_view      _a_str_rep,
+        const std::source_location& _a_source_location
+    ) noexcept
+{
+    const bool _l_result{_a_matcher.matcher_result().passed()};
+    using namespace std;
+    string _l_left_str{_a_matcher.matcher_result().str()};
+    bool   _l_left_passed{_a_matcher.matcher_result().passed()};
+    bool   _l_does_right_need_to_be_evaluated;
+    string _l_right_str;
+    if constexpr (Logic_Enum == logic_enum_t::OR)
+    {
+        _l_does_right_need_to_be_evaluated = not _l_left_passed;
+    }
+    else
+    {
+        // Logic_Enum == logic_enum_t::AND
+        _l_does_right_need_to_be_evaluated = _l_left_passed;
+    }
+    if (_l_does_right_need_to_be_evaluated)
+    {
+        _l_right_str = "<unset>";
+        logic_enum_t     _m_logic_type_of_matcher;
+        matcher_result_t _m_matcher_result_l;
+        bool             _m_left_precedence_less_than_logic_enum;
+    }
+    else
+    {
+        _l_right_str = "<unevaluated>";
+    }
+    pair<const char*, const char*>& _l_str_pair_l{
+        is_precdence_less_than_child<Logic_Enum>(_a_matcher.precedence())
+            ? _c_normal_bracket_pair
+            : _c_normal_bracket_pair
+    };
+    pair<const char*, const char*>& _l_str_pair_r{
+        is_precdence_less_than_child<Logic_Enum>(_a_matcher.precedence())
+            ? _c_normal_bracket_pair
+            : _c_normal_bracket_pair
+    };
+    matcher_result_t _l_mr(
+        compute_logic_result<Logic_Enum>(_l_left_passed, true),
+        fmt::format(
+            "{0}{1}{2} {3} {4}{5}{6}",
+            _l_str_pair_l.first,
+            _l_left_str,
+            _l_str_pair_l.second,
+            logic_str<Logic_Enum>(),
+            _l_str_pair_r.first,
+            _l_right_str,
+            _l_str_pair_r.second
+        )
+    );
+    _a_matcher.set_result_and_precedence(_l_mr, Logic_Enum);
+    _a_matcher.add_source_info(_a_macro_str, _a_str_rep, _a_source_location);
+    return _l_result;
 }
 
 template <bool Has_Annotation>
@@ -515,9 +676,9 @@ __constexpr_imp bool
 }
 
 __no_constexpr_imp matcher_wrapper_t<false>
-make_matcher(
-    const matcher_result_t& _a_generic_matcher_ptr
-) noexcept
+                   make_matcher(
+                       const matcher_result_t& _a_generic_matcher_ptr
+                   ) noexcept
 {
     using namespace std;
     return matcher_wrapper_t<false>(
@@ -570,22 +731,44 @@ __no_constexpr_imp matcher_wrapper_t<true>
 template <bool Has_Annotation, logic_enum_t Logic_Enum>
 __constexpr_imp matcher_wrapper_t<Has_Annotation>
                 make_strict_logic_matcher_wrapper(
-                    const matcher_wrapper_t<Has_Annotation>& _a_matcher_l,
-                    const matcher_wrapper_t<Has_Annotation>& _a_matcher_r
+                    const std::optional<matcher_wrapper_t<Has_Annotation>>& _a_matcher_l,
+                    const std::optional<matcher_wrapper_t<Has_Annotation>>& _a_matcher_r,
+                    const std::string_view                                  _a_default_str
                 )
 {
     using namespace std;
-    string _l_left_str{_a_matcher_l.matcher_result().str()};
-    string _l_right_str{_a_matcher_r.matcher_result().str()};
-    bool   _l_left_passed{_a_matcher_l.matcher_result().passed()};
-    bool   _l_right_passed{_a_matcher_l.matcher_result().passed()};
+    using namespace abc::ds;
+    string _l_left_str{
+        _a_matcher_l.has_value() ? _a_matcher_l.value().matcher_result().str()
+                                 : _a_default_str
+    };
+    string _l_right_str{
+        _a_matcher_r.has_value() ? _a_matcher_r.value().matcher_result().str()
+                                 : _a_default_str
+    };
+    bool _l_left_passed{
+        _a_matcher_l.has_value()
+            ? _a_matcher_l.value().matcher_result().passed()
+            : false
+    };
+    bool _l_right_passed{
+        _a_matcher_r.has_value()
+            ? _a_matcher_r.value().matcher_result().passed()
+            : false
+    };
     pair<const char*, const char*>& _l_str_pair_l{
-        is_precdence_less_than_child<Logic_Enum>(_a_matcher_l.precedence())
+        is_precdence_less_than_child<Logic_Enum>(
+            _a_matcher_l.has_value() ? _a_matcher_l.value().precedence()
+                                     : optional<precedence_t>{}
+        )
             ? _c_normal_bracket_pair
             : _c_normal_bracket_pair
     };
     pair<const char*, const char*>& _l_str_pair_r{
-        is_precdence_less_than_child<Logic_Enum>(_a_matcher_r.precedence())
+        is_precdence_less_than_child<Logic_Enum>(
+            _a_matcher_r.has_value() ? _a_matcher_r.value().precedence()
+                                     : optional<precedence_t>{}
+        )
             ? _c_normal_bracket_pair
             : _c_normal_bracket_pair
     };
@@ -602,20 +785,21 @@ __constexpr_imp matcher_wrapper_t<Has_Annotation>
             _l_str_pair_r.second
         )
     );
-    matcher_source_map_t _l_msm_l, _l_msm_r;
-    _a_matcher_l.gather_map_source(_l_msm_l);
-    _a_matcher_r.gather_map_source(_l_msm_l);
-
+    vector<single_source_t> _l_sources_l =
+        _a_matcher_l.has_value() ?
+        make_matcher_vector(
+            _a_matcher_l.value().get_sources(), _a_matcher_l.value().primary_source()
+        ) : vector<single_source_t>{};
+    vector<single_source_t> _l_sources_r =
+        _a_matcher_r.has_value() ?
+        make_matcher_vector(
+            _a_matcher_r.value().get_sources(), _a_matcher_r.value().primary_source()
+        ) : vector<single_source_t>{};
+    vector<single_source_t> _l_sources =
+        abc::utility::join(_l_sources_l, _l_sources_r);
     return matcher_wrapper_t<Has_Annotation>(
         _l_mr,
-        abc::utility::join(
-            make_matcher_vector(
-                _a_matcher_l.get_sources(), _a_matcher_l.primary_source()
-            ),
-            make_matcher_vector(
-                _a_matcher_r.get_sources(), _a_matcher_r.primary_source()
-            )
-        ),
+        _l_sources,
         std::optional<ds::single_source_t>(),
         logic_precedence<Logic_Enum>(),
         std::optional<simulated_binary_logic_expr_t>{}

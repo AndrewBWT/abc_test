@@ -163,22 +163,27 @@
  *
  * @param _a_matcher The matcher_t to use.
  */
-#define _IF_OR_STATEMENT(_a_matcher)                         \
-    if (_a_matcher.or_statement(_ABC_NS_DS::single_source_t( \
-            _ABC_NS_UTILITY::str::create_string(             \
-                {"_IF_OR_STATEMENT(", #_a_matcher, ")"}      \
-            ),                                               \
-            std::source_location::current()                  \
-        )))
+#define _IF_OR_OPERATOR(_a_matcher, _a_logic_matcher_name) \
+    if (_ABC_NS_MATCHER::simulated_logic_expr_t<           \
+            _ABC_NS_MATCHER::logic_enum_t::OR>             \
+            _a_logic_matcher_name(                         \
+                _a_matcher,                                \
+                "_IF_OR_OPERATOR",                         \
+                #_a_matcher,                               \
+                std::source_location::current()            \
+            );                                             \
+        not _a_logic_matcher_name.passed())
+
+
 /*!
  * @brief Macro used to help to use an and statement with a matcher.
  *
  * @param _a_matcher The matcher_t to use.
  */
-#define _IF_AND_STATEMENT(_a_matcher)                         \
+#define _IF_AND_OPERATOR(_a_matcher)                          \
     if (_a_matcher.and_statement(_ABC_NS_DS::single_source_t( \
             _ABC_NS_UTILITY::str::create_string(              \
-                {"_IF_OR_STATEMENT(", #_a_matcher, ")"}       \
+                {"_IF_AND_OPERATOR(", #_a_matcher, ")"}       \
             ),                                                \
             std::source_location::current()                   \
         )))
