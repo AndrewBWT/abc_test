@@ -1,10 +1,10 @@
 #pragma once
 
-#include "abc_test/internal/matchers/operator_based_matcher.hpp"
+
 #include "abc_test/internal/utility/internal/macros.hpp"
 
 _BEGIN_ABC_MATCHER_NS
-
+using precedence_t = std::size_t;
 /*!
  * @brief Enum containing the different logical values used with the
  * logic_matcher_t.
@@ -22,8 +22,7 @@ enum logic_enum_t
     /*!
      * @brief Represents the and (&&) operator.
      */
-    AND,
-    NONE
+    AND
 };
 
 /*!
@@ -34,22 +33,6 @@ enum logic_enum_t
 template <logic_enum_t Logic_Enum>
 __constexpr precedence_t
     logic_precedence() noexcept;
-__constexpr precedence_t
-logic_precedence(const logic_enum_t _a_enum)
-{
-    using enum logic_enum_t;
-    switch (_a_enum)
-    {
-    case NOT:
-        return 3;
-    case AND:
-        return 14;
-    case OR:
-        return 15;
-    default:
-        throw abc::errors::unaccounted_for_enum_exception(_a_enum);
-    }
-}
 /*!
  * @brief Returns a string version of the operator given as a template.
  * @tparam The template used to create the string.
@@ -58,21 +41,6 @@ logic_precedence(const logic_enum_t _a_enum)
 template <logic_enum_t Logic_Enum>
 __constexpr const char*
     logic_str() noexcept;
-__constexpr const char*
-logic_str(const logic_enum_t _a_enum)
-{
-    switch (_a_enum)
-    {
-    case NOT:
-        return "!";
-    case AND:
-        return "&&";
-    case OR:
-        return "||";
-    default:
-        throw abc::errors::unaccounted_for_enum_exception(_a_enum);
-    }
-}
 /*!
  * @brief Function which takes two booealn values and runs the given logical
  * operator, descirbed by the template paramter, on them.

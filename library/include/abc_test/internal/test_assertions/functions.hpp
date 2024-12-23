@@ -16,6 +16,8 @@
 #include "abc_test/internal/test_runner.hpp"
 #include "abc_test/internal/utility/str/string_utility.hpp"
 
+#include "abc_test/internal/matchers/simulated_logic_expr.hpp"
+
 #include <concepts>
 
 
@@ -164,7 +166,7 @@ __constexpr_imp _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>
                 ) noexcept
 {
     using namespace _ABC_NS_MATCHER;
-    return run_matcher_macro<Has_Annotation>(
+    return mk_matcher_from_MATCHER_macro<Has_Annotation>(
         _a_element, _a_macro_str, _a_matcher_str, _a_sl
     );
 }
@@ -267,8 +269,8 @@ create_assertion(
     using namespace _ABC_NS_MATCHER;
     using namespace std;
     return create_assertion<T, false>(
-        make_strict_logic_matcher_wrapper<false,Logic_Enum>(
-            _a_matcher.left_child(),_a_matcher.right_child(),"<unevaluated>"
+        mk_matcher_representing_binary_logical_expr<Logic_Enum>(
+            _a_matcher.left_child(), _a_matcher.right_child(), "<unevaluated>"
         ),
         _a_macro_str,
         _a_matcher_str,

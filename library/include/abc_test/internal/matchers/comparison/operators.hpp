@@ -1,5 +1,5 @@
 #pragma once
-#include "abc_test/internal/matchers/comparison/comparison_matcher.hpp"
+#include "abc_test/internal/matchers/comparison/comparison_functions.hpp"
 #include "abc_test/internal/matchers/comparison/comparison_placeholder.hpp"
 #include "abc_test/internal/matchers/comparison/comparison_wrapper.hpp"
 

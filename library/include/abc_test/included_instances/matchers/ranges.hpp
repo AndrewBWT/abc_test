@@ -1,6 +1,5 @@
 #pragma once
 
-#include "abc_test/included_instances/matchers/function_wrapper.hpp"
 
 #include <ranges>
 
@@ -24,15 +23,10 @@ __constexpr matcher_t
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
-    return matcher_t(matcher_base_ptr_t(new function_wrapper_matcher_t(
-        [&]()
-        {
-            return matcher_result_t(
-                (ranges::find(_a_range, _a_value) != _a_range.end()),
-                fmt::format("{0} does not contain {1}", _a_range, _a_value)
-            );
-        }
-    )));
+    return matcher_t(matcher_result_t(
+        (ranges::find(_a_range, _a_value) != _a_range.end()),
+        fmt::format("{0} does not contain {1}", _a_range, _a_value)
+    ));
 }
 
 _END_ABC_NS

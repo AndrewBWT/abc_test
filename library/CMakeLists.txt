@@ -94,26 +94,22 @@ set(LIBRARY_FILES
   include/abc_test/internal/data_generator/data_generator_file_reader_and_writer.hpp
   # Core matcher files
   include/abc_test/internal/matchers/matcher_wrapper.hpp
+  include/abc_test/internal/matchers/simulated_logic_expr.hpp
   include/abc_test/internal/matchers/bool_matcher.hpp
   include/abc_test/internal/matchers/static_matcher.hpp
       src/abc_test/internal/matchers/static_matcher.cpp
-  include/abc_test/internal/matchers/matcher_base.hpp
-  include/abc_test/internal/matchers/operator_based_matcher.hpp
-  include/abc_test/internal/matchers/comparison.hpp
   include/abc_test/internal/matchers/comparison/macros.hpp
   include/abc_test/internal/matchers/matcher_result.hpp
-  include/abc_test/internal/matchers/comparison/comparison_matcher.hpp
+  include/abc_test/internal/matchers/comparison/comparison_functions.hpp
   include/abc_test/internal/matchers/comparison/comparison_enum.hpp
   include/abc_test/internal/matchers/comparison/operators.hpp
   include/abc_test/internal/matchers/comparison/comparison_placeholder.hpp
   include/abc_test/internal/matchers/comparison/comparison_wrapper.hpp
-  include/abc_test/internal/matchers/logic/logic_matcher.hpp
-  include/abc_test/internal/matchers/logic/logic_enum.hpp
+  include/abc_test/internal/matchers/logic_enum.hpp
   include/abc_test/internal/matchers/source_map.hpp
       src/abc_test/internal/matchers/source_map.cpp
   # Matcher subfolder. Code contains logic for writing individual assertions.
   include/abc_test/included_instances/matchers/ranges.hpp
-  include/abc_test/included_instances/matchers/function_wrapper.hpp
   # gen_data subfolder. Contains the logic that allow the gen_data for loops to work.
   include/abc_test/included_instances/data_generator/manual_data_generator.hpp
   include/abc_test/included_instances/data_generator/file_data_generator.hpp

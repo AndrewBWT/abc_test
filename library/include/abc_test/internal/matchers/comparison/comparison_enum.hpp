@@ -1,7 +1,7 @@
 #pragma once
 
 #include "abc_test/internal/utility/internal/macros.hpp"
-#include "abc_test/internal/matchers/operator_based_matcher.hpp"
+#include "abc_test/internal/matchers/logic_enum.hpp"
 
 _BEGIN_ABC_MATCHER_NS
 /*!

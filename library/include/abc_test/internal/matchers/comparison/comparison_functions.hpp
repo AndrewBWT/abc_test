@@ -2,7 +2,6 @@
 
 #include "abc_test/internal/matchers/comparison/comparison_enum.hpp"
 #include "abc_test/internal/matchers/matcher_wrapper.hpp"
-#include "abc_test/internal/matchers/operator_based_matcher.hpp"
 
 _BEGIN_ABC_MATCHER_NS
 
@@ -148,9 +147,9 @@ __constexpr_imp matcher_t
     ) noexcept
 {
     using namespace std;
-    return make_matcher_opt(
+    return mk_matcher_using_result_and_precedence(
         make_matcher_result<Cmp_Enum>(
-            std::forward<T1>(_a_left_arg), std::forward<T2>(_a_right_arg)
+            forward<T1>(_a_left_arg), forward<T2>(_a_right_arg)
         ),
         cmp_precedence<Cmp_Enum>()
 
