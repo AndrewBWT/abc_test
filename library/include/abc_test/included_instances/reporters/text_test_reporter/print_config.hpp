@@ -187,6 +187,8 @@ public:
     __constexpr       std::string
                       status() const noexcept;
     __constexpr const std::string_view
+                      time_taken_str() const noexcept;
+    __constexpr const std::string_view
                       test_description_str() const noexcept;
     __constexpr const std::string_view
                       static_test_annotation_str() const noexcept;
@@ -198,10 +200,17 @@ public:
         const std::string_view
         pass_message_str(
         ) const noexcept;*/
-    __constexpr std::string
-                message_str(const std::string& _a_str) const noexcept;
-    __constexpr std::string
-                message_str(const std::string_view& _a_str) const noexcept;
+    __constexpr     std::string
+                    message_str(const std::string& _a_str) const noexcept;
+    __constexpr     std::string
+                    message_str(const std::string_view& _a_str) const noexcept;
+    __no_constexpr_imp std::string
+                    time_taken(
+                        const std::chrono::time_point<std::chrono::high_resolution_clock>&
+                            _a_begin_time,
+                        const std::chrono::time_point<std::chrono::high_resolution_clock>&
+                            _a_end_time
+                    ) const noexcept;
     __constexpr std::string
         message_str(const std::optional<std::string>& _a_str) const noexcept;
     __constexpr std::string
@@ -937,6 +946,12 @@ __constexpr_imp std::string
 }
 
 __constexpr_imp const std::string_view
+                      print_config_t::time_taken_str() const noexcept
+{
+    return "Time taken";
+}
+
+__constexpr_imp const std::string_view
                       print_config_t::test_description_str() const noexcept
 {
     return "Assertion description";
@@ -985,6 +1000,22 @@ __constexpr_imp std::string
 {
     return slight_highlight(
         _a_str.has_value() ? quote(_a_str.value()) : "<no message>"
+    );
+}
+
+__no_constexpr_imp std::string
+                print_config_t::time_taken(
+        const std::chrono::time_point<std::chrono::high_resolution_clock>&
+            _a_begin_time,
+        const std::chrono::time_point<std::chrono::high_resolution_clock>&
+            _a_end_time
+    ) const noexcept
+{
+    return fmt::format(
+        "{0} microseconds",
+        std::chrono::duration_cast<std::chrono::microseconds>(
+            _a_end_time - _a_begin_time
+        ).count()
     );
 }
 

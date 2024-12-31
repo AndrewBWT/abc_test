@@ -214,6 +214,8 @@ public:
             const std::optional<matcher_wrapper_t<false>>& _a_matcher_r,
             const std::string_view _a_str_representing_nullopt
         ) noexcept;
+    __constexpr explicit
+        operator bool();
 private:
     std::conditional_t<Has_Annotation, std::string, std::monostate>
                                        _m_annotation;
@@ -559,6 +561,12 @@ __constexpr_imp matcher_wrapper_t<false>
         std::optional<ds::single_source_t>(),
         logic_precedence<Logic_Enum>()
     );
+}
+template <bool Has_Annotation>
+__constexpr
+matcher_wrapper_t<Has_Annotation>::operator bool()
+{
+    return _m_test_result.passed();
 }
 
 template <bool Has_Annotation>

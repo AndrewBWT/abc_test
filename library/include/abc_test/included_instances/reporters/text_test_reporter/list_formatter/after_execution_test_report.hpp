@@ -51,6 +51,7 @@ __constexpr_imp bool
     case ASSERTIONS_FAILED:
     case COMPACT_ASSERTION_DATA:
     case TERMINATION_STATUS:
+    case TIME_TAKEN:
         return true;
     case DESCRIPTION:
         return _a_element.post_setup_test_data()
@@ -73,6 +74,13 @@ __constexpr_imp std::vector<std::string>
     using enum enum_after_execution_test_report_fields_t;
     switch (_a_fid)
     {
+    case TIME_TAKEN:
+        return {
+            _a_pc.space(_a_pc.colon(_a_pc.time_taken_str())),
+            _a_pc.slight_highlight(
+                _a_pc.time_taken(_a_element.time_begin(), _a_element.time_end())
+            )
+        };
     case DESCRIPTION:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.test_description_str())),
@@ -107,10 +115,10 @@ __constexpr_imp std::vector<std::string>
         };
         return {
             _a_pc.space(_a_pc.colon(_a_pc.source_location_str())),
-                        _a_pc.source_location(
+            _a_pc.source_location(
                 _l_opt.has_value()
-                    ? optional<source_location>{_l_opt.value()
-                                                .source_location()}
+                    ? optional<source_location>{_l_opt.value().source_location()
+                      }
                     : optional<source_location>{}
             )
         };

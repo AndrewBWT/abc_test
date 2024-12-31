@@ -43,8 +43,8 @@ Status: Incomplete
 - [x] Introduction
 - [x] Basic matchers.
 - [x] Logical operators.
-- [ ] Simulating logical operators.
-- [ ] Included matchers.
+- [x] Simulating logical operators.
+- [x] Included matchers.
 
 ## Data Generators
 Status: Incomplete

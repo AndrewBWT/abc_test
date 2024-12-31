@@ -276,6 +276,17 @@ public:
     __constexpr void
         add_warning(reports::unexpected_non_terminating_report_ptr_t&& _a_pstr
         ) noexcept;
+    __constexpr void
+        set_time_taken(
+            const std::chrono::time_point<std::chrono::high_resolution_clock>&
+                _a_begin_time,
+            const std::chrono::time_point<std::chrono::high_resolution_clock>&
+                _a_end_time
+        ) noexcept;
+    __constexpr  const std::chrono::time_point<std::chrono::high_resolution_clock>&
+        time_begin() const noexcept;
+    __constexpr  const std::chrono::time_point<std::chrono::high_resolution_clock>&
+        time_end() const noexcept;
 private:
     const post_setup_test_data_t&   _m_post_setup_test_data;
     ds::tdg_collection_stack_trie_t _m_tests_for_loop_stack_trie;
@@ -290,7 +301,9 @@ private:
     std::size_t _m_total_number_assertions_failed   = 0;
     reports::assertion_base_collection_t _m_assertions;
     reports::opt_unexpected_report_t     _m_termination_report;
-    reports::unexpected_non_terminating_report_collection_t _m_warnings;
+    reports::unexpected_non_terminating_report_collection_t     _m_warnings;
+    std::chrono::time_point<std::chrono::high_resolution_clock> _m_begin_time,
+        _m_end_time;
 };
 
 namespace
@@ -391,7 +404,9 @@ __constexpr_imp opt_idgc_memoized_element_t
             ? opt_idgc_memoized_element_t{}
             : _m_post_setup_test_data.for_loop_stack_trie()
                   .find_first_child_of_sequence_in_trie(
-                      _m_for_loop_data_collection.create_data_sequence(false,true)
+                      _m_for_loop_data_collection.create_data_sequence(
+                          false, true
+                      )
                   )
     };
     return _l_rv;
@@ -408,9 +423,8 @@ __constexpr_imp opt_idgc_memoized_element_t
         not _m_post_setup_test_data.has_for_loop_stack_trie()
             ? opt_idgc_memoized_element_t{}
             : _m_post_setup_test_data.for_loop_stack_trie()
-                  .increment_last_index(
-                      _m_for_loop_data_collection.create_data_sequence(false,true)
-                  )
+                  .increment_last_index(_m_for_loop_data_collection
+                                            .create_data_sequence(false, true))
     };
     return _l_rv;
 }
@@ -421,8 +435,8 @@ __constexpr_imp bool
     return (not _m_post_setup_test_data.has_for_loop_stack_trie())
                ? true
                : _m_post_setup_test_data.for_loop_stack_trie()
-                     .is_sequence_in_trie(
-                         _m_for_loop_data_collection.create_data_sequence(true,true)
+                     .is_sequence_in_trie(_m_for_loop_data_collection
+                                              .create_data_sequence(true, true)
                      );
 }
 
@@ -436,7 +450,7 @@ __constexpr_imp void
     invoked_test_data_t::add_current_for_loop_stack_to_trie() noexcept
 {
     _m_tests_for_loop_stack_trie.add_for_loop_creation_data_sequence(
-        _m_for_loop_data_collection.create_data_sequence(true,false)
+        _m_for_loop_data_collection.create_data_sequence(true, false)
     );
 }
 
@@ -449,7 +463,7 @@ __constexpr_imp std::size_t
 template <bool Single_Source, typename Assertion_Status>
 __constexpr_imp void
     invoked_test_data_t::add_assertion(
-        reports::assertion_ptr_t<Single_Source,Assertion_Status>& _a_ptr
+        reports::assertion_ptr_t<Single_Source, Assertion_Status>& _a_ptr
     )
 {
     using namespace reports;
@@ -587,6 +601,27 @@ __constexpr_imp void
     _m_warnings.push_back(std::move(_a_pstr));
 }
 
+__constexpr void
+    invoked_test_data_t::set_time_taken(
+        const std::chrono::time_point<std::chrono::high_resolution_clock>&
+            _a_begin_time,
+        const std::chrono::time_point<std::chrono::high_resolution_clock>&
+            _a_end_time
+    ) noexcept
+{
+    _m_begin_time = _a_begin_time;
+    _m_end_time   = _a_end_time;
+}
+__constexpr  const std::chrono::time_point<std::chrono::high_resolution_clock>&
+invoked_test_data_t::time_begin() const noexcept
+{
+    return _m_begin_time;
+}
+__constexpr  const std::chrono::time_point<std::chrono::high_resolution_clock>&
+invoked_test_data_t::time_end() const noexcept
+{
+    return _m_end_time;
+}
 namespace
 {
 __no_constexpr_imp std::filesystem::path

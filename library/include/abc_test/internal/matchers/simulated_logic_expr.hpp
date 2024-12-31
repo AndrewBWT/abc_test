@@ -7,18 +7,30 @@ template <logic_enum_t Logic_Enum>
 struct simulated_logic_expr_t
 {
     __constexpr
+    simulated_logic_expr_t()
+        = default;
+    __constexpr explicit
     simulated_logic_expr_t(const matcher_wrapper_t<false>& _a_matcher);
     __constexpr const std::optional<matcher_wrapper_t<false>>&
                       left_child() const noexcept;
     __constexpr void
         set_left_child(const matcher_wrapper_t<false>& _a_matcher) noexcept;
-
+    template <logic_enum_t Arg_Logic_Enum>
+    __constexpr void
+        set_left_child(const simulated_logic_expr_t<Arg_Logic_Enum>& _a_matcher
+        ) noexcept;
     __constexpr void
         set_right_child(const matcher_wrapper_t<false>& _a_matcher) noexcept;
+    template <logic_enum_t Arg_Logic_Enum>
+    __constexpr void
+        set_right_child(const simulated_logic_expr_t<Arg_Logic_Enum>& _a_matcher
+        ) noexcept;
     __constexpr const std::optional<matcher_wrapper_t<false>>&
                       right_child() const noexcept;
     __constexpr explicit
-        operator bool();
+                operator bool();
+    __constexpr matcher_wrapper_t<false>
+                matcher() const noexcept;
 private:
     std::optional<matcher_wrapper_t<false>> _m_matcher_l;
     std::optional<matcher_wrapper_t<false>> _m_matcher_r;
@@ -59,6 +71,26 @@ __constexpr_imp void
 }
 
 template <logic_enum_t Logic_Enum>
+template <logic_enum_t Arg_Logic_Enum>
+__constexpr_imp void
+    simulated_logic_expr_t<Logic_Enum>::set_left_child(
+        const simulated_logic_expr_t<Arg_Logic_Enum>& _a_matcher
+    ) noexcept
+{
+    set_left_child(_a_matcher.matcher());
+}
+
+template <logic_enum_t Logic_Enum>
+template <logic_enum_t Arg_Logic_Enum>
+__constexpr_imp void
+    simulated_logic_expr_t<Logic_Enum>::set_right_child(
+        const simulated_logic_expr_t<Arg_Logic_Enum>& _a_matcher
+    ) noexcept
+{
+    set_right_child(_a_matcher.matcher());
+}
+
+template <logic_enum_t Logic_Enum>
 __constexpr_imp void
     simulated_logic_expr_t<Logic_Enum>::set_right_child(
         const matcher_wrapper_t<false>& _a_matcher
@@ -77,11 +109,17 @@ __constexpr_imp const std::optional<matcher_wrapper_t<false>>&
 template <logic_enum_t Logic_Enum>
 __constexpr_imp simulated_logic_expr_t<Logic_Enum>::operator bool()
 {
+    // Both unset, return false.
     if (not _m_matcher_l.has_value() && not _m_matcher_r.has_value())
     {
         return false;
     }
-    // Atleast one is set. Prefer the left.
+    // Both set, return false.
+    if (_m_matcher_l.has_value() && _m_matcher_r.has_value())
+    {
+        return false;
+    }
+    // Only one element is set.
     const matcher_wrapper_t<false>& _l_matcher_ref{
         _m_matcher_l.has_value() ? _m_matcher_l.value() : _m_matcher_r.value()
     };
@@ -89,10 +127,23 @@ __constexpr_imp simulated_logic_expr_t<Logic_Enum>::operator bool()
     {
         return not _l_matcher_ref.matcher_result().passed();
     }
-    else
+    else if constexpr (Logic_Enum == logic_enum_t::AND)
     {
         return _l_matcher_ref.matcher_result().passed();
     }
+    else
+    {
+        throw std::runtime_error("Unknown result");
+    }
+}
+
+template <logic_enum_t Logic_Enum>
+__constexpr matcher_wrapper_t<false>
+            simulated_logic_expr_t<Logic_Enum>::matcher() const noexcept
+{
+    return mk_matcher_representing_binary_logical_expr<Logic_Enum>(
+        _m_matcher_l, _m_matcher_r, "<unevaluated>"
+    );
 }
 
 _END_ABC_MATCHER_NS

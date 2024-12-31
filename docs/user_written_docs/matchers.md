@@ -40,6 +40,8 @@ Internally, a matcher object holds information about the test performed. The dat
 - `std::string result_str`. A text representation of the test performed.
 - `std::string annotation`. The previously mentioned optional user-provided annotation. It can be used to provide clarification on what is being tested.
 
+Matchers have an implicit bool operator associated with them which returns the `result` status of the matcher.
+
 We conclude this section by showing the user some code examples of matchers in `abc_test`.
 
 ```cpp
@@ -484,7 +486,7 @@ matcher_t operator&&(const matcher_t& _a_matcher) const noexcept;
 matcher_t operator||(const matcher_t& _a_matcher) const noexcept;
 ```
 
-These operators can be used to encode verbose test logic into a single `matcher_t` object. The reader should note that the `matcher_t` objects created by these operators are not evaluated lazily. For example the expression `_EXPR(1 < 2) || _EXPR(2 < 3)` will always evaluate both subexpressions `_EXPR(1 < 2)` and `_EXPR(2 < 3)`. This contrasts with how the `||` operator behaves with `bool` values. In [this subsection]() we consider an alternative way of encoding logic into matchers, which allows us to simulate lazily evaluated logical operators.
+These operators can be used to encode verbose test logic into a single `matcher_t` object. The reader should note that the `matcher_t` objects created by the operators which take two arguments are not evaluated lazily. For example the expression `_EXPR(1 < 2) || _EXPR(2 < 3)` will always evaluate both subexpressions `_EXPR(1 < 2)` and `_EXPR(2 < 3)`. This contrasts with how the `||` operator behaves with `bool` values. In [this subsection]() we consider an alternative way of encoding logic into matchers, which allows us to simulate lazily evaluated logical operators.
 
 To conclude this subsection, below we show an example test case which uses the matcher's logical operators. Through this example, and the output shown underneith, the reader should gain an understanding of how these operators can be used.
 
@@ -592,23 +594,432 @@ Below we show the output for the above test case.
 
 ## Simulating Lazily Evaluated Logic Operators
 
-The logical operators introduced above
+As discussed in the previous subsection, `matcher_t`'s logical operators which take two arguments - specifically `&&` and `||` - have no inbuilt lazy evaluation. For those unfamiliar with this type of behaviour when using logical operators with Booleans, consider the following functions.
+
+```cpp
+inline bool f1()
+{
+    return false;
+}
+inline bool f2()
+{
+    return true;
+}
+```
+
+If we were to write the expression `f1() && f2()`, only `f1()` would be evaluated. This is because when `f1()` returns `false`, the `&&` operator understands that it is not possible for the function to return `true` no matter what the result of `f2()` is, and therefore does not evaluate it. However if we consider the expression `f2() && f1()`, after evaluating `f2()` the operator understands that it is still possible for the function to return `true`, and so `f1()` is evaluated.
+
+`matcher_t`'s `&&` and `||` operators do not behave in this manner - in fact in C++ it is only `bool` whose logical operators exhibit this lazy behaviour. Instead, in a `matcher_t`-based expression such as `bool_matcher(f1()) && bool_matcher(f2())`, both subexpressions are always evaluated no matter what the result of the left or right subexpressions are.
+
+However, lazy behaviour could be beneficial for matchers. For example, consider the following test case.
+
+```cpp
+_TEST_CASE(
+    abc::test_case_t({.name = "A computationally expensive test"})
+)
+{
+    using namespace abc;
+    using namespace std;
+    auto check_iota_results
+        = [](const vector<int>&    vect,
+             const pair<int, int>& begin_and_end_int)
+    {
+        matcher_t left_matcher
+        {
+            _EXPR(
+                vect.size()
+                == abs(begin_and_end_int.second - begin_and_end_int.first)
+            )
+        };
+        matcher_t right_matcher{_EXPR(
+            vect
+            == ranges::to<vector<int>>(ranges::iota_view(begin_and_end_int.first, begin_and_end_int.second))
+        )};
+        _CHECK(left_matcher && right_matcher);
+    };
+    check_iota_results(
+        ranges::to<vector<int>>(ranges::iota_view(1, 10'000)), { 1,9'999 }
+    );
+}
+```
+
+Here, `right_matcher` is much more computationally expensive to compute than `left_matcher`. The entire test case takes `3355 microseconds` to run on our machine. `abc_test` provides functionality which allows the user to write expressions that simulate lazily evaluated logical operators. As we will see later on, this will allow us to re-write this test case in a more efficient manner.
+
+Unfortunately, due to how C++ works, it is not possible to use the logical operators `&&` and `||` to do this. Instead, `abc_test` provides this functionality through two additional types; the `simulated_or_expr_t` type and the `simulated_and_expr_t` type. Internally, they are both type synonyms for the type `template<abc::matcher::logic_enum_t> abc::matcher::simulated_logic_expr_t`, only differing by which `logic_enum_t` template parameter they use. `simulated_or_expr_t` is used to simulate lazily evaluated logical OR statements, while `simulated_and_expr_t` is used to simulate lazily evaluated logical AND statements. 
+
+As both `simulated_or_expr_t` and `simulated_and_expr_t` are type synonyms for the `simulated_logic_expr_t` type, we will begin by explaining how the `simulated_logic_expr_t` type works. Internally, `simulated_logic_expr_t` contains two `std::optional` matchers, referred to as the left and right child. The user is able to set the left and right child using the functions `set_left_child` and `set_right_child` respectively. 
+
+There is only one constructor for `simulated_logic_expr_t`. This is the default constructor, which sets both children to `std::nullopt` values.
+
+`simulated_logic_expr_t` is designed to be used in the following way:
+- First an instance of the object is created using the default constructor, and then one (usually the left) of the children is initialised. 
+- `simulated_logic_expr_t` has an overloaded `bool operator` function, allowing an object instance to be used as an argument to an `if` statement. The `bool operator` function is defined in such a manner so that the `if` statement body will only be entered if the second child is required for the logical statement. 
+- The user should then set the other (usually the right) child in the `if` statement's body. 
+- After the `if` statement is concluded, the user is able to use the `simulated_logic_expr_t` object with an assertion macro. The assertion macro converts the `simulated_logic_expr_t` object to a `matcher_t` object, and the test is reported to the `abc_test` framework.
+
+Below we show a test case which shows examples of how the `simulated_or_expr_t` and `simulated_and_expr_t` types, both type synonyms for `simulated_logic_expr_t`, should be used.
+
+```cpp
+_TEST_CASE(
+    abc::test_case_t({.name = "Simple simulation of logical operators"})
+)
+{
+    using namespace abc;
+    using namespace std;
+    simulated_or_expr_t se_1;
+    se_1.set_left_child(_MATCHER(_EXPR(1 == 1)));
+    // This simulates a logical OR expression. As the only set child is
+    // true, the if statemenet's body is not entered.
+    if (se_1)
+    {
+        se_1.set_right_child(_MATCHER(_EXPR(2 == 2)));
+    }
+    _CHECK(se_1);
+
+    simulated_and_expr_t se_2;
+    se_2.set_left_child(_MATCHER(_EXPR(1 == 2)));
+    // This simulates a logical AND expression. As the only set child is false,
+    // the if statement's body is not entered.
+    if (se_2)
+    {
+        se_2.set_right_child(_MATCHER(_EXPR(2 == 2)));
+    }
+    _CHECK(se_2);
+}
+```
+
+Below we show the output from the test case above.
+
+```
+ 1)  Single-line assertion passed.
+     Source location:
+       ..\docs\assertion_examples.hpp:15
+     Source code representation:
+       "_CHECK(se_1)"
+     Matcher's other sources:
+       Source location:
+         ..\docs\assertion_examples.hpp:8
+       Source code representation:
+         "_MATCHER(_EXPR(1 == 1))"
+     Matcher passed with output:
+       "(1 == 1) || (<unevaluated>)"
+ 2)  Single-line assertion failed.
+     Source location:
+       ..\docs\assertion_examples.hpp:25
+     Source code representation:
+       "_CHECK(se_2)"
+     Matcher's other sources:
+       Source location:
+         ..\docs\assertion_examples.hpp:18
+       Source code representation:
+         "_MATCHER(_EXPR(1 == 2))"
+     Matcher failed with output:
+       "(1 != 2) && (<unevaluated>)"
+```
+
+We can see from the output above that both `simulated_logic_expr_t` objects did not enter their associated `if` statements. Both objects determined that they did not need to do so due to the result of their already set left children. The unevaluated right children are represented by the `"(<unevaluated>)"` strings shown in the output. 
+
+The reader should note that one disadvantage of creating an assertion using a `simulated_logic_expr_t` object is that it is possible for there to be "missing" source code representations in its test output. For example, in the above test case both `simulated_logic_expr_t` objects do not enter their associated `if` statements. This causes the lines which call the function `set_right_child` to not be evaluated. In turn, these lines are not shown as part of either assertion's `"Matcher's other sources"`. This has the potential to create some difficulties in understanding the control flow behind a failing test case.
+
+Returning to `simulated_logic_expr_t`'s `bool operator` function, it is defined as follows:
+- If neither of `simulated_logic_expr_t`'s children are set to `std::nullopt`, or both are set to `nullopt`, then the `bool operator` returns `false`.
+- In all other cases, only one child is set to `std::nullopt`. We refer to the non-`std::nullopt` child as `child`. If the `simulated_logic_expr_t`'s `logic_enum_t` template value equals `logic_enum_t::OR` then the `bool operator` returns the result of `! child.result`. If the `simulated_logic_expr_t`'s `logic_enum_value_t` value equals `logic_enum_t::AND`, then the `bool operator` returns `child.result`. Otherwise, `bool operator` throws a runtime error.
+
+The assertion macros `_CHECK`, `_REQUIRE`, `_BLOCK_CHECK`, `_BLOCK_REQUIRE` (and any source modifying BBA macros) can take an element of type `simulated_logic_expr_t` as an argument. They convert this argument to a `matcher_t` object, and then register this created `matcher_t` object with the `abc_test` framework. 
+
+The reader should also note that the `_MATCHER` macro can also accept a `simulated_logic_expr_t` object as an argument, converting it to a `matcher_t` object. This allows the user to set the left and right children of a `simulated_logic_expr_t` object using `simulated_logic_expr_t` objects.
+
+Below we show a test case which contains several simple examples created using the `simulated_logic_expr_t` type. This test case shows the user less commonly used functionality from the `simulated_logic_expr_t` type. We have also included comments describing the behaviour.
+
+```cpp
+_TEST_CASE(
+    abc::test_case_t(
+        {.name = "Several assertions created using simulated_logic_expr_t"}
+    )
+)
+{
+    using namespace abc;
+    // A default constructed simulated_logic_expr_t has no left or right element
+    // set.
+    simulated_and_expr_t m1;
+    // The if statement's body will not be entered.
+    if (m1)
+    {
+        _TERMINATE_WITH_MSG("Never entered");
+    }
+    // This assertion will fail. All simulated_logic_expr_t entities with no
+    // elements set automatically fail.
+    _CHECK(m1);
+
+    simulated_or_expr_t m2;
+    m2.set_left_child(_MATCHER(_EXPR(1 == 1)));
+    m2.set_right_child(_MATCHER(_EXPR(1 == 1)));
+    // As both children are set (it doesn't matter if they are true or false)
+    // this if statement will not be entered.
+    if (m2)
+    {
+        _TERMINATE_WITH_MSG("Never entered");
+    }
+    // This assertion will pass. In the results the reader will see that both
+    // children are evaluated.
+    _CHECK(m2);
+
+    // This resets both elements to std::nullopt.
+    m2 = simulated_or_expr_t();
+
+    // We can choose to set either the left or the right child. As long as only
+    // one child is set, then the if statement may be entered.
+    m2.set_right_child(_MATCHER(_EXPR(1 == 2)));
+    if (m2)
+    {
+        m2.set_left_child(_MATCHER(_EXPR(1 == 1)));
+    }
+    // This assertion will pass.
+    _CHECK(m2);
+
+    simulated_and_expr_t m3;
+    // The two set_right_child functions below set the children of m3 using
+    // m2 and m1, both simulated_logic_expr_t types.
+    // We can do this with or without the _MATCHER macro. Using it adds
+    // source information to the test result.
+    m3.set_left_child(m2);
+    if (m3)
+    {
+        m3.set_right_child(_MATCHER(m1));
+    }
+    _CHECK(m3);
+}
+```
+
+Below we show the output from this test case.
+
+```
+ 1)  Single-line assertion failed.
+     Source location:
+       ..\docs\assertion_examples.hpp:17
+     Source code representation:
+       "_CHECK(m1)"
+     Matcher failed with output:
+       "(<unevaluated>) && (<unevaluated>)"
+ 2)  Single-line assertion passed.
+     Source location:
+       ..\docs\assertion_examples.hpp:30
+     Source code representation:
+       "_CHECK(m2)"
+     Matcher's other sources:
+       Source location:
+         ..\docs\assertion_examples.hpp:20
+       Source code representation:
+         "_MATCHER(_EXPR(1 == 1))"
+       Source location:
+         ..\docs\assertion_examples.hpp:21
+       Source code representation:
+         "_MATCHER(_EXPR(1 == 1))"
+     Matcher passed with output:
+       "(1 == 1) || (1 == 1)"
+ 3)  Single-line assertion passed.
+     Source location:
+       ..\docs\assertion_examples.hpp:43
+     Source code representation:
+       "_CHECK(m2)"
+     Matcher's other sources:
+       Source location:
+         ..\docs\assertion_examples.hpp:37
+       Source code representation:
+         "_MATCHER(_EXPR(1 == 2))"
+       Source location:
+         ..\docs\assertion_examples.hpp:40
+       Source code representation:
+         "_MATCHER(_EXPR(1 == 1))"
+     Matcher passed with output:
+       "(1 == 1) || (1 != 2)"
+ 4)  Single-line assertion failed.
+     Source location:
+       ..\docs\assertion_examples.hpp:55
+     Source code representation:
+       "_CHECK(m3)"
+     Matcher's other sources:
+       Source location:
+         ..\docs\assertion_examples.hpp:37
+       Source code representation:
+         "_MATCHER(_EXPR(1 == 2))"
+       Source location:
+         ..\docs\assertion_examples.hpp:40
+       Source code representation:
+         "_MATCHER(_EXPR(1 == 1))"
+       Source location:
+         ..\docs\assertion_examples.hpp:53
+       Source code representation:
+         "_MATCHER(m1)"
+     Matcher failed with output:
+       "((1 == 1) || (1 != 2)) && ((<unevaluated>) && (<unevaluated>))"
+```
+
+Below we show the first test case shown in this subsection re-written using the `simulated_and_expr_t` type.
+
+```cpp
+_TEST_CASE(
+    abc::test_case_t({.name = "A computationally expensive test, revisited"})
+)
+{
+    using namespace abc;
+    using namespace std;
+    auto check_iota_results
+        = [](const vector<int>& vect, const pair<int, int>& begin_and_end_ints)
+    {
+        simulated_and_expr_t simulated_expr;
+        simulated_expr.set_left_child(_MATCHER(_EXPR(
+            vect.size()
+            == std::abs(begin_and_end_ints.second - begin_and_end_ints.first)
+        )));
+        if (simulated_expr)
+        {
+            simulated_expr.set_right_child(_MATCHER(_EXPR(
+                vect
+                == ranges::to<vector<int>>(ranges::iota_view(
+                    begin_and_end_ints.first, begin_and_end_ints.second
+                ))
+            )));
+        }
+        _CHECK(simulated_expr);
+    };
+    check_iota_results(
+        ranges::to<vector<int>>(ranges::iota_view(1, 10'000)), {1, 9'999}
+    );
+}
+```
+
+This test case only takes `160 microseconds` to run on our machine, a significant speedup compared to the original test case. The following output is created from the test case above.
+
+```
+ 1)  Single-line assertion failed.
+     Source location:
+       ..\docs\assertion_examples.hpp:24
+     Source code representation:
+       "_CHECK(simulated_expr)"
+     Matcher's other sources:
+       Source location:
+         ..\docs\assertion_examples.hpp:11
+       Source code representation:
+         "_MATCHER(_EXPR( vect.size() == std::abs(begin_and_end_ints.second - begin_and_end_ints.first) ))"
+     Matcher failed with output:
+       "(9999 != 9998) && (<unevaluated>)"
+```
+
+The reader may question why `simulated_logic_expr_t` has been included with `abc_test`, as the same behaviour could be produced using a `matcher_t` object and its `bool operator` function. There are two core reasons behind this; firstly, by including the type `simulated_logic_expr_t`, the end-user saves time by not having to write their own logic around the `matcher_t` type to mimic `simulated_logic_expr_t`'s behaviour. Secondly, the output produced from the `simulated_logic_expr_t` type clearly shows the intention behind the created assertion through the use of the `(<unevaluated>)` string to represent unevaluated parts of a logical expression. Producing similar output from a `matcher_t` object would not be possible.
 
 # User-Defined Matchers
 
-In this section we show the reader how they can design their own matchers to use with `abc_test`. 
+In this section we show the reader how they can create their own matchers to use with `abc_test`. 
 
-Each `matcher_t` entity has an internal element of type `matcher_base_t`. It is this `matcher_base_t` entity which is used to write 
+A `matcher_t` entity has no public constructors (except for the default constructor). Instead, we would direct the user to the function `mk_matcher_using_result` to create `matcher_t` objects. It is defined as follows:
+
+```cpp
+matcher_t mk_matcher_using_result(const matcher_result_t&)
+```
+
+A `matcher_result_t` object has two constructors; a default constructor and a constructor with the following type signature.
+
+```cpp
+matcher_result_t(const bool passed, const std::string_view str) noexcept;
+```
+
+The `passed` variable denotes whether the matcher passes, and the `str` variable holds a text representation of the matcher's result, which is used when producing output for the user.
+
+Below we show an example of a function to create a `matcher_t` object. It is designed to check two `std::array` objects for equality, and if they are not equal it produces output which tells the user where the arrays diverge.
+
+```cpp
+template <typename T, std::size_t N>
+inline abc::matcher_t
+    arrays_equal(
+        const std::array<T, N>& arr_l,
+        const std::array<T, N>& arr_r
+    )
+{
+    using namespace abc::matcher;
+    using namespace std;
+    optional<size_t> diverging_idx_opt;
+    for (size_t idx{0}; idx < N; ++idx)
+    {
+        if (arr_l[idx] != arr_r[idx])
+        {
+            diverging_idx_opt = idx;
+            break;
+        }
+    }
+    if (diverging_idx_opt.has_value())
+    {
+        size_t diverging_idx{diverging_idx_opt.value()};
+        return mk_matcher_using_result(matcher_result_t(
+            false,
+            fmt::format(
+                "{0} != {1}. Arrays diverge at index {2}. Left array at index "
+                "{2} = {3}, while right array at index {2} = {4}.",
+                arr_l,
+                arr_r,
+                diverging_idx,
+                arr_l[diverging_idx],
+                arr_r[diverging_idx]
+            )
+        ));
+    }
+    else
+    {
+        return mk_matcher_using_result(
+            matcher_result_t(true, fmt::format("{0} == {1}", arr_l, arr_r))
+        );
+    }
+}
+
+_TEST_CASE(
+    abc::test_case_t({.name = "User-defined matcher"})
+)
+{
+    using namespace std;
+    _CHECK(arrays_equal(array<int, 3>{1, 2, 3}, array<int, 3>{1, 2, 3}));
+    _CHECK(arrays_equal(array<int, 3>{1, 2, 3}, array<int, 3>{1, 2, 4}));
+}
+```
+
+Below we show the output from this test.
+
+```
+ 1)  Single-line assertion passed.
+     Source location:
+       ..\docs\assertion_examples.hpp:47
+     Source code representation:
+       "_CHECK(arrays_equal(array<int, 3>{1, 2, 3}, array<int, 3>{1, 2, 3}))"
+     Matcher passed with output:
+       "[1, 2, 3] == [1, 2, 3]"
+ 2)  Single-line assertion failed.
+     Source location:
+       ..\docs\assertion_examples.hpp:48
+     Source code representation:
+       "_CHECK(arrays_equal(array<int, 3>{1, 2, 3}, array<int, 3>{1, 2, 4}))"
+     Matcher failed with output:
+       "[1, 2, 3] != [1, 2, 4]. Arrays diverge at index 2. Left array at index 2 = 3, while right array at index 2 = 4."
+```
 
 # Included Matchers
 
-In this section we provide an overview of the matchers included with `abc_test`.
+`abc_test` comes with a set of functions to create matchers, which are designed to help the user when writing their own tests. All of these matchers require the following include directive.
 
+```cpp
+#include "abc_test/included_instances.hpp"
+```
 
+## Ranges
 
-* 
+This subsection describes the set of matchers which are based around ranges.
+
+```cpp
+template <typename T, typename R>
+requires std::same_as<std::ranges::range_value_t<R>, T>
+constexpr matcher_t contains(R&& _a_range, const T& _a_value) noexcept;
+```
+
+This function creates a matcher which checks if `_a_range` contains `_a_value`.
 
 # The Design of Matchers
 
 We have not written this section yet.
-

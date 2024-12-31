@@ -6,11 +6,13 @@
 #include "abc_test/internal/test_reports//unexpected_thrown_exception.hpp"
 #include "abc_test/internal/utility/internal/log.hpp"
 
+#include <chrono>
+
 _BEGIN_ABC_NS
 __no_constexpr_or_inline_imp void
     test_runner_t::run_test(
         const _ABC_NS_DS::post_setup_test_data_t& _a_post_setup_test_data,
-        const std::size_t _a_order_ran_id
+        const std::size_t                         _a_order_ran_id
     )
 {
     using namespace std;
@@ -37,8 +39,10 @@ __no_constexpr_or_inline_imp void
         _l_current_test.post_setup_test_data().registered_test_data()
     };
     _m_tests_most_recent_source = _l_rtd._m_source;
+    chrono::time_point<chrono::high_resolution_clock> _l_clock_begin, _l_clock_end;
     try
     {
+        _l_clock_begin = chrono::high_resolution_clock::now();
         _l_rtd._m_test_function->run();
     }
     catch (const test_assertion_exception_t& _l_assertion)
@@ -50,11 +54,11 @@ __no_constexpr_or_inline_imp void
     catch (const exception& _l_exception)
     {
         _l_current_test.set_unexpected_termination(
-            make_unique<unexpected_thrown_exception_t >(
-                    most_recent_source(),
-                    typeid(_l_exception).name(),
-                    _l_exception.what()
-                
+            make_unique<unexpected_thrown_exception_t>(
+                most_recent_source(),
+                typeid(_l_exception).name(),
+                _l_exception.what()
+
             )
         );
     }
@@ -68,6 +72,10 @@ __no_constexpr_or_inline_imp void
             )
         );
     }
+    _l_clock_end = chrono::high_resolution_clock::now();
+    _l_current_test.set_time_taken(
+        _l_clock_begin, _l_clock_end
+    );
     _m_trc.get().report_test(_l_current_test);
     _m_current_log_msgs.clear();
     //++_m_tests_ran;

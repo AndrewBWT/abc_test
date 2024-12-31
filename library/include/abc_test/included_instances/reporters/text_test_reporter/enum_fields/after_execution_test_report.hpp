@@ -19,7 +19,8 @@ enum class enum_after_execution_test_report_fields_t
 	ASSERTIONS_PASSED,
 	ASSERTIONS_FAILED,
 	COMPACT_ASSERTION_DATA,
-	TERMINATION_STATUS
+	TERMINATION_STATUS,
+	TIME_TAKEN
 };
 __constexpr
 enum_print_pair_collection_t< enum_after_execution_test_report_fields_t>
@@ -54,6 +55,7 @@ default_after_execution_test_report_fields(
 		{ASSERTIONS_FAILED, CONTEXTUAL_PRINT},
 		{COMPACT_ASSERTION_DATA,CONTEXTUAL_PRINT},
 		{TERMINATION_STATUS,CONTEXTUAL_PRINT},
+		{TIME_TAKEN,CONTEXTUAL_PRINT}
 	};
 }
 _END_ABC_REPORTERS_NS

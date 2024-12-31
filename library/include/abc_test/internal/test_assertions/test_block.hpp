@@ -194,7 +194,7 @@ __constexpr assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>
 
 template <typename T, bool Annotated>
 requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
-__constexpr assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>
+__constexpr assertion_wp_t<T>
             make_entity_bba_compatable(
                 const _ABC_NS_MATCHER::matcher_wrapper_t<Annotated>& _a_matcher,
                 const std::string_view      _a_str_representation,
@@ -212,7 +212,7 @@ __constexpr assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>
             std::optional<std::string>(_a_matcher.annotation()),
             _l_msm
         );
-        return assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>{_l_tuple};
+        return assertion_wp_t<T>{_l_tuple};
     }
     else
     {
@@ -222,7 +222,7 @@ __constexpr assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>
             std::optional<std::string>{},
             _l_msm
         );
-        return assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>{_l_tuple};
+        return assertion_wp_t<T>{_l_tuple};
     }
 }
 

@@ -70,7 +70,7 @@ _TEST_CASE(
 `abc_test` contains a set of macros that create assertions. `abc_test` is designed so that, in most cases, it is only these macros which the user will require when working with assertions. This document contains the documentation for these macros.
 
 # Static Assertions
-Static assertions are the simplest assertion type in `abc_test`. As stated previously, their pass status is encoded at compile time. Unlike all other assertion types, they cannot be assigned a user-defined test condition. Three basic static assertions are included with `abc_test`; one which always passes, and two which always fail. Of the two failing static assertions, one is check-based and one is termination-based. Below we show an overview of the macros used to create these static assertions:
+Static assertions are the simplest assertion type in `abc_test`. As stated previously, their pass status is encoded at compile time. Unlike all other assertion types, they cannot be assigned a user-defined test condition. Three basic static assertions are included with `abc_test`; one which always passes, and two which always fail. Of the two failing static assertions, one is check-based and one is termination-based. Each static assertion macro returns a `bool`, which encodes its pass status. Below we show an overview of the macros used to create these static assertions:
 
 | Macro | Check-based or Termination-based? | Description |
 |--|--|--| 
@@ -156,7 +156,7 @@ We will use these matchers throughout the rest of this document to aid the reade
 
 # Single-line Assertions
 
-In the previous section we provided the reader with a brief introduction to matchers in `abc_test`. In this section we introduce single-line assertions (SLAs) to the reader. There are two core SLA macros included with `abc_test`; the `_CHECK` macro and the `_REQUIRE` macro. Each take a matcher as an argument. The `_CHECK` macro represents a check-based assertion, while the `_REQUIRE` macro represents a termination-based assertion. An overview of these macros is shown below.
+In the previous section we provided the reader with a brief introduction to matchers in `abc_test`. In this section we introduce single-line assertions (SLAs) to the reader. There are two core SLA macros included with `abc_test`; the `_CHECK` macro and the `_REQUIRE` macro. Each take a matcher as an argument. The `_CHECK` macro represents a check-based assertion, while the `_REQUIRE` macro represents a termination-based assertion. Each macro, like the static assertion macros, returns the assertion's pass status as a `bool`. An overview of these macros is shown below.
 
 | Macro | Check-based or Termination-based? | Description |
 |--|--|--| 
@@ -196,7 +196,7 @@ _CHECK_EXPR(expression) = _CHECK(_EXPR(expression));
 _REQUIRE_EXPR(expression) = _REQUIRE(_EXPR(expression));
 ```
 
-These macros are used as shorthand for when the user wants to write an SLA which uses an EEM in its construction. However if using them, the user is unable to access the internal matcher object.
+These macros are used as shorthand for when the user wants to write an SLA which uses an EEM in its construction. However if using them, the user is unable to access the internal matcher object. Like the `_CHECK` and `_REQUIRE` macros, these return the assertion's pass status as a `bool`.
 
 Below we show an example test case using these macros.
 
@@ -260,23 +260,23 @@ In the next subsection we show the full set of BBAME macros in `abc_test`. We al
 
 ## Overview of Included Macros
 
-In this subsection we provide documentation for all of the core BBA-related macros available in `abc_test`. The remaining non-core macros are almost identical to those introduced  in this section, except that they allow the user to modify the internal source location and representation used by the BBAs. We discuss these in greater detail in the [next subsection]().
+In this subsection we provide documentation for all of the core BBA-related macros available in `abc_test`. The remaining non-core macros are almost identical to those introduced  in this section, except that they allow the user to modify the internal source location and representation used by the BBAs. We discuss these in greater detail in the [next subsection](). 
 
-The following table contains details about BBAME macros available in `abc_test`. Each macro takes a single matcher argument.
+The following table contains details about BBAME macros available in `abc_test`. Each macro takes a single matcher argument, and returns an entity which is compatable with a BBA.
 
 |Macro | Check-based or Termination-based? |Description |
 |--|--|--|
 `_BLOCK_CHECK` | Check. | Encodes a matcher argument for use with a BBA. The matcher is evaluated by this macro. |
 `_BLOCK_REQUIRE`| Termination. | Encodes a matcher arguemnt for use with a BBA. The matcher argument is evaluated by this macro. If the matcher returns false, then this macro will raise a pre-emptive termination in the associated BBA. See [this subsection](#the-_block_require-macros) for more information regarding this. |
 
-The table below shows an overview of each BBA provided by `abc_test`. It also includes each BBA's three core components; its begin macro, its object type and its method of assigning matchers to it. Each BBA begin macro requires two arguments; the first is `name`, the name of the internal BBA object to be created, and the second is `description`, an `std::string_view` object representing a user-defined description of the BBA. 
+The table below shows an overview of each BBA provided by `abc_test`. It also includes each BBA's three core components; its begin macro, its object type and its method of assigning matchers to it. Each BBA begin macro requires two arguments; the first is `name`, the name of the internal BBA object to be created, and the second is `description`, an `std::string_view` object representing a user-defined description of the BBA. None of these macros return any value. 
 
 | Name |  Begin Macro | Internal Object | Assignment Method | Description |
 |--|--|--|--|--|
 Single-assertion BBA (SA-BBA) | `_BEGIN_SINGLE_` `ELEMENT_BBA` | `single_element_` `test_block_t` | `=` operator | Begins a BBA that can have a single matcher assigned to it. When the end macro is called on it, it will pass if its assigned matcher's result is true. It will fail otherwise. |
 Multi-assertion BBA (MA-BBA) | `_BEGIN_MULTI_` `ELEMENT_BBA` | `multi_element_` `test_block_t` | `+=` operator | Begins a BBA that holds multiple matcher elements. When the end macro is called on it, it will pass if all of its assigned matcher's results are true. It will fail otherwise. |
 
-Finally, below we show an overview of the end BBA macros. They all require a single argument; the name of the object which stores the BBA. 
+Finally, below we show an overview of the end BBA macros. They all require a single argument; the name of the object which stores the BBA. None of these macros return any value.
 
 | Name | Check-based or Termination-based? | Description |
 |--|--|--|

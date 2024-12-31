@@ -41,6 +41,14 @@ __constexpr _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>
                 const std::string_view      _a_matcher_str,
                 const std::source_location& _a_sl
             ) noexcept;
+template <_ABC_NS_MATCHER::logic_enum_t Logic_Enum>
+__constexpr _ABC_NS_MATCHER::matcher_wrapper_t<false>
+matcher_macro(
+    const _ABC_NS_MATCHER::simulated_logic_expr_t<Logic_Enum>& _a_element,
+    const std::string_view                                    _a_macro_str,
+    const std::string_view      _a_matcher_str,
+    const std::source_location& _a_sl
+) noexcept;
 /*!
  * @brief function to create an assertion.
  *
@@ -170,6 +178,20 @@ __constexpr_imp _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>
         _a_element, _a_macro_str, _a_matcher_str, _a_sl
     );
 }
+template <_ABC_NS_MATCHER::logic_enum_t Logic_Enum>
+__constexpr_imp _ABC_NS_MATCHER::matcher_wrapper_t<false>
+matcher_macro(
+    const _ABC_NS_MATCHER::simulated_logic_expr_t<Logic_Enum>& _a_element,
+    const std::string_view                                    _a_macro_str,
+    const std::string_view      _a_matcher_str,
+    const std::source_location& _a_sl
+) noexcept
+{
+    using namespace _ABC_NS_MATCHER;
+    matcher_wrapper_t<false> _l_matcher(_a_element.matcher());
+    _l_matcher.add_source_info(_a_macro_str, _a_matcher_str, _a_sl);
+    return _l_matcher;
+}
 
 template<
     typename T, bool Has_Annotation
@@ -269,9 +291,7 @@ create_assertion(
     using namespace _ABC_NS_MATCHER;
     using namespace std;
     return create_assertion<T, false>(
-        mk_matcher_representing_binary_logical_expr<Logic_Enum>(
-            _a_matcher.left_child(), _a_matcher.right_child(), "<unevaluated>"
-        ),
+        _a_matcher.matcher(),
         _a_macro_str,
         _a_matcher_str,
         _a_sl,
@@ -331,6 +351,7 @@ create_assertion_block(
 {
     using namespace _ABC_NS_REPORTS;
     using namespace _ABC_NS_MATCHER;
+    using namespace _ABC_NS_ERRORS;
     _a_test_block.register_end(_ABC_NS_DS::single_source_t(
         _a_source_representation, _a_source_location
     ));
@@ -364,6 +385,8 @@ create_assertion_block(
 {
     using namespace _ABC_NS_REPORTS;
     using namespace _ABC_NS_MATCHER;
+    using namespace _ABC_NS_ERRORS;
+    using namespace std;
     assertion_ptr_t<false, T> _l_gur;
     bool _l_passed{_a_test_block.get_matcher().matcher_result().passed()};
     matcher_result_with_annotation_and_source_info_t _l_mtr{
