@@ -52,7 +52,7 @@ _BEGIN_ABC_NS
 template <typename T, typename R = std::initializer_list<T>>
 requires std::same_as<std::ranges::range_value_t<R>, T>
 __constexpr
-    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>, true>
+    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
     iterate_over(R&& _a_init_list);
 _END_ABC_NS
 
@@ -158,7 +158,7 @@ _BEGIN_ABC_NS
 template <typename T, typename R>
 requires std::same_as<std::ranges::range_value_t<R>, T>
 __constexpr_imp
-    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>, true>
+    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
     iterate_over(
         R&& _a_init_list
     )

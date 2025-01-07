@@ -53,7 +53,7 @@ _END_ABC_DG_NS
 
 _BEGIN_ABC_NS
 template <typename T, typename... Args>
-__constexpr _ABC_NS_DG::data_generator_collection_t<T, true>
+__constexpr _ABC_NS_DG::data_generator_collection_t<T>
             enumerate_data(
                 const std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>& _a_es,
                 const std::shared_ptr<_ABC_NS_DG::enumeration_data_object_t<T>>&
@@ -61,13 +61,13 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T, true>
                 Args... _a_file_reader_writers
             );
 template <typename T, typename... Args>
-__constexpr _ABC_NS_DG::data_generator_collection_t<T, true>
+__constexpr _ABC_NS_DG::data_generator_collection_t<T>
             enumerate_data(
                 const std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>& _a_es,
                 Args... _a_file_reader_writers
             );
 template <typename T, typename... Args>
-__constexpr _ABC_NS_DG::data_generator_collection_t<T, true>
+__constexpr _ABC_NS_DG::data_generator_collection_t<T>
             enumerate_data(
                 const std::shared_ptr<_ABC_NS_DG::enumeration_data_object_t<T>>&
                     _a_enumerate_base,
@@ -75,7 +75,7 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T, true>
             );
 
 template <typename T, typename... Args>
-__constexpr _ABC_NS_DG::data_generator_collection_t<T, true>
+__constexpr _ABC_NS_DG::data_generator_collection_t<T>
             enumerate_data(Args... _a_file_reader_writers);
 _END_ABC_NS
 
@@ -93,9 +93,15 @@ __constexpr_imp
     , _m_current_element(_a_es->start_value())
     , _m_end_value(_a_es->end_value(_a_edo))
     , _m_forward_direction(_a_es->is_direction_forward(_a_edo))
-    , _m_number_of_complete_advancements_to_end(_a_es->number_of_complete_advancements(_a_edo))
-    , _m_remainder_after_all_advancements(_a_es->remaining_entities_after_maximum_advancements(_a_edo))
-    , _m_n_advancements_per_generate_next(_a_es->n_advancements_per_advancement(_a_edo))
+    , _m_number_of_complete_advancements_to_end(
+          _a_es->number_of_complete_advancements(_a_edo)
+      )
+    , _m_remainder_after_all_advancements(
+          _a_es->remaining_entities_after_maximum_advancements(_a_edo)
+      )
+    , _m_n_advancements_per_generate_next(
+          _a_es->n_advancements_per_advancement(_a_edo)
+      )
 {}
 
 template <typename T>
@@ -112,7 +118,8 @@ __constexpr_imp bool
     if (_m_has_current_element)
     {
         _m_tertiary_data++;
-        _m_has_current_element = next_element(_m_n_advancements_per_generate_next);
+        _m_has_current_element
+            = next_element(_m_n_advancements_per_generate_next);
     }
     return _m_has_current_element;
 }
@@ -179,7 +186,7 @@ _END_ABC_DG_NS
 
 _BEGIN_ABC_NS
 template <typename T, typename... Args>
-__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
                 enumerate_data(
                     const std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>& _a_es,
                     const std::shared_ptr<_ABC_NS_DG::enumeration_data_object_t<T>>&
@@ -196,7 +203,7 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
 }
 
 template <typename T, typename... Args>
-__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
                 enumerate_data(
                     const std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>& _a_es,
                     Args... _a_file_reader_writers
@@ -214,7 +221,7 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
 }
 
 template <typename T, typename... Args>
-__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
                 enumerate_data(
                     const std::shared_ptr<_ABC_NS_DG::enumeration_data_object_t<T>>&
                         _a_enumerate_base,
@@ -230,7 +237,7 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
 }
 
 template <typename T, typename... Args>
-__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
                 enumerate_data(
                     Args... _a_file_reader_writers
                 )

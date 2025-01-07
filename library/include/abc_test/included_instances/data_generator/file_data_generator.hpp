@@ -67,9 +67,17 @@ _END_ABC_DG_NS
 
 _BEGIN_ABC_NS
 template <typename T, typename R = std::initializer_list<T>>
+    requires std::same_as<std::ranges::range_value_t<R>, T>
+__constexpr
+_ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
+read_data_from_file(
+    const std::string_view& _a_data_file_name,
+    R&& _a_init_list = R{}
+);
+template <typename T, typename R = std::initializer_list<T>>
 requires std::same_as<std::ranges::range_value_t<R>, T>
 __constexpr
-    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>, true>
+    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
     read_data_from_file(
         const utility::io::general_data_t& _a_general_data_file,
         R&&                                _a_init_list = R{}
@@ -77,7 +85,7 @@ __constexpr
 template <typename T, typename R = std::initializer_list<T>>
 requires std::same_as<std::ranges::range_value_t<R>, T>
 __constexpr
-    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>, true>
+    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
     read_data_from_file(
         const utility::io::general_data_with_rw_info_t<T>& _a_general_data_file,
         R&&                                                _a_init_list = R{}
@@ -240,7 +248,21 @@ _BEGIN_ABC_NS
 template <typename T, typename R>
 requires std::same_as<std::ranges::range_value_t<R>, T>
 __constexpr_imp
-    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>, true>
+    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
+    read_data_from_file(
+        const std::string_view& _a_data_file_name,
+        R&&                     _a_init_list
+    )
+{
+    return read_data_from_file<T, R>(
+        general_data_file(_a_data_file_name), std::forward<R>(_a_init_list)
+    );
+}
+
+template <typename T, typename R>
+requires std::same_as<std::ranges::range_value_t<R>, T>
+__constexpr_imp
+    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
     read_data_from_file(
         const utility::io::general_data_t& _a_general_data_file,
         R&&                                _a_init_list
@@ -258,7 +280,7 @@ __constexpr_imp
 template <typename T, typename R>
 requires std::same_as<std::ranges::range_value_t<R>, T>
 __constexpr_imp
-    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>, true>
+    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
     read_data_from_file(
         const utility::io::general_data_with_rw_info_t<T>& _a_general_data_file,
         R&&                                                _a_init_list

@@ -35,7 +35,7 @@ using dgc_internal_itt_t = dgc_internal_t<T>::iterator;
  * Doing this ensures that the code which is written looks similar, but there is
  * type-safety ensuring unintended things cannot be done.
  */
-template <typename T, bool Single_Element>
+template <typename T>
 struct data_generator_collection_t
 {
 public:
@@ -79,9 +79,19 @@ public:
      * arguments.
      */
     template <typename... Args>
-    requires (std::same_as<Args, data_generator_collection_t<T, true>> && ...)
+    requires (std::same_as<Args, data_generator_collection_t<T>> && ...)
     __constexpr
-    data_generator_collection_t(Args... _a_elements) noexcept;
+                data_generator_collection_t(Args... _a_elements) noexcept;
+    __constexpr data_generator_collection_t<T>
+                operator&(
+            const data_generator_collection_t<T>& _a_arg
+        ) const noexcept
+    {
+        dgc_internal_t<T> _l_elements{ get_elements()};
+        _l_elements.append_range(_a_arg.get_elements());
+        return data_generator_collection_t<T>(_l_elements);
+    }
+
     /*!
      * @brief Returns the begin iterator to the caller.
      * @return The begin iterator of this object.
@@ -126,6 +136,12 @@ public:
      */
     __constexpr const dgc_internal_t<T>&
                       get_elements() const noexcept;
+    __constexpr
+        data_generator_collection_t(const dgc_internal_t<T>& _a_elements) noexcept
+        : _m_elements(_a_elements)
+    {
+
+    }
 private:
     dgc_internal_t<T> _m_elements;
     __constexpr iterator
@@ -141,8 +157,8 @@ private:
  * @return A data_generation_collection_t element.
  */
 template <typename T, typename... Args>
-requires (std::same_as<Args, data_generator_collection_t<T, true>> && ...)
-__constexpr data_generator_collection_t<T, false>
+requires (std::same_as<Args, data_generator_collection_t<T>> && ...)
+__constexpr data_generator_collection_t<T>
             data_generator_collection(Args... _a_elements) noexcept;
 /*!
  * @brief Factory function which creates a data_generator_collection_t element
@@ -156,7 +172,7 @@ __constexpr data_generator_collection_t<T, false>
  * appended to one-another.
  */
 template <typename T>
-__constexpr data_generator_collection_t<T, true>
+__constexpr data_generator_collection_t<T>
             unary_collection(const dgc_element_t<T>& _a_pointer) noexcept;
 
 namespace
@@ -174,7 +190,7 @@ namespace
  * data_generator_collection_t elements.
  */
 template <typename T, typename... Args>
-requires (std::same_as<Args, data_generator_collection_t<T, true>> && ...)
+requires (std::same_as<Args, data_generator_collection_t<T>> && ...)
 __constexpr dgc_internal_t<T>
             process_all_data_generator_elements(Args... _a_elements) noexcept;
 /*!
@@ -183,11 +199,11 @@ __constexpr dgc_internal_t<T>
  * @tparam Args The variaidc arguments types.
  */
 template <typename T, typename... Args>
-requires (std::same_as<Args, data_generator_collection_t<T, true>> && ...)
+requires (std::same_as<Args, data_generator_collection_t<T>> && ...)
 __constexpr void
     process_all_data_generator_elements_with_result(
         std::vector<data_generator_ptr_t<T>>&       _l_vect,
-        const data_generator_collection_t<T, true>& _a_gdc,
+        const data_generator_collection_t<T>& _a_gdc,
         Args... _a_elements
     ) noexcept;
 /*!
@@ -197,84 +213,88 @@ template <typename T>
 __constexpr void
     process_all_data_generator_elements_with_result(
         std::vector<data_generator_ptr_t<T>>&       _l_vect,
-        const data_generator_collection_t<T, true>& _a_gdc
+        const data_generator_collection_t<T>& _a_gdc
     ) noexcept;
 } // namespace
 
 _END_ABC_DG_NS
 
 _BEGIN_ABC_DG_NS
-template <typename T, bool Single_Element>
+template <typename T>
 template <typename... Args>
-requires (std::same_as<Args, data_generator_collection_t<T, true>> && ...)
+requires (std::same_as<Args, data_generator_collection_t<T>> && ...)
 __constexpr_imp
-    data_generator_collection_t<T, Single_Element>::data_generator_collection_t(
+    data_generator_collection_t<T>::data_generator_collection_t(
         Args... _a_elements
     ) noexcept
     : _m_elements(process_all_data_generator_elements<T>(_a_elements...))
 {}
 
-template <typename T, bool Single_Element>
-__constexpr_imp data_generator_collection_t<T, Single_Element>::iterator
-                data_generator_collection_t<T, Single_Element>::begin()
+template <typename T>
+__constexpr_imp data_generator_collection_t<T>::iterator
+                data_generator_collection_t<T>::begin()
 {
     return gen_iterator_begin();
 }
 
-template <typename T, bool Single_Element>
-__constexpr_imp data_generator_collection_t<T, Single_Element>::sentinel_t
-                data_generator_collection_t<T, Single_Element>::end()
+template <typename T>
+__constexpr_imp data_generator_collection_t<T>::sentinel_t
+                data_generator_collection_t<T>::end()
 {
     return sentinel_t();
 }
 
-template <typename T, bool Single_Element>
-__constexpr_imp data_generator_collection_t<T, Single_Element>::const_iterator
-                data_generator_collection_t<T, Single_Element>::begin() const
+template <typename T>
+__constexpr_imp data_generator_collection_t<T>::const_iterator
+                data_generator_collection_t<T>::begin() const
 {
     return gen_iterator_begin();
 }
 
-template <typename T, bool Single_Element>
-__constexpr_imp data_generator_collection_t<T, Single_Element>::const_sentinel_t
-                data_generator_collection_t<T, Single_Element>::end() const
+template <typename T>
+__constexpr_imp data_generator_collection_t<T>::const_sentinel_t
+                data_generator_collection_t<T>::end() const
 {
     return const_sentinel_t();
 }
 
-template <typename T, bool Single_Element>
-__constexpr_imp data_generator_collection_t<T, Single_Element>::const_iterator
-                data_generator_collection_t<T, Single_Element>::cbegin() const
+template <typename T>
+__constexpr_imp data_generator_collection_t<T>::const_iterator
+                data_generator_collection_t<T>::cbegin() const
 {
     return gen_iterator_begin();
 }
 
-template <typename T, bool Single_Element>
-__constexpr_imp data_generator_collection_t<T, Single_Element>::const_sentinel_t
-                data_generator_collection_t<T, Single_Element>::cend() const
+template <typename T>
+__constexpr_imp data_generator_collection_t<T>::const_sentinel_t
+                data_generator_collection_t<T>::cend() const
 {
     return const_sentinel_t();
 }
 
-template <typename T, bool Single_Element>
+template <typename T>
 __constexpr_imp const dgc_internal_t<T>&
-    data_generator_collection_t<T, Single_Element>::get_elements(
+    data_generator_collection_t<T>::get_elements(
     ) const noexcept
 {
     return _m_elements;
 }
 
-template <typename T, bool Single_Element>
+template <typename T>
 __constexpr_imp
-    data_generator_collection_t<T, Single_Element>::data_generator_collection_t(
+    data_generator_collection_t<T>::data_generator_collection_t(
         const dgc_element_t<T>& _a_element
     ) noexcept
-    : _m_elements(_a_element.get()->has_current_element() ? dgc_internal_t<T>(1,_a_element) : dgc_internal_t<T>())
+    : _m_elements(
+          _a_element.get()->has_current_element()
+              ? dgc_internal_t<T>(1, _a_element)
+              : dgc_internal_t<T>()
+      )
 {}
 
-template <typename T, bool Single_Element>
-__constexpr_imp data_generator_collection_t<T, Single_Element>::iterator
-    data_generator_collection_t<T, Single_Element>::gen_iterator_begin()
+template <typename T>
+__constexpr_imp data_generator_collection_t<T>::iterator
+    data_generator_collection_t<T>::gen_iterator_begin()
 {
     return iterator(
         _m_elements.begin(),
@@ -284,29 +304,29 @@ __constexpr_imp data_generator_collection_t<T, Single_Element>::iterator
 }
 
 template <typename T, typename... Args>
-requires (std::same_as<Args, data_generator_collection_t<T, true>> && ...)
-__constexpr data_generator_collection_t<T, false>
+requires (std::same_as<Args, data_generator_collection_t<T>> && ...)
+__constexpr data_generator_collection_t<T>
             data_generator_collection(
                 Args... _a_elements
             ) noexcept
 {
-    return data_generator_collection_t<T, false>(_a_elements...);
+    return data_generator_collection_t<T>(_a_elements...);
 }
 
 template <typename T>
-__constexpr_imp data_generator_collection_t<T, true>
+__constexpr_imp data_generator_collection_t<T>
                 unary_collection(
                     const dgc_element_t<T>& _a_pointer
                 ) noexcept
 {
-    return data_generator_collection_t<T, true>(_a_pointer);
+    return data_generator_collection_t<T>(_a_pointer);
 }
 
 namespace
 {
 
 template <typename T, typename... Args>
-requires (std::same_as<Args, data_generator_collection_t<T, true>> && ...)
+requires (std::same_as<Args, data_generator_collection_t<T>> && ...)
 __constexpr_imp std::vector<data_generator_ptr_t<T>>
                 process_all_data_generator_elements(
                     Args... _a_elements
@@ -319,11 +339,11 @@ __constexpr_imp std::vector<data_generator_ptr_t<T>>
 }
 
 template <typename T, typename... Args>
-requires (std::same_as<Args, data_generator_collection_t<T, true>> && ...)
+requires (std::same_as<Args, data_generator_collection_t<T>> && ...)
 __constexpr_imp void
     process_all_data_generator_elements_with_result(
         std::vector<data_generator_ptr_t<T>>&       _l_vect,
-        const data_generator_collection_t<T, true>& _a_gdc,
+        const data_generator_collection_t<T>& _a_gdc,
         Args... _a_elements
     ) noexcept
 {
@@ -335,7 +355,7 @@ template <typename T>
 __constexpr_imp void
     process_all_data_generator_elements_with_result(
         std::vector<data_generator_ptr_t<T>>&       _l_vect,
-        const data_generator_collection_t<T, true>& _a_gdc
+        const data_generator_collection_t<T>& _a_gdc
     ) noexcept
 {
     for (const dgc_element_t<T>& _l_element : _a_gdc.get_elements())

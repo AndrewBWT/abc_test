@@ -152,7 +152,7 @@ template <
     typename R                      = std::initializer_list<T>,
     typename... Args>
 __constexpr _ABC_NS_DG::
-    data_generator_collection_t<_ABC_NS_DG::combinatorics_return_type<T>, true>
+    data_generator_collection_t<_ABC_NS_DG::combinatorics_return_type<T>>
     using_combinatorics_generator(
         R&& _a_collection_of_elements,
         Args... _a_file_reader_writers
@@ -165,7 +165,7 @@ template <
     typename R                      = std::initializer_list<T>,
     typename... Args>
 __constexpr _ABC_NS_DG::
-    data_generator_collection_t<_ABC_NS_DG::combinatorics_return_type<T>, true>
+    data_generator_collection_t<_ABC_NS_DG::combinatorics_return_type<T>>
     using_combinatorics_generator(
         R&&                                       _a_collection_of_elements,
         const _ABC_NS_DG::combinatorics_schema_t& _a_combinations_sizes,
@@ -909,7 +909,7 @@ template <
     typename R,
     typename... Args>
 __constexpr_imp _ABC_NS_DG::
-    data_generator_collection_t<_ABC_NS_DG::combinatorics_return_type<T>, true>
+    data_generator_collection_t<_ABC_NS_DG::combinatorics_return_type<T>>
     using_combinatorics_generator(
         R&& _a_collection_of_elements,
         Args... _a_file_reader_writers
@@ -939,7 +939,7 @@ template <
     typename R,
     typename... Args>
 __constexpr_imp _ABC_NS_DG::
-    data_generator_collection_t<_ABC_NS_DG::combinatorics_return_type<T>, true>
+    data_generator_collection_t<_ABC_NS_DG::combinatorics_return_type<T>>
     using_combinatorics_generator(
         R&&                                       _a_collection_of_elements,
         const _ABC_NS_DG::combinatorics_schema_t& _a_combinations_sizes,

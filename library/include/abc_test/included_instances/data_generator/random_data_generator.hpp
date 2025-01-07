@@ -49,22 +49,22 @@ _END_ABC_DG_NS
 _BEGIN_ABC_NS
 
 template <typename T, typename... Args>
-__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
                 generate_data_randomly(
                     std::shared_ptr<_ABC_NS_DG::random_generator_object_t<T>> _a_rnd_base,
                     Args... _a_file_reader_writers
                 );
 template <typename T, typename... Args>
-__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
                 generate_data_randomly(Args... _a_file_reader_writers);
 
 template <typename T>
-__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
 generate_data_randomly(
     std::shared_ptr<_ABC_NS_DG::random_generator_object_t<T>> _a_rnd_base
 );
 template <typename T>
-__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
 generate_data_randomly();
 
 _END_ABC_NS
@@ -147,7 +147,7 @@ _END_ABC_DG_NS
 
 _BEGIN_ABC_NS
 template <typename T, typename... Args>
-__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
                 generate_data_randomly(
                     std::shared_ptr<_ABC_NS_DG::random_generator_object_t<T>> _a_rnd_base,
                     Args... _a_file_reader_writers
@@ -160,7 +160,7 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
 }
 
 template <typename T, typename... Args>
-__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
                 generate_data_randomly(
                     Args... _a_file_reader_writers
                 )
@@ -172,7 +172,7 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
     );
 }
 template <typename T>
-__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
 generate_data_randomly(
     std::shared_ptr<_ABC_NS_DG::random_generator_object_t<T>> _a_rnd_base
 )
@@ -183,7 +183,7 @@ generate_data_randomly(
     );
 }
 template <typename T>
-__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T, true>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
 generate_data_randomly()
 {
     using namespace _ABC_NS_DG;

@@ -9,7 +9,7 @@ struct test_runner_t;
 _END_ABC_NS
 _BEGIN_ABC_DG_NS
 // Forward declarations
-template <typename T, bool Single_Element>
+template <typename T>
 struct data_generator_collection_t;
 
 /*!

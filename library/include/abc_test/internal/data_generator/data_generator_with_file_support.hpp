@@ -67,7 +67,7 @@ private:
 template <typename T, typename... Args>
 requires concept_for_data_generator_with_file_support<T>
 __constexpr
-    _ABC_NS_DG::data_generator_collection_t<typename T::generator_type, true>
+    _ABC_NS_DG::data_generator_collection_t<typename T::generator_type>
     make_data_generator_with_file_support(
         const T& _a_generator,
         Args... _a_file_reader_writers
@@ -76,7 +76,7 @@ __constexpr
 template <typename T>
     requires concept_for_data_generator_with_file_support<T>
 __constexpr
-_ABC_NS_DG::data_generator_collection_t<typename T::generator_type, true>
+_ABC_NS_DG::data_generator_collection_t<typename T::generator_type>
 make_data_generator_with_file_support(
     const T& _a_generator
 ) noexcept;
@@ -453,7 +453,7 @@ __constexpr void
 template <typename T, typename... Args>
 requires concept_for_data_generator_with_file_support<T>
 __constexpr_imp
-    _ABC_NS_DG::data_generator_collection_t<typename T::generator_type, true>
+    _ABC_NS_DG::data_generator_collection_t<typename T::generator_type>
     make_data_generator_with_file_support(
         const T& _a_generator,
         Args... _a_file_reader_writers
@@ -500,7 +500,7 @@ __constexpr_imp
 template <typename T>
     requires concept_for_data_generator_with_file_support<T>
 __constexpr
-_ABC_NS_DG::data_generator_collection_t<typename T::generator_type, true>
+_ABC_NS_DG::data_generator_collection_t<typename T::generator_type>
 make_data_generator_with_file_support(
     const T& _a_generator
 ) noexcept
