@@ -68,7 +68,7 @@ __no_constexpr_imp
           0,
         ds::dgc_memoized_element_t{ 0,
           ds::dg_memoized_element_t{0,
-          utility::str::printer_t<tertiary_type>().run_printer(0) } }
+        abc::utility::str::print(0) } }
       ))
 {
     using namespace global;
@@ -123,6 +123,6 @@ manual_data_generator_t::generate_data_generator_memoized_element(
     const bool _a_get_data_for_repeating
 ) const noexcept
 {
-    return { 0,utility::str::printer_t<tertiary_type>().run_printer(_m_idx) };
+    return { 0,abc::utility::str::print(_m_idx) };
 }
 _END_ABC_NS

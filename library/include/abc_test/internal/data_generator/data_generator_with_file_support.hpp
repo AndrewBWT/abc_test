@@ -66,20 +66,16 @@ private:
 
 template <typename T, typename... Args>
 requires concept_for_data_generator_with_file_support<T>
-__constexpr
-    _ABC_NS_DG::data_generator_collection_t<typename T::generator_type>
-    make_data_generator_with_file_support(
-        const T& _a_generator,
-        Args... _a_file_reader_writers
-    ) noexcept;
+__constexpr _ABC_NS_DG::data_generator_collection_t<typename T::generator_type>
+            make_data_generator_with_file_support(
+                const T& _a_generator,
+                Args... _a_file_reader_writers
+            ) noexcept;
 
 template <typename T>
-    requires concept_for_data_generator_with_file_support<T>
-__constexpr
-_ABC_NS_DG::data_generator_collection_t<typename T::generator_type>
-make_data_generator_with_file_support(
-    const T& _a_generator
-) noexcept;
+requires concept_for_data_generator_with_file_support<T>
+__constexpr _ABC_NS_DG::data_generator_collection_t<typename T::generator_type>
+    make_data_generator_with_file_support(const T& _a_generator) noexcept;
 
 namespace
 {
@@ -191,15 +187,15 @@ __constexpr void
         {
         case 0:
             _m_file_read_writer.set_data_generator_using_additional_data(
-                utility::str::parser_t<std::size_t>().run_parser_with_exception(
+                abc::utility::str::run_parser_with_exception<std::size_t>(
                     _a_dgme.additional_data
                 )
             );
             break;
         case 1:
             _m_object.set_generator_using_tertiary_data(
-                _m_tertiary_rw_info.parser().run_parser_with_exception(
-                    _a_dgme.additional_data
+                abc::utility::str::run_parser_with_exception(
+                    _a_dgme.additional_data, _m_tertiary_rw_info.parser()
                 )
             );
             break;
@@ -213,8 +209,8 @@ __constexpr void
         {
         case 0:
             _m_object.set_generator_using_tertiary_data(
-                _m_tertiary_rw_info.parser().run_parser_with_exception(
-                    _a_dgme.additional_data
+                abc::utility::str::run_parser_with_exception(
+                    _a_dgme.additional_data, _m_tertiary_rw_info.parser()
                 )
             );
             break;
@@ -346,7 +342,9 @@ __constexpr ds::dg_memoized_element_t
                 );
                 break;
             case 1:
-                _l_rv = _m_tertiary_rw_info.printer().run_printer(_m_object.tertiary_data());
+                _l_rv = _m_tertiary_rw_info.printer().run_printer(
+                    _m_object.tertiary_data()
+                );
                 break;
             default:
                 throw std::exception("Couldn't work");
@@ -375,7 +373,9 @@ __constexpr ds::dg_memoized_element_t
                 }
                 else
                 {
-                    _l_rv = _m_tertiary_rw_info.printer().run_printer(_m_object.tertiary_data());
+                    _l_rv = _m_tertiary_rw_info.printer().run_printer(
+                        _m_object.tertiary_data()
+                    );
                 }
                 // file_writer_t<generator_type>
                 //_m_object. T.
@@ -488,8 +488,10 @@ __constexpr_imp
                 _a_generator,
                 _l_file_reader_writers[0],
                 pair<
-                    typename file_names_t<typename T::generator_type>::const_iterator,
-                    typename file_names_t<typename T::generator_type>::const_iterator>(
+                    typename file_names_t<
+                        typename T::generator_type>::const_iterator,
+                    typename file_names_t<
+                        typename T::generator_type>::const_iterator>(
                     _l_file_reader_writers.begin() + 1,
                     _l_file_reader_writers.end()
                 )
@@ -497,23 +499,22 @@ __constexpr_imp
         );
     }
 }
+
 template <typename T>
-    requires concept_for_data_generator_with_file_support<T>
-__constexpr
-_ABC_NS_DG::data_generator_collection_t<typename T::generator_type>
-make_data_generator_with_file_support(
-    const T& _a_generator
-) noexcept
+requires concept_for_data_generator_with_file_support<T>
+__constexpr _ABC_NS_DG::data_generator_collection_t<typename T::generator_type>
+            make_data_generator_with_file_support(
+                const T& _a_generator
+            ) noexcept
 {
     using namespace _ABC_NS_DG;
     using namespace std;
     using namespace utility::io;
     return unary_collection<typename T::generator_type>(
-        make_shared<data_generator_with_file_support_t<T, false>>(
-            _a_generator
-        )
+        make_shared<data_generator_with_file_support_t<T, false>>(_a_generator)
     );
 }
+
 namespace
 {
 template <typename T>

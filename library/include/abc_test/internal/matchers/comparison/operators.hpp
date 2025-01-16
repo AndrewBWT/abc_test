@@ -14,7 +14,6 @@ _BEGIN_ABC_MATCHER_NS
  * @param _a_right_arg An element of type T2.
  * @return matcher_t modelling equality between the entity in _a_left_arg and
  * _a_right_arg.
- */
 template <typename T1, typename T2>
 __constexpr matcher_t
     operator==(comparison_wrapper_t<T1>&& _a_left_arg, T2&& _a_right_arg)

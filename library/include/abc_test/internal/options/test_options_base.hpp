@@ -62,7 +62,7 @@ public:
      * elements. This is specifically for those files where the reader and
      * writer uses fmt::format and scn::scan.
      */
-    std::string general_data_extension                       = "dg";
+    std::string general_data_extension                       = "gd";
     std::string tertiary_data_file_extension = "td";
     /*!
      * @brief The comment line string.

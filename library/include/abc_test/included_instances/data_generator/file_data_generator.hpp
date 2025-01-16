@@ -67,13 +67,13 @@ _END_ABC_DG_NS
 
 _BEGIN_ABC_NS
 template <typename T, typename R = std::initializer_list<T>>
-    requires std::same_as<std::ranges::range_value_t<R>, T>
+requires std::same_as<std::ranges::range_value_t<R>, T>
 __constexpr
-_ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
-read_data_from_file(
-    const std::string_view& _a_data_file_name,
-    R&& _a_init_list = R{}
-);
+    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
+    read_data_from_file(
+        const std::string_view& _a_data_file_name,
+        R&&                     _a_init_list = R{}
+    );
 template <typename T, typename R = std::initializer_list<T>>
 requires std::same_as<std::ranges::range_value_t<R>, T>
 __constexpr
@@ -118,8 +118,8 @@ __constexpr_imp void
     if (_a_tertiary_data == _m_elements_read)
     {
         _m_elements_read = _a_tertiary_data;
-        _m_element = _m_element_rw_info.parser().run_parser_with_exception(
-            _m_line_reader.current_line()
+        _m_element       = abc::utility::str::run_parser_with_exception(
+            _m_line_reader.current_line(), _m_element_rw_info.parser()
         );
     }
 }
@@ -191,8 +191,8 @@ __constexpr_imp void
     if (_m_line_reader.has_current_line())
     {
         ++_m_elements_read;
-        _m_element = _m_element_rw_info.parser().run_parser_with_exception(
-            _m_line_reader.current_line()
+        _m_element = abc::utility::str::run_parser_with_exception(
+            _m_line_reader.current_line(), _m_element_rw_info.parser()
         );
     }
 }
@@ -224,8 +224,9 @@ __constexpr_imp bool
     if (_m_line_reader.get_next_line())
     {
         ++_m_elements_read;
-        _m_element = _m_element_rw_info.parser().run_parser_with_exception(
-            _m_line_reader.current_line()
+        _m_element = abc::utility::str::run_parser_with_exception(
+            _m_line_reader.current_line(),
+            _m_element_rw_info.parser()
         );
         return true;
     }
@@ -255,7 +256,7 @@ __constexpr_imp
     )
 {
     return read_data_from_file<T, R>(
-        general_data_file(_a_data_file_name), std::forward<R>(_a_init_list)
+        gdf(_a_data_file_name), std::forward<R>(_a_init_list)
     );
 }
 

@@ -18,5 +18,4 @@
 #include "abc_test/included_instances/utility/limits/enum.hpp"
 #include "abc_test/included_instances/utility/limits/fundamental_types.hpp"
 #include "abc_test/included_instances/utility/limits/vector.hpp"
-
 #include "abc_test/included_instances/data_generator/random_generator_object/enumeration_based_random_generator_object.hpp"
