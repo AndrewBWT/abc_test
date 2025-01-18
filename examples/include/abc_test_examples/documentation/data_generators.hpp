@@ -70,13 +70,12 @@ template <>
 struct abc::utility::str::printer_t<S>
 {
     __no_constexpr_imp std::string
-                run_printer(
-                    const S& _a_object
-                ) const noexcept
+                       run_printer(
+                           const S& _a_object
+                       ) const noexcept
     {
-        return fmt::format(
-            "{}", std::make_tuple(_a_object.int_1, _a_object.int_2)
-        );
+        return object_printer({ "int_1", "int_2" }, "S", '{', '}',
+            _a_object.int_1, _a_object.int_2);
     }
 };
 
@@ -90,7 +89,7 @@ struct fmt::formatter<S> : formatter<string_view>
         ) const -> format_context::iterator
     {
         using namespace std;
-        const string _l_rv{fmt::format("{}", make_tuple(arg.int_1, arg.int_2))};
+        const string _l_rv = abc::utility::str::printer_t<S>().run_printer(arg);
         return formatter<string_view>::format(_l_rv, _a_ctx);
     }
 };
@@ -120,7 +119,7 @@ _TEST_CASE(
     _CHECK_EXPR(
         abc::utility::str::print(S{1, 2}, s_printer_func) == "S {1, 2}"
     );
-    _CHECK_EXPR(abc::utility::str::print(S{1, 2}) == "(1, 2)");
+    _CHECK_EXPR(abc::utility::str::print(S{1, 2}) == "S {int_1 = 1, int_2 = 2}");
 }
 
 constexpr bool
@@ -148,8 +147,8 @@ struct parser_t<S>
             "S",
             '{',
             '}',
-            _a_parse_input,
-            std::make_tuple(parser_t<int>(), parser_t<int>())
+            _a_parse_input
+           // std::make_tuple(parser_t<int>(), parser_t<int>())
         );
     }
 };
@@ -255,6 +254,12 @@ _TEST_CASE(
     using namespace std;
     using namespace abc::utility;
     // Below we show how the default printer and parser work.
+    _CHECK_EXPR(
+        abc::utility::str::print(make_tuple("123"s, "456"s))
+        == "(\"123\", \"456\")"
+    );
+    abc::utility::str::printer_t<std::string> ti;
+    abc::utility::str::printer_t<std::tuple<std::string>> ti2(ti);
     _CHECK_EXPR(abc::utility::str::print("123") == "\"123\"");
     _CHECK_EXPR(abc::utility::str::parse<string>("\"123\"") == "123");
     _CHECK_EXPR(
@@ -269,7 +274,7 @@ _TEST_CASE(
     _CHECK_EXPR(
         (abc::utility::str::parse<pair<int, int>>(abc::utility::str::print(arg_1
         )))
-        != arg_1
+        == arg_1
     );
     const auto arg_2 = make_pair("\"123\""s, "\"456\""s);
     // The user could surround the strings by quotes, and assume that the parser

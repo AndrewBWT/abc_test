@@ -1,8 +1,7 @@
 #pragma once
 #include "abc_test/internal/errors/test_library_exception.hpp"
-#include "abc_test/internal/utility/internal/macros.hpp"
-
 #include "abc_test/internal/utility/concepts.hpp"
+#include "abc_test/internal/utility/internal/macros.hpp"
 
 #include <expected>
 #include <fmt/format.h>
@@ -129,6 +128,14 @@ private:
     std::string_view::const_iterator _m_cur_itt;
     std::string_view::const_iterator _m_end_itt;
 };
+
+auto
+    format_as(
+        abc::utility::str::parse_input_t _a_val
+    )
+{
+    return _a_val.sv();
+}
 
 // Forward declaration
 namespace
@@ -306,81 +313,183 @@ struct parser_t<T>
     }
 };
 
-template <typename T>
-requires is_tuple<T>::value
-struct parser_t<T>
+template <typename... Ts>
+struct parser_t<std::tuple<Ts...>>
 {
-    template <typename... Args>
-    static __constexpr auto
-        tuple_make_default_parsers()
-    {
-        return std::make_tuple(parser_t<Args>()...);
-    }
+    using value_type = std::tuple<Ts...>;
 
-    __constexpr virtual parse_result_t<T>
+    parser_t(
+        parser_t<Ts>... _a_parsers
+    )
+        : _m_parsers{std::move(_a_parsers)...}
+    {}
+
+    parser_t()
+    requires (std::is_default_constructible_v<parser_t<Ts>> && ...)
+    = default;
+
+    __constexpr virtual parse_result_t<value_type>
         run_parser(
             parse_input_t& _a_parse_input
         ) const
     {
-        auto _a_parsers = tuple_make_default_parsers<T>();
-        return parse_result_t<T>();
+        value_type _l_rv;
+        if (_a_parse_input.check_and_advance("("))
+        {
+        }
+        run_parser_internal<0>(_l_rv, _a_parse_input);
+        if (_a_parse_input.check_and_advance(")"))
+        {
+        }
+        return parse_result_t<value_type>(_l_rv);
         // return run_parser_(_a_parse_input, T{});
+    }
+private:
+    std::tuple<parser_t<Ts>...> _m_parsers;
+
+    template <std::size_t I>
+    __constexpr void
+        run_parser_internal(
+            value_type&    _a_object,
+            parse_input_t& _a_parse_input
+        ) const
+    {
+        if (auto _l_result{std::get<I>(_m_parsers).run_parser(_a_parse_input)};
+            _l_result.has_value())
+        {
+            std::get<I>(_a_object) = _l_result.value();
+        }
+        if constexpr (I + 1 < std::tuple_size<value_type>{})
+        {
+            if (_a_parse_input.check_and_advance(", "))
+            {
+            }
+            run_parser_internal<I + 1>(_a_object, _a_parse_input);
+        }
     }
 };
 
-template <typename T>
-requires is_pair<T>::value
-struct parser_t<T>
+template <typename T, typename U>
+struct parser_t<std::pair<T, U>>
 {
-    template <typename... Args>
-    static __constexpr auto
-        pair_make_default_parsers()
-    {
-        return std::make_pair(parser_t<int>(), parser_t<int>());
-    }
+private:
+    std::pair<parser_t<T>, parser_t<U>> _m_parsers;
+public:
+    using value_type = std::pair<T, U>;
 
-    __constexpr virtual parse_result_t<T>
+    parser_t(
+        const parser_t<T>& _a_parser_t,
+        const parser_t<U>& _a_parser_u
+    )
+        : _m_parsers{std::make_pair(_a_parser_t, _a_parser_u)}
+    {}
+
+    parser_t()
+    requires (std::is_default_constructible_v<parser_t<T>>
+              && std::is_default_constructible_v<parser_t<U>>)
+    = default;
+
+    __constexpr virtual parse_result_t<value_type>
         run_parser(
             parse_input_t& _a_parse_input
         ) const
     {
-        auto _a_parsers = pair_make_default_parsers<T>();
-        return parse_result_t<T>();
+        value_type _l_rv;
+        if (_a_parse_input.check_and_advance("("))
+        {
+        }
+        if (auto _l_first_result{_m_parsers.first.run_parser(_a_parse_input)};
+            _l_first_result.has_value())
+        {
+            _l_rv.first = _l_first_result.value();
+        }
+        if (_a_parse_input.check_and_advance(", "))
+        {
+        }
+        if (auto _l_second_result{_m_parsers.second.run_parser(_a_parse_input)};
+            _l_second_result.has_value())
+        {
+            _l_rv.second = _l_second_result.value();
+        }
+        if (_a_parse_input.check_and_advance(")"))
+        {
+        }
+        return parse_result_t<value_type>(_l_rv);
         // return run_parser_(_a_parse_input, T{});
     }
 };
 
-template <typename T, typename... Args, typename... Args2>
+template <std::size_t I, typename... Ts>
+__constexpr void
+    run_object_reader(
+        utility::str::parse_input_t&                       _a_parse_input,
+        std::tuple<Ts...>&                                 _a_default_tuple,
+        const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
+        std::tuple<parser_t<Ts>...>                        _a_parsers
+    ) noexcept
+{
+    if (_a_parse_input.check_and_advance(std::get<I>(_a_object_names)))
+    {
+    }
+    if (_a_parse_input.check_and_advance(" = "))
+    {
+    }
+    if (auto _l_result{std::get<I>(_a_parsers).run_parser(_a_parse_input)};
+        _l_result.has_value())
+    {
+        std::get<I>(_a_default_tuple) = _l_result.value();
+        if constexpr (I + 1 < std::tuple_size<std::tuple<Ts...>>{})
+        {
+            if (_a_parse_input.check_and_advance(", "))
+            {
+            }
+            run_object_reader<I + 1>(
+                _a_parse_input, _a_default_tuple, _a_object_names, _a_parsers
+            );
+        }
+    }
+}
+
+
+template <typename T, typename... Ts>
 __constexpr abc::utility::str::parse_result_t<T>
             object_parser(
-                const std::array<std::string_view, sizeof...(Args)>& _a_object_names,
-                const std::string_view                               _a_begin_str,
-                const char                                           _a_begin_char,
-                const char                                           _a_end_char,
-                utility::str::parse_input_t&                         _a_parse_input,
-                const std::tuple<Args2...>&                          _a_parsers
+                const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
+                const std::string_view                             _a_begin_str,
+                const char                                         _a_begin_char,
+                const char                                         _a_end_char,
+                utility::str::parse_input_t&                       _a_parse_input,
+                std::tuple<parser_t<Ts>...>                        _a_parsers
             )
 {
     using namespace std;
     using namespace abc::utility::str;
-    size_t         _l_idx{0};
-    tuple<Args...> default_tuple;
-    const size_t   _l_tuple_size{std::tuple_size_v<std::tuple<Args...>>};
+    tuple<Ts...> default_tuple;
     if (_a_parse_input.check_and_advance(_a_begin_str))
     {
-        return parse_result_t<T>(unexpected("Couldn't work out"));
+        return parse_result_t<T>(unexpected(fmt::format(
+            "Object parser could not find _a_begin_str in _a_parse_input. "
+            "_a_begin_str = \"{0}\", _a_parse_input = \"{1}\"",
+            _a_begin_str,
+            _a_parse_input
+        )));
     }
     if (_a_parse_input.check_and_advance(' '))
     {
-        return parse_result_t<T>(unexpected("Couldn't work out"));
+        return parse_result_t<T>(unexpected(fmt::format(
+            "Object parser could not find expected space in _a_parse_input. "
+            "_a_parse_input = \"{1}\"",
+            _a_begin_str,
+            _a_parse_input
+        )));
     }
     if (_a_parse_input.check_and_advance(_a_begin_char))
     {
         return parse_result_t<T>(unexpected("Couldn't work out"));
     }
-    // run_object_reader<0, std::tuple_size_v<tuple<Args...>>>(
-    //     _a_parse_input, default_tuple, _a_parsers, _a_object_names
-    // );
+    run_object_reader<0>(
+        _a_parse_input, default_tuple, _a_object_names, _a_parsers
+    );
     if (_a_parse_input.check_and_advance(_a_end_char))
     {
         return parse_result_t<T>(unexpected("Couldn't work out"));
@@ -389,6 +498,28 @@ __constexpr abc::utility::str::parse_result_t<T>
     {
         return parse_result_t<T>(std::make_from_tuple<T>(default_tuple));
     }
+}
+
+template <typename T, typename... Ts>
+requires (std::is_default_constructible_v<parser_t<Ts>> && ...)
+__constexpr abc::utility::str::parse_result_t<T>
+            object_parser(
+                const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
+                const std::string_view                             _a_begin_str,
+                const char                                         _a_begin_char,
+                const char                                         _a_end_char,
+                utility::str::parse_input_t&                       _a_parse_input
+            )
+{
+    std::tuple<parser_t<Ts>...> _l_parsers;
+    return object_parser<T>(
+        _a_object_names,
+        _a_begin_str,
+        _a_begin_char,
+        _a_end_char,
+        _a_parse_input,
+        _l_parsers
+    );
 }
 
 /*template <typename T>

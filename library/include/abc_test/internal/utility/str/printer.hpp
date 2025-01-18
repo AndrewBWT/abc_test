@@ -58,64 +58,201 @@ __constexpr_imp std::string
 
 template <typename T>
 __constexpr_imp std::string
-print(
+                print(
                     const T&           _a_object,
                     const printer_t<T> _a_printer = printer_t<T>()
                 ) noexcept
 {
     return _a_printer.run_printer(_a_object);
 }
+
 template <typename T>
-    requires is_from_chars_convertable_c<T>
+requires is_to_string_convertable_t<T>
 struct printer_t<T>
 {
     __constexpr std::string
-        run_printer(
-            const T& _a_object
-        ) const noexcept
+                run_printer(
+                    const T& _a_object
+                ) const noexcept
     {
         return std::to_string(_a_object);
     }
 };
 
-template <typename T>
-    requires is_tuple<T>::value
-struct printer_t<T>
+template <typename T, typename... Args>
+struct tuple_printer_inner_t
+{};
+
+namespace
 {
+template <std::size_t I, typename... Ts>
+__constexpr void
+    object_printer_inner(
+        std::string&                                       _a_str,
+        const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
+        std::tuple<printer_t<Ts>...>                       _a_parsers,
+        std::tuple<Ts...> _a_elements_to_print
+    )
+{
+    _a_str.append(std::get<I>(_a_object_names));
+    _a_str.append(" = ");
+    _a_str.append(std::get<I>(_a_parsers).run_printer(std::get<I>(_a_elements_to_print)));
+    if constexpr (I + 1 < sizeof...(Ts))
+    {
+        _a_str.append(", ");
+        object_printer_inner<I + 1>(
+            _a_str, _a_object_names, _a_parsers, _a_elements_to_print
+        );
+    }
+}
+} // namespace
+
+template <typename... Ts>
+__constexpr std::string
+            object_printer(
+                const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
+                const std::string_view                             _a_begin_str,
+                const char                                         _a_begin_char,
+                const char                                         _a_end_char,
+                std::tuple<printer_t<Ts>...>                       _a_parsers,
+                Ts... _a_elements_to_print
+            )
+{
+    using namespace std;
+    string _l_rv{_a_begin_str};
+    _l_rv.append(" ");
+    _l_rv.push_back(_a_begin_char);
+    std::tuple<Ts...> _l_tuple{ std::tie(_a_elements_to_print...) };
+    object_printer_inner<0>(
+        _l_rv, _a_object_names, _a_parsers, _l_tuple
+    );
+    _l_rv.push_back(_a_end_char);
+    return _l_rv;
+}
+
+template <typename... Ts>
+__constexpr std::string
+            object_printer(
+                const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
+                const std::string_view                             _a_begin_str,
+                const char                                         _a_begin_char,
+                const char                                         _a_end_char,
+                Ts... _a_elements_to_print
+            )
+{
+    std::tuple<printer_t<Ts>...> _l_printers;
+    return object_printer(
+        _a_object_names,
+        _a_begin_str,
+        _a_begin_char,
+        _a_end_char,
+        _l_printers,
+        _a_elements_to_print...
+    );
+}
+
+template <typename... Ts>
+requires requires (printer_t<Ts>... printers, Ts... ts) {
+    (printers.run_printer(ts), ...);
+}
+struct printer_t<std::tuple<Ts...>>
+{
+    using value_type = std::tuple<Ts...>;
+
+    printer_t(
+        printer_t<Ts>... printers
+    )
+        : printers_{std::move(printers)...}
+    {}
+
+    printer_t()
+    requires (std::is_default_constructible_v<printer_t<Ts>> && ...)
+    = default;
+
     __constexpr std::string
-        run_printer(
-            const T& _a_object
+                run_printer(
+                    const value_type& _a_object
+                ) const noexcept
+    {
+        using namespace std;
+        string _l_str{"("};
+        run_internal_printer<0>(_l_str, _a_object);
+        _l_str.append(")");
+        return _l_str;
+    }
+private:
+    std::tuple<printer_t<Ts>...> printers_;
+
+    template <std::size_t Curr_Idx>
+    __constexpr void
+        run_internal_printer(
+            std::string&      _a_str,
+            const value_type& _a_object
         ) const noexcept
     {
-        return fmt::format("{0}", _a_object);
+        using U = std::tuple_element<Curr_Idx, value_type>::type;
+        _a_str.append(std::get<Curr_Idx>(printers_).run_printer(
+            std::get<Curr_Idx>(_a_object)
+        ));
+        if constexpr (Curr_Idx + 1 < std::tuple_size<value_type>{})
+        {
+            _a_str.append(", ");
+            run_internal_printer<Curr_Idx + 1>(_a_str, _a_object);
+        }
     }
 };
 
-template <typename T>
-    requires is_pair<T>::value
-struct printer_t<T>
+template <typename T, typename U>
+struct printer_t<std::pair<T, U>>
 {
+    using value_type = std::pair<T, U>;
+
+    __constexpr
+    printer_t(
+        const printer_t<T>  _a_printer_t,
+        const printer_t<U>& _a_printer_u
+    )
+        : _m_printers{std::pair<printer_t<T>, printer_t<U>>(
+              make_pair(_a_printer_t, _a_printer_u)
+          )}
+    {}
+
+    __constexpr
+    printer_t()
+    requires (std::is_default_constructible_v<printer_t<T>>
+              && std::is_default_constructible_v<printer_t<U>>)
+    = default;
+
     __constexpr std::string
-        run_printer(
-            const T& _a_object
-        ) const noexcept
+                run_printer(
+                    const value_type& _a_object
+                ) const noexcept
     {
-        return fmt::format("{0}", _a_object);
+        using namespace std;
+        string _l_str{"("};
+        _l_str.append(_m_printers.first.run_printer(_a_object.first));
+        _l_str.append(", ");
+        _l_str.append(_m_printers.second.run_printer(_a_object.second));
+        _l_str.append(")");
+        return _l_str;
     }
+private:
+    std::pair<printer_t<T>, printer_t<U>> _m_printers;
 };
 
 template <typename T>
-    requires (std::convertible_to<T, std::string_view>)
+requires (std::convertible_to<T, std::string_view>)
 struct printer_t<T>
 {
     __constexpr std::string
-        run_printer(
-            const T& _a_object
-        ) const noexcept
+                run_printer(
+                    const T& _a_object
+                ) const noexcept
     {
         return fmt::format("\"{0}\"", _a_object);
     }
 };
+
 namespace
 {
 template <typename T>
