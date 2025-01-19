@@ -11,131 +11,12 @@
 #include <variant>
 #include <vector>
 
+#include "abc_test/internal/utility/str/parser_input.hpp"
+
 _BEGIN_ABC_UTILITY_STR_NS
-template <typename T, typename Char = char>
-concept scannable = scn::has_scanner<std::remove_reference_t<T>, Char>;
 template <typename T>
 using parse_result_t = std::expected<T, std::string>;
 
-struct parse_input_t
-{
-public:
-    __constexpr
-    parse_input_t(
-        const std::string_view _a_str
-    ) noexcept
-        : _m_cur_itt(_a_str.begin()), _m_end_itt(_a_str.end())
-    {}
-
-    __constexpr bool
-        check_and_advance(
-            const char _a_char_to_check_against
-        ) noexcept
-    {
-        if (*_m_cur_itt != _a_char_to_check_against)
-        {
-            return true;
-        }
-        else
-        {
-            ++_m_cur_itt;
-            return false;
-        }
-    }
-
-    __constexpr bool
-        check_and_advance(
-            const std::string_view _a_str_to_check_against
-        ) noexcept
-    {
-        using namespace std;
-        const size_t _l_str_len{_a_str_to_check_against.size()};
-        if (string_view(_m_cur_itt, _m_cur_itt + _l_str_len)
-            != _a_str_to_check_against)
-        {
-            return true;
-        }
-        else
-        {
-            _m_cur_itt += _l_str_len;
-            return false;
-        }
-    }
-
-    __constexpr void
-        advance(
-            const std::size_t _a_new_itereator
-        ) noexcept
-    {
-        _m_cur_itt += _a_new_itereator;
-    }
-
-    __constexpr const std::string_view
-                      sv() const noexcept
-    {
-        return std::string_view(_m_cur_itt, _m_end_itt);
-    }
-
-    __constexpr const std::string_view
-                      sv(
-                          const std::size_t _a_size
-                      ) const noexcept
-    {
-        return std::string_view(_m_cur_itt, _m_cur_itt + _a_size);
-    }
-
-    __constexpr std::size_t
-                size() const noexcept
-    {
-        return std::distance(_m_cur_itt, _m_end_itt);
-    }
-
-    __constexpr char
-        operator*() const noexcept
-    {
-        return *_m_cur_itt;
-    }
-
-    __constexpr parse_input_t&
-        operator++()
-    {
-        if (_m_cur_itt == _m_end_itt)
-        {
-            throw std::runtime_error("Couldn't work out");
-        }
-        else
-        {
-            ++_m_cur_itt;
-        }
-        return *this;
-    }
-
-    __constexpr parse_input_t
-        operator++(
-            int
-        )
-    {
-        ++*this;
-        return *this;
-    }
-
-    __constexpr bool
-        at_end() const noexcept
-    {
-        return _m_cur_itt == _m_end_itt;
-    }
-private:
-    std::string_view::const_iterator _m_cur_itt;
-    std::string_view::const_iterator _m_end_itt;
-};
-
-auto
-    format_as(
-        abc::utility::str::parse_input_t _a_val
-    )
-{
-    return _a_val.sv();
-}
 
 // Forward declaration
 namespace
@@ -149,7 +30,7 @@ struct parser_t
 {
     __constexpr virtual parse_result_t<T>
         run_parser(
-            parse_input_t& _a_parse_input
+            parser_input_t& _a_parse_input
         ) const
     {
         __STATIC_ASSERT(
@@ -161,7 +42,7 @@ struct parser_t
 };
 
 template <typename T, typename F>
-requires std::invocable<F, parse_input_t&>
+requires std::invocable<F, parser_input_t&>
 __constexpr_imp parse_result_t<T>
                 parse(
                     const std::string_view _a_str,
@@ -170,7 +51,7 @@ __constexpr_imp parse_result_t<T>
 {
     using namespace std;
     using namespace errors;
-    parse_input_t _l_pit(_a_str);
+    parser_input_t _l_pit(_a_str);
     try
     {
         const parse_result_t<T> _l_inner_parser_result{
@@ -203,7 +84,7 @@ __constexpr_imp parse_result_t<T>
 {
     using namespace std;
     using namespace errors;
-    parse_input_t _l_pit(_a_str);
+    parser_input_t _l_pit(_a_str);
     try
     {
         const parse_result_t<T> _l_inner_parser_result{
@@ -253,7 +134,7 @@ struct parser_t<T>
 {
     __constexpr parse_result_t<T>
                 run_parser(
-                    parse_input_t& _a_parse_input
+                    parser_input_t& _a_parse_input
                 ) const
     {
         using namespace std;
@@ -284,7 +165,7 @@ struct parser_t<T>
 {
     __constexpr parse_result_t<T>
                 run_parser(
-                    parse_input_t& _a_parse_input
+                    parser_input_t& _a_parse_input
                 ) const
     {
         using namespace std;
@@ -330,7 +211,7 @@ struct parser_t<std::tuple<Ts...>>
 
     __constexpr virtual parse_result_t<value_type>
         run_parser(
-            parse_input_t& _a_parse_input
+            parser_input_t& _a_parse_input
         ) const
     {
         value_type _l_rv;
@@ -351,7 +232,7 @@ private:
     __constexpr void
         run_parser_internal(
             value_type&    _a_object,
-            parse_input_t& _a_parse_input
+            parser_input_t& _a_parse_input
         ) const
     {
         if (auto _l_result{std::get<I>(_m_parsers).run_parser(_a_parse_input)};
@@ -391,7 +272,7 @@ public:
 
     __constexpr virtual parse_result_t<value_type>
         run_parser(
-            parse_input_t& _a_parse_input
+            parser_input_t& _a_parse_input
         ) const
     {
         value_type _l_rv;
@@ -422,7 +303,7 @@ public:
 template <std::size_t I, typename... Ts>
 __constexpr void
     run_object_reader(
-        utility::str::parse_input_t&                       _a_parse_input,
+        utility::str::parser_input_t&                       _a_parse_input,
         std::tuple<Ts...>&                                 _a_default_tuple,
         const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
         std::tuple<parser_t<Ts>...>                        _a_parsers
@@ -458,7 +339,7 @@ __constexpr abc::utility::str::parse_result_t<T>
                 const std::string_view                             _a_begin_str,
                 const char                                         _a_begin_char,
                 const char                                         _a_end_char,
-                utility::str::parse_input_t&                       _a_parse_input,
+                utility::str::parser_input_t&                       _a_parse_input,
                 std::tuple<parser_t<Ts>...>                        _a_parsers
             )
 {
@@ -508,7 +389,7 @@ __constexpr abc::utility::str::parse_result_t<T>
                 const std::string_view                             _a_begin_str,
                 const char                                         _a_begin_char,
                 const char                                         _a_end_char,
-                utility::str::parse_input_t&                       _a_parse_input
+                utility::str::parser_input_t&                       _a_parse_input
             )
 {
     std::tuple<parser_t<Ts>...> _l_parsers;
@@ -560,18 +441,18 @@ struct parsable_object_t
 {
 public:
     __constexpr virtual parse_result_t<T>
-        run(parse_input_t&) const noexcept = 0;
+        run(parser_input_t&) const noexcept = 0;
 };
 
 template <typename T, typename F>
-requires std::invocable<F, parse_input_t&>
+requires std::invocable<F, parser_input_t&>
 class parseable_t : public parsable_object_t<T>
 {
 public:
     __constexpr
                 parseable_t(F _a_callable_object) noexcept;
     __constexpr parse_result_t<T>
-                run(parse_input_t& _a_str) const noexcept;
+                run(parser_input_t& _a_str) const noexcept;
 private:
     F _m_callable_object;
 };
@@ -585,7 +466,7 @@ struct parser_from_func_t : parser_t<T>
     {}
 
     template <typename T, typename F>
-    requires std::invocable<F, utility::str::parse_input_t&>
+    requires std::invocable<F, utility::str::parser_input_t&>
     __constexpr
     parser_from_func_t(
         F _a_callable
@@ -595,7 +476,7 @@ struct parser_from_func_t : parser_t<T>
 
     __constexpr virtual parse_result_t<T>
         run_parser(
-            parse_input_t& _a_parse_input
+            parser_input_t& _a_parse_input
         ) const
     {
         return _m_func->run(_a_parse_input);
@@ -903,7 +784,7 @@ __constexpr_imp
 namespace
 {
 template <typename T, typename F>
-requires std::invocable<F, parse_input_t&>
+requires std::invocable<F, parser_input_t&>
 __constexpr
 parseable_t<T, F>::parseable_t(
     F _a_callable_object
@@ -912,10 +793,10 @@ parseable_t<T, F>::parseable_t(
 {}
 
 template <typename T, typename F>
-requires std::invocable<F, parse_input_t&>
+requires std::invocable<F, parser_input_t&>
 __constexpr parse_result_t<T>
             parseable_t<T, F>::run(
-        parse_input_t& _a_str
+        parser_input_t& _a_str
     ) const noexcept
 {
     return std::invoke(_m_callable_object, _a_str);

@@ -172,6 +172,8 @@ set(LIBRARY_FILES
   include/abc_test/internal/utility/io/file/file_line_writer_with_optional_rw_info.hpp
   # Utility functions and objects for strings including parsing and printing.
   include/abc_test/internal/utility/str/parser.hpp
+  include/abc_test/internal/utility/str/parser_input.hpp
+  include/abc_test/internal/utility/str/parser_exceptions.hpp
   include/abc_test/internal/utility/str/printer.hpp
   include/abc_test/internal/utility/str/parser_utility.hpp
   include/abc_test/internal/utility/str/string_utility.hpp

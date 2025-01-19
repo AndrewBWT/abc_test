@@ -139,7 +139,7 @@ struct parser_t<S>
 {
     __constexpr virtual parse_result_t<S>
         run_parser(
-            parse_input_t& _a_parse_input
+            parser_input_t& _a_parse_input
         ) const
     {
         return object_parser<S, int, int>(
@@ -195,7 +195,7 @@ _TEST_CASE(
     using namespace abc;
     using namespace std;
     // int_printer_1 is created using a bespoke function to print int objects.
-    auto int_parser_func = [](abc::utility::str::parse_input_t& str)
+    auto int_parser_func = [](abc::utility::str::parser_input_t& str)
     {
         int               result{};
         const string_view _l_str{str.sv()};
@@ -222,7 +222,7 @@ _TEST_CASE(
     _CHECK_EXPR(abc::utility::str::parse("123", int_parser_2) == 123);
 
     // s_printer_1 is created using a bespoke function to print S objects.
-    auto s_parser_func = [](abc::utility::str::parse_input_t& _a_str)
+    auto s_parser_func = [](abc::utility::str::parser_input_t& _a_str)
     {
         auto res = scn::scan<int, int>(_a_str.sv(), "S {{{0}, {1}}}");
         if (res.has_value())
