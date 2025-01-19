@@ -15,3 +15,6 @@
 #include "abc_test/internal/utility/do_not_optimise.hpp"
 #include "abc_test/internal/ds/test_data/test_function_callable_object.hpp"
 #include "abc_test/internal/utility/str.hpp"
+
+#include "abc_test/internal/utility/str/parsers/specializations/fundamental_types.hpp"
+#include "abc_test/internal/utility/str/parsers/function_parser.hpp"

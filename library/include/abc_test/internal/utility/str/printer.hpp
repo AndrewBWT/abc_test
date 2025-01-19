@@ -10,6 +10,8 @@
 #include <variant>
 #include <vector>
 
+#include "abc_test/internal/utility/concepts.hpp"
+
 _BEGIN_ABC_UTILITY_STR_NS
 template <typename T>
 using printer_fp_t = std::string (*)(const T&);

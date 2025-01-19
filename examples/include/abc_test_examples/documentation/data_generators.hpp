@@ -135,7 +135,7 @@ constexpr bool
 _BEGIN_ABC_UTILITY_STR_NS
 
 template <>
-struct parser_t<S>
+struct default_parser_t<S> : public parser_base_t<S>
 {
     __constexpr virtual parse_result_t<S>
         run_parser(
@@ -216,7 +216,7 @@ _TEST_CASE(
         }
     };
     // int_printer_2 is created using int's fmt::format definition.
-    abc::utility::str::parser_t<int> int_parser_2;
+    abc::utility::str::parser_t<int> int_parser_2 = abc::utility::str::default_parser<int>();
 
     _CHECK_EXPR(abc::utility::str::parse<int>("123", int_parser_func) == 123);
     _CHECK_EXPR(abc::utility::str::parse("123", int_parser_2) == 123);

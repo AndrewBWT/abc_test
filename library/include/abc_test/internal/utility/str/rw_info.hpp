@@ -1,5 +1,5 @@
 #pragma once
-#include "abc_test/internal/utility/str/parser.hpp"
+#include "abc_test/internal/utility/str/parsers/default_parser.hpp"
 #include "abc_test/internal/utility/str/printer.hpp"
 
 _BEGIN_ABC_UTILITY_STR_NS
@@ -10,7 +10,7 @@ class rw_info_t
 public:
     __constexpr
     rw_info_t(
-        const str::parser_t<T>&  _a_parser  = str::parser_t<T>(),
+        const str::parser_t<T>&  _a_parser  = str::default_parser<T>(),
         const str::printer_t<T>& _a_printer = str::printer_t<T>()
     ) noexcept;
     __constexpr
@@ -51,7 +51,7 @@ __constexpr_imp
     rw_info_t<T>::rw_info_t(
         const str::printer_t<T>& _a_printer
     ) noexcept
-    : rw_info_t<T>(str::parser_t<T>(), _a_printer)
+    : rw_info_t<T>(str::default_parser_t<T>(), _a_printer)
 {}
 
 template <typename T>
