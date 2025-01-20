@@ -67,13 +67,14 @@ struct S
 };
 
 template <>
-struct abc::utility::str::printer_t<S>
+struct abc::utility::printer::default_printer_t<S> : public abc::utility::printer::printer_base_t<S>
 {
     __no_constexpr_imp std::string
                        run_printer(
                            const S& _a_object
                        ) const noexcept
     {
+      //  return "S";
         return object_printer({ "int_1", "int_2" }, "S", '{', '}',
             _a_object.int_1, _a_object.int_2);
     }
@@ -89,7 +90,7 @@ struct fmt::formatter<S> : formatter<string_view>
         ) const -> format_context::iterator
     {
         using namespace std;
-        const string _l_rv = abc::utility::str::printer_t<S>().run_printer(arg);
+        const string _l_rv = abc::utility::printer::default_printer_t<S>().run_printer(arg);
         return formatter<string_view>::format(_l_rv, _a_ctx);
     }
 };
@@ -108,8 +109,8 @@ _TEST_CASE(
         to_chars(buf, buf + buf_size, i);
         return string(buf);
     };
-    _CHECK_EXPR(abc::utility::str::print(123, int_printer_func) == "123");
-    _CHECK_EXPR(abc::utility::str::print(123) == "123");
+    _CHECK_EXPR(abc::utility::printer::print(123, int_printer_func) == "123");
+    _CHECK_EXPR(abc::utility::printer::print(123) == "123");
 
     // s_printer_1 is created using a bespoke function to print S objects.
     auto s_printer_func = [](const S& s)
@@ -117,9 +118,9 @@ _TEST_CASE(
         return fmt::format("S {{{0}, {1}}}", s.int_1, s.int_2);
     };
     _CHECK_EXPR(
-        abc::utility::str::print(S{1, 2}, s_printer_func) == "S {1, 2}"
+        abc::utility::printer::print(S{1, 2}, s_printer_func) == "S {1, 2}"
     );
-    _CHECK_EXPR(abc::utility::str::print(S{1, 2}) == "S {int_1 = 1, int_2 = 2}");
+    _CHECK_EXPR(abc::utility::printer::print(S{1, 2}) == "S {int_1 = 1, int_2 = 2}");
 }
 
 constexpr bool
@@ -132,7 +133,7 @@ constexpr bool
            == std::make_pair(rhs.int_1, rhs.int_2);
 }
 
-_BEGIN_ABC_UTILITY_STR_NS
+_BEGIN_ABC_UTILITY_PARSER_NS
 
 template <>
 struct default_parser_t<S> : public parser_base_t<S>
@@ -153,7 +154,28 @@ struct default_parser_t<S> : public parser_base_t<S>
     }
 };
 
-_END_ABC_UTILITY_STR_NS
+_END_ABC_UTILITY_PARSER_NS
+
+_BEGIN_ABC_UTILITY_PRINTER_NS
+/*template <>
+struct default_printer_t<S> : public printer_base_t<S>
+{
+    __constexpr virtual std::string
+        run_printer(
+            const S& _a_parse_input
+        ) const
+    {
+        return object_printer(
+            { "int_1", "int_2" },
+            "S",
+            '{',
+            '}',
+            _a_parse_input.int_1, _a_parse_input.int_2
+            // std::make_tuple(parser_t<int>(), parser_t<int>())
+        );
+    }
+};*/
+_END_ABC_UTILITY_PRINTER_NS
 
 /*template <>
 struct scn::scanner<S>
@@ -195,7 +217,7 @@ _TEST_CASE(
     using namespace abc;
     using namespace std;
     // int_printer_1 is created using a bespoke function to print int objects.
-    auto int_parser_func = [](abc::utility::str::parser_input_t& str)
+    auto int_parser_func = [](abc::utility::parser::parser_input_t& str)
     {
         int               result{};
         const string_view _l_str{str.sv()};
@@ -216,13 +238,13 @@ _TEST_CASE(
         }
     };
     // int_printer_2 is created using int's fmt::format definition.
-    abc::utility::str::parser_t<int> int_parser_2 = abc::utility::str::default_parser<int>();
+    abc::utility::parser::parser_t<int> int_parser_2 = abc::utility::parser::default_parser<int>();
 
-    _CHECK_EXPR(abc::utility::str::parse<int>("123", int_parser_func) == 123);
-    _CHECK_EXPR(abc::utility::str::parse("123", int_parser_2) == 123);
+    _CHECK_EXPR(abc::utility::parser::parse<int>("123", int_parser_func) == 123);
+    _CHECK_EXPR(abc::utility::parser::parse("123", int_parser_2) == 123);
 
     // s_printer_1 is created using a bespoke function to print S objects.
-    auto s_parser_func = [](abc::utility::str::parser_input_t& _a_str)
+    auto s_parser_func = [](abc::utility::parser::parser_input_t& _a_str)
     {
         auto res = scn::scan<int, int>(_a_str.sv(), "S {{{0}, {1}}}");
         if (res.has_value())
@@ -239,10 +261,10 @@ _TEST_CASE(
         }
     };
     _CHECK_EXPR(
-        abc::utility::str::parse<S>("S {1, 2}", s_parser_func) == (S{1, 2})
+        abc::utility::parser::parse<S>("S {1, 2}", s_parser_func) == (S{1, 2})
     );
     _CHECK_EXPR(
-        abc::utility::str::parse<S>("S {int_1 = 1, int_2 = 2}") == (S{1, 2})
+        abc::utility::parser::parse<S>("S {int_1 = 1, int_2 = 2}") == (S{1, 2})
     );
 }
 
@@ -255,15 +277,15 @@ _TEST_CASE(
     using namespace abc::utility;
     // Below we show how the default printer and parser work.
     _CHECK_EXPR(
-        abc::utility::str::print(make_tuple("123"s, "456"s))
+        abc::utility::printer::print(make_tuple("123"s, "456"s))
         == "(\"123\", \"456\")"
     );
-    abc::utility::str::printer_t<std::string> ti;
-    abc::utility::str::printer_t<std::tuple<std::string>> ti2(ti);
-    _CHECK_EXPR(abc::utility::str::print("123") == "\"123\"");
-    _CHECK_EXPR(abc::utility::str::parse<string>("\"123\"") == "123");
+   // abc::utility::printer::printer_t<std::string> ti;
+ //   abc::utility::printer::printer_t<std::tuple<std::string>> ti2(ti);
+    _CHECK_EXPR(abc::utility::printer::print("123") == "\"123\"");
+    _CHECK_EXPR(abc::utility::parser::parse<string>("\"123\"") == "123");
     _CHECK_EXPR(
-        (abc::utility::str::parse<pair<string, string>>("(\"123\", \"456\")"))
+        (abc::utility::parser::parse<pair<string, string>>("(\"123\", \"456\")"))
         == make_pair("123"s, "456"s)
     );
     // This printer/parser pair is not able to parse the argument correctly.
@@ -272,7 +294,7 @@ _TEST_CASE(
     // 456}". It is parsed as {"{123," "456}"}.
     pair<int, int> arg_1 = make_pair(123, 456);
     _CHECK_EXPR(
-        (abc::utility::str::parse<pair<int, int>>(abc::utility::str::print(arg_1
+        (abc::utility::parser::parse<pair<int, int>>(abc::utility::printer::print(arg_1
         )))
         == arg_1
     );
@@ -282,8 +304,8 @@ _TEST_CASE(
     // scn::scan to be formatted correctly, which isn't how the default parser
     // is defined. So the following won't work.
     _CHECK_EXPR(
-        (abc::utility::str::parse<pair<string, string>>(
-            abc::utility::str::print(arg_2)
+        (abc::utility::parser::parse<pair<string, string>>(
+            abc::utility::printer::print(arg_2)
         ))
         != arg_2
     );
@@ -308,81 +330,6 @@ constexpr bool
            == std::make_tuple(rhs.m1, rhs.m2, rhs.m3, rhs.m4);
 }
 
-// The formatter for T converts all the std::string elements into str_t
-// elements, then prints the object as a tuple.
-template <>
-struct fmt::formatter<T> : formatter<string_view>
-{
-    inline auto
-        format(
-            T               arg,
-            format_context& _a_ctx
-        ) const -> format_context::iterator
-    {
-        using namespace std;
-        tuple<
-            int,
-            abc::utility::str_t,
-            vector<abc::utility::str_t>,
-            tuple<int, abc::utility::str_t, char, int>>
-            val;
-        get<0>(val) = arg.m1;
-        get<1>(val) = abc::utility::str_t(arg.m2);
-        for (auto& str : arg.m3)
-        {
-            get<2>(val).push_back(abc::utility::str_t(str));
-        }
-        get<0>(get<3>(val)) = get<0>(arg.m4);
-        get<1>(get<3>(val)) = abc::utility::str_t(get<1>(arg.m4));
-        get<2>(get<3>(val)) = get<2>(arg.m4);
-        get<3>(get<3>(val)) = get<3>(arg.m4);
-        const string _l_rv{fmt::format("T {}", val)};
-        return formatter<string_view>::format(_l_rv, _a_ctx);
-    }
-};
-
-// The scanner for T works backwards; converts the string to the intermediary
-// tuple, then back to the original T entity.
-template <>
-struct scn::scanner<T>
-{
-    template <typename ParseContext>
-    auto
-        parse(
-            ParseContext& pctx
-        ) -> scan_expected<typename ParseContext::iterator>
-    {
-        return pctx.begin();
-    }
-
-    template <typename Context>
-    auto
-        scan(
-            T&       val,
-            Context& ctx
-        ) -> scan_expected<typename Context::iterator>
-    {
-        auto result = scn::scan<std::tuple<
-            int,
-            abc::utility::str_t,
-            std::vector<abc::utility::str_t>,
-            std::tuple<int, abc::utility::str_t, char, int>>>(
-            ctx.range(), "T {}"
-        );
-        if (! result)
-        {
-            return unexpected(result.error());
-        }
-        else
-        {
-            // val.m1 = get<0>(result->value());
-            // val.m2 = get<1>(result->value());
-            // val.m3 = get<2>(result->value());
-            // val.m4 = get<3>(result->value());
-            return result->begin();
-        }
-    }
-};
 
 _TEST_CASE(
     abc::test_case_t({.name = "Strings and str_t's"})

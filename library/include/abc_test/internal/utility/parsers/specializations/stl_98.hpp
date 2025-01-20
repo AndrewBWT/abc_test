@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/internal/utility/parsers/default_parser.hpp"
 
-_BEGIN_ABC_UTILITY_STR_NS
+_BEGIN_ABC_UTILITY_PARSER_NS
 
 template <typename T>
 requires (std::convertible_to<T, std::string_view>)
@@ -56,9 +56,8 @@ public:
         run_parser(parser_input_t& _a_parse_input) const;
 };
 
-_END_ABC_UTILITY_STR_NS
-
-_BEGIN_ABC_UTILITY_STR_NS
+_END_ABC_UTILITY_PARSER_NS
+_BEGIN_ABC_UTILITY_PARSER_NS
 
 /*template <typename T>
 requires (std::convertible_to<T, std::string_view>)
@@ -141,4 +140,4 @@ __constexpr_imp
     }
 }
 
-_END_ABC_UTILITY_STR_NS
+_END_ABC_UTILITY_PARSER_NS

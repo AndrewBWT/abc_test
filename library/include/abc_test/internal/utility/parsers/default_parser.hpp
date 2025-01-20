@@ -2,7 +2,7 @@
 
 #include "abc_test/internal/utility/parsers/parser_base.hpp"
 
-_BEGIN_ABC_UTILITY_STR_NS
+_BEGIN_ABC_UTILITY_PARSER_NS
 
 template <typename T>
 struct default_parser_t : public parser_base_t<T>
@@ -15,9 +15,8 @@ public:
 template <typename T>
 __constexpr parser_t<T>
             default_parser() noexcept;
-_END_ABC_UTILITY_STR_NS
-
-_BEGIN_ABC_UTILITY_STR_NS
+_END_ABC_UTILITY_PARSER_NS
+_BEGIN_ABC_UTILITY_PARSER_NS
 template <typename T>
 __constexpr parse_result_t<T>
             default_parser_t<T>::run_parser(
@@ -39,4 +38,4 @@ __constexpr_imp parser_t<T>
     return make_shared<default_parser_t<T>>();
 }
 
-_END_ABC_UTILITY_STR_NS
+_END_ABC_UTILITY_PARSER_NS

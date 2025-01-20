@@ -1,7 +1,8 @@
 #pragma once
 #include "abc_test/internal/utility/parsers/default_parser.hpp"
+#include "abc_test/internal/utility/concepts.hpp"
 
-_BEGIN_ABC_UTILITY_STR_NS
+_BEGIN_ABC_UTILITY_PARSER_NS
 
 template <typename T>
 requires is_from_chars_convertable_c<T>
@@ -35,24 +36,24 @@ struct default_parser_t<T> : public parser_base_t<T>
 };
 
 template <typename T, typename... Ts>
-__constexpr abc::utility::str::parse_result_t<T>
+__constexpr parse_result_t<T>
             object_parser(
                 const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
                 const std::string_view                             _a_begin_str,
                 const char                                         _a_begin_char,
                 const char                                         _a_end_char,
-                utility::str::parser_input_t&                      _a_parse_input,
+                parser_input_t&                      _a_parse_input,
                 std::tuple<default_parser_t<Ts>...>                _a_parsers
             );
 template <typename T, typename... Ts>
 requires (std::is_default_constructible_v<default_parser_t<Ts>> && ...)
-__constexpr abc::utility::str::parse_result_t<T>
+__constexpr parse_result_t<T>
             object_parser(
                 const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
                 const std::string_view                             _a_begin_str,
                 const char                                         _a_begin_char,
                 const char                                         _a_end_char,
-                utility::str::parser_input_t&                      _a_parse_input
+                parser_input_t&                      _a_parse_input
             );
 
 namespace
@@ -60,16 +61,15 @@ namespace
 template <std::size_t I, typename... Ts>
 __constexpr void
     run_object_reader(
-        utility::str::parser_input_t&                      _a_parse_input,
+        parser_input_t&                      _a_parse_input,
         std::tuple<Ts...>&                                 _a_default_tuple,
         const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
         std::tuple<default_parser_t<Ts>...>                _a_parsers
     ) noexcept;
 } // namespace
 
-_END_ABC_UTILITY_STR_NS
-
-_BEGIN_ABC_UTILITY_STR_NS
+_END_ABC_UTILITY_PARSER_NS
+_BEGIN_ABC_UTILITY_PARSER_NS
 
 /*
 template <typename T>
@@ -100,13 +100,13 @@ __constexpr_imp parse_result_t<T>
 }*/
 
 template <typename T, typename... Ts>
-__constexpr_imp abc::utility::str::parse_result_t<T>
+__constexpr_imp parse_result_t<T>
                 object_parser(
                     const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
                     const std::string_view                             _a_begin_str,
                     const char                                         _a_begin_char,
                     const char                                         _a_end_char,
-                    utility::str::parser_input_t&                      _a_parse_input,
+                    parser_input_t&                      _a_parse_input,
                     std::tuple<default_parser_t<Ts>...>                _a_parsers
                 )
 {
@@ -125,16 +125,17 @@ __constexpr_imp abc::utility::str::parse_result_t<T>
 
 template <typename T, typename... Ts>
 requires (std::is_default_constructible_v<default_parser_t<Ts>> && ...)
-__constexpr_imp abc::utility::str::parse_result_t<T>
+__constexpr_imp parse_result_t<T>
                 object_parser(
                     const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
                     const std::string_view                             _a_begin_str,
                     const char                                         _a_begin_char,
                     const char                                         _a_end_char,
-                    utility::str::parser_input_t&                      _a_parse_input
+                    parser_input_t&                      _a_parse_input
                 )
 {
-    std::tuple<default_parser_t<Ts>...> _l_parsers;
+    using namespace std;
+    tuple<default_parser_t<Ts>...> _l_parsers;
     return object_parser<T>(
         _a_object_names,
         _a_begin_str,
@@ -150,7 +151,7 @@ namespace
 template <std::size_t I, typename... Ts>
 __constexpr_imp void
     run_object_reader(
-        utility::str::parser_input_t&                      _a_parse_input,
+        parser_input_t&                      _a_parse_input,
         std::tuple<Ts...>&                                 _a_default_tuple,
         const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
         std::tuple<default_parser_t<Ts>...>                _a_parsers
@@ -174,4 +175,4 @@ __constexpr_imp void
 }
 } // namespace
 
-_END_ABC_UTILITY_STR_NS
+_END_ABC_UTILITY_PARSER_NS

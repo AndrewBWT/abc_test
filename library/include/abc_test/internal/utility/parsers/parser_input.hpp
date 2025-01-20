@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/internal/utility/parsers/parser_exceptions.hpp"
 
-_BEGIN_ABC_UTILITY_STR_NS
+_BEGIN_ABC_UTILITY_PARSER_NS
 
 struct parser_input_t
 {
@@ -41,10 +41,9 @@ private:
 };
 
 auto
-    format_as(abc::utility::str::parser_input_t _a_val);
-_END_ABC_UTILITY_STR_NS
-
-_BEGIN_ABC_UTILITY_STR_NS
+    format_as(abc::utility::parser::parser_input_t _a_val);
+_END_ABC_UTILITY_PARSER_NS
+_BEGIN_ABC_UTILITY_PARSER_NS
 __constexpr
 parser_input_t::parser_input_t(
     const std::string_view _a_str
@@ -188,10 +187,10 @@ __constexpr bool
 
 auto
     format_as(
-        abc::utility::str::parser_input_t _a_val
+        abc::utility::parser::parser_input_t _a_val
     )
 {
     return _a_val.sv();
 }
 
-_END_ABC_UTILITY_STR_NS
+_END_ABC_UTILITY_PARSER_NS

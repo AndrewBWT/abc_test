@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <string>
 
-_BEGIN_ABC_UTILITY_STR_NS
+_BEGIN_ABC_UTILITY_PARSER_NS
 
 class parser_at_end_of_string_exception_t : std::runtime_error
 {
@@ -33,10 +33,8 @@ public:
         const std::string_view _a_str_failed_to_match
     ) noexcept;
 };
-
-_END_ABC_UTILITY_STR_NS
-
-_BEGIN_ABC_UTILITY_STR_NS
+_END_ABC_UTILITY_PARSER_NS
+_BEGIN_ABC_UTILITY_PARSER_NS
 __no_constexpr_imp
     parser_at_end_of_string_exception_t::parser_at_end_of_string_exception_t(
         const std::string_view _a_str,
@@ -65,4 +63,4 @@ __no_constexpr_imp
       ))
 {}
 
-_END_ABC_UTILITY_STR_NS
+_END_ABC_UTILITY_PARSER_NS

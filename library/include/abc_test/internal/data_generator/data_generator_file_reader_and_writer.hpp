@@ -192,7 +192,7 @@ __constexpr void
     else
     {
         _m_object.set_generator_using_tertiary_data(
-            abc::utility::str::default_parser_t<typename T::tertiary_type>()
+            abc::utility::parser::default_parser_t<typename T::tertiary_type>()
                 .run_parser_with_exception(_m_line_reader.current_line())
         );
     }

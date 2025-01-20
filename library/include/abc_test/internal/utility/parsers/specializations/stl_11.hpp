@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/internal/utility/parsers/default_parser.hpp"
 
-_BEGIN_ABC_UTILITY_STR_NS
+_BEGIN_ABC_UTILITY_PARSER_NS
 
 template <typename... Ts>
 struct default_parser_t<std::tuple<Ts...>>
@@ -27,9 +27,8 @@ private:
                 ) const;
 };
 
-_END_ABC_UTILITY_STR_NS
-
-_BEGIN_ABC_UTILITY_STR_NS
+_END_ABC_UTILITY_PARSER_NS
+_BEGIN_ABC_UTILITY_PARSER_NS
 template <typename... Ts>
 __constexpr
 default_parser_t<std::tuple<Ts...>>::default_parser_t(
@@ -91,4 +90,4 @@ __constexpr std::optional<std::string>
     }
 }
 
-_END_ABC_UTILITY_STR_NS
+_END_ABC_UTILITY_PARSER_NS

@@ -69,33 +69,30 @@
     namespace abc     \
     {
 // inline namespace v0 {
-#define _BEGIN_ABC_INTERNAL_NS \
-    _BEGIN_ABC_NS              
-#define _END_ABC_NS }
+#define _BEGIN_ABC_INTERNAL_NS _BEGIN_ABC_NS
+#define _END_ABC_NS            }
 // }
-#define _END_ABC_INTERNAL_NS \
-                            \
-    _END_ABC_NS
+#define _END_ABC_INTERNAL_NS   _END_ABC_NS
 #define _BEGIN_ABC_DS_NS   \
     _BEGIN_ABC_INTERNAL_NS \
     namespace ds           \
     {
 
-#define _ABC_NS abc
+#define _ABC_NS           abc
 
-#define _ABC_NS_DS _ABC_NS::ds
+#define _ABC_NS_DS        _ABC_NS::ds
 
-#define _ABC_NS_ERRORS _ABC_NS::errors
+#define _ABC_NS_ERRORS    _ABC_NS::errors
 
-#define _ABC_NS_UTILITY _ABC_NS::utility
+#define _ABC_NS_UTILITY   _ABC_NS::utility
 
 #define _ABC_NS_REPORTERS _ABC_NS::reporters
 
-#define _ABC_NS_REPORTS _ABC_NS::reports
+#define _ABC_NS_REPORTS   _ABC_NS::reports
 
-#define _ABC_NS_LOGGING _ABC_NS::logging
+#define _ABC_NS_LOGGING   _ABC_NS::logging
 
-#define _ABC_NS_GLOBAL _ABC_NS::global
+#define _ABC_NS_GLOBAL    _ABC_NS::global
 
 #define _BEGIN_ABC_ERRORS_NS \
     _BEGIN_ABC_INTERNAL_NS   \
@@ -121,6 +118,16 @@
     _BEGIN_ABC_INTERNAL_NS        \
     namespace utility::str        \
     {
+
+#define _BEGIN_ABC_UTILITY_PARSER_NS \
+    _BEGIN_ABC_INTERNAL_NS           \
+    namespace utility::parser        \
+    {
+#define _BEGIN_ABC_UTILITY_PRINTER_NS \
+    _BEGIN_ABC_INTERNAL_NS           \
+    namespace utility::printer        \
+    {
+
 #define _BEGIN_ABC_GLOBAL_NS \
     _BEGIN_ABC_INTERNAL_NS   \
     namespace global         \
@@ -138,18 +145,17 @@
 
 #define _ABC_NS_DG _ABC_NS::data_gen
 
-#define _BEGIN_ABC_MATCHER_NS   \
-    _BEGIN_ABC_INTERNAL_NS \
-    namespace matcher     \
+#define _BEGIN_ABC_MATCHER_NS \
+    _BEGIN_ABC_INTERNAL_NS    \
+    namespace matcher         \
     {
 
 #define _ABC_NS_MATCHER _ABC_NS::matcher
 
-#define _BEGIN_ABC_LOGGING_NS   \
-    _BEGIN_ABC_INTERNAL_NS \
-    namespace logging     \
+#define _BEGIN_ABC_LOGGING_NS \
+    _BEGIN_ABC_INTERNAL_NS    \
+    namespace logging         \
     {
-
 
 
 #define _END_ABC_DS_NS   \
@@ -173,6 +179,14 @@
 #define _END_ABC_UTILITY_STR_NS \
     _END_ABC_INTERNAL_NS        \
     }
+#define _END_ABC_UTILITY_PARSER_NS \
+    _END_ABC_INTERNAL_NS           \
+    }
+
+#define _END_ABC_UTILITY_PRINTER_NS \
+    _END_ABC_INTERNAL_NS           \
+    }
+
 #define _END_ABC_GLOBAL_NS \
     _END_ABC_INTERNAL_NS   \
     }
@@ -184,11 +198,11 @@
     _END_ABC_INTERNAL_NS \
     }
 
-#define _END_ABC_LOGGING_NS   \
-    _END_ABC_INTERNAL_NS \
+#define _END_ABC_LOGGING_NS \
+    _END_ABC_INTERNAL_NS    \
     }
-#define _END_ABC_MATCHER_NS   \
-    _END_ABC_INTERNAL_NS \
+#define _END_ABC_MATCHER_NS \
+    _END_ABC_INTERNAL_NS    \
     }
 
 // Appears to be a regression regarding static_assert(false, msg). This is a

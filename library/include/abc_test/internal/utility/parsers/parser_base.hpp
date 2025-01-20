@@ -5,7 +5,7 @@
 
 #include <memory>
 
-_BEGIN_ABC_UTILITY_STR_NS
+_BEGIN_ABC_UTILITY_PARSER_NS
 
 template <typename T>
 struct parser_base_t
@@ -34,9 +34,8 @@ __constexpr_imp T
         const std::string_view _a_str,
         const parser_t<T>&     _a_parser = default_parser<T>()
     );
-_END_ABC_UTILITY_STR_NS
-
-_BEGIN_ABC_UTILITY_STR_NS
+_END_ABC_UTILITY_PARSER_NS
+_BEGIN_ABC_UTILITY_PARSER_NS
 template <typename T>
 __constexpr_imp parse_result_t<T>
                 parse(
@@ -90,4 +89,4 @@ __constexpr_imp T
     }
 }
 
-_END_ABC_UTILITY_STR_NS
+_END_ABC_UTILITY_PARSER_NS

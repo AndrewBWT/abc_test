@@ -1,4 +1,5 @@
 #pragma once
+#if 0
 #include "abc_test/internal/errors/test_library_exception.hpp"
 #include "abc_test/internal/utility/internal/macros.hpp"
 
@@ -373,3 +374,4 @@ __constexpr abc::utility::str::printer_t<T>
 }
 */
 _END_ABC_NS
+#endif

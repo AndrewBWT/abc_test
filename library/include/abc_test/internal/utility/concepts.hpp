@@ -13,7 +13,7 @@ concept is_from_chars_convertable_c
 };
 
 template<typename T>
-concept is_to_string_convertable_t
+concept is_to_string_convertable_c
 = requires(T _a_element)
 {
     { std::to_string(_a_element) } -> std::same_as<std::string>;
