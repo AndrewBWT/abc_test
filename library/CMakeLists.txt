@@ -171,13 +171,15 @@ set(LIBRARY_FILES
   include/abc_test/internal/utility/io/file/tertiary_data.hpp
   include/abc_test/internal/utility/io/file/file_line_writer_with_optional_rw_info.hpp
   # Utility functions and objects for strings including parsing and printing.
-  include/abc_test/internal/utility/str/parsers/types.hpp
-  include/abc_test/internal/utility/str/parsers/parser_input.hpp
-  include/abc_test/internal/utility/str/parsers/parser_exceptions.hpp
-  include/abc_test/internal/utility/str/parsers/function_parser.hpp
-  include/abc_test/internal/utility/str/parsers/parser_base.hpp
-  include/abc_test/internal/utility/str/parsers/default_parser.hpp
-  include/abc_test/internal/utility/str/parsers/specializations/fundamental_types.hpp
+  include/abc_test/internal/utility/parsers/types.hpp
+  include/abc_test/internal/utility/parsers/parser_input.hpp
+  include/abc_test/internal/utility/parsers/parser_exceptions.hpp
+  include/abc_test/internal/utility/parsers/function_parser.hpp
+  include/abc_test/internal/utility/parsers/parser_base.hpp
+  include/abc_test/internal/utility/parsers/default_parser.hpp
+  include/abc_test/internal/utility/parsers/specializations/fundamental_types.hpp
+  include/abc_test/internal/utility/parsers/specializations/stl_98.hpp
+  include/abc_test/internal/utility/parsers/specializations/stl_11.hpp
   include/abc_test/internal/utility/str/printer.hpp
   include/abc_test/internal/utility/str/parser_utility.hpp
   include/abc_test/internal/utility/str/string_utility.hpp

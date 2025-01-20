@@ -1,7 +1,7 @@
 #pragma once
 
-#include "abc_test/internal/utility/str/parsers/parser_input.hpp"
-#include "abc_test/internal/utility/str/parsers/types.hpp"
+#include "abc_test/internal/utility/parsers/parser_input.hpp"
+#include "abc_test/internal/utility/parsers/types.hpp"
 
 #include <memory>
 

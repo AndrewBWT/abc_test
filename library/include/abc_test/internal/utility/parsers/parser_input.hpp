@@ -1,5 +1,5 @@
 #pragma once
-#include "abc_test/internal/utility/str/parsers/parser_exceptions.hpp"
+#include "abc_test/internal/utility/parsers/parser_exceptions.hpp"
 
 _BEGIN_ABC_UTILITY_STR_NS
 
@@ -13,6 +13,10 @@ public:
     __constexpr bool
         check_and_advance(const std::string_view _a_str_to_check_against
         ) noexcept;
+    __constexpr void
+        check_advance_and_throw(const char _a_char_to_check_against);
+    __constexpr void
+        check_advance_and_throw(const std::string_view _a_str_to_check_against);
     __constexpr void
                       advance(const std::size_t _a_new_itereator) noexcept;
     __constexpr const std::string_view
@@ -49,6 +53,38 @@ parser_input_t::parser_input_t(
     , _m_end_itt(_a_str.end())
     , _m_complete_string(_a_str)
 {}
+
+__constexpr void
+    parser_input_t::check_advance_and_throw(
+        const char _a_char_to_check_against
+    )
+{
+    using namespace std;
+    if (not check_and_advance(_a_char_to_check_against))
+    {
+        throw parser_could_not_match_string_t(
+            _m_complete_string,
+            string_view(_m_cur_itt, _m_end_itt),
+            string(1, _a_char_to_check_against)
+        );
+    }
+}
+
+__constexpr void
+    parser_input_t::check_advance_and_throw(
+        const std::string_view _a_str_to_check_against
+    )
+{
+    using namespace std;
+    if (not check_and_advance(_a_str_to_check_against))
+    {
+        throw parser_could_not_match_string_t(
+            _m_complete_string,
+            string_view(_m_cur_itt, _m_end_itt),
+            _a_str_to_check_against
+        );
+    }
+}
 
 __constexpr bool
     parser_input_t::check_and_advance(
