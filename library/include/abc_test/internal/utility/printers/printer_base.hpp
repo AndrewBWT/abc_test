@@ -22,21 +22,23 @@ struct default_printer_t;
 template<typename T>
 __constexpr_imp printer_t<T>
 default_printer() noexcept;
+_END_ABC_UTILITY_PARSER_NS
+_BEGIN_ABC_NS
 template <typename T>
 __constexpr_imp std::string
 print(
     const T& _a_object,
-    const printer_t<T>& _a_printer = default_printer<T>()
+    const utility::printer::printer_t<T>& _a_printer = utility::printer::default_printer<T>()
 ) noexcept;
-_END_ABC_UTILITY_PRINTER_NS
-_BEGIN_ABC_UTILITY_PRINTER_NS
+_END_ABC_NS
+_BEGIN_ABC_NS
 template <typename T>
 __constexpr_imp std::string
 print(
     const T& _a_object,
-    const printer_t<T>& _a_printer
+    const utility::printer::printer_t<T>& _a_printer
 ) noexcept
 {
     return _a_printer->run_printer(_a_object);
 }
-_END_ABC_UTILITY_PRINTER_NS
+_END_ABC_NS

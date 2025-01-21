@@ -187,14 +187,14 @@ __constexpr void
         {
         case 0:
             _m_file_read_writer.set_data_generator_using_additional_data(
-                abc::utility::parser::run_parser_with_exception<std::size_t>(
+                abc::run_parser_with_exception<std::size_t>(
                     _a_dgme.additional_data
                 )
             );
             break;
         case 1:
             _m_object.set_generator_using_tertiary_data(
-                abc::utility::parser::run_parser_with_exception(
+                abc::run_parser_with_exception(
                     _a_dgme.additional_data, _m_tertiary_rw_info.parser()
                 )
             );
@@ -209,7 +209,7 @@ __constexpr void
         {
         case 0:
             _m_object.set_generator_using_tertiary_data(
-                abc::utility::parser::run_parser_with_exception(
+                abc::run_parser_with_exception(
                     _a_dgme.additional_data, _m_tertiary_rw_info.parser()
                 )
             );

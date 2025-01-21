@@ -67,16 +67,18 @@ struct S
 };
 
 template <>
-struct abc::utility::printer::default_printer_t<S> : public abc::utility::printer::printer_base_t<S>
+struct abc::utility::printer::default_printer_t<S>
+    : public abc::utility::printer::printer_base_t<S>
 {
     __no_constexpr_imp std::string
                        run_printer(
                            const S& _a_object
                        ) const noexcept
     {
-      //  return "S";
-        return object_printer({ "int_1", "int_2" }, "S", '{', '}',
-            _a_object.int_1, _a_object.int_2);
+        // return "S";
+        return object_printer(
+            {"int_1", "int_2"}, "S", '{', '}', _a_object.int_1, _a_object.int_2
+        );
     }
 };
 
@@ -90,7 +92,8 @@ struct fmt::formatter<S> : formatter<string_view>
         ) const -> format_context::iterator
     {
         using namespace std;
-        const string _l_rv = abc::utility::printer::default_printer_t<S>().run_printer(arg);
+        const string _l_rv
+            = abc::utility::printer::default_printer_t<S>().run_printer(arg);
         return formatter<string_view>::format(_l_rv, _a_ctx);
     }
 };
@@ -109,18 +112,16 @@ _TEST_CASE(
         to_chars(buf, buf + buf_size, i);
         return string(buf);
     };
-    _CHECK_EXPR(abc::utility::printer::print(123, int_printer_func) == "123");
-    _CHECK_EXPR(abc::utility::printer::print(123) == "123");
+    _CHECK_EXPR(abc::print(123, int_printer_func) == "123");
+    _CHECK_EXPR(abc::print(123) == "123");
 
     // s_printer_1 is created using a bespoke function to print S objects.
     auto s_printer_func = [](const S& s)
     {
         return fmt::format("S {{{0}, {1}}}", s.int_1, s.int_2);
     };
-    _CHECK_EXPR(
-        abc::utility::printer::print(S{1, 2}, s_printer_func) == "S {1, 2}"
-    );
-    _CHECK_EXPR(abc::utility::printer::print(S{1, 2}) == "S {int_1 = 1, int_2 = 2}");
+    _CHECK_EXPR(abc::print(S{1, 2}, s_printer_func) == "S {1, 2}");
+    _CHECK_EXPR(abc::print(S{1, 2}) == "S {int_1 = 1, int_2 = 2}");
 }
 
 constexpr bool
@@ -144,12 +145,8 @@ struct default_parser_t<S> : public parser_base_t<S>
         ) const
     {
         return object_parser<S, int, int>(
-            {"int_1", "int_2"},
-            "S",
-            '{',
-            '}',
-            _a_parse_input
-           // std::make_tuple(parser_t<int>(), parser_t<int>())
+            {"int_1", "int_2"}, "S", '{', '}', _a_parse_input
+            // std::make_tuple(parser_t<int>(), parser_t<int>())
         );
     }
 };
@@ -238,10 +235,11 @@ _TEST_CASE(
         }
     };
     // int_printer_2 is created using int's fmt::format definition.
-    abc::utility::parser::parser_t<int> int_parser_2 = abc::utility::parser::default_parser<int>();
+    abc::utility::parser::parser_t<int> int_parser_2
+        = abc::utility::parser::default_parser<int>();
 
-    _CHECK_EXPR(abc::utility::parser::parse<int>("123", int_parser_func) == 123);
-    _CHECK_EXPR(abc::utility::parser::parse("123", int_parser_2) == 123);
+    _CHECK_EXPR(parse<int>("123", int_parser_func) == 123);
+    _CHECK_EXPR(parse("123", int_parser_2) == 123);
 
     // s_printer_1 is created using a bespoke function to print S objects.
     auto s_parser_func = [](abc::utility::parser::parser_input_t& _a_str)
@@ -260,12 +258,8 @@ _TEST_CASE(
             );
         }
     };
-    _CHECK_EXPR(
-        abc::utility::parser::parse<S>("S {1, 2}", s_parser_func) == (S{1, 2})
-    );
-    _CHECK_EXPR(
-        abc::utility::parser::parse<S>("S {int_1 = 1, int_2 = 2}") == (S{1, 2})
-    );
+    _CHECK_EXPR(parse<S>("S {1, 2}", s_parser_func) == (S{1, 2}));
+    _CHECK_EXPR(parse<S>("S {int_1 = 1, int_2 = 2}") == (S{1, 2}));
 }
 
 _TEST_CASE(
@@ -276,16 +270,13 @@ _TEST_CASE(
     using namespace std;
     using namespace abc::utility;
     // Below we show how the default printer and parser work.
+    _CHECK_EXPR(abc::print(make_tuple("123"s, "456"s)) == "(\"123\", \"456\")");
+    // abc::utility::printer::printer_t<std::string> ti;
+    // abc::utility::printer::printer_t<std::tuple<std::string>> ti2(ti);
+    _CHECK_EXPR(abc::print("123") == "\"123\"");
+    _CHECK_EXPR(parse<string>("\"123\"") == "123");
     _CHECK_EXPR(
-        abc::utility::printer::print(make_tuple("123"s, "456"s))
-        == "(\"123\", \"456\")"
-    );
-   // abc::utility::printer::printer_t<std::string> ti;
- //   abc::utility::printer::printer_t<std::tuple<std::string>> ti2(ti);
-    _CHECK_EXPR(abc::utility::printer::print("123") == "\"123\"");
-    _CHECK_EXPR(abc::utility::parser::parse<string>("\"123\"") == "123");
-    _CHECK_EXPR(
-        (abc::utility::parser::parse<pair<string, string>>("(\"123\", \"456\")"))
+        (parse<pair<string, string>>("(\"123\", \"456\")"))
         == make_pair("123"s, "456"s)
     );
     // This printer/parser pair is not able to parse the argument correctly.
@@ -293,22 +284,13 @@ _TEST_CASE(
     // character, or at the end of the string. The printed pair becomes "{123,
     // 456}". It is parsed as {"{123," "456}"}.
     pair<int, int> arg_1 = make_pair(123, 456);
-    _CHECK_EXPR(
-        (abc::utility::parser::parse<pair<int, int>>(abc::utility::printer::print(arg_1
-        )))
-        == arg_1
-    );
+    _CHECK_EXPR((parse<pair<int, int>>(abc::print(arg_1))) == arg_1);
     const auto arg_2 = make_pair("\"123\""s, "\"456\""s);
     // The user could surround the strings by quotes, and assume that the parser
     // would recognise them as escape characters. However this requires
     // scn::scan to be formatted correctly, which isn't how the default parser
     // is defined. So the following won't work.
-    _CHECK_EXPR(
-        (abc::utility::parser::parse<pair<string, string>>(
-            abc::utility::printer::print(arg_2)
-        ))
-        != arg_2
-    );
+    _CHECK_EXPR((parse<pair<string, string>>(abc::print(arg_2))) != arg_2);
 }
 
 // Here is another entity called T.
@@ -329,7 +311,6 @@ constexpr bool
     return std::make_tuple(lhs.m1, lhs.m2, lhs.m3, lhs.m4)
            == std::make_tuple(rhs.m1, rhs.m2, rhs.m3, rhs.m4);
 }
-
 
 _TEST_CASE(
     abc::test_case_t({.name = "Strings and str_t's"})

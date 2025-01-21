@@ -27,7 +27,7 @@ public:
      * Default constructor for the manual_for_loop_t object.
      */
     __no_constexpr
-    manual_data_generator_t() noexcept;
+        manual_data_generator_t() noexcept;
     /*!
      * Destructor for the object.
      *
@@ -51,10 +51,10 @@ private:
     std::size_t                 _m_idx;
     bool                        _m_should_idx_be_ran;
     ds::idgc_memoized_element_t _m_repetition_data;
-    __constexpr ds::dg_memoized_element_t
-    generate_data_generator_memoized_element(
-        const bool _a_get_data_for_repeating
-    ) const noexcept;
+    __constexpr                 ds::dg_memoized_element_t
+                                generate_data_generator_memoized_element(
+                                    const bool _a_get_data_for_repeating
+                                ) const noexcept;
 };
 
 _END_ABC_NS
@@ -68,7 +68,7 @@ __no_constexpr_imp
           0,
         ds::dgc_memoized_element_t{ 0,
           ds::dg_memoized_element_t{0,
-        abc::utility::printer::print(0) } }
+        abc::print(0) } }
       ))
 {
     using namespace global;
@@ -118,11 +118,13 @@ __no_constexpr_imp manual_data_generator_t
     ++(*this);
     return _l_cpy;
 }
+
 __constexpr ds::dg_memoized_element_t
-manual_data_generator_t::generate_data_generator_memoized_element(
-    const bool _a_get_data_for_repeating
-) const noexcept
+            manual_data_generator_t::generate_data_generator_memoized_element(
+        const bool _a_get_data_for_repeating
+    ) const noexcept
 {
-    return { 0,abc::utility::printer::print(_m_idx) };
+    return {0, abc::print(_m_idx)};
 }
+
 _END_ABC_NS

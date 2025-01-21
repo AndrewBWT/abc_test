@@ -22,29 +22,32 @@ struct default_parser_t;
 template<typename T>
 __constexpr_imp parser_t<T>
 default_parser() noexcept;
+_END_ABC_UTILITY_PARSER_NS
+_BEGIN_ABC_NS
 template <typename T>
-__constexpr_imp parse_result_t<T>
+__constexpr_imp utility::parser::parse_result_t<T>
                 parse(
                     const std::string_view _a_str,
-                    const parser_t<T>&     _a_parser = default_parser<T>()
+                    const utility::parser::parser_t<T>&     _a_parser = utility::parser::default_parser<T>()
                 ) noexcept;
 template <typename T>
 __constexpr_imp T
     run_parser_with_exception(
         const std::string_view _a_str,
-        const parser_t<T>&     _a_parser = default_parser<T>()
+        const utility::parser::parser_t<T>&     _a_parser = utility::parser::default_parser<T>()
     );
-_END_ABC_UTILITY_PARSER_NS
-_BEGIN_ABC_UTILITY_PARSER_NS
+_END_ABC_NS
+_BEGIN_ABC_NS
 template <typename T>
-__constexpr_imp parse_result_t<T>
+__constexpr_imp utility::parser::parse_result_t<T>
                 parse(
                     const std::string_view _a_str,
-                    const parser_t<T>&     _a_parser
+                    const utility::parser::parser_t<T>&     _a_parser
                 ) noexcept
 {
     using namespace std;
     using namespace errors;
+    using namespace utility::parser;
     parser_input_t _l_pit(_a_str);
     try
     {
@@ -73,11 +76,12 @@ template <typename T>
 __constexpr_imp T
     run_parser_with_exception(
         const std::string_view _a_str,
-        const parser_t<T>&     _a_parser
+        const utility::parser::parser_t<T>&     _a_parser
     )
 {
     using namespace std;
     using namespace errors;
+    using namespace utility::parser;
     const parse_result_t<T> _l_parse_result{parse(_a_str, _a_parser)};
     if (_l_parse_result.has_value())
     {
@@ -89,4 +93,4 @@ __constexpr_imp T
     }
 }
 
-_END_ABC_UTILITY_PARSER_NS
+_END_ABC_NS

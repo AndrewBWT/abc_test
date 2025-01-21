@@ -118,7 +118,7 @@ __constexpr_imp void
     if (_a_tertiary_data == _m_elements_read)
     {
         _m_elements_read = _a_tertiary_data;
-        _m_element       = abc::utility::parser::run_parser_with_exception(
+        _m_element       = abc::run_parser_with_exception(
             _m_line_reader.current_line(), _m_element_rw_info.parser()
         );
     }
@@ -191,7 +191,7 @@ __constexpr_imp void
     if (_m_line_reader.has_current_line())
     {
         ++_m_elements_read;
-        _m_element = abc::utility::parser::run_parser_with_exception(
+        _m_element = abc::run_parser_with_exception(
             _m_line_reader.current_line(), _m_element_rw_info.parser()
         );
     }
@@ -224,7 +224,7 @@ __constexpr_imp bool
     if (_m_line_reader.get_next_line())
     {
         ++_m_elements_read;
-        _m_element = abc::utility::parser::run_parser_with_exception(
+        _m_element = abc::run_parser_with_exception(
             _m_line_reader.current_line(),
             _m_element_rw_info.parser()
         );

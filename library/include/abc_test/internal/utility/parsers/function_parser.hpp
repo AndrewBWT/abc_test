@@ -15,13 +15,15 @@ public:
 private:
     F _m_callable;
 };
+_END_ABC_UTILITY_PARSER_NS
+_BEGIN_ABC_NS
 template <typename T, typename F>
-    requires std::invocable<F, parser_input_t&>
-__constexpr parse_result_t<T> parse(
+    requires std::invocable<F, utility::parser::parser_input_t&>
+__constexpr utility::parser::parse_result_t<T> parse(
     const std::string_view _a_str,
     F _a_callable
 );
-_END_ABC_UTILITY_PARSER_NS
+_END_ABC_NS
 _BEGIN_ABC_UTILITY_PARSER_NS
 template <typename T, typename F>
     requires std::invocable<F, parser_input_t&>
@@ -40,14 +42,17 @@ function_parser_t<T, F>::run_parser(
 {
     return std::invoke(_m_callable, _a_parse_input);
 }
+_END_ABC_UTILITY_PARSER_NS
+_BEGIN_ABC_NS
 template <typename T, typename F>
-    requires std::invocable<F, parser_input_t&>
-__constexpr parse_result_t<T> parse(
+    requires std::invocable<F, utility::parser::parser_input_t&>
+__constexpr utility::parser::parse_result_t<T> parse(
     const std::string_view _a_str,
     F _a_callable
 )
 {
     using namespace std;
+    using namespace utility::parser;
     return parse<T>(_a_str, make_shared<function_parser_t<T, F>>(_a_callable));
 }
-_END_ABC_UTILITY_PARSER_NS
+_END_ABC_NS

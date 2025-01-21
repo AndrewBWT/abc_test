@@ -16,12 +16,13 @@ public:
 private:
     F _m_callable;
 };
-
+_END_ABC_UTILITY_PRINTER_NS
+_BEGIN_ABC_NS
 template <typename T, typename F>
 requires std::invocable<F, const T&>
 __constexpr std::string
             print(const T& _a_object, F _a_callable);
-_END_ABC_UTILITY_PRINTER_NS
+_END_ABC_NS
 
 _BEGIN_ABC_UTILITY_PRINTER_NS
 template <typename T, typename F>
@@ -43,7 +44,8 @@ __constexpr std::string
 {
     return std::invoke(_m_callable, _a_object);
 }
-
+_END_ABC_UTILITY_PRINTER_NS
+_BEGIN_ABC_NS
 template <typename T, typename F>
 requires std::invocable<F, const T&>
 __constexpr std::string
@@ -54,8 +56,8 @@ __constexpr std::string
 {
     using namespace std;
     return print<T>(
-        _a_object, make_shared<function_printer_t<T, F>>(_a_callable)
+        _a_object, make_shared<utility::printer::function_printer_t<T, F>>(_a_callable)
     );
 }
 
-_END_ABC_UTILITY_PRINTER_NS
+_END_ABC_NS
