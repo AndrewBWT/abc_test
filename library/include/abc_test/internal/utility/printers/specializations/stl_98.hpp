@@ -4,20 +4,21 @@
 _BEGIN_ABC_UTILITY_PRINTER_NS
 
 template <typename T>
-    requires (std::convertible_to<T, std::string_view>)
+requires (std::convertible_to<T, std::string_view>)
 struct default_printer_t<T> : public printer_base_t<T>
 {
     __constexpr std::string
-        run_printer(
-            const T& _a_object
-        ) const
+                run_printer(
+                    const T& _a_object
+                ) const
     {
         return fmt::format("\"{0}\"", _a_object);
     }
 };
 
 template <typename T, typename U>
-struct default_printer_t<std::pair<T, U>> : public printer_base_t<std::pair<T, U>>
+struct default_printer_t<std::pair<T, U>>
+    : public printer_base_t<std::pair<T, U>>
 {
 private:
     std::pair<default_printer_t<T>, default_printer_t<U>> _m_printers;
@@ -25,14 +26,34 @@ public:
     using value_type = std::pair<T, U>;
 
     __constexpr
-        default_printer_t(
-            const default_printer_t<T>& _a_printer_t,
-            const default_printer_t<U>& _a_printer_u
-        );
+    default_printer_t(
+        const default_printer_t<T>& _a_printer_t,
+        const default_printer_t<U>& _a_printer_u
+    );
     default_printer_t()
-        requires (std::is_default_constructible_v<default_printer_t<T>>
-    && std::is_default_constructible_v<default_printer_t<U>>)
-        = default;
+    requires (std::is_default_constructible_v<default_printer_t<T>>
+              && std::is_default_constructible_v<default_printer_t<U>>)
+    = default;
+
+    __constexpr virtual std::string
+        run_printer(const value_type& _a_object) const;
+};
+
+template <typename T>
+struct default_printer_t<std::vector<T>> : public printer_base_t<std::vector<T>>
+{
+private:
+    printer_t<T> _m_printer;
+public:
+    using value_type = std::vector<T>;
+
+    __constexpr
+    default_printer_t(const printer_t<T>& _a_printer);
+    default_printer_t()
+        requires (std::is_default_constructible_v<default_printer_t<T>>)
+    : _m_printer(mk_printer(default_printer_t<T>()))
+    {
+    }
 
     __constexpr virtual std::string
         run_printer(const value_type& _a_object) const;
@@ -75,28 +96,53 @@ __constexpr_imp parse_result_t<T>
 
 template <typename T, typename U>
 __constexpr_imp
-default_printer_t<std::pair<T, U>>::default_printer_t(
-    const default_printer_t<T>& _a_printer_t,
-    const default_printer_t<U>& _a_printer_u
-)
-    : _m_printers{ std::make_pair(_a_printer_t, _a_printer_u) }
-{
-}
+    default_printer_t<std::pair<T, U>>::default_printer_t(
+        const default_printer_t<T>& _a_printer_t,
+        const default_printer_t<U>& _a_printer_u
+    )
+    : _m_printers{std::make_pair(_a_printer_t, _a_printer_u)}
+{}
 
 template <typename T, typename U>
-__constexpr_imp
-std::string
-default_printer_t<std::pair<T, U>>::run_printer(
-    const default_printer_t<std::pair<T,U>>::value_type& _a_object
-) const
+__constexpr_imp std::string
+                default_printer_t<std::pair<T, U>>::run_printer(
+        const default_printer_t<std::pair<T, U>>::value_type& _a_object
+    ) const
 {
     using namespace std;
-    string _l_str{ "(" };
+    string _l_str{"("};
     _l_str.append(_m_printers.first.run_printer(_a_object.first));
     _l_str.append(", ");
     _l_str.append(_m_printers.second.run_printer(_a_object.second));
     _l_str.append(")");
     return _l_str;
 }
+template <typename T>
+__constexpr_imp
+default_printer_t<std::vector<T>>::default_printer_t(
+    const printer_t<T>& _a_printer
+)
+    : _m_printer{ _a_printer }
+{
+}
 
+template <typename T>
+__constexpr_imp std::string
+default_printer_t<std::vector<T>>::run_printer(
+    const default_printer_t<std::vector<T>>::value_type& _a_object
+) const
+{
+    using namespace std;
+    string _l_str{ "{" };
+    for (size_t _l_idx{ 0 }; _l_idx < _a_object.size(); ++_l_idx)
+    {
+        _l_str.append(_m_printer->run_printer(_a_object[_l_idx]));
+        if (_l_idx + 1 < _a_object.size())
+        {
+            _l_str.append(", ");
+        }
+    }
+    _l_str.append("}");
+    return _l_str;
+}
 _END_ABC_UTILITY_PRINTER_NS

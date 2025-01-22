@@ -112,95 +112,38 @@ The reader should note that the object `data_generator_collection_t` (and its as
 
 ## Printers & Parsers
 
-Many of the data generators included with `abc_test` have functionality which allows them to interact with files. Part of this functionality relies on the user being able to define a printer and parser for an arbitrary data type `T`. In this subsection we provide the documentation for the objects which represent these abstract ideas.
+Many of the data generators included with `abc_test` have functionality which allows them to interact with files. Part of this functionality relies on there being a printer and parser for the generator's data type `T`. As well as providing printers and parsers for many types included with C++, `abc_test` also allows the user to write their own printers and parsers. In this subsection we provide the documentation for the objects which represent these abstract ideas.
 
 ### Printer
 
-`template<typename T> abc::utility::str::printer_t<T>` is a utility class designed to provide a uniform interface to user-defined printing functions in `abc_test`. After initialisation, a `printer_t` instance is able to create text representations of objects of type `T`. `printer_t`'s "printing function" is a member function called `run_printer`, which has the following type signature.
+Printers in `abc_test` are, in their most basic form, represented by the abstract class `template<typename T> abc::utility::printer::base_printer_t`. It contains one virtual function `run_printer`, with the following type signature. 
 
 ```cpp
-std::string run_printer(const T& arg) const noexcept;
+std::string run_printer(const T& object) const;
 ```
 
-`printer_t` has a private member variable called `print_function`, whose type is analoguous to a callable function with a type signature identical to `run_printer`'s. Internally, `run_printer` calls `print_function` using `arg` as its argument.
+As `base_printer_t` cannot be instantiated, derived classes must be used to create instances of `base_printer_t`. `abc_test` uses the `template<typename T> printer_t` type, which is a synonym for `std::shared_ptr<base_printer_t>` to refer to an "arbitrary" printer.
 
-`printer_t` instances can be created using one of two factory methods. Both of these are in the `abc` namespace, and are declared as follows.
+There is a single function in the `abc` namespace which can be used to invoke a `printer_base_t` object, defined as follows.
 
 ```cpp
-template<typenmae T, typename F>
-requires std::invocable<F, const T&>
-abc::utility::str::printer_t<T> printer(F function) noexcept;
-
-template<typename T>
-requires fmt::formattable<T>
-abc::utility::str::printer_t<T> default_printer() noexcept;
+template <typename T>
+std::string
+print(
+    const T& object,
+    const utility::printer::printer_t<T>& printer = utility::printer::default_printer<T>()
+) noexcept;
 ```
 
-`printer` takes any function-like object `function` as an argument and creates a `printer_t` object using it. It does this by initializing `print_function` using `function`. `function` must be a callable object which takes a single argument of type `const T&`, and returns an `std::string` object. 
+`print` calls `printer`'s `run_printer` function on `object`. We can see that `printer` has a default value, which is created from the function `default_printer`. `default_printer` creates a `printer_t` instance using a subclass of `printer_base_t` included with `abc_test` called `default_printer_t`.
 
-`default_printer` constructs a `printer_t` object only if `T` adheres to the concept `fmt::formattable`. Assuming it does, `default_printer` creates its own `printer_t` instance using the `fmt` library. It does this by initializing `print_function` using an `std::function` wrapped around the expression `fmt::format("{}",arg)`, where `arg` is a `const T&` variable. 
+`default_printer_t` is perhaps the most commonly used printer in `abc_test`. It has no default implementation, instead it can only be instantiated using specializations. We include many specializations with `abc_test `for types in the `stl`, as well as auxillery functions that can be used to create `default_printer_t` specializations for objects and enums.
 
-The reader may question why `abc_test` uses `fmt::format` rather than `std::format` for its `default_printer` definition. Currently `std::format` does not have as many definitions for `std` types when compared to `fmt::format`. Using `fmt::format` provides the user with many more specialisations of `default_printer` - for example, most range-like containers can be used with `fmt::format`, but cannot be used with `std::format`.
+`default_printer` wraps the `default_printer_t` object for `T` in a `printer_t` object. 
 
-Below we show some example uses of the `printer_t` object using the functions introduced above.
+There is one other subclass of `base_printer_t` included with `abc_test` called `function_printer_t`. Instances of it can only be created by providing a callable object which takes an object of type `T` and returns an `std::string`. It is designed to allow the user to use an arbitrary function to create their own `printer_t` type. 
 
-```cpp
-struct S
-{
-    int int_1;
-    int int_2;
-};
-
-template <>
-struct fmt::formatter<S> : formatter<string_view>
-{
-    inline auto
-        format(
-            S               arg,
-            format_context& _a_ctx
-        ) const -> format_context::iterator
-    {
-        using namespace std;
-        const string _l_rv{fmt::format("{}", make_tuple(arg.int_1, arg.int_2))};
-        return formatter<string_view>::format(_l_rv, _a_ctx);
-    }
-};
-
-_TEST_CASE(
-    abc::test_case_t({.name = "Printer object"})
-)
-{
-    using namespace abc;
-    using namespace std;
-    // int_printer_1 is created using a bespoke function to print int objects.
-    auto int_printer_func = [](const int& i)
-    {
-        const size_t buf_size = 10;
-        char         buf[buf_size]{};
-        to_chars(buf, buf + buf_size, i);
-        return string(buf);
-    };
-    abc::utility::str::printer_t<int> int_printer_1
-        = printer<int>(int_printer_func);
-    // int_printer_2 is created using int's fmt::format definition.
-    abc::utility::str::printer_t<int> int_printer_2 = default_printer<int>();
-
-    _CHECK_EXPR(int_printer_1.run_printer(123) == "123");
-    _CHECK_EXPR(int_printer_2.run_printer(123) == "123");
-
-    // s_printer_1 is created using a bespoke function to print S objects.
-    auto s_printer_func = [](const S& s)
-    {
-        return fmt::format("S {{{0}, {1}}}", s.int_1, s.int_2);
-    };
-    abc::utility::str::printer_t<S> s_printer_1 = printer<S>(s_printer_func);
-    // s_printer_2 is created using S's fmt::format definition.
-    abc::utility::str::printer_t<S> s_printer_2 = default_printer<S>();
-
-    _CHECK_EXPR(s_printer_1.run_printer(S{1, 2}) == "{1, 2}");
-    _CHECK_EXPR(s_printer_2.run_printer(S{ 1, 2 }) == "S {1, 2}");
-}
-```
+Below we show a test case which shows the things above. 
 
 ### Parser
 

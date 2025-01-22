@@ -60,43 +60,208 @@ _TEST_CASE(
     _END_BBA_CHECK(check_numbs);
 }
 
+_TEST_CASE(
+    abc::test_case_t({.name = "Printers in abc_test"})
+)
+{
+    using namespace abc;
+    using namespace std;
+    // As we cannot create instantiations of base_printer_t, we will show the
+    // user the included subclasses which use it as their base class.
+
+    // The first of these is default_printer_t.
+    utility::printer::default_printer_t<int> printer_1;
+    _CHECK_EXPR(printer_1.run_printer(123) == "123");
+
+    // We recomend that the user use the function default_printer in the abc
+    // namespace.
+
+    // It returns a printer_t type, which is a type synonym for a
+    // std::shared_ptr.
+    auto printer_2 = utility::printer::default_printer<int>();
+    _CHECK_EXPR(printer_2->run_printer(123) == "123");
+
+
+    // We advice that the user use the print function usually.
+    _CHECK_EXPR(print<int>(123, printer_2) == "123");
+
+    // We can elevate printer_1 to a printer_t type using the function
+    // mk_printer
+    _CHECK_EXPR(print<int>(123, mk_printer(printer_1)) == "123");
+
+    // print has a default parameter for its second argument, allowing the user
+    // to write.
+    _CHECK_EXPR(print<int>(123) == "123");
+
+    // abc_test includes specializations for more complicated types, such as
+    // std::tuple and std::vector.
+    using tuple_type = tuple<int, string, vector<bool>>;
+    tuple_type tuple_1{
+        123, "h3llo"s, vector<bool>{true, false, true}
+    };
+    _CHECK_EXPR(print(tuple_1) == "(123, \"h3llo\", {true, false, true})");
+
+    // Here is an example using function_printer_t. We first create a function
+    // which prints a bool
+    auto bool_printer = [](const bool& _a_bool) -> std::string
+    {
+        return _a_bool ? "1" : "0";
+    };
+    // We can now use it to create a bool printer...
+    abc::utility::printer::function_printer_t<bool, decltype(bool_printer)> fp1(
+        bool_printer
+    );
+    _CHECK_EXPR(fp1.run_printer(true) == "1");
+
+    // There is a print function which takes a function_printer_t argument.
+    _CHECK_EXPR(print(true, bool_printer) == "1");
+
+    // Or if we wanted, we could use the function function_printer to elevate
+    // it to being a printer_t, and then use the other print function.
+    _CHECK_EXPR(print(true, function_printer<bool>(bool_printer)) == "1");
+
+    // Using bool_printer, we can use the constructor for the specialization of
+    // std::tuple and std::vector to change how tuple_1 is printed.
+    {
+        using namespace utility::printer;
+        // This type is quite complicated, so we use the above namespace to
+        // reduce text.
+        _CHECK_EXPR(
+            print(
+                // Printing tuple_1
+                tuple_1,
+                // Make a printer using the default type of the tuple.
+                default_printer<tuple_type>(
+                    // But initialized with our own printers for each of the
+                    // tuple's types.
+                    default_printer<int>(),
+                    default_printer<string>(),
+                    // The last type is changed. It uses the default_printer_t
+                    // constructor for vector.
+                    default_printer<vector<bool>>(
+                        // But it uses its own printer_t type for bool, created
+                        // using function_printer.
+                        function_printer<bool>(bool_printer)
+                    )
+                )
+            )
+            == "(123, \"h3llo\", {1, 0, 1})"
+        );
+        // An easier way to get the same effect is as follows: firstly create a
+        // default printer. Note we don't use the default_printer function here,
+        // we use the default_printer_t constructor instead.
+        auto tuple_printer{default_printer_t<tuple_type>()};
+        // Then change the third field.
+        std::get<2>(tuple_printer.get_printers_ref()
+        ) = default_printer<vector<bool>>(function_printer<bool>(bool_printer));
+        // Then run the printer using mk_printer to elevate tuple_printer to a
+        // printer_t type.
+        _CHECK_EXPR(
+            print(tuple_1, mk_printer(tuple_printer))
+            == "(123, \"h3llo\", {1, 0, 1})"
+        );
+    }
+}
+
+// This is a user-defined object.
 struct S
 {
     int int_1;
     int int_2;
 };
 
+// This is how we create a default_printer_t instance for S.
 template <>
 struct abc::utility::printer::default_printer_t<S>
     : public abc::utility::printer::printer_base_t<S>
 {
-    __no_constexpr_imp std::string
-                       run_printer(
-                           const S& _a_object
-                       ) const noexcept
+    inline std::string
+        run_printer(
+            const S& _a_object
+        ) const noexcept
     {
-        // return "S";
-        return object_printer(
-            {"int_1", "int_2"}, "S", '{', '}', _a_object.int_1, _a_object.int_2
+        // We use the object object_printer_parser_t and the function
+        // object_printer. We give it the default object_printer_parser_t
+        // object, a string which is prepended to the beginning of the list of
+        // data fields, the names of the data fields, and then the fields
+        // themselves
+        return object_printer_with_field_names(
+            object_printer_parser_t{},
+            "S",
+            {"int_1", "int_2"},
+            _a_object.int_1,
+            _a_object.int_2
         );
     }
 };
 
-template <>
-struct fmt::formatter<S> : formatter<string_view>
+// This is a bespoke printer_base_t instance for int. It prints the data out in
+// hex.
+struct int_printer_t : abc::utility::printer::printer_base_t<int>
 {
-    inline auto
-        format(
-            S               arg,
-            format_context& _a_ctx
-        ) const -> format_context::iterator
+    inline std::string
+        run_printer(
+            const int& _a_object
+        ) const noexcept
     {
-        using namespace std;
-        const string _l_rv
-            = abc::utility::printer::default_printer_t<S>().run_printer(arg);
-        return formatter<string_view>::format(_l_rv, _a_ctx);
+        return fmt::format("{:x}", _a_object);
     }
 };
+
+// This is a bespoke printer for S.
+struct s_printer : public abc::utility::printer::printer_base_t<S>
+{
+    abc::utility::printer::printer_t<int> m_int_printer
+        = abc::utility::printer::default_printer<int>();
+    s_printer() = default;
+
+    inline s_printer(
+        const abc::utility::printer::printer_t<int>& int_printer
+    )
+        : m_int_printer(int_printer)
+    {}
+
+    inline std::string
+        run_printer(
+            const S& _a_object
+        ) const noexcept
+    {
+        // This printer uses the function object_printer_with_custom_printers
+        // with a bespoke object_printer_parser_t object.
+        // object_printer_with_custom_printers takes a tuple of bespoke printers
+        // for each field it is provided.
+        return object_printer_with_custom_printers(
+            abc::utility::object_printer_parser_t{
+                .begin_char                             = '(',
+                .end_char                               = ')',
+            },
+            "S",
+            std::make_tuple(m_int_printer, m_int_printer),
+            _a_object.int_1,
+            _a_object.int_2
+        );
+    }
+};
+
+_TEST_CASE(
+    abc::test_case_t({.name = "Custom printer"})
+)
+{
+    using namespace abc;
+    S s1{10'000, 20'000};
+    // This will call the default printer on S.
+    _CHECK_EXPR(print(s1) == "S {int_1 = 10000, int_2 = 20000}");
+
+    // This printer uses the bespoke printer s_printer.
+    _CHECK_EXPR(print(s1, mk_printer(s_printer())) == "S (10000, 20000)");
+
+    // This also uses the bespoke printer s_printer, but we use int_printer_t to
+    // print S's integers.
+    _CHECK_EXPR(
+        print(s1, mk_printer(s_printer(mk_printer(int_printer_t()))))
+        == "S (2710, 4e20)"
+    );
+}
 
 _TEST_CASE(
     abc::test_case_t({.name = "Printer object"})

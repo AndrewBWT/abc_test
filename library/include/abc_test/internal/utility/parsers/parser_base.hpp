@@ -65,7 +65,7 @@ __constexpr_imp utility::parser::parse_result_t<T>
         }
         return _l_inner_parser_result;
     }
-    catch (const std::runtime_error& _a_exception)
+    catch (const parser_could_not_match_string_t& _a_exception)
     {
         return parse_result_t<T>{unexpected("Parser threw unexpected exception")
         };

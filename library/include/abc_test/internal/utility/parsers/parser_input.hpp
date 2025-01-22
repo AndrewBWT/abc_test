@@ -59,7 +59,7 @@ __constexpr void
     )
 {
     using namespace std;
-    if (not check_and_advance(_a_char_to_check_against))
+    if (check_and_advance(_a_char_to_check_against))
     {
         throw parser_could_not_match_string_t(
             _m_complete_string,
@@ -75,7 +75,7 @@ __constexpr void
     )
 {
     using namespace std;
-    if (not check_and_advance(_a_str_to_check_against))
+    if (check_and_advance(_a_str_to_check_against))
     {
         throw parser_could_not_match_string_t(
             _m_complete_string,

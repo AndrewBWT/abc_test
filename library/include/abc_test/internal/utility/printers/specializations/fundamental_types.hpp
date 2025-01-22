@@ -1,17 +1,30 @@
 #pragma once
-#include "abc_test/internal/utility/printers/default_printer.hpp"
 #include "abc_test/internal/utility/concepts.hpp"
+#include "abc_test/internal/utility/object_printer_parser.hpp"
+#include "abc_test/internal/utility/printers/default_printer.hpp"
 
 _BEGIN_ABC_UTILITY_PRINTER_NS
 
+template <>
+struct default_printer_t<bool> : public printer_base_t<bool>
+{
+    __constexpr std::string
+                run_printer(
+                    const bool& _a_object
+                ) const
+    {
+        return _a_object ? "true" : "false";
+    }
+};
+
 template <typename T>
-    requires is_to_string_convertable_c<T>
+    requires is_to_string_convertable_c<T> && (not std::same_as<T,bool>)
 struct default_printer_t<T> : public printer_base_t<T>
 {
     __constexpr std::string
-        run_printer(
-            const T& _a_object
-        ) const
+                run_printer(
+                    const T& _a_object
+                ) const
     {
         using namespace std;
         return to_string(_a_object);
@@ -20,34 +33,59 @@ struct default_printer_t<T> : public printer_base_t<T>
 
 template <typename... Ts>
 __constexpr std::string
-object_printer(
-    const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
-    const std::string_view                             _a_begin_str,
-    const char                                         _a_begin_char,
-    const char                                         _a_end_char,
-    std::tuple<default_printer_t<Ts>...>                       _a_parsers,
-    Ts... _a_elements_to_print
-);
+            object_printer_with_custom_printers(
+                const utility::object_printer_parser_t& _a_object_print_parser,
+                const std::string_view&                 _a_begin_str,
+                std::tuple<printer_t<Ts>...>            _a_parsers,
+                Ts... _a_elements_to_print
+            );
 template <typename... Ts>
 __constexpr std::string
-object_printer(
-    const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
-    const std::string_view                             _a_begin_str,
-    const char                                         _a_begin_char,
-    const char                                         _a_end_char,
-    Ts... _a_elements_to_print
-);
+            object_printer(
+                const utility::object_printer_parser_t& _a_object_print_parser,
+                const std::string_view&                 _a_begin_str,
+                Ts... _a_elements_to_print
+            );
+template <typename... Ts>
+__constexpr std::string
+            object_printer_with_field_names_and_custom_printers(
+                const utility::object_printer_parser_t& _a_object_print_parser,
+                const std::string_view&                 _a_begin_str,
+                const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
+                std::tuple<printer_t<Ts>...>                       _a_parsers,
+                Ts... _a_elements_to_print
+            );
+template <typename... Ts>
+__constexpr std::string
+            object_printer_with_field_names(
+                const utility::object_printer_parser_t& _a_object_print_parser,
+                const std::string_view&                 _a_begin_str,
+                const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
+                Ts... _a_elements_to_print
+            );
 
 namespace
 {
-    template <std::size_t I, typename... Ts>
-    __constexpr void
-        object_printer_inner(
-            std::string& _a_str,
-            const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
-            std::tuple<default_printer_t<Ts>...>                       _a_parsers,
-            std::tuple<Ts...> _a_elements_to_print
-        ) noexcept;
+template <typename... Ts>
+__constexpr std::string
+            object_printer_internal(
+                const utility::object_printer_parser_t& _a_object_print_parser,
+                const std::string_view&                 _a_begin_str,
+                const std::optional<std::array<std::string_view, sizeof...(Ts)>>&
+                                             _a_object_names,
+                std::tuple<printer_t<Ts>...> _a_parsers,
+                Ts... _a_elements_to_print
+            );
+template <std::size_t I, typename... Ts>
+__constexpr void
+    object_printer_internal(
+        const utility::object_printer_parser_t& _a_object_print_parser,
+        std::string&                            _a_str,
+        const std::optional<std::array<std::string_view, sizeof...(Ts)>>&
+                                     _a_object_names,
+        std::tuple<printer_t<Ts>...> _a_parsers,
+        std::tuple<Ts...>            _a_elements_to_print
+    ) noexcept;
 } // namespace
 
 _END_ABC_UTILITY_PRINTER_NS
@@ -81,44 +119,80 @@ __constexpr_imp parse_result_t<T>
     }
 }*/
 template <typename... Ts>
-__constexpr_imp std::string
-object_printer(
-    const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
-    const std::string_view                             _a_begin_str,
-    const char                                         _a_begin_char,
-    const char                                         _a_end_char,
-    std::tuple<default_printer_t<Ts>...>                       _a_parsers,
-    Ts... _a_elements_to_print
-)
+__constexpr std::string
+            object_printer_with_custom_printers(
+                const utility::object_printer_parser_t& _a_object_print_parser,
+                const std::string_view&                 _a_begin_str,
+                std::tuple<printer_t<Ts>...>            _a_printers,
+                Ts... _a_elements_to_print
+            )
 {
     using namespace std;
-    string _l_rv{ _a_begin_str };
-    _l_rv.append(" ");
-    _l_rv.push_back(_a_begin_char);
-    tuple<Ts...> _l_tuple{ tie(_a_elements_to_print...) };
-    object_printer_inner<0>(
-        _l_rv, _a_object_names, _a_parsers, _l_tuple
+    return object_printer_internal(
+        _a_object_print_parser,
+        _a_begin_str,
+        optional<array<string_view, sizeof...(Ts)>>{},
+        _a_printers,
+        _a_elements_to_print...
     );
-    _l_rv.push_back(_a_end_char);
-    return _l_rv;
 }
+
+template <typename... Ts>
+__constexpr std::string
+            object_printer(
+                const utility::object_printer_parser_t& _a_object_print_parser,
+                const std::string_view&                 _a_begin_str,
+                Ts... _a_elements_to_print
+            )
+{
+    using namespace std;
+    tuple<printer_t<Ts>...> _l_printers
+        = std::make_tuple(default_printer<Ts>()...);
+    return object_printer_internal(
+        _a_object_print_parser,
+        _a_begin_str,
+        optional<array<string_view, sizeof...(Ts)>>{},
+        _l_printers,
+        _a_elements_to_print...
+    );
+}
+
 template <typename... Ts>
 __constexpr_imp std::string
-object_printer(
-    const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
-    const std::string_view                             _a_begin_str,
-    const char                                         _a_begin_char,
-    const char                                         _a_end_char,
-    Ts... _a_elements_to_print
-)
+                object_printer_with_field_names_and_custom_printers(
+                    const utility::object_printer_parser_t& _a_object_print_parser,
+                    const std::string_view&                 _a_begin_str,
+                    const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
+                    std::tuple<printer_t<Ts>...>                       _a_parsers,
+                    Ts... _a_elements_to_print
+                )
 {
     using namespace std;
-    tuple<default_printer_t<Ts>...> _l_printers;
-    return object_printer(
-        _a_object_names,
+    return object_printer_internal(
+        _a_object_print_parser,
         _a_begin_str,
-        _a_begin_char,
-        _a_end_char,
+        _a_object_names,
+        _a_parsers,
+        _a_elements_to_print...
+    );
+}
+
+template <typename... Ts>
+__constexpr_imp std::string
+                object_printer_with_field_names(
+                    const utility::object_printer_parser_t& _a_object_print_parser,
+                    const std::string_view&                 _a_begin_str,
+                    const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
+                    Ts... _a_elements_to_print
+                )
+{
+    using namespace std;
+    tuple<printer_t<Ts>...> _l_printers
+        = std::make_tuple(default_printer<Ts>()...);
+    return object_printer_internal(
+        _a_object_print_parser,
+        _a_begin_str,
+        _a_object_names,
         _l_printers,
         _a_elements_to_print...
     );
@@ -126,26 +200,89 @@ object_printer(
 
 namespace
 {
-    template <std::size_t I, typename... Ts>
-    __constexpr void
-        object_printer_inner(
-            std::string& _a_str,
-            const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
-            std::tuple<default_printer_t<Ts>...>                       _a_parsers,
-            std::tuple<Ts...> _a_elements_to_print
-        ) noexcept
+template <typename... Ts>
+__constexpr std::string
+            object_printer_internal(
+                const utility::object_printer_parser_t& _a_object_print_parser,
+                const std::string_view&                 _a_begin_str,
+                const std::optional<std::array<std::string_view, sizeof...(Ts)>>&
+                                             _a_object_names,
+                std::tuple<printer_t<Ts>...> _a_parsers,
+                Ts... _a_elements_to_print
+            )
+{
+    using namespace std;
+    string _l_rv{_a_begin_str};
+    if (_a_object_print_parser.space_after_object_name)
     {
-        _a_str.append(std::get<I>(_a_object_names));
-        _a_str.append(" = ");
-        _a_str.append(std::get<I>(_a_parsers).run_printer(std::get<I>(_a_elements_to_print)));
-        if constexpr (I + 1 < sizeof...(Ts))
+        _l_rv.append(" ");
+    }
+    _l_rv.push_back(_a_object_print_parser.begin_char);
+    tuple<Ts...> _l_tuple{tie(_a_elements_to_print...)};
+    object_printer_internal<0>(
+        _a_object_print_parser, _l_rv, _a_object_names, _a_parsers, _l_tuple
+    );
+    _l_rv.push_back(_a_object_print_parser.end_char);
+    return _l_rv;
+}
+
+template <std::size_t I, typename... Ts>
+__constexpr void
+    object_printer_internal(
+        const utility::object_printer_parser_t& _a_object_print_parser,
+        std::string&                            _a_str,
+        const std::optional<std::array<std::string_view, sizeof...(Ts)>>&
+                                     _a_object_names,
+        std::tuple<printer_t<Ts>...> _a_parsers,
+        std::tuple<Ts...>            _a_elements_to_print
+    ) noexcept
+{
+    /*
+        bool space_after_object_name = true;
+    bool space_before_field_name_and_field_separator = true;
+    bool space_after_field_name_and_field_separator = true;
+    bool space_after_field_delimieter = true;
+    bool space_before_field_delimiter = false;
+    */
+    using namespace std;
+    if (_a_object_names.has_value())
+    {
+        _a_str.append(get<I>(_a_object_names.value()));
+        if (_a_object_print_parser.space_before_field_name_and_field_separator)
         {
-            _a_str.append(", ");
-            object_printer_inner<I + 1>(
-                _a_str, _a_object_names, _a_parsers, _a_elements_to_print
-            );
+            _a_str.push_back(' ');
+        }
+        _a_str.push_back(
+            _a_object_print_parser.delimiter_between_field_name_and_field
+        );
+        if (_a_object_print_parser.space_after_field_name_and_field_separator)
+        {
+            _a_str.push_back(' ');
         }
     }
+    _a_str.append(
+        std::get<I>(_a_parsers)->run_printer(std::get<I>(_a_elements_to_print))
+    );
+    if constexpr (I + 1 < sizeof...(Ts))
+    {
+        if (_a_object_print_parser.space_before_field_delimiter)
+        {
+            _a_str.push_back(' ');
+        }
+        _a_str.push_back(_a_object_print_parser.delimiter_between_fields);
+        if (_a_object_print_parser.space_after_field_delimieter)
+        {
+            _a_str.push_back(' ');
+        }
+        object_printer_internal<I + 1>(
+            _a_object_print_parser,
+            _a_str,
+            _a_object_names,
+            _a_parsers,
+            _a_elements_to_print
+        );
+    }
+}
 } // namespace
 
 _END_ABC_UTILITY_PRINTER_NS

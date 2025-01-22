@@ -186,6 +186,7 @@ set(LIBRARY_FILES
   include/abc_test/internal/utility/printers/specializations/fundamental_types.hpp
   include/abc_test/internal/utility/printers/specializations/stl_98.hpp
   include/abc_test/internal/utility/printers/specializations/stl_11.hpp
+  include/abc_test/internal/utility/object_printer_parser.hpp
   include/abc_test/internal/utility/str/parser_utility.hpp
   include/abc_test/internal/utility/str/string_utility.hpp
   include/abc_test/internal/utility/str/string_table.hpp
