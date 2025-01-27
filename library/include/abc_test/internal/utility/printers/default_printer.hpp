@@ -11,10 +11,12 @@ public:
     __constexpr virtual std::string
         run_printer(const T& _a_object) const override;
 };
-
-template <typename T, typename ...Ts>
+template<typename T, typename ... Ts>
 __constexpr printer_t<T>
-default_printer(Ts... args) noexcept;
+default_printer(Ts ... elements)
+{
+    return mk_printer(default_printer_t<T>(elements...));
+}
 _END_ABC_UTILITY_PRINTER_NS
 _BEGIN_ABC_UTILITY_PRINTER_NS
 template <typename T>
@@ -29,13 +31,4 @@ default_printer_t<T>::run_printer(
         "run_printer<T>()."
     );
 }
-
-template <typename T, typename ...Ts>
-__constexpr_imp printer_t<T>
-default_printer(Ts... args) noexcept
-{
-    using namespace std;
-    return make_shared<default_printer_t<T>>(std::forward<Ts>(args)...);
-}
-
 _END_ABC_UTILITY_PRINTER_NS

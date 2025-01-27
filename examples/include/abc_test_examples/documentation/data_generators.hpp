@@ -66,101 +66,94 @@ _TEST_CASE(
 {
     using namespace abc;
     using namespace std;
+    // The printer functionality is contained in the abc::utility::printer
+    // namespace.
+    using namespace abc::utility::printer;
     // As we cannot create instantiations of base_printer_t, we will show the
     // user the included subclasses which use it as their base class.
 
     // The first of these is default_printer_t.
-    utility::printer::default_printer_t<int> printer_1;
+    default_printer_t<int> printer_1;
     _CHECK_EXPR(printer_1.run_printer(123) == "123");
 
-    // We recomend that the user use the function default_printer in the abc
-    // namespace.
+    // We recommend that the user use the function print when printing. It takes
+    // two arguments; the first is the object to be printed, and the second is
+    // the printer_t object. Any derived type from base_printer_t can be
+    // elevated to this type using mk_printer.
 
-    // It returns a printer_t type, which is a type synonym for a
-    // std::shared_ptr.
-    auto printer_2 = utility::printer::default_printer<int>();
-    _CHECK_EXPR(printer_2->run_printer(123) == "123");
+    _CHECK_EXPR(print(123, mk_printer(printer_1)) == "123");
 
+    // We can also use the specialised default_printer function, which will
+    // create and wrap a default_printer_t in a printer_t object.
+    _CHECK_EXPR(print(123, default_printer<int>()) == "123");
 
-    // We advice that the user use the print function usually.
-    _CHECK_EXPR(print<int>(123, printer_2) == "123");
-
-    // We can elevate printer_1 to a printer_t type using the function
-    // mk_printer
-    _CHECK_EXPR(print<int>(123, mk_printer(printer_1)) == "123");
-
-    // print has a default parameter for its second argument, allowing the user
-    // to write.
+    // print has a default parameter for its second argument, which creates a
+    // default_printer_t object. Therefore, to get the default behaviour, no
+    // argument needs to be provided.
     _CHECK_EXPR(print<int>(123) == "123");
 
-    // abc_test includes specializations for more complicated types, such as
-    // std::tuple and std::vector.
+    // abc_test includes default_printer_t specializations for more complicated
+    // types, such as std::tuple and std::vector.
     using tuple_type = tuple<int, string, vector<bool>>;
     tuple_type tuple_1{
         123, "h3llo"s, vector<bool>{true, false, true}
     };
     _CHECK_EXPR(print(tuple_1) == "(123, \"h3llo\", {true, false, true})");
 
-    // Here is an example using function_printer_t. We first create a function
-    // which prints a bool
-    auto bool_printer = [](const bool& _a_bool) -> std::string
+    // A function_printer_t object allows the user to create a base_printer_t
+    // object which can take any callable object which takes a const T& and
+    // returns an std::string.
+
+    // Here is a function which prints a bool.
+    auto bool_printer = [](const bool& object) -> std::string
     {
-        return _a_bool ? "1" : "0";
+        return object ? "1" : "0";
     };
-    // We can now use it to create a bool printer...
-    abc::utility::printer::function_printer_t<bool, decltype(bool_printer)> fp1(
-        bool_printer
-    );
-    _CHECK_EXPR(fp1.run_printer(true) == "1");
+    // We can now use it to create a function_printer_t object.
+    function_printer_t<bool, decltype(bool_printer)> fp1(bool_printer);
+    _CHECK_EXPR(print(true, mk_printer(fp1)) == "1");
 
-    // There is a print function which takes a function_printer_t argument.
-    _CHECK_EXPR(print(true, bool_printer) == "1");
-
-    // Or if we wanted, we could use the function function_printer to elevate
-    // it to being a printer_t, and then use the other print function.
+    // We can use the auxillery function function_printer, which removes some of
+    // the boilerplate code required.
     _CHECK_EXPR(print(true, function_printer<bool>(bool_printer)) == "1");
 
-    // Using bool_printer, we can use the constructor for the specialization of
-    // std::tuple and std::vector to change how tuple_1 is printed.
-    {
-        using namespace utility::printer;
-        // This type is quite complicated, so we use the above namespace to
-        // reduce text.
-        _CHECK_EXPR(
-            print(
-                // Printing tuple_1
-                tuple_1,
-                // Make a printer using the default type of the tuple.
-                default_printer<tuple_type>(
-                    // But initialized with our own printers for each of the
-                    // tuple's types.
-                    default_printer<int>(),
-                    default_printer<string>(),
-                    // The last type is changed. It uses the default_printer_t
-                    // constructor for vector.
-                    default_printer<vector<bool>>(
-                        // But it uses its own printer_t type for bool, created
-                        // using function_printer.
-                        function_printer<bool>(bool_printer)
-                    )
+    // Using bool_printer, we can use the specialized default_printer_t
+    // constructors for the types std::tuple and std::vector to
+    // change how tuple_1 is printed.
+    _CHECK_EXPR(
+        print(
+            // Printing tuple_1
+            tuple_1,
+            // Make a printer using the default type of the tuple.
+            default_printer<tuple_type>(
+                // But initialized with our own printers for each of the
+                // tuple's types.
+                default_printer<int>(),
+                default_printer<string>(),
+                // The last type is changed. It uses the specialized
+                // default_printer_t constructor for vector.
+                default_printer<vector<bool>>(
+                    // But it uses its own printer_t type for bool, created
+                    // using function_printer.
+                    function_printer<bool>(bool_printer)
                 )
             )
-            == "(123, \"h3llo\", {1, 0, 1})"
-        );
-        // An easier way to get the same effect is as follows: firstly create a
-        // default printer. Note we don't use the default_printer function here,
-        // we use the default_printer_t constructor instead.
-        auto tuple_printer{default_printer_t<tuple_type>()};
-        // Then change the third field.
-        std::get<2>(tuple_printer.get_printers_ref()
-        ) = default_printer<vector<bool>>(function_printer<bool>(bool_printer));
-        // Then run the printer using mk_printer to elevate tuple_printer to a
-        // printer_t type.
-        _CHECK_EXPR(
-            print(tuple_1, mk_printer(tuple_printer))
-            == "(123, \"h3llo\", {1, 0, 1})"
-        );
-    }
+        )
+        == "(123, \"h3llo\", {1, 0, 1})"
+    );
+    // An easier way to get the same effect is as follows: firstly
+    // create a default printer for tuple_type.
+    default_printer_t<tuple_type> tuple_printer;
+    // Then change the third field.
+    std::get<2>(tuple_printer.get_printers_ref())
+        = default_printer<vector<bool>>(function_printer<bool>(bool_printer));
+    // Then run the printer using mk_printer to elevate tuple_printer to
+    // a printer_t type.
+
+    _CHECK_EXPR(
+        print(tuple_1, mk_printer(tuple_printer))
+        == "(123, \"h3llo\", {1, 0, 1})"
+    );
 }
 
 // This is a user-defined object.
@@ -232,8 +225,8 @@ struct s_printer : public abc::utility::printer::printer_base_t<S>
         // for each field it is provided.
         return object_printer_with_custom_printers(
             abc::utility::object_printer_parser_t{
-                .begin_char                             = '(',
-                .end_char                               = ')',
+                .begin_char = '(',
+                .end_char   = ')',
             },
             "S",
             std::make_tuple(m_int_printer, m_int_printer),
@@ -244,10 +237,11 @@ struct s_printer : public abc::utility::printer::printer_base_t<S>
 };
 
 _TEST_CASE(
-    abc::test_case_t({.name = "Custom printer"})
+    abc::test_case_t({.name = "Custom printers"})
 )
 {
     using namespace abc;
+    using namespace abc::utility::printer;
     S s1{10'000, 20'000};
     // This will call the default printer on S.
     _CHECK_EXPR(print(s1) == "S {int_1 = 10000, int_2 = 20000}");
@@ -261,32 +255,6 @@ _TEST_CASE(
         print(s1, mk_printer(s_printer(mk_printer(int_printer_t()))))
         == "S (2710, 4e20)"
     );
-}
-
-_TEST_CASE(
-    abc::test_case_t({.name = "Printer object"})
-)
-{
-    using namespace abc;
-    using namespace std;
-    // int_printer_1 is created using a bespoke function to print int objects.
-    auto int_printer_func = [](const int& i)
-    {
-        const size_t buf_size = 10;
-        char         buf[buf_size]{};
-        to_chars(buf, buf + buf_size, i);
-        return string(buf);
-    };
-    _CHECK_EXPR(abc::print(123, int_printer_func) == "123");
-    _CHECK_EXPR(abc::print(123) == "123");
-
-    // s_printer_1 is created using a bespoke function to print S objects.
-    auto s_printer_func = [](const S& s)
-    {
-        return fmt::format("S {{{0}, {1}}}", s.int_1, s.int_2);
-    };
-    _CHECK_EXPR(abc::print(S{1, 2}, s_printer_func) == "S {1, 2}");
-    _CHECK_EXPR(abc::print(S{1, 2}) == "S {int_1 = 1, int_2 = 2}");
 }
 
 constexpr bool
@@ -434,11 +402,12 @@ _TEST_CASE(
     using namespace abc;
     using namespace std;
     using namespace abc::utility;
+    using namespace abc::utility::printer;
     // Below we show how the default printer and parser work.
-    _CHECK_EXPR(abc::print(make_tuple("123"s, "456"s)) == "(\"123\", \"456\")");
+    _CHECK_EXPR(print(make_tuple("123"s, "456"s)) == "(\"123\", \"456\")");
     // abc::utility::printer::printer_t<std::string> ti;
     // abc::utility::printer::printer_t<std::tuple<std::string>> ti2(ti);
-    _CHECK_EXPR(abc::print("123") == "\"123\"");
+    _CHECK_EXPR(print("123") == "\"123\"");
     _CHECK_EXPR(parse<string>("\"123\"") == "123");
     _CHECK_EXPR(
         (parse<pair<string, string>>("(\"123\", \"456\")"))
@@ -449,13 +418,13 @@ _TEST_CASE(
     // character, or at the end of the string. The printed pair becomes "{123,
     // 456}". It is parsed as {"{123," "456}"}.
     pair<int, int> arg_1 = make_pair(123, 456);
-    _CHECK_EXPR((parse<pair<int, int>>(abc::print(arg_1))) == arg_1);
+    _CHECK_EXPR((parse<pair<int, int>>(print(arg_1))) == arg_1);
     const auto arg_2 = make_pair("\"123\""s, "\"456\""s);
     // The user could surround the strings by quotes, and assume that the parser
     // would recognise them as escape characters. However this requires
     // scn::scan to be formatted correctly, which isn't how the default parser
     // is defined. So the following won't work.
-    _CHECK_EXPR((parse<pair<string, string>>(abc::print(arg_2))) != arg_2);
+    _CHECK_EXPR((parse<pair<string, string>>(print(arg_2))) != arg_2);
 }
 
 // Here is another entity called T.

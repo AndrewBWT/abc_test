@@ -116,34 +116,278 @@ Many of the data generators included with `abc_test` have functionality which al
 
 ### Printer
 
-Printers in `abc_test` are, in their most basic form, represented by the abstract class `template<typename T> abc::utility::printer::base_printer_t`. It contains one virtual function `run_printer`, with the following type signature. 
+All of the classes and functions described in this subsection are contained in the namespace `abc::utility::printer`. 
+
+Printers in `abc_test` are, in their most basic form, represented by the abstract class `template<typename T> printer_base_t`. `printer_base_t` objects are specifically designed to allow the user to print entities of type `T`. Below we show an overview of the class.
 
 ```cpp
-std::string run_printer(const T& object) const;
+template<typename T>
+class printer_base_t
+{
+private:
+    using value_type_t = T;
+    std::string run_printer(const T& object) const = 0;
+};
 ```
 
-As `base_printer_t` cannot be instantiated, derived classes must be used to create instances of `base_printer_t`. `abc_test` uses the `template<typename T> printer_t` type, which is a synonym for `std::shared_ptr<base_printer_t>` to refer to an "arbitrary" printer.
 
-There is a single function in the `abc` namespace which can be used to invoke a `printer_base_t` object, defined as follows.
+As the `printer_base_t` class cannot be instantiated, the user must use classes derived from it to create concrete objects, which can then be used to print text representations of objects of type `value_type_t`. `abc_test` contains the type synonym `template<typename T> printer_t` to represent `std::unique_ptr<base_printer_t>` objects. It uses this type synonym to represent concrete `printer_base_t` objects, allowing them to be passed around the `abc_test` framework.
+
+There are two core functions which should be used when creating and running printers. They are outlined below.
 
 ```cpp
 template <typename T>
-std::string
-print(
-    const T& object,
-    const utility::printer::printer_t<T>& printer = utility::printer::default_printer<T>()
+std::string print(
+    const T&                              object,
+    const printer_t<T>&                   printer_obj
+    = mk_printer(default_printer_t<T>())
 ) noexcept;
+
+template <typename T>
+printer_t<typename T::value_type>
+            mk_printer(const T& _a_printer_base) noexcept;
 ```
 
-`print` calls `printer`'s `run_printer` function on `object`. We can see that `printer` has a default value, which is created from the function `default_printer`. `default_printer` creates a `printer_t` instance using a subclass of `printer_base_t` included with `abc_test` called `default_printer_t`.
+`print` is the function designed to be used when printing data. As arguments it takes the entity `object` to be printed, and the `printer_t` object `printer_obj`. It runs the `object` through `printer_obj`, returning the `std::string` result from `printer_obj`. `printer_obj` is default initialized using the `default_printer_t` object and the function `mk_printer`. The `mk_printer` function is very simple; it converts an arbitrary `base_printer_t` object into a `printer_t` object. The `default_printer_t` object is outlined below.
 
-`default_printer_t` is perhaps the most commonly used printer in `abc_test`. It has no default implementation, instead it can only be instantiated using specializations. We include many specializations with `abc_test `for types in the `stl`, as well as auxillery functions that can be used to create `default_printer_t` specializations for objects and enums.
+There are two concrete classes derived from `base_printer_t` included with `abc_test`. The first of these is the `template<typename T> default_printer_t` object. It has no default implementation, and instead relies on there being a specialization for its `T` template parameter. `abc_test` provides implementations for many of the classes included with the `stl`. As seen previously, the function `print` uses a `default_printer_t` object if no `printer_t` argument is supplied.
 
-`default_printer` wraps the `default_printer_t` object for `T` in a `printer_t` object. 
+The user is encouraged to create specializations for `default_printer_t` for their own classes. In the test case shown at the end of this section, we show an example of this.
 
-There is one other subclass of `base_printer_t` included with `abc_test` called `function_printer_t`. Instances of it can only be created by providing a callable object which takes an object of type `T` and returns an `std::string`. It is designed to allow the user to use an arbitrary function to create their own `printer_t` type. 
+The reader should note there is an auxillery function associated with `default_printer_t` called `default_printer`. It creates and wraps a `default_printer_t` in a `printer_t` object. `default_printer` takes an arbitrary number of arguments, all of which are passed to the constructor for `default_printer_t`. Its type signature is as follows.
 
-Below we show a test case which shows the things above. 
+```cpp
+template<typename T, typename ... Ts>
+ printer_t<T> default_printer(Ts ... elements) noexcept;
+```
+
+The other class derived from `base_printer_t` included with `abc_test` is the class `template<typename T> function_printer_t`. Below we show an overview of this class. We also show the reader how it is implemented, which should aid in their understanding.
+
+```cpp
+template<typename T, typename F>
+requires std::is_invocable_r_v<std::string, F, const T&>
+class function_printer_t
+{
+public:
+    function_printer_t() = delete;
+    function_printer_t(F _callable_object) noexcept : callable_object(_callable_object) {}
+    std::string run_printer(const T& object) const
+    {
+        return std::invoke(callable_object, object);
+    }
+private:
+    F callable_object;
+};
+```
+
+This class is designed to allow the user to use their own callable object when interfacing with `abc_test`'s printer facilities, meaning they do not necessarily have to define their own subclass of `base_printer_t` when writing their own printer. In a similar vein to `default_printer`, there is an auxillery function associated with `function_printer_t` called `function_printer`. It creates and wraps a `function_printer` in a `printer_t` object. Its type signautre is as follows.
+
+```cpp
+template<typename T, typename F>
+    requires std::is_invocable_r_v<std::string, F, const T&>
+printer_t<T> function_printer(F _a_callable) noexcept;
+```
+
+Below we show a test case which contains several examples showing how printers work. This example also shows the user how to define their own `default_printer_t` instances, and their own classes derived from `base_printer_t` .
+
+```cpp
+_TEST_CASE(
+    abc::test_case_t({.name = "Printers in abc_test"})
+)
+{
+    using namespace abc;
+    using namespace std;
+    // The printer functionality is contained in the abc::utility::printer
+    // namespace.
+    using namespace abc::utility::printer;
+    // As we cannot create instantiations of base_printer_t, we will show the
+    // user the included subclasses which use it as their base class.
+
+    // The first of these is default_printer_t.
+    default_printer_t<int> printer_1;
+    _CHECK_EXPR(printer_1.run_printer(123) == "123");
+
+    // We recommend that the user use the function print when printing. It takes
+    // two arguments; the first is the object to be printed, and the second is
+    // the printer_t object. Any derived type from base_printer_t can be
+    // elevated to this type using mk_printer.
+
+    _CHECK_EXPR(print(123, mk_printer(printer_1)) == "123");
+
+    // We can also use the specialised default_printer function, which will
+    // create and wrap a default_printer_t in a printer_t object.
+    _CHECK_EXPR(print(123, default_printer<int>()) == "123");
+
+    // print has a default parameter for its second argument, which creates a
+    // default_printer_t object. Therefore, to get the default behaviour, no
+    // argument needs to be provided.
+    _CHECK_EXPR(print<int>(123) == "123");
+
+    // abc_test includes default_printer_t specializations for more complicated
+    // types, such as std::tuple and std::vector.
+    using tuple_type = tuple<int, string, vector<bool>>;
+    tuple_type tuple_1{
+        123, "h3llo"s, vector<bool>{true, false, true}
+    };
+    _CHECK_EXPR(print(tuple_1) == "(123, \"h3llo\", {true, false, true})");
+
+    // A function_printer_t object allows the user to create a base_printer_t
+    // object which can take any callable object which takes a const T& and
+    // returns an std::string.
+
+    // Here is a function which prints a bool.
+    auto bool_printer = [](const bool& object) -> std::string
+    {
+        return object ? "1" : "0";
+    };
+    // We can now use it to create a function_printer_t object.
+    function_printer_t<bool, decltype(bool_printer)> fp1(bool_printer);
+    _CHECK_EXPR(print(true, mk_printer(fp1)) == "1");
+
+    // We can use the auxillery function function_printer, which removes some of
+    // the boilerplate code required.
+    _CHECK_EXPR(print(true, function_printer<bool>(bool_printer)) == "1");
+
+    // Using bool_printer, we can use the specialized default_printer_t
+    // constructors for the types std::tuple and std::vector to
+    // change how tuple_1 is printed. 
+    _CHECK_EXPR(
+        print(
+            // Printing tuple_1
+            tuple_1,
+            // Make a printer using the default type of the tuple.
+            default_printer<tuple_type>(
+                // But initialized with our own printers for each of the
+                // tuple's types.
+                default_printer<int>(),
+                default_printer<string>(),
+                // The last type is changed. It uses the specialized
+                // default_printer_t constructor for vector.
+                default_printer<vector<bool>>(
+                    // But it uses its own printer_t type for bool, created
+                    // using function_printer.
+                    function_printer<bool>(bool_printer)
+                )
+            )
+        )
+        == "(123, \"h3llo\", {1, 0, 1})"
+    );
+    // An easier way to get the same effect is as follows: firstly
+    // create a default printer for tuple_type.
+    default_printer_t<tuple_type> tuple_printer;
+    // Then change the third field.
+    std::get<2>(tuple_printer.get_printers_ref())
+        = default_printer<vector<bool>>(function_printer<bool>(bool_printer));
+    // Then run the printer using mk_printer to elevate tuple_printer to
+    // a printer_t type.
+
+    _CHECK_EXPR(
+        print(tuple_1, mk_printer(tuple_printer))
+        == "(123, \"h3llo\", {1, 0, 1})"
+    );
+}
+
+// This is a user-defined object.
+struct S
+{
+    int int_1;
+    int int_2;
+};
+
+// This is how we create a default_printer_t instance for S.
+template <>
+struct abc::utility::printer::default_printer_t<S>
+    : public abc::utility::printer::printer_base_t<S>
+{
+    inline std::string
+        run_printer(
+            const S& _a_object
+        ) const noexcept
+    {
+        // We use the object object_printer_parser_t and the function
+        // object_printer. We give it the default object_printer_parser_t
+        // object, a string which is prepended to the beginning of the list of
+        // data fields, the names of the data fields, and then the fields
+        // themselves
+        return object_printer_with_field_names(
+            object_printer_parser_t{},
+            "S",
+            {"int_1", "int_2"},
+            _a_object.int_1,
+            _a_object.int_2
+        );
+    }
+};
+
+// This is a bespoke printer_base_t instance for int. It prints the data out in
+// hex.
+struct int_printer_t : abc::utility::printer::printer_base_t<int>
+{
+    inline std::string
+        run_printer(
+            const int& _a_object
+        ) const noexcept
+    {
+        return fmt::format("{:x}", _a_object);
+    }
+};
+
+// This is a bespoke printer for S.
+struct s_printer : public abc::utility::printer::printer_base_t<S>
+{
+    abc::utility::printer::printer_t<int> m_int_printer
+        = abc::utility::printer::default_printer<int>();
+    s_printer() = default;
+
+    inline s_printer(
+        const abc::utility::printer::printer_t<int>& int_printer
+    )
+        : m_int_printer(int_printer)
+    {}
+
+    inline std::string
+        run_printer(
+            const S& _a_object
+        ) const noexcept
+    {
+        // This printer uses the function object_printer_with_custom_printers
+        // with a bespoke object_printer_parser_t object.
+        // object_printer_with_custom_printers takes a tuple of bespoke printers
+        // for each field it is provided.
+        return object_printer_with_custom_printers(
+            abc::utility::object_printer_parser_t{
+                .begin_char = '(',
+                .end_char   = ')',
+            },
+            "S",
+            std::make_tuple(m_int_printer, m_int_printer),
+            _a_object.int_1,
+            _a_object.int_2
+        );
+    }
+};
+
+_TEST_CASE(
+    abc::test_case_t({.name = "Custom printers"})
+)
+{
+    using namespace abc;
+    using namespace abc::utility::printer;
+    S s1{10'000, 20'000};
+    // This will call the default printer on S.
+    _CHECK_EXPR(print(s1) == "S {int_1 = 10000, int_2 = 20000}");
+
+    // This printer uses the bespoke printer s_printer.
+    _CHECK_EXPR(print(s1, mk_printer(s_printer())) == "S (10000, 20000)");
+
+    // This also uses the bespoke printer s_printer, but we use int_printer_t to
+    // print S's integers.
+    _CHECK_EXPR(
+        print(s1, mk_printer(s_printer(mk_printer(int_printer_t()))))
+        == "S (2710, 4e20)"
+    );
+}
+```
 
 ### Parser
 

@@ -10,19 +10,20 @@ class rw_info_t
 public:
     __constexpr
     rw_info_t(
-        const parser::parser_t<T>&  _a_parser  = parser::default_parser<T>(),
-        const printer::printer_t<T>& _a_printer = printer::default_printer<T>()
+        const parser::parser_t<T>&   _a_parser = parser::default_parser<T>(),
+        const printer::printer_t<T>& _a_printer
+        = printer::mk_printer(printer::default_printer_t<T>())
     ) noexcept;
     __constexpr
     rw_info_t(parser::parser_t<T>& _a_parser) noexcept;
     __constexpr
-                      rw_info_t(const printer::printer_t<T>& _a_printer) noexcept;
+    rw_info_t(const printer::printer_t<T>& _a_printer) noexcept;
     __constexpr const parser::parser_t<T>&
                       parser() const noexcept;
     __constexpr const printer::printer_t<T>&
                       printer() const noexcept;
 private:
-    parser::parser_t<T>  _m_parser;
+    parser::parser_t<T>   _m_parser;
     printer::printer_t<T> _m_printer;
 };
 
@@ -32,7 +33,7 @@ _BEGIN_ABC_UTILITY_STR_NS
 template <typename T>
 __constexpr_imp
     rw_info_t<T>::rw_info_t(
-        const parser::parser_t<T>&  _a_parser,
+        const parser::parser_t<T>&   _a_parser,
         const printer::printer_t<T>& _a_printer
     ) noexcept
     : _m_parser(_a_parser), _m_printer(_a_printer)
@@ -43,7 +44,7 @@ __constexpr_imp
     rw_info_t<T>::rw_info_t(
         parser::parser_t<T>& _a_parser
     ) noexcept
-    : rw_info_t<T>(_a_parser, printer::default_printer<T>())
+    : rw_info_t<T>(_a_parser, printer::mk_printer(printer::default_printer_t<T>()))
 {}
 
 template <typename T>

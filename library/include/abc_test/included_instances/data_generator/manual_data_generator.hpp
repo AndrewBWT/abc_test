@@ -68,7 +68,7 @@ __no_constexpr_imp
           0,
         ds::dgc_memoized_element_t{ 0,
           ds::dg_memoized_element_t{0,
-        abc::print(0) } }
+        abc::utility::printer::print(0) } }
       ))
 {
     using namespace global;
@@ -124,7 +124,7 @@ __constexpr ds::dg_memoized_element_t
         const bool _a_get_data_for_repeating
     ) const noexcept
 {
-    return {0, abc::print(_m_idx)};
+    return {0, abc::utility::printer::print(_m_idx)};
 }
 
 _END_ABC_NS

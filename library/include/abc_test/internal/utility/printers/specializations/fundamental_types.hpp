@@ -188,7 +188,7 @@ __constexpr_imp std::string
 {
     using namespace std;
     tuple<printer_t<Ts>...> _l_printers
-        = std::make_tuple(default_printer<Ts>()...);
+        = std::make_tuple(mk_printer(default_printer_t<Ts>())...);
     return object_printer_internal(
         _a_object_print_parser,
         _a_begin_str,

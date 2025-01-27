@@ -337,7 +337,7 @@ __constexpr ds::dg_memoized_element_t
             switch (_m_mode)
             {
             case 0:
-                _l_rv = abc::utility::printer::default_printer<std::size_t>().run_printer(
+                _l_rv = utility::printer::print<size_t>(
                     _m_file_read_writer.get_file_position()
                 );
                 break;
@@ -358,7 +358,7 @@ __constexpr ds::dg_memoized_element_t
             switch (_m_mode)
             {
             case 0:
-                _l_rv = abc::utility::printer::default_printer<std::size_t>().run_printer(
+                _l_rv = utility::printer::print<size_t>(
                     _m_file_read_writer.get_file_position()
                 );
                 break;
@@ -366,10 +366,9 @@ __constexpr ds::dg_memoized_element_t
                 if (global::get_global_test_options().write_data_to_files)
                 {
                     _l_mode = 0;
-                    _l_rv
-                        = abc::utility::printer::default_printer<std::size_t>()
-                              .run_printer(_m_file_read_writer
-                                               .write_data_to_file(_m_object));
+                    _l_rv   = utility::printer::print<size_t>(
+                        _m_file_read_writer.write_data_to_file(_m_object)
+                    );
                 }
                 else
                 {
@@ -413,7 +412,8 @@ __constexpr ds::dg_memoized_element_t
         );
         return dg_memoized_element_t{
             _m_mode,
-            _m_tertiary_rw_info.printer()->run_printer(_m_object.tertiary_data())
+            _m_tertiary_rw_info.printer()->run_printer(_m_object.tertiary_data()
+            )
         };
     }
 }
