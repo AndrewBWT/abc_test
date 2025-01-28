@@ -22,7 +22,7 @@ template<typename T, typename F>
 __constexpr utility::printer::printer_t<T>
 function_printer(F _a_callable) noexcept
 {
-    return std::make_shared<utility::printer::function_printer_t<T, F>>(_a_callable);
+    return std::make_shared<function_printer_t<T, F>>(_a_callable);
 }
 _END_ABC_UTILITY_PRINTER_NS
 

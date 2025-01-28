@@ -5,44 +5,56 @@
 
 #include <memory>
 
+
 _BEGIN_ABC_UTILITY_PARSER_NS
 
 template <typename T>
 struct parser_base_t
 {
 public:
+    using value_type_t = T;
     __constexpr virtual parse_result_t<T>
         run_parser(parser_input_t& _a_parse_input) const = 0;
 };
-
+template<typename T>
+struct default_parser_t;
 template <typename T>
 using parser_t = std::shared_ptr<parser_base_t<T>>;
 template <typename T>
-struct default_parser_t;
-template<typename T>
-__constexpr_imp parser_t<T>
-default_parser() noexcept;
-_END_ABC_UTILITY_PARSER_NS
-_BEGIN_ABC_NS
+__constexpr parser_t<typename T::value_type_t>
+mk_parser(T) noexcept;
 template <typename T>
-__constexpr_imp utility::parser::parse_result_t<T>
+__constexpr_imp parse_result_t<T>
                 parse(
                     const std::string_view _a_str,
-                    const utility::parser::parser_t<T>&     _a_parser = utility::parser::default_parser<T>()
+                    const parser_t<T>&     _a_parser = mk_parser(default_parser_t<T>())
                 ) noexcept;
 template <typename T>
 __constexpr_imp T
-    run_parser_with_exception(
-        const std::string_view _a_str,
-        const utility::parser::parser_t<T>&     _a_parser = utility::parser::default_parser<T>()
+parse_with_exception(
+        const std::string_view              _a_str,
+        const utility::parser::parser_t<T>& _a_parser
+        = mk_parser(default_parser_t<T>())
     );
-_END_ABC_NS
-_BEGIN_ABC_NS
+
+template <typename T>
+__constexpr parser_t<typename T::value_type_t>
+            mk_parser(
+                T _a_parser_base
+            ) noexcept
+{
+    using namespace std;
+    return make_shared<T>(_a_parser_base);
+}
+
+_END_ABC_UTILITY_PARSER_NS
+
+_BEGIN_ABC_UTILITY_PARSER_NS
 template <typename T>
 __constexpr_imp utility::parser::parse_result_t<T>
                 parse(
-                    const std::string_view _a_str,
-                    const utility::parser::parser_t<T>&     _a_parser
+                    const std::string_view              _a_str,
+                    const utility::parser::parser_t<T>& _a_parser
                 ) noexcept
 {
     using namespace std;
@@ -74,9 +86,9 @@ __constexpr_imp utility::parser::parse_result_t<T>
 
 template <typename T>
 __constexpr_imp T
-    run_parser_with_exception(
-        const std::string_view _a_str,
-        const utility::parser::parser_t<T>&     _a_parser
+parse_with_exception(
+        const std::string_view              _a_str,
+        const utility::parser::parser_t<T>& _a_parser
     )
 {
     using namespace std;
@@ -93,4 +105,4 @@ __constexpr_imp T
     }
 }
 
-_END_ABC_NS
+_END_ABC_UTILITY_PARSER_NS

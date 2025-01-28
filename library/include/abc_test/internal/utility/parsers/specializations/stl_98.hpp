@@ -56,6 +56,29 @@ public:
         run_parser(parser_input_t& _a_parse_input) const;
 };
 
+template <typename T>
+struct default_parser_t<std::vector<T>> : public parser_base_t<std::vector<T>>
+{
+private:
+    parser_t<T> _m_parser;
+public:
+
+    __constexpr
+        default_parser_t(const parser_t<T>& _a_parser)
+        : _m_parser(_a_parser)
+    {
+
+    }
+    default_parser_t()
+        requires (std::is_default_constructible_v<default_parser_t<T>>)
+    : _m_parser(mk_parser(default_parser_t<T>()))
+    {
+    }
+
+    __constexpr virtual parse_result_t<std::vector<T>>
+        run_parser(parser_input_t& _a_parse_input) const;
+};
+
 _END_ABC_UTILITY_PARSER_NS
 _BEGIN_ABC_UTILITY_PARSER_NS
 
@@ -140,4 +163,47 @@ __constexpr_imp
     }
 }
 
+template <typename T>
+__constexpr_imp parse_result_t<std::vector<T>>
+default_parser_t<std::vector<T>>::run_parser(
+    parser_input_t& _a_parse_input
+) const
+{
+    using namespace std;
+
+    vector<T> _l_rv;
+    _a_parse_input.check_advance_and_throw("{");
+    if (*_a_parse_input == '}')
+    {
+        _a_parse_input.advance(1);
+        return _l_rv;
+    }
+    else
+    {
+        //_a_parse_input.advance(1);
+        while (true)
+        {
+            auto _l_result{ _m_parser->run_parser(_a_parse_input) };
+            if (not _l_result.has_value())
+            {
+                return parse_error<vector<T>>(_l_result.error());
+            }
+            _l_rv.push_back(_l_result.value());
+            if (_a_parse_input.check_and_advance(", "))
+            {
+                continue;
+            }
+            else if (*_a_parse_input == '}')
+            {
+                _a_parse_input.advance(1);
+                return _l_rv;
+            }
+            else
+            {
+                return parse_error<vector<T>>("unexpected character");
+            }
+        }
+        return parse_error<vector<T>>("Shouldn't be poissibel to get here");
+    }
+}
 _END_ABC_UTILITY_PARSER_NS

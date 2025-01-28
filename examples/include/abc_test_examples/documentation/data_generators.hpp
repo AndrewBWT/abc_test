@@ -267,6 +267,234 @@ constexpr bool
            == std::make_pair(rhs.int_1, rhs.int_2);
 }
 
+_TEST_CASE(
+    abc::test_case_t({.name = "Parsers in abc_test"})
+)
+{
+    using namespace abc;
+    using namespace std;
+    // The parser functionality is contained in the abc::utility::parser
+    // namespace.
+    using namespace abc::utility::parser;
+    // As we cannot create instantiations of base_parser_t, we will show the
+    // user the included subclasses which use it as their base class.
+
+    // The first of these is default_printer_t.
+    default_parser_t<int> parser_1;
+    // We can elevate it to the parser_t type using mk_parser.
+    _CHECK_EXPR(parse("123", mk_parser(parser_1)) == parse_result_t<int>(123));
+    // For the rest of the assertions in this test case, we will use the
+    // function parse_with_exception. This removes the need for the
+    // parse_result_t type.
+    _CHECK_EXPR(parse_with_exception<int>("123", mk_parser(parser_1)) == 123);
+
+    // We can also use the default_parser function instead of using mk_parser.
+    _CHECK_EXPR(parse_with_exception<int>("123", default_parser<int>()) == 123);
+
+    // As parse_with_exception (and parse) have their second argument defaulted
+    // to a default parser, we can just write.
+    _CHECK_EXPR(parse_with_exception<int>("123") == 123);
+
+
+    // abc_test includes default_parser_t specializations for more complicated
+    // types, such as std::tuple and std::vector.
+    using tuple_type = tuple<int, string, vector<bool>>;
+    tuple_type tuple_1{
+        123, "h3llo"s, vector<bool>{true, false, true}
+    };
+    _CHECK_EXPR(
+        parse_with_exception<tuple_type>("(123, \"h3llo\", {true, false, true})"
+        )
+        == tuple_1
+    );
+
+    // A function_parser_t object allows the user to create a base_parser_t
+    // object which can take any callable object which takes a parser_input_t&
+    // and returns a parse_result<T>.
+
+    // Here is a function which parses a bool represented as a 0 or 1.
+    auto bool_parser = [](parser_input_t& input) -> parse_result_t<bool>
+    {
+        if (*input == '1')
+        {
+            input.advance(1);
+            return parse_result_t<bool>(true);
+        }
+        else if (*input == '0')
+        {
+            input.advance(1);
+            return parse_result_t<bool>(false);
+        }
+        else
+        {
+            return parse_error<bool>(
+                "Could not recognise character. Should be 0 or 1"
+            );
+        }
+    };
+    // We can now use it to create a function_parser_t object.
+    function_parser_t<bool, decltype(bool_parser)> fp1(bool_parser);
+    _CHECK_EXPR(parse_with_exception<bool>("1", mk_parser(fp1)) == true);
+
+    // We can use the auxillery function function_parser, which removes some of
+    // the boilerplate code required.
+    _CHECK_EXPR(
+        parse_with_exception<bool>("1", function_parser<bool>(bool_parser))
+        == true
+    );
+
+    // Using bool_parser, we can use the specialized default_parser_t
+    // constructors for the types std::tuple and std::vector to
+    // change how tuple_1 is printed.
+    _CHECK_EXPR(
+        parse_with_exception(
+            // Printing the following string
+            "(123, \"h3llo\", {1, 0, 1})",
+            // Make a parser using the default type of the tuple.
+            default_parser<tuple_type>(
+                // But initialized with our own parsers for each of the
+                // tuple's types.
+                default_parser<int>(),
+                default_parser<string>(),
+                // The last type is changed. It uses the specialized
+                // default_parser_t constructor for vector.
+                default_parser<vector<bool>>(
+                    // But it uses its own parser_t type for bool, created
+                    // using function_parser.
+                    function_parser<bool>(bool_parser)
+                )
+            )
+        )
+        == tuple_1
+    );
+    // An easier way to get the same effect is as follows: firstly
+    // create a default printer for tuple_type.
+    default_parser_t<tuple_type> tuple_parser;
+    // Then change the third field.
+    std::get<2>(tuple_parser.get_parsers_ref())
+        = default_parser<vector<bool>>(function_parser<bool>(bool_parser));
+    // Then run the printer using mk_printer to elevate tuple_printer to
+    // a printer_t type.
+
+    _CHECK_EXPR(
+        parse_with_exception(
+            "(123, \"h3llo\", {1, 0, 1})", mk_parser(tuple_parser)
+        )
+        == tuple_1
+    );
+}
+
+// This is how we create a default_printer_t instance for S.
+template <>
+struct abc::utility::parser::default_parser_t<S>
+    : public abc::utility::parser::parser_base_t<S>
+{
+    inline parse_result_t<S>
+        run_parser(
+            parser_input_t& _a_input
+        ) const noexcept
+    {
+        // We use the object object_printer_parser_t and the function
+        // object_printer. We give it the default object_printer_parser_t
+        // object, a string which is prepended to the beginning of the list of
+        // data fields, the names of the data fields, and then the fields
+        // themselves
+        return abc::utility::parser::
+            object_parser_with_field_names<S, int, int>(
+                object_printer_parser_t{}, "S", {"int_1", "int_2"}, _a_input
+            );
+    }
+};
+
+// This is a bespoke printer_base_t instance for int. It prints the data out in
+// hex.
+struct int_parser_t : abc::utility::parser::parser_base_t<int>
+{
+    inline abc::utility::parser::parse_result_t<int>
+        run_parser(
+            abc::utility::parser::parser_input_t& _a_input
+        ) const noexcept
+    {
+        using namespace std;
+        using namespace abc::utility::parser;
+        string_view sv{_a_input.sv()};
+        size_t      pos{sv.find_first_not_of("0123456789abcdef")};
+        if (pos == string::npos)
+        {
+            return parse_error<int>("Could not parse");
+        }
+        else
+        {
+            string sv2{sv.substr(0, pos)};
+            int    n = stoul(sv2.c_str(), nullptr, 16);
+            _a_input.advance(pos);
+            return parse_result_t<int>(n);
+        }
+    }
+};
+
+// This is a bespoke printer for S.
+struct s_parser : public abc::utility::parser::parser_base_t<S>
+{
+    abc::utility::parser::parser_t<int> m_int_parser
+        = abc::utility::parser::default_parser<int>();
+    s_parser() = default;
+
+    inline s_parser(
+        const abc::utility::parser::parser_t<int>& int_parser
+    )
+        : m_int_parser(int_parser)
+    {}
+
+    inline abc::utility::parser::parse_result_t<S>
+        run_parser(
+            abc::utility::parser::parser_input_t& _a_input
+        ) const
+    {
+        // This printer uses the function object_printer_with_custom_printers
+        // with a bespoke object_printer_parser_t object.
+        // object_printer_with_custom_printers takes a tuple of bespoke printers
+        // for each field it is provided.
+        return abc::utility::parser::
+            object_printer_with_custom_parsers<S, int, int>(
+                abc::utility::object_printer_parser_t{
+                    .begin_char = '(',
+                    .end_char   = ')',
+                },
+                "S",
+                std::make_tuple(m_int_parser, m_int_parser),
+                _a_input
+            );
+    }
+};
+
+_TEST_CASE(
+    abc::test_case_t({.name = "Custom parsers"})
+)
+{
+    using namespace abc;
+    using namespace abc::utility::parser;
+    S s1{10'000, 20'000};
+    // This will call the default printer on S.
+    _CHECK_EXPR(
+        parse_with_exception<S>("S {int_1 = 10000, int_2 = 20000}") == s1
+    );
+
+    // This printer uses the bespoke printer s_printer.
+    _CHECK_EXPR(
+        parse_with_exception<S>("S (10000, 20000)", mk_parser(s_parser())) == s1
+    );
+
+    // This also uses the bespoke printer s_printer, but we use int_printer_t to
+    // print S's integers.
+    _CHECK_EXPR(
+        parse_with_exception<S>(
+            "S (2710, 4e20)", mk_parser(s_parser(mk_parser(int_parser_t())))
+        )
+        == s1
+    );
+}
+#if 0
 _BEGIN_ABC_UTILITY_PARSER_NS
 
 template <>
@@ -346,6 +574,7 @@ _TEST_CASE(
 {
     using namespace abc;
     using namespace std;
+    using namespace abc::utility::parser;
     // int_printer_1 is created using a bespoke function to print int objects.
     auto int_parser_func = [](abc::utility::parser::parser_input_t& str)
     {
@@ -403,6 +632,7 @@ _TEST_CASE(
     using namespace std;
     using namespace abc::utility;
     using namespace abc::utility::printer;
+    using namespace abc::utility::parser;
     // Below we show how the default printer and parser work.
     _CHECK_EXPR(print(make_tuple("123"s, "456"s)) == "(\"123\", \"456\")");
     // abc::utility::printer::printer_t<std::string> ti;
@@ -544,3 +774,4 @@ _TEST_CASE(
     string s3
         = gdf_from_path("special_root/hello/three/hello3.gdf").path().string();
 }
+#endif

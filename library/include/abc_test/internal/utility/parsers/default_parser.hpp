@@ -8,13 +8,14 @@ template <typename T>
 struct default_parser_t : public parser_base_t<T>
 {
 public:
+    using value_type_t = T;
     __constexpr virtual parse_result_t<T>
         run_parser(parser_input_t& _a_parse_input) const override;
 };
 
-template <typename T>
+template <typename T, typename ... Ts>
 __constexpr parser_t<T>
-            default_parser() noexcept;
+            default_parser(Ts ... elements) noexcept;
 _END_ABC_UTILITY_PARSER_NS
 _BEGIN_ABC_UTILITY_PARSER_NS
 template <typename T>
@@ -30,12 +31,12 @@ __constexpr parse_result_t<T>
     );
 }
 
-template <typename T>
-__constexpr_imp parser_t<T>
-                default_parser() noexcept
+template <typename T, typename ... Ts>
+__constexpr parser_t<T>
+default_parser(Ts ... elements) noexcept
 {
     using namespace std;
-    return make_shared<default_parser_t<T>>();
+    return make_shared<default_parser_t<T>>(elements...);
 }
 
 _END_ABC_UTILITY_PARSER_NS

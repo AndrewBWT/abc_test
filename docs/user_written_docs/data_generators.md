@@ -391,6 +391,293 @@ _TEST_CASE(
 
 ### Parser
 
+All of the classes and functions described in this subsection are contained in the namespace `abc::utility::parser`. 
+
+Parsers in `abc_test` are, in their most basic form, represented by the abstract class `template<typename T> parser_base_t`. `parser_base_t` objects are specifically designed to allow the user to parse entities of type `T`. This functionality is realised using a class representing text `parser_input_t` and a type synonym representing a parser's result `template<typename T> parse_result<T>`.
+
+Below we show the definition of `parser_result`, and an overview of the `parser_base_t` class.
+
+```cpp
+template <typename T>
+using parse_result_t = std::expected<T, std::string>;
+
+template <typename T>
+struct parser_base_t
+{
+public:
+    using value_type_t = T;
+    virtual parse_result_t<T>
+        run_parser(parser_input_t& _a_parse_input) const = 0;
+};
+```
+
+The `parse_input_t` class can abstractly be thought of as a `std::string_view`. In reality, it uses a set of iterators, together with specialised functions for parsing text. When the reader is writing their own parsers using `abc_test`, we recomend them checking the class definition of `parse_input_t`. 
+
+
+As the `parser_base_t` class cannot be instantiated, the user must use classes derived from it to create concrete objects, which can then be parse text representations of objects of type `value_type_t`. `abc_test` contains the type synonym `template<typename T> parser_t` to represent `std::unique_ptr<base_parser_t<T>>` objects. It uses this type synonym to represent concrete `parser_base_t` objects, allowing them to be passed around the `abc_test` framework.
+
+There are three core functions which should be used when creating and running parsers. They are outlined below.
+
+```cpp
+template <typename T>
+parse_result_t<T> parse(
+    const std::string_view str,
+    const parser_t<T>&     parser_obj = mk_parser(default_parser_t<T>())
+) noexcept;
+template <typename T>
+T run_parser_with_exception(
+    const std::string_view str,
+    const parser_t<T>&     parser_obj = mk_parser(default_parser_t<T>())
+);
+template <typename T>
+parser_t<typename T::value_type_t> mk_parser(
+    T parser_base_obj
+) noexcept;
+```
+
+`parse` and `run_parser_with_exception` are the functions designed to be used when parsing data. As arguments both take the `std::string_view` `str` to be parsed, and the `parser_t` object `parser_obj`. It runs `str` through `parser_obj`, returning either a `parse_result_t<T>` object (for `parse`), or a `T` object (from `run_parser_with_exception`). `run_parser_with_exception` will throw an exception if parsing fails. In both functions `parser_obj` is default initialized using the `default_parser_t` object and the function `mk_parser`. The `mk_parser` function is very simple; it converts an arbitrary `parser_base_t` object into a `parser_t` object. The `default_parser_t` object is outlined below.
+
+There are two concrete classes derived from `parser_base_t` included with `abc_test`. The first of these is the `template<typename T> default_parser_t` object. It has no default implementation, and instead relies on there being a specialization for its `T` template parameter. `abc_test` provides implementations for many of the classes included with the `stl`. As seen previously, the functions `parse` and `run_parser_with_exception` use a `default_parser_t` object if no `parser_t` argument is supplied.
+
+The user is encouraged to create specializations for `default_parser_t` for their own classes. In the test case shown at the end of this section, we show an example of this.
+
+The reader should note there is an auxillery function associated with `default_parser_t` called `default_parser`. It creates and wraps a `default_parser_t` in a `parser_t` object. `default_parser` takes an arbitrary number of arguments, all of which are passed to the constructor for `default_parser_t`. Its type signature is as follows.
+
+```cpp
+template <typename T, typename ... Ts>
+parser_t<T> default_parser(Ts ... elements) noexcept;
+```
+
+The other class derived from `parser_base_t` included with `abc_test` is the class `template<typename T> function_parser_t`. Below we show an overview of this class. We also show the reader how it is implemented, which should aid in their understanding.
+
+```cpp
+template <typename T, typename F>
+    requires std::is_invocable_r_v<parse_result_t<T>, F, parser_input_t&>
+struct function_parser_t : public parser_base_t<T>
+{
+public:
+    function_parser_t() = delete;
+    function_parser_t(F _callable) noexcept : callable(_callable) {}
+    parse_result_t<T> run_parser(
+        parser_input_t& parse_input) const override
+    {
+        return std::invoke_r(_callable,parse_input);
+    }
+private:
+    F callable;
+};
+```
+
+This class is designed to allow the user to use their own callable object when interfacing with `abc_test`'s parser facilities, meaning they do not necessarily have to define their own subclass of `base_parser_t` when writing their own parser. In a similar vein to `default_parser`, there is an auxillery function associated with `function_parser_t` called `function_parser`. It creates and wraps a `function_parser_t` in a `parser_t` object. Its type signautre is as follows.
+
+```cpp
+template <typename T, typename F>
+    requires std::is_invocable_r_v<parse_result_t<T>, F, parser_input_t&>
+__constexpr parser_t<T> function_parser(F _a_callable) noexcept;
+```
+
+Below we show a test case which contains several examples showing how parsers work. This example also shows the user how to define their own `default_parser_t` instances, and their own classes derived from `base_parser_t`. This example uses the struct `S` defined in the example shown in the previous subsection.
+
+```cpp
+_TEST_CASE(
+    abc::test_case_t({.name = "Printers in abc_test"})
+)
+{
+    using namespace abc;
+    using namespace std;
+    // The printer functionality is contained in the abc::utility::printer
+    // namespace.
+    using namespace abc::utility::printer;
+    // As we cannot create instantiations of base_printer_t, we will show the
+    // user the included subclasses which use it as their base class.
+
+    // The first of these is default_printer_t.
+    default_printer_t<int> printer_1;
+    _CHECK_EXPR(printer_1.run_printer(123) == "123");
+
+    // We recommend that the user use the function print when printing. It takes
+    // two arguments; the first is the object to be printed, and the second is
+    // the printer_t object. Any derived type from base_printer_t can be
+    // elevated to this type using mk_printer.
+
+    _CHECK_EXPR(print(123, mk_printer(printer_1)) == "123");
+
+    // We can also use the specialised default_printer function, which will
+    // create and wrap a default_printer_t in a printer_t object.
+    _CHECK_EXPR(print(123, default_printer<int>()) == "123");
+
+    // print has a default parameter for its second argument, which creates a
+    // default_printer_t object. Therefore, to get the default behaviour, no
+    // argument needs to be provided.
+    _CHECK_EXPR(print<int>(123) == "123");
+
+    // abc_test includes default_printer_t specializations for more complicated
+    // types, such as std::tuple and std::vector.
+    using tuple_type = tuple<int, string, vector<bool>>;
+    tuple_type tuple_1{
+        123, "h3llo"s, vector<bool>{true, false, true}
+    };
+    _CHECK_EXPR(print(tuple_1) == "(123, \"h3llo\", {true, false, true})");
+
+    // A function_printer_t object allows the user to create a base_printer_t
+    // object which can take any callable object which takes a const T& and
+    // returns an std::string.
+
+    // Here is a function which prints a bool.
+    auto bool_printer = [](const bool& object) -> std::string
+    {
+        return object ? "1" : "0";
+    };
+    // We can now use it to create a function_printer_t object.
+    function_printer_t<bool, decltype(bool_printer)> fp1(bool_printer);
+    _CHECK_EXPR(print(true, mk_printer(fp1)) == "1");
+
+    // We can use the auxillery function function_printer, which removes some of
+    // the boilerplate code required.
+    _CHECK_EXPR(print(true, function_printer<bool>(bool_printer)) == "1");
+
+    // Using bool_printer, we can use the specialized default_printer_t
+    // constructors for the types std::tuple and std::vector to
+    // change how tuple_1 is printed. 
+    _CHECK_EXPR(
+        print(
+            // Printing tuple_1
+            tuple_1,
+            // Make a printer using the default type of the tuple.
+            default_printer<tuple_type>(
+                // But initialized with our own printers for each of the
+                // tuple's types.
+                default_printer<int>(),
+                default_printer<string>(),
+                // The last type is changed. It uses the specialized
+                // default_printer_t constructor for vector.
+                default_printer<vector<bool>>(
+                    // But it uses its own printer_t type for bool, created
+                    // using function_printer.
+                    function_printer<bool>(bool_printer)
+                )
+            )
+        )
+        == "(123, \"h3llo\", {1, 0, 1})"
+    );
+    // An easier way to get the same effect is as follows: firstly
+    // create a default printer for tuple_type.
+    default_printer_t<tuple_type> tuple_printer;
+    // Then change the third field.
+    std::get<2>(tuple_printer.get_printers_ref())
+        = default_printer<vector<bool>>(function_printer<bool>(bool_printer));
+    // Then run the printer using mk_printer to elevate tuple_printer to
+    // a printer_t type.
+
+    _CHECK_EXPR(
+        print(tuple_1, mk_printer(tuple_printer))
+        == "(123, \"h3llo\", {1, 0, 1})"
+    );
+}
+
+// This is a user-defined object.
+struct S
+{
+    int int_1;
+    int int_2;
+};
+
+// This is how we create a default_printer_t instance for S.
+template <>
+struct abc::utility::printer::default_printer_t<S>
+    : public abc::utility::printer::printer_base_t<S>
+{
+    inline std::string
+        run_printer(
+            const S& _a_object
+        ) const noexcept
+    {
+        // We use the object object_printer_parser_t and the function
+        // object_printer. We give it the default object_printer_parser_t
+        // object, a string which is prepended to the beginning of the list of
+        // data fields, the names of the data fields, and then the fields
+        // themselves
+        return object_printer_with_field_names(
+            object_printer_parser_t{},
+            "S",
+            {"int_1", "int_2"},
+            _a_object.int_1,
+            _a_object.int_2
+        );
+    }
+};
+
+// This is a bespoke printer_base_t instance for int. It prints the data out in
+// hex.
+struct int_printer_t : abc::utility::printer::printer_base_t<int>
+{
+    inline std::string
+        run_printer(
+            const int& _a_object
+        ) const noexcept
+    {
+        return fmt::format("{:x}", _a_object);
+    }
+};
+
+// This is a bespoke printer for S.
+struct s_printer : public abc::utility::printer::printer_base_t<S>
+{
+    abc::utility::printer::printer_t<int> m_int_printer
+        = abc::utility::printer::default_printer<int>();
+    s_printer() = default;
+
+    inline s_printer(
+        const abc::utility::printer::printer_t<int>& int_printer
+    )
+        : m_int_printer(int_printer)
+    {}
+
+    inline std::string
+        run_printer(
+            const S& _a_object
+        ) const noexcept
+    {
+        // This printer uses the function object_printer_with_custom_printers
+        // with a bespoke object_printer_parser_t object.
+        // object_printer_with_custom_printers takes a tuple of bespoke printers
+        // for each field it is provided.
+        return object_printer_with_custom_printers(
+            abc::utility::object_printer_parser_t{
+                .begin_char = '(',
+                .end_char   = ')',
+            },
+            "S",
+            std::make_tuple(m_int_printer, m_int_printer),
+            _a_object.int_1,
+            _a_object.int_2
+        );
+    }
+};
+
+_TEST_CASE(
+    abc::test_case_t({.name = "Custom printers"})
+)
+{
+    using namespace abc;
+    using namespace abc::utility::printer;
+    S s1{10'000, 20'000};
+    // This will call the default printer on S.
+    _CHECK_EXPR(print(s1) == "S {int_1 = 10000, int_2 = 20000}");
+
+    // This printer uses the bespoke printer s_printer.
+    _CHECK_EXPR(print(s1, mk_printer(s_printer())) == "S (10000, 20000)");
+
+    // This also uses the bespoke printer s_printer, but we use int_printer_t to
+    // print S's integers.
+    _CHECK_EXPR(
+        print(s1, mk_printer(s_printer(mk_printer(int_printer_t()))))
+        == "S (2710, 4e20)"
+    );
+}
+```
+
+
 `template<typename T> abc::utility::str::parser<T>` is a utility class designed to provide a uniform interface to user-defined parsing functions in `abc_test`. After initialisation, a `parser_t` instance is able to parse text representations to objects of type `T`. `parser_t`'s core "parsing function" is a member function called `run_parser`, which has the following type signature.
 
 ```cpp
