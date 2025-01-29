@@ -210,7 +210,7 @@ __constexpr void
         case 0:
             _m_object.set_generator_using_tertiary_data(
                 abc::utility::parser::parse_with_exception(
-                    _a_dgme.additional_data, _m_tertiary_rw_info.parser()
+                    _a_dgme.additional_data, _m_tertiary_rw_info.internal_parser
                 )
             );
             break;
@@ -407,12 +407,9 @@ __constexpr ds::dg_memoized_element_t
     }
     else
     {
-        auto ki = _m_tertiary_rw_info.printer()->run_printer(
-            _m_object.tertiary_data()
-        );
         return dg_memoized_element_t{
             _m_mode,
-            _m_tertiary_rw_info.printer()->run_printer(_m_object.tertiary_data()
+            _m_tertiary_rw_info.internal_printer->run_printer(_m_object.tertiary_data()
             )
         };
     }

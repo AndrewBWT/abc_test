@@ -38,19 +38,20 @@ template <typename T, typename U>
 struct default_parser_t<std::pair<T, U>> : public parser_base_t<std::pair<T, U>>
 {
 private:
-    std::pair<default_parser_t<T>, default_parser_t<U>> _m_parsers;
+    std::pair<parser_t<T>, parser_t<U>> _m_parsers;
 public:
     using value_type = std::pair<T, U>;
 
     __constexpr
     default_parser_t(
-        const default_parser_t<T>& _a_parser_t,
-        const default_parser_t<U>& _a_parser_u
+        const parser_t<T>& _a_parser_t,
+        const parser_t<U>& _a_parser_u
     );
+
     default_parser_t()
-    requires (std::is_default_constructible_v<default_parser_t<T>>
-              && std::is_default_constructible_v<default_parser_t<U>>)
-    = default;
+    requires (std::is_default_constructible_v<default_parser_t<T>> && std::is_default_constructible_v<default_parser_t<U>>)
+        : _m_parsers(std::make_pair(default_parser<T>(), default_parser<U>()))
+    {}
 
     __constexpr virtual parse_result_t<value_type>
         run_parser(parser_input_t& _a_parse_input) const;
@@ -62,18 +63,17 @@ struct default_parser_t<std::vector<T>> : public parser_base_t<std::vector<T>>
 private:
     parser_t<T> _m_parser;
 public:
-
     __constexpr
-        default_parser_t(const parser_t<T>& _a_parser)
+    default_parser_t(
+        const parser_t<T>& _a_parser
+    )
         : _m_parser(_a_parser)
-    {
+    {}
 
-    }
     default_parser_t()
-        requires (std::is_default_constructible_v<default_parser_t<T>>)
-    : _m_parser(mk_parser(default_parser_t<T>()))
-    {
-    }
+    requires (std::is_default_constructible_v<default_parser_t<T>>)
+        : _m_parser(mk_parser(default_parser_t<T>()))
+    {}
 
     __constexpr virtual parse_result_t<std::vector<T>>
         run_parser(parser_input_t& _a_parse_input) const;
@@ -117,8 +117,8 @@ __constexpr_imp parse_result_t<T>
 template <typename T, typename U>
 __constexpr_imp
     default_parser_t<std::pair<T, U>>::default_parser_t(
-        const default_parser_t<T>& _a_parser_t,
-        const default_parser_t<U>& _a_parser_u
+        const parser_t<T>& _a_parser_t,
+        const parser_t<U>& _a_parser_u
     )
     : _m_parsers{std::make_pair(_a_parser_t, _a_parser_u)}
 {}
@@ -132,12 +132,13 @@ __constexpr_imp
 {
     value_type _l_rv;
     _a_parse_input.check_advance_and_throw("(");
-    if (auto _l_first_result{_m_parsers.first.run_parser(_a_parse_input)};
+    if (auto _l_first_result{_m_parsers.first->run_parser(_a_parse_input)};
         _l_first_result.has_value())
     {
         _l_rv.first = _l_first_result.value();
         _a_parse_input.check_advance_and_throw(", ");
-        if (auto _l_second_result{_m_parsers.second.run_parser(_a_parse_input)};
+        if (auto _l_second_result{_m_parsers.second->run_parser(_a_parse_input)
+            };
             _l_second_result.has_value())
         {
             _l_rv.second = _l_second_result.value();
@@ -165,9 +166,9 @@ __constexpr_imp
 
 template <typename T>
 __constexpr_imp parse_result_t<std::vector<T>>
-default_parser_t<std::vector<T>>::run_parser(
-    parser_input_t& _a_parse_input
-) const
+                default_parser_t<std::vector<T>>::run_parser(
+        parser_input_t& _a_parse_input
+    ) const
 {
     using namespace std;
 
@@ -183,7 +184,7 @@ default_parser_t<std::vector<T>>::run_parser(
         //_a_parse_input.advance(1);
         while (true)
         {
-            auto _l_result{ _m_parser->run_parser(_a_parse_input) };
+            auto _l_result{_m_parser->run_parser(_a_parse_input)};
             if (not _l_result.has_value())
             {
                 return parse_error<vector<T>>(_l_result.error());
@@ -206,4 +207,5 @@ default_parser_t<std::vector<T>>::run_parser(
         return parse_error<vector<T>>("Shouldn't be poissibel to get here");
     }
 }
+
 _END_ABC_UTILITY_PARSER_NS

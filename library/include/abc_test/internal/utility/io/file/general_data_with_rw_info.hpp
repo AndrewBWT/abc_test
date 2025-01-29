@@ -2,6 +2,7 @@
 
 #include "abc_test/internal/utility/internal/macros.hpp"
 #include "abc_test/internal/utility/str/rw_info.hpp"
+#include "abc_test/internal/utility/io/file/general_data.hpp"
 
 #include <filesystem>
 
@@ -16,15 +17,15 @@ public:
         = delete;
     __constexpr
         general_data_with_rw_info_t(
-            const std::filesystem::path& _a_path,
+            const general_data_t& _a_gdf,
             const _ABC_NS_UTILITY::str::rw_info_t<T>& _a_rw_info
         ) noexcept;
-    __constexpr const std::filesystem::path&
-        path() const noexcept;
+    __constexpr const abc::utility::io::general_data_t&
+        general_data_file() const noexcept;
     __constexpr const _ABC_NS_UTILITY::str::rw_info_t<T>&
         rw_info() const noexcept;
 private:
-    std::filesystem::path              _m_path;
+    abc::utility::io::general_data_t              _m_gdf;
     _ABC_NS_UTILITY::str::rw_info_t<T> _m_rw_info;
 };
 
@@ -34,7 +35,7 @@ _BEGIN_ABC_NS
 template <typename T>
 __no_constexpr abc::utility::io::general_data_with_rw_info_t<T>
 general_data_file(
-    const std::string_view                 _a_str,
+    const abc::utility::io::general_data_t&                 _a_gdf,
     const abc::utility::str::rw_info_t<T>& _a_rw_info
 ) noexcept;
 
@@ -44,17 +45,17 @@ _BEGIN_ABC_UTILITY_IO_NS
 template <typename T>
 __constexpr_imp
 general_data_with_rw_info_t<T>::general_data_with_rw_info_t(
-    const std::filesystem::path& _a_path,
+    const general_data_t& _a_gdf,
     const _ABC_NS_UTILITY::str::rw_info_t<T>& _a_rw_info
 ) noexcept
-    : _m_path(_a_path), _m_rw_info(_a_rw_info)
+    : _m_gdf(_a_gdf), _m_rw_info(_a_rw_info)
 {}
 
 template <typename T>
-__constexpr_imp const std::filesystem::path&
-general_data_with_rw_info_t<T>::path() const noexcept
+__constexpr_imp const abc::utility::io::general_data_t&
+general_data_with_rw_info_t<T>::general_data_file() const noexcept
 {
-    return _m_path;
+    return _m_gdf;
 }
 
 template <typename T>
@@ -70,13 +71,13 @@ _BEGIN_ABC_NS
 template <typename T>
 __no_constexpr_imp abc::utility::io::general_data_with_rw_info_t<T>
 general_data_file(
-    const std::string_view                 _a_str,
+    const abc::utility::io::general_data_t&                 _a_gdf,
     const abc::utility::str::rw_info_t<T>& _a_rw_info
 ) noexcept
 {
     using namespace std;
     using namespace abc::utility::io;
-    return general_data_with_rw_info_t<T>{_a_str, _a_rw_info};
+    return general_data_with_rw_info_t<T>{_a_gdf, _a_rw_info};
 }
 
 _END_ABC_NS

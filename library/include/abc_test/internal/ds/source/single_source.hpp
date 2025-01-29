@@ -103,13 +103,13 @@ __constexpr_imp bool
 {
     __cmp_test(_m_str);
     __cmp_test(_m_sl.column());
-    if (std::strcmp(_m_sl.file_name(), _a_rhs._m_sl.file_name()) == 0)
+    if (std::strcmp(_m_sl.file_name(), _a_rhs._m_sl.file_name()) != 0)
     {
-        return true;
+        return false;
     }
-    if (std::strcmp(_m_sl.function_name(), _a_rhs._m_sl.function_name()) == 0)
+    if (std::strcmp(_m_sl.function_name(), _a_rhs._m_sl.function_name()) != 0)
     {
-        return true;
+        return false;
     }
     __cmp_test(_m_sl.line());
     return true;

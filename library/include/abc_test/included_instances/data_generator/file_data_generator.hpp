@@ -119,7 +119,7 @@ __constexpr_imp void
     {
         _m_elements_read = _a_tertiary_data;
         _m_element       = abc::utility::parser::parse_with_exception(
-            _m_line_reader.current_line(), _m_element_rw_info.parser()
+            _m_line_reader.current_line(), _m_element_rw_info.internal_parser
         );
     }
 }
@@ -142,7 +142,7 @@ __constexpr_imp
         for (auto&& _l_element : _a_elements)
         {
             _l_flw.write_line(
-                _m_element_rw_info.printer()->run_printer(_l_element)
+                _m_element_rw_info.internal_printer->run_printer(_l_element)
             );
         }
     }
@@ -156,7 +156,8 @@ __constexpr_imp
         const utility::io::general_data_with_rw_info_t<T>& _a_gdf,
         R&&                                                _a_elements
     )
-    : _m_path(_a_gdf._m_path)
+    : _m_path(_a_gdf.general_data_file().path())
+    , _m_element_rw_info(_a_gdf.rw_info())
 {
     using namespace abc::utility::io;
     using namespace std::filesystem;
@@ -167,7 +168,7 @@ __constexpr_imp
         for (auto&& _l_element : _a_elements)
         {
             _l_flw.write_line(
-                _m_element_rw_info.printer().run_printer(_l_element)
+                _m_element_rw_info.internal_printer->run_printer(_l_element)
             );
         }
     }
@@ -192,7 +193,7 @@ __constexpr_imp void
     {
         ++_m_elements_read;
         _m_element = abc::utility::parser::parse_with_exception(
-            _m_line_reader.current_line(), _m_element_rw_info.parser()
+            _m_line_reader.current_line(), _m_element_rw_info.internal_parser
         );
     }
 }
@@ -226,7 +227,7 @@ __constexpr_imp bool
         ++_m_elements_read;
         _m_element = abc::utility::parser::parse_with_exception(
             _m_line_reader.current_line(),
-            _m_element_rw_info.parser()
+            _m_element_rw_info.internal_parser
         );
         return true;
     }

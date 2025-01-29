@@ -476,120 +476,134 @@ template <typename T, typename F>
 __constexpr parser_t<T> function_parser(F _a_callable) noexcept;
 ```
 
-Below we show a test case which contains several examples showing how parsers work. This example also shows the user how to define their own `default_parser_t` instances, and their own classes derived from `base_parser_t`. This example uses the struct `S` defined in the example shown in the previous subsection.
+Below we show a test case which contains several examples showing how parsers work. This example also shows the user how to define their own `default_parser_t` instances, and their own classes derived from `base_parser_t`. This example uses the struct `S` defined in the example shown in the previous subsection. The reader should note that there is an unseen equals operator defined for `S`, to ensure that the tests are able to work correctly.
 
 ```cpp
 _TEST_CASE(
-    abc::test_case_t({.name = "Printers in abc_test"})
+    abc::test_case_t({.name = "Parsers in abc_test"})
 )
 {
     using namespace abc;
     using namespace std;
-    // The printer functionality is contained in the abc::utility::printer
+    // The parser functionality is contained in the abc::utility::parser
     // namespace.
-    using namespace abc::utility::printer;
-    // As we cannot create instantiations of base_printer_t, we will show the
+    using namespace abc::utility::parser;
+    // As we cannot create instantiations of base_parser_t, we will show the
     // user the included subclasses which use it as their base class.
 
     // The first of these is default_printer_t.
-    default_printer_t<int> printer_1;
-    _CHECK_EXPR(printer_1.run_printer(123) == "123");
+    default_parser_t<int> parser_1;
+    // We can elevate it to the parser_t type using mk_parser.
+    _CHECK_EXPR(parse("123", mk_parser(parser_1)) == parse_result_t<int>(123));
+    // For the rest of the assertions in this test case, we will use the
+    // function parse_with_exception. This removes the need for the
+    // parse_result_t type.
+    _CHECK_EXPR(parse_with_exception<int>("123", mk_parser(parser_1)) == 123);
 
-    // We recommend that the user use the function print when printing. It takes
-    // two arguments; the first is the object to be printed, and the second is
-    // the printer_t object. Any derived type from base_printer_t can be
-    // elevated to this type using mk_printer.
+    // We can also use the default_parser function instead of using mk_parser.
+    _CHECK_EXPR(parse_with_exception<int>("123", default_parser<int>()) == 123);
 
-    _CHECK_EXPR(print(123, mk_printer(printer_1)) == "123");
+    // As parse_with_exception (and parse) have their second argument defaulted
+    // to a default parser, we can just write.
+    _CHECK_EXPR(parse_with_exception<int>("123") == 123);
 
-    // We can also use the specialised default_printer function, which will
-    // create and wrap a default_printer_t in a printer_t object.
-    _CHECK_EXPR(print(123, default_printer<int>()) == "123");
 
-    // print has a default parameter for its second argument, which creates a
-    // default_printer_t object. Therefore, to get the default behaviour, no
-    // argument needs to be provided.
-    _CHECK_EXPR(print<int>(123) == "123");
-
-    // abc_test includes default_printer_t specializations for more complicated
+    // abc_test includes default_parser_t specializations for more complicated
     // types, such as std::tuple and std::vector.
     using tuple_type = tuple<int, string, vector<bool>>;
     tuple_type tuple_1{
         123, "h3llo"s, vector<bool>{true, false, true}
     };
-    _CHECK_EXPR(print(tuple_1) == "(123, \"h3llo\", {true, false, true})");
-
-    // A function_printer_t object allows the user to create a base_printer_t
-    // object which can take any callable object which takes a const T& and
-    // returns an std::string.
-
-    // Here is a function which prints a bool.
-    auto bool_printer = [](const bool& object) -> std::string
-    {
-        return object ? "1" : "0";
-    };
-    // We can now use it to create a function_printer_t object.
-    function_printer_t<bool, decltype(bool_printer)> fp1(bool_printer);
-    _CHECK_EXPR(print(true, mk_printer(fp1)) == "1");
-
-    // We can use the auxillery function function_printer, which removes some of
-    // the boilerplate code required.
-    _CHECK_EXPR(print(true, function_printer<bool>(bool_printer)) == "1");
-
-    // Using bool_printer, we can use the specialized default_printer_t
-    // constructors for the types std::tuple and std::vector to
-    // change how tuple_1 is printed. 
     _CHECK_EXPR(
-        print(
-            // Printing tuple_1
-            tuple_1,
-            // Make a printer using the default type of the tuple.
-            default_printer<tuple_type>(
-                // But initialized with our own printers for each of the
+        parse_with_exception<tuple_type>("(123, \"h3llo\", {true, false, true})"
+        )
+        == tuple_1
+    );
+
+    // A function_parser_t object allows the user to create a base_parser_t
+    // object which can take any callable object which takes a parser_input_t&
+    // and returns a parse_result<T>.
+
+    // Here is a function which parses a bool represented as a 0 or 1.
+    auto bool_parser = [](parser_input_t& input) -> parse_result_t<bool>
+    {
+        if (*input == '1')
+        {
+            input.advance(1);
+            return parse_result_t<bool>(true);
+        }
+        else if (*input == '0')
+        {
+            input.advance(1);
+            return parse_result_t<bool>(false);
+        }
+        else
+        {
+            return parse_error<bool>(
+                "Could not recognise character. Should be 0 or 1"
+            );
+        }
+    };
+    // We can now use it to create a function_parser_t object.
+    function_parser_t<bool, decltype(bool_parser)> fp1(bool_parser);
+    _CHECK_EXPR(parse_with_exception<bool>("1", mk_parser(fp1)) == true);
+
+    // We can use the auxillery function function_parser, which removes some of
+    // the boilerplate code required.
+    _CHECK_EXPR(
+        parse_with_exception<bool>("1", function_parser<bool>(bool_parser))
+        == true
+    );
+
+    // Using bool_parser, we can use the specialized default_parser_t
+    // constructors for the types std::tuple and std::vector to
+    // change how tuple_1 is printed.
+    _CHECK_EXPR(
+        parse_with_exception(
+            // Printing the following string
+            "(123, \"h3llo\", {1, 0, 1})",
+            // Make a parser using the default type of the tuple.
+            default_parser<tuple_type>(
+                // But initialized with our own parsers for each of the
                 // tuple's types.
-                default_printer<int>(),
-                default_printer<string>(),
+                default_parser<int>(),
+                default_parser<string>(),
                 // The last type is changed. It uses the specialized
-                // default_printer_t constructor for vector.
-                default_printer<vector<bool>>(
-                    // But it uses its own printer_t type for bool, created
-                    // using function_printer.
-                    function_printer<bool>(bool_printer)
+                // default_parser_t constructor for vector.
+                default_parser<vector<bool>>(
+                    // But it uses its own parser_t type for bool, created
+                    // using function_parser.
+                    function_parser<bool>(bool_parser)
                 )
             )
         )
-        == "(123, \"h3llo\", {1, 0, 1})"
+        == tuple_1
     );
     // An easier way to get the same effect is as follows: firstly
     // create a default printer for tuple_type.
-    default_printer_t<tuple_type> tuple_printer;
+    default_parser_t<tuple_type> tuple_parser;
     // Then change the third field.
-    std::get<2>(tuple_printer.get_printers_ref())
-        = default_printer<vector<bool>>(function_printer<bool>(bool_printer));
+    std::get<2>(tuple_parser.get_parsers_ref())
+        = default_parser<vector<bool>>(function_parser<bool>(bool_parser));
     // Then run the printer using mk_printer to elevate tuple_printer to
     // a printer_t type.
 
     _CHECK_EXPR(
-        print(tuple_1, mk_printer(tuple_printer))
-        == "(123, \"h3llo\", {1, 0, 1})"
+        parse_with_exception(
+            "(123, \"h3llo\", {1, 0, 1})", mk_parser(tuple_parser)
+        )
+        == tuple_1
     );
 }
 
-// This is a user-defined object.
-struct S
-{
-    int int_1;
-    int int_2;
-};
-
 // This is how we create a default_printer_t instance for S.
 template <>
-struct abc::utility::printer::default_printer_t<S>
-    : public abc::utility::printer::printer_base_t<S>
+struct abc::utility::parser::default_parser_t<S>
+    : public abc::utility::parser::parser_base_t<S>
 {
-    inline std::string
-        run_printer(
-            const S& _a_object
+    inline parse_result_t<S>
+        run_parser(
+            parser_input_t& _a_input
         ) const noexcept
     {
         // We use the object object_printer_parser_t and the function
@@ -597,330 +611,118 @@ struct abc::utility::printer::default_printer_t<S>
         // object, a string which is prepended to the beginning of the list of
         // data fields, the names of the data fields, and then the fields
         // themselves
-        return object_printer_with_field_names(
-            object_printer_parser_t{},
-            "S",
-            {"int_1", "int_2"},
-            _a_object.int_1,
-            _a_object.int_2
-        );
+        return abc::utility::parser::
+            object_parser_with_field_names<S, int, int>(
+                object_printer_parser_t{}, "S", {"int_1", "int_2"}, _a_input
+            );
     }
 };
 
 // This is a bespoke printer_base_t instance for int. It prints the data out in
 // hex.
-struct int_printer_t : abc::utility::printer::printer_base_t<int>
+struct int_parser_t : abc::utility::parser::parser_base_t<int>
 {
-    inline std::string
-        run_printer(
-            const int& _a_object
+    inline abc::utility::parser::parse_result_t<int>
+        run_parser(
+            abc::utility::parser::parser_input_t& _a_input
         ) const noexcept
     {
-        return fmt::format("{:x}", _a_object);
+        using namespace std;
+        using namespace abc::utility::parser;
+        string_view sv{_a_input.sv()};
+        size_t      pos{sv.find_first_not_of("0123456789abcdef")};
+        if (pos == string::npos)
+        {
+            return parse_error<int>("Could not parse");
+        }
+        else
+        {
+            string sv2{sv.substr(0, pos)};
+            int    n = stoul(sv2.c_str(), nullptr, 16);
+            _a_input.advance(pos);
+            return parse_result_t<int>(n);
+        }
     }
 };
 
 // This is a bespoke printer for S.
-struct s_printer : public abc::utility::printer::printer_base_t<S>
+struct s_parser : public abc::utility::parser::parser_base_t<S>
 {
-    abc::utility::printer::printer_t<int> m_int_printer
-        = abc::utility::printer::default_printer<int>();
-    s_printer() = default;
+    abc::utility::parser::parser_t<int> m_int_parser
+        = abc::utility::parser::default_parser<int>();
+    s_parser() = default;
 
-    inline s_printer(
-        const abc::utility::printer::printer_t<int>& int_printer
+    inline s_parser(
+        const abc::utility::parser::parser_t<int>& int_parser
     )
-        : m_int_printer(int_printer)
+        : m_int_parser(int_parser)
     {}
 
-    inline std::string
-        run_printer(
-            const S& _a_object
-        ) const noexcept
+    inline abc::utility::parser::parse_result_t<S>
+        run_parser(
+            abc::utility::parser::parser_input_t& _a_input
+        ) const
     {
         // This printer uses the function object_printer_with_custom_printers
         // with a bespoke object_printer_parser_t object.
         // object_printer_with_custom_printers takes a tuple of bespoke printers
         // for each field it is provided.
-        return object_printer_with_custom_printers(
-            abc::utility::object_printer_parser_t{
-                .begin_char = '(',
-                .end_char   = ')',
-            },
-            "S",
-            std::make_tuple(m_int_printer, m_int_printer),
-            _a_object.int_1,
-            _a_object.int_2
-        );
+        return abc::utility::parser::
+            object_printer_with_custom_parsers<S, int, int>(
+                abc::utility::object_printer_parser_t{
+                    .begin_char = '(',
+                    .end_char   = ')',
+                },
+                "S",
+                std::make_tuple(m_int_parser, m_int_parser),
+                _a_input
+            );
     }
 };
 
 _TEST_CASE(
-    abc::test_case_t({.name = "Custom printers"})
+    abc::test_case_t({.name = "Custom parsers"})
 )
 {
     using namespace abc;
-    using namespace abc::utility::printer;
+    using namespace abc::utility::parser;
     S s1{10'000, 20'000};
     // This will call the default printer on S.
-    _CHECK_EXPR(print(s1) == "S {int_1 = 10000, int_2 = 20000}");
+    _CHECK_EXPR(
+        parse_with_exception<S>("S {int_1 = 10000, int_2 = 20000}") == s1
+    );
 
     // This printer uses the bespoke printer s_printer.
-    _CHECK_EXPR(print(s1, mk_printer(s_printer())) == "S (10000, 20000)");
+    _CHECK_EXPR(
+        parse_with_exception<S>("S (10000, 20000)", mk_parser(s_parser())) == s1
+    );
 
     // This also uses the bespoke printer s_printer, but we use int_printer_t to
     // print S's integers.
     _CHECK_EXPR(
-        print(s1, mk_printer(s_printer(mk_printer(int_printer_t()))))
-        == "S (2710, 4e20)"
-    );
-}
-```
-
-
-`template<typename T> abc::utility::str::parser<T>` is a utility class designed to provide a uniform interface to user-defined parsing functions in `abc_test`. After initialisation, a `parser_t` instance is able to parse text representations to objects of type `T`. `parser_t`'s core "parsing function" is a member function called `run_parser`, which has the following type signature.
-
-```cpp
-std::expected<T,std::string> run_parser(const std::string_view str) const noexcept;
-```
-
-If the parse of `str` is successful, then `run_parser` returns a `T` entity. If it is unsuccessful, then `run_parser` returns an `std::string` object.
-
-`parser_t` has a private member variable called `parse_function`, whose type is analoguous to a callable function with a type signature identical to `run_parser`'s. Internally, `run_parser` calls `parse_function` using `arg` as its argument.
-
-`parser_t` has an additional member function called `run_parser_with_exception`, which is also used for parsing. It performs identically to `run_parser`, except that it throws an exception if its `std::string_view` argument cannot be parsed. It has the following type signature.
-
-```cpp
-T run_parser_with_exception(const std::string_view str) const;
-```
-
-`parser_t` instances can be created using one of two factory methods. Both of these are in the `abc` namespace, and are declared as follows.
-
-```cpp
-template<typenmae T, typename F>
-requires std::invocable<F, const std::string_view>
-abc::utility::str::parser<T> parser(F function) noexcept;
-
-template<typename T>
-requires abc::utility::str::scannable<T>
-abc::utility::str::parser<T> default_parser() noexcept;
-```
-
-`parser` takes any function-like object `function` as an argument and creates a `parser_t` object using it. It does this by initializing `parse_function` with `function`. `function` must be a callable object which takes a single argument of type `const std::string_view`, and returns an `std::expected<T,std::string>` object. 
-
-`default_parser` constructs a `parser_t` object only if `T` adheres to the concept `abc::utility::str::scannable`. Assuming it does, `default_parser` creates its own `parser_t` instance using the `scn` library. It does this by initializing `parse_function` using an `std::function` wrapped around the expression `scn::scan(str, "{}")`, where `str` is a `const std::string_view` variable. 
-
-`scannable` is a simple concept which ensures that the object `T` has a `scn::scanner` class specialisation defined.
-
-Below we show some example uses of the `parser_t` object using the functions introduced above.
-
-```cpp
-constexpr bool
-    operator==(
-        const S& lhs,
-        const S& rhs
-    )
-{
-    return std::make_pair(lhs.int_1, lhs.int_2)
-           == std::make_pair(rhs.int_1, rhs.int_2);
-}
-
-template <>
-struct scn::scanner<S>
-{
-    template <typename ParseContext>
-    auto
-        parse(
-            ParseContext& pctx
-        ) -> scan_expected<typename ParseContext::iterator>
-    {
-        return pctx.begin();
-    }
-
-    template <typename Context>
-    auto
-        scan(
-            S&       val,
-            Context& ctx
-        ) -> scan_expected<typename Context::iterator>
-    {
-        // constexpr std::string _l_str;
-        auto result = scn::scan<std::pair<int, int>>(ctx.range(), "{}");
-        if (! result)
-        {
-            return unexpected(result.error());
-        }
-        else
-        {
-            val.int_1 = result->value().first;
-            val.int_2 = result->value().second;
-            return result->begin();
-        }
-    }
-};
-
-_TEST_CASE(
-    abc::test_case_t({.name = "Parser object"})
-)
-{
-    using namespace abc;
-    using namespace std;
-    // int_printer_1 is created using a bespoke function to print int objects.
-    auto int_parser_func = [](const std::string_view str)
-    {
-        int result{};
-        auto [ptr, ec]
-            = from_chars(str.data(), str.data() + str.size(), result);
-
-        if (ec == std::errc())
-        {
-            return expected<int, string>(result);
-        }
-        else
-        {
-            return expected<int, string>(
-                unexpected(fmt::format("Could not parse \"{0}\"", str))
-            );
-        }
-    };
-    abc::utility::str::parser_t<int> int_parser_1
-        = parser<int>(int_parser_func);
-    // int_printer_2 is created using int's fmt::format definition.
-    abc::utility::str::parser_t<int> int_parser_2 = default_parser<int>();
-
-    _CHECK_EXPR(int_parser_1.run_parser_with_exception("123") == 123);
-    _CHECK_EXPR(int_parser_2.run_parser_with_exception("123") == 123);
-
-    // s_printer_1 is created using a bespoke function to print S objects.
-    auto s_parser_func = [](const std::string_view str)
-    {
-        auto res = scn::scan<pair<int, int>>(string(str), "S {{{}}}");
-        if (res.has_value())
-        {
-            return expected<S, string>(
-                S{res->value().first, res->value().second}
-            );
-        }
-        else
-        {
-            return expected<S, string>(
-                unexpected(fmt::format("Could not parse \"{0}\"", str))
-            );
-        }
-    };
-    abc::utility::str::parser_t<S> s_parser_1 = parser<S>(s_parser_func);
-    // s_printer_2 is created using S's fmt::format definition.
-    abc::utility::str::parser_t<S> s_parser_2 = default_parser<S>();
-
-    _CHECK_EXPR(s_parser_1.run_parser_with_exception("S {1, 2}") == (S{1, 2}));
-    _CHECK_EXPR(s_parser_2.run_parser_with_exception("{1, 2}") == (S{1, 2}));
-}
-```
-
-### Strings
-
-We advise the user to be careful when using `std::string` (or any other type which is an alias for `std::basic_string`) with default `printer_t` or `parser_t` objects, as the behaviour may not be what the user expects.
-
-Later on in this document we will show how some data generators in `abc_test` can read and write data to files. They do this using the `printer_t` and `parser_t` objects described in this section. As dicsused previously, `parser_t` and `printer_t` use the libraries `scn` and `fmt` respectively to write their default functions. However, this causes issues for string-like entities such as `std::string`.
-
-To understand why this is, we must first consider how `fmt` and `scn` process `std::string`s by default. If considering a `std::string` object on its own, `fmt` will print it without quotation marks. `scn` behaves similarly; when parsing it will assume there are no quotation marks around the `std::string`.
-
-The default behaviour of the two libraries diverges when `std::string` entities are used with range-based formatters and parsers. Consider the `std::pair<std::string,std::string>` element `{"123", "456}`. `fmt` will print this element in the form `("123", "456")`. `scn` is unable to parse this back to a `std::pair<std::string,std::string>` entity.
-
-To that end `abc_test` provides an alternate to `std::string` called `abc::str_t`. Internally it contains a `std::string` entity. Below we show its two constructors. Both initialise `str_t`'s internal `std::string` entity using the argument.
-
-```cpp
-str_t(const char* val);
-str_t(const std::string_view _a_str);
-```
-
-`str_t`'s `default_printer` will always print out its string using quotation marks. Its `default_parser` will firstly check for quotation marks to parse, before then trying to parse a quoteless `std::string`, terminating on the first blank space.
-
-When working with files, we advise the user to use `str_t` instead of `std::string`. While we know that this is not deal, we believe that, without us providing our own `fmt` and `scn`-like functionality, it is the best solution.
-
-
-Below we show two test cases which illustrate the aformentioned beheaviour concerning `std::string`s, as well as how to use `str_t`. This example shows how we could write a printer and parser for a bespoke datatype which internally contains `std::string`s. The reader will see from this example that using `str_t`'s for parsing bespoke data structures which contain `std::string` entities can be laborious. 
-
-```cpp
-_TEST_CASE(
-    abc::test_case_t({.name = "Strings and str_t's"})
-)
-{
-    using namespace abc;
-    using namespace std;
-    using namespace abc::utility;
-    // This pair of printer/parser is able to parse the argument correctly.
-    _CHECK_EXPR(
-        default_parser<string>().run_parser_with_exception(
-            default_printer<string>().run_printer("123")
+        parse_with_exception<S>(
+            "S (2710, 4e20)", mk_parser(s_parser(mk_parser(int_parser_t())))
         )
-        == "123"
-    );
-    auto       pair_parser_1  = default_parser<pair<string, string>>();
-    auto       pair_printer_1 = default_printer<pair<string, string>>();
-    const auto arg_1          = make_pair("123"s, "456"s);
-    // This printer/parser pair is not able to parse the argument correctly.
-    // This is because the parser will terminate either at the first whitespace
-    // character, or at the end of the string. The printed pair becomes "{123,
-    // 456}". It is parsed as {"{123," "456}"}.
-    _CHECK_EXPR(
-        pair_parser_1.run_parser_with_exception(pair_printer_1.run_printer(arg_1
-        ))
-        != arg_1
-    );
-    const auto arg_2 = make_pair("\"123\""s, "\"456\""s);
-    // The user could surround the strings by quotes, and assume that the parser
-    // would recognise them as escape characters. However this requires
-    // scn::scan to be formatted correctly, which isn't how the default parser
-    // is defined. So the following won't work.
-    _CHECK_EXPR(
-        pair_parser_1.run_parser_with_exception(pair_printer_1.run_printer(arg_2
-        ))
-        != arg_2
-    );
-    // The user may question why not specialise std::string's default_parser
-    // implementation, however this would not fix the issue. If we had a
-    // pair<string,string> elements, it would not call the default_parser, it
-    // would call the default scn::scan implementation.
-
-    auto       pair_parser_2  = default_parser<pair<str_t, str_t>>();
-    auto       pair_printer_2 = default_printer<pair<str_t, str_t>>();
-    const auto arg_3          = make_pair(str_t("\"123\""s), str_t("\"456\""s));
-    // However this will work. str_t always requires delimited strings -
-    // beginning and ending with ".
-    _CHECK_EXPR(
-        pair_parser_2.run_parser_with_exception(pair_printer_2.run_printer(arg_3
-        ))
-        == arg_3
-    );
-
-    // This will also parse correctly.
-    _CHECK_EXPR(
-        default_parser<str_t>().run_parser_with_exception(
-            default_printer<str_t>().run_printer("\"123\"")
-        )
-        == "\"123\""
-    );
-    // However this will not. There MUST be a " to begin a str_t.
-    _CHECK_EXPR(
-        default_parser<str_t>().run_parser_with_exception(
-            default_printer<str_t>().run_printer("123")
-        )
-        == "123"
+        == s1
     );
 }
 ```
-
-Unfortunately.
-
-### Reader/Writer Information
 
 
 ### Reader/Writer Interface
 
-In `abc_test` there is an object `template<typename T> abc::utility::str::rw_info_t` that provides functionality to print and parse objects between the `std::string` type and the `T` type. By creating instances of this class, the user is able to write their own printers and parsers for either their own type, or currently existing types. 
+The parsers and printers we described above are used in some data generators in `abc_test`. We pair together parsers and printers in the auxillery struct `template<typename T> abc::utility::str::rw_info_t`. It is a simple class, and is defined as follows.
 
-The type itself consists of two internal objects; an instance of `template<typename T> abc::utility::str::printer` and an instance of `template<typename T> abc::utility::str::parser`. These objects can be created using a callable object signature. 
+```cpp
+template <typename T>
+struct rw_info_t
+{
+    parser::parser_t<T>   internal_parser  = parser::default_parser<T>();
+    printer::printer_t<T> internal_printer = printer::mk_printer(printer::default_printer_t<T>()
+};
+```
+
+Naturally, the user is able to set the `internal_parser` and `internal_printer` to suit their needs, if they require different parsing or printing functionality.
 
 ## Data Generators & Files
 
@@ -928,21 +730,44 @@ In this section we describe the data these files contain, what they are used for
 
 There are two types of data file in `abc_test` used with data generators. These are the general data file (GDF) and the tertiary data file (TDF).
 
+These data files can be used to write data which has failed a test to a file, which can then be re-used in future tests. This can be particularly useful for randomly generated data, to ensure there is no regression when code is updated.
+
 ### General Data Files
 
-For a data generator `dg` whose return type is a value of type `T`, a GDF used with `dg` represents a collection of `T` values. `dg` has a general data file interface (GDFI) which describes how to transform each `std::string` extracted from the GDF into an element `T`. The GDFI also describes how to turn `T` elements into `std::string` entities. In essence, the GDF stores text which represents `T` values, the GDFI describes how to parse and print `T` values, and the data generator controls how and when the GDFI reads and writes to the GDF.
+For a data generator class `dg` whose return type is a value of type `T`, a GDF used with `dg` contains a collection of `T` values. `dg` has a general data file interface (GDFI) which describes how to transform each `std::string` extracted from the GDF into an element `T`. The GDFI also describes how to turn `T` elements into `std::string` entities. In essence, the GDF stores text which represents `T` values, the GDFI describes how to parse and print `T` values, and the data generator controls how and when the GDFI reads and writes to the GDF. `abc_test` uses the `rw_info_t` object to represent the GDFI. 
 
-`abc_test` uses two objects, `abc::utility::io::general_data_t` and `template<typename T> abc::utility::io::general_data_with_rw_info_t`, to represent data for use with general data files. The object `general_data_t` represents a GDF with a user-provided file name and a default parser and printer, while a `general_data_with_rw_info_t` object represents a GDF with a user-provided file name and a user-provided `rw_info_t` object.
+`abc_test` uses two objects, `abc::utility::io::general_data_t` and `template<typename T> abc::utility::io::general_data_with_rw_info_t`, to allow the user to dictate how a data generator interacts with a GDF. The object `general_data_t` represents a GDF with a user-provided file name and a default parser and printer, while a `general_data_with_rw_info_t` object represents a GDF with a user-provided file name and a user-provided `rw_info_t` object.
 
-There are three factory methods in the `abc` namespace which can be used to construct `general_data_t` objects. They are defined as follows:
+There are three factory methods in the `abc` namespace which can be used to construct `general_data_t` objects. Their type signature is shown below.
 
-- `abc::utility::io::general_data_t general_data(const std::string_view file_name) noexcept`. This function creates a `general_data_t` object whose internal file name is built using `abc_test` framework's `file_location`, the current test case's `path` and the user-provided `file_name` variable.
-- `abc::utility::io::general_data_t general_data(const std::string_view file_name, const std::string_view folder) noexcept`. This function creates a `general_data_t` object whose internal file name is built using `abc_test` framework's `file_location`, the user-provided `folder` variable and the user-provided `file_name` variable.
-- `abc::utility::io::general_data_t general_data(const std::filesystem::path path) noexcept`. This function creates a `general_data_t` object whose internal file name is equal to the user-provided `path` variable.
+```cpp
+abc::utility::io::general_data_t
+               gdf(const std::string_view _a_str) noexcept;
+abc::utility::io::general_data_t
+               gdf(const std::string_view _a_folder,
+                   const std::string_view _a_str) noexcept;
+abc::utility::io::general_data_t
+               gdf_from_path(const std::filesystem::path& _a_path) noexcept;
+```
 
-There is one factory method in the `abc` namespace which can be used to construct `general_data_with_rw_info_t` objecst. It is defined as follows:
+The first `gdf` function creates a `general_data_t` object whose internal file name is built using `abc_test` framework's `file_location`, the current test case's `path` and the user-provided `file_name` variable. If the internal file does not exist, then it is created. This includes any parent folders which do not exist (up to the `abc_test` framework's `file_location`).
 
-- `abc::utility::io::general_data_with_rw_info_t<T> gdf_w_rw_info(const abc::utility::io::general_data_t& general_data, const rw_info_t<T>& rw_info) noexcept;`. It constructs a `general_data_with_rw_info_t<T>` object which uses the `general_data_t`'s file entity as its path, and the `rw_info` as its `rw_info_t` element.
+The second `gdf` function creates a `general_data_t` object whose internal file name is built using `abc_test` framework's `file_location`, the user-provided `folder` variable and the user-provided `file_name` variable. If the internal file does not exist, then it is created. However if the user-provided `folder` does not exist, then an exception will be thrown and the testing framework will terminate. 
+
+ Finally, `gdf_from_path` creates a `general_data_t` object whose internal file name is equal to the user-provided `path` variable. The entire folder subdirectory must exist otherwise an exception will be thrown and the testing framework will terminate. 
+
+There is one factory method in the `abc` namespace which can be used to construct `general_data_with_rw_info_t` objecst. It is defined as follows.
+
+```cpp
+template <typename T>
+__no_constexpr abc::utility::io::general_data_with_rw_info_t<T>
+general_data_file(
+    const abc::utility::io::general_data_t                 _a_gdf,
+    const abc::utility::str::rw_info_t<T>& _a_rw_info
+) noexcept;
+```
+
+This function constructs a `general_data_with_rw_info_t<T>` object which uses the `general_data_t`'s file entity as its path, and the `rw_info` as its `rw_info_t` element.
 
 Below we show a test case which shows some example uses of these factory methods.
 
@@ -972,23 +797,9 @@ _TEST_CASE(
 
 ### Tertiary Data Files
 
-`abc_test` uses uniform terminology and a uniform interface for allowing a data generator to interact with a file. In this subsection we explain this interface in detail.
+A TDF is very different to a GDF; each data generator class has a tertiary data type associated with it. This data dictates how the data generator can "re-generate" that data. For example, in a static data generator, this is an integer index. In a file data generator, this is the line in the file the data was drawn from, and in a random data generator, it is state information pertaining to the random number generator.
 
-There are two core file interfaces associated with data generators in `abc_test`. The first is the general data file interface (GDFI). This type of data file interface, associated with a data generator which produces values of type `T`, can be abstractly represented by the triple `(file_name, parser, printer)`, where `file_name` is a file name, `parser` is a function in the form `std::optional<T> parser(const std::string_view)` and `printer` is a function in the form `std::string printer(const T&)`.
-
-A GDFI allows a data generator to read and write values of type `T` to a plain text file. Perhaps the most obvious example we will see [in a future section]() is the file data generator. It can read and write `T` values to a file. This allows the user to write their testing data to a file, without having to re-compile their executable.
-
-However other data generators included with `abc_test` also use a GDFI. For example, the random data generator, the enumeration data generator, and the combinatorics data generator can output failing test cases to a general data file. However these data generaotrs do not read the associated data file.
-
-The second core file interface is the tertiary data file interface (TDFI). This type of file interface is associated with a data generator which produces values of type `T` and some secondary type `U`, can be abstractly represented by the quintuple `(file_name, parser, printer, t_to_u, u_to_t)`, where `file_name` is a file name, `parser` is a function in the form `std::optional<U> parser(const std::string_view)`,`printer` is a function in the form `std::string printer(const U&)`, `t_to_u` is a function in the form `U t_to_u(const T&)` and `u_to_t` is a function in the form `T u_to_t(const U&)`. 
-
-A TDFI allows a data generator to read and write values of type `U` to a plain text file, and to convert them to the data generator's `T` type. This `U` type is specific to the data generaotr itself - for example, a random data generator uses seed values as their tertiary type, and an enumeration data generator and a combinatorics data generator use a `std::size_t` value as an index for their tertiary type.
-
-These abstract types of data generator are 
-
-## Strings
-
-We would not recomend using `std::string` to read or write data to files in `abc_test` - unless using a bespoke `rw_info_t` entity. This is because the default parser (based on `scn`) does not escape `"` characters. Instead we have provided a placeholder called `abc::str`, which includes correct `fmt` and `scn` implementations.
+A TDF stores this data for a specific data generator class. The end-user has no control over how this data is recorded, it can simply be used by them to set the data generator itself. A TDF can be initialised using a `general_data_t` object, using the auxillery functions described in the previous subsection. 
 
 # Static Data Generator
 
@@ -1077,17 +888,121 @@ _TEST_CASE(
 
 # File Data Generator
 
-A file data generator is a data generator used when wanting to use hand-written values with a data generator. It is represented by the type `template <typename T> file_data_generator_t`, and requires the include directive `#include "abc_test/included_instances.hpp"` to use.
+A file data generator is a data generator best-used when wanting to use hand-written values with a data generator. It is represented by the type `template <typename T> file_data_generator_t`, and requires the include directive `#include "abc_test/included_instances.hpp"` to use.
 
-A `file_data_generator_t` object, as the name suggests, is able to read (and write) data to an associated file. The object has several configrable components, described as follows:
+A `file_data_generator_t` object, as the name suggests, is able to read (and write) data to an associated file. There are several factory methods in the `abc` namespace which can be used to construct file data generators, outlined as follows.
 
-- A `abc::utility::str::parser<T>` component called the `parser`. It contains a function for reading `std::string`s and converting them into `T` objects.
-- A `abc::utility::str::printer<T>` component called the `printer`. It contains a function for turning an object of type `T` into a `std::string` object.
-- A `std::filesystem::path` component called the `file_location`. This is a path where the test case's files are located. 
-- A `std::filesystem::path` component called the `file_name`. This is the specific file which contains this data generator's test data in the path `file_location`.
+```cpp
+template <typename T, typename R = std::initializer_list<T>>
+requires std::same_as<std::ranges::range_value_t<R>, T>
+__constexpr
+    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
+    read_data_from_file(
+        const std::string_view& _a_data_file_name,
+        R&&                     _a_init_list = R{}
+    );
+template <typename T, typename R = std::initializer_list<T>>
+requires std::same_as<std::ranges::range_value_t<R>, T>
+__constexpr
+    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
+    read_data_from_file(
+        const utility::io::general_data_t& _a_general_data_file,
+        R&&                                _a_init_list = R{}
+    );
+template <typename T, typename R = std::initializer_list<T>>
+requires std::same_as<std::ranges::range_value_t<R>, T>
+__constexpr
+    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
+    read_data_from_file(
+        const utility::io::general_data_with_rw_info_t<T>& _a_general_data_file,
+        R&&                                                _a_init_list = R{}
+    );
+```
 
-All of these components, apart from `file_name`, can have default values. These are described as follows:
+Each `read_data_from_file` takes two argumnets; the first pertains to file information for the class. The second argument is an optional list of values to seed the file with when it is created.
 
-- The `parser`'s default value is created using the expression `scn::scan<T>(str, "{}"))`. If it will not compile (because `T` does not have a `scan` function) then a compile-time error is thrown.
-- The `printer`'s default value is created using the expression `fmt::format("{}",obj)`. If it will not compile (because `T` has no `format` function) then a compile-time error is thrown.
-- The `file_location` is set to the test case's `path` value. The user is able to set the root of the tests data using command line arguments (see this document), allowing it to be set correctly.
+The first `read_data_from_file` function creates its GDF using the `std::string_view` provided, calling the first `gdf` function which takes a `std::string_view` as an argument. The second takes a generic `general_data_t` object to define its file. The third takes a `general_data_with_rw_info_t` to define its file type. This includes a `rw_info` which is used to read and write data to and from the file, instead of the default values.
+
+Below we show some example uses of the file data generator.
+
+```cpp
+_TEST_CASE(
+    abc::test_case_t({.name = "File data generator examples"})
+)
+{
+    using namespace abc;
+    using namespace std;
+    _BEGIN_MULTI_ELEMENT_BBA(
+        to_string_check, "Testing std::to_string function"
+    );
+    // The type we will use in this test case.
+    using test_type_1 = pair<int, string>;
+    // The file "integer_file" contains the following data:
+    // (1, "1")
+    // (2, "2")
+    // (100, "102")
+    for (auto& [integer, str] :
+         read_data_from_file<test_type_1>("integer_file"))
+    {
+        to_string_check += _BLOCK_CHECK(_EXPR(to_string(integer) == str));
+    }
+    // This is another way of accessing "integer_file".
+    for (auto& [integer, str] :
+         read_data_from_file<test_type_1>(gdf("integer_file")))
+    {
+        to_string_check += _BLOCK_CHECK(_EXPR(to_string(integer) == str));
+    }
+    // This accesses a differnet file, in special_folder. special_folder must
+    // exist before this data generator is ran. Otherwise, the test framework
+    // will throw an exception and terminate.
+    // The file, if it doesn't already exist, is initialised using the data
+    // shown.
+    for (auto& [integer, str] : read_data_from_file<test_type_1>(
+             gdf("special_folder", "integer_file"),
+             {
+                 {10,  "10" },
+                 {20,  "20" },
+                 {300, "301"}
+    }
+         ))
+    {
+        to_string_check += _BLOCK_CHECK(_EXPR(to_string(integer) == str));
+    }
+    // Another example. This one has an exact file where the data is located.
+    for (auto& [integer, str] : read_data_from_file<test_type_1>(
+             gdf_from_path(
+                 "../../examples/data/test_data/unique/path/integer_file.gd"
+             ),
+             {
+                 {1'000,  "1000" },
+                 {2'000,  "2000" },
+                 {30'000, "30100"}
+    }
+         ))
+    {
+        to_string_check += _BLOCK_CHECK(_EXPR(to_string(integer) == str));
+    }
+    // This one uses a custom printer and parser, which reads the int data in
+    // hex.
+    for (auto& [integer, str] :
+         read_data_from_file<test_type_1>(general_data_file(
+             gdf("integer_file"),
+             utility::str::rw_info_t<test_type_1>{
+                 .internal_parser
+                 = utility::parser::default_parser<test_type_1>(
+                     utility::parser::mk_parser(int_parser_t()),
+                     utility::parser::default_parser<string>()
+                 ),
+                 .internal_printer
+                 = utility::printer::default_printer<test_type_1>(
+                     utility::printer::mk_printer(int_printer_t()),
+                     utility::printer::default_printer<string>()
+                 )
+             }
+         )))
+    {
+        to_string_check += _BLOCK_CHECK(_EXPR(to_string(integer) == str));
+    }
+    _END_BBA_CHECK(to_string_check);
+}
+```

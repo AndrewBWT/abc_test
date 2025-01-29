@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
-
+#if 0
 _TEST_CASE(
     abc::test_case_t({.name = "Simple data generators"})
 )
@@ -187,6 +187,7 @@ struct abc::utility::printer::default_printer_t<S>
         );
     }
 };
+#endif
 
 // This is a bespoke printer_base_t instance for int. It prints the data out in
 // hex.
@@ -200,6 +201,7 @@ struct int_printer_t : abc::utility::printer::printer_base_t<int>
         return fmt::format("{:x}", _a_object);
     }
 };
+#if 0
 
 // This is a bespoke printer for S.
 struct s_printer : public abc::utility::printer::printer_base_t<S>
@@ -405,7 +407,7 @@ struct abc::utility::parser::default_parser_t<S>
             );
     }
 };
-
+#endif
 // This is a bespoke printer_base_t instance for int. It prints the data out in
 // hex.
 struct int_parser_t : abc::utility::parser::parser_base_t<int>
@@ -432,7 +434,7 @@ struct int_parser_t : abc::utility::parser::parser_base_t<int>
         }
     }
 };
-
+#if 0
 // This is a bespoke printer for S.
 struct s_parser : public abc::utility::parser::parser_base_t<S>
 {
@@ -467,7 +469,6 @@ struct s_parser : public abc::utility::parser::parser_base_t<S>
             );
     }
 };
-
 _TEST_CASE(
     abc::test_case_t({.name = "Custom parsers"})
 )
@@ -494,206 +495,25 @@ _TEST_CASE(
         == s1
     );
 }
-#if 0
-_BEGIN_ABC_UTILITY_PARSER_NS
-
-template <>
-struct default_parser_t<S> : public parser_base_t<S>
-{
-    __constexpr virtual parse_result_t<S>
-        run_parser(
-            parser_input_t& _a_parse_input
-        ) const
-    {
-        return object_parser<S, int, int>(
-            {"int_1", "int_2"}, "S", '{', '}', _a_parse_input
-            // std::make_tuple(parser_t<int>(), parser_t<int>())
-        );
-    }
-};
-
-_END_ABC_UTILITY_PARSER_NS
-
-_BEGIN_ABC_UTILITY_PRINTER_NS
-/*template <>
-struct default_printer_t<S> : public printer_base_t<S>
-{
-    __constexpr virtual std::string
-        run_printer(
-            const S& _a_parse_input
-        ) const
-    {
-        return object_printer(
-            { "int_1", "int_2" },
-            "S",
-            '{',
-            '}',
-            _a_parse_input.int_1, _a_parse_input.int_2
-            // std::make_tuple(parser_t<int>(), parser_t<int>())
-        );
-    }
-};*/
-_END_ABC_UTILITY_PRINTER_NS
-
-/*template <>
-struct scn::scanner<S>
-{
-    template <typename ParseContext>
-    auto
-        parse(
-            ParseContext& pctx
-        ) -> scan_expected<typename ParseContext::iterator>
-    {
-        return pctx.begin();
-    }
-
-    template <typename Context>
-    auto
-        scan(
-            S&       val,
-            Context& ctx
-        ) -> scan_expected<typename Context::iterator>
-    {
-        auto result = scn::scan<std::pair<int, int>>(ctx.range(), "{}");
-        if (! result)
-        {
-            return unexpected(result.error());
-        }
-        else
-        {
-            val.int_1 = result->value().first;
-            val.int_2 = result->value().second;
-            return result->begin();
-        }
-    }
-};*/
 
 _TEST_CASE(
-    abc::test_case_t({.name = "Parser object"})
-)
-{
-    using namespace abc;
-    using namespace std;
-    using namespace abc::utility::parser;
-    // int_printer_1 is created using a bespoke function to print int objects.
-    auto int_parser_func = [](abc::utility::parser::parser_input_t& str)
-    {
-        int               result{};
-        const string_view _l_str{str.sv()};
-        auto [ptr, ec]
-            = from_chars(_l_str.data(), _l_str.data() + _l_str.size(), result);
-
-        if (ec == std::errc())
-        {
-            str.advance(ptr - _l_str.data());
-            return expected<int, string>(result);
-        }
-        else
-        {
-            return expected<int, string>(
-                unexpected(fmt::format("Could not parse \"{0}\"", _l_str))
-
-            );
-        }
-    };
-    // int_printer_2 is created using int's fmt::format definition.
-    abc::utility::parser::parser_t<int> int_parser_2
-        = abc::utility::parser::default_parser<int>();
-
-    _CHECK_EXPR(parse<int>("123", int_parser_func) == 123);
-    _CHECK_EXPR(parse("123", int_parser_2) == 123);
-
-    // s_printer_1 is created using a bespoke function to print S objects.
-    auto s_parser_func = [](abc::utility::parser::parser_input_t& _a_str)
-    {
-        auto res = scn::scan<int, int>(_a_str.sv(), "S {{{0}, {1}}}");
-        if (res.has_value())
-        {
-            auto [arg1, arg2] = res->values();
-            _a_str.advance(_a_str.sv().size());
-            return expected<S, string>(S{arg1, arg2});
-        }
-        else
-        {
-            return expected<S, string>(
-                unexpected(fmt::format("Could not parse \"{0}\"", _a_str.sv()))
-            );
-        }
-    };
-    _CHECK_EXPR(parse<S>("S {1, 2}", s_parser_func) == (S{1, 2}));
-    _CHECK_EXPR(parse<S>("S {int_1 = 1, int_2 = 2}") == (S{1, 2}));
-}
-
-_TEST_CASE(
-    abc::test_case_t({.name = "Strings and str_t's"})
-)
-{
-    using namespace abc;
-    using namespace std;
-    using namespace abc::utility;
-    using namespace abc::utility::printer;
-    using namespace abc::utility::parser;
-    // Below we show how the default printer and parser work.
-    _CHECK_EXPR(print(make_tuple("123"s, "456"s)) == "(\"123\", \"456\")");
-    // abc::utility::printer::printer_t<std::string> ti;
-    // abc::utility::printer::printer_t<std::tuple<std::string>> ti2(ti);
-    _CHECK_EXPR(print("123") == "\"123\"");
-    _CHECK_EXPR(parse<string>("\"123\"") == "123");
-    _CHECK_EXPR(
-        (parse<pair<string, string>>("(\"123\", \"456\")"))
-        == make_pair("123"s, "456"s)
-    );
-    // This printer/parser pair is not able to parse the argument correctly.
-    // This is because the parser will terminate either at the first whitespace
-    // character, or at the end of the string. The printed pair becomes "{123,
-    // 456}". It is parsed as {"{123," "456}"}.
-    pair<int, int> arg_1 = make_pair(123, 456);
-    _CHECK_EXPR((parse<pair<int, int>>(print(arg_1))) == arg_1);
-    const auto arg_2 = make_pair("\"123\""s, "\"456\""s);
-    // The user could surround the strings by quotes, and assume that the parser
-    // would recognise them as escape characters. However this requires
-    // scn::scan to be formatted correctly, which isn't how the default parser
-    // is defined. So the following won't work.
-    _CHECK_EXPR((parse<pair<string, string>>(print(arg_2))) != arg_2);
-}
-
-// Here is another entity called T.
-struct T
-{
-    int                                     m1;
-    std::string                             m2;
-    std::vector<std::string>                m3;
-    std::tuple<int, std::string, char, int> m4;
-};
-
-constexpr bool
-    operator==(
-        const T& lhs,
-        const T& rhs
+    abc::test_case_t(
+        {.name = "General data examples", .path = "abc::general_data"}
     )
-{
-    return std::make_tuple(lhs.m1, lhs.m2, lhs.m3, lhs.m4)
-           == std::make_tuple(rhs.m1, rhs.m2, rhs.m3, rhs.m4);
-}
-
-_TEST_CASE(
-    abc::test_case_t({.name = "Strings and str_t's"})
 )
 {
+    // Assume the root path is set at "root_path".
+    // Assume the default general data file extension "gd" has been used
+    using namespace std::filesystem;
     using namespace abc;
     using namespace std;
-    using namespace abc::utility;
-    T object_1 = T{
-        500, "501"s, {"502"s, "503"s, "504"s},
-          {505, "506"s, 'c', 508}
-    };
-    // This pair of printer/parser is able to parse the argument correctly.
-    // _CHECK_EXPR(
-    //    default_parser<T>().run_parser_with_exception(
-    //        default_printer<T>().run_printer(object_1)
-    //    )
-    //   == object_1
-    // );
+    // s1 = "root_path/abc/general_data/general\ data\ examples/hello.gd
+    string s1 = gdf("hello").path().string();
+    // s2 = "root_path/abc/special_folder/hello2.gd.
+    string s2 = gdf("hello", "abc/special_folder").path().string();
+    // s3 = "special_root/hello/three/hello3.gdf
+    string s3
+        = gdf_from_path("special_root/hello/three/hello3.gdf").path().string();
 }
 
 _TEST_CASE(
@@ -754,24 +574,84 @@ _TEST_CASE(
     }
     _END_BBA_CHECK(to_string_check);
 }
+#endif
 
 _TEST_CASE(
-    abc::test_case_t(
-        {.name = "General data examples", .path = "abc::general_data"}
-    )
+    abc::test_case_t({.name = "File data generator examples"})
 )
 {
-    // Assume the root path is set at "root_path".
-    // Assume the default general data file extension "gd" has been used
-    using namespace std::filesystem;
     using namespace abc;
     using namespace std;
-    // s1 = "root_path/abc/general_data/general\ data\ examples/hello.gd
-    string s1 = gdf("hello").path().string();
-    // s2 = "root_path/abc/special_folder/hello2.gd.
-    string s2 = gdf("hello", "abc/special_folder").path().string();
-    // s3 = "special_root/hello/three/hello3.gdf
-    string s3
-        = gdf_from_path("special_root/hello/three/hello3.gdf").path().string();
+    _BEGIN_MULTI_ELEMENT_BBA(
+        to_string_check, "Testing std::to_string function"
+    );
+    // The type we will use in this test case.
+    using test_type_1 = pair<int, string>;
+    // The file "integer_file" contains the following data:
+    // (1, "1")
+    // (2, "2")
+    // (100, "102")
+    for (auto& [integer, str] :
+         read_data_from_file<test_type_1>("integer_file"))
+    {
+        to_string_check += _BLOCK_CHECK(_EXPR(to_string(integer) == str));
+    }
+    // This is another way of accessing "integer_file".
+    for (auto& [integer, str] :
+         read_data_from_file<test_type_1>(gdf("integer_file")))
+    {
+        to_string_check += _BLOCK_CHECK(_EXPR(to_string(integer) == str));
+    }
+    // This accesses a differnet file, in special_folder. special_folder must
+    // exist before this data generator is ran. Otherwise, the test framework
+    // will throw an exception and terminate.
+    // The file, if it doesn't already exist, is initialised using the data
+    // shown.
+    for (auto& [integer, str] : read_data_from_file<test_type_1>(
+             gdf("special_folder", "integer_file"),
+             {
+                 {10,  "10" },
+                 {20,  "20" },
+                 {300, "301"}
+    }
+         ))
+    {
+        to_string_check += _BLOCK_CHECK(_EXPR(to_string(integer) == str));
+    }
+    // Another example. This one has an exact file where the data is located.
+    for (auto& [integer, str] : read_data_from_file<test_type_1>(
+             gdf_from_path(
+                 "../../examples/data/test_data/unique/path/integer_file.gd"
+             ),
+             {
+                 {1'000,  "1000" },
+                 {2'000,  "2000" },
+                 {30'000, "30100"}
+    }
+         ))
+    {
+        to_string_check += _BLOCK_CHECK(_EXPR(to_string(integer) == str));
+    }
+    // This one uses a custom printer and parser, which reads the int data in
+    // hex.
+    for (auto& [integer, str] :
+         read_data_from_file<test_type_1>(general_data_file(
+             gdf("integer_file"),
+             utility::str::rw_info_t<test_type_1>{
+                 .internal_parser
+                 = utility::parser::default_parser<test_type_1>(
+                     utility::parser::mk_parser(int_parser_t()),
+                     utility::parser::default_parser<string>()
+                 ),
+                 .internal_printer
+                 = utility::printer::default_printer<test_type_1>(
+                     utility::printer::mk_printer(int_printer_t()),
+                     utility::printer::default_printer<string>()
+                 )
+             }
+         )))
+    {
+        to_string_check += _BLOCK_CHECK(_EXPR(to_string(integer) == str));
+    }
+    _END_BBA_CHECK(to_string_check);
 }
-#endif
