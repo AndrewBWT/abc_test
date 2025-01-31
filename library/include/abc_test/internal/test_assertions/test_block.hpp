@@ -170,6 +170,7 @@ __constexpr assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>
     using namespace _ABC_NS_MATCHER;
     matcher_source_map_t _l_msm;
     _a_matcher.gather_map_source(_l_msm);
+    global::get_this_threads_current_test().add_current_for_loop_stack_to_trie();
     if constexpr (Annotated)
     {
         matcher_result_with_annotation_and_source_info_t _l_tuple(
@@ -203,6 +204,7 @@ __constexpr assertion_wp_t<T>
 {
     using namespace _ABC_NS_MATCHER;
     matcher_source_map_t _l_msm;
+    global::get_this_threads_current_test().add_current_for_loop_stack_to_trie();
     _a_matcher.gather_map_source(_l_msm);
     if constexpr (Annotated)
     {

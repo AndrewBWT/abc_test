@@ -155,14 +155,14 @@ _TEST_CASE(
         == "(123, \"h3llo\", {1, 0, 1})"
     );
 }
-
+#endif
 // This is a user-defined object.
 struct S
 {
     int int_1;
     int int_2;
 };
-
+#if 0
 // This is how we create a default_printer_t instance for S.
 template <>
 struct abc::utility::printer::default_printer_t<S>
@@ -654,4 +654,116 @@ _TEST_CASE(
         to_string_check += _BLOCK_CHECK(_EXPR(to_string(integer) == str));
     }
     _END_BBA_CHECK(to_string_check);
+}
+
+struct int_generator_t : public abc::data_gen::random_generator_base_t<int>
+{
+    int_generator_t(
+        int multiplier = 10
+    )
+        : m_multiplier(multiplier)
+    {}
+
+    inline int
+        operator()(
+            abc::utility::rng& _a_rnd_generator,
+            const std::size_t  _a_index
+        )
+    {
+        using namespace std;
+        size_t limit{_a_index * m_multiplier};
+        return _a_rnd_generator() % limit;
+    }
+private:
+    int m_multiplier;
+};
+
+template <>
+struct abc::data_gen::default_random_generator_t<S>
+    : public abc::data_gen::random_generator_base_t<S>
+{
+    inline default_random_generator_t(
+        abc::data_gen::random_generator_t<int> int_generator
+    )
+        : m_int_generator(int_generator)
+    {}
+
+    inline S
+        operator()(
+            abc::utility::rng& _a_rnd_generator,
+            const std::size_t  _a_index
+        )
+    {
+        using namespace std;
+        return make_random_object<S>(
+            _a_rnd_generator,
+            _a_index,
+            make_tuple(m_int_generator, m_int_generator)
+        );
+    }
+
+    abc::data_gen::random_generator_t<int> m_int_generator
+        = default_random_generator<int>();
+};
+
+_TEST_CASE(
+    abc::test_case_t({.name = "Random data generator examples"})
+)
+{
+    using namespace abc;
+    using namespace std;
+    _BEGIN_MULTI_ELEMENT_BBA(
+        check_integer_overflow, "Testing integers do not overflow"
+    );
+    // This random generator uses the default_random_generator_t instance for
+    // int.
+    for (auto integer : generate_data_randomly<int>())
+    {
+        check_integer_overflow
+            += _BLOCK_CHECK(_EXPR(integer + integer > integer));
+    }
+    // There are two other overloads of generate_data_randomly. The first of
+    // these takes an unbounded list of files to write failing data to. As with
+    // the majority of data generators which use file data, only the first file
+    // will have data read from it. All files in the list will have failing data
+    // written to it.
+    // This data file only has a single tertiary data file which failing data is
+    // read and written to.
+    for (auto integer : generate_data_randomly<int>(tdf("integer_file")))
+    {
+        check_integer_overflow
+            += _BLOCK_CHECK(_EXPR(integer + integer > integer));
+    }
+    // This one reads data from a different tertiay data file. Failing test
+    // cases are also written to gdf_1 and special_folder/gdf_2.
+    for (auto integer : generate_data_randomly<int>(
+             tdf("integer_file2"), gdf("gdf_1"), gdf("special_folder", "gdf_2")
+         ))
+    {
+        check_integer_overflow
+            += _BLOCK_CHECK(_EXPR(integer + integer > integer));
+    }
+    // This random data generator has an upper and lower bound between 500 and
+    // 1000.
+    for (auto integer :
+         generate_data_randomly<int>(default_random_generator<int>(500, 1'000)))
+    {
+        check_integer_overflow
+            += _BLOCK_CHECK(_EXPR(integer + integer > integer));
+    }
+    // This does the same as above, but writes the failing output to the
+    // specified files.
+    for (auto integer : generate_data_randomly<int>(
+             default_random_generator<int>(500, 1'000),
+             tdf("integer_file3"),
+             gdf("gdf_1"),
+             gdf("special_folder", "gdf_2")
+         ))
+    {
+        check_integer_overflow
+            += _BLOCK_CHECK(_EXPR(integer + integer > integer));
+    }
+    for (auto integer :
+         generate_data_randomly<int>(mk_random_generator(int_generator_t(100))))
+        _END_BBA_CHECK(check_integer_overflow);
 }

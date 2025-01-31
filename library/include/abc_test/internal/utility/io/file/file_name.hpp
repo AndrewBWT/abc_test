@@ -36,7 +36,7 @@ __constexpr_imp const std::filesystem::path&
     if (auto _l_ptr{get_if<general_data_with_rw_info_t<T>>(&_a_file_name)};
         _l_ptr != nullptr)
     {
-        return _l_ptr->path();
+        return _l_ptr->general_data_file().path();
     }
     else if (auto _l_ptr{get_if<general_data_t>(&_a_file_name)};
              _l_ptr != nullptr)

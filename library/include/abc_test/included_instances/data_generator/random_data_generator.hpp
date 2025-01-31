@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/included_instances/data_generator/random_generator_object.hpp"
+#include "abc_test/included_instances/data_generator/random_generator/random_generator_base.hpp"
 #include "abc_test/internal/data_generator/data_generator.hpp"
 #include "abc_test/internal/test_runner.hpp"
 #include "abc_test/internal/utility/io/file/file_line_reader.hpp"
@@ -18,7 +18,7 @@ class random_data_generator_t
 {
 public:
     using generator_type = T;
-    using tertiary_type  = std::tuple<std::size_t, std::size_t,std::size_t>;
+    using tertiary_type  = std::tuple<std::size_t, std::size_t, std::size_t>;
     __constexpr const tertiary_type&
         tertiary_data() const;
     __constexpr void
@@ -27,21 +27,19 @@ public:
     __constexpr void
         reset();
     __constexpr
-    random_data_generator_t(
-        const std::shared_ptr<random_generator_object_t<T>>& _a_rnd
-    );
+    random_data_generator_t(const random_generator_t<T>& _a_rnd);
     __constexpr bool
         has_current_element() const;
     __constexpr bool
         generate_next();
     __constexpr const T&
-                      current_element() const;
+        current_element() const;
 private:
-    tertiary_type                                 _m_random_calls_before_after;
-    std::shared_ptr<random_generator_object_t<T>> _m_random_generator;
-    size_t      _m_elemnets_to_randomly_generate{10};
-    std::size_t _l_elements_generated{0};
-    T           _m_element;
+    tertiary_type         _m_random_calls_before_after;
+    random_generator_t<T> _m_random_generator;
+    size_t                _m_elemnets_to_randomly_generate{10};
+    std::size_t           _l_elements_generated{0};
+    T                     _m_element;
 };
 
 _END_ABC_DG_NS
@@ -51,7 +49,7 @@ _BEGIN_ABC_NS
 template <typename T, typename... Args>
 __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
                 generate_data_randomly(
-                    std::shared_ptr<_ABC_NS_DG::random_generator_object_t<T>> _a_rnd_base,
+                    const _ABC_NS_DG::random_generator_t<T>& _a_rnd,
                     Args... _a_file_reader_writers
                 );
 template <typename T, typename... Args>
@@ -60,12 +58,10 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
 
 template <typename T>
 __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
-generate_data_randomly(
-    std::shared_ptr<_ABC_NS_DG::random_generator_object_t<T>> _a_rnd_base
-);
+    generate_data_randomly(const _ABC_NS_DG::random_generator_t<T>& _a_rnd);
 template <typename T>
 __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
-generate_data_randomly();
+                generate_data_randomly();
 
 _END_ABC_NS
 
@@ -96,11 +92,26 @@ __constexpr void
 template <typename T>
 __constexpr
 random_data_generator_t<T>::random_data_generator_t(
-    const std::shared_ptr<random_generator_object_t<T>>& _a_rnd
+    const random_generator_t<T>& _a_rnd
 )
     : _m_random_generator(_a_rnd)
 
-{}
+{
+    get<0>(_m_random_calls_before_after)
+        = global::get_this_threads_current_test()
+        .get_random_generator()
+        .calls();
+    get<2>(_m_random_calls_before_after) = _l_elements_generated;
+    _m_element = (*_m_random_generator)(
+        global::get_this_threads_current_test().get_random_generator(),
+        _l_elements_generated
+        );
+    get<1>(_m_random_calls_before_after)
+        = global::get_this_threads_current_test()
+        .get_random_generator()
+        .calls();
+    _l_elements_generated++;
+}
 
 template <typename T>
 __constexpr bool
@@ -120,8 +131,9 @@ __constexpr bool
                   .get_random_generator()
                   .calls();
         get<2>(_m_random_calls_before_after) = _l_elements_generated;
-        _m_element = (*_m_random_generator)(
-            global::get_this_threads_current_test().get_random_generator(), _l_elements_generated
+        _m_element                           = (*_m_random_generator)(
+            global::get_this_threads_current_test().get_random_generator(),
+            _l_elements_generated
         );
         get<1>(_m_random_calls_before_after)
             = global::get_this_threads_current_test()
@@ -149,13 +161,13 @@ _BEGIN_ABC_NS
 template <typename T, typename... Args>
 __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
                 generate_data_randomly(
-                    std::shared_ptr<_ABC_NS_DG::random_generator_object_t<T>> _a_rnd_base,
+                    const _ABC_NS_DG::random_generator_t<T>& _a_rnd,
                     Args... _a_file_reader_writers
                 )
 {
     using namespace _ABC_NS_DG;
     return make_data_generator_with_file_support<random_data_generator_t<T>>(
-        random_data_generator_t<T>(_a_rnd_base), _a_file_reader_writers...
+        random_data_generator_t<T>(_a_rnd), _a_file_reader_writers...
     );
 }
 
@@ -168,28 +180,29 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
     using namespace _ABC_NS_DG;
     using namespace std;
     return generate_data_randomly<T>(
-        make_shared<random_generator_object_t<T>>(), _a_file_reader_writers...
+        default_random_generator<T>(), _a_file_reader_writers...
     );
 }
+
 template <typename T>
 __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
-generate_data_randomly(
-    std::shared_ptr<_ABC_NS_DG::random_generator_object_t<T>> _a_rnd_base
-)
+                generate_data_randomly(
+                    const _ABC_NS_DG::random_generator_t<T>& _a_rnd
+                )
 {
     using namespace _ABC_NS_DG;
     return make_data_generator_with_file_support<random_data_generator_t<T>>(
-        random_data_generator_t<T>(_a_rnd_base)
+        random_data_generator_t<T>(_a_rnd)
     );
 }
+
 template <typename T>
 __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
-generate_data_randomly()
+                generate_data_randomly()
 {
     using namespace _ABC_NS_DG;
     using namespace std;
-    return generate_data_randomly<T>(
-        make_shared<random_generator_object_t<T>>()
-    );
+    return generate_data_randomly<T>(default_random_generator<T>());
 }
+
 _END_ABC_NS

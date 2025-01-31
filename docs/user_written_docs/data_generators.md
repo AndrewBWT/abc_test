@@ -1006,3 +1006,167 @@ _TEST_CASE(
     _END_BBA_CHECK(to_string_check);
 }
 ```
+
+# Random Data Generator
+
+A random data generator is used when wanting to test with randomly generated values. It also includes extensive support for reading and writing values fo files. It is represented by the type `template <typename T> random_data_generator_t`, and requires the include directive `#include "abc_test/included_instances.hpp"` to use.
+
+# Basic Random Generator
+
+`abc_test` comes with its own random generator which is used when making random data generators. This is the `abc::utility::rng` object. If the user is writing their own random generator object, an understanding of how this object works is beneficial.
+
+There are components of the `rng` object which are not required by the user. Below we provide an overview of the pertinant class information.
+
+```cpp
+class rng
+{
+public:
+    using result_type = std::mt19937_64::result_type;
+    inline result_type
+    operator()()
+    {
+        return inner_rng();
+    }
+private:
+    std::mt19937_64 inner_rng;
+}
+```
+
+The user can see that `rng` is essentially a wrapper around an `std::mt19937_64` object. Random data values can be extracted using the `operator()` function.
+
+## Random Generator
+
+`random_data_generator_t` objects are able to use a user-defined random generator object. These are all derived from the abstract class `template<typename T> random_generator_base_t`, which we outline below.
+
+```cpp
+template <typename T>
+struct random_generator_base_t
+{
+public:
+    using value_type_t = T;
+    virtual T
+        operator()(utility::rng& rnd_generator, const std::size_t index) = 0;
+};
+```
+
+The `random_generator_base_t` class has a single function, `operator()`. It takes a random generator `utility::rng` and the element being generated represented as an `std::size_t`, `index`. This is the function which creates the random elements. The `index` variable can be used to "limit" the created values; for example, if creating a random `std::vector`, this can be used to control the size of the created vector.
+
+`abc_test` also comes with a type synonym `random_generator_t` used to define instances of `random_generator_base_t`, as well as a function for elevating arbitrary classes which extend `random_generator_base_t` to `random_generator_t` entities. These are outlined below.
+
+```cpp
+template <typename T>
+using random_generator_t = std::shared_ptr<random_generator_base_t<T>>;
+template <typename T>
+__constexpr data_gen::random_generator_t<typename T::value_type_t>
+            mk_random_generator(T&& _a_random_generator_base) noexcept;
+```
+
+The user is able to define concrete classes by extending `random_generator_base_t`. Below we show an example.
+
+```cpp
+struct int_generator_t : public abc::data_gen::random_generator_base_t<int>
+{
+    int_generator_t(int multiplier = 10)
+        : m_multiplier(multiplier)
+    { }
+    inline int
+        operator()(abc::utility::rng& _a_rnd_generator, const std::size_t _a_index)
+    {
+        using namespace std;
+        size_t limit{ _a_index * m_multiplier };
+        return (_a_rnd_generator() % limit);
+    }
+private:
+    int m_multiplier;
+};
+```
+
+`abc_test` comes with three concrete instances of `random_generator_base_t`. The first of these is `random_generator_function_t`, which is outlined below.
+
+```cpp
+template <typename T, typename F>
+    requires std::is_invocable_r_v<T, F, utility::rng&, const std::size_t>
+struct random_generator_function_t : public random_generator_base_t<T>
+{
+private:
+    F _m_rnd_gen;
+public:
+    random_generator_function_t(F _a_rnd_func) noexcept;
+    virtual T
+        operator()(utility::rng& _a_rnd_generator, const std::size_t _a_index);
+};
+```
+
+This object allows the user to wrap a callable entity into a `random_generator_base_t` object, without having to define their own class derived from `random_generator_base_t`. 
+
+`random_generator_base_t` also has an associated class in the `abc` namespace, which can be used to quickly construct an entity of type `random_generator_function_t` wrapped in a `random_generator_t` entity. It is defined as follows.
+
+```cpp
+template <typename T, typename F>
+    requires std::is_invocable_r_v<T, F, utility::rng&, const std::size_t>
+data_gen::random_generator_t<typename T::value_type_t>
+using_function(F func) noexcept;
+```
+
+The second of these is the `default_random_generator_t`. Its `operator()` function has no concrete implementation, instead relying on there being specializations defined for this class.
+
+Below we show an example of a specialization defined for the type `S`, introduced earlier in this document.
+
+```cpp
+template <>
+struct abc::data_gen::default_random_generator_t<S>
+    : public abc::data_gen::random_generator_base_t<S>
+{
+    inline default_random_generator_t(
+        abc::data_gen::random_generator_t<int> int_generator
+    )
+        : m_int_generator(int_generator)
+    {}
+
+    inline S
+        operator()(
+            abc::utility::rng& _a_rnd_generator,
+            const std::size_t  _a_index
+        )
+    {
+        using namespace std;
+        return make_random_object<S>(
+            _a_rnd_generator,
+            _a_index,
+            make_tuple(m_int_generator, m_int_generator)
+        );
+    }
+
+    abc::data_gen::random_generator_t<int> m_int_generator
+        = default_random_generator<int>();
+};
+```
+
+The final of these concrete subclasses of `random_generator_base_t` is slightly more complicated. It uses the enumeration data generator described in the previous section as a basis for generating random values. 
+
+## Creating Random Data Generators
+
+
+There are several factory methods in the `abc` namespace which can be used to construct random data generators, outlined as follows.
+
+```cpp
+template <typename T, typename... Args>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
+                generate_data_randomly(
+                    const data_gen::random_generator_t<T>& _a_rnd,
+                    Args... _a_file_reader_writers
+                );
+template <typename T, typename... Args>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
+                generate_data_randomly(Args... _a_file_reader_writers);
+
+template <typename T>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
+    generate_data_randomly(const _ABC_NS_DG::random_generator_t<T>& _a_rnd);
+template <typename T>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
+                generate_data_randomly();
+```
+
+The first of these `generate_data_randomly` takes a `data_gen::random_data_generator_t<T>` object, and a list of additional file arguments. These file arguments can either be `tertiay_data_file_t`, `general_data_file_t` or `template<typename T> general_data_with_rw_info_t` objects. However it is only the first in the set of argumnets which the data generator will read elements from. The other files are useful if the user wants to use failing values for other data generators.
+

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/included_instances/data_generator/random_generator_object.hpp"
+#include "abc_test/included_instances/data_generator/random_generator/default_random_generator.hpp"
 #include "abc_test/internal/utility/limits/max_value_concept.hpp"
 #include "abc_test/internal/utility/limits/min_value_concept.hpp"
 #include "concepts"
@@ -10,13 +10,13 @@
 _BEGIN_ABC_DG_NS
 
 template <typename T>
-struct random_generator_object_t<std::optional<T>>
+struct default_random_generator_t<std::optional<T>> : public random_generator_base_t<std::optional<T>>
 {
 public:
     __no_constexpr virtual std::optional<T>
         operator()(utility::rng& _a_rnd_generator, const std::size_t _a_index);
 private:
-    random_generator_object_t<T> _m_rng;
+    random_generator_t<T> _m_rng;
 };
 
 _END_ABC_DG_NS
@@ -24,7 +24,7 @@ _END_ABC_DG_NS
 _BEGIN_ABC_DG_NS
 template <typename T>
 __no_constexpr_imp std::optional<T>
-                   random_generator_object_t<std::optional<T>>::operator()(
+default_random_generator_t<std::optional<T>>::operator()(
         utility::rng&     _a_rnd_generator,
         const std::size_t _a_index
     )

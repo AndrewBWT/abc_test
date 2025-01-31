@@ -14,7 +14,7 @@ class data_generator_file_reader_and_writer_t
 public:
     __constexpr
     data_generator_file_reader_and_writer_t(
-        const T& _a_object,
+        const T&                                                    _a_object,
         const utility::io::file_name_t<typename T::generator_type>& _a_frw,
         const std::string_view _a_comment_str
     );
@@ -89,16 +89,20 @@ __constexpr std::size_t
     )
 {
     using namespace abc::utility::str;
+    using namespace abc::utility::printer;
     if (_m_opt_rw_info.has_value())
     {
-        _m_line_writer.write_line(_m_opt_rw_info.value().printer().run_printer(
-            _a_element.current_element()
-        ));
+        _m_line_writer.write_line(
+            _m_opt_rw_info.value().internal_printer->run_printer(
+                _a_element.current_element()
+            )
+        );
     }
     else
     {
-        _m_line_writer.write_line(printer_t<typename T::tertiary_type>()
-                                      .run_printer(_a_element.tertiary_data()));
+        _m_line_writer.write_line(default_printer<typename T::tertiary_type>()
+                                      ->run_printer(_a_element.tertiary_data())
+        );
     }
 
     return ++_m_elements_read_or_written;
@@ -123,10 +127,9 @@ __constexpr void
 {
     while (_m_elements_read_or_written < _a_idx)
     {
-        const bool _l_has_next_line{ generate_next() };
+        const bool _l_has_next_line{generate_next()};
         if (not _l_has_next_line)
         {
-
         }
     }
 }
@@ -183,18 +186,20 @@ requires data_gen::concept_for_data_generator_with_file_support<T>
 __constexpr void
     data_generator_file_reader_and_writer_t<T>::set_element()
 {
+    using namespace abc::utility::parser;
     if (_m_opt_rw_info.has_value())
     {
-        _m_element = _m_opt_rw_info.value().parser().run_parser_with_exception(
-            _m_line_reader.current_line()
+        _m_element = parse_with_exception(
+            _m_line_reader.current_line(),
+            _m_opt_rw_info.value().internal_parser
         );
     }
     else
     {
-        _m_object.set_generator_using_tertiary_data(
-            abc::utility::parser::default_parser_t<typename T::tertiary_type>()
-                .run_parser_with_exception(_m_line_reader.current_line())
-        );
+        _m_object.set_generator_using_tertiary_data(parse_with_exception(
+            _m_line_reader.current_line(),
+            default_parser<typename T::tertiary_type>()
+        ));
     }
 }
 

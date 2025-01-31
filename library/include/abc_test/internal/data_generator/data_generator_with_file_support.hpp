@@ -195,7 +195,7 @@ __constexpr void
         case 1:
             _m_object.set_generator_using_tertiary_data(
                 abc::utility::parser::parse_with_exception(
-                    _a_dgme.additional_data, _m_tertiary_rw_info.parser()
+                    _a_dgme.additional_data, _m_tertiary_rw_info.internal_parser
                 )
             );
             break;
@@ -342,7 +342,7 @@ __constexpr ds::dg_memoized_element_t
                 );
                 break;
             case 1:
-                _l_rv = _m_tertiary_rw_info.printer().run_printer(
+                _l_rv = _m_tertiary_rw_info.internal_printer->run_printer(
                     _m_object.tertiary_data()
                 );
                 break;
@@ -372,7 +372,7 @@ __constexpr ds::dg_memoized_element_t
                 }
                 else
                 {
-                    _l_rv = _m_tertiary_rw_info.printer().run_printer(
+                    _l_rv = _m_tertiary_rw_info.internal_printer->run_printer(
                         _m_object.tertiary_data()
                     );
                 }
@@ -392,7 +392,7 @@ __constexpr ds::dg_memoized_element_t
                     else
                     {
                         _l_writer.write_line(
-                            _m_tertiary_rw_info.printer().run_printer(
+                            _m_tertiary_rw_info.internal_printer->run_printer(
                                 _m_object.tertiary_data()
                             )
                         );

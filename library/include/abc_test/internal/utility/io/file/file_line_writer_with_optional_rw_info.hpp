@@ -56,7 +56,7 @@ file_line_writer_with_optional_rw_info_t<T>::write_line_using_rw_info(
     if (_m_opt_rw_info.has_value())
     {
         return write_line(
-            _m_opt_rw_info.value().printer().run_printer(_a_element)
+            _m_opt_rw_info.value().internal_printer->run_printer(_a_element)
         );
     }
 }

@@ -117,18 +117,18 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/data_generator/combinatorics_data_generator.hpp
   include/abc_test/included_instances/data_generator/combinatorics_data_generator/permutations_generator.hpp
   # Subfolder contains logic specifically to do with random data generation.
-  include/abc_test/included_instances/data_generator/random_generator_object.hpp
-  include/abc_test/included_instances/data_generator/random_generator_object/specializations.hpp
-  include/abc_test/included_instances/data_generator/random_generator_object/enumeration_based_random_generator_object.hpp
+  include/abc_test/included_instances/data_generator/random_generator/random_generator_base.hpp
+  include/abc_test/included_instances/data_generator/random_generator/default_random_generator.hpp
+  include/abc_test/included_instances/data_generator/random_generator/random_generator_function.hpp
+  
+  include/abc_test/included_instances/data_generator/random_generator/specializations.hpp
+  include/abc_test/included_instances/data_generator/random_generator/enumeration_based_random_generator_object.hpp
   # Folder containing random data specializations for std types.
-  include/abc_test/included_instances/data_generator/random_generator_object/specializations/std.hpp
-  include/abc_test/included_instances/data_generator/random_generator_object/specializations/std_11.hpp
-  include/abc_test/included_instances/data_generator/random_generator_object/specializations/std_14.hpp
-  include/abc_test/included_instances/data_generator/random_generator_object/specializations/std_17.hpp
-  include/abc_test/included_instances/data_generator/random_generator_object/specializations/fundamental_types.hpp
-  include/abc_test/included_instances/data_generator/random_generator_object/specializations/enum.hpp
-  include/abc_test/included_instances/data_generator/random_generator_object/specializations/array.hpp
-  include/abc_test/included_instances/data_generator/random_generator_object/specializations/vector.hpp
+  include/abc_test/included_instances/data_generator/random_generator/specializations/stl_11.hpp
+  include/abc_test/included_instances/data_generator/random_generator/specializations/stl_14.hpp
+  include/abc_test/included_instances/data_generator/random_generator/specializations/stl_17.hpp
+  include/abc_test/included_instances/data_generator/random_generator/specializations/stl_98.hpp
+  include/abc_test/included_instances/data_generator/random_generator/specializations/fundamental_types.hpp
   # Static data files
   include/abc_test/included_instances/data_generator/static_data_generator.hpp
   # Enumeration files
