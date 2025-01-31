@@ -132,17 +132,16 @@ set(LIBRARY_FILES
   # Static data files
   include/abc_test/included_instances/data_generator/static_data_generator.hpp
   # Enumeration files
-  include/abc_test/included_instances/data_generator/enumeration_schema.hpp
-  include/abc_test/included_instances/data_generator/enumeration_schema/from_m_to_n.hpp
-  include/abc_test/included_instances/data_generator/enumeration_schema/from_m_move_k_elements.hpp
-  include/abc_test/included_instances/data_generator/enumeration_data_generator.hpp
-  include/abc_test/included_instances/data_generator/enumeration_data_object.hpp
-  include/abc_test/included_instances/data_generator/enumeration_data_object/specializations.hpp
+  include/abc_test/included_instances/data_generator/enumeration/enumeration_schema.hpp
+  include/abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_to_n.hpp
+  include/abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_move_k_elements.hpp
+  include/abc_test/included_instances/data_generator/enumeration/enumeration_data_object.hpp
+  include/abc_test/included_instances/data_generator/enumeration/specializations.hpp
   # Folder containing random data specializations for std types.
-  include/abc_test/included_instances/data_generator/enumeration_data_object/specializations/fundamental_types.hpp
-  include/abc_test/included_instances/data_generator/enumeration_data_object/specializations/enum.hpp
-  include/abc_test/included_instances/data_generator/enumeration_data_object/specializations/array.hpp
-  include/abc_test/included_instances/data_generator/enumeration_data_object/specializations/vector.hpp
+  include/abc_test/included_instances/data_generator/enumeration/specializations/fundamental_types.hpp
+  include/abc_test/included_instances/data_generator/enumeration/specializations/enum.hpp
+  include/abc_test/included_instances/data_generator/enumeration/specializations/array.hpp
+  include/abc_test/included_instances/data_generator/enumeration/specializations/vector.hpp
   # utility subfolder. Contains axillary helper classes and functions not necessary
   # related to the core testing framework.
   include/abc_test/internal/utility/ptr_utility.hpp

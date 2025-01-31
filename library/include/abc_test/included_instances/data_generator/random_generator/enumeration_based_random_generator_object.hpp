@@ -1,7 +1,7 @@
 #pragma once
 
-#include "abc_test/included_instances/data_generator/enumeration_data_object.hpp"
-#include "abc_test/included_instances/data_generator/enumeration_schema.hpp"
+#include "abc_test/included_instances/data_generator/enumeration/enumeration_data_object.hpp"
+#include "abc_test/included_instances/data_generator/enumeration/enumeration_schema.hpp"
 #include "abc_test/included_instances/data_generator/random_generator/random_generator_base.hpp"
 #include "concepts"
 

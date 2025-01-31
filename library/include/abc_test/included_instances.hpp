@@ -11,7 +11,7 @@
 #include "included_instances/options/included_instances_test_options.hpp"
 #include "abc_test/included_instances/data_generator/random_generator/random_generator_base.hpp"
 #include "abc_test/included_instances/data_generator/random_generator/specializations.hpp"
-#include "abc_test/included_instances/data_generator/enumeration_data_object/specializations.hpp"
+#include "abc_test/included_instances/data_generator/enumeration/specializations.hpp"
 #include "abc_test/included_instances/data_generator/manual_data_generator.hpp"
 #include "abc_test/included_instances/data_generator/combinatorics_data_generator.hpp"
 #include "abc_test/included_instances/utility/limits/array.hpp"

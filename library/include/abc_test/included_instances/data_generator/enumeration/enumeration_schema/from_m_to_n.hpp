@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/included_instances/data_generator/enumeration_schema.hpp"
+#include "abc_test/included_instances/data_generator/enumeration/enumeration_schema.hpp"
 #include "abc_test/internal/utility/limits/max_value_concept.hpp"
 #include "abc_test/internal/utility/limits/min_value_concept.hpp"
 // #include

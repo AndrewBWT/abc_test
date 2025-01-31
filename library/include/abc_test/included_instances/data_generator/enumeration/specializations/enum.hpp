@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/included_instances/data_generator/enumeration_data_object.hpp"
+#include "abc_test/included_instances/data_generator/enumeration/enumeration_data_object.hpp"
 
 #include <map>
 #include "abc_test/internal/utility/enum.hpp"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/included_instances/data_generator/enumeration_data_object.hpp"
+#include "abc_test/included_instances/data_generator/enumeration/enumeration_data_object.hpp"
 #include "abc_test/included_instances/utility/limits/array.hpp"
 
 #include <array>
