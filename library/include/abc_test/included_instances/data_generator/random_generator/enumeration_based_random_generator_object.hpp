@@ -1,7 +1,7 @@
 #pragma once
 
 #include "abc_test/included_instances/data_generator/enumeration/enumeration_data_object.hpp"
-#include "abc_test/included_instances/data_generator/enumeration/enumeration_schema.hpp"
+#include "abc_test/included_instances/data_generator/enumeration/enumeration_schema_base.hpp"
 #include "abc_test/included_instances/data_generator/random_generator/random_generator_base.hpp"
 #include "concepts"
 
@@ -14,7 +14,7 @@ struct enumeration_based_random_generator_object_t
 public:
     __constexpr
     enumeration_based_random_generator_object_t(
-        const std::shared_ptr<enumeration_schema_t<T>>&      _a_es,
+        const _ABC_NS_DG::enumeration_schema_t<T>&      _a_es,
         const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
     ) noexcept;
     __no_constexpr virtual T
@@ -35,7 +35,7 @@ _BEGIN_ABC_NS
 template <typename T>
 __constexpr _ABC_NS_DG::random_generator_t<T>
             using_enumeration_generator(
-                const std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>& _a_es,
+                const _ABC_NS_DG::enumeration_schema_t<T>& _a_es,
                 const std::shared_ptr<_ABC_NS_DG::enumeration_data_object_t<T>>&
                     _a_enumerate_base
             ) noexcept;
@@ -43,12 +43,12 @@ __constexpr _ABC_NS_DG::random_generator_t<T>
 template <typename T>
 __constexpr _ABC_NS_DG::random_generator_t<T>
             using_enumeration_generator(
-                const std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>& _a_es
+                const _ABC_NS_DG::enumeration_schema_t<T>& _a_es
             ) noexcept;
 template <typename T>
 __constexpr _ABC_NS_DG::random_generator_t<T>
             using_enumeration_generator(
-                const std::shared_ptr<_ABC_NS_DG::enumeration_data_object_t<T>>&
+                const _ABC_NS_DG::enumeration_schema_t<T>&
                     _a_enumerate_base
             ) noexcept;
 template <typename T>
@@ -60,7 +60,7 @@ _BEGIN_ABC_DG_NS template <typename T>
 __constexpr_imp
     enumeration_based_random_generator_object_t<T>::
         enumeration_based_random_generator_object_t(
-            const std::shared_ptr<enumeration_schema_t<T>>&      _a_es,
+            const _ABC_NS_DG::enumeration_schema_t<T>&      _a_es,
             const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
         ) noexcept
     : _m_enum_object(_a_edo)
@@ -101,7 +101,7 @@ _BEGIN_ABC_NS
 template <typename T>
 __constexpr_imp _ABC_NS_DG::random_generator_t<T>
                 using_enumeration_generator(
-                    const std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>& _a_es,
+                    const _ABC_NS_DG::enumeration_schema_t<T>& _a_es,
                     const std::shared_ptr<_ABC_NS_DG::enumeration_data_object_t<T>>&
                         _a_enumerate_base
                 ) noexcept
@@ -116,7 +116,7 @@ __constexpr_imp _ABC_NS_DG::random_generator_t<T>
 template <typename T>
 __constexpr_imp _ABC_NS_DG::random_generator_t<T>
                 using_enumeration_generator(
-                    const std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>& _a_es
+                    const _ABC_NS_DG::enumeration_schema_t<T>& _a_es
                 ) noexcept
 {
     using namespace std;

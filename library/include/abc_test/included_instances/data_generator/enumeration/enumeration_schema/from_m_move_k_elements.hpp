@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/included_instances/data_generator/enumeration_schema.hpp"
+#include "abc_test/included_instances/data_generator/enumeration/enumeration_schema_base.hpp"
 
 #include <optional>
 
@@ -13,7 +13,7 @@ class enumeration_data_generator_t;
 
 template <typename T>
 class enumeration_schema_from_m_move_k_elements_t
-    : public enumeration_schema_t<T>
+    : public enumeration_schema_base_t<T>
 {
 public:
     __constexpr
@@ -40,7 +40,7 @@ _END_ABC_DG_NS
 _BEGIN_ABC_NS
 
 template <typename T>
-__constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 from_m_enumerate_k_elements(
                     const T& _a_start_value,
                     const typename _ABC_NS_DG::enumeration_data_generator_t<
@@ -48,14 +48,14 @@ __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
                     const bool             _a_forward_direction
                 ) noexcept;
 template <typename T>
-__constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 from_m_move_forward_k_elements(
                     const T& _a_start_value,
                     const typename _ABC_NS_DG::enumeration_data_generator_t<
                         T>::tertiary_type& _a_elements
                 ) noexcept;
 template <typename T>
-__constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 from_m_move_backward_k_elements(
                     const T& _a_start_value,
                     const typename _ABC_NS_DG::enumeration_data_generator_t<
@@ -155,7 +155,7 @@ _END_ABC_DG_NS
 
 _BEGIN_ABC_NS
 template <typename T>
-__constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 from_m_enumerate_k_elements(
                     const T& _a_start_value,
                     const typename _ABC_NS_DG::enumeration_data_generator_t<
@@ -171,7 +171,7 @@ __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
 }
 
 template <typename T>
-__constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 from_m_move_forward_k_elements(
                     const T& _a_start_value,
                     const typename _ABC_NS_DG::enumeration_data_generator_t<
@@ -182,7 +182,7 @@ __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
 }
 
 template <typename T>
-__constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 from_m_move_backward_k_elements(
                     const T& _a_start_value,
                     const typename _ABC_NS_DG::enumeration_data_generator_t<

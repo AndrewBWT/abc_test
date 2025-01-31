@@ -15,7 +15,7 @@ public:
     using tertiary_type  = std::size_t;
     __constexpr
     enumeration_data_generator_t(
-        const std::shared_ptr<enumeration_schema_t<T>>&      _a_es,
+        const enumeration_schema_t<T>&      _a_es,
         const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
     ) noexcept;
     __constexpr bool
@@ -55,7 +55,7 @@ _BEGIN_ABC_NS
 template <typename T, typename... Args>
 __constexpr _ABC_NS_DG::data_generator_collection_t<T>
             enumerate_data(
-                const std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>& _a_es,
+                const _ABC_NS_DG::enumeration_schema_t<T>& _a_es,
                 const std::shared_ptr<_ABC_NS_DG::enumeration_data_object_t<T>>&
                     _a_enumerate_base,
                 Args... _a_file_reader_writers
@@ -63,13 +63,13 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
 template <typename T, typename... Args>
 __constexpr _ABC_NS_DG::data_generator_collection_t<T>
             enumerate_data(
-                const std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>& _a_es,
+                const _ABC_NS_DG::enumeration_schema_t<T>& _a_es,
                 Args... _a_file_reader_writers
             );
 template <typename T, typename... Args>
 __constexpr _ABC_NS_DG::data_generator_collection_t<T>
             enumerate_data(
-                const std::shared_ptr<_ABC_NS_DG::enumeration_data_object_t<T>>&
+                const _ABC_NS_DG::enumeration_schema_t<T>&
                     _a_enumerate_base,
                 Args... _a_file_reader_writers
             );
@@ -83,7 +83,7 @@ _BEGIN_ABC_DG_NS
 template <typename T>
 __constexpr_imp
     enumeration_data_generator_t<T>::enumeration_data_generator_t(
-        const std::shared_ptr<enumeration_schema_t<T>>&      _a_es,
+        const _ABC_NS_DG::enumeration_schema_t<T>&      _a_es,
         const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
     ) noexcept
     : _m_enum_object(_a_edo)
@@ -188,7 +188,7 @@ _BEGIN_ABC_NS
 template <typename T, typename... Args>
 __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
                 enumerate_data(
-                    const std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>& _a_es,
+                    const _ABC_NS_DG::enumeration_schema_t<T>& _a_es,
                     const std::shared_ptr<_ABC_NS_DG::enumeration_data_object_t<T>>&
                         _a_enumerate_base,
                     Args... _a_file_reader_writers

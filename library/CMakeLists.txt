@@ -132,12 +132,15 @@ set(LIBRARY_FILES
   # Static data files
   include/abc_test/included_instances/data_generator/static_data_generator.hpp
   # Enumeration files
-  include/abc_test/included_instances/data_generator/enumeration/enumeration_schema.hpp
+  include/abc_test/included_instances/data_generator/enumeration_data_generator.hpp
+  include/abc_test/included_instances/data_generator/enumeration/enumeration_base.hpp
+  include/abc_test/included_instances/data_generator/enumeration/enumeration_from_functions.hpp
+  include/abc_test/included_instances/data_generator/enumeration/enumeration_schema_base.hpp
   include/abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_to_n.hpp
   include/abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_move_k_elements.hpp
   include/abc_test/included_instances/data_generator/enumeration/enumeration_data_object.hpp
   include/abc_test/included_instances/data_generator/enumeration/specializations.hpp
-  # Folder containing random data specializations for std types.
+  # Folder containing enumeration data specializations for std types.
   include/abc_test/included_instances/data_generator/enumeration/specializations/fundamental_types.hpp
   include/abc_test/included_instances/data_generator/enumeration/specializations/enum.hpp
   include/abc_test/included_instances/data_generator/enumeration/specializations/array.hpp

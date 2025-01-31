@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/included_instances/data_generator/enumeration/enumeration_schema.hpp"
+#include "abc_test/included_instances/data_generator/enumeration/enumeration_schema_base.hpp"
 #include "abc_test/internal/utility/limits/max_value_concept.hpp"
 #include "abc_test/internal/utility/limits/min_value_concept.hpp"
 // #include
@@ -13,7 +13,7 @@
 _BEGIN_ABC_DG_NS
 
 template <typename T>
-class enumeration_schema_from_m_to_n_t : public enumeration_schema_t<T>
+class enumeration_schema_from_m_to_n_t : public enumeration_schema_base_t<T>
 {
 public:
     __constexpr
@@ -42,37 +42,37 @@ _END_ABC_DG_NS
 _BEGIN_ABC_NS
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
-__constexpr std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr _ABC_NS_DG::enumeration_schema_t<T>
             all_values() noexcept;
 template <typename T>
-__constexpr std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr _ABC_NS_DG::enumeration_schema_t<T>
             from_m_to_n(const T& _a_lower, const T& _a_upper) noexcept;
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T>
-__constexpr std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr _ABC_NS_DG::enumeration_schema_t<T>
             from_val_to_max(const T& _a_value) noexcept;
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T>
-__constexpr std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr _ABC_NS_DG::enumeration_schema_t<T>
             from_max_to_val(const T& _a_value) noexcept;
 template <typename T>
 requires _ABC_NS_UTILITY::min_value_c<T>
-__constexpr std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr _ABC_NS_DG::enumeration_schema_t<T>
             from_val_to_min(const T& _a_value) noexcept;
 template <typename T>
 requires _ABC_NS_UTILITY::min_value_c<T>
-__constexpr std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr _ABC_NS_DG::enumeration_schema_t<T>
             from_min_to_val(const T& _a_value) noexcept;
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
-__constexpr std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr _ABC_NS_DG::enumeration_schema_t<T>
             all_values_moving_forward() noexcept;
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
-__constexpr std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr _ABC_NS_DG::enumeration_schema_t<T>
             all_values_moving_backward() noexcept;
 template <typename T>
-__constexpr std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr _ABC_NS_DG::enumeration_schema_t<T>
             from_m_to_n_using_k_values(
                 const T&          _a_lower,
                 const T&          _a_upper,
@@ -147,14 +147,14 @@ _END_ABC_DG_NS
 _BEGIN_ABC_NS
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
-__constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 all_values() noexcept
 {
     return all_values_moving_forward<T>();
 }
 
 template <typename T>
-__constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 from_m_to_n(
                     const T& _a_lower,
                     const T& _a_upper
@@ -167,7 +167,7 @@ __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
 
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T>
-__constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 from_val_to_max(
                     const T& _a_value
                 ) noexcept
@@ -178,7 +178,7 @@ __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
 
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T>
-__constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 from_max_to_val(
                     const T& _a_value
                 ) noexcept
@@ -189,7 +189,7 @@ __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
 
 template <typename T>
 requires _ABC_NS_UTILITY::min_value_c<T>
-__constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 from_val_to_min(
                     const T& _a_value
                 ) noexcept
@@ -200,7 +200,7 @@ __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
 
 template <typename T>
 requires _ABC_NS_UTILITY::min_value_c<T>
-__constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 from_min_to_val(
                     const T& _a_value
                 ) noexcept
@@ -211,7 +211,7 @@ __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
 
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
-__constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 all_values_moving_forward() noexcept
 {
     using namespace _ABC_NS_DG;
@@ -223,7 +223,7 @@ __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
 
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
-__constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 all_values_moving_backward() noexcept
 {
     using namespace _ABC_NS_DG;
@@ -234,7 +234,7 @@ __constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
 }
 
 template <typename T>
-__constexpr_imp std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>
+__constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 from_m_to_n_using_k_values(
                     const T&          _a_lower,
                     const T&          _a_upper,
