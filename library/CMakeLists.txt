@@ -139,7 +139,6 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/data_generator/enumeration/enumeration_schema_base.hpp
   include/abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_to_n.hpp
   include/abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_move_k_elements.hpp
-  include/abc_test/included_instances/data_generator/enumeration/enumeration_data_object.hpp
   # utility subfolder. Contains axillary helper classes and functions not necessary
   # related to the core testing framework.
   include/abc_test/internal/utility/ptr_utility.hpp
