@@ -1,4 +1,5 @@
 #pragma once
+#if 0
 #include "abc_test/internal/errors/test_library_exception.hpp"
 #include "abc_test/internal/utility/internal/macros.hpp"
 
@@ -6,6 +7,7 @@
 #include <variant>
 
 _BEGIN_ABC_DG_NS
+
 using enumerate_index_t = std::size_t;
 template <typename T>
 using cmp_func_t = std::function<bool(const T&, const T&)>;
@@ -87,3 +89,4 @@ enumeration_data_object_t<T>::decrement(
 }
 
 _END_ABC_DG_NS
+#endif

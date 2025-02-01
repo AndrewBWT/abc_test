@@ -16,7 +16,7 @@ requires std::is_invocable_r_v<bool, Compare_Func, const T&, const T&>
              enumerate_index_t,
              std::optional<T>&>
          && std::
-             is_invocable_r_v<std::size_t, Difference_Func, const T&, const T&>
+             is_invocable_r_v<std::pair<std::size_t,std::size_t>, Difference_Func, const T&, const T&>
 struct enumeration_from_functions_t : public enumeration_base_t<T>
 {
 private:
@@ -56,8 +56,10 @@ public:
             const std::optional<T>& _a_max_value
         );
 
-    __constexpr virtual std::size_t
-        difference(const T& _a_arg1, const T& _a_arg2) noexcept;
+    __constexpr virtual std::pair<std::size_t, std::size_t> difference(
+        const T& _a_arg1,
+        const T& _a_arg2
+    ) noexcept;
 };
 
 _END_ABC_DG_NS
@@ -76,7 +78,7 @@ requires std::is_invocable_r_v<bool, Compare_Func, const T&, const T&>
              data_gen::enumerate_index_t,
              std::optional<T>&>
          && std::
-             is_invocable_r_v<std::size_t, Difference_Func, const T&, const T&>
+             is_invocable_r_v<std::pair<std::size_t, std::size_t>, Difference_Func, const T&, const T&>
 __constexpr data_gen::enumeration_t<T>
             mk_enumeration_function(
                 Compare_Func                _a_equal_func,
@@ -227,7 +229,7 @@ template <
     typename Compare_Func,
     typename Increment_Or_Decrement_Func,
     typename Difference_Func>
-inline __constexpr std::size_t
+inline __constexpr std::pair<std::size_t,std::size_t>
                    enumeration_from_functions_t<
                        T,
                        Compare_Func,

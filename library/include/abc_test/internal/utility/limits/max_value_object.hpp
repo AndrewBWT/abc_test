@@ -6,6 +6,10 @@ _BEGIN_ABC_UTILITY_NS
 template <typename T>
 struct max_value_t
 {
+    __constexpr max_value_t()
+    {
+
+    }
     __constexpr T
         max_value() const noexcept;
 };

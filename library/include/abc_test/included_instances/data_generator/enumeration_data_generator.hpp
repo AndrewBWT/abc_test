@@ -1,6 +1,7 @@
 #pragma once
 
-#include "abc_test/included_instances/data_generator/enumeration/enumeration_data_object.hpp"
+#include "abc_test/included_instances/data_generator/enumeration/enumeration_base.hpp"
+#include "abc_test/included_instances/data_generator/enumeration/default_enumeration.hpp"
 #include "abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_to_n.hpp"
 #include "abc_test/internal/data_generator/data_generator_collection.hpp"
 #include "abc_test/internal/data_generator/data_generator_with_file_support.hpp"
@@ -15,8 +16,8 @@ public:
     using tertiary_type  = std::size_t;
     __constexpr
     enumeration_data_generator_t(
-        const enumeration_schema_t<T>&      _a_es,
-        const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
+        const enumeration_schema_t<T>&                       _a_es,
+        const enumeration_t<T>& _a_edo
     ) noexcept;
     __constexpr bool
         has_current_element() const noexcept;
@@ -32,16 +33,16 @@ public:
     __constexpr void
         reset() noexcept;
 private:
-    std::shared_ptr<enumeration_data_object_t<T>> _m_enum_object;
-    generator_type                                _m_current_element;
-    tertiary_type                                 _m_tertiary_data;
-    bool                                          _m_has_current_element;
-    T                                             _m_start_value;
-    T                                             _m_end_value;
-    bool                                          _m_forward_direction;
-    std::size_t _m_number_of_complete_advancements_to_end;
-    std::size_t _m_remainder_after_all_advancements;
-    std::size_t _m_n_advancements_per_generate_next;
+    enumeration_t<T> _m_enum_object;
+    generator_type        _m_current_element;
+    tertiary_type         _m_tertiary_data;
+    bool                  _m_has_current_element;
+    T                     _m_start_value;
+    T                     _m_end_value;
+    bool                  _m_forward_direction;
+    std::size_t           _m_number_of_complete_advancements_to_end;
+    std::size_t           _m_remainder_after_all_advancements;
+    std::size_t           _m_n_advancements_per_generate_next;
 
     __constexpr bool
         next_element(const enumerate_index_t& _a_times_called) noexcept;
@@ -56,7 +57,7 @@ template <typename T, typename... Args>
 __constexpr _ABC_NS_DG::data_generator_collection_t<T>
             enumerate_data(
                 const _ABC_NS_DG::enumeration_schema_t<T>& _a_es,
-                const std::shared_ptr<_ABC_NS_DG::enumeration_data_object_t<T>>&
+                const _ABC_NS_DG::enumeration_t<T>&
                     _a_enumerate_base,
                 Args... _a_file_reader_writers
             );
@@ -69,8 +70,7 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
 template <typename T, typename... Args>
 __constexpr _ABC_NS_DG::data_generator_collection_t<T>
             enumerate_data(
-                const _ABC_NS_DG::enumeration_schema_t<T>&
-                    _a_enumerate_base,
+                const _ABC_NS_DG::enumeration_schema_t<T>& _a_enumerate_base,
                 Args... _a_file_reader_writers
             );
 
@@ -83,8 +83,8 @@ _BEGIN_ABC_DG_NS
 template <typename T>
 __constexpr_imp
     enumeration_data_generator_t<T>::enumeration_data_generator_t(
-        const _ABC_NS_DG::enumeration_schema_t<T>&      _a_es,
-        const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
+        const _ABC_NS_DG::enumeration_schema_t<T>&           _a_es,
+        const _ABC_NS_DG::enumeration_t<T>& _a_edo
     ) noexcept
     : _m_enum_object(_a_edo)
     , _m_tertiary_data(tertiary_type{0})
@@ -189,7 +189,7 @@ template <typename T, typename... Args>
 __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
                 enumerate_data(
                     const _ABC_NS_DG::enumeration_schema_t<T>& _a_es,
-                    const std::shared_ptr<_ABC_NS_DG::enumeration_data_object_t<T>>&
+                    const _ABC_NS_DG::enumeration_t<T>&
                         _a_enumerate_base,
                     Args... _a_file_reader_writers
                 )
@@ -205,7 +205,7 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
 template <typename T, typename... Args>
 __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
                 enumerate_data(
-                    const std::shared_ptr<_ABC_NS_DG::enumeration_schema_t<T>>& _a_es,
+                    const _ABC_NS_DG::enumeration_schema_t<T>& _a_es,
                     Args... _a_file_reader_writers
                 )
 {
@@ -214,7 +214,7 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
     return make_data_generator_with_file_support<
         enumeration_data_generator_t<T>>(
         enumeration_data_generator_t<T>(
-            _a_es, make_shared<enumeration_data_object_t<T>>()
+            _a_es, default_enumeration<T>()
         ),
         _a_file_reader_writers...
     );
@@ -223,7 +223,7 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
 template <typename T, typename... Args>
 __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
                 enumerate_data(
-                    const std::shared_ptr<_ABC_NS_DG::enumeration_data_object_t<T>>&
+                    const _ABC_NS_DG::enumeration_t<T>&
                         _a_enumerate_base,
                     Args... _a_file_reader_writers
                 )
@@ -245,7 +245,7 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<T>
     using namespace _ABC_NS_DG;
     using namespace std;
     return enumerate_data<T>(
-        make_shared<enumeration_data_object_t<T>>(), _a_file_reader_writers...
+        default_enumeration<T>(), _a_file_reader_writers...
     );
 }
 

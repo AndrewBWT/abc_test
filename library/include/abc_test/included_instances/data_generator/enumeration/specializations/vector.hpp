@@ -1,5 +1,5 @@
 #pragma once
-
+#if 0
 #include "abc_test/included_instances/data_generator/enumeration/enumeration_data_object.hpp"
 #include "abc_test/included_instances/utility/limits/vector.hpp"
 
@@ -339,3 +339,4 @@ __constexpr_imp bool
 }
 
 _END_ABC_DG_NS
+#endif

@@ -24,13 +24,13 @@ public:
         = std::optional<std::size_t>()
     ) noexcept;
     __constexpr T virtual end_value(
-        const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
+        const enumeration_t<T>& _a_edo
     ) const noexcept override;
     __constexpr bool virtual is_direction_forward(
-        const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
+        const enumeration_t<T>& _a_edo
     ) const noexcept override;
     __constexpr std::size_t virtual n_advancements_per_advancement(
-        const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
+        const enumeration_t<T>& _a_edo
     ) const noexcept override;
 private:
     T                           _m_end_value;
@@ -88,7 +88,7 @@ __constexpr_imp
         const T&                          _a_end_value,
         const std::optional<std::size_t>& _a_n_advancements
     ) noexcept
-    : enumeration_schema_t<T>(_a_start_value)
+    : enumeration_schema_base_t<T>(_a_start_value)
     , _m_end_value(_a_end_value)
     , _m_n_advancements_to_make(_a_n_advancements)
 {}
@@ -96,7 +96,7 @@ __constexpr_imp
 template <typename T>
 __constexpr_imp T
     enumeration_schema_from_m_to_n_t<T>::end_value(
-        const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
+        const enumeration_t<T>& _a_edo
     ) const noexcept
 {
     return _m_end_value;
@@ -105,7 +105,7 @@ __constexpr_imp T
 template <typename T>
 __constexpr_imp bool
     enumeration_schema_from_m_to_n_t<T>::is_direction_forward(
-        const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
+        const enumeration_t<T>& _a_edo
     ) const noexcept
 {
     if (not _m_is_direction_forwards.has_value())
@@ -120,7 +120,7 @@ __constexpr_imp bool
 template <typename T>
 __constexpr_imp std::size_t
     enumeration_schema_from_m_to_n_t<T>::n_advancements_per_advancement(
-        const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
+        const enumeration_t<T>& _a_edo
     ) const noexcept
 {
     if (_m_n_advancements_to_make.has_value())
@@ -206,6 +206,7 @@ __constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 ) noexcept
 {
     using namespace _ABC_NS_DG;
+    using namespace _ABC_NS_UTILITY;
     return from_m_to_n(min_value_t<T>().min_value(), _a_value);
 }
 

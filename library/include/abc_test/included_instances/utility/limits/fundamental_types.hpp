@@ -4,9 +4,7 @@
 
 _BEGIN_ABC_UTILITY_NS
 template <typename T>
-concept has_limits_c = (not std::is_enum_v<T>) && requires () {
-    { std::numeric_limits<T>::is_specialized == true };
-};
+concept has_limits_c = (not std::is_enum_v<T>) && std::numeric_limits<T>::is_specialized == true;
 
 template <typename T>
     requires has_limits_c<T>

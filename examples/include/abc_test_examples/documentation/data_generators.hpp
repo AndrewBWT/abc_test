@@ -671,6 +671,10 @@ struct int_generator_t : public abc::data_gen::random_generator_base_t<int>
         )
     {
         using namespace std;
+        if (_a_index == 0)
+        {
+            return 0;
+        }
         size_t limit{_a_index * m_multiplier};
         return _a_rnd_generator() % limit;
     }
@@ -705,6 +709,31 @@ struct abc::data_gen::default_random_generator_t<S>
     abc::data_gen::random_generator_t<int> m_int_generator
         = default_random_generator<int>();
 };
+
+_TEST_CASE(
+    abc::test_case_t({ .name = "Enumeration data generator examples" })
+)
+{
+    using namespace abc;
+    using namespace std;
+    _BEGIN_MULTI_ELEMENT_BBA(
+        character_tester, "Testing character values"
+    );
+    // This random generator uses the default_random_generator_t instance for
+    // int.
+  //  for (auto character : enumerate_data<char>())
+  //  {
+  //      character_tester
+  //          += _BLOCK_CHECK(_EXPR(character != 'd'));
+ //   }
+    for (const std::vector<char>& character : enumerate_data<std::vector<char>>(
+        from_min_to_val<std::vector<char>>({'a'})))
+    {
+        character_tester
+            += _BLOCK_CHECK(_EXPR(character != std::vector<char>()));
+    }
+    _END_BBA_CHECK(character_tester);
+}
 
 _TEST_CASE(
     abc::test_case_t({.name = "Random data generator examples"})
@@ -764,6 +793,9 @@ _TEST_CASE(
             += _BLOCK_CHECK(_EXPR(integer + integer > integer));
     }
     for (auto integer :
-         generate_data_randomly<int>(mk_random_generator(int_generator_t(100))))
-        _END_BBA_CHECK(check_integer_overflow);
+        generate_data_randomly<int>(mk_random_generator(int_generator_t(100))))
+    {
+    }
+    _END_BBA_CHECK(check_integer_overflow);
+
 }

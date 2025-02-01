@@ -35,7 +35,7 @@ public:
             enumerate_index_t& _a_n_times_to_increment,
             const std::optional<T>& _a_max_value
         ) = 0;
-    __constexpr virtual std::size_t difference(
+    __constexpr virtual std::pair<std::size_t,std::size_t> difference(
         const T& _a_arg1,
         const T& _a_arg2
     ) noexcept = 0;

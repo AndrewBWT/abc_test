@@ -6,7 +6,9 @@
 
 _BEGIN_ABC_DG_NS
 template <typename T>
-class enumeration_data_object_t;
+class enumeration_base_t;
+template<typename T>
+using enumeration_t = std::shared_ptr<enumeration_base_t<T>>;
 
 template <typename T>
 class enumeration_schema_base_t
@@ -18,26 +20,26 @@ public:
         enumeration_schema_base_t() noexcept
         = delete;
     __constexpr T virtual end_value(
-        const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
+        const enumeration_t<T>& _a_edo
     ) const noexcept
         = 0;
     __constexpr bool virtual is_direction_forward(
-        const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
+        const enumeration_t<T>& _a_edo
     ) const noexcept
         = 0;
     __constexpr std::size_t
                 number_of_complete_advancements(
-                    const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
+                    const enumeration_t<T>& _a_edo
                 ) const noexcept;
     __constexpr std::size_t
                 remaining_entities_after_maximum_advancements(
-                    const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
+                    const enumeration_t<T>& _a_edo
                 ) const noexcept;
     __constexpr const T&
                 start_value() const noexcept;
     __constexpr virtual std::size_t 
                 n_advancements_per_advancement(
-                    const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
+                    const enumeration_t<T>& _a_edo
                 ) const noexcept;
 protected:
     T _m_start_value;
@@ -62,7 +64,7 @@ enumeration_schema_base_t<T>::enumeration_schema_base_t(
 template <typename T>
 __constexpr std::size_t
 enumeration_schema_base_t<T>::number_of_complete_advancements(
-        const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
+        const enumeration_t<T>& _a_edo
     ) const noexcept
 {
     return _a_edo->difference(_m_start_value, end_value(_a_edo)).first;
@@ -71,7 +73,7 @@ enumeration_schema_base_t<T>::number_of_complete_advancements(
 template <typename T>
 __constexpr std::size_t
 enumeration_schema_base_t<T>::remaining_entities_after_maximum_advancements(
-        const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
+        const enumeration_t<T >& _a_edo
     ) const noexcept
 {
     return _a_edo->difference(_m_start_value, end_value(_a_edo)).second;
@@ -86,7 +88,7 @@ enumeration_schema_base_t<T>::start_value() const noexcept
 template <typename T>
 __constexpr_imp std::size_t
 enumeration_schema_base_t<T>::n_advancements_per_advancement(
-    const std::shared_ptr<enumeration_data_object_t<T>>& _a_edo
+    const enumeration_t<T>& _a_edo
 ) const noexcept
 {
     using namespace std;
