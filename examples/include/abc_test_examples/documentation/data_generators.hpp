@@ -721,11 +721,16 @@ _TEST_CASE(
     );
     // This random generator uses the default_random_generator_t instance for
     // int.
-  //  for (auto character : enumerate_data<char>())
-  //  {
-  //      character_tester
-  //          += _BLOCK_CHECK(_EXPR(character != 'd'));
- //   }
+    for (char character : enumerate_data<char>())
+    {
+        character_tester
+            += _BLOCK_CHECK(_EXPR(character != 'd'));
+    }
+    for (auto&& character : enumerate_data<bool>())
+    {
+        character_tester
+            += _BLOCK_CHECK(_EXPR(character != true));
+    }
     for (const std::vector<char>& character : enumerate_data<std::vector<char>>(
         from_min_to_val<std::vector<char>>({'a'})))
     {

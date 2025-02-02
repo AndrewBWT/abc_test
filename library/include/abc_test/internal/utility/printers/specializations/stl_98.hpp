@@ -7,11 +7,17 @@ template <typename T>
 requires (std::convertible_to<T, std::string_view>)
 struct default_printer_t<T> : public printer_base_t<T>
 {
+    static constexpr bool is_specialized{ true };
     __constexpr std::string
                 run_printer(
                     const T& _a_object
                 ) const
     {
+        if constexpr (std::same_as<T, char>)
+        {
+            auto xi = fmt::format("\"{0}\"", _a_object);
+            int x = 3;
+        }
         return fmt::format("\"{0}\"", _a_object);
     }
 };
@@ -23,6 +29,7 @@ struct default_printer_t<std::pair<T, U>>
 private:
     std::pair<printer_t<T>, printer_t<U>> _m_printers;
 public:
+    static constexpr bool is_specialized{ true };
     using value_type = std::pair<T, U>;
 
     __constexpr
@@ -48,6 +55,7 @@ struct default_printer_t<std::vector<T>> : public printer_base_t<std::vector<T>>
 private:
     printer_t<T> _m_printer;
 public:
+    static constexpr bool is_specialized{ true };
     using value_type = std::vector<T>;
 
     __constexpr

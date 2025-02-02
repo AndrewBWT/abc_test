@@ -8,6 +8,7 @@ _BEGIN_ABC_UTILITY_PRINTER_NS
 template <>
 struct default_printer_t<bool> : public printer_base_t<bool>
 {
+    static constexpr bool is_specialized{ true };
     __constexpr std::string
                 run_printer(
                     const bool& _a_object
@@ -16,20 +17,45 @@ struct default_printer_t<bool> : public printer_base_t<bool>
         return _a_object ? "true" : "false";
     }
 };
-
+template <>
+struct default_printer_t<char> : public printer_base_t<char>
+{
+    static constexpr bool is_specialized{ true };
+    __constexpr std::string
+        run_printer(
+            const char& _a_object
+        ) const
+    {
+        return "`" + std::string(1, _a_object) + "`";
+    }
+};
 template <typename T>
-    requires is_to_string_convertable_c<T> && (not std::same_as<T,bool>)
+    requires (std::is_same_v<std::remove_cvref_t<T>, T> && is_to_string_convertable_c<T> && (not std::same_as<T,bool>) && (not std::same_as<char, T>))
 struct default_printer_t<T> : public printer_base_t<T>
 {
+    static constexpr bool is_specialized{ true };
     __constexpr std::string
                 run_printer(
                     const T& _a_object
                 ) const
     {
+        const bool x1 = (is_to_string_convertable_c<T> && (not std::same_as<T, bool>) && (not std::same_as<char, T>));
+        const bool x2 =  (not std::same_as<T, bool>);
+        const bool x3 = (std::same_as<decltype(_a_object), char>);
         using namespace std;
+        if constexpr (std::same_as<char, T>)
+        {
+            auto abc = to_string(_a_object);
+            int x = 3;
+        }
+        string xi = typeid(T).name();
+        char xsdfi;
+        string x222 = typeid(decltype(xsdfi)).name();
+        bool sp8ht = std::same_as<decltype(xsdfi), T>;
         return to_string(_a_object);
     }
 };
+
 
 template <typename... Ts>
 __constexpr std::string

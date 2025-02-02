@@ -8,7 +8,7 @@ struct default_printer_t<std::tuple<Ts...>>
     : public printer_base_t<std::tuple<Ts...>>
 {
     using value_type = std::tuple<Ts...>;
-
+    static constexpr bool is_specialized{ true };
     __constexpr
     default_printer_t(printer_t<Ts>... _a_printers);
     __constexpr

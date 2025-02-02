@@ -2,6 +2,7 @@
 
 #include "abc_test/internal/matchers/comparison/comparison_enum.hpp"
 #include "abc_test/internal/matchers/matcher_wrapper.hpp"
+#include "abc_test/internal/utility/printers/default_printer.hpp"
 
 _BEGIN_ABC_MATCHER_NS
 
@@ -101,8 +102,8 @@ __constexpr matcher_result_t
     ) noexcept
 {
     using namespace std;
-    string     _l_left_str{format_str<T1>(_a_t1)};
-    string     _l_right_str{format_str<T2>(_a_t2)};
+    string     _l_left_str{format_str<T1>(forward<T1>(_a_t1))};
+    string     _l_right_str{format_str<T2>(forward<T2>(_a_t2))};
     const bool _l_result{
         cmp<T1, T2, Cmp>(forward<T1>(_a_t1), forward<T2>(_a_t2))
     };
@@ -125,16 +126,16 @@ __constexpr_imp std::string
 {
     using namespace std;
     string _l_rv{"[?]"};
-    if constexpr (fmt::formattable<T>)
+    if constexpr (abc::utility::printer::default_printable<
+                      typename std::remove_cvref<T>::type>)
     {
-        if constexpr (same_as<T, string>)
-        {
-            _l_rv = fmt::format("\"{}\"", _a_element);
-        }
-        else
-        {
-            _l_rv = fmt::format("{}", _a_element);
-        }
+        _l_rv = abc::utility::printer::default_printer<
+                    typename std::remove_cvref<T>::type>()
+                    ->run_printer(_a_element);
+    }
+    else if constexpr (fmt::formattable<T>)
+    {
+        _l_rv = fmt::format("{}", _a_element);
     }
     return _l_rv;
 }
