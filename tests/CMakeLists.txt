@@ -9,6 +9,7 @@ set(TEST_LIB_NAME testlib)
 set(TEST_FILES
   include/abc_test_test/internal/ds/test_data/user_defined_test_data.hpp
       src/main.cpp
+  include/abc_test_test/included_instances/data_generator/enumeration/default_enumeration.hpp
 )
 
 # These are the libs required for the testing suite.

@@ -1,0 +1,10 @@
+use_global_test_list = true
+root_path = ../../tests/data/test_data
+threads = 1
+general_data_file_extension = gd
+n_integers_used_for_rng_generation = 100
+force_run_all_tests = true
+write_data_to_files = true
+automatic_repetition_data_folder = ../../tests/data/repetition_data_file
+override_automatic_configuration = false
+automaticly_rerun_last_test_if_failure = true

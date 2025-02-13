@@ -40,9 +40,9 @@ private:
     T                     _m_start_value;
     T                     _m_end_value;
     bool                  _m_forward_direction;
-    std::size_t           _m_number_of_complete_advancements_to_end;
-    std::size_t           _m_remainder_after_all_advancements;
-    std::size_t           _m_n_advancements_per_generate_next;
+    enumerate_index_t           _m_number_of_complete_advancements_to_end;
+    enumerate_index_t           _m_remainder_after_all_advancements;
+    enumerate_index_t           _m_n_advancements_per_generate_next;
 
     __constexpr bool
         next_element(const enumerate_index_t& _a_times_called) noexcept;

@@ -2,9 +2,12 @@
 
 #include "abc_test/internal/errors/test_library_exception.hpp"
 #include "abc_test/internal/utility/internal/macros.hpp"
+#include "abc_test/internal/utility/parsers/default_parser.hpp"
+#include "abc_test/internal/utility/parsers/specializations/stl_11.hpp"
 
 #include <random>
 #include <scn/scan.h>
+
 
 _BEGIN_ABC_UTILITY_NS
 using seed_t = std::vector<uint32_t>;
@@ -16,6 +19,12 @@ public:
 
     complete_global_seed_t(
         const unsigned int _a_seed
+    ) noexcept
+        : _m_inner_seed(_a_seed)
+    {}
+
+    complete_global_seed_t(
+        const std::variant<unsigned int, std::vector<uint32_t>>& _a_seed
     ) noexcept
         : _m_inner_seed(_a_seed)
     {}
@@ -85,10 +94,11 @@ private:
     std::variant<unsigned int, std::vector<uint32_t>> _m_inner_seed
         = std::vector<uint32_t>();
 };
+
 __constexpr std::expected<complete_global_seed_t, std::string>
-parse_complete_global_string_in_hex(
-    const std::string_view _a_str
-)
+            parse_complete_global_string_in_hex(
+                const std::string_view _a_str
+            )
 {
     using namespace std;
     if (_a_str.size() == 0)
@@ -101,13 +111,13 @@ parse_complete_global_string_in_hex(
     }
     else
     {
-        char              _l_mode{ _a_str[0] };
-        const string_view _l_rest_of_str{ _a_str.substr(1) };
+        char              _l_mode{_a_str[0]};
+        const string_view _l_rest_of_str{_a_str.substr(1)};
         if (_l_mode == '0')
         {
             // Parse rest of string as hex.
             //  interpret the parsed number as hex
-            auto _l_result{ scn::scan<unsigned int>(_l_rest_of_str, "{:x}") };
+            auto _l_result{scn::scan<unsigned int>(_l_rest_of_str, "{:x}")};
             if (_l_result.has_value())
             {
                 return complete_global_seed_t(_l_result->value());
@@ -124,7 +134,7 @@ parse_complete_global_string_in_hex(
         else if (_l_mode == '1')
         {
             // Every 8 characters is a uint32_t.
-            size_t _l_str_size_mod_8{ _l_rest_of_str.size() / 8 };
+            size_t _l_str_size_mod_8{_l_rest_of_str.size() / 8};
             if ((_l_rest_of_str.size() % 8) != 0)
             {
                 return unexpected(fmt::format(
@@ -138,15 +148,13 @@ parse_complete_global_string_in_hex(
             else
             {
                 vector<uint32_t> _l_vector;
-                size_t _l_str_size_mod_8{ _l_rest_of_str.size() / 8 };
-                for (size_t _l_idx{ 0 }; _l_idx < _l_str_size_mod_8; ++_l_idx)
+                size_t           _l_str_size_mod_8{_l_rest_of_str.size() / 8};
+                for (size_t _l_idx{0}; _l_idx < _l_str_size_mod_8; ++_l_idx)
                 {
                     string_view _l_integer_str{
                         _l_rest_of_str.substr(_l_idx * 8, 8)
                     };
-                    auto _l_result{
-                        scn::scan<uint32_t>(_l_integer_str, "{:x}")
-                    };
+                    auto _l_result{scn::scan<uint32_t>(_l_integer_str, "{:x}")};
                     if (_l_result.has_value())
                     {
                         _l_vector.push_back(_l_result->value());
@@ -175,6 +183,7 @@ parse_complete_global_string_in_hex(
         }
     }
 }
+
 class global_seed_t
 {
 public:
@@ -299,6 +308,63 @@ private:
 };
 
 _END_ABC_UTILITY_NS
+_BEGIN_ABC_UTILITY_PARSER_NS
+template <>
+struct default_parser_t<global_seed_t>
+    : public parser_base_t<global_seed_t>
+{
+    __constexpr parse_result_t<global_seed_t>
+        run_parser(
+            parser_input_t& _a_parse_input
+        ) const
+    {
+        using namespace std;
+        const parse_result_t<variant<unsigned int, std::vector<uint32_t>>>
+            _l_variant_result{ utility::parser::default_parser_t<
+                                  variant<unsigned int, std::vector<uint32_t>>>(
+            )
+                                  .run_parser(_a_parse_input) };
+        if (_l_variant_result.has_value())
+        {
+            return parse_result_t<global_seed_t>(
+                complete_global_seed_t(_l_variant_result.value())
+            );
+        }
+        else
+        {
+            return parse_error<global_seed_t>(_l_variant_result.error());
+        }
+    }
+};
+template <>
+struct default_parser_t<complete_global_seed_t>
+    : public parser_base_t<complete_global_seed_t>
+{
+    __constexpr parse_result_t<complete_global_seed_t>
+                run_parser(
+                    parser_input_t& _a_parse_input
+                ) const
+    {
+        using namespace std;
+        const parse_result_t<variant<unsigned int, std::vector<uint32_t>>>
+            _l_variant_result{utility::parser::default_parser_t<
+                                  variant<unsigned int, std::vector<uint32_t>>>(
+            )
+                                  .run_parser(_a_parse_input)};
+        if (_l_variant_result.has_value())
+        {
+            return parse_result_t<complete_global_seed_t>(
+                complete_global_seed_t(_l_variant_result.value())
+            );
+        }
+        else
+        {
+            return parse_error<complete_global_seed_t>(_l_variant_result.error());
+        }
+    }
+};
+
+_END_ABC_UTILITY_PARSER_NS
 
 /*!
  * formatter for registered_test_data_t

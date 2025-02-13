@@ -13,10 +13,11 @@ public:
         run_parser(parser_input_t& _a_parse_input) const override;
 };
 
-template <typename T, typename ... Ts>
+template <typename T, typename... Ts>
 __constexpr parser_t<T>
-            default_parser(Ts ... elements) noexcept;
+            default_parser(Ts... elements) noexcept;
 _END_ABC_UTILITY_PARSER_NS
+
 _BEGIN_ABC_UTILITY_PARSER_NS
 template <typename T>
 __constexpr parse_result_t<T>
@@ -31,9 +32,11 @@ __constexpr parse_result_t<T>
     );
 }
 
-template <typename T, typename ... Ts>
+template <typename T, typename... Ts>
 __constexpr parser_t<T>
-default_parser(Ts ... elements) noexcept
+            default_parser(
+                Ts... elements
+            ) noexcept
 {
     using namespace std;
     return make_shared<default_parser_t<T>>(elements...);

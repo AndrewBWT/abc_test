@@ -4,9 +4,26 @@
 
 #include <functional>
 #include <variant>
+#include "abc_test/external/bigint/BigUnsigned.hpp"
 
 _BEGIN_ABC_DG_NS
+#define _ENUMERATE_INDEX 0
+
+#if _ENUMERATE_INDEX == 0
 using enumerate_index_t = std::size_t;
+#else
+using enumerate_index_t = BigUnsigned;
+#endif
+using enumeration_diff_t = std::pair< enumerate_index_t, enumerate_index_t>;
+
+__constexpr std::size_t to_size_t(const enumerate_index_t& _a_enumerate_index)
+{
+#if _ENUMERATE_INDEX == 0
+    return _a_enumerate_index;
+#else
+    return _a_enumerate_index.toUnsignedLong();
+#endif
+}
 
 template <typename T>
 struct enumeration_base_t
@@ -35,7 +52,7 @@ public:
             enumerate_index_t& _a_n_times_to_increment,
             const std::optional<T>& _a_max_value
         ) = 0;
-    __constexpr virtual std::pair<std::size_t,std::size_t> difference(
+    __constexpr virtual enumeration_diff_t difference(
         const T& _a_arg1,
         const T& _a_arg2
     ) noexcept = 0;

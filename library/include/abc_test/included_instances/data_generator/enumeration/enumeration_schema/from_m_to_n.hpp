@@ -29,13 +29,13 @@ public:
     __constexpr bool virtual is_direction_forward(
         const enumeration_t<T>& _a_edo
     ) const noexcept override;
-    __constexpr std::size_t virtual n_advancements_per_advancement(
+    __no_constexpr enumerate_index_t virtual n_advancements_per_advancement(
         const enumeration_t<T>& _a_edo
     ) const noexcept override;
 private:
     T                           _m_end_value;
     mutable std::optional<bool> _m_is_direction_forwards;
-    std::optional<std::size_t>  _m_n_advancements_to_make;
+    std::optional<enumerate_index_t>  _m_n_advancements_to_make;
 };
 
 _END_ABC_DG_NS
@@ -118,22 +118,22 @@ __constexpr_imp bool
 }
 
 template <typename T>
-__constexpr_imp std::size_t
+__no_constexpr_imp enumerate_index_t
     enumeration_schema_from_m_to_n_t<T>::n_advancements_per_advancement(
         const enumeration_t<T>& _a_edo
     ) const noexcept
 {
     if (_m_n_advancements_to_make.has_value())
     {
-        const size_t _l_n_advancements_to_make{ _m_n_advancements_to_make.value() };
+        const enumerate_index_t _l_n_advancements_to_make{ _m_n_advancements_to_make.value() };
         const auto [_l_divisor, _l_remainder]{
             _a_edo->difference(this->_m_start_value, _m_end_value)
         };
-        const size_t _l_difference{ _l_divisor % _l_n_advancements_to_make };
-        const size_t _l_divider{
-            _m_n_advancements_to_make.value() - (_l_difference == 0 ? 1 : 2)
+        const enumerate_index_t _l_difference{ _l_divisor % _l_n_advancements_to_make };
+        const enumerate_index_t _l_divider{
+            _l_n_advancements_to_make - (_l_difference == 0 ? 1 : 2)
         };
-        const size_t _l_base_advancements{_l_divisor / _l_divider};
+        const enumerate_index_t _l_base_advancements{_l_divisor / _l_divider};
         return _l_base_advancements;
     }
     else

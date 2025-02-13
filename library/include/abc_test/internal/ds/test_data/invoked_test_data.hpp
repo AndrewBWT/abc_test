@@ -283,9 +283,11 @@ public:
             const std::chrono::time_point<std::chrono::high_resolution_clock>&
                 _a_end_time
         ) noexcept;
-    __constexpr  const std::chrono::time_point<std::chrono::high_resolution_clock>&
+    __constexpr const
+        std::chrono::time_point<std::chrono::high_resolution_clock>&
         time_begin() const noexcept;
-    __constexpr  const std::chrono::time_point<std::chrono::high_resolution_clock>&
+    __constexpr const
+        std::chrono::time_point<std::chrono::high_resolution_clock>&
         time_end() const noexcept;
 private:
     const post_setup_test_data_t&   _m_post_setup_test_data;
@@ -612,18 +614,50 @@ __constexpr void
     _m_begin_time = _a_begin_time;
     _m_end_time   = _a_end_time;
 }
-__constexpr  const std::chrono::time_point<std::chrono::high_resolution_clock>&
-invoked_test_data_t::time_begin() const noexcept
+
+__constexpr const std::chrono::time_point<std::chrono::high_resolution_clock>&
+                  invoked_test_data_t::time_begin() const noexcept
 {
     return _m_begin_time;
 }
-__constexpr  const std::chrono::time_point<std::chrono::high_resolution_clock>&
-invoked_test_data_t::time_end() const noexcept
+
+__constexpr const std::chrono::time_point<std::chrono::high_resolution_clock>&
+                  invoked_test_data_t::time_end() const noexcept
 {
     return _m_end_time;
 }
+
 namespace
 {
+__constexpr std::string
+normalise_for_file_use(
+    const std::string_view _a_str
+) noexcept
+{
+    using namespace std;
+    vector<pair<string, string>> _l_strs_to_replace =
+    {
+        {":","_"},
+        {" ", "_"}
+    };
+    string _l_rv(_a_str);
+    for (auto& [_l_to_find, _l_to_replace_with] : _l_strs_to_replace)
+    {
+        bool _l_replaced{ false };
+        do
+        {
+            _l_replaced = false;
+            if (auto _l_str_pos{ _l_rv.find(_l_to_find) };
+                _l_str_pos != string::npos)
+            {
+                _l_replaced = true;
+                _l_rv.replace(_l_str_pos, _l_to_find.size(), _l_to_replace_with);
+            }
+        } while (_l_replaced);
+    }
+    return _l_rv;
+}
+
 __no_constexpr_imp std::filesystem::path
                    create_test_path(
                        const post_setup_test_data_t& _a_test_info,
@@ -636,9 +670,9 @@ __no_constexpr_imp std::filesystem::path
     for (const test_path_element_ref_t& _a_test_path_component :
          _a_test_info.test_path_hierarchy())
     {
-        _l_path /= _a_test_path_component;
+        _l_path /= normalise_for_file_use(_a_test_path_component);
     }
-    _l_path /= _a_test_info.registered_test_data()._m_user_data.name;
+    _l_path /= normalise_for_file_use(_a_test_info.registered_test_data()._m_user_data.name);
     if (not exists(_l_path))
     {
         create_directories(_l_path);

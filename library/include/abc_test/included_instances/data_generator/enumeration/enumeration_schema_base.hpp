@@ -27,17 +27,17 @@ public:
         const enumeration_t<T>& _a_edo
     ) const noexcept
         = 0;
-    __constexpr std::size_t
+    __no_constexpr enumerate_index_t
                 number_of_complete_advancements(
                     const enumeration_t<T>& _a_edo
                 ) const noexcept;
-    __constexpr std::size_t
+    __no_constexpr enumerate_index_t
                 remaining_entities_after_maximum_advancements(
                     const enumeration_t<T>& _a_edo
                 ) const noexcept;
     __constexpr const T&
                 start_value() const noexcept;
-    __constexpr virtual std::size_t 
+    __no_constexpr virtual enumerate_index_t
                 n_advancements_per_advancement(
                     const enumeration_t<T>& _a_edo
                 ) const noexcept;
@@ -62,7 +62,7 @@ enumeration_schema_base_t<T>::enumeration_schema_base_t(
 {}
 
 template <typename T>
-__constexpr std::size_t
+__no_constexpr_imp enumerate_index_t
 enumeration_schema_base_t<T>::number_of_complete_advancements(
         const enumeration_t<T>& _a_edo
     ) const noexcept
@@ -71,7 +71,7 @@ enumeration_schema_base_t<T>::number_of_complete_advancements(
 }
 
 template <typename T>
-__constexpr std::size_t
+__no_constexpr_imp enumerate_index_t
 enumeration_schema_base_t<T>::remaining_entities_after_maximum_advancements(
         const enumeration_t<T >& _a_edo
     ) const noexcept
@@ -86,13 +86,13 @@ enumeration_schema_base_t<T>::start_value() const noexcept
     return _m_start_value;
 }
 template <typename T>
-__constexpr_imp std::size_t
+__no_constexpr_imp enumerate_index_t
 enumeration_schema_base_t<T>::n_advancements_per_advancement(
     const enumeration_t<T>& _a_edo
 ) const noexcept
 {
     using namespace std;
-    return size_t{ 1 };
+    return enumerate_index_t{ 1 };
 }
 _END_ABC_DG_NS
 _BEGIN_ABC_NS

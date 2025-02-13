@@ -16,7 +16,7 @@ requires std::is_invocable_r_v<bool, Compare_Func, const T&, const T&>
              enumerate_index_t,
              std::optional<T>&>
          && std::
-             is_invocable_r_v<std::pair<std::size_t,std::size_t>, Difference_Func, const T&, const T&>
+             is_invocable_r_v<enumeration_diff_t, Difference_Func, const T&, const T&>
 struct enumeration_from_functions_t : public enumeration_base_t<T>
 {
 private:
@@ -56,7 +56,7 @@ public:
             const std::optional<T>& _a_max_value
         );
 
-    __constexpr virtual std::pair<std::size_t, std::size_t> difference(
+    __constexpr virtual enumeration_diff_t difference(
         const T& _a_arg1,
         const T& _a_arg2
     ) noexcept;

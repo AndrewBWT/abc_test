@@ -194,6 +194,8 @@ set(LIBRARY_FILES
   include/abc_test/internal/utility/limits/max_value_object.hpp
   include/abc_test/internal/utility/limits/min_value_concept.hpp
   include/abc_test/internal/utility/limits/max_value_concept.hpp
+  # Command line parser
+  include/abc_test/internal/utility/clp.hpp
   #Included instances utility files  include/abc_test/internal/utility/limits/min_value_object.hpp
   include/abc_test/included_instances/utility/limits/array.hpp
   include/abc_test/included_instances/utility/limits/enum.hpp

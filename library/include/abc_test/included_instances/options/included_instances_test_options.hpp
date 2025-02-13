@@ -17,7 +17,11 @@ public:
         text_error_reporter_file_names;
 protected:
     __no_constexpr virtual void
-        validate_and_pre_process_(std::vector<std::string>& _a_error_ref
+        validate_and_pre_process_(
+            std::vector<std::string>& _a_error_ref,
+            std::function<
+                void(const std::vector<std::pair<std::string, std::string>>&, std::vector<std::string>&)>
+                _a_process_func
         ) noexcept;
 };
 
@@ -34,20 +38,40 @@ __no_constexpr std::vector<std::filesystem::path>
 } // namespace
 
 _END_ABC_NS
+_BEGIN_ABC_UTILITY_PARSER_NS
+template<>
+struct default_parser_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
+    : public parser_base_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
+{
+    __no_constexpr_imp virtual parse_result_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
+        run_parser(parser_input_t& _a_parse_input) const
+    {
+        using namespace abc::ds;
+        return parse_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(_a_parse_input.sv());
+    }
+};
+_END_ABC_UTILITY_PARSER_NS
+
 template <>
-struct fmt::formatter<abc::included_instances_test_options_t> : formatter<string_view>
+struct fmt::formatter<abc::included_instances_test_options_t>
+    : formatter<string_view>
 {
     // parse is inherited from formatter<string_view>.
     // Can'tbe constexpr due to use of fmt::format
     __no_constexpr auto
-        format(abc::included_instances_test_options_t _a_rtd, format_context& _a_ctx) const
-        ->format_context::iterator;
+        format(
+            abc::included_instances_test_options_t _a_rtd,
+            format_context&                        _a_ctx
+        ) const -> format_context::iterator;
 };
 
 _BEGIN_ABC_NS
 __no_constexpr void
     included_instances_test_options_t::validate_and_pre_process_(
-        std::vector<std::string>& _a_error_ref
+        std::vector<std::string>& _a_error_ref,
+        std::function<
+            void(const std::vector<std::pair<std::string, std::string>>&, std::vector<std::string>&)>
+            _a_process_func
     ) noexcept
 {
     using namespace _ABC_NS_REPORTERS;
@@ -73,22 +97,28 @@ __no_constexpr void
         root_path,
         "text_test_reporter_t"
     )};
-    test_options_base_t::validate_and_pre_process_(_a_error_ref);
-    //No errors in the system. We can continue.
+    // No errors in the system. We can continue.
     if (_a_error_ref.size() == 0)
     {
         for (const path& _l_path : _l_error_files)
         {
-            this->error_reporters.push_back(make_shared<text_error_reporter_t>(_l_path));
+            this->error_reporters.push_back(
+                make_shared<text_error_reporter_t>(_l_path)
+            );
         }
     }
     if (_a_error_ref.size() == 0)
     {
         for (const path& _l_path : _l_test_files)
         {
-            this->test_reporters.push_back(make_shared<text_test_reporter_t>(_l_path));
+            this->test_reporters.push_back(
+                make_shared<text_test_reporter_t>(_l_path)
+            );
         }
     }
+    test_options_base_t::validate_and_pre_process_(
+        _a_error_ref, _a_process_func
+    );
 }
 
 namespace
@@ -135,7 +165,7 @@ __no_constexpr_imp std::vector<std::filesystem::path>
                 if (exists(_l_file_to_be_made))
                 {
                     size_t _l_int{0};
-                    path _l_file_to_be_made_with_int{
+                    path   _l_file_to_be_made_with_int{
                         _l_file_to_be_made
                         / string("_").append(to_string(_l_int))
                     };
@@ -167,13 +197,13 @@ __no_constexpr_imp std::vector<std::filesystem::path>
 _END_ABC_NS
 
 __no_constexpr_imp auto
-fmt::formatter<abc::included_instances_test_options_t>::format(
-    abc::included_instances_test_options_t _a_rtd,
-    format_context& _a_ctx
-) const -> format_context::iterator
+    fmt::formatter<abc::included_instances_test_options_t>::format(
+        abc::included_instances_test_options_t _a_rtd,
+        format_context&                        _a_ctx
+    ) const -> format_context::iterator
 {
     using namespace std;
-    const string _l_rv{ fmt::format(
+    const string _l_rv{fmt::format(
         "{0}{{{1}"
         ", {2} = {3}"
         ", {4} = {5}"
@@ -182,10 +212,14 @@ fmt::formatter<abc::included_instances_test_options_t>::format(
         "}}",
         typeid(_a_rtd).name(),
         make_test_options_base_member_variables_fmt(_a_rtd),
-        "use_text_test_reporter_to_cout", _a_rtd.use_text_test_reporter_to_cout,
-        "use_text_error_reporter_to_cout", _a_rtd.use_text_error_reporter_to_cout,
-        "text_test_reporter_file_names", _a_rtd.text_test_reporter_file_names,
-        "text_error_reporter_file_names", _a_rtd.text_error_reporter_file_names
-    ) };
+        "use_text_test_reporter_to_cout",
+        _a_rtd.use_text_test_reporter_to_cout,
+        "use_text_error_reporter_to_cout",
+        _a_rtd.use_text_error_reporter_to_cout,
+        "text_test_reporter_file_names",
+        _a_rtd.text_test_reporter_file_names,
+        "text_error_reporter_file_names",
+        _a_rtd.text_error_reporter_file_names
+    )};
     return formatter<string_view>::format(_l_rv, _a_ctx);
 }

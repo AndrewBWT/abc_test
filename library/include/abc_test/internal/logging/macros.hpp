@@ -1,5 +1,6 @@
 #pragma once
 #include "abc_test/internal/utility/internal/macros.hpp"
+#include "abc_test/internal/logging/log_msg.hpp"
 
 /*!
  * @brief Internal macro, used to assign a random name to the annonymous
@@ -16,16 +17,17 @@
  * @param _a_str_represntation A string represntation of the line used to call
  * this macro.
  */
-#define __ABC_INTERNAL_LOG(                                               \
-    _a_string_to_log, _a_delete_after_use, _a_str_representation          \
-)                                                                         \
-    abc::log_msg_t __ABC_TEST_NAMED_COUNTER(__ABC_INTERNAL_LOG_VAR_NAME)( \
-        abc::ds::single_source_t(                                         \
-            _a_str_representation, std::source_location::current()        \
-        ),                                                                \
-        _a_string_to_log,                                                 \
-        _a_delete_after_use                                               \
-    )
+#define __ABC_INTERNAL_LOG(                                            \
+    _a_string_to_log, _a_delete_after_use, _a_str_representation       \
+)                                                                      \
+    abc::logging::log_msg_t                                            \
+        __ABC_TEST_NAMED_COUNTER(__ABC_INTERNAL_LOG_VAR_NAME)(         \
+            abc::ds::single_source_t(                                  \
+                _a_str_representation, std::source_location::current() \
+            ),                                                         \
+            _a_string_to_log,                                          \
+            _a_delete_after_use                                        \
+        )
 /*!
  * @brief Macro used to log a message. This macro will log a message which will
  * persist; any assetiosn in scope which use the thread's log cache will print
@@ -61,10 +63,13 @@
  * @param _a_delete_after_use Whether to delete this variable after its first
  * used.
  */
-#define __ABC_INTERNAL_VLOG(_a_variable, _a_delete_after_use) \
-    __ABC_INTERNAL_LOG(                                       \
-        fmt::format("{0} = {1}", #_a_variable, _a_variable),  \
-        _a_delete_after_use                                   \
+#define __ABC_INTERNAL_VLOG(                                 \
+    _a_variable, _a_delete_after_use, _a_str_representation  \
+)                                                            \
+    __ABC_INTERNAL_LOG(                                      \
+        fmt::format("{0} = {1}", #_a_variable, _a_variable), \
+        _a_delete_after_use,                                 \
+        _a_str_representation                                \
     )
 /*!
  * @brief Macro used to log a single variable to an assertion.

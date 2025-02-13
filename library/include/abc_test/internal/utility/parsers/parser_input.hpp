@@ -40,9 +40,10 @@ private:
     std::string_view::const_iterator _m_end_itt;
 };
 
-auto
+__no_constexpr auto
     format_as(abc::utility::parser::parser_input_t _a_val);
 _END_ABC_UTILITY_PARSER_NS
+
 _BEGIN_ABC_UTILITY_PARSER_NS
 __constexpr
 parser_input_t::parser_input_t(
@@ -185,7 +186,7 @@ __constexpr bool
     return _m_cur_itt == _m_end_itt;
 }
 
-auto
+__no_constexpr_imp auto
     format_as(
         abc::utility::parser::parser_input_t _a_val
     )

@@ -1,7 +1,9 @@
 #pragma once
+#include "abc_test/external/bigint/BigIntegerUtils.hpp"
 #include "abc_test/included_instances/data_generator/enumeration/enumeration_base.hpp"
 #include "abc_test/included_instances/data_generator/enumeration/enumeration_schema_base.hpp"
 
+#include <numeric>
 _BEGIN_ABC_DG_NS
 
 template <typename T>
@@ -25,7 +27,7 @@ public:
             enumerate_index_t&      _a_n_times_to_increment,
             const std::optional<T>& _a_max_value
         );
-    __constexpr virtual std::pair<std::size_t, std::size_t>
+    __constexpr virtual enumeration_diff_t
         difference(const T& _a_arg1, const T& _a_arg2) noexcept;
 };
 
@@ -97,8 +99,8 @@ __constexpr bool
 }
 
 template <typename T>
-__constexpr std::pair<std::size_t,std::size_t>
-            default_enumeration_t<T>::difference(
+__constexpr enumeration_diff_t
+    default_enumeration_t<T>::difference(
         const T& _a_arg1,
         const T& _a_arg2
     ) noexcept
@@ -130,10 +132,10 @@ concept has_equal_c = requires (const T& _a_element) {
 template <typename T>
     requires has_addition_c<T>&& has_subtraction_c<T>&& has_less_than_c<T>
 && has_equal_c<T> && (not std::is_enum_v<T>)
+&& (not std::floating_point<T>)
 struct default_enumeration_t<T> : public enumeration_base_t<T>
 {
-
-    __constexpr virtual std::pair<std::size_t, std::size_t>
+    __constexpr virtual enumeration_diff_t
         difference(
             const T& _a_arg1,
             const T& _a_arg2
@@ -146,9 +148,7 @@ struct default_enumeration_t<T> : public enumeration_base_t<T>
         const T _l_divisor{
             static_cast<T>(_l_straight_difference / _m_difference)
         };
-        const T _l_remainder{
-            static_cast<T>(_l_straight_difference % _m_difference)
-        };
+        T _l_remainder = static_cast<T>(_l_straight_difference % _m_difference);
         return {
             static_cast<std::size_t>(_l_divisor),
             static_cast<std::size_t>(_l_remainder)
@@ -183,7 +183,7 @@ struct default_enumeration_t<T> : public enumeration_base_t<T>
     __constexpr bool
         increment(
             T&                      _a_element,
-            std::size_t&            _a_times_called,
+            enumerate_index_t&      _a_times_called,
             const std::optional<T>& _a_max_value = std::optional<T>{}
         )
     {
@@ -226,7 +226,7 @@ struct default_enumeration_t<T> : public enumeration_base_t<T>
     __constexpr bool
         decrement(
             T&                      _a_element,
-            std::size_t&            _a_times_called,
+            enumerate_index_t&      _a_times_called,
             const std::optional<T>& _a_max_value = std::optional<T>{}
         )
     {
@@ -269,6 +269,505 @@ private:
     T _m_difference;
 };
 
+namespace
+{
+template <typename T>
+requires std::floating_point<T>
+__constexpr T
+    find_point_at_which_increment_no_longer_works(
+        const T& _a_add_val
+    )
+{
+    using namespace std;
+    T _l_lower{0};
+    T _l_higher{numeric_limits<T>::max()};
+    while (true)
+    {
+        if (_l_lower == _l_higher)
+        {
+            // There is no point where adding _a_add_val will result in
+            // the same result. So we just return the max value.
+            return numeric_limits<T>::max();
+        }
+        const T _l_midpoint{midpoint(_l_lower, _l_higher)};
+        if (_l_midpoint + _a_add_val == _l_midpoint
+            && _l_midpoint - _a_add_val != _l_midpoint)
+        {
+            return _l_midpoint;
+        }
+        else if (_l_midpoint + _a_add_val != _l_midpoint)
+        {
+            _l_lower = _l_midpoint;
+        }
+        else
+        {
+            _l_higher = _l_midpoint;
+        }
+    }
+}
+
+template <typename T>
+requires std::floating_point<T>
+__constexpr std::size_t
+            encode_into_size_t(
+                T _a_input
+            )
+{
+    using namespace std;
+    size_t _l_input_as_int{0};
+    std::memcpy(&_l_input_as_int, &_a_input, sizeof(T));
+    bitset<CHAR_BIT * sizeof(T)>      _l_bitset{_l_input_as_int};
+    bitset<sizeof(size_t) * CHAR_BIT> _l_sizet_bitset{};
+    if (_l_bitset[sizeof(T) * CHAR_BIT - 1] == true)
+    {
+        _l_sizet_bitset[sizeof(size_t) * CHAR_BIT - 1] = true;
+    }
+    for (size_t _l_idx{sizeof(T) * CHAR_BIT - 1}; _l_idx > 0; --_l_idx)
+    {
+        auto ki = sizeof(size_t) * CHAR_BIT - _l_idx;
+        auto k2 = sizeof(T) * CHAR_BIT - _l_idx;
+        _l_sizet_bitset[sizeof(size_t) * CHAR_BIT - _l_idx - 1]
+            = _l_bitset[sizeof(T) * CHAR_BIT - _l_idx - 1];
+    }
+    return static_cast<size_t>(_l_sizet_bitset.to_ullong());
+}
+} // namespace
+
+template <typename T>
+requires (std::floating_point<T>)
+struct default_enumeration_t<T> : public enumeration_base_t<T>
+{
+    static const std::size_t _c_highest_bit
+        = 0b1000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000;
+    static const std::size_t _c_non_highest_bit
+        = 0b0111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111;
+    std::optional<T> _m_point_at_which_increment_will_not_work;
+
+    template <typename T>
+    static T
+        encode_into_t(
+            const std::size_t _a_element
+        ) noexcept
+    {
+        const bool _l_sign_bit{(_c_highest_bit & _a_element) == _c_highest_bit};
+        T          _l_rv{0};
+        const std::size_t _l_element{_a_element & _c_non_highest_bit};
+        std::memcpy(&_l_rv, &_l_element, sizeof(T));
+        if (_l_sign_bit)
+        {
+            _l_rv = -_l_rv;
+        }
+        return _l_rv;
+    }
+
+    static std::size_t
+        encode_into_size_t(
+            T _a_input
+        )
+    {
+        using namespace std;
+        size_t _l_input_as_int{0};
+        std::memcpy(&_l_input_as_int, &_a_input, sizeof(T));
+        bitset<CHAR_BIT * sizeof(T)>      _l_bitset{_l_input_as_int};
+        bitset<sizeof(size_t) * CHAR_BIT> _l_sizet_bitset{};
+        if (_l_bitset[sizeof(T) * CHAR_BIT - 1] == true)
+        {
+            _l_sizet_bitset[sizeof(size_t) * CHAR_BIT - 1] = true;
+        }
+        for (size_t _l_idx{sizeof(T) * CHAR_BIT - 1}; _l_idx > 0; --_l_idx)
+        {
+            auto ki = sizeof(size_t) * CHAR_BIT - _l_idx;
+            auto k2 = sizeof(T) * CHAR_BIT - _l_idx;
+            _l_sizet_bitset[sizeof(size_t) * CHAR_BIT - _l_idx - 1]
+                = _l_bitset[sizeof(T) * CHAR_BIT - _l_idx - 1];
+        }
+        return static_cast<size_t>(_l_sizet_bitset.to_ullong());
+    }
+
+    __constexpr virtual enumeration_diff_t
+        difference(
+            const T& _a_arg1,
+            const T& _a_arg2
+        ) noexcept
+    {
+        using namespace std;
+        /*!
+         * For floating point types (henceforth called FP) this is harder.
+         *
+         * This is because we cannot guarantee that continually adding
+         * difference will always incremeht a number.
+         *
+         * So instead, the algorithm is in two stages:
+         *
+         * 1) Search for the number which adding _m_difference to will not
+         * change the result. If there is no number which this occours in the
+         * range [_a_arg1, _a_arg2], then find the difference between the two
+         * dividied by _m_difference, find the remainder of the difference
+         * between the two and _m_difference, then return these values.
+         *
+         * 2) Call this resulting number k. Find the difference between the
+         * start number and k, then divide by _m_difference. Call this number
+         * s1. Then find the number of times nextafter must be called on k to
+         * obtain arg_2. Add s1 to this number, call it s2. Return {s2,0}.
+         */
+        const T& _l_lesser{less_than(_a_arg1, _a_arg2) ? _a_arg1 : _a_arg2};
+        const T& _l_greater{less_than(_a_arg1, _a_arg2) ? _a_arg2 : _a_arg1};
+        // If numbers are equal nothing to be done.
+        if (_l_lesser == _l_greater)
+        {
+            return {0, 0};
+        }
+        // lesser < greater < neg_add_barrier < pos_add_barrier
+        if (_l_greater < _m_neg_add_barrier)
+        {
+            return {get_increments_between_values(_l_lesser, _l_greater), 0};
+        }
+        // lesser < neg_add_barrier <= greater < pos_add_barrier
+        else if (_l_lesser < _m_neg_add_barrier
+                 && _l_greater < _m_pos_add_barrier)
+        {
+            const pair<size_t, size_t>
+                _l_div_and_rem_from_neg_barrier_to_greater{
+                    get_additions_between_elements(
+                        _m_neg_add_barrier, _l_greater
+                    )
+                };
+            return {
+                get_increments_between_values(_l_lesser, _m_neg_add_barrier)
+                    + _l_div_and_rem_from_neg_barrier_to_greater.first,
+                _l_div_and_rem_from_neg_barrier_to_greater.second
+            };
+        }
+        // lesser < neg_add_barrier < pos_add_barrier <= greater
+        else if (_l_lesser < _m_neg_add_barrier
+                 && _m_pos_add_barrier <= _l_greater)
+        {
+            return {
+                get_increments_between_values(_l_lesser, _m_neg_add_barrier)
+                    + get_additions_between_elements(
+                          _m_neg_add_barrier, _m_pos_add_barrier
+                    )
+                          .first
+                    + get_increments_between_values(
+                        _m_pos_add_barrier, _l_greater
+                    ),
+                0
+            };
+        }
+        // neg_add_barrier <= lesser < greater < pos_add_barrier
+        else if (_m_neg_add_barrier <= _l_lesser
+                 && _l_greater < _m_pos_add_barrier)
+        {
+            return get_additions_between_elements(_l_lesser, _l_greater);
+        }
+        // neg_add_barrier <= lesser < pos_add_barrier <= greater
+        else if (_m_neg_add_barrier <= _l_lesser
+                 && _m_pos_add_barrier <= _l_greater)
+        {
+            const pair<size_t, size_t>
+                _l_div_and_rem_from_lesser_to_pos_barrier{
+                    get_additions_between_elements(
+                        _l_lesser, _m_pos_add_barrier
+                    )
+                };
+            return {
+                get_increments_between_values(_m_pos_add_barrier, _l_greater)
+                    + _l_div_and_rem_from_lesser_to_pos_barrier.first,
+                _l_div_and_rem_from_lesser_to_pos_barrier.second
+            };
+        }
+        // neg_add_barrier < < pos_add_barrier <= lesser < greater
+        else
+        {
+            return {get_increments_between_values(_l_lesser, _l_greater), 0};
+        }
+    }
+
+    __constexpr
+    default_enumeration_t(
+        const T _a_difference,
+        const T _a_add_barrier
+    ) noexcept
+        : _m_difference(_a_difference)
+        , _m_pos_add_barrier(_a_add_barrier)
+        , _m_neg_add_barrier(-_a_add_barrier)
+    {}
+
+    __constexpr
+    default_enumeration_t(
+        const T _a_difference = T(1)
+    ) noexcept
+        : default_enumeration_t<T>(
+              _a_difference,
+              find_point_at_which_increment_no_longer_works(_a_difference)
+          )
+    {}
+
+    __constexpr_imp virtual bool
+        less_than(
+            const T& _a_l,
+            const T& _a_r
+        ) const noexcept
+    {
+        return _a_l < _a_r;
+    }
+
+    __constexpr_imp virtual bool
+        equal(
+            const T& _a_l,
+            const T& _a_r
+        ) const noexcept
+    {
+        return _a_l == _a_r;
+    }
+
+    __constexpr bool
+        increment(
+            T&                      _a_element,
+            enumerate_index_t&      _a_times_called,
+            const std::optional<T>& _a_max_value = std::optional<T>{}
+        )
+    {
+        using namespace std;
+        // _a_element < _m_neg_add_barrier.
+        if (_a_element < _m_neg_add_barrier)
+        {
+            // This says we're gonna have to exit if we're not done moving
+            // through the current range.
+            bool _l_hard_limit{
+                _a_max_value.has_value()
+                && _a_max_value.value() <= _m_neg_add_barrier
+            };
+            // What is the limit we're approaching for this if statmenet?
+            T _l_below_neg_add_barrier_limit{
+                _l_hard_limit ? _a_max_value.value() : _m_neg_add_barrier
+            };
+            while (_a_times_called > 0)
+            {
+                _a_element = std::nextafter(
+                    _a_element, _l_below_neg_add_barrier_limit
+                );
+                --_a_times_called;
+                if (_a_element == _l_below_neg_add_barrier_limit)
+                {
+                    if (_l_hard_limit)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            if (_a_times_called == 0)
+            {
+                return true;
+            }
+        }
+        if (_a_element < _m_pos_add_barrier)
+        {
+            // This says we're gonna have to exit if we're not done moving
+            // through the current range.
+            bool _l_hard_limit{
+                _a_max_value.has_value()
+                && _a_max_value.value() <= _m_pos_add_barrier
+            };
+            // What is the limit we're approaching for this if statmenet?
+            T _l_below_pos_add_barrier_limit{
+                _l_hard_limit ? _a_max_value.value() : _m_pos_add_barrier
+            };
+            const enumerate_index_t _l_n_increments_to_get_to_max_value{
+                static_cast<size_t>(
+                    (_l_below_pos_add_barrier_limit - _a_element)
+                    / _m_difference
+                )
+            };
+            if (_l_n_increments_to_get_to_max_value >= _a_times_called)
+            {
+                size_t _l_times_called{to_size_t(_a_times_called)};
+                _a_element += static_cast<T>(_l_times_called) * _m_difference;
+                _a_times_called = 0;
+                return true;
+            }
+            else
+            {
+                _a_times_called += (_l_n_increments_to_get_to_max_value);
+                _a_element       = _l_below_pos_add_barrier_limit;
+                if (_l_hard_limit)
+                {
+                    return false;
+                }
+            }
+        }
+
+        // if (_a_element < numeric_limits<T>::max())
+        {
+            // This says we're gonna have to exit if we're not done moving
+            // through the current range.
+            bool _l_hard_limit{_a_max_value.has_value()};
+            // What is the limit we're approaching for this if statmenet?
+            T _l_below_max_numb_limit{
+                _l_hard_limit ? _a_max_value.value() : numeric_limits<T>::max()
+            };
+            while (_a_times_called > 0)
+            {
+                _a_element
+                    = std::nextafter(_a_element, _l_below_max_numb_limit);
+                --_a_times_called;
+                if (_a_element == _l_below_max_numb_limit)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    __constexpr bool
+        decrement(
+            T&                      _a_element,
+            enumerate_index_t&      _a_times_called,
+            const std::optional<T>& _a_max_value = std::optional<T>{}
+        )
+    {
+        using namespace std;
+        // _a_element < _m_neg_add_barrier.
+        if (_a_element > _m_pos_add_barrier)
+        {
+            // This says we're gonna have to exit if we're not done moving
+            // through the current range.
+            bool _l_hard_limit{
+                _a_max_value.has_value()
+                && _a_max_value.value() >= _m_pos_add_barrier
+            };
+            // What is the limit we're approaching for this if statmenet?
+            T _l_above_pos_add_barrier_limit{
+                _l_hard_limit ? _a_max_value.value() : _m_pos_add_barrier
+            };
+            while (_a_times_called > 0)
+            {
+                _a_element = std::nextafter(
+                    _a_element, _l_above_pos_add_barrier_limit
+                );
+                --_a_times_called;
+                if (_a_element == _l_above_pos_add_barrier_limit)
+                {
+                    if (_l_hard_limit)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            if (_a_times_called == 0)
+            {
+                return true;
+            }
+        }
+        if (_a_element > _m_neg_add_barrier)
+        {
+            // This says we're gonna have to exit if we're not done moving
+            // through the current range.
+            bool _l_hard_limit{
+                _a_max_value.has_value()
+                && _a_max_value.value() >= _m_neg_add_barrier
+            };
+            // What is the limit we're approaching for this if statmenet?
+            T _l_above_neg_add_barrier_limit{
+                _l_hard_limit ? _a_max_value.value() : _m_neg_add_barrier
+            };
+            const enumerate_index_t _l_n_decrements_to_get_to_max_value{
+                static_cast<size_t>(
+                    (_a_element - _l_above_neg_add_barrier_limit)
+                    / _m_difference
+                )
+            };
+            if (_l_n_decrements_to_get_to_max_value >= _a_times_called)
+            {
+                size_t _l_times_called{to_size_t(_a_times_called)};
+                _a_element -= static_cast<T>(_l_times_called) * _m_difference;
+                _a_times_called = 0;
+                return true;
+            }
+            else
+            {
+                _a_times_called += (_l_n_decrements_to_get_to_max_value);
+                _a_element       = _l_above_neg_add_barrier_limit;
+                if (_l_hard_limit)
+                {
+                    return false;
+                }
+            }
+        }
+
+        // if (_a_element < numeric_limits<T>::max())
+        {
+            // This says we're gonna have to exit if we're not done moving
+            // through the current range.
+            bool _l_hard_limit{_a_max_value.has_value()};
+            // What is the limit we're approaching for this if statmenet?
+            T _l_below_min_numb_limit{
+                _l_hard_limit ? _a_max_value.value()
+                              : numeric_limits<T>::lowest()
+            };
+            while (_a_times_called > 0)
+            {
+                _a_element
+                    = std::nextafter(_a_element, _l_below_min_numb_limit);
+                --_a_times_called;
+                if (_a_element == _l_below_min_numb_limit)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+private:
+    T           _m_difference;
+    T           _m_pos_add_barrier;
+    T           _m_neg_add_barrier;
+
+    __constexpr std::size_t
+                get_increments_between_values(
+                    const T& _a_lesser,
+                    const T& _a_greater
+                )
+    {
+        // This uses the code from
+        // https://stackoverflow.com/questions/55049251/how-many-values-can-be-represented-in-a-given-range-by-a-float
+        size_t _l_arg1{encode_into_size_t(_a_lesser)};
+        size_t _l_arg2{encode_into_size_t(_a_greater)};
+        if (_c_highest_bit & _l_arg1)
+        {
+            _l_arg1 = _c_highest_bit - _l_arg1;
+        }
+        if (_c_highest_bit & _l_arg2)
+        {
+            _l_arg2 = _c_highest_bit - _l_arg2;
+        }
+        // Return the distance between the two transformed encodings.
+        return _l_arg2 - _l_arg1;
+    }
+
+    __constexpr std::pair<std::size_t, std::size_t>
+                get_additions_between_elements(
+                    const T& _a_lower,
+                    const T& _a_higher
+                ) const noexcept
+    {
+        const T _l_difference{_a_higher - _a_lower};
+        return {
+            static_cast<size_t>(_l_difference / _m_difference),
+            static_cast<size_t>(remainder(_l_difference, _m_difference))
+        };
+    }
+};
+
 template <>
 struct default_enumeration_t<bool> : public enumeration_base_t<bool>
 {
@@ -276,25 +775,33 @@ struct default_enumeration_t<bool> : public enumeration_base_t<bool>
         less_than(const bool& _a_l, const bool& _a_r) const noexcept;
     __constexpr_imp virtual bool
         equal(const bool& _a_l, const bool& _a_r) const noexcept;
-    __constexpr bool
+    __no_constexpr bool
         increment(
             bool&                      _a_element,
-            std::size_t&               _a_n_times_to_increment,
+            enumerate_index_t&         _a_n_times_to_increment,
             const std::optional<bool>& _a_max_value
         );
-    __constexpr bool
+    __no_constexpr bool
         decrement(
             bool&                      _a_element,
-            std::size_t&               _a_n_times_to_increment,
+            enumerate_index_t&         _a_n_times_to_increment,
             const std::optional<bool>& _a_max_value
         );
-    __constexpr std::pair<std::size_t, std::size_t>
+
+    __no_constexpr_imp enumeration_diff_t
         difference(
             const bool& _a_arg1,
             const bool& _a_arg2
         ) noexcept
     {
-        return { 0,0 };
+        if (_a_arg1 == _a_arg2)
+        {
+            return {0, 0};
+        }
+        else
+        {
+            return {1, 0};
+        }
     }
 };
 
@@ -320,21 +827,23 @@ public:
     __constexpr_imp bool
         increment(
             std::array<T, N>&                      _a_array,
-            std::size_t&                           _a_n_times_to_increment,
+            enumerate_index_t&                     _a_n_times_to_increment,
             const std::optional<std::array<T, N>>& _a_max_value
         );
     __constexpr_imp bool
         decrement(
             std::array<T, N>&                      _a_array,
-            std::size_t&                           _a_n_times_to_increment,
+            enumerate_index_t&                     _a_n_times_to_increment,
             const std::optional<std::array<T, N>>& _a_max_value
         );
-    __constexpr virtual std::pair<std::size_t,std::size_t> difference(
-        const std::array<T,N>& _a_arg1,
-        const std::array<T,N>& _a_arg2
-    ) noexcept
+
+    __constexpr virtual enumeration_diff_t
+        difference(
+            const std::array<T, N>& _a_arg1,
+            const std::array<T, N>& _a_arg2
+        ) noexcept
     {
-        return { 0,0 };
+        return {0, 0};
     }
 };
 
@@ -349,9 +858,16 @@ private:
 public:
     __constexpr_imp
         default_enumeration_t(
-            const std::size_t       _a_n_jumps   = std::size_t{1},
-            const enumeration_t<T>& _a_enumerate = default_enumeration<T>(),
-            const enumeration_schema_t<T> _a_schema = all_values<T>()
+            const enumeration_t<T>&        _a_enumerate,
+            const enumeration_schema_t<T>& _a_schema
+        );
+    __constexpr_imp
+        default_enumeration_t(const enumeration_schema_t<T>& _a_schema);
+    __constexpr_imp
+        default_enumeration_t(
+            const std::size_t       _a_n_jumps       = std::size_t{1},
+            const enumeration_t<T>& _a_enumerate     = default_enumeration<T>(),
+            const enumeration_schema_t<T>& _a_schema = all_values<T>()
         );
     __constexpr_imp virtual bool
         less_than(const std::vector<T>& _a_l, const std::vector<T>& _a_r)
@@ -363,8 +879,8 @@ public:
         ) const noexcept;
     __constexpr_imp void
         either_increment_vector_or_create_next_largest_vector(
-            std::vector<T>& _a_vector,
-            std::size_t&    _a_n_times_to_increment
+            std::vector<T>&    _a_vector,
+            enumerate_index_t& _a_n_times_to_increment
         ) const noexcept;
     __constexpr_imp virtual bool
         equal(const std::vector<T>& _a_l, const std::vector<T>& _a_r)
@@ -373,21 +889,95 @@ public:
     __constexpr_imp bool
         increment(
             std::vector<T>&                      _a_array,
-            std::size_t&                         _a_n_times_to_increment,
+            enumerate_index_t&                   _a_n_times_to_increment,
             const std::optional<std::vector<T>>& _a_max_value
         );
     __constexpr_imp bool
         decrement(
             std::vector<T>&                      _a_array,
-            std::size_t&                         _a_n_times_to_increment,
+            enumerate_index_t&                   _a_n_times_to_increment,
             const std::optional<std::vector<T>>& _a_max_value
         );
-    __constexpr virtual std::pair<std::size_t,std::size_t> difference(
-        const std::vector<T>& _a_arg1,
-        const std::vector<T>& _a_arg2
-    ) noexcept
+
+    __constexpr virtual enumeration_diff_t
+        difference(
+            const std::vector<T>& _a_arg1,
+            const std::vector<T>& _a_arg2
+        ) noexcept
     {
-        return { 0,0 };
+        using namespace std;
+        enumeration_diff_t _l_rv{ 0, 0 };
+        // Find the lesser of the two, then copy the lesser.
+        const bool              _l_arg_1_lesser{ less_than(_a_arg1, _a_arg2) };
+        auto& _l_lesser{ _l_arg_1_lesser ? _a_arg1 : _a_arg2 };
+        auto& _l_greater{ _l_arg_1_lesser ? _a_arg2 : _a_arg1 };
+        const enumerate_index_t _l_divisor{
+            _m_enumeration_schema->n_advancements_per_advancement(_m_enumerate)
+        };
+        size_t             _l_greater_idx{ _l_greater.size() - 1 };
+        vector<T>          _l_local_lesser{ _l_lesser };
+        enumeration_diff_t _l_biggest_difference{ _m_enumerate->difference(
+            _m_enumeration_schema->start_value(),
+            _m_enumeration_schema->end_value(_m_enumerate)
+        ) };
+        _l_biggest_difference.second += 1;
+        for (size_t _l_idx{ _l_lesser.size() }; _l_idx > 0; --_l_idx)
+        {
+            size_t _l_idx_offset{ _l_idx - 1 };
+            // To get to i requires (X,Y).
+            enumeration_diff_t _l_this_diff{ 0, 0 };
+            if (_m_enumerate->equal(
+                _l_lesser[_l_idx_offset], _l_greater[_l_greater_idx]
+            ))
+            {
+            }
+            else if (_m_enumerate->less_than(
+                _l_lesser[_l_idx_offset], _l_greater[_l_greater_idx]
+            ))
+            {
+                enumeration_diff_t _l_local_diff = _m_enumerate->difference(
+                    _l_lesser[_l_idx_offset], _l_greater[_l_greater_idx]
+                );
+                _l_rv.first += _l_local_diff.first;
+                _l_rv.second += _l_local_diff.second;
+            }
+            else
+            {
+                enumeration_diff_t _l_local_diff = _m_enumerate->difference(
+                    _l_lesser[_l_idx_offset], _l_greater[_l_greater_idx]
+                );
+                enumeration_diff_t _l_local_diff_2 = _l_biggest_difference;
+                if (_l_local_diff_2.second > _l_local_diff.second)
+                {
+                    _l_local_diff_2.first--;
+                    _l_local_diff_2.second += _l_divisor;
+                }
+                _l_local_diff_2.second -= _l_local_diff.second;
+                _l_local_diff_2.first -= _l_local_diff.first;
+                _l_rv.first += _l_local_diff_2.first;
+                _l_rv.second += _l_local_diff_2.second;
+            }
+            _l_greater_idx--;
+        }
+        enumeration_diff_t _l_rolling_product{ 1,1 };
+        // Gone through all of them. Now gotta go through the remaining indexes.
+        for (size_t _l_idx{ _l_greater.size() - _l_lesser.size() }; _l_idx > 0;
+            --_l_idx)
+        {
+            enumeration_diff_t _l_local_diff = _m_enumerate->difference(
+                _m_enumeration_schema->start_value(), _l_greater[_l_idx - 1]
+            );
+            _l_local_diff.second += 1;
+            _l_rv.first += _l_local_diff.first * _l_rolling_product.first;
+            _l_rv.second += _l_local_diff.second * _l_rolling_product.second;
+            _l_rolling_product.first *= _l_biggest_difference.first;
+            _l_rolling_product.second *= _l_biggest_difference.second;
+        }
+        enumerate_index_t _l_remainder{ _l_rv.second };
+        _l_rv.first += (_l_remainder / _l_divisor);
+        _l_rv.second = (_l_remainder % _l_divisor);
+        string si = bigUnsignedToString(_l_rv.first);
+        return _l_rv;
     }
 };
 
@@ -554,10 +1144,10 @@ __constexpr_imp bool
     return _a_l == _a_r;
 }
 
-__constexpr_imp bool
+__no_constexpr_imp bool
     default_enumeration_t<bool>::increment(
         bool&                      _a_element,
-        std::size_t&               _a_n_times_to_increment,
+        enumerate_index_t&         _a_n_times_to_increment,
         const std::optional<bool>& _a_max_value
     )
 {
@@ -574,10 +1164,10 @@ __constexpr_imp bool
     }
 }
 
-__constexpr_imp bool
+__no_constexpr_imp bool
     default_enumeration_t<bool>::decrement(
         bool&                      _a_element,
-        std::size_t&               _a_n_times_to_increment,
+        enumerate_index_t&         _a_n_times_to_increment,
         const std::optional<bool>& _a_max_value
     )
 {
@@ -649,7 +1239,7 @@ template <typename T, std::size_t N>
 __constexpr_imp bool
     default_enumeration_t<std::array<T, N>>::increment(
         std::array<T, N>&                      _a_array,
-        std::size_t&                           _a_n_times_to_increment,
+        enumerate_index_t&                     _a_n_times_to_increment,
         const std::optional<std::array<T, N>>& _a_max_value
     )
 {
@@ -715,7 +1305,7 @@ template <typename T, std::size_t N>
 __constexpr_imp bool
     default_enumeration_t<std::array<T, N>>::decrement(
         std::array<T, N>&                      _a_array,
-        std::size_t&                           _a_n_times_to_increment,
+        enumerate_index_t&                     _a_n_times_to_increment,
         const std::optional<std::array<T, N>>& _a_max_value
     )
 {
@@ -781,12 +1371,38 @@ __constexpr_imp bool
 template <typename T>
 __constexpr_imp
     default_enumeration_t<std::vector<T>>::default_enumeration_t(
-        const std::size_t       _a_n_jumps,
-        const enumeration_t<T>& _a_enumerate,
-        const enumeration_schema_t<T> _a_schema
+        const enumeration_t<T>&        _a_enumerate,
+        const enumeration_schema_t<T>& _a_schema
     )
-    : _m_enumerate(_a_enumerate), _m_n_jumps(_a_n_jumps), 
-    _m_enumeration_schema(_a_schema)
+    : _m_enumerate(_a_enumerate)
+    , _m_n_jumps(1)
+    , _m_enumeration_schema(_a_schema)
+{}
+template <typename T>
+__constexpr_imp
+    default_enumeration_t<std::vector<T>>::default_enumeration_t(
+        const enumeration_schema_t<T>& _a_schema
+    )
+    : _m_enumerate(default_enumeration<T>())
+    , _m_n_jumps(1)
+    , _m_enumeration_schema(_a_schema)
+// : default_enumeration_t<T>(
+//      std::size_t{1},
+// default_enumeration<T>(),
+// _a_schema
+// )
+{}
+
+template <typename T>
+__constexpr_imp
+    default_enumeration_t<std::vector<T>>::default_enumeration_t(
+        const std::size_t              _a_n_jumps,
+        const enumeration_t<T>&        _a_enumerate,
+        const enumeration_schema_t<T>& _a_schema
+    )
+    : _m_enumerate(_a_enumerate)
+    , _m_n_jumps(_a_n_jumps)
+    , _m_enumeration_schema(_a_schema)
 {}
 
 template <typename T>
@@ -843,8 +1459,8 @@ template <typename T>
 __constexpr_imp void
     default_enumeration_t<std::vector<T>>::
         either_increment_vector_or_create_next_largest_vector(
-            std::vector<T>& _a_vector,
-            std::size_t&    _a_n_times_to_increment
+            std::vector<T>&    _a_vector,
+            enumerate_index_t& _a_n_times_to_increment
         ) const noexcept
 {
     bool _l_change_made{false};
@@ -853,8 +1469,12 @@ __constexpr_imp void
         _a_vector.back() = _m_enumeration_schema->start_value();
         for (size_t _l_idx{_a_vector.size() - 1}; _l_idx > 0; --_l_idx)
         {
-            std::size_t _l_arg{1};
-            if (_m_enumerate->increment(_a_vector[_l_idx - 1], _l_arg,std::optional<T>()))
+            enumerate_index_t _l_arg{1};
+            if (_m_enumerate->increment(
+                    _a_vector[_l_idx - 1],
+                    _l_arg,
+                    _m_enumeration_schema->end_value(_m_enumerate)
+                ))
             {
                 --_a_n_times_to_increment;
                 _l_change_made = true;
@@ -913,7 +1533,7 @@ template <typename T>
 __constexpr_imp bool
     default_enumeration_t<std::vector<T>>::increment(
         std::vector<T>&                      _a_array,
-        std::size_t&                         _a_n_times_to_increment,
+        enumerate_index_t&                   _a_n_times_to_increment,
         const std::optional<std::vector<T>>& _a_max_value
     )
 {
@@ -940,7 +1560,9 @@ __constexpr_imp bool
         {
             T& _l_elem{_a_array.back()};
             if (_m_enumerate->increment(
-                    _l_elem, _a_n_times_to_increment, std::optional<T>()
+                    _l_elem,
+                    _a_n_times_to_increment,
+                    _m_enumeration_schema->end_value(_m_enumerate)
                 ))
             {
                 if (_a_n_times_to_increment == 0)
@@ -969,7 +1591,7 @@ template <typename T>
 __constexpr_imp bool
     default_enumeration_t<std::vector<T>>::decrement(
         std::vector<T>&                      _a_array,
-        std::size_t&                         _a_n_times_to_increment,
+        enumerate_index_t&                   _a_n_times_to_increment,
         const std::optional<std::vector<T>>& _a_max_value
     )
 {
@@ -1002,7 +1624,7 @@ __constexpr_imp bool
                 _l_elem = _m_enumeration_schema->end_value(_m_enumerate);
                 for (size_t _l_idx{_a_array.size() - 1}; _l_idx > 0; --_l_idx)
                 {
-                    std::size_t _l_arg{1};
+                    enumerate_index_t _l_arg{1};
                     if (_m_enumerate->decrement(
                             _a_array[_l_idx - 1], _l_arg, std::optional<T>()
                         ))
@@ -1037,9 +1659,10 @@ __constexpr_imp bool
             _l_elem = _m_enumeration_schema->end_value(_m_enumerate);
             for (size_t _l_idx{_a_array.size() - 1}; _l_idx > 0; --_l_idx)
             {
-                std::size_t _l_arg{1};
-                if (_m_enumerate
-                    ->decrement(_a_array[_l_idx - 1], _l_arg, std::optional<T>{}))
+                enumerate_index_t _l_arg{1};
+                if (_m_enumerate->decrement(
+                        _a_array[_l_idx - 1], _l_arg, std::optional<T>{}
+                    ))
                 {
                     --_a_n_times_to_increment;
                     break;

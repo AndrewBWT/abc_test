@@ -711,31 +711,58 @@ struct abc::data_gen::default_random_generator_t<S>
 };
 
 _TEST_CASE(
-    abc::test_case_t({ .name = "Enumeration data generator examples" })
+    abc::test_case_t({.name = "Enumeration data generator examples"})
 )
 {
     using namespace abc;
     using namespace std;
-    _BEGIN_MULTI_ELEMENT_BBA(
-        character_tester, "Testing character values"
-    );
-    // This random generator uses the default_random_generator_t instance for
-    // int.
-    for (char character : enumerate_data<char>())
+    _BEGIN_MULTI_ELEMENT_BBA(character_tester, "Testing character values");
+    // This enumeration generator uses the default enumeration of char. It will
+    // go through all char values.
+    /*for (char character : enumerate_data<char>())
     {
-        character_tester
-            += _BLOCK_CHECK(_EXPR(character != 'd'));
+        character_tester += _BLOCK_CHECK(_EXPR(character != 'd'));
     }
-    for (auto&& character : enumerate_data<bool>())
-    {
-        character_tester
-            += _BLOCK_CHECK(_EXPR(character != true));
-    }
+    // This enumeration generator will go through all vector<char> values up to
+    // a max of {a}. vector does not have a default max value, so we cannot just
+    // enumerate all vector values.
     for (const std::vector<char>& character : enumerate_data<std::vector<char>>(
-        from_min_to_val<std::vector<char>>({'a'})))
+             from_min_to_val<std::vector<char>>({'a'})
+         ))
     {
         character_tester
             += _BLOCK_CHECK(_EXPR(character != std::vector<char>()));
+    }
+    // This inner enumerator for char will only print a-z.
+    for (const std::vector<char>& character : enumerate_data<std::vector<char>>(
+             from_min_to_val<std::vector<char>>({'a', 'a'}),
+             default_enumeration<std::vector<char>>(from_m_to_n('a', 'z'))
+         ))
+    {
+        character_tester
+            += _BLOCK_CHECK(_EXPR(character != std::vector<char>()));
+    }
+    for (const float& character : enumerate_data<float>(
+        from_m_to_n(0.0f, 20.0f), default_enumeration<float>(7.03f)
+    ))
+    {
+        character_tester += _BLOCK_CHECK(_EXPR(character != 1.0f));
+    }
+    for (const float& character : enumerate_data<float>(
+             from_m_to_n(0.0f, 1e10f), default_enumeration<float>(100.0f)
+         ))
+    {
+        //character_tester += _BLOCK_CHECK(_EXPR(character != 1.0f));
+    }*/
+    for (const vector<float>& character : enumerate_data<vector<float>>(
+             from_min_to_val<vector<float>>({0.3f, 0.93f, 0.56f}),
+             default_enumeration<vector<float>>(
+                 default_enumeration<float>(0.03f), from_m_to_n(0.17f, 0.93f)
+             )
+         ))
+    {
+        character_tester
+            += _BLOCK_CHECK(_EXPR(character != std::vector<float>()));
     }
     _END_BBA_CHECK(character_tester);
 }
@@ -798,9 +825,8 @@ _TEST_CASE(
             += _BLOCK_CHECK(_EXPR(integer + integer > integer));
     }
     for (auto integer :
-        generate_data_randomly<int>(mk_random_generator(int_generator_t(100))))
+         generate_data_randomly<int>(mk_random_generator(int_generator_t(100))))
     {
     }
     _END_BBA_CHECK(check_integer_overflow);
-
 }
