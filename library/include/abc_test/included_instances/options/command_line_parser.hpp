@@ -1,20 +1,8 @@
 #pragma once
-#include "abc_test/external/CLI11/CLI11.hpp"
 #include "abc_test/included_instances/options/included_instances_test_options.hpp"
 #include "abc_test/internal/options/test_options_base.hpp"
 #include "abc_test/internal/utility/cli.hpp"
 
-_BEGIN_ABC_DS_NS
-__no_constexpr bool
-    lexical_cast(
-        const std::string&                            _a_input,
-        map_unique_id_to_tdg_collection_stack_trie_t& _a_param
-    );
-_END_ABC_DS_NS
-_BEGIN_ABC_UTILITY_NS
-__no_constexpr bool
-    lexical_cast(const std::string& _a_input, global_seed_t& _a_param);
-_END_ABC_UTILITY_NS
 _BEGIN_ABC_NS
 __no_constexpr int
     run_test_suite_using_command_line_args(int argc, char** argv);
@@ -34,8 +22,6 @@ public:
             included_instances_test_options_t& _a_opts,
             cli_t&                             _a_cli
         ) noexcept;
-    __constexpr CLI::App&
-                get_ref() noexcept;
     __no_constexpr void
         run_file_reader(
             const std::vector<std::pair<std::string, std::string>>& _a_strs,
@@ -115,25 +101,16 @@ public:
         = {"test_paths_to_run", "Which test paths are to be ran. ", {}};
     static constexpr std::string_view _s_automatic_config_option = "--config";
 private:
-    std::unique_ptr<CLI::App>     _m_internal_ptr;
     std::reference_wrapper<cli_t> _m_cli;
     std::map<
         std::string,
         std::function<std::optional<std::string>(const std::string_view)>>
         _m_map_strs_to_parsing_funcs;
     std::reference_wrapper<included_instances_test_options_t> _m_iito_wrapper;
-    // Static Options
-    std::map<std::string, CLI::Option*> _m_option_str_to_option_ptr;
     template <typename T, typename U = T>
     __constexpr void
         insert_option(const option_config_t& _a_option_config, T& _a_value)
             noexcept;
-    template <typename T>
-    __constexpr void
-        insert_continuous_file_option(
-            const option_config_t& _a_option_config,
-            T&                     _a_value
-        ) noexcept;
 };
 
 namespace
@@ -145,52 +122,8 @@ __constexpr std::string
 
 _END_ABC_NS
 
-_BEGIN_ABC_DS_NS
-__no_constexpr_imp bool
-    lexical_cast(
-        const std::string&                            _a_input,
-        map_unique_id_to_tdg_collection_stack_trie_t& _a_param
-    )
-{
-    // Annoyingly we can't parse and validate at the same time (or atleast I've
-    // not been able to find a way to).
-    using namespace _ABC_NS_DS;
-    const parse_map_unique_id_to_tdg_collection_stack_trie_result_t _l_result{
-        parse_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
-            _a_input
-        )
-    };
-    if (_l_result.has_value())
-    {
-        _a_param = _l_result.value();
-    }
-    return _l_result.has_value();
-}
 
-_END_ABC_DS_NS
 
-_BEGIN_ABC_UTILITY_NS
-__no_constexpr_imp bool
-    lexical_cast(
-        const std::string& _a_input,
-        global_seed_t&     _a_param
-    )
-{
-    // Annoyingly we can't parse and validate at the same time (or atleast I've
-    // not been able to find a way to).
-    using namespace _ABC_NS_DS;
-    std::expected<complete_global_seed_t, std::string> _l_parse_result{
-        abc::utility::parse_complete_global_string_in_hex(_a_input)
-    };
-    if (_l_parse_result.has_value())
-    {
-        _a_param = _l_parse_result.value();
-        return true;
-    }
-    return true;
-}
-
-_END_ABC_UTILITY_NS
 
 _BEGIN_ABC_NS
 __no_constexpr_imp int
@@ -273,8 +206,7 @@ __no_constexpr_imp
         included_instances_test_options_t& _a_opts,
         cli_t&                             _a_cli
     ) noexcept
-    : _m_internal_ptr(std::make_unique<CLI::App>())
-    , _m_iito_wrapper(_a_opts)
+    :  _m_iito_wrapper(_a_opts)
     , _m_cli(std::reference_wrapper(_a_cli))
 {
     using namespace std;
@@ -327,43 +259,6 @@ __no_constexpr_imp
             ? optional<char>(get<2>(_c_test_paths_to_run).value()[0])
             : optional<char>{}
     );
-
-    _m_option_str_to_option_ptr.insert(
-        {string(_s_automatic_config_option),
-         _m_internal_ptr->set_config(string(_s_automatic_config_option))}
-    );
-    _m_internal_ptr->allow_config_extras(false);
-    insert_continuous_file_option(
-        _s_global_test_list, _a_opts.use_global_test_list
-    );
-    insert_continuous_file_option(_s_path_delimiter, _a_opts.path_delimiter);
-    insert_continuous_file_option(_s_root_path, _a_opts.root_path);
-    insert_continuous_file_option(_s_threads, _a_opts.threads);
-    insert_continuous_file_option(_s_comment_str, _a_opts.comment_str);
-    insert_continuous_file_option(
-        _s_general_data_file_extension, _a_opts.general_data_extension
-    );
-    insert_continuous_file_option(
-        _s_tertiary_data_file_extension, _a_opts.tertiary_data_file_extension
-    );
-    insert_continuous_file_option(
-        _s_integers_used_for_rng_generation,
-        _a_opts.number_of_integers_used_to_seed_random_generators
-    );
-    insert_continuous_file_option(
-        _s_repetition_config, _a_opts.map_of_unique_ids_and_for_loop_stack_tries
-    );
-    insert_continuous_file_option(_s_global_seed, _a_opts.global_seed);
-
-    insert_continuous_file_option(
-        _s_force_run_all_tests, _a_opts.force_run_all_tests
-    );
-}
-
-__constexpr_imp CLI::App&
-                abc_test_clp_app::get_ref() noexcept
-{
-    return *_m_internal_ptr;
 }
 
 __no_constexpr_imp void
@@ -410,47 +305,6 @@ __constexpr void
             ? optional<char>(get<2>(_a_option_config).value()[0])
             : optional<char>{}
     );
-}
-
-template <typename T>
-__constexpr void
-    abc_test_clp_app::insert_continuous_file_option(
-        const abc_test_clp_app::option_config_t& _a_option_config,
-        T&                                       _a_value
-    ) noexcept
-{
-    /*using namespace std;
-    _m_map_strs_to_parsing_funcs.insert(
-        {string(get<0>(_a_option_config)),
-         [&](const std::string_view _a_str) -> std::optional<std::string>
-         {
-             if (not _m_iito_wrapper.get().override_automatic_configuration
-                 && _m_option_str_to_option_ptr
-                            .at(string(get<0>(_a_option_config)))
-                            ->count()
-                        > 0)
-             {
-                 return fmt::format(
-                     "Cannot override field member {0}, as it has already been "
-                     "written by the user",
-                     1
-                 );
-             }
-             else
-             {
-                 auto _l_res = abc::utility::parser::parse<T>(_a_str);
-                 if (_l_res.has_value())
-                 {
-                     _a_value = _l_res.value();
-                     return optional<string>{};
-                 }
-                 else
-                 {
-                     return _l_res.error();
-                 }
-             }
-         }}
-    );*/
 }
 
 namespace

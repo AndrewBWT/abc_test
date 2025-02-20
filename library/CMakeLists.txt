@@ -243,7 +243,6 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/options/command_line_parser.hpp
   include/abc_test/included_instances/options/included_instances_test_options.hpp
   #Externally included libraries (we include the files rather than linking to the git repo).
-  include/abc_test/external/CLI11/CLI11.hpp
   include/abc_test/external/bigint/BigInteger.hpp
       src/abc_test/external/bigint/BigInteger.cpp
   include/abc_test/external/bigint/BigIntegerAlgorithms.hpp

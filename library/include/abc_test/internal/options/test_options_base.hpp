@@ -1,6 +1,5 @@
 #pragma once
 
-#include "abc_test/external/CLI11/CLI11.hpp"
 #include "abc_test/internal/ds/data_generator_memoization/map_unique_id_to_tdg_collection_stack_trie.hpp"
 #include "abc_test/internal/ds/type_synonyms.hpp"
 #include "abc_test/internal/global.hpp"
@@ -180,8 +179,6 @@ __no_constexpr std::string
                make_test_options_base_member_variables_fmt(
                    const test_options_base_t& _a_opts
                ) noexcept;
-__no_constexpr CLI::App*
-    build_auto_repetition_file_parser(test_options_base_t& _a_opts) noexcept;
 __no_constexpr std::expected<rep_data_file_info_t, std::string>
     get_most_recent_test_data(const std::string_view _a_folder) noexcept;
 __no_constexpr std::expected<rep_data_file_info_t, std::string>
