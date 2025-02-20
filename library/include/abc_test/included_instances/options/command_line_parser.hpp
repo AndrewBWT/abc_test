@@ -22,11 +22,6 @@ public:
             included_instances_test_options_t& _a_opts,
             cli_t&                             _a_cli
         ) noexcept;
-    __no_constexpr void
-        run_file_reader(
-            const std::vector<std::pair<std::string, std::string>>& _a_strs,
-            std::vector<std::string>&                               _a_errors
-        ) noexcept;
     static constexpr const option_config_t _s_global_test_list
         = {"use_global_test_list",
            "Use the global test list as the set of tests",
@@ -113,12 +108,6 @@ private:
             noexcept;
 };
 
-namespace
-{
-__constexpr std::string
-    make_cml_string(const abc_test_clp_app::option_config_t& _a_option_config_t
-    ) noexcept;
-} // namespace
 
 _END_ABC_NS
 
@@ -180,7 +169,7 @@ __no_constexpr_imp int
             for (size_t _l_idx{0};
                  string & _l_error : _l_validated_test_options.error())
             {
-                _l_st.push_back(fmt::format(" {0})  ", _l_idx++));
+                _l_st.push_back(fmt::format(" {0})  ", ++_l_idx));
                 _l_st.push_back(_l_error);
                 _l_st.new_line();
             }
@@ -235,22 +224,6 @@ __no_constexpr_imp
 
     insert_option(_s_force_run_all_tests, _a_opts.force_run_all_tests);
     _m_cli.get().add_auto_configuration();
-    /*insert_option<std::optional<std::string>, std::string>(
-        _s_automatic_repetition_data_folder,
-        _a_opts.automatic_repetition_data_folder
-    );
-    insert_option(
-        _s_override_automatic_configuration,
-        _a_opts.override_automatic_configuration
-    );
-    insert_option(
-        _c_automatically_rerun_last_test_if_failure,
-        _a_opts.automatic_repeating_of_previous_test_if_failure
-    );*/
-
-    // insert_option<vector<std::string>, std::string>(
-    // _c_test_paths_to_run, _a_opts.test_paths_to_run
-    // );
     _m_cli.get().add_multi_element_option<vector<string>, string>(
         get<0>(_c_test_paths_to_run),
         get<1>(_c_test_paths_to_run),
@@ -259,34 +232,6 @@ __no_constexpr_imp
             ? optional<char>(get<2>(_c_test_paths_to_run).value()[0])
             : optional<char>{}
     );
-}
-
-__no_constexpr_imp void
-    abc_test_clp_app::run_file_reader(
-        const std::vector<std::pair<std::string, std::string>>& _a_strs,
-        std::vector<std::string>&                               _a_errors
-    ) noexcept
-{
-    using namespace std;
-    char** _l_args = new char*[_a_strs.size() * 2 + 1];
-
-
-    for (const auto& [_l_field_name, _l_field_data] : _a_strs)
-    {
-        if (auto finder = _m_map_strs_to_parsing_funcs.find(_l_field_name);
-            finder != _m_map_strs_to_parsing_funcs.end())
-        {
-            finder->second(_l_field_data);
-        }
-        else
-        {
-            _a_errors.push_back(fmt::format(
-                "Could not find field \"{0}\" when parsing automatically "
-                "generated configuration file.",
-                _l_field_name
-            ));
-        }
-    }
 }
 
 template <typename T, typename U>
@@ -307,21 +252,5 @@ __constexpr void
     );
 }
 
-namespace
-{
-__constexpr_imp std::string
-                make_cml_string(
-                    const abc_test_clp_app::option_config_t& _a_option_config
-                ) noexcept
-{
-    return (get<2>(_a_option_config).has_value())
-               ? fmt::format(
-                     "-{0},--{1}",
-                     get<2>(_a_option_config).value(),
-                     get<0>(_a_option_config)
-                 )
-               : fmt::format("--{0}", get<0>(_a_option_config));
-}
-} // namespace
 
 _END_ABC_NS
