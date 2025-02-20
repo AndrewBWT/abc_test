@@ -18,10 +18,7 @@ public:
 protected:
     __no_constexpr virtual void
         validate_and_pre_process_(
-            std::vector<std::string>& _a_error_ref,
-            std::function<
-                void(const std::vector<std::pair<std::string, std::string>>&, std::vector<std::string>&)>
-                _a_process_func
+            std::vector<std::string>& _a_error_ref
         ) noexcept;
 };
 
@@ -68,10 +65,7 @@ struct fmt::formatter<abc::included_instances_test_options_t>
 _BEGIN_ABC_NS
 __no_constexpr void
     included_instances_test_options_t::validate_and_pre_process_(
-        std::vector<std::string>& _a_error_ref,
-        std::function<
-            void(const std::vector<std::pair<std::string, std::string>>&, std::vector<std::string>&)>
-            _a_process_func
+        std::vector<std::string>& _a_error_ref
     ) noexcept
 {
     using namespace _ABC_NS_REPORTERS;
@@ -117,7 +111,7 @@ __no_constexpr void
         }
     }
     test_options_base_t::validate_and_pre_process_(
-        _a_error_ref, _a_process_func
+        _a_error_ref
     );
 }
 

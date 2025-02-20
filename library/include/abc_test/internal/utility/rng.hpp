@@ -319,9 +319,9 @@ struct default_parser_t<global_seed_t>
         ) const
     {
         using namespace std;
-        const parse_result_t<variant<unsigned int, std::vector<uint32_t>>>
+        const parse_result_t<unsigned int>
             _l_variant_result{ utility::parser::default_parser_t<
-                                  variant<unsigned int, std::vector<uint32_t>>>(
+                                  unsigned int>(
             )
                                   .run_parser(_a_parse_input) };
         if (_l_variant_result.has_value())

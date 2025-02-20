@@ -1,11 +1,13 @@
 #pragma once
 
+#include "abc_test/internal/errors/test_library_exception.hpp"
 #include "abc_test/internal/utility/internal/macros.hpp"
 
 #include <fmt/base.h>
 #include <string>
 #include <vector>
-#include "abc_test/internal/errors/test_library_exception.hpp"
+#include <source_location>
+#include <charconv>
 
 _BEGIN_ABC_UTILITY_STR_NS
 /*!
@@ -21,6 +23,11 @@ __constexpr std::vector<std::string>
                 const std::string_view _a_str,
                 const std::string_view delimiter
             ) noexcept;
+__constexpr std::vector<std::string_view>
+split_string_sv(
+    const std::string_view _a_str,
+    const std::string_view delimiter
+) noexcept;
 __no_constexpr std::string
                location_string(const std::source_location& _a_sl) noexcept;
 __constexpr    std::string
@@ -39,6 +46,8 @@ __constexpr std::expected<std::string, std::string>
             from_hex(const std::string_view _a_str);
 __constexpr std::string
             from_hex_with_exception(const std::string_view _a_str);
+__no_constexpr std::string
+remove_whitespace(const std::string_view _a_str) noexcept;
 _END_ABC_UTILITY_STR_NS
 
 _BEGIN_ABC_UTILITY_STR_NS
@@ -78,6 +87,31 @@ __constexpr_imp std::vector<std::string>
         res.push_back(token);
     }
     res.push_back(string(_a_str.substr(pos_start)));
+    return res;
+}
+
+__constexpr_imp std::vector<std::string_view>
+split_string_sv(
+    const std::string_view _a_str,
+    const std::string_view _a_delimiter
+) noexcept
+{
+    using namespace std;
+    if (_a_str == "")
+    {
+        return {};
+    }
+    size_t         pos_start = 0, pos_end, delim_len = _a_delimiter.size();
+    string_view         token;
+    vector<string_view> res;
+
+    while ((pos_end = _a_str.find(_a_delimiter, pos_start)) != string::npos)
+    {
+        token = _a_str.substr(pos_start, pos_end - pos_start);
+        pos_start = pos_end + delim_len;
+        res.push_back(token);
+    }
+    res.push_back(_a_str.substr(pos_start));
     return res;
 }
 
@@ -207,6 +241,27 @@ __constexpr_imp std::string
     {
         return _l_res.value();
     }
+}
+
+__no_constexpr_imp std::string
+                remove_whitespace(
+                    const std::string_view _a_str
+                ) noexcept
+{
+    using namespace std;
+    string _l_rv{_a_str};
+    _l_rv.erase(
+        std::remove_if(
+            _l_rv.begin(),
+            _l_rv.end(),
+            [](char c)
+            {
+                return std::isspace(static_cast<unsigned char>(c));
+            }
+        ),
+        _l_rv.end()
+    );
+    return _l_rv;
 }
 
 _END_ABC_UTILITY_STR_NS

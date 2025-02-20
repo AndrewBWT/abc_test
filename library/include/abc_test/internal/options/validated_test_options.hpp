@@ -38,10 +38,7 @@ public:
      */
     __no_constexpr static validated_test_options_or_error_t<T>
         validate_test_options(
-            T& _a_test_options,
-            std::function<
-                void(const std::vector<std::pair<std::string, std::string>>&, std::vector<std::string>&)>
-                _a_process_func
+            T& _a_test_options
         ) noexcept;
 private:
     __no_constexpr
@@ -61,15 +58,12 @@ __constexpr_imp const T&
 template <typename T>
 __no_constexpr_imp validated_test_options_or_error_t<T>
                    validated_test_options_t<T>::validate_test_options(
-        T& _a_test_options,
-        std::function<
-                           void(const std::vector<std::pair<std::string, std::string>>&, std::vector<std::string>&)>
-            _a_process_func
+        T& _a_test_options
     ) noexcept
 {
     using namespace std;
     if (optional<vector<string>> _l_error_msg{
-            _a_test_options.validate_and_pre_process(_a_process_func)
+            _a_test_options.validate_and_pre_process()
         };
         _l_error_msg.has_value())
     {

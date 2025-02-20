@@ -2,6 +2,7 @@
 
 #include "abc_test/internal/utility/parsers/parser_input.hpp"
 #include "abc_test/internal/utility/parsers/types.hpp"
+#include "abc_test/internal/errors/test_library_exception.hpp"
 
 #include <memory>
 
@@ -58,7 +59,6 @@ __constexpr_imp utility::parser::parse_result_t<T>
                 ) noexcept
 {
     using namespace std;
-    using namespace errors;
     using namespace utility::parser;
     parser_input_t _l_pit(_a_str);
     try

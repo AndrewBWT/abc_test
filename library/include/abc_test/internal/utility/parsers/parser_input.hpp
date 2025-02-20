@@ -109,8 +109,9 @@ __constexpr bool
 {
     using namespace std;
     const size_t _l_str_len{_a_str_to_check_against.size()};
-    if (string_view(_m_cur_itt, _m_cur_itt + _l_str_len)
-        == _a_str_to_check_against)
+    if ( _l_str_len <= std::distance(_m_cur_itt, _m_end_itt)
+        && string_view(_m_cur_itt, _m_cur_itt + _l_str_len)
+               == _a_str_to_check_against)
     {
         _m_cur_itt += _l_str_len;
         return true;

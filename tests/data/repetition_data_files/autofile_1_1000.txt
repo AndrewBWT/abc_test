@@ -1,3 +1,4 @@
+metadata_(false, 1)
 test_config_index = 1
 passed = true
 test_config_index = 2
@@ -5,4 +6,4 @@ passed = false
 use_global_test_list = true
 threads = 12
 n_integers_used_for_rng_generation = 1000
-global_seed = 0 123456
+global_seed = 123456

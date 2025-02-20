@@ -58,6 +58,21 @@ private:
     const test_options_base_t&             _m_options;
 };
 
+__constexpr std::vector<ds::test_path_hierarchy_t>
+            process_test_path_hierarchies(
+                const std::vector<std::string>& _a_strs,
+                const std::string_view          _a_delimiter
+            ) noexcept
+{
+    using namespace std;
+    vector<test_path_hierarchy_t> _l_rv;
+    for (const std::string_view _l_str : _a_strs)
+    {
+        _l_rv.emplace_back(utility::str::split_string(_l_str, _a_delimiter));
+    }
+    return _l_rv;
+}
+
 _END_ABC_DS_NS
 
 _BEGIN_ABC_DS_NS
@@ -84,7 +99,10 @@ __no_constexpr_imp void
     const map<key_t, tdg_collection_stack_trie_t>& _l_map{
         _m_options.map_of_unique_ids_and_for_loop_stack_tries.map()
     };
-    const std::vector<test_path_hierarchy_t>& _l_test_paths_to_use = _m_options.test_paths_to_run;
+    std::vector<test_path_hierarchy_t> _l_test_paths_to_use
+        = process_test_path_hierarchies(
+            _m_options.test_paths_to_run, _m_options.path_delimiter
+        );
     for (std::reference_wrapper<const test_list_t> _l_test_list_element :
          _a_test_list_collection)
     {

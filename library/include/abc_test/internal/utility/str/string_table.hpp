@@ -2,6 +2,7 @@
 #include "abc_test/internal/utility/internal/macros.hpp"
 #include <vector>
 #include <string>
+#include <map>
 
 _BEGIN_ABC_UTILITY_STR_NS
 class string_table_t
@@ -128,7 +129,7 @@ __no_constexpr_imp
 	++_m_next_column;
 	_m_str_table.back().push_back(_l_to_insert);
 }
-__no_constexpr
+__no_constexpr_imp
 	void
 	string_table_t::push_empty(
 	) noexcept

@@ -195,7 +195,12 @@ set(LIBRARY_FILES
   include/abc_test/internal/utility/limits/min_value_concept.hpp
   include/abc_test/internal/utility/limits/max_value_concept.hpp
   # Command line parser
-  include/abc_test/internal/utility/clp.hpp
+  include/abc_test/internal/utility/cli.hpp
+  include/abc_test/internal/utility/cli/cli_info.hpp
+  include/abc_test/internal/utility/cli/cli_help.hpp
+  include/abc_test/internal/utility/cli/cli_help.hpp
+      src/abc_test/internal/utility/cli/cli_help.cpp
+  include/abc_test/internal/utility/cli/cli_output.hpp
   #Included instances utility files  include/abc_test/internal/utility/limits/min_value_object.hpp
   include/abc_test/included_instances/utility/limits/array.hpp
   include/abc_test/included_instances/utility/limits/enum.hpp

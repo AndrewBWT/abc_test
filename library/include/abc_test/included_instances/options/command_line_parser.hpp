@@ -2,6 +2,7 @@
 #include "abc_test/external/CLI11/CLI11.hpp"
 #include "abc_test/included_instances/options/included_instances_test_options.hpp"
 #include "abc_test/internal/options/test_options_base.hpp"
+#include "abc_test/internal/utility/cli.hpp"
 
 _BEGIN_ABC_DS_NS
 __no_constexpr bool
@@ -29,7 +30,10 @@ public:
     abc_test_clp_app() noexcept
         = delete;
     __no_constexpr
-        abc_test_clp_app(included_instances_test_options_t& _a_opts) noexcept;
+        abc_test_clp_app(
+            included_instances_test_options_t& _a_opts,
+            cli_t&                             _a_cli
+        ) noexcept;
     __constexpr CLI::App&
                 get_ref() noexcept;
     __no_constexpr void
@@ -73,11 +77,31 @@ public:
         = {"global_seed", "Set the global seed", {}};
     static constexpr option_config_t _s_force_run_all_tests
         = {"force_run_all_tests", "Forces all tests to run", {}};
-    static constexpr option_config_t _s_automatic_repetition_data_folder
-        = {"automatic_repetition_data_folder",
-           "Place to save ran testing configurations, and where to search when "
-           "re-running previous configurations.",
-           {}};
+    static constexpr option_config_t _s_automatic_repetition_data_folder = {
+        "automatic_repetition_data_folder",
+        "Denotes this run as automatically configured. Requires exactly "
+        "three arguments; the first must be a folder location. The second "
+        "is either a positive integer or the strings latest or "
+        "latest_if_failure. The third is any of the strings always_write, "
+        "write_if_different_or_new_run_that_failed or do_not_write. Using this "
+        "option will "
+        "read "
+        "memoized configurations from the folder given. These are "
+        "configurations indexed by integer, with an additional bool "
+        "denoting whether the test was a success or failure. If the second "
+        "argument is an integer, that configuration is found and loaded (if "
+        "it exists). If it is the string \"latest\", it will run the most "
+        "recent configuration. If it is the string \"latest_if_failure\", it "
+        "will only load the configuration if the previous test was a failure. "
+        "Otherwise it will will not load any configuration. The third argument "
+        "denotes whether to write data after the test is run to the folder. If "
+        "the string is \"always_write\", the data is always written. If the "
+        "string is \"\", the data is only written if it was loaded and "
+        "overridden by the user, or no configuration was automatically loaded "
+        "and instead a clean run was performd, which failed. If the string is "
+        "\"do_not_write\", the configuration is never written to any files. ",
+        {}
+    };
     static constexpr option_config_t _s_override_automatic_configuration
         = {"override_automatic_configuration",
            "Allows an automatic configuration to be overriden by user-provided "
@@ -87,9 +111,12 @@ public:
         = {"automaticly_rerun_last_test_if_failure",
            "Automatically runs previously ran configurations. ",
            {}};
+    static constexpr option_config_t _c_test_paths_to_run
+        = {"test_paths_to_run", "Which test paths are to be ran. ", {}};
     static constexpr std::string_view _s_automatic_config_option = "--config";
 private:
-    std::unique_ptr<CLI::App> _m_internal_ptr;
+    std::unique_ptr<CLI::App>     _m_internal_ptr;
+    std::reference_wrapper<cli_t> _m_cli;
     std::map<
         std::string,
         std::function<std::optional<std::string>(const std::string_view)>>
@@ -97,7 +124,7 @@ private:
     std::reference_wrapper<included_instances_test_options_t> _m_iito_wrapper;
     // Static Options
     std::map<std::string, CLI::Option*> _m_option_str_to_option_ptr;
-    template <typename T>
+    template <typename T, typename U = T>
     __constexpr void
         insert_option(const option_config_t& _a_option_config, T& _a_value)
             noexcept;
@@ -172,59 +199,87 @@ __no_constexpr_imp int
         char** argv
     )
 {
-    using namespace abc;
     using namespace std;
+    using namespace _ABC_NS;
     using namespace _ABC_NS_REPORTERS;
     using namespace _ABC_NS_DS;
     using namespace _ABC_NS_UTILITY;
+    std::cout << "abc_test run started." << std::endl;
     included_instances_test_options_t _l_iito;
-    abc_test_clp_app                  _l_clp_app(_l_iito);
-    std::function<
-        void(const std::vector<std::pair<std::string, std::string>>&, std::vector<std::string>&)>
-        f = std::bind(
-            &abc_test_clp_app::run_file_reader,
-            &_l_clp_app,
-            std::placeholders::_1,
-            std::placeholders::_2
-        );
-    CLI11_PARSE(_l_clp_app.get_ref(), argc, argv);
-    auto _l_validated_test_options{validated_test_options_t<
-        included_instances_test_options_t>::validate_test_options(_l_iito, f)};
-    if (_l_validated_test_options.has_value())
+    cli_output_t                      _l_cli_output;
+    cli_t                             _l_cli(_l_cli_output);
+    abc_test_clp_app                  _l_clp_app(_l_iito, _l_cli);
+    std::cout << "Parsing command line parameters." << std::endl;
+    _l_cli.parse_arguments(argc, argv);
+    if (_l_cli_output.has_errors())
     {
-        test_main_t _l_test_main(_l_validated_test_options.value());
-        _l_test_main.run_tests();
-        return 0;
+        std::cout << "Errors encountered when parsing command line parameters. "
+                     "These are as follows:"
+                  << std::endl;
+        std::cout << "\t" << _l_cli_output.errors();
+    }
+    if (_l_cli_output.has_warnings())
+    {
+    }
+    if (_l_cli_output.show_log())
+    {
+    }
+    if (_l_cli_output.has_text_output())
+    {
+        for (auto& k : _l_cli_output.text_output())
+        {
+            std::cout << k << std::endl;
+        }
+    }
+    if (_l_cli_output.can_continue())
+    {
+        auto _l_validated_test_options{validated_test_options_t<
+            included_instances_test_options_t>::validate_test_options(_l_iito)};
+        if (_l_validated_test_options.has_value())
+        {
+            test_main_t _l_test_main(_l_validated_test_options.value());
+            _l_test_main.run_tests();
+            return 0;
+        }
+        else
+        {
+            str::string_table_t _l_st({1});
+            for (size_t _l_idx{0};
+                 string & _l_error : _l_validated_test_options.error())
+            {
+                _l_st.push_back(fmt::format(" {0})  ", _l_idx++));
+                _l_st.push_back(_l_error);
+                _l_st.new_line();
+            }
+            std::cout << fmt::format(
+                "Error(s) encountered when validating test_options_t. "
+                "The following errors were returned from the validation "
+                "function:\n{0}\nThe program will now terminate. "
+                "included_instances_test_options_t = {1}",
+                _l_st(),
+                _l_iito
+            );
+            return -1;
+        }
     }
     else
     {
-        str::string_table_t _l_st({1});
-        for (size_t _l_idx{0};
-             string & _l_error : _l_validated_test_options.error())
-        {
-            _l_st.push_back(fmt::format(" {0})  ", _l_idx++));
-            _l_st.push_back(_l_error);
-            _l_st.new_line();
-        }
-        std::cout << fmt::format(
-            "Error(s) encountered when validating test_options_t. "
-            "The following errors were returned from the validation "
-            "function:\n{0}\nThe program will now terminate. "
-            "included_instances_test_options_t = {1}",
-            _l_st(),
-            _l_iito
-        );
         return -1;
     }
 }
 
 __no_constexpr_imp
     abc_test_clp_app::abc_test_clp_app(
-        included_instances_test_options_t& _a_opts
+        included_instances_test_options_t& _a_opts,
+        cli_t&                             _a_cli
     ) noexcept
-    : _m_internal_ptr(std::make_unique<CLI::App>()), _m_iito_wrapper(_a_opts)
+    : _m_internal_ptr(std::make_unique<CLI::App>())
+    , _m_iito_wrapper(_a_opts)
+    , _m_cli(std::reference_wrapper(_a_cli))
 {
     using namespace std;
+    _m_cli.get().add_help_flag();
+    _m_cli.get().add_file_config_flag();
     insert_option(_s_global_test_list, _a_opts.use_global_test_list);
     insert_option(_s_write_data_to_files, _a_opts.write_data_to_files);
     insert_option(_s_path_delimiter, _a_opts.path_delimiter);
@@ -247,7 +302,8 @@ __no_constexpr_imp
     insert_option(_s_global_seed, _a_opts.global_seed);
 
     insert_option(_s_force_run_all_tests, _a_opts.force_run_all_tests);
-    insert_option(
+    _m_cli.get().add_auto_configuration();
+    /*insert_option<std::optional<std::string>, std::string>(
         _s_automatic_repetition_data_folder,
         _a_opts.automatic_repetition_data_folder
     );
@@ -258,7 +314,20 @@ __no_constexpr_imp
     insert_option(
         _c_automatically_rerun_last_test_if_failure,
         _a_opts.automatic_repeating_of_previous_test_if_failure
+    );*/
+
+    // insert_option<vector<std::string>, std::string>(
+    // _c_test_paths_to_run, _a_opts.test_paths_to_run
+    // );
+    _m_cli.get().add_multi_element_option<vector<string>, string>(
+        get<0>(_c_test_paths_to_run),
+        get<1>(_c_test_paths_to_run),
+        _a_opts.test_paths_to_run,
+        get<2>(_c_test_paths_to_run).has_value()
+            ? optional<char>(get<2>(_c_test_paths_to_run).value()[0])
+            : optional<char>{}
     );
+
     _m_option_str_to_option_ptr.insert(
         {string(_s_automatic_config_option),
          _m_internal_ptr->set_config(string(_s_automatic_config_option))}
@@ -267,18 +336,10 @@ __no_constexpr_imp
     insert_continuous_file_option(
         _s_global_test_list, _a_opts.use_global_test_list
     );
-    insert_continuous_file_option(
-        _s_path_delimiter, _a_opts.path_delimiter
-    );
-    insert_continuous_file_option(
-        _s_root_path, _a_opts.root_path
-    );
-    insert_continuous_file_option(
-        _s_threads, _a_opts.threads
-    );
-    insert_continuous_file_option(
-        _s_comment_str, _a_opts.comment_str
-    );
+    insert_continuous_file_option(_s_path_delimiter, _a_opts.path_delimiter);
+    insert_continuous_file_option(_s_root_path, _a_opts.root_path);
+    insert_continuous_file_option(_s_threads, _a_opts.threads);
+    insert_continuous_file_option(_s_comment_str, _a_opts.comment_str);
     insert_continuous_file_option(
         _s_general_data_file_extension, _a_opts.general_data_extension
     );
@@ -333,7 +394,7 @@ __no_constexpr_imp void
     }
 }
 
-template <typename T>
+template <typename T, typename U>
 __constexpr void
     abc_test_clp_app::insert_option(
         const abc_test_clp_app::option_config_t& _a_option_config,
@@ -341,13 +402,13 @@ __constexpr void
     ) noexcept
 {
     using namespace std;
-    _m_option_str_to_option_ptr.insert(
-        {string(get<0>(_a_option_config)),
-         _m_internal_ptr->add_flag(
-             make_cml_string(_a_option_config),
-             _a_value,
-             string(get<1>(_a_option_config))
-         )}
+    _m_cli.get().add_option<T, U>(
+        get<0>(_a_option_config),
+        get<1>(_a_option_config),
+        _a_value,
+        get<2>(_a_option_config).has_value()
+            ? optional<char>(get<2>(_a_option_config).value()[0])
+            : optional<char>{}
     );
 }
 
@@ -358,7 +419,7 @@ __constexpr void
         T&                                       _a_value
     ) noexcept
 {
-    using namespace std;
+    /*using namespace std;
     _m_map_strs_to_parsing_funcs.insert(
         {string(get<0>(_a_option_config)),
          [&](const std::string_view _a_str) -> std::optional<std::string>
@@ -389,7 +450,7 @@ __constexpr void
                  }
              }
          }}
-    );
+    );*/
 }
 
 namespace

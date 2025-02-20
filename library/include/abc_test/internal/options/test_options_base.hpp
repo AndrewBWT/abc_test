@@ -144,11 +144,7 @@ public:
     /*!
      * Test paths to run
      */
-    std::vector<ds::test_path_hierarchy_t> test_paths_to_run;
-    std::optional<std::string>             automatic_repetition_data_folder;
-    std::optional<std::size_t>             automatic_file_line_index;
-    bool        automatic_repeating_of_previous_test_if_failure;
-    bool        override_automatic_configuration;
+    std::vector<std::string> test_paths_to_run;
     std::size_t size_of_repetition_files = 1'000;
     /*!
      * @brief Function to validate the input.
@@ -160,12 +156,10 @@ public:
      */
     __no_constexpr std::optional<std::vector<std::string>>
                    validate_and_pre_process(
-                       std::function<void(const rep_data_fields_t&,std::vector<std::string>&)> _a_process_func
                    ) noexcept;
 protected:
     __no_constexpr void virtual validate_and_pre_process_(
-        std::vector<std::string>&                     _a_error_ref,
-        std::function<void(const rep_data_fields_t&, std::vector<std::string>&)> _a_file_process_function
+        std::vector<std::string>&                     _a_error_ref
     ) noexcept;
     std::optional<std::filesystem::path> _m_file_to_write_to;
     __constexpr void
@@ -229,14 +223,11 @@ struct fmt::formatter<abc::test_options_base_t> : formatter<string_view>
 _BEGIN_ABC_NS
 __no_constexpr_imp std::optional<std::vector<std::string>>
                    test_options_base_t::validate_and_pre_process(
-        std::function<
-                           void(const std::vector<std::pair<std::string, std::string>>&, std::vector<std::string>&)>
-            _a_process_func
     ) noexcept
 {
     using namespace std;
     vector<string> _l_rv{};
-    validate_and_pre_process_(_l_rv, _a_process_func);
+    validate_and_pre_process_(_l_rv);
     if (_l_rv.size() == 0)
     {
         return optional<vector<string>>{};
@@ -249,16 +240,13 @@ __no_constexpr_imp std::optional<std::vector<std::string>>
 
 __no_constexpr_imp void
     test_options_base_t::validate_and_pre_process_(
-        std::vector<std::string>& _a_error_ref,
-        std::function<
-            void(const std::vector<std::pair<std::string, std::string>>&, std::vector<std::string>&)>
-            _a_file_process_function
+        std::vector<std::string>& _a_error_ref
     ) noexcept
 {
     using namespace std;
     using namespace _ABC_NS_REPORTERS;
     vector<string> _l_rv;
-    if (automatic_file_line_index.has_value()
+    /*if (automatic_file_line_index.has_value()
         && not automatic_repetition_data_folder.has_value())
     {
         _a_error_ref.push_back(fmt::format(
@@ -351,7 +339,7 @@ __no_constexpr_imp void
         else
         {
         }
-    }
+    }*/
     if (error_reporters.size() == 0)
     {
         _a_error_ref.push_back(fmt::format(
@@ -470,16 +458,16 @@ __no_constexpr_imp void
             fmt::format("Root folder \"{0}\" does not exist", root_path)
         );
     }
-    if (automatic_file_line_index.has_value()
+    /*if (automatic_file_line_index.has_value()
         && not automatic_repetition_data_folder.has_value())
 
     {
-    }
+    }*/
     if (test_paths_to_run.size() == 0)
     {
         using namespace ds;
         test_paths_to_run
-            = vector<test_path_hierarchy_t>(1, vector<test_path_element_t>());
+            = vector<string>(1, "");
     }
 }
 
