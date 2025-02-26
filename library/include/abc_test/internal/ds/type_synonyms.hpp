@@ -66,6 +66,9 @@ using log_infos_t                = std::vector<std::string>;
 using test_path_delimiter        = std::string;
 using test_path_delimiter_ref    = std::string_view;
 using path_t                     = std::filesystem::path;
+using memoized_cli_history_t     = std::map<
+        std::string,
+        std::vector<std::tuple<std::string, std::vector<std::string>>>>;
 _END_ABC_DS_NS
 _BEGIN_ABC_NS
 struct test_options_base_t;
@@ -79,6 +82,6 @@ using log_msg_ptrs_t = std::list<log_msg_ref_t>;
 using log_msg_itt_t  = log_msg_ptrs_t::iterator;
 _END_ABC_LOGGING_NS
 _BEGIN_ABC_UTILITY_NS
-using volatilte_void_ptr_t = void const volatile*;
+using volatilte_void_ptr_t          = void const volatile *;
 using volatilte_volatile_void_ptr_t = volatilte_void_ptr_t volatile;
 _END_ABC_UTILITY_NS

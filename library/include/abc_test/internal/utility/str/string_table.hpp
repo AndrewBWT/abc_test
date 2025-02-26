@@ -94,9 +94,10 @@ __constexpr std::vector<std::string> string_table_t::as_lines() const noexcept
 			_l_str.append(_l_table_element);
 			if (_m_columns_to_largest_str.contains(_l_column))
 			{
+				const size_t _l_element_size{ _l_table_element.size() };
 				_l_str.append(string(
 					_m_columns_to_largest_str.at(_l_column) -
-					_l_table_element.size(), ' '));
+					_l_element_size, ' '));
 			}
 			++_l_column;
 		}

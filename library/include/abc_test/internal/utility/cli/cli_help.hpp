@@ -25,12 +25,12 @@ public:
           )
     {}
 
-    __no_constexpr_or_inline virtual void
+    __no_constexpr_or_inline virtual bool
         process_args(
             const std::string_view               _a_flag,
             const std::vector<std::string_view>& _a_args,
-            const cli_t&                         _a_cli,
-            cli_output_t&                        _a_cli_output
+            const cli_t& _a_cli,
+            cli_results_t& _a_cli_results
         ) const noexcept;
 };
 
@@ -52,12 +52,12 @@ public:
           )
     {}
 
-    __no_constexpr_or_inline virtual void
+    __no_constexpr_or_inline virtual bool
         process_args(
             const std::string_view               _a_flag,
             const std::vector<std::string_view>& _a_args,
-            const cli_t&                         _a_cli,
-            cli_output_t&                        _a_cli_output
+            const cli_t& _a_cli,
+            cli_results_t& _a_cli_results
         ) const noexcept;
 };
 
@@ -99,12 +99,12 @@ public:
     {
     }
 
-    __no_constexpr_or_inline virtual void
+    __no_constexpr_or_inline virtual bool
         process_args(
             const std::string_view               _a_flag,
             const std::vector<std::string_view>& _a_args,
             const cli_t& _a_cli,
-            cli_output_t& _a_cli_output
+            cli_results_t& _a_cli_results
         ) const noexcept;
 };
 

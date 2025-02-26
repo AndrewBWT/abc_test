@@ -2,117 +2,35 @@
 #include "abc_test/included_instances/options/included_instances_test_options.hpp"
 #include "abc_test/internal/options/test_options_base.hpp"
 #include "abc_test/internal/utility/cli.hpp"
+#include "abc_test/internal/utility/printers/specializations/fundamental_types.hpp"
+#include "abc_test/internal/utility/printers/specializations/stl_11.hpp"
+#include "abc_test/internal/utility/printers/specializations/stl_98.hpp"
+#include "abc_test/included_instances/options/option_config.hpp"
 
 _BEGIN_ABC_NS
 __no_constexpr int
     run_test_suite_using_command_line_args(int argc, char** argv);
 
-class abc_test_clp_app
+namespace detail
 {
-public:
-    using option_config_t = std::tuple<
-        std::string_view,
-        std::string_view,
-        std::optional<std::string_view>>;
-    __constexpr
-    abc_test_clp_app() noexcept
-        = delete;
-    __no_constexpr
-        abc_test_clp_app(
-            included_instances_test_options_t& _a_opts,
-            cli_t&                             _a_cli
-        ) noexcept;
-    static constexpr const option_config_t _s_global_test_list
-        = {"use_global_test_list",
-           "Use the global test list as the set of tests",
-           {"g"}};
-    static constexpr option_config_t _s_write_data_to_files
-        = {"write_data_to_files",
-           "Denotes that data can be written to files",
-           {"w"}};
-    static constexpr option_config_t _s_path_delimiter
-        = {"path_delimiter", "Path delimiter used", {}};
-    static constexpr option_config_t _s_root_path
-        = {"root_path", "Root path used", {}};
-    static constexpr option_config_t _s_threads
-        = {"threads", "Number of threads allocated to the library", {}};
-    static constexpr option_config_t _s_comment_str
-        = {"comment", "Comment used", {}};
-    static constexpr option_config_t _s_general_data_file_extension
-        = {"general_data_file_extension",
-           "The extension used for general data files",
-           {}};
-    static constexpr option_config_t _s_tertiary_data_file_extension
-        = {"tertiary_data_file_extension",
-           "The extension used for tertiary data files",
-           {}};
-    static constexpr option_config_t _s_integers_used_for_rng_generation = {
-        "n_integers_used_for_rng_generation",
-        "Number of integers used to seed each individual random generator from "
-        "the global random generator",
-        {}
-    };
-    static constexpr option_config_t _s_repetition_config
-        = {"repetition_config", "Map of repetition trees", {}};
-    static constexpr option_config_t _s_global_seed
-        = {"global_seed", "Set the global seed", {}};
-    static constexpr option_config_t _s_force_run_all_tests
-        = {"force_run_all_tests", "Forces all tests to run", {}};
-    static constexpr option_config_t _s_automatic_repetition_data_folder = {
-        "automatic_repetition_data_folder",
-        "Denotes this run as automatically configured. Requires exactly "
-        "three arguments; the first must be a folder location. The second "
-        "is either a positive integer or the strings latest or "
-        "latest_if_failure. The third is any of the strings always_write, "
-        "write_if_different_or_new_run_that_failed or do_not_write. Using this "
-        "option will "
-        "read "
-        "memoized configurations from the folder given. These are "
-        "configurations indexed by integer, with an additional bool "
-        "denoting whether the test was a success or failure. If the second "
-        "argument is an integer, that configuration is found and loaded (if "
-        "it exists). If it is the string \"latest\", it will run the most "
-        "recent configuration. If it is the string \"latest_if_failure\", it "
-        "will only load the configuration if the previous test was a failure. "
-        "Otherwise it will will not load any configuration. The third argument "
-        "denotes whether to write data after the test is run to the folder. If "
-        "the string is \"always_write\", the data is always written. If the "
-        "string is \"\", the data is only written if it was loaded and "
-        "overridden by the user, or no configuration was automatically loaded "
-        "and instead a clean run was performd, which failed. If the string is "
-        "\"do_not_write\", the configuration is never written to any files. ",
-        {}
-    };
-    static constexpr option_config_t _s_override_automatic_configuration
-        = {"override_automatic_configuration",
-           "Allows an automatic configuration to be overriden by user-provided "
-           "values. ",
-           {}};
-    static constexpr option_config_t _c_automatically_rerun_last_test_if_failure
-        = {"automaticly_rerun_last_test_if_failure",
-           "Automatically runs previously ran configurations. ",
-           {}};
-    static constexpr option_config_t _c_test_paths_to_run
-        = {"test_paths_to_run", "Which test paths are to be ran. ", {}};
-    static constexpr std::string_view _s_automatic_config_option = "--config";
-private:
-    std::reference_wrapper<cli_t> _m_cli;
-    std::map<
-        std::string,
-        std::function<std::optional<std::string>(const std::string_view)>>
-        _m_map_strs_to_parsing_funcs;
-    std::reference_wrapper<included_instances_test_options_t> _m_iito_wrapper;
-    template <typename T, typename U = T>
-    __constexpr void
-        insert_option(const option_config_t& _a_option_config, T& _a_value)
-            noexcept;
-};
-
+__no_constexpr void
+    add_all_options(
+        included_instances_test_options_t& _a_opts,
+        cli_t&                             _a_cli,
+        cli_results_t&                     _a_cli_results
+    ) noexcept;
+template <typename T, typename U = T>
+__constexpr void
+    insert_option(
+        cli_t&                 _a_cli,
+        const option_config_t& _a_option_config,
+        T&                     _a_value,
+        cli_results_t&         _a_cli_results
+    ) noexcept;
+static constexpr std::string_view _s_automatic_config_option = "--config";
+} // namespace detail
 
 _END_ABC_NS
-
-
-
 
 _BEGIN_ABC_NS
 __no_constexpr_imp int
@@ -126,41 +44,44 @@ __no_constexpr_imp int
     using namespace _ABC_NS_REPORTERS;
     using namespace _ABC_NS_DS;
     using namespace _ABC_NS_UTILITY;
-    std::cout << "abc_test run started." << std::endl;
     included_instances_test_options_t _l_iito;
-    cli_output_t                      _l_cli_output;
-    cli_t                             _l_cli(_l_cli_output);
-    abc_test_clp_app                  _l_clp_app(_l_iito, _l_cli);
-    std::cout << "Parsing command line parameters." << std::endl;
-    _l_cli.parse_arguments(argc, argv);
-    if (_l_cli_output.has_errors())
+    cli_results_t                     _l_cli_results;
+    cli_t                             _l_cli;
+    detail::add_all_options(_l_iito, _l_cli, _l_cli_results);
+    _l_cli.parse_arguments(argc, argv, _l_cli_results);
+    if (_l_cli_results.has_errors())
     {
         std::cout << "Errors encountered when parsing command line parameters. "
                      "These are as follows:"
                   << std::endl;
-        std::cout << "\t" << _l_cli_output.errors();
+        std::cout << "\t" << _l_cli_results.errors();
+        return -1;
     }
-    if (_l_cli_output.has_warnings())
+    if (_l_cli_results.has_warnings())
     {
     }
-    if (_l_cli_output.show_log())
+    if (_l_cli_results.show_log())
     {
+        _l_cli_results.log_msg();
+        return -1;
     }
-    if (_l_cli_output.has_text_output())
+    if (_l_cli_results.has_text_output())
     {
-        for (auto& k : _l_cli_output.text_output())
+        for (auto& k : _l_cli_results.text_output())
         {
             std::cout << k << std::endl;
         }
+        return -1;
     }
-    if (_l_cli_output.can_continue())
+    if (_l_cli_results.can_continue())
     {
+        ds::pre_test_run_report_t _l_ptrr(_l_cli_results.memoized_data(), _l_iito);
         auto _l_validated_test_options{validated_test_options_t<
             included_instances_test_options_t>::validate_test_options(_l_iito)};
         if (_l_validated_test_options.has_value())
         {
             test_main_t _l_test_main(_l_validated_test_options.value());
-            _l_test_main.run_tests();
+            _l_test_main.run_tests(_l_ptrr);
             return 0;
         }
         else
@@ -190,67 +111,101 @@ __no_constexpr_imp int
     }
 }
 
-__no_constexpr_imp
-    abc_test_clp_app::abc_test_clp_app(
+namespace detail
+{
+__no_constexpr_imp void
+    add_all_options(
         included_instances_test_options_t& _a_opts,
-        cli_t&                             _a_cli
+        cli_t&                             _a_cli,
+        cli_results_t&                     _a_cli_results
     ) noexcept
-    :  _m_iito_wrapper(_a_opts)
-    , _m_cli(std::reference_wrapper(_a_cli))
 {
     using namespace std;
-    _m_cli.get().add_help_flag();
-    _m_cli.get().add_file_config_flag();
-    insert_option(_s_global_test_list, _a_opts.use_global_test_list);
-    insert_option(_s_write_data_to_files, _a_opts.write_data_to_files);
-    insert_option(_s_path_delimiter, _a_opts.path_delimiter);
-    insert_option(_s_root_path, _a_opts.root_path);
-    insert_option(_s_threads, _a_opts.threads);
-    insert_option(_s_comment_str, _a_opts.comment_str);
+    _a_cli.add_help_flag();
+    _a_cli.add_file_config_flag();
     insert_option(
-        _s_general_data_file_extension, _a_opts.general_data_extension
+        _a_cli,
+        _s_global_test_list,
+        _a_opts.use_global_test_list,
+        _a_cli_results
     );
     insert_option(
-        _s_tertiary_data_file_extension, _a_opts.tertiary_data_file_extension
+        _a_cli,
+        _s_write_data_to_files,
+        _a_opts.write_data_to_files,
+        _a_cli_results
     );
     insert_option(
+        _a_cli, _s_path_delimiter, _a_opts.path_delimiter, _a_cli_results
+    );
+    insert_option(_a_cli, _s_root_path, _a_opts.root_path, _a_cli_results);
+    insert_option(_a_cli, _s_threads, _a_opts.threads, _a_cli_results);
+    insert_option(_a_cli, _s_comment_str, _a_opts.comment_str, _a_cli_results);
+    insert_option(
+        _a_cli,
+        _s_general_data_file_extension,
+        _a_opts.general_data_extension,
+        _a_cli_results
+    );
+    insert_option(
+        _a_cli,
+        _s_tertiary_data_file_extension,
+        _a_opts.tertiary_data_file_extension,
+        _a_cli_results
+    );
+    insert_option(
+        _a_cli,
         _s_integers_used_for_rng_generation,
-        _a_opts.number_of_integers_used_to_seed_random_generators
+        _a_opts.number_of_integers_used_to_seed_random_generators,
+        _a_cli_results
     );
     insert_option(
-        _s_repetition_config, _a_opts.map_of_unique_ids_and_for_loop_stack_tries
+        _a_cli,
+        _s_repetition_config,
+        _a_opts.map_of_unique_ids_and_for_loop_stack_tries,
+        _a_cli_results
     );
-    insert_option(_s_global_seed, _a_opts.global_seed);
+    insert_option(_a_cli, _s_global_seed, _a_opts.global_seed, _a_cli_results);
 
-    insert_option(_s_force_run_all_tests, _a_opts.force_run_all_tests);
-    _m_cli.get().add_auto_configuration();
-    _m_cli.get().add_multi_element_option<vector<string>, string>(
+    insert_option(
+        _a_cli,
+        _s_force_run_all_tests,
+        _a_opts.force_run_all_tests,
+        _a_cli_results
+    );
+    _a_cli.add_auto_configuration();
+    _a_cli.add_multi_element_option<vector<string>, string>(
         get<0>(_c_test_paths_to_run),
         get<1>(_c_test_paths_to_run),
         _a_opts.test_paths_to_run,
         get<2>(_c_test_paths_to_run).has_value()
             ? optional<char>(get<2>(_c_test_paths_to_run).value()[0])
-            : optional<char>{}
+            : optional<char>{},
+        _a_cli_results
     );
 }
 
 template <typename T, typename U>
 __constexpr void
-    abc_test_clp_app::insert_option(
-        const abc_test_clp_app::option_config_t& _a_option_config,
-        T&                                       _a_value
+    insert_option(
+        cli_t&                 _a_cli,
+        const option_config_t& _a_option_config,
+        T&                     _a_value,
+        cli_results_t&         _a_cli_results
     ) noexcept
 {
     using namespace std;
-    _m_cli.get().add_option<T, U>(
+    _a_cli.add_option<T, U>(
         get<0>(_a_option_config),
         get<1>(_a_option_config),
         _a_value,
         get<2>(_a_option_config).has_value()
             ? optional<char>(get<2>(_a_option_config).value()[0])
-            : optional<char>{}
+            : optional<char>{},
+        _a_cli_results
     );
 }
 
+} // namespace detail
 
 _END_ABC_NS

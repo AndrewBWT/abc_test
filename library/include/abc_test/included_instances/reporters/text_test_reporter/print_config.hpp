@@ -4,16 +4,20 @@
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion_block.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion_single_line.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/multi_element_assertion_block.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/pre_test_set_data_report.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/static_assertion.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_thrown_exception.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_thrown_non_descript_entity.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter.hpp"
+#include "abc_test/internal/ds/data_generator_memoization/map_unique_id_to_tdg_collection_stack_trie.hpp"
+#include "abc_test/internal/ds/test_data/enum_test_status.hpp"
 #include "abc_test/internal/matchers/matcher_result.hpp"
 #include "abc_test/internal/test_reports/assertion_status/fail.hpp"
 #include "abc_test/internal/test_reports/assertion_status/pass.hpp"
 #include "abc_test/internal/test_reports/assertion_status/pass_or_fail.hpp"
 #include "abc_test/internal/test_reports/assertion_status/pass_or_terminate.hpp"
 #include "abc_test/internal/test_reports/assertion_status/terminate.hpp"
+#include "abc_test/internal/utility/rng.hpp"
 
 #include <fmt/color.h>
 _BEGIN_ABC_REPORTERS_NS
@@ -41,6 +45,8 @@ public:
                       ) const noexcept;
     __no_constexpr std::string
         print_seed(const utility::complete_global_seed_t& _a_seed) const;
+    __no_constexpr std::string
+        print_global_seed(const utility::global_seed_t& _a_seed) const noexcept;
     __constexpr const std::string_view
                       str_total_tests_passed() const noexcept;
     __constexpr const std::string_view
@@ -143,6 +149,8 @@ public:
     __constexpr
         enum_print_pair_collection_t<enum_finalised_test_set_data_fields_t>
         finalised_test_set_data_fields() const noexcept;
+    __constexpr enum_print_pair_collection_t<enum_pre_test_set_data_fields_t>
+                pre_test_set_data_fields() const noexcept;
     __constexpr
         enum_print_pair_collection_t<combined_enum_static_assertion_fields_t>
         static_assertion_fields() const noexcept;
@@ -200,17 +208,17 @@ public:
         const std::string_view
         pass_message_str(
         ) const noexcept;*/
-    __constexpr     std::string
-                    message_str(const std::string& _a_str) const noexcept;
-    __constexpr     std::string
-                    message_str(const std::string_view& _a_str) const noexcept;
+    __constexpr std::string
+                message_str(const std::string& _a_str) const noexcept;
+    __constexpr std::string
+                message_str(const std::string_view& _a_str) const noexcept;
     __no_constexpr_imp std::string
-                    time_taken(
-                        const std::chrono::time_point<std::chrono::high_resolution_clock>&
-                            _a_begin_time,
-                        const std::chrono::time_point<std::chrono::high_resolution_clock>&
-                            _a_end_time
-                    ) const noexcept;
+                       time_taken(
+                           const std::chrono::time_point<std::chrono::high_resolution_clock>&
+                               _a_begin_time,
+                           const std::chrono::time_point<std::chrono::high_resolution_clock>&
+                               _a_end_time
+                       ) const noexcept;
     __constexpr std::string
         message_str(const std::optional<std::string>& _a_str) const noexcept;
     __constexpr std::string
@@ -220,6 +228,8 @@ public:
         _m_after_execution_test_report_fields_t;
     enum_print_pair_collection_t<enum_finalised_test_set_data_fields_t>
         _m_finalised_test_set_data_fields;
+    enum_print_pair_collection_t<enum_pre_test_set_data_fields_t>
+        _m_pre_test_set_data_fields;
     enum_print_pair_collection_t<
         combined_enum_matcher_based_assertion_single_line_fields_t>
         _m_matcher_assertion_fields;
@@ -258,6 +268,9 @@ public:
     __constexpr std::string
                 highlight(const std::string_view _a_str) const noexcept;
     __constexpr std::string
+                make_source_info(const std::vector<std::string>& _a_vect
+                ) const noexcept;
+    __constexpr std::string
         highlight_pass_or_fail(const bool _a_pass, const std::string _a_str)
             const noexcept;
     __constexpr    std::string
@@ -285,6 +298,79 @@ public:
                       exception_message_str() const noexcept;
     __constexpr       std::string
                 exception_message(const std::string_view _a_str) const noexcept;
+    __constexpr std::string
+                global_test_list_used() const noexcept;
+    __no_constexpr std::string
+                   use_global_test_list_info(const bool _a_use_global_test_list
+                   ) const noexcept;
+    __no_constexpr std::string
+                   write_data_to_files_info(const bool _a_use_global_test_list
+                   ) const noexcept;
+    __no_constexpr std::string
+        path_delimiter_used_info(const std::string_view _a_file_delimiter
+        ) const noexcept;
+    __no_constexpr std::string
+        root_path_info(const std::filesystem::path& _a_path) const noexcept;
+    __no_constexpr std::string
+        threads_used_info(const std::size_t _a_thrads) const noexcept;
+    __no_constexpr std::string
+        comment_str_info(const std::string_view _a_str) const noexcept;
+    __no_constexpr std::string
+        general_data_file_extension_info(const std::string_view _a_str
+        ) const noexcept;
+    __no_constexpr std::string
+                   n_integers_used_for_creation_of_rng_info(
+                       const std::size_t _a_n_integers_to_use
+                   ) const noexcept;
+    __no_constexpr std::string
+                   repetition_config_used_info() const noexcept;
+    __no_constexpr std::string
+                   global_seed_info(const utility::global_seed_t& _a_global_seed
+                   ) const noexcept;
+    __no_constexpr std::string
+                   force_run_all_tests_info(const bool _a_force_run_all_tests
+                   ) const noexcept;
+    __no_constexpr std::string
+                   test_paths_to_run_info(
+                       const std::vector<std::string>& _a_force_run_all_tests
+                   ) const noexcept;
+    __constexpr std::string
+                write_data_to_files() const noexcept;
+    __constexpr std::string
+                path_delimiter_used() const noexcept;
+    __constexpr std::string
+                root_path_used() const noexcept;
+    __constexpr std::string
+                threads_used() const noexcept;
+    __constexpr std::string
+                comment_str_used() const noexcept;
+    __constexpr std::string
+                general_data_file_extension_used() const noexcept;
+    __constexpr std::string
+                n_integers_used_for_creation_of_rng_used() const noexcept;
+    __constexpr std::string
+                repetition_config_used() const noexcept;
+    __constexpr std::string
+                global_seed_used() const noexcept;
+    __constexpr std::string
+                force_run_all_tests_used() const noexcept;
+    __constexpr std::string
+                test_paths_to_run_used() const noexcept;
+    __constexpr std::string
+                show_test_paths_to_run(const std::vector<std::string>& _a_strs
+                ) const noexcept;
+    __constexpr std::string
+                show_repetition_config(
+                    const _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t&
+                        _a_config
+                ) const noexcept;
+    __no_constexpr std::string
+                show_path(const std::filesystem::path& _a_path) const noexcept;
+    __constexpr std::string
+                question(const std::string_view _a_str) const noexcept;
+    __no_constexpr std::string
+                print_global_test_list_used(const bool _a_lobal_test_list_used
+                ) const noexcept;
 
     __constexpr std::string
                 style(
@@ -320,6 +406,7 @@ __constexpr_imp
     , _m_thrown_exception_fields(default_unexpected_exception_fields())
     , _m_finalised_test_set_data_fields(default_finalised_test_set_data_fields()
       )
+    , _m_pre_test_set_data_fields(default_pre_test_set_data_fields())
     , _m_matcher_assertion_single_block_assertion_list_fields(
           default_matcher_based_assertion_single_block_assertion_fields()
       )
@@ -383,12 +470,20 @@ __no_constexpr_imp std::string
     );
 }
 
-__no_constexpr std::string
-               print_config_t::print_seed(
+__no_constexpr_imp std::string
+                   print_config_t::print_seed(
         const utility::complete_global_seed_t& _a_seed
     ) const
 {
     return quote(_a_seed.print_in_hex());
+}
+
+__no_constexpr_imp std::string
+                   print_config_t::print_global_seed(
+        const utility::global_seed_t& _a_seed
+    ) const noexcept
+{
+    return fmt::format("{0}", _a_seed);
 }
 
 __constexpr_imp const std::string_view
@@ -740,6 +835,12 @@ __constexpr enum_print_pair_collection_t<enum_finalised_test_set_data_fields_t>
     return _m_finalised_test_set_data_fields;
 }
 
+__constexpr enum_print_pair_collection_t<enum_pre_test_set_data_fields_t>
+            print_config_t::pre_test_set_data_fields() const noexcept
+{
+    return _m_pre_test_set_data_fields;
+}
+
 __constexpr_imp
     enum_print_pair_collection_t<combined_enum_static_assertion_fields_t>
     print_config_t::static_assertion_fields() const noexcept
@@ -1004,7 +1105,7 @@ __constexpr_imp std::string
 }
 
 __no_constexpr_imp std::string
-                print_config_t::time_taken(
+                   print_config_t::time_taken(
         const std::chrono::time_point<std::chrono::high_resolution_clock>&
             _a_begin_time,
         const std::chrono::time_point<std::chrono::high_resolution_clock>&
@@ -1015,7 +1116,8 @@ __no_constexpr_imp std::string
         "{0} microseconds",
         std::chrono::duration_cast<std::chrono::microseconds>(
             _a_end_time - _a_begin_time
-        ).count()
+        )
+            .count()
     );
 }
 
@@ -1045,6 +1147,38 @@ __constexpr_imp std::string
     ) const noexcept
 {
     return style(_a_str, _m_highlight_style);
+}
+
+__constexpr std::string
+            print_config_t::make_source_info(
+        const std::vector<std::string>& _a_vect
+    ) const noexcept
+{
+    using namespace std;
+    string _l_rv{"[  "};
+    if (_a_vect.size() == 0)
+    {
+        _l_rv.append("Set using default value");
+    }
+    else
+    {
+        _l_rv.append("Set using ");
+        for (size_t _l_idx{0}; const string_view _l_str : _a_vect)
+        {
+            _l_rv.append(_l_str);
+            if (_l_idx + 2 < _a_vect.size())
+            {
+                _l_rv.append(", ");
+            }
+            else if (_l_idx + 1 < _a_vect.size())
+            {
+                _l_rv.append(" and ");
+            }
+            ++_l_idx;
+        }
+    }
+    _l_rv.append(".  ]");
+    return _l_rv;
 }
 
 __constexpr_imp std::string
@@ -1146,6 +1280,264 @@ __constexpr std::string
     ) const noexcept
 {
     return slight_highlight(quote(_a_str));
+}
+
+__constexpr_imp std::string
+                print_config_t::global_test_list_used() const noexcept
+{
+    return "Global test list used";
+}
+
+__no_constexpr_imp std::string
+                   print_config_t::use_global_test_list_info(
+        const bool _a_use_global_test_list
+    ) const noexcept
+{
+    return fmt::format(
+        "Tests created using the macros \"_TEST_CASE\" "
+        "and \"_NAMED_TEST_CASE\" are {0}included in "
+        "the set of tests to be ran.",
+        _a_use_global_test_list ? "" : "not "
+    );
+}
+
+__no_constexpr_imp std::string
+                   print_config_t::write_data_to_files_info(
+        const bool _a_use_global_test_list
+    ) const noexcept
+{
+    return fmt::format(
+        "When an assertoin that is contained within a data generator linked to "
+        "a file fails, the data generator will {0}write that data to its "
+        "associated "
+        "file.",
+        _a_use_global_test_list ? "" : "not "
+    );
+}
+
+__no_constexpr_imp std::string
+                   print_config_t::path_delimiter_used_info(
+        const std::string_view _a_file_delimiter
+    ) const noexcept
+{
+    return fmt::format(
+        "The string \"{0}\" is used to separate a test's path. For "
+        "example, the test path \"aa{0}bb{0}cc\" becomes {{aa,bb,cc}}. Any "
+        "default-initialised file data for that test will be stored at "
+        "root_path/aa/bb/cc",
+        _a_file_delimiter
+    );
+}
+
+__no_constexpr_imp std::string
+                   print_config_t::root_path_info(
+        const std::filesystem::path& _a_file_delimiter
+    ) const noexcept
+{
+    return fmt::format(
+        "All files for the tests created when this instance of the test "
+        "framework are ran are stored within the root folder {0}",
+        _a_file_delimiter
+    );
+}
+
+__no_constexpr_imp std::string
+                   print_config_t::threads_used_info(
+        const std::size_t _a_threads
+    ) const noexcept
+{
+    return fmt::format(
+        "{0} threads are available to the system. Any test which requires more "
+        "threads than this will not be ran.",
+        _a_threads
+    );
+}
+
+__no_constexpr_imp std::string
+                   print_config_t::comment_str_info(
+        const std::string_view _a_str
+    ) const noexcept
+{
+    return fmt::format(
+        "The string \"{0}\" is used at the beginning of a file line to show "
+        "its a comment. Note that files which have "
+        "been read before this point - such as configuration files - use the "
+        "default comment string \"#\".",
+        _a_str
+    );
+}
+
+__no_constexpr_imp std::string
+                   print_config_t::general_data_file_extension_info(
+        const std::string_view _a_str
+    ) const noexcept
+{
+    return fmt::format(
+        "The extension \"{0}\" is used for general data files.", _a_str
+    );
+}
+
+__no_constexpr_imp std::string
+                   print_config_t::n_integers_used_for_creation_of_rng_info(
+        const std::size_t _a_n_integers_to_use
+    ) const noexcept
+{
+    return fmt::format(
+        "{0} integers are taken from the global RNG to seed each individual "
+        "test's RNG",
+        _a_n_integers_to_use
+    );
+}
+
+__no_constexpr_imp std::string
+                   print_config_t::repetition_config_used_info() const noexcept
+{
+    return fmt::format("This string denotes the repetition config used. It "
+                       "describes the set of tests to be ran, and in those "
+                       "tests which data points to re-generate. abc_test is "
+                       "designed for this to be generated by a computer.");
+}
+
+__no_constexpr_imp std::string
+                   print_config_t::global_seed_info(
+        const utility::global_seed_t& _a_global_seed
+    ) const noexcept
+{
+    return fmt::format("The global seed used for this run");
+}
+
+__no_constexpr_imp std::string
+                   print_config_t::force_run_all_tests_info(
+        const bool _a_force_run_all_tests
+    ) const noexcept
+{
+    return (
+        _a_force_run_all_tests
+            ? "All tests, irrispective of whether they have a repetition "
+              "configuration associated with them, but only those which are "
+              "denoted by the test path, are ran"
+            : "Only those tests denoted by the test path, and if a repetition "
+              "configuration is given, are ran"
+    );
+}
+
+__no_constexpr_imp std::string
+                   print_config_t::test_paths_to_run_info(
+        const std::vector<std::string>& _a_force_run_all_tests
+    ) const noexcept
+{
+    return fmt::format(
+        "The test paths {0} are ran",
+        _a_force_run_all_tests
+    );
+}
+
+__constexpr std::string
+            print_config_t::write_data_to_files() const noexcept
+{
+    return "Write data to files";
+}
+
+__constexpr std::string
+            print_config_t::path_delimiter_used() const noexcept
+{
+    return "Path delimiter used";
+}
+
+__constexpr std::string
+            print_config_t::root_path_used() const noexcept
+{
+    return "Root path used";
+}
+
+__constexpr std::string
+            print_config_t::threads_used() const noexcept
+{
+    return "Threads used";
+}
+
+__constexpr std::string
+            print_config_t::comment_str_used() const noexcept
+{
+    return "Comment used";
+}
+
+__constexpr std::string
+            print_config_t::general_data_file_extension_used() const noexcept
+{
+    return "general data extension used";
+}
+
+__constexpr std::string
+    print_config_t::n_integers_used_for_creation_of_rng_used() const noexcept
+{
+    return "Number of values used to seed RNGs";
+}
+
+__constexpr std::string
+            print_config_t::repetition_config_used() const noexcept
+{
+    return "print config used";
+}
+
+__constexpr std::string
+            print_config_t::global_seed_used() const noexcept
+{
+    return "global seed";
+}
+
+__constexpr std::string
+            print_config_t::force_run_all_tests_used() const noexcept
+{
+    return "Force run all tests used";
+}
+
+__constexpr std::string
+            print_config_t::test_paths_to_run_used() const noexcept
+{
+    return "test paths to run";
+}
+
+__constexpr std::string
+            print_config_t::show_test_paths_to_run(
+        const std::vector<std::string>& _a_strs
+    ) const noexcept
+{
+    return "{}";
+}
+
+__constexpr std::string
+            print_config_t::show_repetition_config(
+        const _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t&
+            _a_config
+    ) const noexcept
+{
+    return "config";
+}
+
+__no_constexpr_imp std::string
+                   print_config_t::show_path(
+        const std::filesystem::path& _a_path
+    ) const noexcept
+{
+    return _a_path.string();
+}
+
+__constexpr_imp std::string
+                print_config_t::question(
+        const std::string_view _a_str
+    ) const noexcept
+{
+    using namespace std;
+    return string(_a_str).append("?");
+}
+
+__no_constexpr_imp std::string
+                   print_config_t::print_global_test_list_used(
+        const bool _a_lobal_test_list_used
+    ) const noexcept
+{
+    return fmt::format("{0}", _a_lobal_test_list_used);
 }
 
 _END_ABC_REPORTERS_NS

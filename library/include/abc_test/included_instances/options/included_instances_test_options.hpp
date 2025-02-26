@@ -21,7 +21,6 @@ protected:
             std::vector<std::string>& _a_error_ref
         ) noexcept;
 };
-
 namespace
 {
 __no_constexpr std::vector<std::filesystem::path>
@@ -48,6 +47,19 @@ struct default_parser_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
     }
 };
 _END_ABC_UTILITY_PARSER_NS
+_BEGIN_ABC_UTILITY_PRINTER_NS
+template<>
+struct default_printer_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
+    : public printer_base_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
+{
+    __no_constexpr_imp virtual std::string
+        run_printer(const abc::ds::map_unique_id_to_tdg_collection_stack_trie_t& _a_parse_input) const
+    {
+        using namespace abc::ds;
+        return fmt::format("{}", _a_parse_input.map());
+    }
+};
+_END_ABC_UTILITY_PRINTER_NS
 
 template <>
 struct fmt::formatter<abc::included_instances_test_options_t>
@@ -63,7 +75,7 @@ struct fmt::formatter<abc::included_instances_test_options_t>
 };
 
 _BEGIN_ABC_NS
-__no_constexpr void
+__no_constexpr_imp void
     included_instances_test_options_t::validate_and_pre_process_(
         std::vector<std::string>& _a_error_ref
     ) noexcept

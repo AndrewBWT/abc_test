@@ -1,6 +1,7 @@
 #pragma once
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/after_execution_test_report.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/print_config.hpp"
 _BEGIN_ABC_REPORTERS_NS
 
 struct test_report_list_formatter

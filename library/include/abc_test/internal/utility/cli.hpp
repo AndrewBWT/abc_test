@@ -1,11 +1,13 @@
 #pragma once
 
+#include "abc_test/internal/ds/test_data/pre_test_run_report.hpp"
 #include "abc_test/internal/utility/cli/cli_help.hpp"
 #include "abc_test/internal/utility/cli/cli_info.hpp"
 #include "abc_test/internal/utility/internal/macros.hpp"
 #include "abc_test/internal/utility/parsers/specializations/fundamental_types.hpp"
 #include "abc_test/internal/utility/parsers/specializations/stl_11.hpp"
 #include "abc_test/internal/utility/parsers/specializations/stl_98.hpp"
+#include "abc_test/internal/utility/printers/default_printer.hpp"
 #include "abc_test/internal/utility/str/string_table.hpp"
 #include "abc_test/internal/utility/str/string_utility.hpp"
 
@@ -146,20 +148,21 @@ struct utility::parser::default_parser_t<rep_file_index_t>
 class cli_t
 {
 public:
-    std::reference_wrapper<cli_output_t> _m_cli_output;
-    __no_constexpr
-        cli_t()
-        = delete;
     __no_constexpr
         cli_t(
-            cli_output_t&          _a_cli_output,
             const char             _a_single_char_cml_identifier,
             const std::string_view _a_multi_char_cml_identifier
         ) noexcept;
     __no_constexpr void
-        parse_arguments(int _a_argc, char** _a_arg_v) const noexcept;
+        parse_arguments(
+            int            _a_argc,
+            char**         _a_arg_v,
+            cli_results_t& _a_cli_results
+        ) const noexcept;
     __no_constexpr void
-        parse_arguments(const std::vector<std::string_view>& _a_args
+        parse_arguments(
+            const std::vector<std::string_view>& _a_args,
+            cli_results_t&                       _a_cli_results
         ) const noexcept;
     template <typename T, typename U>
     __no_constexpr void
@@ -168,6 +171,7 @@ public:
             const std::string_view     _a_description,
             T&                         _a_reference,
             const std::optional<char>& _a_single_char_flag,
+            cli_results_t&             _a_cli_results,
             std::function<std::optional<U>(const std::string_view)>
                 _a_parser_func
             = detail::make_parser_func<U>(),
@@ -181,6 +185,7 @@ public:
             const std::string_view     _a_description,
             T&                         _a_reference,
             const std::optional<char>& _a_single_char_flag,
+            cli_results_t&             _a_cli_results,
             std::function<std::optional<U>(const std::string_view)>
                 _a_parser_func
             = detail::make_parser_func<U>(),
@@ -195,18 +200,20 @@ public:
                    add_auto_configuration() noexcept;
     __no_constexpr abc::utility::str::string_table_t
                    make_help_output() const noexcept;
-    __constexpr void
+    __constexpr bool
         process_config_line(
             const std::string_view          _a_field_name,
-            const std::vector<std::string>& _a_args
+            const std::vector<std::string>& _a_args,
+            const std::string_view          _a_source_line,
+            cli_results_t&                  _a_cli_results
         ) const noexcept;
-    __no_constexpr void
+    __no_constexpr bool
         process_repetition_data(
             const std::tuple<
                 std::filesystem::path,
                 rep_file_index_t,
                 rep_write_data_type_t>& _a_tuple_data,
-            cli_output_t&               _a_cli_output
+            cli_results_t&              _a_cli_results
         ) const noexcept;
 private:
     mutable std::optional<std::tuple<
@@ -226,13 +233,15 @@ private:
                 ) const noexcept;
     __constexpr const std::optional<std::reference_wrapper<cli_info_t>>
         find_clp_info(const std::string_view& _a_info) const noexcept;
-    __constexpr void
+    __constexpr bool
         process_args(
-            const std::string_view               _a_flag,
-            const cli_info_t&                    _a_cli_info,
-            const std::vector<std::string_view>& _a_strs,
-            const std::size_t                    _a_strs_size,
-            std::size_t&                         _a_current_index
+            const std::string_view                 _a_flag,
+            const cli_info_t&                      _a_cli_info,
+            const std::vector<std::string_view>&   _a_strs,
+            const std::size_t                      _a_strs_size,
+            std::size_t&                           _a_current_index,
+            const std::optional<std::string_view>& _a_source,
+            cli_results_t&                         _a_cli_results
         ) const noexcept;
     char        _m_single_char_identifier = '-';
     std::string _m_multi_char_identifier  = "--";
@@ -350,28 +359,30 @@ _END_ABC_NS
 _BEGIN_ABC_NS
 __no_constexpr_imp
     cli_t::cli_t(
-        cli_output_t&          _a_cli_output,
         const char             _a_single_char_cml_identifier = '-',
         const std::string_view _a_multi_char_cml_identifier  = "--"
     ) noexcept
-    : _m_cli_output(std::reference_wrapper(_a_cli_output))
-    , _m_single_char_identifier(_a_single_char_cml_identifier)
+    : _m_single_char_identifier(_a_single_char_cml_identifier)
     , _m_multi_char_identifier(_a_multi_char_cml_identifier)
 {}
 
 __no_constexpr_imp void
     cli_t::parse_arguments(
-        int    _a_argc,
-        char** _a_arg_v
+        int            _a_argc,
+        char**         _a_arg_v,
+        cli_results_t& _a_cli_results
     ) const noexcept
 {
-    parse_arguments(detail::make_strs_from_command_line_args(_a_argc, _a_arg_v)
+    parse_arguments(
+        detail::make_strs_from_command_line_args(_a_argc, _a_arg_v),
+        _a_cli_results
     );
 }
 
 __no_constexpr_imp void
     cli_t::parse_arguments(
-        const std::vector<std::string_view>& _a_args
+        const std::vector<std::string_view>& _a_args,
+        cli_results_t&                       _a_cli_results
     ) const noexcept
 {
     using namespace std;
@@ -389,22 +400,25 @@ __no_constexpr_imp void
                 };
                 _l_clp_info.has_value())
             {
-                process_args(
-                    _l_opt_normalised_str.value(),
-                    _l_clp_info.value().get(),
-                    _a_args,
-                    _l_strs_size,
-                    _l_idx
-                );
+                if (const bool _l_terminate{process_args(
+                        _l_opt_normalised_str.value(),
+                        _l_clp_info.value().get(),
+                        _a_args,
+                        _l_strs_size,
+                        _l_idx,
+                        optional<string_view>{},
+                        _a_cli_results
+                    )};
+                    _l_terminate)
+                {
+                    break;
+                }
             }
         }
         else
         {
-            _m_cli_output.get().add_error(_l_opt_normalised_str.error());
-        }
-        if (_m_cli_output.get().terminate_early())
-        {
-            break;
+            _a_cli_results.add_error(_l_opt_normalised_str.error());
+            return;
         }
     }
 }
@@ -416,6 +430,7 @@ __no_constexpr_imp void
         const std::string_view     _a_description,
         T&                         _a_reference,
         const std::optional<char>& _a_single_char_flag,
+        cli_results_t&             _a_cli_results,
         std::function<std::optional<U>(const std::string_view)> _a_parser_func,
         std::function<void(T&, const U&)> _m_process_parsed_value
 
@@ -430,6 +445,12 @@ __no_constexpr_imp void
         _a_parser_func,
         _m_process_parsed_value
     ));
+    _a_cli_results.add_memoized_data(
+        false,
+        _a_flag,
+        abc::utility::printer::default_printer_t<T>().run_printer(_a_reference),
+        "default value"
+    );
 }
 
 template <typename T, typename U>
@@ -439,6 +460,7 @@ __no_constexpr_imp void
         const std::string_view     _a_description,
         T&                         _a_reference,
         const std::optional<char>& _a_single_char_flag,
+        cli_results_t&             _a_cli_results,
         std::function<std::optional<U>(const std::string_view)> _a_parser_func,
         std::function<void(T&, const U&)> _m_process_parsed_value
 
@@ -453,6 +475,12 @@ __no_constexpr_imp void
         _a_parser_func,
         _m_process_parsed_value
     ));
+    _a_cli_results.add_memoized_data(
+        false,
+        _a_flag,
+        abc::utility::printer::default_printer_t<T>().run_printer(_a_reference),
+        "default value"
+    );
 }
 
 __no_constexpr_imp void
@@ -513,10 +541,12 @@ __no_constexpr_imp abc::utility::str::string_table_t
     return _l_st;
 }
 
-__constexpr_imp void
+__constexpr_imp bool
     cli_t::process_config_line(
         const std::string_view          _a_field_name,
-        const std::vector<std::string>& _a_args
+        const std::vector<std::string>& _a_args,
+        const std::string_view          _a_source_line,
+        cli_results_t&                  _a_cli_results
     ) const noexcept
 {
     using namespace std;
@@ -536,28 +566,36 @@ __constexpr_imp void
             {
                 _l_strs.push_back(_l_arg);
             }
-            process_args(
-                _l_opt_normalised_str.value(),
-                _l_clp_info.value().get(),
-                _l_strs,
-                _l_strs.size(),
-                _l_idx
-            );
+            if (bool _l_terminate{process_args(
+                    _l_opt_normalised_str.value(),
+                    _l_clp_info.value().get(),
+                    _l_strs,
+                    _l_strs.size(),
+                    _l_idx,
+                    _a_source_line,
+                    _a_cli_results
+                )};
+                _l_terminate)
+            {
+                return true;
+            }
         }
     }
     else
     {
-        _m_cli_output.get().add_error(_l_opt_normalised_str.error());
+        _a_cli_results.add_error(_l_opt_normalised_str.error());
+        return true;
     }
+    return false;
 }
 
-__no_constexpr_imp void
+__no_constexpr_imp bool
     cli_t::process_repetition_data(
         const std::tuple<
             std::filesystem::path,
             rep_file_index_t,
             rep_write_data_type_t>& _a_tuple_data,
-        cli_output_t&               _a_cli_output
+        cli_results_t&              _a_cli_results
     ) const noexcept
 {
     using namespace std;
@@ -573,11 +611,11 @@ __no_constexpr_imp void
         auto f1 = _l_folder;
         if (not filesystem::exists(_l_folder.parent_path()))
         {
-            _a_cli_output.add_error(fmt::format(
+            _a_cli_results.add_error(fmt::format(
                 "Parent folder {0} does not exist",
                 _l_folder.parent_path().string()
             ));
-            return;
+            return true;
         }
         filesystem::create_directory(_l_folder);
     }
@@ -660,7 +698,7 @@ __no_constexpr_imp void
     // If the file exists by this point, we have it.
     if (not _l_file_to_read_from.has_value())
     {
-        _a_cli_output.add_error(fmt::format(
+        _a_cli_results.add_error(fmt::format(
             "System was unable to find a file in the folder \"{0}\". {1}",
             _l_folder.string(),
             (_l_rep_file_idx.index().has_value()
@@ -671,7 +709,7 @@ __no_constexpr_imp void
                    )
                  : "Could not find any configuration files in the folder")
         ));
-        return;
+        return true;
     }
     // Now time to read the relevant parts of the file
     tuple<bool, size_t, vector<string>> _l_data;
@@ -680,14 +718,16 @@ __no_constexpr_imp void
         const filesystem::path _l_path{
             get<filesystem::path>(_l_file_to_read_from.value())
         };
-        if (auto _l_r = detail::find_data(_l_path, _l_rep_file_idx.index().value()); _l_r.has_value())
+        if (auto _l_r
+            = detail::find_data(_l_path, _l_rep_file_idx.index().value());
+            _l_r.has_value())
         {
             _l_data = _l_r.value();
         }
         else
         {
-            _a_cli_output.add_error("Couldn't work it out");
-            return;
+            _a_cli_results.add_error("Couldn't work it out");
+            return true;
         }
     }
     else
@@ -696,19 +736,18 @@ __no_constexpr_imp void
             get<pair<filesystem::path, size_t>>(_l_file_to_read_from.value())
                 .first
         };
-        if (auto _l_r
-            = detail::find_data(_l_path);
-            _l_r.has_value())
+        if (auto _l_r = detail::find_data(_l_path); _l_r.has_value())
         {
             _l_data         = _l_r.value();
             get<1>(_l_data) = true;
         }
         else
         {
-            _a_cli_output.add_error("Couldn't work it out");
-            return;
+            _a_cli_results.add_error("Couldn't work it out");
+            return true;
         }
     }
+    size_t _l_line_idx{1};
     for (const string_view _l_line : get<2>(_l_data))
     {
         // Split string into parts. Then process.
@@ -719,8 +758,8 @@ __no_constexpr_imp void
         const size_t _l_equals_pos{_l_line.find_first_of("=")};
         if (_l_equals_pos == string::npos)
         {
-            _a_cli_output.add_error(fmt::format("couldn't run file"));
-            return;
+            _a_cli_results.add_error(fmt::format("couldn't run file"));
+            return true;
         }
         else
         {
@@ -730,72 +769,36 @@ __no_constexpr_imp void
             vector<string> _l_strs = abc::utility::str::split_string(
                 _l_line.substr(_l_equals_pos + 1), " "
             );
-            process_config_line(_l_field_name, _l_strs);
-            if (not _m_cli_output.get().can_continue())
+            if (bool _l_terminate{process_config_line(
+                    _l_field_name,
+                    _l_strs,
+                    fmt::format(
+                        "memoized configuration {0} from file \"{1}\", line "
+                        "{2}",
+                        get<1>(_l_data),
+                        (holds_alternative<filesystem::path>(
+                             _l_file_to_read_from.value()
+                         )
+                             ? get<filesystem::path>(_l_file_to_read_from.value(
+                                                     ))
+                                   .string()
+                             : get<std::pair<
+                                   std::filesystem::path,
+                                   std::size_t>>(_l_file_to_read_from.value())
+                                   .first.string()),
+                        _l_line_idx
+                    ),
+                    _a_cli_results
+                )};
+                _l_terminate)
             {
-                break;
+                return true;
             }
         }
+        ++_l_line_idx;
     }
+    return false;
 }
-
-/*for (const filesystem::path& _l_file :
-     filesystem::directory_iterator(_l_folder))
-{
-    const string _l_file_name{_l_file.filename().string()};
-    if (auto _l_pos{_l_file_name.find(auto_repetition_file_name)};
-        _l_pos != string::npos || _l_pos == 0)
-    {
-        // The filename begins with the correct string.
-        const size_t _l_first_underscore{
-            _l_file_name.find_first_of("_", _l_pos)
-        };
-        if (_l_first_underscore == string::npos)
-        {
-            continue;
-        }
-        const size_t _l_second_underscore{
-            _l_file_name.find_first_of("_", _l_first_underscore + 1)
-        };
-        if (_l_second_underscore == string::npos)
-        {
-            continue;
-        }
-        // Get the information out of the file name.
-        size_t _l_begin_index{0};
-        size_t _l_end_index{0};
-        try
-        {
-            _l_begin_index = stoull(_l_file_name.substr(
-                _l_first_underscore + 1,
-                _l_second_underscore - (_l_first_underscore + 1)
-            ));
-            _l_end_index
-                = stoull(_l_file_name.substr(_l_second_underscore + 1));
-        }
-        catch (...)
-        {
-            continue;
-        }
-        // If we have a pre-determined repetition to try, find out if
-        // this file has it in.
-        if (not _l_previous_greatest.has_value())
-        {
-            _l_previous_greatest = _l_end_index;
-            _l_correct_file_opt
-                = make_tuple(_l_file, _l_begin_index, _l_end_index);
-        }
-        else
-        {
-            if (_l_previous_greatest.value() < _l_begin_index)
-            {
-                _l_previous_greatest = _l_end_index;
-                _l_correct_file_opt
-                    = make_tuple(_l_file, _l_begin_index, _l_end_index);
-            }
-        }
-    }
-}*/
 
 __constexpr_imp std::expected<std::string_view, std::string>
                 cli_t::normalise_str_from_cli_to_flag(
@@ -888,13 +891,15 @@ __constexpr_imp const std::optional<std::reference_wrapper<cli_info_t>>
     return _m_sv_to_clp_info.at(_a_info);
 }
 
-__constexpr_imp void
+__constexpr_imp bool
     cli_t::process_args(
-        const std::string_view               _a_flag,
-        const cli_info_t&                    _a_cli_info,
-        const std::vector<std::string_view>& _a_strs,
-        const std::size_t                    _a_strs_size,
-        std::size_t&                         _a_current_index
+        const std::string_view                 _a_flag,
+        const cli_info_t&                      _a_cli_info,
+        const std::vector<std::string_view>&   _a_strs,
+        const std::size_t                      _a_strs_size,
+        std::size_t&                           _a_current_index,
+        const std::optional<std::string_view>& _a_source,
+        cli_results_t&                         _a_cli_results
     ) const noexcept
 {
     using namespace std;
@@ -902,29 +907,74 @@ __constexpr_imp void
     switch (_a_cli_info.n_arguments())
     {
     case ZERO:
-        _a_cli_info.process_args(_a_flag, {}, *this, _m_cli_output.get());
-        return;
+    {
+        if (const bool _l_terminate{
+                _a_cli_info.process_args(_a_flag, {}, *this, _a_cli_results)
+            };
+            _l_terminate)
+        {
+            return true;
+        }
+        if (auto _l_opt_print(_a_cli_info.print()); _l_opt_print.has_value())
+        {
+            _a_cli_results.add_memoized_data(
+                false,
+                _a_flag,
+                _l_opt_print.value(),
+                (_a_source.has_value()
+                     ? _a_source.value()
+                     : fmt::format(
+                           "command line argument {0}", _a_current_index
+                       ))
+            );
+        }
+    }
+        return false;
     case ONE:
+    {
         if (expected<string_view, string> _l_next_arg{
                 normalise_str_from_cli_to_flag(_a_strs[++_a_current_index])
             };
             not _l_next_arg.has_value())
         {
-            _a_cli_info.process_args(
-                _a_flag, {_a_strs[_a_current_index]}, *this, _m_cli_output.get()
-            );
+            if (const bool _l_terminate{_a_cli_info.process_args(
+                    _a_flag, {_a_strs[_a_current_index]}, *this, _a_cli_results
+                )};
+                _l_terminate)
+            {
+                return true;
+            }
+            if (auto _l_opt_print(_a_cli_info.print());
+                _l_opt_print.has_value())
+            {
+                _a_cli_results.add_memoized_data(
+                    false,
+                    _a_flag,
+                    _l_opt_print.value(),
+                    (_a_source.has_value()
+                         ? _a_source.value()
+                         : fmt::format(
+                               "command line arguments {0} and {1}",
+                               _a_current_index - 1,
+                               _a_current_index
+                           ))
+                );
+            }
         }
         else
         {
-            _m_cli_output.get().add_error(
+            _a_cli_results.add_error(
                 fmt::format("Expected a single argument, however the argument "
                             "found is a flag.")
             );
+            return true;
         }
-        break;
+    }
+    break;
     default:
         // Could be an unlimited number.
         {
+            size_t _l_index_of_flag{_a_current_index};
             ++_a_current_index;
             vector<string_view> _l_strs_to_pass;
             while (_a_current_index < _a_strs.size())
@@ -944,32 +994,53 @@ __constexpr_imp void
             if (_a_cli_info.min_arguments().has_value()
                 && _a_cli_info.min_arguments().value() > _l_strs_to_pass.size())
             {
-                _m_cli_output.get().add_error(fmt::format(
+                _a_cli_results.add_error(fmt::format(
                     "Flag requires at least {0} arguments, however only "
                     "{1} "
                     "was able be parsed. Arguments successfully parsed =.",
                     _a_cli_info.min_arguments().value(),
                     _l_strs_to_pass.size()
                 ));
-                return;
+                return true;
             }
             else if (_a_cli_info.max_arguments().has_value()
                      && _a_cli_info.max_arguments().value()
                             < _l_strs_to_pass.size())
             {
-                _m_cli_output.get().add_error(fmt::format(
+                _a_cli_results.add_error(fmt::format(
                     "Flag requires at most {0} arguments, however {1} "
                     "were able be parsed. Arguments successfully parsed.",
                     _a_cli_info.min_arguments().value(),
                     _l_strs_to_pass.size()
                 ));
-                return;
+                return true;
             }
-            _a_cli_info.process_args(
-                _a_flag, _l_strs_to_pass, *this, _m_cli_output.get()
-            );
+            if (const bool _l_terminate{_a_cli_info.process_args(
+                    _a_flag, _l_strs_to_pass, *this, _a_cli_results
+                )};
+                _l_terminate)
+            {
+                return true;
+            }
+            if (auto _l_opt_print(_a_cli_info.print());
+                _l_opt_print.has_value())
+            {
+                _a_cli_results.add_memoized_data(
+                    true,
+                    _a_flag,
+                    _l_opt_print.value(),
+                    (_a_source.has_value()
+                         ? _a_source.value()
+                         : fmt::format(
+                               "command line arguments {0} to {1}",
+                               _l_index_of_flag,
+                               _a_current_index
+                           ))
+                );
+            }
         }
     }
+    return false;
 }
 
 __no_constexpr_imp void

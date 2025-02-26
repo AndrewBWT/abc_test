@@ -1,6 +1,8 @@
 #pragma once
 
 #include "abc_test/internal/ds/test_data/test_set_data.hpp"
+#include "abc_test/internal/ds/test_data/pre_test_run_report.hpp"
+#include "abc_test/internal/ds/test_data/finalised_test_set_data.hpp"
 
 _BEGIN_ABC_REPORTERS_NS
 
@@ -27,6 +29,9 @@ public:
      */
     __constexpr virtual void
         final_report(ds::finalised_test_set_data_t& _a_test_set_data) const noexcept
+        = 0;
+    __constexpr virtual void
+        pre_test_run_report(ds::pre_test_run_report_t& _a_pre_test_run_report) const noexcept
         = 0;
 };
 

@@ -43,7 +43,7 @@ public:
      * can access those variables.
      */
     __no_constexpr void
-        run_tests() noexcept;
+        run_tests(ds::pre_test_run_report_t& _a_test_set_data) noexcept;
 private:
     _ABC_NS_DS::test_lists_t             _m_test_list_collection;
     test_options_base_t                  _m_options;
@@ -128,7 +128,7 @@ __no_constexpr_imp
 {}
 
 __no_constexpr_imp void
-    test_main_t::run_tests() noexcept
+    test_main_t::run_tests(ds::pre_test_run_report_t& _a_test_set_data) noexcept
 {
     using namespace std;
     using namespace _ABC_NS_DS;
@@ -150,7 +150,6 @@ __no_constexpr_imp void
     _LIBRARY_LOG(MAIN_INFO, "Setting up global test reporter controller...");
     test_reporter_controller_t& _l_trc{get_global_test_reporter_controller()};
     _l_trc.add_reporters(_m_test_reporters);
-
     _LIBRARY_LOG(MAIN_INFO, "Adding test sets to local test_collection_t...");
     test_collection_t _l_tc(_l_global_test_options, _l_erc);
     _l_tc.add_tests(_m_test_list_collection);
@@ -175,6 +174,7 @@ __no_constexpr_imp void
         test_runner_t(_l_trc, _l_global_test_options)
     );
     size_t _l_order_ran_id_counter{ 0 };
+    _l_trc.report_pre_test_data(_a_test_set_data);
     _LIBRARY_LOG(MAIN_INFO, "Beginning running of tests...");
     while (_l_pstd_itt != _l_pstd_end && _l_erc.should_exit() == false)
     {

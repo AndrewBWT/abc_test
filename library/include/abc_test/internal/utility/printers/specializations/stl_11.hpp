@@ -31,6 +31,17 @@ private:
         run_internal_printer(std::string& _a_str, const value_type& _a_object)
             const;
 };
+template <>
+struct default_printer_t<std::filesystem::path>
+    : public printer_base_t<std::filesystem::path>
+{
+    using value_type = std::filesystem::path;
+    __no_constexpr_imp virtual std::string
+        run_printer(const value_type& _a_parse_input) const
+    {
+        return _a_parse_input.string();
+    }
+};
 
 _END_ABC_UTILITY_PRINTER_NS
 

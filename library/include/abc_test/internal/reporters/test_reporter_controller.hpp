@@ -25,6 +25,8 @@ public:
      */
     __no_constexpr void
         finalise_reports(ds::finalised_test_set_data_t& _a_test_set_data) noexcept;
+    __no_constexpr void
+        report_pre_test_data(ds::pre_test_run_report_t& _a_test_set_data) noexcept;
     /*!
      * @brief Function to call when reporting a test's results.
      * @param _a_aetr the invoked_test_data_t test to report.
@@ -61,7 +63,15 @@ __no_constexpr_imp void
         _l_reporter.get().final_report(_a_test_set_data);
     }
 }
-
+__no_constexpr_imp void
+test_reporter_controller_t::report_pre_test_data(ds::pre_test_run_report_t& _a_test_set_data) noexcept
+{
+    using namespace std;
+    for (reference_wrapper<const test_reporter_t> _l_reporter : _m_reporters)
+    {
+        _l_reporter.get().pre_test_run_report(_a_test_set_data);
+    }
+}
 __constexpr_imp void
     test_reporter_controller_t::report_test(
         const ds::invoked_test_data_t& _a_itd

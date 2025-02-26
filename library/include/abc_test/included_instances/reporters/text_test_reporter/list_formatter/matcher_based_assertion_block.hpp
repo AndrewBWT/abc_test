@@ -2,6 +2,7 @@
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/matcher_based_assertion_block.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/assertion_block_matcher_data.hpp"
 #include "abc_test/internal/test_reports/matcher_based_assertion_block.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/assertion.hpp"
 _BEGIN_ABC_REPORTERS_NS
 
 template <typename Assertion_Status>

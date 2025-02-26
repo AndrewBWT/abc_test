@@ -44,6 +44,7 @@ set(LIBRARY_FILES
   include/abc_test/internal/ds/test_data/test_set_data.hpp
       src/abc_test/internal/ds/test_data/test_set_data.cpp
   include/abc_test/internal/ds/test_data/finalised_test_set_data.hpp
+  include/abc_test/internal/ds/test_data/pre_test_run_report.hpp
   # Bespoke data structures for the library for storing tests in various forms.
   include/abc_test/internal/ds/test_collections/test_collection.hpp
   include/abc_test/internal/ds/test_collections/test_tree.hpp
@@ -197,6 +198,7 @@ set(LIBRARY_FILES
   # Command line parser
   include/abc_test/internal/utility/cli.hpp
   include/abc_test/internal/utility/cli/cli_info.hpp
+      src/abc_test/internal/utility/cli/cli_info.cpp
   include/abc_test/internal/utility/cli/cli_help.hpp
   include/abc_test/internal/utility/cli/cli_help.hpp
       src/abc_test/internal/utility/cli/cli_help.cpp
@@ -229,6 +231,9 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/after_execution_test_report.hpp
   include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/after_execution_test_report.hpp
   include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/finalised_test_set_data_report.hpp
+  include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/pre_test_set_data_report.hpp
+  include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/pre_test_set_data_report.hpp
+      src/abc_test/included_instances/reporters/text_test_reporter/list_formatter/pre_test_set_data_report.cpp
   include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/finalised_test_set_data_report.hpp
   include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_report.hpp
   include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_report.hpp
@@ -242,6 +247,7 @@ set(LIBRARY_FILES
   # Command line parsing
   include/abc_test/included_instances/options/command_line_parser.hpp
   include/abc_test/included_instances/options/included_instances_test_options.hpp
+  include/abc_test/included_instances/options/option_config.hpp
   #Externally included libraries (we include the files rather than linking to the git repo).
   include/abc_test/external/bigint/BigInteger.hpp
       src/abc_test/external/bigint/BigInteger.cpp

@@ -3,7 +3,8 @@
 #include "abc_test/internal/utility/cli/cli_output.hpp"
 #include "abc_test/internal/utility/internal/macros.hpp"
 #include "abc_test/internal/utility/parsers/default_parser.hpp"
-
+#include "abc_test/internal/utility/printers/default_printer.hpp"
+#include "abc_test/internal/utility/printers/specializations/fundamental_types.hpp"
 #include <fmt/core.h>
 #include <functional>
 #include <optional>
@@ -73,14 +74,17 @@ public:
         return _m_enum_n_arguments;
     }
 
-    __no_constexpr_imp virtual void
+    __no_constexpr_imp virtual bool
         process_args(
             const std::string_view               _a_flag,
             const std::vector<std::string_view>& _a_args,
-            const cli_t&                         _a_cli,
-            cli_output_t&                        _a_cli_output
+            const cli_t& _a_cli,
+            cli_results_t& _a_cli_results
         ) const noexcept
         = 0;
+    __constexpr virtual std::optional<std::string> print() const noexcept {
+        return std::nullopt;
+    }
 
     __constexpr std::string_view
                 description() const noexcept
@@ -108,28 +112,33 @@ public:
     __constexpr
     cli_no_args_t()
         = delete;
-
-    __no_constexpr_imp virtual void
+    __constexpr virtual std::optional<std::string> print() const noexcept {
+        using namespace abc::utility::printer;
+        return default_printer_t<bool>().run_printer(_m_element_to_set.get());
+    }
+    __no_constexpr_imp virtual bool
         process_args(
-            const std::string_view               _a_flag,
-            const std::vector<std::string_view>& _a_args,
-            const cli_t&                         _a_cli,
-            cli_output_t&                        _a_cli_output
+                const std::string_view               _a_flag,
+                const std::vector<std::string_view>& _a_args,
+            const cli_t& _a_cli,
+            cli_results_t& _a_cli_results
         ) const noexcept
     {
         using namespace std;
         if (_a_args.size() != 0)
         {
-            _a_cli_output.add_error(fmt::format(
+            _a_cli_results.add_error(fmt::format(
                 "process_args expected no arguments, however the vector "
                 "provided was "
                 "in the form {0}.",
                 _a_args
             ));
+            return true;
         }
         else
         {
             _m_element_to_set.get() = (_a_flag == _m_positive_set);
+            return false;
         }
     }
 private:
@@ -209,24 +218,28 @@ public:
         , _m_parser(_a_parser)
         , _m_process_func(_a_process_func)
     {}
-
-    __no_constexpr_imp virtual void
+    __constexpr virtual std::optional<std::string> print() const noexcept {
+        using namespace abc::utility::printer;
+        return default_printer_t<T>().run_printer(_m_reference.get());
+    }
+    __no_constexpr_imp virtual bool
         process_args(
-            const std::string_view               _a_flag,
-            const std::vector<std::string_view>& _a_args,
-            const cli_t&                         _a_cli,
-            cli_output_t&                        _a_cli_output
+                const std::string_view               _a_flag,
+                const std::vector<std::string_view>& _a_args,
+            const cli_t& _a_cli,
+            cli_results_t& _a_cli_results
         ) const noexcept
     {
         using namespace std;
         if (_a_args.size() != 1)
         {
-            _a_cli_output.add_error(fmt::format(
+            _a_cli_results.add_error(fmt::format(
                 "process_args expected single argument, however the vector "
                 "provided was "
                 "in the form {0}.",
                 _a_args
             ));
+            return true;
         }
         else
         {
@@ -234,15 +247,17 @@ public:
                 _l_parse_result.has_value())
             {
                 _m_process_func(_m_reference.get(), _l_parse_result.value());
+                return false;
             }
             else
             {
-                _a_cli_output.add_error(fmt::format(
+                _a_cli_results.add_error(fmt::format(
                     "Could not parse std::string \"{0}\" to type {1}. "
                     "Reason:",
                     _a_args[0],
                     typeid(T).name()
                 ));
+                return true;
             }
         }
     }
@@ -275,13 +290,16 @@ public:
         , _m_parser(_a_parser)
         , _m_process_func(_a_process_func)
     {}
-
-    __no_constexpr_imp virtual void
+    __constexpr virtual std::optional<std::string> print() const noexcept {
+        using namespace abc::utility::printer;
+        return default_printer_t<T>().run_printer(_m_reference.get());
+    }
+    __no_constexpr_imp virtual bool
         process_args(
             const std::string_view               _a_flag,
             const std::vector<std::string_view>& _a_args,
-            const cli_t&                         _a_cli,
-            cli_output_t&                        _a_cli_output
+            const cli_t& _a_cli,
+            cli_results_t& _a_cli_results
         ) const noexcept
     {
         using namespace std;
@@ -294,15 +312,16 @@ public:
             }
             else
             {
-                _a_cli_output.add_error(fmt::format(
+                _a_cli_results.add_error(fmt::format(
                     "Could not parse std::string \"{0}\" to type {1}. "
                     "Reason:",
                     _l_arg,
                     typeid(T).name()
                 ));
-                return;
+                return true;
             }
         }
+        return false;
     }
 private:
     std::reference_wrapper<T>                               _m_reference;

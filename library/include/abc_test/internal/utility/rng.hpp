@@ -4,6 +4,7 @@
 #include "abc_test/internal/utility/internal/macros.hpp"
 #include "abc_test/internal/utility/parsers/default_parser.hpp"
 #include "abc_test/internal/utility/parsers/specializations/stl_11.hpp"
+#include "abc_test/internal/utility/printers/default_printer.hpp"
 
 #include <random>
 #include <scn/scan.h>
@@ -365,6 +366,34 @@ struct default_parser_t<complete_global_seed_t>
 };
 
 _END_ABC_UTILITY_PARSER_NS
+_BEGIN_ABC_UTILITY_PRINTER_NS
+template <>
+struct default_printer_t<global_seed_t>
+    : public printer_base_t<global_seed_t>
+{
+    __constexpr std::string
+        run_printer(
+            const global_seed_t& _a_parse_input
+        ) const
+    {
+        using namespace std;
+        return "global_seed_t";
+    }
+};
+template <>
+struct default_printer_t<complete_global_seed_t>
+    : public printer_base_t<complete_global_seed_t>
+{
+    __constexpr std::string
+        run_printer(
+            const complete_global_seed_t& _a_parse_input
+        ) const
+    {
+        using namespace std;
+        return "complete_global_seed_t";
+    }
+};
+_END_ABC_UTILITY_PRINTER_NS
 
 /*!
  * formatter for registered_test_data_t

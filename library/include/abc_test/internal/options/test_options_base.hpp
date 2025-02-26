@@ -24,7 +24,6 @@ using rep_data_file_info_t = std::tuple<
     std::filesystem::path,
     std::size_t,
     std::size_t>;
-
 /*!
  * @brief Strcutre which holds the basic options for the library.
  *
@@ -144,9 +143,9 @@ public:
      * Test paths to run
      */
     std::vector<std::string> test_paths_to_run;
-    std::size_t size_of_repetition_files = 1'000;
-    std::string repetition_file_prefix = "autofile";
-    std::string repetition_file_metadata_string = "metadata";
+    std::size_t              size_of_repetition_files        = 1'000;
+    std::string              repetition_file_prefix          = "autofile";
+    std::string              repetition_file_metadata_string = "metadata";
     /*!
      * @brief Function to validate the input.
      *
@@ -156,11 +155,10 @@ public:
      * of the error.
      */
     __no_constexpr std::optional<std::vector<std::string>>
-                   validate_and_pre_process(
-                   ) noexcept;
+                   validate_and_pre_process() noexcept;
 protected:
     __no_constexpr void virtual validate_and_pre_process_(
-        std::vector<std::string>&                     _a_error_ref
+        std::vector<std::string>& _a_error_ref
     ) noexcept;
     std::optional<std::filesystem::path> _m_file_to_write_to;
 };
@@ -193,8 +191,7 @@ struct fmt::formatter<abc::test_options_base_t> : formatter<string_view>
 
 _BEGIN_ABC_NS
 __no_constexpr_imp std::optional<std::vector<std::string>>
-                   test_options_base_t::validate_and_pre_process(
-    ) noexcept
+                   test_options_base_t::validate_and_pre_process() noexcept
 {
     using namespace std;
     vector<string> _l_rv{};
@@ -343,8 +340,7 @@ __no_constexpr_imp void
     if (test_paths_to_run.size() == 0)
     {
         using namespace ds;
-        test_paths_to_run
-            = vector<string>(1, "");
+        test_paths_to_run = vector<string>(1, "");
     }
 }
 
