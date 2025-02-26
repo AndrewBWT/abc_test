@@ -1,5 +1,7 @@
 #pragma once
 #include "abc_test/internal/ds/data_generator_memoization/typeless_data_generator_collection_stack_trie.hpp"
+#include "abc_test/internal/utility/parsers/default_parser.hpp"
+#include "abc_test/internal/utility/printers/default_printer.hpp"
 
 #include <scn/scan.h>
 
@@ -16,10 +18,8 @@ public:
         map_unique_id_to_tdg_collection_stack_trie_t() noexcept
         = default;
     __no_constexpr bool
-        insert(
-            const key_t&                  _a_id,
-            const tdg_collection_stack_trie_t& _a_trie
-        ) noexcept;
+        insert(const key_t& _a_id, const tdg_collection_stack_trie_t& _a_trie)
+            noexcept;
     __no_constexpr const std::map<key_t, tdg_collection_stack_trie_t>&
                          map() const noexcept;
     friend __no_constexpr
@@ -38,6 +38,38 @@ private:
 };
 
 _END_ABC_DS_NS
+_BEGIN_ABC_UTILITY_PARSER_NS
+
+template <>
+struct default_parser_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
+    : public parser_base_t<
+          abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
+{
+    __no_constexpr virtual parse_result_t<
+        abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
+        run_parser(parser_input_t& _a_parse_input) const;
+    // using namespace abc::ds;
+    // return parse_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
+    //   _a_parse_input.sv()
+    // );
+};
+
+_END_ABC_UTILITY_PARSER_NS
+_BEGIN_ABC_UTILITY_PRINTER_NS
+
+template <>
+struct default_printer_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
+    : public printer_base_t<
+          abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
+{
+    static constexpr bool is_specialized{true};
+
+    __no_constexpr virtual std::string
+        run_printer(const abc::ds::map_unique_id_to_tdg_collection_stack_trie_t&
+                        _a_parse_input) const;
+};
+
+_END_ABC_UTILITY_PRINTER_NS
 
 template <>
 struct fmt::formatter<_ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t>
@@ -55,7 +87,7 @@ struct fmt::formatter<_ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t>
 _BEGIN_ABC_DS_NS
 __no_constexpr_imp bool
     map_unique_id_to_tdg_collection_stack_trie_t::insert(
-        const key_t&                  _a_id,
+        const key_t&                       _a_id,
         const tdg_collection_stack_trie_t& _a_trie
     ) noexcept
 {
@@ -87,9 +119,6 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
         const std::string_view _a_str
     ) noexcept
 {
-    // Assumes the string is in the format:
-    //<string> = <empty_string> |
-    //           <unsigned_integer>:<hex_string>:<string>
     using namespace std;
     vector<pair<string_view, string_view>> _l_strs;
     size_t                                 _l_idx{0};
@@ -204,6 +233,34 @@ __no_constexpr_imp std::string
 
 _END_ABC_DS_NS
 
+_BEGIN_ABC_UTILITY_PRINTER_NS
+__no_constexpr_imp std::string
+    default_printer_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>::
+        run_printer(
+            const abc::ds::map_unique_id_to_tdg_collection_stack_trie_t&
+                _a_parse_input
+        ) const
+{
+    return fmt::format("{}", _a_parse_input.map());
+}
+
+_END_ABC_UTILITY_PRINTER_NS
+
+_BEGIN_ABC_UTILITY_PARSER_NS
+__no_constexpr_imp
+    parse_result_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
+    default_parser_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>::
+        run_parser(
+            parser_input_t& _a_parse_input
+        ) const
+{
+    using namespace abc::ds;
+    return parse_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
+        _a_parse_input.sv()
+    );
+}
+
+_END_ABC_UTILITY_PARSER_NS
 __no_constexpr_imp auto
     fmt::formatter<_ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t>::
         format(

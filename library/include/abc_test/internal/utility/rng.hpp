@@ -35,7 +35,30 @@ public:
     ) noexcept
         : _m_inner_seed(_a_seed)
     {}
-
+    __constexpr std::optional<unsigned int> integer() const noexcept
+    {
+        using namespace std;
+        if (holds_alternative<unsigned int>(_m_inner_seed))
+        {
+            return make_optional(get<unsigned int>(_m_inner_seed));
+        }
+        else
+        {
+            return nullopt;
+        }
+    }
+    __constexpr std::optional<std::vector<uint32_t>> vector_of_integers() const noexcept
+    {
+        using namespace std;
+        if (holds_alternative<vector<uint32_t>>(_m_inner_seed))
+        {
+            return make_optional(get<vector<uint32_t>>(_m_inner_seed));
+        }
+        else
+        {
+            return nullopt;
+        }
+    }
     __constexpr utility::seed_t
                 get_seed(
                     const std::size_t _a_seed_to_create_size
@@ -217,6 +240,23 @@ public:
         else
         {
             throw errors::unaccounted_for_variant_exception(_m_inner_seed);
+        }
+    }
+    __constexpr bool is_not_set() const noexcept
+    {
+        using namespace std;
+        return holds_alternative<monostate>(_m_inner_seed);
+    }
+    __constexpr std::optional< complete_global_seed_t> complete_global_seed() const noexcept
+    {
+        using namespace std;
+        if (holds_alternative<complete_global_seed_t>(_m_inner_seed))
+        {
+            return get< complete_global_seed_t>(_m_inner_seed);
+        }
+        else
+        {
+            return nullopt;
         }
     }
 private:

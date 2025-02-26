@@ -22,9 +22,12 @@ public:
                       ) const noexcept;
     __constexpr const included_instances_test_options_t&
         get_options() const noexcept;
+    __constexpr void
+        report_all_tests(const std::size_t _a_size) noexcept;
 private:
     memoized_cli_history_t _m_memoized_option_data;
     std::reference_wrapper<const included_instances_test_options_t> _m_options;
+    std::size_t _m_n_tests{0};
 };
 
 _END_ABC_DS_NS
@@ -43,6 +46,14 @@ __constexpr const included_instances_test_options_t&
     pre_test_run_report_t::get_options() const noexcept
 {
     return _m_options.get();
+}
+
+__constexpr void
+    pre_test_run_report_t::report_all_tests(
+        const std::size_t _a_size
+    ) noexcept
+{
+    _m_n_tests = _a_size;
 }
 
 __constexpr const std::vector<std::string>&

@@ -125,6 +125,12 @@ __no_constexpr_imp void
     _a_cli.add_file_config_flag();
     insert_option(
         _a_cli,
+        _s_show_configuration_explanations,
+        _a_opts.show_configuration_explanations,
+        _a_cli_results
+    );
+    insert_option(
+        _a_cli,
         _s_global_test_list,
         _a_opts.use_global_test_list,
         _a_cli_results

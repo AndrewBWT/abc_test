@@ -107,6 +107,7 @@ public:
      * test_list collection when validating.
      */
     bool use_global_test_list = true;
+    bool show_configuration_explanations = false;
     /*!
      * @brief A collection of shared pointers to test_reporter_t elements; each
      * of these is owned by the system. They are deleted when this object is

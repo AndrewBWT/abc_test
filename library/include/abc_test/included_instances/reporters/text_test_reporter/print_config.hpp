@@ -46,7 +46,10 @@ public:
     __no_constexpr std::string
         print_seed(const utility::complete_global_seed_t& _a_seed) const;
     __no_constexpr std::string
-        print_global_seed(const utility::global_seed_t& _a_seed) const noexcept;
+                   print_global_seed(
+                       const utility::global_seed_t&          _a_seed,
+                       const utility::complete_global_seed_t& _a_seed_global
+                   ) const noexcept;
     __constexpr const std::string_view
                       str_total_tests_passed() const noexcept;
     __constexpr const std::string_view
@@ -359,11 +362,11 @@ public:
     __constexpr std::string
                 show_test_paths_to_run(const std::vector<std::string>& _a_strs
                 ) const noexcept;
-    __constexpr std::string
-                show_repetition_config(
-                    const _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t&
-                        _a_config
-                ) const noexcept;
+    __no_constexpr std::string
+                   show_repetition_config(
+                       const _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t&
+                           _a_config
+                   ) const noexcept;
     __no_constexpr std::string
                 show_path(const std::filesystem::path& _a_path) const noexcept;
     __constexpr std::string
@@ -480,10 +483,38 @@ __no_constexpr_imp std::string
 
 __no_constexpr_imp std::string
                    print_config_t::print_global_seed(
-        const utility::global_seed_t& _a_seed
+        const utility::global_seed_t&          _a_seed,
+        const utility::complete_global_seed_t& _a_seed_global
     ) const noexcept
 {
-    return fmt::format("{0}", _a_seed);
+    using namespace utility::printer;
+    using namespace utility;
+    using namespace std;
+    if (_a_seed.is_not_set())
+    {
+        return fmt::format(
+            "Not set by user. Global seed has been set randomly by system to "
+            "{0}",
+            _a_seed_global.integer().value()
+        );
+    }
+    else
+    {
+        const complete_global_seed_t _l_complete_seed{
+            _a_seed.complete_global_seed().value()
+        };
+        if (const optional<unsigned int> _l_opt_integer{
+                _l_complete_seed.integer()
+            };
+            _l_opt_integer.has_value())
+        {
+            return fmt::format("{0}", _l_opt_integer.value());
+        }
+        else
+        {
+            return fmt::format("{0}", _l_complete_seed.vector_of_integers());
+        }
+    }
 }
 
 __constexpr_imp const std::string_view
@@ -1403,7 +1434,35 @@ __no_constexpr_imp std::string
         const utility::global_seed_t& _a_global_seed
     ) const noexcept
 {
-    return fmt::format("The global seed used for this run");
+    using namespace utility;
+    using namespace std;
+    if (_a_global_seed.is_not_set())
+    {
+        return "The global seed has not been set by the user, and will "
+               "therefore be set using the current time.";
+    }
+    else
+    {
+        const complete_global_seed_t _l_complete_global_seed{
+            _a_global_seed.complete_global_seed().value()
+        };
+        if (const optional<unsigned int> _l_opt_integer{
+                _l_complete_global_seed.integer()
+            };
+            _l_opt_integer.has_value())
+        {
+            return fmt::format(
+                "The global seed is set using the single integer {0}",
+                _l_opt_integer.value()
+            );
+        }
+        else
+        {
+            return fmt::format(
+                "The global seed is set using the vector of integers above."
+            );
+        }
+    }
 }
 
 __no_constexpr_imp std::string
@@ -1411,14 +1470,13 @@ __no_constexpr_imp std::string
         const bool _a_force_run_all_tests
     ) const noexcept
 {
-    return (
-        _a_force_run_all_tests
-            ? "All tests, irrispective of whether they have a repetition "
-              "configuration associated with them, but only those which are "
-              "denoted by the test path, are ran"
-            : "Only those tests denoted by the test path, and if a repetition "
-              "configuration is given, are ran"
-    );
+    return _a_force_run_all_tests
+               ? "All tests, irrispective of whether they have a repetition "
+                 "configuration associated with them, but only those which are "
+                 "denoted by the test path, are ran"
+               : "Only those tests denoted by the test path, and if a "
+                 "repetition "
+                 "configuration is given, are ran";
 }
 
 __no_constexpr_imp std::string
@@ -1426,10 +1484,7 @@ __no_constexpr_imp std::string
         const std::vector<std::string>& _a_force_run_all_tests
     ) const noexcept
 {
-    return fmt::format(
-        "The test paths {0} are ran",
-        _a_force_run_all_tests
-    );
+    return fmt::format("The test paths {0} are ran", _a_force_run_all_tests);
 }
 
 __constexpr std::string
@@ -1477,13 +1532,13 @@ __constexpr std::string
 __constexpr std::string
             print_config_t::repetition_config_used() const noexcept
 {
-    return "print config used";
+    return "Repetition config";
 }
 
 __constexpr std::string
             print_config_t::global_seed_used() const noexcept
 {
-    return "global seed";
+    return "Global seed";
 }
 
 __constexpr std::string
@@ -1503,16 +1558,48 @@ __constexpr std::string
         const std::vector<std::string>& _a_strs
     ) const noexcept
 {
-    return "{}";
+    using namespace std;
+    string _l_rv{};
+    if (_a_strs.size() == 1 && _a_strs[0] == "")
+    {
+        return "No test paths given. All tests will be ran.";
+    }
+    for (size_t _l_idx{0}; const string_view _l_str : _a_strs)
+    {
+        _l_rv.append(_l_str);
+        if (_l_idx + 2 < _a_strs.size())
+        {
+            _l_rv.append(", ");
+        }
+        else if (_l_idx + 1 < _a_strs.size())
+        {
+            _l_rv.append(" and ");
+        }
+        else
+        {
+            _l_rv.append(".");
+        }
+    }
+    return _l_rv;
 }
 
-__constexpr std::string
-            print_config_t::show_repetition_config(
+__no_constexpr_imp std::string
+                   print_config_t::show_repetition_config(
         const _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t&
             _a_config
     ) const noexcept
 {
-    return "config";
+    using namespace utility::printer;
+    if (_a_config.size() == 0)
+    {
+        return "No repetition config given.";
+    }
+    else
+    {
+        return default_printer_t<
+                   _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t>{}
+            .run_printer(_a_config);
+    }
 }
 
 __no_constexpr_imp std::string

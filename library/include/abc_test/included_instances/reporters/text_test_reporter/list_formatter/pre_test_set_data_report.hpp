@@ -20,6 +20,24 @@ public:
             const enum_pre_test_set_data_fields_t& _a_fid,
             const ds::pre_test_run_report_t&       _a_element
         ) const;
+        __no_constexpr_or_inline std::vector<std::string>
+        get_cli_info(
+            const enum_pre_test_set_data_fields_t& _a_fid,
+            const ds::pre_test_run_report_t& _a_element,
+            const print_config_t& _a_pc
+        ) const;
+        __no_constexpr_or_inline std::vector<std::string>
+        get_explanation_data(
+            const enum_pre_test_set_data_fields_t& _a_fid,
+            const ds::pre_test_run_report_t& _a_element,
+            const print_config_t& _a_pc
+        ) const;
+    __no_constexpr_or_inline std::vector<std::string>
+        get_output(
+            const enum_pre_test_set_data_fields_t& _a_fid,
+            const ds::pre_test_run_report_t& _a_element,
+            const print_config_t& _a_pc
+        ) const;
     __no_constexpr_or_inline virtual std::vector<std::string>
         get_data(
             const enum_pre_test_set_data_fields_t& _a_fid,

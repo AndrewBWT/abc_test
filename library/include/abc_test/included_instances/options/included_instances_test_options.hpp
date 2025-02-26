@@ -17,10 +17,10 @@ public:
         text_error_reporter_file_names;
 protected:
     __no_constexpr virtual void
-        validate_and_pre_process_(
-            std::vector<std::string>& _a_error_ref
+        validate_and_pre_process_(std::vector<std::string>& _a_error_ref
         ) noexcept;
 };
+
 namespace
 {
 __no_constexpr std::vector<std::filesystem::path>
@@ -34,32 +34,6 @@ __no_constexpr std::vector<std::filesystem::path>
 } // namespace
 
 _END_ABC_NS
-_BEGIN_ABC_UTILITY_PARSER_NS
-template<>
-struct default_parser_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
-    : public parser_base_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
-{
-    __no_constexpr_imp virtual parse_result_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
-        run_parser(parser_input_t& _a_parse_input) const
-    {
-        using namespace abc::ds;
-        return parse_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(_a_parse_input.sv());
-    }
-};
-_END_ABC_UTILITY_PARSER_NS
-_BEGIN_ABC_UTILITY_PRINTER_NS
-template<>
-struct default_printer_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
-    : public printer_base_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
-{
-    __no_constexpr_imp virtual std::string
-        run_printer(const abc::ds::map_unique_id_to_tdg_collection_stack_trie_t& _a_parse_input) const
-    {
-        using namespace abc::ds;
-        return fmt::format("{}", _a_parse_input.map());
-    }
-};
-_END_ABC_UTILITY_PRINTER_NS
 
 template <>
 struct fmt::formatter<abc::included_instances_test_options_t>
@@ -122,9 +96,7 @@ __no_constexpr_imp void
             );
         }
     }
-    test_options_base_t::validate_and_pre_process_(
-        _a_error_ref
-    );
+    test_options_base_t::validate_and_pre_process_(_a_error_ref);
 }
 
 namespace
@@ -229,3 +201,17 @@ __no_constexpr_imp auto
     )};
     return formatter<string_view>::format(_l_rv, _a_ctx);
 }
+
+_BEGIN_ABC_UTILITY_PRINTER_NS
+/*__no_constexpr_imp std::string
+    default_printer_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>::
+        run_printer(
+            const abc::ds::map_unique_id_to_tdg_collection_stack_trie_t&
+                _a_parse_input
+        ) const
+{
+    using namespace abc::ds;
+    return fmt::format("{}", _a_parse_input.map());
+}*/
+
+_END_ABC_UTILITY_PRINTER_NS

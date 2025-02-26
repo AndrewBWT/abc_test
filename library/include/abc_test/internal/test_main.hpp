@@ -166,6 +166,7 @@ __no_constexpr_imp void
     const post_setup_test_list_t _l_pstd{
         _l_tc.make_finalied_post_setup_test_list_in_run_order()
     };
+    _a_test_set_data.report_all_tests(_l_pstd.size());
     post_setup_test_list_itt_t       _l_pstd_itt{_l_pstd.begin()};
     const post_setup_test_list_itt_t _l_pstd_end{_l_pstd.end()};
 
@@ -264,6 +265,7 @@ __no_constexpr_imp void
         ));
         _l_erc.hard_exit();
     }
+    _LIBRARY_LOG(MAIN_INFO, "Setting up auto configuration");
     _LIBRARY_LOG(MAIN_INFO, "Finalising reports.");
     finalised_test_set_data_t _l_final_report;
     for (auto& _l_test_runner : _m_test_runners)
