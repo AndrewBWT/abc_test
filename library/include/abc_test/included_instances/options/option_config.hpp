@@ -23,10 +23,14 @@ static constexpr option_config_t _s_write_data_to_files
 };
 static constexpr option_config_t _s_path_delimiter
     = {"path_delimiter", "Path delimiter used", {}};
+static constexpr option_config_t _s_repetition_file_metadata_string
+= { "repetition_file_metadata_string", "Path delimiter used", {} };
 static constexpr option_config_t _s_root_path
     = {"root_path", "Root path used", {}};
 static constexpr option_config_t _s_threads
     = {"threads", "Number of threads allocated to the library", {}};
+static constexpr option_config_t _s_autofile_name = { "autofile_name", "Auto file name",{} };
+static constexpr option_config_t _s_autofile_size = { "autofile_size", "Auto file size",{} };
 static constexpr option_config_t _s_comment_str
     = {"comment", "Comment used", {}};
 static constexpr option_config_t _s_general_data_file_extension

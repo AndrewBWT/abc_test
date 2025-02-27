@@ -5,12 +5,13 @@
 #include "abc_test/internal/utility/parsers/default_parser.hpp"
 #include "abc_test/internal/utility/printers/default_printer.hpp"
 #include "abc_test/internal/utility/printers/specializations/fundamental_types.hpp"
+
+#include <filesystem>
 #include <fmt/core.h>
 #include <functional>
 #include <optional>
 #include <string>
 #include <vector>
-#include <filesystem>
 
 _BEGIN_ABC_NS
 class cli_t;
@@ -35,7 +36,7 @@ public:
         const std::string_view     _a_flag,
         const std::string_view     _a_description,
         const std::optional<char>& _a_char_flag = std::optional<char>{},
-        bool _a_enabled_for_config_file = true
+        bool                       _a_enabled_for_config_file = true
     ) noexcept
         : _m_flag(_a_flag)
         , _m_char_flag(_a_char_flag)
@@ -78,11 +79,14 @@ public:
         process_args(
             const std::string_view               _a_flag,
             const std::vector<std::string_view>& _a_args,
-            const cli_t& _a_cli,
-            cli_results_t& _a_cli_results
+            const cli_t&                         _a_cli,
+            cli_results_t&                       _a_cli_results
         ) const noexcept
         = 0;
-    __constexpr virtual std::optional<std::string> print() const noexcept {
+
+    __constexpr virtual std::optional<std::string>
+        print() const noexcept
+    {
         return std::nullopt;
     }
 
@@ -91,7 +95,9 @@ public:
     {
         return _m_description;
     }
-    __constexpr bool enabled_for_config_file() const noexcept
+
+    __constexpr bool
+        enabled_for_config_file() const noexcept
     {
         return _m_enabled_for_config_file;
     }
@@ -102,8 +108,8 @@ private:
     std::string                _m_flag;
     std::optional<char>        _m_char_flag;
     std::string                _m_description;
-    bool _m_enabled_for_config_file;
-    bool _m_enabled_for_config_list;
+    bool                       _m_enabled_for_config_file;
+    bool                       _m_enabled_for_config_list;
 };
 
 class cli_no_args_t : public cli_info_t
@@ -112,16 +118,20 @@ public:
     __constexpr
     cli_no_args_t()
         = delete;
-    __constexpr virtual std::optional<std::string> print() const noexcept {
+
+    __constexpr virtual std::optional<std::string>
+        print() const noexcept
+    {
         using namespace abc::utility::printer;
         return default_printer_t<bool>().run_printer(_m_element_to_set.get());
     }
+
     __no_constexpr_imp virtual bool
         process_args(
-                const std::string_view               _a_flag,
-                const std::vector<std::string_view>& _a_args,
-            const cli_t& _a_cli,
-            cli_results_t& _a_cli_results
+            const std::string_view               _a_flag,
+            const std::vector<std::string_view>& _a_args,
+            const cli_t&                         _a_cli,
+            cli_results_t&                       _a_cli_results
         ) const noexcept
     {
         using namespace std;
@@ -157,7 +167,8 @@ __constexpr std::function<std::optional<T>(const std::string_view)>
     using namespace abc::utility::parser;
     return [](const string_view _a_str)
     {
-        if constexpr (std::same_as<T, std::string> || std::same_as<T,std::filesystem::path>)
+        if constexpr (std::same_as<T, std::string>
+                      || std::same_as<T, std::filesystem::path>)
         {
             return make_optional(T(_a_str));
         }
@@ -177,7 +188,7 @@ __constexpr std::function<std::optional<T>(const std::string_view)>
 }
 
 template <typename T, typename U>
-__constexpr std::function<void(T&, const U&)>
+__constexpr std::function<bool(T&, const U&)>
             process_value()
 {
     using namespace std;
@@ -191,6 +202,7 @@ __constexpr std::function<void(T&, const U&)>
         {
             _a_reference = _a_parse_value;
         }
+        return true;
     };
 }
 } // namespace detail
@@ -206,7 +218,7 @@ public:
         T&                        _a_reference,
         const std::optional<char> _a_char_flag,
         const std::function<std::optional<U>(const std::string_view)> _a_parser,
-        const std::function<void(T&, const U&)> _a_process_func
+        const std::function<bool(T&, const U&)> _a_process_func
     ) noexcept
         : cli_info_t(
               enum_n_arguments::ONE,
@@ -218,16 +230,20 @@ public:
         , _m_parser(_a_parser)
         , _m_process_func(_a_process_func)
     {}
-    __constexpr virtual std::optional<std::string> print() const noexcept {
+
+    __constexpr virtual std::optional<std::string>
+        print() const noexcept
+    {
         using namespace abc::utility::printer;
         return default_printer_t<T>().run_printer(_m_reference.get());
     }
+
     __no_constexpr_imp virtual bool
         process_args(
-                const std::string_view               _a_flag,
-                const std::vector<std::string_view>& _a_args,
-            const cli_t& _a_cli,
-            cli_results_t& _a_cli_results
+            const std::string_view               _a_flag,
+            const std::vector<std::string_view>& _a_args,
+            const cli_t&                         _a_cli,
+            cli_results_t&                       _a_cli_results
         ) const noexcept
     {
         using namespace std;
@@ -246,8 +262,20 @@ public:
             if (const optional<U> _l_parse_result{_m_parser(_a_args[0])};
                 _l_parse_result.has_value())
             {
-                _m_process_func(_m_reference.get(), _l_parse_result.value());
-                return false;
+                if (const bool _l_process_okay{_m_process_func(
+                        _m_reference.get(), _l_parse_result.value()
+                    )};
+                    _l_process_okay)
+                {
+                    return false;
+                }
+                else
+                {
+                    _a_cli_results.add_error(fmt::format(
+                        "Some post-parsing processing error encountered. "
+                    ));
+                    return true;
+                }
             }
             else
             {
@@ -264,7 +292,7 @@ public:
 private:
     std::reference_wrapper<T>                               _m_reference;
     std::function<std::optional<U>(const std::string_view)> _m_parser;
-    std::function<void(T&, const U&)>                       _m_process_func;
+    std::function<bool(T&, const U&)>                       _m_process_func;
 };
 
 template <typename T, typename U>
@@ -278,7 +306,7 @@ public:
         T&                        _a_reference,
         const std::optional<char> _a_char_flag,
         const std::function<std::optional<U>(const std::string_view)> _a_parser,
-        const std::function<void(T&, const U&)> _a_process_func
+        const std::function<bool(T&, const U&)> _a_process_func
     ) noexcept
         : cli_info_t(
               enum_n_arguments::MULTI_ARGUMENT,
@@ -290,25 +318,42 @@ public:
         , _m_parser(_a_parser)
         , _m_process_func(_a_process_func)
     {}
-    __constexpr virtual std::optional<std::string> print() const noexcept {
+
+    __constexpr virtual std::optional<std::string>
+        print() const noexcept
+    {
         using namespace abc::utility::printer;
         return default_printer_t<T>().run_printer(_m_reference.get());
     }
+
     __no_constexpr_imp virtual bool
         process_args(
             const std::string_view               _a_flag,
             const std::vector<std::string_view>& _a_args,
-            const cli_t& _a_cli,
-            cli_results_t& _a_cli_results
+            const cli_t&                         _a_cli,
+            cli_results_t&                       _a_cli_results
         ) const noexcept
     {
         using namespace std;
         for (const string_view _l_arg : _a_args)
         {
-            if (const optional<U> _l_parse_result{ _m_parser(_l_arg) };
+            if (const optional<U> _l_parse_result{_m_parser(_l_arg)};
                 _l_parse_result.has_value())
             {
-                _m_process_func(_m_reference.get(), _l_parse_result.value());
+                if (const bool _l_process_okay{_m_process_func(
+                        _m_reference.get(), _l_parse_result.value()
+                    )};
+                    _l_process_okay)
+                {
+                    return false;
+                }
+                else
+                {
+                    _a_cli_results.add_error(fmt::format(
+                        "Some post-parsing processing error encountered. "
+                    ));
+                    return true;
+                }
             }
             else
             {
@@ -326,7 +371,7 @@ public:
 private:
     std::reference_wrapper<T>                               _m_reference;
     std::function<std::optional<U>(const std::string_view)> _m_parser;
-    std::function<void(T&, const U&)>                       _m_process_func;
+    std::function<bool(T&, const U&)>                       _m_process_func;
 };
 
 _END_ABC_NS

@@ -38,6 +38,8 @@ public:
     __no_constexpr
         test_options_base_t() noexcept
         = default;
+    std::size_t autofile_size = 1000;
+    std::string autofile_name  = "autofile";
     /*!
      * @brief Path delimiter used to separate tests into their components.
      *
@@ -144,9 +146,7 @@ public:
      * Test paths to run
      */
     std::vector<std::string> test_paths_to_run;
-    std::size_t              size_of_repetition_files        = 1'000;
-    std::string              repetition_file_prefix          = "autofile";
-    std::string              repetition_file_metadata_string = "metadata";
+    std::string              autofile_metadata_string = "metadata";
     /*!
      * @brief Function to validate the input.
      *

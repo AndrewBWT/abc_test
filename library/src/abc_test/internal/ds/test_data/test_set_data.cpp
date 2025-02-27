@@ -14,11 +14,20 @@ test_set_data_t::process_invoked_test(
     const string_view _l_delimiter{
         global::get_global_test_options().path_delimiter
     };
-    _m_map_ids_to_tdg_collection_stack_tries.insert(
-        string{ _a_invoked_test.post_setup_test_data().unique_id() },
-        _a_invoked_test.for_loop_stack_trie()
-    );
     const enum_test_status_t _l_test_status{ _a_invoked_test.test_status() };
+    switch (_l_test_status)
+    {
+    case NO_TERMINATION_TEST_FAILED:
+    case TERMINATION_OCCOURED_TEST_FAILED:
+    case TERMINATION_OCCOURED_UNEXPECTED_THROW:
+        _m_map_ids_to_tdg_collection_stack_tries.insert(
+            string{ _a_invoked_test.post_setup_test_data().unique_id() },
+            _a_invoked_test.for_loop_stack_trie()
+        );
+        break;
+    default:
+        break;
+    }
     const bool               _l_test_passed{ test_passed(_l_test_status) };
     _m_total_tests_ran += 1;
     _m_total_tests_passed += _l_test_passed ? 1 : 0;

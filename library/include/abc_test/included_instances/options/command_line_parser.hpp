@@ -80,7 +80,7 @@ __no_constexpr_imp int
             included_instances_test_options_t>::validate_test_options(_l_iito)};
         if (_l_validated_test_options.has_value())
         {
-            test_main_t _l_test_main(_l_validated_test_options.value());
+            test_main_t _l_test_main(_l_validated_test_options.value(), _l_cli.auto_configuration());
             _l_test_main.run_tests(_l_ptrr);
             return 0;
         }
@@ -165,11 +165,28 @@ __no_constexpr_imp void
         _a_opts.number_of_integers_used_to_seed_random_generators,
         _a_cli_results
     );
-    insert_option(
-        _a_cli,
-        _s_repetition_config,
+    _a_cli.add_option<_ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t, string>(
+        get<0>(_s_repetition_config),
+        get<1>(_s_repetition_config),
         _a_opts.map_of_unique_ids_and_for_loop_stack_tries,
-        _a_cli_results
+        get<2>(_s_repetition_config).has_value()
+        ? optional<char>(get<2>(_s_repetition_config).value()[0])
+        : optional<char>{},
+        _a_cli_results,
+        detail::make_parser_func<string>(),
+        [](ds::map_unique_id_to_tdg_collection_stack_trie_t& _a_ref, const string_view _a_str)
+        {
+            auto _l_res = ds::parse_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(_a_str);
+            if (_l_res.has_value())
+            {
+                _a_ref = _l_res.value();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     );
     insert_option(_a_cli, _s_global_seed, _a_opts.global_seed, _a_cli_results);
 
@@ -177,6 +194,30 @@ __no_constexpr_imp void
         _a_cli,
         _s_force_run_all_tests,
         _a_opts.force_run_all_tests,
+        _a_cli_results
+    );
+    insert_option(
+        _a_cli,
+        _s_autofile_name,
+        _a_opts.autofile_name,
+        _a_cli_results
+    );
+    insert_option(
+        _a_cli,
+        _s_autofile_size,
+        _a_opts.autofile_size,
+        _a_cli_results
+    );
+    insert_option(
+        _a_cli,
+        _s_repetition_file_metadata_string,
+        _a_opts.autofile_metadata_string,
+        _a_cli_results
+    );
+    insert_option(
+        _a_cli,
+        _s_tertiary_data_file_extension,
+        _a_opts.tertiary_data_file_extension,
         _a_cli_results
     );
     _a_cli.add_auto_configuration();

@@ -43,7 +43,6 @@ Each list of todo's is given in the order which represents when they are to be c
 - [ ] In abc_test/gen_data/enumeration/specializations/fundamental_types.h, there are several specializations which cannot have separate definitions and implementations (as in, we cannot separate them without an error being encountered). We believe this to be an error with Visual Studio, however we will need to investigate further.
 - [ ] Change text_test_reporter_t and its associated printers to not print information that is not important.
 - [ ] Consider alternate, more space-efficient methods for storing seeds. Hex seems a bit wasteful.
-- [ ] Check through CLI11 docs, and look for way of displaying user-defined error message when a string fails to parse.
 - [ ] Change create_data_sequence in typeless_data_generator_collection_stack.h into two different functions; one memoized, one not. This will make the code clearer.
 
 ## Unorganised (Priority U)

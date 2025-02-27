@@ -1,6 +1,7 @@
 #pragma once
 
 #include "abc_test/internal/ds/test_data/pre_test_run_report.hpp"
+#include "abc_test/internal/utility/cli/cli_auto_configuration.hpp"
 #include "abc_test/internal/utility/cli/cli_help.hpp"
 #include "abc_test/internal/utility/cli/cli_info.hpp"
 #include "abc_test/internal/utility/internal/macros.hpp"
@@ -25,125 +26,6 @@ _BEGIN_ABC_NS
 class cli_t;
 using clp_parser_func_t
     = std::function<std::optional<std::string>(const std::string_view)>;
-enum class enum_rep_file_index_t
-{
-    LATEST,
-    LATEST_IF_FAILURE,
-};
-
-class rep_file_index_t
-{
-public:
-    __constexpr
-    rep_file_index_t()
-        : rep_file_index_t(0)
-    {}
-
-    __constexpr
-    rep_file_index_t(
-        const std::size_t _a_data
-    )
-        : _m_data(_a_data)
-    {}
-
-    __constexpr
-    rep_file_index_t(
-        const enum_rep_file_index_t _a_data
-    )
-        : _m_data(_a_data)
-    {}
-
-    __constexpr std::optional<std::size_t>
-                index() const noexcept
-    {
-        using namespace std;
-        if (holds_alternative<std::size_t>(_m_data))
-        {
-            return make_optional(get<size_t>(_m_data));
-        }
-        else
-        {
-            return nullopt;
-        }
-    }
-private:
-    std::variant<std::size_t, enum_rep_file_index_t> _m_data;
-};
-
-enum class rep_write_data_type_t
-{
-    ALWAYS_WRITE,
-    AUTO,
-    DO_NOT_WRITE
-};
-
-template <>
-struct utility::parser::default_parser_t<rep_write_data_type_t>
-    : public parser_base_t<rep_write_data_type_t>
-{
-    __constexpr parse_result_t<rep_write_data_type_t>
-                run_parser(
-                    parser_input_t& _a_parse_input
-                ) const
-    {
-        using namespace std;
-        if (_a_parse_input.check_and_advance("always_write"))
-        {
-            return rep_write_data_type_t::ALWAYS_WRITE;
-        }
-        else if (_a_parse_input.check_and_advance("auto"))
-        {
-            return rep_write_data_type_t::AUTO;
-        }
-        else if (_a_parse_input.check_and_advance("do_not_write"))
-        {
-            return rep_write_data_type_t::DO_NOT_WRITE;
-        }
-        else
-        {
-            return unexpected("Couldn't parse");
-        }
-    }
-};
-
-template <>
-struct utility::parser::default_parser_t<rep_file_index_t>
-    : public parser_base_t<rep_file_index_t>
-{
-    __constexpr parse_result_t<rep_file_index_t>
-                run_parser(
-                    parser_input_t& _a_parse_input
-                ) const
-    {
-        using namespace std;
-        if (_a_parse_input.check_and_advance("latest"))
-        {
-            return rep_file_index_t(enum_rep_file_index_t::LATEST);
-        }
-        else if (_a_parse_input.check_and_advance("latest_if_failure"))
-        {
-            return rep_file_index_t(enum_rep_file_index_t::LATEST_IF_FAILURE);
-        }
-        else if (_a_parse_input.check_and_advance("auto"))
-        {
-            return rep_file_index_t(enum_rep_file_index_t::LATEST_IF_FAILURE);
-        }
-        else
-        {
-            parse_result_t<size_t> _l_res{
-                default_parser_t<size_t>().run_parser(_a_parse_input)
-            };
-            if (_l_res.has_value())
-            {
-                return rep_file_index_t{_l_res.value()};
-            }
-            else
-            {
-                return unexpected("Couldn't parse");
-            }
-        }
-    }
-};
 
 class cli_t
 {
@@ -175,7 +57,7 @@ public:
             std::function<std::optional<U>(const std::string_view)>
                 _a_parser_func
             = detail::make_parser_func<U>(),
-            std::function<void(T&, const U&)> _m_process_parsed_value
+            std::function<bool(T&, const U&)> _m_process_parsed_value
             = detail::process_value<T, U>()
         ) noexcept;
     template <typename T, typename U>
@@ -189,7 +71,7 @@ public:
             std::function<std::optional<U>(const std::string_view)>
                 _a_parser_func
             = detail::make_parser_func<U>(),
-            std::function<void(T&, const U&)> _m_process_parsed_value
+            std::function<bool(T&, const U&)> _m_process_parsed_value
             = detail::process_value<T, U>()
         ) noexcept;
     __no_constexpr void
@@ -215,14 +97,18 @@ public:
                 rep_write_data_type_t>& _a_tuple_data,
             cli_results_t&              _a_cli_results
         ) const noexcept;
+    __constexpr const std::optional<cli_auto_configuration_t>&
+        auto_configuration() const noexcept;
 private:
-    mutable std::optional<std::tuple<
-        std::filesystem::path,
-        rep_file_index_t,
-        rep_write_data_type_t>>
-                                             _m_rep_data;
-    std::vector<std::shared_ptr<cli_info_t>> _m_clp_info;
-    std::map<char, std::string>              _m_char_to_clp_info;
+    __no_constexpr bool
+        load_data(
+            cli_results_t& _a_cli_results,
+            const std::tuple<bool, size_t, std::vector<std::string>>& _l_data,
+            const std::filesystem::path&                              _a_path
+        ) const noexcept;
+    mutable std::optional<cli_auto_configuration_t> _m_rep_data;
+    std::vector<std::shared_ptr<cli_info_t>>        _m_clp_info;
+    std::map<char, std::string>                     _m_char_to_clp_info;
     std::map<std::string_view, std::reference_wrapper<cli_info_t>>
                 _m_sv_to_clp_info;
     __constexpr std::expected<std::string_view, std::string>
@@ -432,7 +318,7 @@ __no_constexpr_imp void
         const std::optional<char>& _a_single_char_flag,
         cli_results_t&             _a_cli_results,
         std::function<std::optional<U>(const std::string_view)> _a_parser_func,
-        std::function<void(T&, const U&)> _m_process_parsed_value
+        std::function<bool(T&, const U&)> _m_process_parsed_value
 
     ) noexcept
 {
@@ -462,7 +348,7 @@ __no_constexpr_imp void
         const std::optional<char>& _a_single_char_flag,
         cli_results_t&             _a_cli_results,
         std::function<std::optional<U>(const std::string_view)> _a_parser_func,
-        std::function<void(T&, const U&)> _m_process_parsed_value
+        std::function<bool(T&, const U&)> _m_process_parsed_value
 
     ) noexcept
 {
@@ -599,7 +485,6 @@ __no_constexpr_imp bool
     ) const noexcept
 {
     using namespace std;
-    _m_rep_data = _a_tuple_data;
     // Now time to load the data.
     const auto& [_l_folder, _l_rep_file_idx, _l_rep_write_data_type]{
         _a_tuple_data
@@ -620,12 +505,11 @@ __no_constexpr_imp bool
         filesystem::create_directory(_l_folder);
     }
     const string auto_repetition_file_name = "autofile";
-    // Go through each file in the folder
-
-    optional<std::variant<
-        filesystem::path,
-        std::pair<std::filesystem::path, std::size_t>>>
-        _l_file_to_read_from;
+    // This is the file containing the index we will run.
+    optional<cli_auto_configuration_file_info_t>
+        _l_file_containing_index_to_run;
+    // This is the file containing the last known file.
+    optional<cli_auto_configuration_file_info_t> _l_last_file;
     for (const filesystem::path& _l_file :
          filesystem::directory_iterator(_l_folder))
     {
@@ -645,6 +529,13 @@ __no_constexpr_imp bool
                 _l_file_name.find_first_of("_", _l_first_underscore + 1)
             };
             if (_l_second_underscore == string::npos)
+            {
+                continue;
+            }
+            const size_t _l_last_info{_l_file_name.find_first_not_of(
+                "0123456789", _l_second_underscore + 1
+            )};
+            if (_l_last_info != string::npos)
             {
                 continue;
             }
@@ -670,59 +561,64 @@ __no_constexpr_imp bool
                 size_t _l_index{_l_rep_file_idx.index().value()};
                 if (_l_begin_index <= _l_index && _l_end_index >= _l_index)
                 {
-                    _l_file_to_read_from = _l_file;
-                    break;
+                    _l_file_containing_index_to_run.value().file = _l_file;
+                    _l_file_containing_index_to_run.value()
+                        .min_and_max_configuration_indexes
+                        = make_pair(_l_begin_index, _l_end_index);
+                }
+            }
+            if (_l_last_file.has_value())
+            {
+                if (_l_last_file.value()
+                        .min_and_max_configuration_indexes.second
+                    < _l_end_index)
+                {
+                    _l_last_file.value().file = _l_file;
+                    _l_last_file.value().min_and_max_configuration_indexes
+                        = make_pair(_l_begin_index, _l_end_index);
                 }
             }
             else
             {
-                if (_l_file_to_read_from.has_value())
-                {
-                    auto& [_l_file, _l_max_idx]{
-                        get<pair<filesystem::path, size_t>>(
-                            _l_file_to_read_from.value()
-                        )
-                    };
-                    if (_l_max_idx < _l_end_index)
-                    {
-                        _l_file_to_read_from = make_pair(_l_file, _l_end_index);
-                    }
-                }
-                else
-                {
-                    _l_file_to_read_from = make_pair(_l_file, _l_end_index);
-                }
+                _l_last_file = cli_auto_configuration_file_info_t{};
+                _l_last_file.value().file = _l_file;
+                _l_last_file.value().min_and_max_configuration_indexes
+                    = make_pair(_l_begin_index, _l_end_index);
             }
         }
     }
-    // If the file exists by this point, we have it.
-    if (not _l_file_to_read_from.has_value())
+    // Check that if we're looking for a config index but it doesn't exist.
+    if (_l_rep_file_idx.index().has_value()
+        && not _l_file_containing_index_to_run.has_value())
     {
         _a_cli_results.add_error(fmt::format(
-            "System was unable to find a file in the folder \"{0}\". {1}",
-            _l_folder.string(),
-            (_l_rep_file_idx.index().has_value()
-                 ? fmt::format(
-                       "Was looking for specific configuration index {0}, "
-                       "which could not be found from reading the file names.",
-                       _l_rep_file_idx.index().value()
-                   )
-                 : "Could not find any configuration files in the folder")
+            "The file containing index {0} was required, however it could not "
+            "be found",
+            _l_rep_file_idx.index().value()
         ));
         return true;
     }
     // Now time to read the relevant parts of the file
-    tuple<bool, size_t, vector<string>> _l_data;
-    if (holds_alternative<filesystem::path>(_l_file_to_read_from.value()))
+    tuple<bool, size_t, vector<string>>            _l_data;
+    optional<cli_auto_configuration_file_last_loaded_info_t> _l_last_loaded_info;
+    if (_l_file_containing_index_to_run.has_value())
     {
-        const filesystem::path _l_path{
-            get<filesystem::path>(_l_file_to_read_from.value())
-        };
-        if (auto _l_r
-            = detail::find_data(_l_path, _l_rep_file_idx.index().value());
+        if (auto _l_r = detail::find_data(
+                _l_file_containing_index_to_run.value().file,
+                _l_rep_file_idx.index().value()
+            );
             _l_r.has_value())
         {
             _l_data = _l_r.value();
+            if (const bool _l_terminated{load_data(
+                    _a_cli_results,
+                    _l_data,
+                    _l_file_containing_index_to_run.value().file
+                )};
+                _l_terminated)
+            {
+                return true;
+            }
         }
         else
         {
@@ -730,16 +626,28 @@ __no_constexpr_imp bool
             return true;
         }
     }
-    else
+    // If the last file has an index.
+    if (_l_last_file.has_value())
     {
-        const filesystem::path _l_path{
-            get<pair<filesystem::path, size_t>>(_l_file_to_read_from.value())
-                .first
-        };
-        if (auto _l_r = detail::find_data(_l_path); _l_r.has_value())
+        if (auto _l_r = detail::find_data(_l_last_file.value().file);
+            _l_r.has_value())
         {
-            _l_data         = _l_r.value();
-            get<1>(_l_data) = true;
+            _l_data = _l_r.value();
+            if (get<0>(_l_data) == false
+                && not _l_file_containing_index_to_run.has_value())
+            {
+                _l_file_containing_index_to_run = _l_last_file;
+                if (const bool _l_terminated{load_data(
+                        _a_cli_results, _l_data, _l_last_file.value().file
+                    )};
+                    _l_terminated)
+                {
+                    return true;
+                }
+            }
+            _l_last_loaded_info = cli_auto_configuration_file_last_loaded_info_t{};
+            _l_last_loaded_info.value().file = _l_last_file.value().file;
+            _l_last_loaded_info.value().last_index = get<1>(_l_data);
         }
         else
         {
@@ -747,6 +655,28 @@ __no_constexpr_imp bool
             return true;
         }
     }
+    _m_rep_data = cli_auto_configuration_t(
+        _l_folder,
+        _l_rep_file_idx,
+        _l_rep_write_data_type,
+        _l_file_containing_index_to_run,
+        _l_last_loaded_info
+    );
+    return false;
+}
+__constexpr_imp const std::optional<cli_auto_configuration_t>&
+cli_t::auto_configuration() const noexcept
+{
+    return _m_rep_data;
+}
+__no_constexpr_imp bool
+    cli_t::load_data(
+        cli_results_t& _a_cli_results,
+        const std::tuple<bool, size_t, std::vector<std::string>>& _l_data,
+        const std::filesystem::path&                              _a_path
+    ) const noexcept
+{
+    using namespace std;
     size_t _l_line_idx{1};
     for (const string_view _l_line : get<2>(_l_data))
     {
@@ -776,16 +706,7 @@ __no_constexpr_imp bool
                         "memoized configuration {0} from file \"{1}\", line "
                         "{2}",
                         get<1>(_l_data),
-                        (holds_alternative<filesystem::path>(
-                             _l_file_to_read_from.value()
-                         )
-                             ? get<filesystem::path>(_l_file_to_read_from.value(
-                                                     ))
-                                   .string()
-                             : get<std::pair<
-                                   std::filesystem::path,
-                                   std::size_t>>(_l_file_to_read_from.value())
-                                   .first.string()),
+                        _a_path,
                         _l_line_idx
                     ),
                     _a_cli_results

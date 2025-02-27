@@ -87,8 +87,10 @@ public:
      * Only available public constructor.
      */
     __constexpr
-    typeless_data_generator_collection_stack_trie_t() noexcept
-        = default;
+        typeless_data_generator_collection_stack_trie_t() noexcept
+    {
+
+    }
     /*!
      * @brief Returns a string representing the for_loop_stack_trie_t object in
      * a compressed format.

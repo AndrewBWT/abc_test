@@ -44,6 +44,7 @@ set(LIBRARY_FILES
   include/abc_test/internal/ds/test_data/test_set_data.hpp
       src/abc_test/internal/ds/test_data/test_set_data.cpp
   include/abc_test/internal/ds/test_data/finalised_test_set_data.hpp
+      src/abc_test/internal/ds/test_data/finalised_test_set_data.cpp
   include/abc_test/internal/ds/test_data/pre_test_run_report.hpp
   # Bespoke data structures for the library for storing tests in various forms.
   include/abc_test/internal/ds/test_collections/test_collection.hpp
@@ -203,6 +204,8 @@ set(LIBRARY_FILES
   include/abc_test/internal/utility/cli/cli_help.hpp
       src/abc_test/internal/utility/cli/cli_help.cpp
   include/abc_test/internal/utility/cli/cli_output.hpp
+  include/abc_test/internal/utility/cli/cli_auto_configuration.hpp
+      src/abc_test/internal/utility/cli/cli_auto_configuration.cpp
   #Included instances utility files  include/abc_test/internal/utility/limits/min_value_object.hpp
   include/abc_test/included_instances/utility/limits/array.hpp
   include/abc_test/included_instances/utility/limits/enum.hpp
