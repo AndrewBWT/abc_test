@@ -1,60 +1,47 @@
-# To-do List for abc-test #
+# To-do List for abc_test #
 
-**Update 31/10/24: TODO**
+## Current Focus
 
-Entities in the todo list are organised by priority from 1 to 5
-- 1 is the highest priority, and must be rectified ASAP.
-- 2 is high priority. There should be a plan for working towards addressing it.
-- 3 is medium priority. It should be planned for, however it is only actively worked on when there is nothing of a higher priority.
-- 4 low priority. It is not planned for, and it being addressed will realistically not change the trajectory of the project. However, it should be addressed at some point.
-- 5 lowest priority. These issues would be nice, and will help the project. However generally low-hanging fruit goes here.
-- U Elements which have not had a priority set to them. We found that we were either adding elements to priority 2 because it was required for what we are working towards, or priority 5 because we didn't think the issue needed to be done now. By having a "U" group (short for unorganised), we can store new entities. At a later point we can find the correct place for them in the priority list.
-
-Each list of todo's is given in the order which represents when they are to be completed.
-
-## Priority 1
-
-- Code documentation. See docs/internal/DOCUMENTATION.md for details.
+- Code documentation. See docs/internal/documentation.md for details.
 - Tutorials and examples. See docs/internal/tutorials_and_examples.md for details.
 - Tests. See docs/internal/tests.md for details.
 - README. See docs/internal/readme.md for details.
+- Rewrite command line interface (cli) code. When adding auto configuration functionality, we found that the class hierarchy didn't make this easy. We had to "reach across" multiple objects, and wrote very brittle code which will need to be updated in several places every time we add a field to the options.
 
-## Priority 2
+## Not Currently a Focus
 
-- None
-
-## Priority 3
-
+- Change internal subfolder to core.
+- Move internal/utility to utility.
 - Run clang-tidy on the code.
 - Check if code compiles using g++ and clang.
-
-## Priority 4
-
-- [ ] Add functionality for per-test options object. It should be able to be set via either a name (e.g. string), an object or a file.
-- [ ] Add functionality allowing data_generator_t objects to have their elements filtered.
-- [ ] Change master CMakeLists.txt file so that examples subfolder is only built when specified. 
+- Add some functionality which would allow the user to set an options object per test. Either we set it via a name, via an object, or via a file.
+	- Such functionality would raise questions regarding memoized data; either we store each test's options file, or we assume it won't change.
+	- Some options are not things which we would want to change per-test. It may be that actually we want the functionality to change certain things in a test - e.g. number of random elements generated from a data generator.
+- Add functionality allowing data_generator_t objects to have their elements filtered.
+- Change master CMakeLists.txt file so that examples subfolder is only built when specified. 
 - Improve combinatorics algorithm for dealing with file IO; at the moment we just go through the elements in order. We want an algorithm which can hone in on the exact value in an O(log n)-like method. This would mean being able to calculate the size of permutations/combinations, as well as partial-combinations/permutations (e.g. the size of we leave the first element in its place). This may get particularly difficult for permutations, as we used an algorithm which only makes a single change for that one.
-
-## Priority 5
-
-- [ ] Terminology and documentation is inconsistent and confusing. It needs to be improved drastically.
-- [ ] Consider supporting different versions of CMake, VS, C++ etc.
-- [ ] Consider an inline namespace containing the version. We removed this because instantiating specialised templates/structs for some of the derived gen_data classes, when using this keyword, wouldn't allow us to create them in named namespaces; we had to define them in a format similar to how fmt does it (see commented out example in examples/include/abc_test_examples/enumeration/enum_enumeration_examples.h. This may be something only done in visual studio, or may be part of the standard. We should investigate further to find the reasoning. Then decide whether including the versioned namespace is worth the trade off, or if there are any workarounds.
-- [ ] In abc_test/gen_data/enumeration/specializations/fundamental_types.h, there are several specializations which cannot have separate definitions and implementations (as in, we cannot separate them without an error being encountered). We believe this to be an error with Visual Studio, however we will need to investigate further.
-- [ ] Change text_test_reporter_t and its associated printers to not print information that is not important.
-- [ ] Consider alternate, more space-efficient methods for storing seeds. Hex seems a bit wasteful.
-- [ ] Change create_data_sequence in typeless_data_generator_collection_stack.h into two different functions; one memoized, one not. This will make the code clearer.
-
-## Unorganised (Priority U)
-
-- Add different ways of creating data files; e.g. general_data should check for a file extension. If there isn't one, use the one given in the options. There should be a general_data_exact which provides an exact location, not using any part of the test options to initialise it.
+	- Alternative is to use a simpler permutation algorithm.
+- We should have a document which describes our coding style - e.g. making as much constexpr as possible.
+- Terminology and documentation is inconsistent and confusing. It needs to be improved drastically.
+- Consider supporting different versions of CMake, VS, C++ etc.
+- Consider an inline namespace containing the version. We removed this because instantiating specialised templates/structs for some of the derived gen_data classes, when using this keyword, wouldn't allow us to create them in named namespaces; we had to define them in a format similar to how fmt does it (see commented out example in examples/include/abc_test_examples/enumeration/enum_enumeration_examples.h. This may be something only done in visual studio, or may be part of the standard. We should investigate further to find the reasoning. Then decide whether including the versioned namespace is worth the trade off, or if there are any workarounds.
+- In abc_test/gen_data/enumeration/specializations/fundamental_types.h, there are several specializations which cannot have separate definitions and implementations (as in, we cannot separate them without an error being encountered). We believe this to be an error with Visual Studio, however we will need to investigate further.
+- Change text_test_reporter_t and its associated printers to not print information that is not important.
+- Consider alternate, more space-efficient methods for storing seeds. Hex seems a bit wasteful.
+- Change create_data_sequence in typeless_data_generator_collection_stack.h into two different functions; one memoized, one not. This will make the code clearer.
 - Write examples showing how logging works.
-- Implement the ability to write a seed to a file. Give it re-write mode or only write mode. Read only mode too.
 - Should we perform checks on a test's name to ensure it can be used as a file/folder name.
 - Add functionality to allow the user to filter tests based on a path. When this is addressed, update DECLARING_TESTS.md.
 - Check that same pairs of test paths and test names are dealt with properly. Update DECLARING_TESTS.md when this is addressed.
 - We're using a function from Google Benchmark, who use an apache licence. Need to look into whether we need to include the original licence when providing our library.
-- An idea worth investigating; a version where all assertions are built up as a tree. Assertions either have group nodes, or assertion children (assertion children can't have any more children).
+
+## information
+
+The todo list has been re-organised. There are now two sets of elements in the todo list; focus and non-focus. 
+
+- Elements in the focus list are what we are currently working on.
+- Elements in the non-focus list are what we are not currently working on.
+- Elements in the focus list may have sub-lists associated with them, especially if it is a big project. - We may use numbers to enforce ordering on lists or sub-lists of elements.
 
 ## Completed
 
@@ -86,3 +73,7 @@ Each list of todo's is given in the order which represents when they are to be c
 - Test combinatorics generator with file IO and reset - we haven't written the logic for this yet. Rewrote logic, works correctly though it is inefficient.
 - Add random_generator_object specialisations for arrays, vectors and enums.
 - Rename all header files (.h) to .hpp. This was seen on a tip regarding a code review; using this makes it easier to see that the language is C++.
+27/2/25:
+- Add different ways of creating data files; e.g. general_data should check for a file extension. If there isn't one, use the one given in the options. There should be a general_data_exact which provides an exact location, not using any part of the test options to initialise it.
+- Implement the ability to write a seed to a file. Give it re-write mode or only write mode. Read only mode too.
+- An idea worth investigating; a version where all assertions are built up as a tree. Assertions either have group nodes, or assertion children (assertion children can't have any more children). This has sort of been addressed with BBAs.
