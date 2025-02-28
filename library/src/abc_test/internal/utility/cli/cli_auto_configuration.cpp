@@ -1,6 +1,6 @@
 #include "abc_test/internal/utility/cli/cli_auto_configuration.hpp"
 
-#include "abc_test/included_instances/options/option_config.hpp"
+/*#include "abc_test/included_instances/options/option_config.hpp"
 #include "abc_test/internal/options/test_options_base.hpp"
 #include "abc_test/internal/utility/printers/specializations/fundamental_types.hpp"
 #include "abc_test/internal/utility/printers/specializations/stl_11.hpp"
@@ -160,4 +160,4 @@ void
     _l_output.close();
 }
 
-_END_ABC_NS
+_END_ABC_NS*/

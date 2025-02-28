@@ -8,7 +8,7 @@
 #include "abc_test/internal/reporters/test_reporter.hpp"
 #include "abc_test/internal/reporters/test_reporter_controller.hpp"
 #include "abc_test/internal/test_runner.hpp"
-#include "abc_test/internal/utility/cli/cli_auto_configuration.hpp"
+#include "abc_test/internal/utility/cli.hpp"
 
 #include <memory>
 #include <set>
@@ -20,6 +20,7 @@ _BEGIN_ABC_NS
 /*!
  * @brief This class controls the core logic of the test suite.
  */
+template<typename T>
 struct test_main_t
 {
 public:
@@ -31,11 +32,10 @@ public:
      * @param _a_validated_test_options The validated test options used for
      * running the tests.
      */
-    template <typename T>
     __no_constexpr
         test_main_t(
             const validated_test_options_t<T>& _a_validated_test_options,
-            const std::optional<cli_auto_configuration_t>& _a_auto_configuration
+            const cli_t<T>&                    _a_cli
         ) noexcept;
     /*!
      * @brief This function runs the tests.
@@ -48,18 +48,18 @@ public:
     __no_constexpr void
         run_tests(ds::pre_test_run_report_t& _a_test_set_data) noexcept;
 private:
-    std::optional<cli_auto_configuration_t> _m_auto_configuration;
-    _ABC_NS_DS::test_lists_t                _m_test_list_collection;
-    test_options_base_t                     _m_options;
-    _ABC_NS_REPORTERS::test_reporters_t     _m_test_reporters;
-    _ABC_NS_REPORTERS::error_reporters_t    _m_error_reporters;
-    std::mutex                              _m_mutex;
-    size_t                                  _m_thread_pool;
-    std::mutex                              _m_thread_pool_mutex;
-    std::condition_variable                 _m_cv;
-    size_t                                  _m_current_thread_pool;
-    std::mutex                              _m_threads_mutex;
-    std::vector<std::jthread>               _m_threads;
+    cli_t<T>           _m_cli;
+    _ABC_NS_DS::test_lists_t             _m_test_list_collection;
+    T                  _m_options;
+    _ABC_NS_REPORTERS::test_reporters_t  _m_test_reporters;
+    _ABC_NS_REPORTERS::error_reporters_t _m_error_reporters;
+    std::mutex                           _m_mutex;
+    size_t                               _m_thread_pool;
+    std::mutex                           _m_thread_pool_mutex;
+    std::condition_variable              _m_cv;
+    size_t                               _m_current_thread_pool;
+    std::mutex                           _m_threads_mutex;
+    std::vector<std::jthread>            _m_threads;
     // std::vector<_ABC_NS_DS::test_set_data_t> _m_test_set_data;
     std::vector<test_runner_t> _m_test_runners;
     std::set<std::size_t>      _m_threads_free;
@@ -69,8 +69,10 @@ private:
      * @param _a_test_opts The test_options_base_t object.
      */
     __no_constexpr
-        test_main_t(const test_options_base_t& _a_test_opts,
-            const std::optional<cli_auto_configuration_t>& _a_auto_configuration) noexcept;
+        test_main_t(
+            const T&        _a_test_opts,
+            const cli_t<T>& _a_cli
+        ) noexcept;
     /*!
      * @brief Runs an individual test in an individual thread.
      * @param _a_prtd The post_setup_test_data_t to run.
@@ -108,17 +110,17 @@ _END_ABC_NS
 _BEGIN_ABC_NS
 template <typename T>
 __no_constexpr_imp
-    test_main_t::test_main_t(
+    test_main_t<T>::test_main_t(
         const validated_test_options_t<T>& _a_validated_test_options,
-        const std::optional<cli_auto_configuration_t>& _a_auto_configuration
+        const cli_t<T>&                    _a_cli
     ) noexcept
-    : test_main_t(_a_validated_test_options.get_options(), _a_auto_configuration)
+    : test_main_t<T>(_a_validated_test_options.get_options(), _a_cli)
 {}
-
+template<typename T>
 __no_constexpr_imp
-    test_main_t::test_main_t(
-        const test_options_base_t& _a_to,
-        const std::optional<cli_auto_configuration_t>& _a_auto_configuration
+    test_main_t<T>::test_main_t(
+        const T&        _a_to,
+        const cli_t<T>& _a_cli
     ) noexcept
     : _m_test_list_collection(make_test_list_collection(
           _a_to.test_lists,
@@ -131,12 +133,12 @@ __no_constexpr_imp
     , _m_current_thread_pool(_a_to.threads)
     , _m_threads(std::vector<std::jthread>(_a_to.threads))
     , _m_threads_free(set_from_min_to_n(_a_to.threads))
-    , _m_auto_configuration(_a_auto_configuration)
+    , _m_cli(_a_cli)
 //, _m_test_set_data(std::vector<_ABC_NS_DS::test_set_data_t>(_a_to.threads))
 {}
-
+template<typename T>
 __no_constexpr_imp void
-    test_main_t::run_tests(
+    test_main_t<T>::run_tests(
         ds::pre_test_run_report_t& _a_test_set_data
     ) noexcept
 {
@@ -281,20 +283,21 @@ __no_constexpr_imp void
     {
         _l_final_report.process_final_report(_l_test_runner.test_set_data());
     }
-    if (_m_auto_configuration.has_value())
+    if (_m_cli.auto_configuration().has_value())
     {
-        auto _l_auto_config{_m_auto_configuration.value()};
-        _l_auto_config.setup_next_file(
-            _l_final_report.total_tests_failed() == 0,
-            _l_final_report.get_re_run_test_options()
+        _m_cli.setup_next_file(
+            _m_options.autofile_name,
+            _m_options.autofile_size,
+            _l_final_report.get_re_run_test_options<T>(),
+            _l_final_report.total_tests_failed() == 0
         );
     }
     _LIBRARY_LOG(MAIN_INFO, "Finalising reports.");
     _l_trc.finalise_reports(_l_final_report);
 }
-
+template<typename T>
 __no_constexpr_imp void
-    test_main_t::run_individual_test(
+    test_main_t<T>::run_individual_test(
         const _ABC_NS_DS::post_setup_test_data_t& _a_prtd,
         const size_t                              _a_thread_idx,
         test_runner_t&                            _a_test_runner,

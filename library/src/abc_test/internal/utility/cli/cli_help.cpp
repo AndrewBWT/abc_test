@@ -1,5 +1,4 @@
-#include "abc_test/internal/utility/cli/cli_help.hpp"
-
+/*
 #include "abc_test/internal/utility/cli.hpp"
 #include "abc_test/internal/utility/cli/cli_info.hpp"
 #include "abc_test/internal/utility/str/string_utility.hpp"
@@ -10,11 +9,12 @@
 
 _BEGIN_ABC_NS
 
+template <typename Option_Class>
 __no_constexpr_or_inline_imp bool
-    cli_help_t::process_args(
+    cli_help_t<Option_Class>::process_args(
         const std::string_view               _a_flag,
         const std::vector<std::string_view>& _a_args,
-        const cli_t&                         _a_cli,
+        const cli_t<Option_Class>&           _a_cli,
         cli_results_t&                       _a_cli_results
     ) const noexcept
 {
@@ -35,11 +35,12 @@ __no_constexpr_or_inline_imp bool
     }
 }
 
+template <typename Option_Class>
 __no_constexpr_or_inline_imp bool
-    cli_config_t::process_args(
+    cli_config_t<Option_Class>::process_args(
         const std::string_view               _a_flag,
         const std::vector<std::string_view>& _a_args,
-        const cli_t&                         _a_cli,
+        const cli_t<Option_Class>&           _a_cli,
         cli_results_t&                       _a_cli_results
     ) const noexcept
 {
@@ -114,11 +115,12 @@ __no_constexpr_or_inline_imp bool
     }
 }
 
+template <typename Option_Class>
 __no_constexpr_or_inline_imp bool
-    cli_auto_config_t::process_args(
+    cli_auto_config_t<Option_Class>::process_args(
         const std::string_view               _a_flag,
         const std::vector<std::string_view>& _a_args,
-        const cli_t&                         _a_cli,
+        const cli_t<Option_Class>&           _a_cli,
         cli_results_t&                       _a_cli_results
     ) const noexcept
 {
@@ -155,4 +157,4 @@ __no_constexpr_or_inline_imp bool
     return false;
 }
 
-_END_ABC_NS
+_END_ABC_NS*/

@@ -117,4 +117,5 @@ _TEST_CASE(
     using namespace test;
     manual_data_generator_t _l_mgd;
     RUN(_l_mgd, (run_vector_tests<float>()));
+    _CHECK_EXPR(1 == 2);
 }

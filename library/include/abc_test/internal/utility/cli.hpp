@@ -11,7 +11,9 @@
 #include "abc_test/internal/utility/printers/default_printer.hpp"
 #include "abc_test/internal/utility/str/string_table.hpp"
 #include "abc_test/internal/utility/str/string_utility.hpp"
-
+#include "abc_test/internal/utility/printers/specializations/fundamental_types.hpp"
+#include "abc_test/internal/utility/printers/specializations/stl_11.hpp"
+#include "abc_test/internal/utility/printers/specializations/stl_98.hpp"
 #include <expected>
 #include <fmt/ranges.h>
 #include <fstream>
@@ -23,56 +25,62 @@
 #include <variant>
 
 _BEGIN_ABC_NS
-class cli_t;
 using clp_parser_func_t
     = std::function<std::optional<std::string>(const std::string_view)>;
 
+template <typename Option_Class>
 class cli_t
 {
 public:
     __no_constexpr
         cli_t(
-            const char             _a_single_char_cml_identifier,
-            const std::string_view _a_multi_char_cml_identifier
+            const char             _a_single_char_cml_identifier = '-',
+            const std::string_view _a_multi_char_cml_identifier  = "--"
         ) noexcept;
     __no_constexpr void
         parse_arguments(
+            Option_Class&  _a_option_class,
             int            _a_argc,
             char**         _a_arg_v,
             cli_results_t& _a_cli_results
         ) const noexcept;
     __no_constexpr void
         parse_arguments(
+            Option_Class&                        _a_option_class,
             const std::vector<std::string_view>& _a_args,
             cli_results_t&                       _a_cli_results
         ) const noexcept;
     template <typename T, typename U>
     __no_constexpr void
         add_option(
-            const std::string_view     _a_flag,
-            const std::string_view     _a_description,
-            T&                         _a_reference,
+            const std::string_view _a_flag,
+            const std::string_view _a_description,
+            T Option_Class::*          _a_member_var,
             const std::optional<char>& _a_single_char_flag,
             cli_results_t&             _a_cli_results,
             std::function<std::optional<U>(const std::string_view)>
                 _a_parser_func
             = detail::make_parser_func<U>(),
             std::function<bool(T&, const U&)> _m_process_parsed_value
-            = detail::process_value<T, U>()
+            = detail::process_value<T, U>(),
+            const std::function<std::string(const T&)> _a_print_func =
+            detail::make_printer_func<T>()
         ) noexcept;
     template <typename T, typename U>
     __no_constexpr void
         add_multi_element_option(
-            const std::string_view     _a_flag,
-            const std::string_view     _a_description,
-            T&                         _a_reference,
+            const std::string_view _a_flag,
+            const std::string_view _a_description,
+            T Option_Class::*          _a_member_var,
             const std::optional<char>& _a_single_char_flag,
             cli_results_t&             _a_cli_results,
             std::function<std::optional<U>(const std::string_view)>
                 _a_parser_func
             = detail::make_parser_func<U>(),
             std::function<bool(T&, const U&)> _m_process_parsed_value
-            = detail::process_value<T, U>()
+            = detail::process_value<T, U>(),
+            const std::function<std::string(const T&)> _a_print_func =
+            detail::make_printer_func<T>()
         ) noexcept;
     __no_constexpr void
         add_help_flag() noexcept;
@@ -84,6 +92,7 @@ public:
                    make_help_output() const noexcept;
     __constexpr bool
         process_config_line(
+            Option_Class&                   _a_option_class,
             const std::string_view          _a_field_name,
             const std::vector<std::string>& _a_args,
             const std::string_view          _a_source_line,
@@ -91,6 +100,7 @@ public:
         ) const noexcept;
     __no_constexpr bool
         process_repetition_data(
+            Option_Class& _a_option_class,
             const std::tuple<
                 std::filesystem::path,
                 rep_file_index_t,
@@ -98,18 +108,26 @@ public:
             cli_results_t&              _a_cli_results
         ) const noexcept;
     __constexpr const std::optional<cli_auto_configuration_t>&
-        auto_configuration() const noexcept;
+                      auto_configuration() const noexcept;
+    __no_constexpr void
+        setup_next_file(
+            const std::string_view _a_autofile_name,
+            const std::size_t      _a_autofile_size,
+            const Option_Class&    _a_option_class,
+            const bool             _a_test_success
+        ) const noexcept;
 private:
     __no_constexpr bool
         load_data(
+            Option_Class&  _a_option_class,
             cli_results_t& _a_cli_results,
             const std::tuple<bool, size_t, std::vector<std::string>>& _l_data,
             const std::filesystem::path&                              _a_path
         ) const noexcept;
-    mutable std::optional<cli_auto_configuration_t> _m_rep_data;
-    std::vector<std::shared_ptr<cli_info_t>>        _m_clp_info;
-    std::map<char, std::string>                     _m_char_to_clp_info;
-    std::map<std::string_view, std::reference_wrapper<cli_info_t>>
+    mutable std::optional<cli_auto_configuration_t>        _m_rep_data;
+    std::vector<std::shared_ptr<cli_info_t<Option_Class>>> _m_clp_info;
+    std::map<char, std::string>                            _m_char_to_clp_info;
+    std::map<std::string_view, std::reference_wrapper<cli_info_t<Option_Class>>>
                 _m_sv_to_clp_info;
     __constexpr std::expected<std::string_view, std::string>
                 normalise_str_from_cli_to_flag(const std::string_view _a_str
@@ -117,12 +135,14 @@ private:
     __constexpr std::expected<std::string_view, std::string>
                 normalise_str_from_config_to_flag(const std::string_view _a_str
                 ) const noexcept;
-    __constexpr const std::optional<std::reference_wrapper<cli_info_t>>
+    __constexpr const
+        std::optional<std::reference_wrapper<cli_info_t<Option_Class>>>
         find_clp_info(const std::string_view& _a_info) const noexcept;
     __constexpr bool
         process_args(
+            Option_Class&                          _a_option_class,
             const std::string_view                 _a_flag,
-            const cli_info_t&                      _a_cli_info,
+            const cli_info_t<Option_Class>&        _a_cli_info,
             const std::vector<std::string_view>&   _a_strs,
             const std::size_t                      _a_strs_size,
             std::size_t&                           _a_current_index,
@@ -132,7 +152,18 @@ private:
     char        _m_single_char_identifier = '-';
     std::string _m_multi_char_identifier  = "--";
     __no_constexpr void
-        inner_add_option(const std::shared_ptr<cli_info_t> _a_cli) noexcept;
+        inner_add_option(const std::shared_ptr<cli_info_t<Option_Class>> _a_cli
+        ) noexcept;
+    __no_constexpr void
+        write_file(
+            const std::string_view _a_autofile_name,
+            const std::size_t      _a_autofile_size,
+            const Option_Class&    _a_option_class,
+            const bool             _a_test_success
+        ) const noexcept;
+    __constexpr std::vector<std::pair<std::string, std::string>>
+                get_config_file_data(const Option_Class& _a_option_class
+                ) const noexcept;
 };
 
 namespace detail
@@ -243,30 +274,36 @@ __constexpr
 _END_ABC_NS
 
 _BEGIN_ABC_NS
+template <typename Option_Class>
 __no_constexpr_imp
-    cli_t::cli_t(
-        const char             _a_single_char_cml_identifier = '-',
-        const std::string_view _a_multi_char_cml_identifier  = "--"
+    cli_t<Option_Class>::cli_t(
+        const char             _a_single_char_cml_identifier,
+        const std::string_view _a_multi_char_cml_identifier
     ) noexcept
     : _m_single_char_identifier(_a_single_char_cml_identifier)
     , _m_multi_char_identifier(_a_multi_char_cml_identifier)
 {}
 
+template <typename Option_Class>
 __no_constexpr_imp void
-    cli_t::parse_arguments(
+    cli_t<Option_Class>::parse_arguments(
+        Option_Class&  _a_option_class,
         int            _a_argc,
         char**         _a_arg_v,
         cli_results_t& _a_cli_results
     ) const noexcept
 {
     parse_arguments(
+        _a_option_class,
         detail::make_strs_from_command_line_args(_a_argc, _a_arg_v),
         _a_cli_results
     );
 }
 
+template <typename Option_Class>
 __no_constexpr_imp void
-    cli_t::parse_arguments(
+    cli_t<Option_Class>::parse_arguments(
+        Option_Class&                        _a_option_class,
         const std::vector<std::string_view>& _a_args,
         cli_results_t&                       _a_cli_results
     ) const noexcept
@@ -281,12 +318,12 @@ __no_constexpr_imp void
             };
             _l_opt_normalised_str.has_value())
         {
-            if (const optional<reference_wrapper<cli_info_t>> _l_clp_info{
-                    find_clp_info(_l_opt_normalised_str.value())
-                };
+            if (const optional<reference_wrapper<cli_info_t<Option_Class>>>
+                    _l_clp_info{find_clp_info(_l_opt_normalised_str.value())};
                 _l_clp_info.has_value())
             {
                 if (const bool _l_terminate{process_args(
+                        _a_option_class,
                         _l_opt_normalised_str.value(),
                         _l_clp_info.value().get(),
                         _a_args,
@@ -309,89 +346,87 @@ __no_constexpr_imp void
     }
 }
 
+template <typename Option_Class>
 template <typename T, typename U>
 __no_constexpr_imp void
-    cli_t::add_option(
-        const std::string_view     _a_flag,
-        const std::string_view     _a_description,
-        T&                         _a_reference,
+    cli_t<Option_Class>::add_option(
+        const std::string_view _a_flag,
+        const std::string_view _a_description,
+        T Option_Class::*          _a_member_var,
         const std::optional<char>& _a_single_char_flag,
         cli_results_t&             _a_cli_results,
         std::function<std::optional<U>(const std::string_view)> _a_parser_func,
-        std::function<bool(T&, const U&)> _m_process_parsed_value
+        std::function<bool(T&, const U&)> _m_process_parsed_value,
+        const std::function<std::string(const T&)> _a_print_func
 
     ) noexcept
 {
     using namespace std;
-    inner_add_option(make_shared<cli_one_arg_t<T, U>>(
+    inner_add_option(make_shared<cli_one_arg_t<Option_Class, T, U>>(
         _a_flag,
         _a_description,
-        _a_reference,
+        _a_member_var,
         _a_single_char_flag,
         _a_parser_func,
-        _m_process_parsed_value
+        _m_process_parsed_value,
+        _a_print_func
     ));
-    _a_cli_results.add_memoized_data(
-        false,
-        _a_flag,
-        abc::utility::printer::default_printer_t<T>().run_printer(_a_reference),
-        "default value"
-    );
 }
 
+template <typename Option_Class>
 template <typename T, typename U>
 __no_constexpr_imp void
-    cli_t::add_multi_element_option(
-        const std::string_view     _a_flag,
-        const std::string_view     _a_description,
-        T&                         _a_reference,
+    cli_t<Option_Class>::add_multi_element_option(
+        const std::string_view _a_flag,
+        const std::string_view _a_description,
+        T Option_Class::*          _a_member_var,
         const std::optional<char>& _a_single_char_flag,
         cli_results_t&             _a_cli_results,
         std::function<std::optional<U>(const std::string_view)> _a_parser_func,
-        std::function<bool(T&, const U&)> _m_process_parsed_value
+        std::function<bool(T&, const U&)> _m_process_parsed_value,
+        const std::function<std::string(const T&)> _a_print_func
 
     ) noexcept
 {
     using namespace std;
-    inner_add_option(make_shared<cli_multi_args<T, U>>(
+    inner_add_option(make_shared<cli_multi_args<Option_Class, T, U>>(
         _a_flag,
         _a_description,
-        _a_reference,
+        _a_member_var,
         _a_single_char_flag,
         _a_parser_func,
-        _m_process_parsed_value
+        _m_process_parsed_value,
+        _a_print_func
     ));
-    _a_cli_results.add_memoized_data(
-        false,
-        _a_flag,
-        abc::utility::printer::default_printer_t<T>().run_printer(_a_reference),
-        "default value"
-    );
 }
 
+template <typename Option_Class>
 __no_constexpr_imp void
-    cli_t::add_help_flag() noexcept
+    cli_t<Option_Class>::add_help_flag() noexcept
 {
     using namespace std;
-    inner_add_option(make_shared<cli_help_t>());
+    inner_add_option(make_shared<cli_help_t<Option_Class>>());
 }
 
+template <typename Option_Class>
 __no_constexpr_imp void
-    cli_t::add_file_config_flag() noexcept
+    cli_t<Option_Class>::add_file_config_flag() noexcept
 {
     using namespace std;
-    inner_add_option(make_shared<cli_config_t>());
+    inner_add_option(make_shared<cli_config_t<Option_Class>>());
 }
 
+template <typename Option_Class>
 __no_constexpr_imp void
-    cli_t::add_auto_configuration() noexcept
+    cli_t<Option_Class>::add_auto_configuration() noexcept
 {
     using namespace std;
-    inner_add_option(make_shared<cli_auto_config_t>());
+    inner_add_option(make_shared<cli_auto_config_t<Option_Class>>());
 }
 
+template <typename Option_Class>
 __no_constexpr_imp abc::utility::str::string_table_t
-                   cli_t::make_help_output() const noexcept
+                   cli_t<Option_Class>::make_help_output() const noexcept
 {
     using namespace abc::utility::str;
     string_table_t _l_st({0, 1});
@@ -399,9 +434,9 @@ __no_constexpr_imp abc::utility::str::string_table_t
     _l_st.push_back("    ");
     _l_st.push_back("Description:");
     _l_st.new_line();
-    for (const std::shared_ptr<cli_info_t>& _l_flag : _m_clp_info)
+    for (const std::shared_ptr<cli_info_t<Option_Class>>& _l_flag : _m_clp_info)
     {
-        const cli_info_t& _l_cli_info{*_l_flag.get()};
+        const cli_info_t<Option_Class>& _l_cli_info{*_l_flag.get()};
         _l_st.push_back(fmt::format(
             "{0}{1}{2}",
             _m_multi_char_identifier,
@@ -427,8 +462,10 @@ __no_constexpr_imp abc::utility::str::string_table_t
     return _l_st;
 }
 
+template <typename Option_Class>
 __constexpr_imp bool
-    cli_t::process_config_line(
+    cli_t<Option_Class>::process_config_line(
+        Option_Class&                   _a_option_class,
         const std::string_view          _a_field_name,
         const std::vector<std::string>& _a_args,
         const std::string_view          _a_source_line,
@@ -441,9 +478,8 @@ __constexpr_imp bool
         };
         _l_opt_normalised_str.has_value())
     {
-        if (const optional<reference_wrapper<cli_info_t>> _l_clp_info{
-                find_clp_info(_l_opt_normalised_str.value())
-            };
+        if (const optional<reference_wrapper<cli_info_t<Option_Class>>>
+                _l_clp_info{find_clp_info(_l_opt_normalised_str.value())};
             _l_clp_info.has_value())
         {
             size_t              _l_idx{0};
@@ -453,6 +489,7 @@ __constexpr_imp bool
                 _l_strs.push_back(_l_arg);
             }
             if (bool _l_terminate{process_args(
+                    _a_option_class,
                     _l_opt_normalised_str.value(),
                     _l_clp_info.value().get(),
                     _l_strs,
@@ -475,8 +512,10 @@ __constexpr_imp bool
     return false;
 }
 
+template <typename Option_Class>
 __no_constexpr_imp bool
-    cli_t::process_repetition_data(
+    cli_t<Option_Class>::process_repetition_data(
+        Option_Class& _a_option_class,
         const std::tuple<
             std::filesystem::path,
             rep_file_index_t,
@@ -599,8 +638,9 @@ __no_constexpr_imp bool
         return true;
     }
     // Now time to read the relevant parts of the file
-    tuple<bool, size_t, vector<string>>            _l_data;
-    optional<cli_auto_configuration_file_last_loaded_info_t> _l_last_loaded_info;
+    tuple<bool, size_t, vector<string>> _l_data;
+    optional<cli_auto_configuration_file_last_loaded_info_t>
+        _l_last_loaded_info;
     if (_l_file_containing_index_to_run.has_value())
     {
         if (auto _l_r = detail::find_data(
@@ -611,6 +651,7 @@ __no_constexpr_imp bool
         {
             _l_data = _l_r.value();
             if (const bool _l_terminated{load_data(
+                    _a_option_class,
                     _a_cli_results,
                     _l_data,
                     _l_file_containing_index_to_run.value().file
@@ -638,15 +679,19 @@ __no_constexpr_imp bool
             {
                 _l_file_containing_index_to_run = _l_last_file;
                 if (const bool _l_terminated{load_data(
-                        _a_cli_results, _l_data, _l_last_file.value().file
+                        _a_option_class,
+                        _a_cli_results,
+                        _l_data,
+                        _l_last_file.value().file
                     )};
                     _l_terminated)
                 {
                     return true;
                 }
             }
-            _l_last_loaded_info = cli_auto_configuration_file_last_loaded_info_t{};
-            _l_last_loaded_info.value().file = _l_last_file.value().file;
+            _l_last_loaded_info
+                = cli_auto_configuration_file_last_loaded_info_t{};
+            _l_last_loaded_info.value().file       = _l_last_file.value().file;
             _l_last_loaded_info.value().last_index = get<1>(_l_data);
         }
         else
@@ -664,13 +709,59 @@ __no_constexpr_imp bool
     );
     return false;
 }
+
+template <typename Option_Class>
 __constexpr_imp const std::optional<cli_auto_configuration_t>&
-cli_t::auto_configuration() const noexcept
+                      cli_t<Option_Class>::auto_configuration() const noexcept
 {
     return _m_rep_data;
 }
+
+template <typename Option_Class>
+__no_constexpr void
+    cli_t<Option_Class>::setup_next_file(
+        const std::string_view _a_autofile_name,
+        const std::size_t      _a_autofile_size,
+        const Option_Class&    _a_option_class,
+        const bool             _a_test_success
+    ) const noexcept
+{
+    if (_m_rep_data.has_value())
+    {
+        auto& _l_rep_data{_m_rep_data.value()};
+        switch (_l_rep_data._m_rep_write_data_type)
+        {
+        case rep_write_data_type_t::ALWAYS_WRITE:
+            write_file(
+                _a_autofile_name,
+                _a_autofile_size,
+                _a_option_class,
+                _a_test_success
+            );
+            break;
+        case rep_write_data_type_t::AUTO:
+            if ((not _l_rep_data._m_loaded_configuration.has_value()
+                 && not _a_test_success)
+                || (_l_rep_data._m_loaded_configuration.has_value()
+                    && _a_test_success))
+            {
+                write_file(
+                    _a_autofile_name,
+                    _a_autofile_size,
+                    _a_option_class,
+                    _a_test_success
+                );
+            }
+        default:
+            break;
+        }
+    }
+}
+
+template <typename Option_Class>
 __no_constexpr_imp bool
-    cli_t::load_data(
+    cli_t<Option_Class>::load_data(
+        Option_Class&  _a_option_class,
         cli_results_t& _a_cli_results,
         const std::tuple<bool, size_t, std::vector<std::string>>& _l_data,
         const std::filesystem::path&                              _a_path
@@ -700,6 +791,7 @@ __no_constexpr_imp bool
                 _l_line.substr(_l_equals_pos + 1), " "
             );
             if (bool _l_terminate{process_config_line(
+                    _a_option_class,
                     _l_field_name,
                     _l_strs,
                     fmt::format(
@@ -721,8 +813,9 @@ __no_constexpr_imp bool
     return false;
 }
 
+template <typename Option_Class>
 __constexpr_imp std::expected<std::string_view, std::string>
-                cli_t::normalise_str_from_cli_to_flag(
+                cli_t<Option_Class>::normalise_str_from_cli_to_flag(
         const std::string_view _a_str
     ) const noexcept
 {
@@ -778,8 +871,9 @@ __constexpr_imp std::expected<std::string_view, std::string>
     }
 }
 
+template <typename Option_Class>
 __constexpr_imp std::expected<std::string_view, std::string>
-                cli_t::normalise_str_from_config_to_flag(
+                cli_t<Option_Class>::normalise_str_from_config_to_flag(
         const std::string_view _a_str
     ) const noexcept
 {
@@ -803,8 +897,10 @@ __constexpr_imp std::expected<std::string_view, std::string>
     }
 }
 
-__constexpr_imp const std::optional<std::reference_wrapper<cli_info_t>>
-                      cli_t::find_clp_info(
+template <typename Option_Class>
+__constexpr_imp const
+    std::optional<std::reference_wrapper<cli_info_t<Option_Class>>>
+    cli_t<Option_Class>::find_clp_info(
         const std::string_view& _a_info
     ) const noexcept
 {
@@ -812,10 +908,12 @@ __constexpr_imp const std::optional<std::reference_wrapper<cli_info_t>>
     return _m_sv_to_clp_info.at(_a_info);
 }
 
+template <typename Option_Class>
 __constexpr_imp bool
-    cli_t::process_args(
+    cli_t<Option_Class>::process_args(
+        Option_Class&                          _a_option_class,
         const std::string_view                 _a_flag,
-        const cli_info_t&                      _a_cli_info,
+        const cli_info_t<Option_Class>&        _a_cli_info,
         const std::vector<std::string_view>&   _a_strs,
         const std::size_t                      _a_strs_size,
         std::size_t&                           _a_current_index,
@@ -829,14 +927,15 @@ __constexpr_imp bool
     {
     case ZERO:
     {
-        if (const bool _l_terminate{
-                _a_cli_info.process_args(_a_flag, {}, *this, _a_cli_results)
-            };
+        if (const bool _l_terminate{_a_cli_info.process_args(
+                _a_option_class, _a_flag, {}, *this, _a_cli_results
+            )};
             _l_terminate)
         {
             return true;
         }
-        if (auto _l_opt_print(_a_cli_info.print()); _l_opt_print.has_value())
+        if (auto _l_opt_print(_a_cli_info.print(_a_option_class));
+            _l_opt_print.has_value())
         {
             _a_cli_results.add_memoized_data(
                 false,
@@ -859,13 +958,17 @@ __constexpr_imp bool
             not _l_next_arg.has_value())
         {
             if (const bool _l_terminate{_a_cli_info.process_args(
-                    _a_flag, {_a_strs[_a_current_index]}, *this, _a_cli_results
+                    _a_option_class,
+                    _a_flag,
+                    {_a_strs[_a_current_index]},
+                    *this,
+                    _a_cli_results
                 )};
                 _l_terminate)
             {
                 return true;
             }
-            if (auto _l_opt_print(_a_cli_info.print());
+            if (auto _l_opt_print(_a_cli_info.print(_a_option_class));
                 _l_opt_print.has_value())
             {
                 _a_cli_results.add_memoized_data(
@@ -937,13 +1040,17 @@ __constexpr_imp bool
                 return true;
             }
             if (const bool _l_terminate{_a_cli_info.process_args(
-                    _a_flag, _l_strs_to_pass, *this, _a_cli_results
+                    _a_option_class,
+                    _a_flag,
+                    _l_strs_to_pass,
+                    *this,
+                    _a_cli_results
                 )};
                 _l_terminate)
             {
                 return true;
             }
-            if (auto _l_opt_print(_a_cli_info.print());
+            if (auto _l_opt_print(_a_cli_info.print(_a_option_class));
                 _l_opt_print.has_value())
             {
                 _a_cli_results.add_memoized_data(
@@ -964,9 +1071,10 @@ __constexpr_imp bool
     return false;
 }
 
+template <typename Option_Class>
 __no_constexpr_imp void
-    cli_t::inner_add_option(
-        const std::shared_ptr<cli_info_t> _a_cli
+    cli_t<Option_Class>::inner_add_option(
+        const std::shared_ptr<cli_info_t<Option_Class>> _a_cli
     ) noexcept
 {
     using namespace std;
@@ -979,6 +1087,89 @@ __no_constexpr_imp void
     _m_clp_info.push_back(_a_cli);
     _m_sv_to_clp_info.insert({_a_cli->flag(), reference_wrapper(*_a_cli.get())}
     );
+}
+
+template <typename Option_Class>
+__no_constexpr_imp void
+    cli_t<Option_Class>::write_file(
+        const std::string_view _a_autofile_name,
+        const std::size_t      _a_autofile_size,
+        const Option_Class&    _a_option_class,
+        const bool             _a_test_success
+    ) const noexcept
+{
+    using namespace std;
+    auto&    _l_rep_data{_m_rep_data.value()};
+    ofstream _l_output;
+    size_t   _l_next_index;
+    if (_l_rep_data._m_last_config_info.has_value())
+    {
+        _l_next_index = _l_rep_data._m_last_config_info.value().last_index + 1;
+        if (_l_next_index > _l_rep_data._m_last_config_info.value().max_index)
+        {
+            const filesystem::path _l_new_path{
+                filesystem::path(_l_rep_data._m_repetition_folder)
+                    .append(fmt::format(
+                        "{0}_{1}_{2}",
+                        _a_autofile_name,
+                        _l_rep_data._m_last_config_info.value().max_index + 1,
+                        _l_rep_data._m_last_config_info.value().max_index
+                            + _a_autofile_size
+                    ))
+            };
+            _l_output.open(_l_new_path, ios::app);
+            // Create new file.
+        }
+        else
+        {
+            _l_output.open(
+                _l_rep_data._m_last_config_info.value().file, ios::app
+            );
+        }
+    }
+    else
+    {
+        _l_next_index = 1;
+        const filesystem::path _l_new_path{
+            filesystem::path(_l_rep_data._m_repetition_folder)
+                .append(fmt::format(
+                    "{0}_{1}_{2}", _a_autofile_name, 1, +_a_autofile_size
+                ))
+        };
+        _l_output.open(_l_new_path, ios::app);
+    }
+    _l_output << _a_option_class.autofile_metadata_string << "_"
+              << abc::utility::printer::default_printer_t<pair<bool, size_t>>{}
+                     .run_printer(make_pair(_a_test_success, _l_next_index))
+              << std::endl;
+    for (const auto& [_l_field, _l_data] :
+         get_config_file_data(_a_option_class))
+    {
+        _l_output << fmt::format("{0} = {1}", _l_field, _l_data) << endl;
+    }
+    _l_output.close();
+}
+
+template <typename Option_Class>
+__constexpr_imp std::vector<std::pair<std::string, std::string>>
+                cli_t<Option_Class>::get_config_file_data(
+        const Option_Class& _a_option_class
+    ) const noexcept
+{
+    using namespace std;
+    vector<pair<string, string>> _l_rv;
+    for (const shared_ptr<cli_info_t<Option_Class>>& _l_ptr : _m_clp_info)
+    {
+        const cli_info_t<Option_Class>& _l_info{*_l_ptr.get()};
+        const optional<string> _l_opt_str{_l_info.print(_a_option_class)};
+        if (_l_opt_str.has_value())
+        {
+            _l_rv.push_back(
+                make_pair(string(_l_info.flag()), _l_opt_str.value())
+            );
+        }
+    }
+    return _l_rv;
 }
 
 namespace detail

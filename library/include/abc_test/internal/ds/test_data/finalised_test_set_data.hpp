@@ -39,8 +39,17 @@ public:
                       seed() const noexcept;
     __constexpr const abc::ds::map_unique_id_to_tdg_collection_stack_trie_t&
                       map_ids_to_tdg_collection_stack_tries() const noexcept;
-    __no_constexpr_or_inline abc::test_options_base_t
-                             get_re_run_test_options() const noexcept;
+    template<typename T>
+    __no_constexpr_imp T
+        get_re_run_test_options() const noexcept
+    {
+        T _l_opt = *(static_cast<const T*>(&global::get_global_test_options()));
+        _l_opt.force_run_all_tests = false;
+        _l_opt.global_seed = global::get_global_seed();
+        _l_opt.map_of_unique_ids_and_for_loop_stack_tries = this->_m_map_ids_to_tdg_collection_stack_tries;
+        _l_opt.write_data_to_files = false;
+        return _l_opt;
+    }
 private:
     abc::ds::map_unique_id_to_tdg_collection_stack_trie_t
         _m_map_ids_to_tdg_collection_stack_tries;

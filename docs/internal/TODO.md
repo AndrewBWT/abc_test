@@ -6,7 +6,6 @@
 - Tutorials and examples. See docs/internal/tutorials_and_examples.md for details.
 - Tests. See docs/internal/tests.md for details.
 - README. See docs/internal/readme.md for details.
-- Rewrite command line interface (cli) code. When adding auto configuration functionality, we found that the class hierarchy didn't make this easy. We had to "reach across" multiple objects, and wrote very brittle code which will need to be updated in several places every time we add a field to the options.
 
 ## Not Currently a Focus
 

@@ -8,6 +8,8 @@
 #include <filesystem>
 #include <variant>
 
+#include <fstream>
+
 _BEGIN_ABC_NS
 enum class enum_rep_file_index_t
 {
@@ -157,12 +159,12 @@ public:
         const std::optional<cli_auto_configuration_file_last_loaded_info_t>&
             _l_last_config_info
     ) noexcept;
-    __no_constexpr void
-        setup_next_file(
-            const bool                 _a_test_success,
-            const test_options_base_t& _a_options
-        ) const noexcept;
-private:
+   // __no_constexpr void
+   //     setup_next_file(
+   //         const std::vector<std::pair<std::string, std::string>>&
+   //         _a_strs_to_print,
+   //         const bool _a_test_success
+   //     ) const noexcept;
     std::filesystem::path _m_repetition_folder;
     // Either auto, or auto with specific element.
     rep_file_index_t _m_rep_file_index;
@@ -171,12 +173,17 @@ private:
     // The loaded configuration
     std::optional<cli_auto_configuration_file_info_t> _m_loaded_configuration;
     // The file containing the last index.
-    std::optional<cli_auto_configuration_file_last_loaded_info_t> _m_last_config_info;
-    __no_constexpr_or_inline void
-        prepare_file(
-            const bool                 _a_test_success,
-            const test_options_base_t& _a_options
-        ) const noexcept;
+    std::optional<cli_auto_configuration_file_last_loaded_info_t>
+        _m_last_config_info;
+//    template<typename Option_Object>
+//    __constexpr void
+ //       prepare_file(
+ //           const std::string_view _a_autofile_name,
+ //           const std::size_t _a_autofile_size,
+ //           const std::vector<std::pair<std::string, std::string>>&
+   //         _a_strs_to_print,
+   //         const bool _a_test_success
+   //     ) const noexcept;
 };
 
 _END_ABC_NS
@@ -199,5 +206,85 @@ __constexpr_imp
     , _m_loaded_configuration(_a_loaded_configuration)
 {}
 
+/*template<typename Option_Object>
+__no_constexpr_imp void
+cli_auto_configuration_t::setup_next_file(
+    const Option_Object&
+    _a_strs_to_print,
+    const bool _a_test_success
+) const noexcept
+{
+    switch (_m_rep_write_data_type)
+    {
+    case rep_write_data_type_t::ALWAYS_WRITE:
+        prepare_file(_a_strs_to_print, _a_test_success);
+        break;
+    case rep_write_data_type_t::AUTO:
+        if ((not this->_m_loaded_configuration.has_value() && not _a_test_success) ||
+            (_m_loaded_configuration.has_value() && _a_test_success))
+        {
+            prepare_file(_a_strs_to_print, _a_test_success);
+        }
+    default:
+        break;
+    }
+}
+
+__constexpr void
+    cli_auto_configuration_t::prepare_file(
+        const std::string_view _a_autofile_name,
+        const std::size_t _a_autofile_size,
+        const std::vector<std::pair<std::string, std::string>>&
+                   _a_strs_to_print,
+        const bool _a_test_success
+    ) const noexcept
+{
+    using namespace std;
+    ofstream _l_output;
+    size_t   _l_next_index;
+    if (_m_last_config_info.has_value())
+    {
+        _l_next_index = _m_last_config_info.value().last_index + 1;
+        if (_l_next_index > _m_last_config_info.value().max_index)
+        {
+            const filesystem::path _l_new_path{
+                filesystem::path(_m_repetition_folder)
+                    .append(fmt::format(
+                        "{0}_{1}_{2}",
+                        _a_autofile_name,
+                        _m_last_config_info.value().max_index + 1,
+                        _m_last_config_info.value().max_index
+                            + _a_autofile_size
+                    ))
+            };
+            _l_output.open(_l_new_path, ios::app);
+            // Create new file.
+        }
+        else
+        {
+            _l_output.open(this->_m_last_config_info.value().file, ios::app);
+        }
+    }
+    else
+    {
+        _l_next_index = 1;
+        const filesystem::path _l_new_path{
+            filesystem::path(_m_repetition_folder)
+                .append(fmt::format(
+                    "{0}_{1}_{2}",
+                    _a_autofile_name,
+                    1,
+                    +_a_autofile_size
+                ))
+        };
+        _l_output.open(_l_new_path, ios::app);
+    }
+    using namespace detail;
+    for (const auto& [_l_field_name, _l_field] : _a_strs_to_print)
+    {
+        _l_output << fmt::format("{0} = {1}", _l_field_name, _l_field) << std::endl;
+    }
+    _l_output.close();
+}*/
 
 _END_ABC_NS

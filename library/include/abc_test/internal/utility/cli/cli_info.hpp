@@ -14,6 +14,7 @@
 #include <vector>
 
 _BEGIN_ABC_NS
+template <typename Option_Class>
 class cli_t;
 class cli_output_t;
 enum class enum_n_arguments
@@ -23,6 +24,7 @@ enum class enum_n_arguments
     MULTI_ARGUMENT
 };
 
+template <typename Option_Class>
 class cli_info_t
 {
 public:
@@ -77,15 +79,18 @@ public:
 
     __no_constexpr_imp virtual bool
         process_args(
+            Option_Class&                        _a_option_class,
             const std::string_view               _a_flag,
             const std::vector<std::string_view>& _a_args,
-            const cli_t&                         _a_cli,
+            const cli_t<Option_Class>&           _a_cli,
             cli_results_t&                       _a_cli_results
         ) const noexcept
         = 0;
 
     __constexpr virtual std::optional<std::string>
-        print() const noexcept
+        print(
+            const Option_Class& _a_option_class
+        ) const noexcept
     {
         return std::nullopt;
     }
@@ -112,7 +117,8 @@ private:
     bool                       _m_enabled_for_config_list;
 };
 
-class cli_no_args_t : public cli_info_t
+template <typename Option_Class>
+class cli_no_args_t : public cli_info_t<Option_Class>
 {
 public:
     __constexpr
@@ -128,9 +134,10 @@ public:
 
     __no_constexpr_imp virtual bool
         process_args(
+            Option_Class&                        _a_option_class,
             const std::string_view               _a_flag,
             const std::vector<std::string_view>& _a_args,
-            const cli_t&                         _a_cli,
+            const cli_t<Option_Class>&           _a_cli,
             cli_results_t&                       _a_cli_results
         ) const noexcept
     {
@@ -187,6 +194,29 @@ __constexpr std::function<std::optional<T>(const std::string_view)>
     };
 }
 
+template <typename T>
+__constexpr std::function<std::string(const T&)>
+            make_printer_func() noexcept
+{
+    return [](const T& _a_element)
+    {
+        if constexpr (std::same_as<T, std::string>)
+        {
+            return _a_element;
+        }
+        else if constexpr (std::same_as<T, std::filesystem::path>)
+        {
+            return _a_element.string();
+        }
+        else
+        {
+            return abc::utility::printer::default_printer_t<T>{}.run_printer(
+                _a_element
+            );
+        }
+    };
+}
+
 template <typename T, typename U>
 __constexpr std::function<bool(T&, const U&)>
             process_value()
@@ -207,42 +237,47 @@ __constexpr std::function<bool(T&, const U&)>
 }
 } // namespace detail
 
-template <typename T, typename U>
-class cli_one_arg_t : public cli_info_t
+template <typename Option_Class, typename T, typename U>
+class cli_one_arg_t : public cli_info_t<Option_Class>
 {
 public:
     __constexpr
     cli_one_arg_t(
-        const std::string_view    _a_flag,
-        const std::string_view    _a_description,
-        T&                        _a_reference,
+        const std::string_view _a_flag,
+        const std::string_view _a_description,
+        T Option_Class::*         _a_member_var,
         const std::optional<char> _a_char_flag,
         const std::function<std::optional<U>(const std::string_view)> _a_parser,
-        const std::function<bool(T&, const U&)> _a_process_func
+        const std::function<bool(T&, const U&)>    _a_process_func,
+        const std::function<std::string(const T&)> _a_print_func
     ) noexcept
-        : cli_info_t(
+        : cli_info_t<Option_Class>(
               enum_n_arguments::ONE,
               _a_flag,
               _a_description,
               _a_char_flag
           )
-        , _m_reference(std::reference_wrapper<T>(_a_reference))
+        , _m_member_var(_a_member_var)
         , _m_parser(_a_parser)
         , _m_process_func(_a_process_func)
+        , _m_print_func(_a_print_func)
     {}
 
     __constexpr virtual std::optional<std::string>
-        print() const noexcept
+        print(
+            const Option_Class& _a_option_class
+        ) const noexcept
     {
         using namespace abc::utility::printer;
-        return default_printer_t<T>().run_printer(_m_reference.get());
+        return _m_print_func(_a_option_class.*_m_member_var);
     }
 
     __no_constexpr_imp virtual bool
         process_args(
+            Option_Class&                        _a_option_class,
             const std::string_view               _a_flag,
             const std::vector<std::string_view>& _a_args,
-            const cli_t&                         _a_cli,
+            const cli_t<Option_Class>&           _a_cli,
             cli_results_t&                       _a_cli_results
         ) const noexcept
     {
@@ -263,7 +298,7 @@ public:
                 _l_parse_result.has_value())
             {
                 if (const bool _l_process_okay{_m_process_func(
-                        _m_reference.get(), _l_parse_result.value()
+                        _a_option_class.*_m_member_var, _l_parse_result.value()
                     )};
                     _l_process_okay)
                 {
@@ -290,47 +325,53 @@ public:
         }
     }
 private:
-    std::reference_wrapper<T>                               _m_reference;
+    T Option_Class::*                                       _m_member_var;
     std::function<std::optional<U>(const std::string_view)> _m_parser;
     std::function<bool(T&, const U&)>                       _m_process_func;
+    std::function<std::string(const T&)>                    _m_print_func;
 };
 
-template <typename T, typename U>
-class cli_multi_args : public cli_info_t
+template <typename Option_Class, typename T, typename U>
+class cli_multi_args : public cli_info_t<Option_Class>
 {
 public:
     __constexpr
     cli_multi_args(
-        const std::string_view    _a_flag,
-        const std::string_view    _a_description,
-        T&                        _a_reference,
+        const std::string_view _a_flag,
+        const std::string_view _a_description,
+        T Option_Class::*         _a_member_var,
         const std::optional<char> _a_char_flag,
         const std::function<std::optional<U>(const std::string_view)> _a_parser,
-        const std::function<bool(T&, const U&)> _a_process_func
+        const std::function<bool(T&, const U&)>    _a_process_func,
+        const std::function<std::string(const T&)> _a_print_func
     ) noexcept
-        : cli_info_t(
+        : cli_info_t<Option_Class>(
               enum_n_arguments::MULTI_ARGUMENT,
               _a_flag,
               _a_description,
               _a_char_flag
           )
-        , _m_reference(std::reference_wrapper<T>(_a_reference))
+        , _m_member_var(_a_member_var)
         , _m_parser(_a_parser)
         , _m_process_func(_a_process_func)
+        , _m_print_func(_a_print_func)
     {}
 
     __constexpr virtual std::optional<std::string>
-        print() const noexcept
+        print(
+            const Option_Class& _a_option_class
+        ) const noexcept
     {
         using namespace abc::utility::printer;
-        return default_printer_t<T>().run_printer(_m_reference.get());
+        return _m_print_func(_a_option_class.*_m_member_var);
     }
 
     __no_constexpr_imp virtual bool
         process_args(
+            Option_Class&                        _a_option_class,
             const std::string_view               _a_flag,
             const std::vector<std::string_view>& _a_args,
-            const cli_t&                         _a_cli,
+            const cli_t<Option_Class>&           _a_cli,
             cli_results_t&                       _a_cli_results
         ) const noexcept
     {
@@ -341,7 +382,7 @@ public:
                 _l_parse_result.has_value())
             {
                 if (const bool _l_process_okay{_m_process_func(
-                        _m_reference.get(), _l_parse_result.value()
+                        _a_option_class.*_m_member_var, _l_parse_result.value()
                     )};
                     _l_process_okay)
                 {
@@ -369,9 +410,10 @@ public:
         return false;
     }
 private:
-    std::reference_wrapper<T>                               _m_reference;
+    T Option_Class::*                                       _m_member_var;
     std::function<std::optional<U>(const std::string_view)> _m_parser;
     std::function<bool(T&, const U&)>                       _m_process_func;
+    std::function<std::string(const T&)>                    _m_print_func;
 };
 
 _END_ABC_NS

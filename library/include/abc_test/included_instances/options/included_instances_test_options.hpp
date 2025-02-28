@@ -9,6 +9,7 @@ _BEGIN_ABC_NS
 struct included_instances_test_options_t : public test_options_base_t
 {
 public:
+
     bool use_text_test_reporter_to_cout  = true;
     bool use_text_error_reporter_to_cout = true;
     std::vector<std::pair<std::filesystem::path, bool>>
