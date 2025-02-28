@@ -142,9 +142,7 @@ __no_constexpr_imp void
         _a_cli_results
     );
     _a_cli.add_option(
-        _s_threads,
-        &included_instances_test_options_t::threads,
-        _a_cli_results
+        _s_threads, &included_instances_test_options_t::threads, _a_cli_results
     );
     _a_cli.add_option(
         _s_comment_str,
@@ -174,58 +172,67 @@ __no_constexpr_imp void
         &included_instances_test_options_t::
             map_of_unique_ids_and_for_loop_stack_tries,
         _a_cli_results,
-        detail::make_parser_func<string>(),
-        [](ds::map_unique_id_to_tdg_collection_stack_trie_t& _a_ref,
-           const string_view                                 _a_str)
-        {
-            auto _l_res = ds::
-                parse_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
-                    _a_str
-                );
-            if (_l_res.has_value())
+        cli_argument_processing_info_t<
+            _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t,
+            std::string>{
+            .process_parsed_value_func =
+                [](ds::map_unique_id_to_tdg_collection_stack_trie_t& _a_ref,
+                   const string&                                     _a_str)
             {
-                _a_ref = _l_res.value();
-                return true;
-            }
-            else
+                auto _l_res = ds::
+                    parse_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
+                        _a_str
+                    );
+                if (_l_res.has_value())
+                {
+                    _a_ref = _l_res.value();
+                    return optional<string>{};
+                }
+                else
+                {
+                    return make_optional(_l_res.error());
+                }
+            },
+            .print_func =
+                [](const ds::map_unique_id_to_tdg_collection_stack_trie_t&
+                       _a_element)
             {
-                return false;
+                return ds::
+                    print_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
+                        _a_element
+                    );
             }
-        },
-        [](const ds::map_unique_id_to_tdg_collection_stack_trie_t& _a_element)
-        {
-            return ds::
-                print_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
-                    _a_element
-                );
         }
     );
     _a_cli.add_option<utility::global_seed_t, utility::global_seed_t>(
         _s_global_seed,
         &included_instances_test_options_t::global_seed,
         _a_cli_results,
-        detail::make_parser_func<utility::global_seed_t>(),
-        detail::process_value<utility::global_seed_t, utility::global_seed_t>(),
-        [](const utility::global_seed_t& _a_global_seed)
-        {
-            return _a_global_seed.complete_global_seed()
-                           .value()
-                           .integer()
-                           .has_value()
-                       ? fmt::format(
-                             "{0}",
-                             _a_global_seed.complete_global_seed()
-                                 .value()
-                                 .integer()
-                                 .value()
-                         )
-                       : fmt::format(
-                             "{0}",
-                             _a_global_seed.complete_global_seed()
-                                 .value()
-                                 .vector_of_integers()
-                                 .value()
-                         );
+        cli_argument_processing_info_t<
+            utility::global_seed_t,
+            utility::global_seed_t>{
+            .print_func =
+                [](const utility::global_seed_t& _a_global_seed)
+            {
+                return _a_global_seed.complete_global_seed()
+                               .value()
+                               .integer()
+                               .has_value()
+                           ? fmt::format(
+                                 "{0}",
+                                 _a_global_seed.complete_global_seed()
+                                     .value()
+                                     .integer()
+                                     .value()
+                             )
+                           : fmt::format(
+                                 "{0}",
+                                 _a_global_seed.complete_global_seed()
+                                     .value()
+                                     .vector_of_integers()
+                                     .value()
+                             );
+            }
         }
     );
     _a_cli.add_option(
@@ -258,25 +265,26 @@ __no_constexpr_imp void
         _c_test_paths_to_run,
         &included_instances_test_options_t::test_paths_to_run,
         _a_cli_results,
-        detail::make_parser_func<string>(),
-        detail::process_value<vector<string>, string>(),
-        [](const vector<string>& _a_strs)
-        {
-            string _l_rv;
-            for (size_t _l_idx{0}; const string_view _l_str : _a_strs)
+        cli_argument_processing_info_t<vector<string>, string>{
+            .print_func =
+                [](const vector<string>& _a_strs)
             {
-                if (_l_str == "")
+                string _l_rv;
+                for (size_t _l_idx{0}; const string_view _l_str : _a_strs)
                 {
-                    continue;
+                    if (_l_str == "")
+                    {
+                        continue;
+                    }
+                    _l_rv.append(_l_str);
+                    if (_l_idx + 1 < _a_strs.size())
+                    {
+                        _l_rv.append(" ");
+                    }
+                    ++_l_idx;
                 }
-                _l_rv.append(_l_str);
-                if (_l_idx + 1 < _a_strs.size())
-                {
-                    _l_rv.append(" ");
-                }
-                ++_l_idx;
+                return _l_rv;
             }
-            return _l_rv;
         }
     );
 }

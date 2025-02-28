@@ -26,8 +26,6 @@
 #include <variant>
 
 _BEGIN_ABC_NS
-using clp_parser_func_t
-    = std::function<std::optional<std::string>(const std::string_view)>;
 
 template <typename Option_Class>
 class cli_t
@@ -57,13 +55,8 @@ public:
             const cli_option_config_t& _a_option,
             T Option_Class::*          _a_member_var,
             cli_results_t&             _a_cli_results,
-            std::function<std::optional<U>(const std::string_view)>
-                _a_parser_func
-            = detail::make_parser_func<U>(),
-            std::function<bool(T&, const U&)> _m_process_parsed_value
-            = detail::process_value<T, U>(),
-            const std::function<std::string(const T&)> _a_print_func
-            = detail::make_printer_func<T>()
+            const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs = 
+            cli_argument_processing_info_t<T, U>{}
         ) noexcept;
     template <typename T, typename U>
     __no_constexpr void
@@ -71,13 +64,8 @@ public:
             const cli_option_config_t& _a_cli_option,
             T Option_Class::* _a_member_var,
             cli_results_t& _a_cli_results,
-            std::function<std::optional<U>(const std::string_view)>
-                _a_parser_func
-            = detail::make_parser_func<U>(),
-            std::function<bool(T&, const U&)> _m_process_parsed_value
-            = detail::process_value<T, U>(),
-            const std::function<std::string(const T&)> _a_print_func
-            = detail::make_printer_func<T>()
+            const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs =
+            cli_argument_processing_info_t<T, U>{}
         ) noexcept;
     __no_constexpr void
         add_help_flag() noexcept;
@@ -350,9 +338,7 @@ __no_constexpr_imp void
         const cli_option_config_t& _a_option,
         T Option_Class::*                                       _a_member_var,
         cli_results_t&                                          _a_cli_results,
-        std::function<std::optional<U>(const std::string_view)> _a_parser_func,
-        std::function<bool(T&, const U&)>          _m_process_parsed_value,
-        const std::function<std::string(const T&)> _a_print_func
+        const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs
 
     ) noexcept
 {
@@ -360,9 +346,7 @@ __no_constexpr_imp void
     inner_add_option(make_shared<cli_one_arg_t<Option_Class, T, U>>(
         _a_option,
         _a_member_var,
-        _a_parser_func,
-        _m_process_parsed_value,
-        _a_print_func
+        _a_cli_processing_funcs
     ));
 }
 
@@ -373,9 +357,7 @@ __no_constexpr_imp void
         const cli_option_config_t& _a_cli_option,
         T Option_Class::*          _a_member_var,
         cli_results_t&             _a_cli_results,
-        std::function<std::optional<U>(const std::string_view)> _a_parser_func,
-        std::function<bool(T&, const U&)>          _m_process_parsed_value,
-        const std::function<std::string(const T&)> _a_print_func
+        const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs
 
     ) noexcept
 {
@@ -383,9 +365,7 @@ __no_constexpr_imp void
     inner_add_option(make_shared<cli_multi_args<Option_Class, T, U>>(
         _a_cli_option,
         _a_member_var,
-        _a_parser_func,
-        _m_process_parsed_value,
-        _a_print_func
+        _a_cli_processing_funcs
     ));
 }
 
