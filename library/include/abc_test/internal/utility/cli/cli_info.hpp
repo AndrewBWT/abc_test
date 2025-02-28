@@ -1,5 +1,6 @@
 #pragma once
 
+#include "abc_test/internal/utility/cli/cli_option_config.hpp"
 #include "abc_test/internal/utility/cli/cli_output.hpp"
 #include "abc_test/internal/utility/internal/macros.hpp"
 #include "abc_test/internal/utility/parsers/default_parser.hpp"
@@ -35,28 +36,24 @@ public:
     __constexpr
     cli_info_t(
         const enum_n_arguments     _a_enum_n_arguments,
-        const std::string_view     _a_flag,
-        const std::string_view     _a_description,
-        const std::optional<char>& _a_char_flag = std::optional<char>{},
+        const cli_option_config_t& _a_option_config,
         bool                       _a_enabled_for_config_file = true
     ) noexcept
-        : _m_flag(_a_flag)
-        , _m_char_flag(_a_char_flag)
+        : _m_option_config(_a_option_config)
         , _m_enum_n_arguments(_a_enum_n_arguments)
-        , _m_description(_a_description)
         , _m_enabled_for_config_file(_a_enabled_for_config_file)
     {}
 
     __constexpr std::string_view
                 flag() const noexcept
     {
-        return _m_flag;
+        return _m_option_config.flag;
     }
 
     __constexpr std::optional<char>
                 char_flag() const noexcept
     {
-        return _m_char_flag;
+        return _m_option_config.single_char_flag;
     }
 
     __constexpr const std::optional<std::size_t>
@@ -98,7 +95,7 @@ public:
     __constexpr std::string_view
                 description() const noexcept
     {
-        return _m_description;
+        return _m_option_config.description;
     }
 
     __constexpr bool
@@ -110,9 +107,7 @@ private:
     std::optional<std::size_t> _m_min_arguments;
     std::optional<std::size_t> _m_max_arguments;
     enum_n_arguments           _m_enum_n_arguments;
-    std::string                _m_flag;
-    std::optional<char>        _m_char_flag;
-    std::string                _m_description;
+    cli_option_config_t        _m_option_config;
     bool                       _m_enabled_for_config_file;
     bool                       _m_enabled_for_config_list;
 };
@@ -243,20 +238,13 @@ class cli_one_arg_t : public cli_info_t<Option_Class>
 public:
     __constexpr
     cli_one_arg_t(
-        const std::string_view _a_flag,
-        const std::string_view _a_description,
-        T Option_Class::*         _a_member_var,
-        const std::optional<char> _a_char_flag,
+        const cli_option_config_t& _a_cli_option_config,
+        T Option_Class::* _a_member_var,
         const std::function<std::optional<U>(const std::string_view)> _a_parser,
         const std::function<bool(T&, const U&)>    _a_process_func,
         const std::function<std::string(const T&)> _a_print_func
     ) noexcept
-        : cli_info_t<Option_Class>(
-              enum_n_arguments::ONE,
-              _a_flag,
-              _a_description,
-              _a_char_flag
-          )
+        : cli_info_t<Option_Class>(enum_n_arguments::ONE, _a_cli_option_config)
         , _m_member_var(_a_member_var)
         , _m_parser(_a_parser)
         , _m_process_func(_a_process_func)
@@ -337,19 +325,15 @@ class cli_multi_args : public cli_info_t<Option_Class>
 public:
     __constexpr
     cli_multi_args(
-        const std::string_view _a_flag,
-        const std::string_view _a_description,
-        T Option_Class::*         _a_member_var,
-        const std::optional<char> _a_char_flag,
+        const cli_option_config_t& _a_cli_option_config,
+        T Option_Class::* _a_member_var,
         const std::function<std::optional<U>(const std::string_view)> _a_parser,
         const std::function<bool(T&, const U&)>    _a_process_func,
         const std::function<std::string(const T&)> _a_print_func
     ) noexcept
         : cli_info_t<Option_Class>(
               enum_n_arguments::MULTI_ARGUMENT,
-              _a_flag,
-              _a_description,
-              _a_char_flag
+              _a_cli_option_config
           )
         , _m_member_var(_a_member_var)
         , _m_parser(_a_parser)

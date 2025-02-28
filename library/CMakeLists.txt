@@ -203,6 +203,7 @@ set(LIBRARY_FILES
   include/abc_test/internal/utility/cli/cli_help.hpp
   include/abc_test/internal/utility/cli/cli_help.hpp
       src/abc_test/internal/utility/cli/cli_help.cpp
+  include/abc_test/internal/utility/cli/cli_option_config.hpp
   include/abc_test/internal/utility/cli/cli_output.hpp
   include/abc_test/internal/utility/cli/cli_auto_configuration.hpp
       src/abc_test/internal/utility/cli/cli_auto_configuration.cpp

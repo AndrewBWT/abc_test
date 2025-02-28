@@ -4,6 +4,7 @@
 // "abc_test/included_instances/options/included_instances_test_options.hpp"
 #include "abc_test/included_instances/options/option_config.hpp"
 #include "abc_test/internal/utility/internal/macros.hpp"
+#include "abc_test/internal/utility/cli/cli_option_config.hpp"
 _BEGIN_ABC_NS
 class included_instances_test_options_t;
 _END_ABC_NS
@@ -18,7 +19,7 @@ public:
             const included_instances_test_options_t& _a_test_options
         ) noexcept;
     __constexpr const std::vector<std::string>&
-                      get_option_data(const detail::option_config_t& _a_element
+                      get_option_data(const abc::cli_option_config_t& _a_element
                       ) const noexcept;
     __constexpr const included_instances_test_options_t&
         get_options() const noexcept;
@@ -58,11 +59,11 @@ __constexpr void
 
 __constexpr const std::vector<std::string>&
                   pre_test_run_report_t::get_option_data(
-        const detail::option_config_t& _a_element
+                      const abc::cli_option_config_t& _a_element
     ) const noexcept
 {
     using namespace std;
-    return get<1>(_m_memoized_option_data.at(string(get<0>(_a_element))).back()
+    return get<1>(_m_memoized_option_data.at(string(_a_element.flag)).back()
     );
 }
 

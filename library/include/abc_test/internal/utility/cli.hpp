@@ -9,11 +9,12 @@
 #include "abc_test/internal/utility/parsers/specializations/stl_11.hpp"
 #include "abc_test/internal/utility/parsers/specializations/stl_98.hpp"
 #include "abc_test/internal/utility/printers/default_printer.hpp"
-#include "abc_test/internal/utility/str/string_table.hpp"
-#include "abc_test/internal/utility/str/string_utility.hpp"
 #include "abc_test/internal/utility/printers/specializations/fundamental_types.hpp"
 #include "abc_test/internal/utility/printers/specializations/stl_11.hpp"
 #include "abc_test/internal/utility/printers/specializations/stl_98.hpp"
+#include "abc_test/internal/utility/str/string_table.hpp"
+#include "abc_test/internal/utility/str/string_utility.hpp"
+
 #include <expected>
 #include <fmt/ranges.h>
 #include <fstream>
@@ -50,37 +51,33 @@ public:
             const std::vector<std::string_view>& _a_args,
             cli_results_t&                       _a_cli_results
         ) const noexcept;
-    template <typename T, typename U>
+    template <typename T, typename U = T>
     __no_constexpr void
         add_option(
-            const std::string_view _a_flag,
-            const std::string_view _a_description,
+            const cli_option_config_t& _a_option,
             T Option_Class::*          _a_member_var,
-            const std::optional<char>& _a_single_char_flag,
             cli_results_t&             _a_cli_results,
             std::function<std::optional<U>(const std::string_view)>
                 _a_parser_func
             = detail::make_parser_func<U>(),
             std::function<bool(T&, const U&)> _m_process_parsed_value
             = detail::process_value<T, U>(),
-            const std::function<std::string(const T&)> _a_print_func =
-            detail::make_printer_func<T>()
+            const std::function<std::string(const T&)> _a_print_func
+            = detail::make_printer_func<T>()
         ) noexcept;
     template <typename T, typename U>
     __no_constexpr void
         add_multi_element_option(
-            const std::string_view _a_flag,
-            const std::string_view _a_description,
-            T Option_Class::*          _a_member_var,
-            const std::optional<char>& _a_single_char_flag,
-            cli_results_t&             _a_cli_results,
+            const cli_option_config_t& _a_cli_option,
+            T Option_Class::* _a_member_var,
+            cli_results_t& _a_cli_results,
             std::function<std::optional<U>(const std::string_view)>
                 _a_parser_func
             = detail::make_parser_func<U>(),
             std::function<bool(T&, const U&)> _m_process_parsed_value
             = detail::process_value<T, U>(),
-            const std::function<std::string(const T&)> _a_print_func =
-            detail::make_printer_func<T>()
+            const std::function<std::string(const T&)> _a_print_func
+            = detail::make_printer_func<T>()
         ) noexcept;
     __no_constexpr void
         add_help_flag() noexcept;
@@ -350,23 +347,19 @@ template <typename Option_Class>
 template <typename T, typename U>
 __no_constexpr_imp void
     cli_t<Option_Class>::add_option(
-        const std::string_view _a_flag,
-        const std::string_view _a_description,
-        T Option_Class::*          _a_member_var,
-        const std::optional<char>& _a_single_char_flag,
-        cli_results_t&             _a_cli_results,
+        const cli_option_config_t& _a_option,
+        T Option_Class::*                                       _a_member_var,
+        cli_results_t&                                          _a_cli_results,
         std::function<std::optional<U>(const std::string_view)> _a_parser_func,
-        std::function<bool(T&, const U&)> _m_process_parsed_value,
+        std::function<bool(T&, const U&)>          _m_process_parsed_value,
         const std::function<std::string(const T&)> _a_print_func
 
     ) noexcept
 {
     using namespace std;
     inner_add_option(make_shared<cli_one_arg_t<Option_Class, T, U>>(
-        _a_flag,
-        _a_description,
+        _a_option,
         _a_member_var,
-        _a_single_char_flag,
         _a_parser_func,
         _m_process_parsed_value,
         _a_print_func
@@ -377,23 +370,19 @@ template <typename Option_Class>
 template <typename T, typename U>
 __no_constexpr_imp void
     cli_t<Option_Class>::add_multi_element_option(
-        const std::string_view _a_flag,
-        const std::string_view _a_description,
+        const cli_option_config_t& _a_cli_option,
         T Option_Class::*          _a_member_var,
-        const std::optional<char>& _a_single_char_flag,
         cli_results_t&             _a_cli_results,
         std::function<std::optional<U>(const std::string_view)> _a_parser_func,
-        std::function<bool(T&, const U&)> _m_process_parsed_value,
+        std::function<bool(T&, const U&)>          _m_process_parsed_value,
         const std::function<std::string(const T&)> _a_print_func
 
     ) noexcept
 {
     using namespace std;
     inner_add_option(make_shared<cli_multi_args<Option_Class, T, U>>(
-        _a_flag,
-        _a_description,
+        _a_cli_option,
         _a_member_var,
-        _a_single_char_flag,
         _a_parser_func,
         _m_process_parsed_value,
         _a_print_func

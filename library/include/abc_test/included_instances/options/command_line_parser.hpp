@@ -19,15 +19,6 @@ __no_constexpr void
         cli_t<included_instances_test_options_t>& _a_cli,
         cli_results_t&                            _a_cli_results
     ) noexcept;
-template <typename T, typename U = T>
-__constexpr void
-    insert_option(
-        cli_t<included_instances_test_options_t>& _a_cli,
-        const option_config_t&                    _a_option_config,
-        T included_instances_test_options_t::* _a_member_var,
-        cli_results_t&                         _a_cli_results
-    ) noexcept;
-static constexpr std::string_view _s_automatic_config_option = "--config";
 } // namespace detail
 
 _END_ABC_NS
@@ -125,62 +116,52 @@ __no_constexpr_imp void
     using namespace std;
     _a_cli.add_help_flag();
     _a_cli.add_file_config_flag();
-    insert_option(
-        _a_cli,
+    _a_cli.add_option(
         _s_show_configuration_explanations,
         &included_instances_test_options_t::show_configuration_explanations,
         _a_cli_results
     );
-    insert_option(
-        _a_cli,
+    _a_cli.add_option(
         _s_global_test_list,
         &included_instances_test_options_t::use_global_test_list,
         _a_cli_results
     );
-    insert_option(
-        _a_cli,
+    _a_cli.add_option(
         _s_write_data_to_files,
         &included_instances_test_options_t::write_data_to_files,
         _a_cli_results
     );
-    insert_option(
-        _a_cli,
+    _a_cli.add_option(
         _s_path_delimiter,
         &included_instances_test_options_t::path_delimiter,
         _a_cli_results
     );
-    insert_option(
-        _a_cli,
+    _a_cli.add_option(
         _s_root_path,
         &included_instances_test_options_t::root_path,
         _a_cli_results
     );
-    insert_option(
-        _a_cli,
+    _a_cli.add_option(
         _s_threads,
         &included_instances_test_options_t::threads,
         _a_cli_results
     );
-    insert_option(
-        _a_cli,
+    _a_cli.add_option(
         _s_comment_str,
         &included_instances_test_options_t::comment_str,
         _a_cli_results
     );
-    insert_option(
-        _a_cli,
+    _a_cli.add_option(
         _s_general_data_file_extension,
         &included_instances_test_options_t::general_data_extension,
         _a_cli_results
     );
-    insert_option(
-        _a_cli,
+    _a_cli.add_option(
         _s_tertiary_data_file_extension,
         &included_instances_test_options_t::tertiary_data_file_extension,
         _a_cli_results
     );
-    insert_option(
-        _a_cli,
+    _a_cli.add_option(
         _s_integers_used_for_rng_generation,
         &included_instances_test_options_t::
             number_of_integers_used_to_seed_random_generators,
@@ -189,13 +170,9 @@ __no_constexpr_imp void
     _a_cli.add_option<
         _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t,
         string>(
-        get<0>(_s_repetition_config),
-        get<1>(_s_repetition_config),
+        _s_repetition_config,
         &included_instances_test_options_t::
             map_of_unique_ids_and_for_loop_stack_tries,
-        get<2>(_s_repetition_config).has_value()
-            ? optional<char>(get<2>(_s_repetition_config).value()[0])
-            : optional<char>{},
         _a_cli_results,
         detail::make_parser_func<string>(),
         [](ds::map_unique_id_to_tdg_collection_stack_trie_t& _a_ref,
@@ -223,83 +200,70 @@ __no_constexpr_imp void
                 );
         }
     );
-    _a_cli.add_option<utility::global_seed_t,utility::global_seed_t>(
-        get<0>(_s_global_seed),
-        get<1>(_s_global_seed),
+    _a_cli.add_option<utility::global_seed_t, utility::global_seed_t>(
+        _s_global_seed,
         &included_instances_test_options_t::global_seed,
-        get<2>(_s_global_seed).has_value()
-        ? optional<char>(get<2>(_s_global_seed).value()[0])
-        : optional<char>{},
         _a_cli_results,
         detail::make_parser_func<utility::global_seed_t>(),
         detail::process_value<utility::global_seed_t, utility::global_seed_t>(),
         [](const utility::global_seed_t& _a_global_seed)
         {
             return _a_global_seed.complete_global_seed()
-                .value()
-                .integer()
-                .has_value()
-                ? fmt::format(
-                    "{0}",
-                    _a_global_seed.complete_global_seed()
-                    .value()
-                    .integer()
-                    .value()
-                )
-                : fmt::format(
-                    "{0}",
-                    _a_global_seed.complete_global_seed()
-                    .value()
-                    .vector_of_integers()
-                    .value()
-                );
+                           .value()
+                           .integer()
+                           .has_value()
+                       ? fmt::format(
+                             "{0}",
+                             _a_global_seed.complete_global_seed()
+                                 .value()
+                                 .integer()
+                                 .value()
+                         )
+                       : fmt::format(
+                             "{0}",
+                             _a_global_seed.complete_global_seed()
+                                 .value()
+                                 .vector_of_integers()
+                                 .value()
+                         );
         }
     );
-    insert_option(
-        _a_cli,
+    _a_cli.add_option(
         _s_force_run_all_tests,
         &included_instances_test_options_t::force_run_all_tests,
         _a_cli_results
     );
-    insert_option(
-        _a_cli,
+    _a_cli.add_option(
         _s_autofile_name,
         &included_instances_test_options_t::autofile_name,
         _a_cli_results
     );
-    insert_option(
-        _a_cli,
+    _a_cli.add_option(
         _s_autofile_size,
         &included_instances_test_options_t::autofile_size,
         _a_cli_results
     );
-    insert_option(
-        _a_cli,
+    _a_cli.add_option(
         _s_repetition_file_metadata_string,
         &included_instances_test_options_t::autofile_metadata_string,
         _a_cli_results
     );
-    insert_option(
-        _a_cli,
+    _a_cli.add_option(
         _s_tertiary_data_file_extension,
         &included_instances_test_options_t::tertiary_data_file_extension,
         _a_cli_results
     );
     _a_cli.add_auto_configuration();
     _a_cli.add_multi_element_option<vector<string>, string>(
-        get<0>(_c_test_paths_to_run),
-        get<1>(_c_test_paths_to_run),
+        _c_test_paths_to_run,
         &included_instances_test_options_t::test_paths_to_run,
-        get<2>(_c_test_paths_to_run).has_value()
-            ? optional<char>(get<2>(_c_test_paths_to_run).value()[0])
-            : optional<char>{},
         _a_cli_results,
         detail::make_parser_func<string>(),
         detail::process_value<vector<string>, string>(),
         [](const vector<string>& _a_strs)
         {
             string _l_rv;
-            for (size_t _l_idx{ 0 }; const string_view _l_str : _a_strs)
+            for (size_t _l_idx{0}; const string_view _l_str : _a_strs)
             {
                 if (_l_str == "")
                 {
@@ -316,28 +280,6 @@ __no_constexpr_imp void
         }
     );
 }
-
-template <typename T, typename U>
-__constexpr void
-    insert_option(
-        cli_t<included_instances_test_options_t>& _a_cli,
-        const option_config_t&                    _a_option_config,
-        T included_instances_test_options_t::* _a_member_var,
-        cli_results_t&                         _a_cli_results
-    ) noexcept
-{
-    using namespace std;
-    _a_cli.add_option<T, U>(
-        get<0>(_a_option_config),
-        get<1>(_a_option_config),
-        _a_member_var,
-        get<2>(_a_option_config).has_value()
-            ? optional<char>(get<2>(_a_option_config).value()[0])
-            : optional<char>{},
-        _a_cli_results
-    );
-}
-
 } // namespace detail
 
 _END_ABC_NS
