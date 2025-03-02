@@ -35,66 +35,81 @@ __no_constexpr_imp int
     using namespace _ABC_NS_REPORTERS;
     using namespace _ABC_NS_DS;
     using namespace _ABC_NS_UTILITY;
-    included_instances_test_options_t        _l_iito;
-    cli_results_t                            _l_cli_results;
-    cli_t<included_instances_test_options_t> _l_cli;
-    detail::add_all_options(_l_iito, _l_cli, _l_cli_results);
-    _l_cli.parse_arguments(_l_iito, argc, argv, _l_cli_results);
-    if (_l_cli_results.has_errors())
+    included_instances_test_options_t                  _l_iito;
+    cli_results_t                                      _l_cli_results;
+    result_t<cli_t<included_instances_test_options_t>> _l_cli_res{
+        make_cli<included_instances_test_options_t>()
+    };
+    if (_l_cli_res.has_value())
     {
-        std::cout << "Errors encountered when parsing command line parameters. "
-                     "These are as follows:"
-                  << std::endl;
-        std::cout << "\t" << _l_cli_results.errors();
-        return -1;
-    }
-    if (_l_cli_results.has_warnings())
-    {
-    }
-    if (_l_cli_results.show_log())
-    {
-        _l_cli_results.log_msg();
-        return -1;
-    }
-    if (_l_cli_results.has_text_output())
-    {
-        for (auto& k : _l_cli_results.text_output())
+        cli_t<included_instances_test_options_t>& _l_cli{ _l_cli_res.value() };
+        detail::add_all_options(_l_iito, _l_cli, _l_cli_results);
+        _l_cli.parse_arguments(_l_iito, argc, argv, _l_cli_results);
+        if (_l_cli_results.has_errors())
         {
-            std::cout << k << std::endl;
+            std::cout
+                << "Errors encountered when parsing command line parameters. "
+                   "These are as follows:"
+                << std::endl;
+            std::cout << "\t" << _l_cli_results.errors();
+            return -1;
         }
-        return -1;
-    }
-    if (_l_cli_results.can_continue())
-    {
-        ds::pre_test_run_report_t _l_ptrr(
-            _l_cli_results.memoized_data(), _l_iito
-        );
-        auto _l_validated_test_options{validated_test_options_t<
-            included_instances_test_options_t>::validate_test_options(_l_iito)};
-        if (_l_validated_test_options.has_value())
+        if (_l_cli_results.has_warnings())
         {
-            test_main_t _l_test_main(_l_validated_test_options.value(), _l_cli);
-            _l_test_main.run_tests(_l_ptrr);
-            return 0;
+        }
+        if (_l_cli_results.show_log())
+        {
+            _l_cli_results.log_msg();
+            return -1;
+        }
+        if (_l_cli_results.has_text_output())
+        {
+            for (auto& k : _l_cli_results.text_output())
+            {
+                std::cout << k << std::endl;
+            }
+            return -1;
+        }
+        if (_l_cli_results.can_continue())
+        {
+            ds::pre_test_run_report_t _l_ptrr(
+                _l_cli_results.memoized_data(), _l_iito
+            );
+            auto _l_validated_test_options{
+                validated_test_options_t<included_instances_test_options_t>::
+                    validate_test_options(_l_iito)
+            };
+            if (_l_validated_test_options.has_value())
+            {
+                test_main_t _l_test_main(
+                    _l_validated_test_options.value(), _l_cli
+                );
+                _l_test_main.run_tests(_l_ptrr);
+                return 0;
+            }
+            else
+            {
+                str::string_table_t _l_st({1});
+                for (size_t _l_idx{0};
+                     string & _l_error : _l_validated_test_options.error())
+                {
+                    _l_st.push_back(fmt::format(" {0})  ", ++_l_idx));
+                    _l_st.push_back(_l_error);
+                    _l_st.new_line();
+                }
+                std::cout << fmt::format(
+                    "Error(s) encountered when validating test_options_t. "
+                    "The following errors were returned from the validation "
+                    "function:\n{0}\nThe program will now terminate. "
+                    "included_instances_test_options_t = {1}",
+                    _l_st(),
+                    _l_iito
+                );
+                return -1;
+            }
         }
         else
         {
-            str::string_table_t _l_st({1});
-            for (size_t _l_idx{0};
-                 string & _l_error : _l_validated_test_options.error())
-            {
-                _l_st.push_back(fmt::format(" {0})  ", ++_l_idx));
-                _l_st.push_back(_l_error);
-                _l_st.new_line();
-            }
-            std::cout << fmt::format(
-                "Error(s) encountered when validating test_options_t. "
-                "The following errors were returned from the validation "
-                "function:\n{0}\nThe program will now terminate. "
-                "included_instances_test_options_t = {1}",
-                _l_st(),
-                _l_iito
-            );
             return -1;
         }
     }

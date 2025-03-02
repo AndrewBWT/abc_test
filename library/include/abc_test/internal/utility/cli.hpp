@@ -27,14 +27,20 @@
 
 _BEGIN_ABC_NS
 
+namespace detail
+{
+struct found_data_t;
+} // namespace detail
+template<typename T>
+using result_t = std::expected<T, std::string>;
 template <typename Option_Class>
 class cli_t
 {
 public:
     __no_constexpr
         cli_t(
-            const char             _a_single_char_cml_identifier = '-',
-            const std::string_view _a_multi_char_cml_identifier  = "--"
+            const char             _a_single_char_cml_identifier,
+            const std::string_view _a_multi_char_cml_identifier
         ) noexcept;
     __no_constexpr void
         parse_arguments(
@@ -53,19 +59,19 @@ public:
     __no_constexpr void
         add_option(
             const cli_option_config_t& _a_option,
-            T Option_Class::*          _a_member_var,
-            cli_results_t&             _a_cli_results,
-            const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs = 
-            cli_argument_processing_info_t<T, U>{}
+            T Option_Class::*                           _a_member_var,
+            cli_results_t&                              _a_cli_results,
+            const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs
+            = cli_argument_processing_info_t<T, U>{}
         ) noexcept;
     template <typename T, typename U>
     __no_constexpr void
         add_multi_element_option(
             const cli_option_config_t& _a_cli_option,
-            T Option_Class::* _a_member_var,
-            cli_results_t& _a_cli_results,
-            const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs =
-            cli_argument_processing_info_t<T, U>{}
+            T Option_Class::*                           _a_member_var,
+            cli_results_t&                              _a_cli_results,
+            const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs
+            = cli_argument_processing_info_t<T, U>{}
         ) noexcept;
     __no_constexpr void
         add_help_flag() noexcept;
@@ -104,10 +110,10 @@ public:
 private:
     __no_constexpr bool
         load_data(
-            Option_Class&  _a_option_class,
-            cli_results_t& _a_cli_results,
-            const std::tuple<bool, size_t, std::vector<std::string>>& _l_data,
-            const std::filesystem::path&                              _a_path
+            Option_Class&                _a_option_class,
+            cli_results_t&               _a_cli_results,
+            const detail::found_data_t&  _l_data,
+            const std::filesystem::path& _a_path
         ) const noexcept;
     mutable std::optional<cli_auto_configuration_t>        _m_rep_data;
     std::vector<std::shared_ptr<cli_info_t<Option_Class>>> _m_clp_info;
@@ -150,110 +156,39 @@ private:
                 get_config_file_data(const Option_Class& _a_option_class
                 ) const noexcept;
 };
-
+template<typename Option_Class>
+__no_constexpr_imp result_t<cli_t<Option_Class>> make_cli(
+    const char _a_single_char_cli_identifier = '-',
+    const std::string_view _a_multi_char_cli_identifier = "--"
+) noexcept
+{
+    return cli_t<Option_Class>(_a_single_char_cli_identifier, _a_multi_char_cli_identifier);
+}
 namespace detail
 {
 __constexpr std::vector<std::string_view>
             make_strs_from_command_line_args(const int _a_argc, char** _a_argv)
         noexcept;
 
-__constexpr
-    std::optional<std::tuple<bool, std::size_t, std::vector<std::string>>>
-    find_data(
-        const std::filesystem::path&      _a_path,
-        const std::optional<std::size_t>& _a_index
-        = std::optional<std::size_t>{}
-    ) noexcept
+struct found_data_t
 {
-    using namespace std;
-    fstream _l_file_input(_a_path);
-    string  _l_line;
-    optional<std::tuple<bool, std::size_t, std::vector<std::string>>> _l_rv;
-    string           _l_str_to_find{"metadata_"};
-    optional<string> _l_unprocessed_line;
-    while (_l_unprocessed_line.has_value() || getline(_l_file_input, _l_line))
-    {
-        string _l_line_to_get = _l_unprocessed_line.has_value()
-                                    ? _l_unprocessed_line.value()
-                                    : _l_line;
-        if (_l_unprocessed_line.has_value())
-        {
-            _l_unprocessed_line = nullopt;
-        }
-        if (_l_line_to_get.starts_with(_l_str_to_find))
-        {
-            auto _l_res = utility::parser::parse<pair<bool, size_t>>(
-                _l_line_to_get.substr(_l_str_to_find.size())
-            );
-            if (_l_res.has_value())
-            {
-                if (_a_index.has_value())
-                {
-                    if (_a_index.value() == _l_res.value().second)
-                    {
-                        _l_rv = tuple<bool, size_t, vector<string>>{};
-                        get<1>(_l_rv.value()) = _l_res.value().second;
-                        get<0>(_l_rv.value()) = _l_res.value().first;
-                        while (getline(_l_file_input, _l_line))
-                        {
-                            if (_l_line.starts_with(_l_str_to_find))
-                            {
-                                return _l_rv;
-                            }
-                            else
-                            {
-                                get<2>(_l_rv.value()).push_back(_l_line);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    if (_l_rv.has_value())
-                    {
-                        if (get<1>(_l_rv.value()) < _l_res.value().second)
-                        {
-                            get<1>(_l_rv.value()) = _l_res.value().second;
-                            get<0>(_l_rv.value()) = _l_res.value().first;
-                            while (getline(_l_file_input, _l_line))
-                            {
-                                if (_l_line.starts_with(_l_str_to_find))
-                                {
-                                    _l_unprocessed_line = _l_line;
-                                    break;
-                                }
-                                else
-                                {
-                                    get<2>(_l_rv.value()).push_back(_l_line);
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        _l_rv = tuple<bool, size_t, vector<string>>{};
-                        get<1>(_l_rv.value()) = _l_res.value().second;
-                        get<0>(_l_rv.value()) = _l_res.value().first;
-                        while (getline(_l_file_input, _l_line))
-                        {
-                            if (_l_line.starts_with(_l_str_to_find))
-                            {
-                                _l_unprocessed_line = _l_line;
-                                break;
-                            }
-                            else
-                            {
-                                get<2>(_l_rv.value()).push_back(_l_line);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return _l_rv;
-    // Carry on reading until either EOF or another metadata line.
-}
+    bool                     test_passed;
+    std::size_t              configuration_index;
+    std::vector<std::string> configuration_data;
+
+    __no_constexpr           std::optional<std::string>
+                             process_lines(
+                                 std::fstream&          _a_fstream,
+                                 const std::string_view _a_str_to_find
+                             ) noexcept;
+};
+
+__constexpr std::optional<found_data_t>
+            find_data(
+                const std::filesystem::path&      _a_path,
+                const std::optional<std::size_t>& _a_index
+                = std::optional<std::size_t>{}
+            ) noexcept;
 } // namespace detail
 
 _END_ABC_NS
@@ -336,17 +271,15 @@ template <typename T, typename U>
 __no_constexpr_imp void
     cli_t<Option_Class>::add_option(
         const cli_option_config_t& _a_option,
-        T Option_Class::*                                       _a_member_var,
-        cli_results_t&                                          _a_cli_results,
+        T Option_Class::*                           _a_member_var,
+        cli_results_t&                              _a_cli_results,
         const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs
 
     ) noexcept
 {
     using namespace std;
     inner_add_option(make_shared<cli_one_arg_t<Option_Class, T, U>>(
-        _a_option,
-        _a_member_var,
-        _a_cli_processing_funcs
+        _a_option, _a_member_var, _a_cli_processing_funcs
     ));
 }
 
@@ -355,17 +288,15 @@ template <typename T, typename U>
 __no_constexpr_imp void
     cli_t<Option_Class>::add_multi_element_option(
         const cli_option_config_t& _a_cli_option,
-        T Option_Class::*          _a_member_var,
-        cli_results_t&             _a_cli_results,
+        T Option_Class::*                           _a_member_var,
+        cli_results_t&                              _a_cli_results,
         const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs
 
     ) noexcept
 {
     using namespace std;
     inner_add_option(make_shared<cli_multi_args<Option_Class, T, U>>(
-        _a_cli_option,
-        _a_member_var,
-        _a_cli_processing_funcs
+        _a_cli_option, _a_member_var, _a_cli_processing_funcs
     ));
 }
 
@@ -607,7 +538,7 @@ __no_constexpr_imp bool
         return true;
     }
     // Now time to read the relevant parts of the file
-    tuple<bool, size_t, vector<string>> _l_data;
+    detail::found_data_t _l_data;
     optional<cli_auto_configuration_file_last_loaded_info_t>
         _l_last_loaded_info;
     if (_l_file_containing_index_to_run.has_value())
@@ -643,7 +574,7 @@ __no_constexpr_imp bool
             _l_r.has_value())
         {
             _l_data = _l_r.value();
-            if (get<0>(_l_data) == false
+            if (_l_data.test_passed == false
                 && not _l_file_containing_index_to_run.has_value())
             {
                 _l_file_containing_index_to_run = _l_last_file;
@@ -659,9 +590,10 @@ __no_constexpr_imp bool
                 }
             }
             _l_last_loaded_info
-                = cli_auto_configuration_file_last_loaded_info_t{};
-            _l_last_loaded_info.value().file       = _l_last_file.value().file;
-            _l_last_loaded_info.value().last_index = get<1>(_l_data);
+                = cli_auto_configuration_file_last_loaded_info_t{
+                    .file       = _l_last_file.value().file,
+                    .last_index = _l_data.configuration_index
+                };
         }
         else
         {
@@ -730,15 +662,15 @@ __no_constexpr void
 template <typename Option_Class>
 __no_constexpr_imp bool
     cli_t<Option_Class>::load_data(
-        Option_Class&  _a_option_class,
-        cli_results_t& _a_cli_results,
-        const std::tuple<bool, size_t, std::vector<std::string>>& _l_data,
-        const std::filesystem::path&                              _a_path
+        Option_Class&                _a_option_class,
+        cli_results_t&               _a_cli_results,
+        const detail::found_data_t&  _l_data,
+        const std::filesystem::path& _a_path
     ) const noexcept
 {
     using namespace std;
     size_t _l_line_idx{1};
-    for (const string_view _l_line : get<2>(_l_data))
+    for (const string_view _l_line : _l_data.configuration_data)
     {
         // Split string into parts. Then process.
         if (_l_line.size() == 0 || _l_line[0] == '#')
@@ -766,7 +698,7 @@ __no_constexpr_imp bool
                     fmt::format(
                         "memoized configuration {0} from file \"{1}\", line "
                         "{2}",
-                        get<1>(_l_data),
+                        _l_data.configuration_index,
                         _a_path,
                         _l_line_idx
                     ),
@@ -891,151 +823,44 @@ __constexpr_imp bool
     ) const noexcept
 {
     using namespace std;
-    using enum enum_n_arguments;
-    switch (_a_cli_info.n_arguments())
+    size_t _l_index_of_flag{_a_current_index};
+    ++_a_current_index;
+    vector<string_view> _l_strs_to_pass;
+    while (_a_current_index < _a_strs.size())
     {
-    case ZERO:
-    {
-        if (const bool _l_terminate{_a_cli_info.process_args(
-                _a_option_class, _a_flag, {}, *this, _a_cli_results
-            )};
-            _l_terminate)
+        expected<string_view, string> _l_next_arg
+            = normalise_str_from_cli_to_flag(_a_strs[_a_current_index]);
+        if (_l_next_arg.has_value())
         {
-            return true;
-        }
-        if (auto _l_opt_print(_a_cli_info.print(_a_option_class));
-            _l_opt_print.has_value())
-        {
-            _a_cli_results.add_memoized_data(
-                false,
-                _a_flag,
-                _l_opt_print.value(),
-                (_a_source.has_value()
-                     ? _a_source.value()
-                     : fmt::format(
-                           "command line argument {0}", _a_current_index
-                       ))
-            );
-        }
-    }
-        return false;
-    case ONE:
-    {
-        if (expected<string_view, string> _l_next_arg{
-                normalise_str_from_cli_to_flag(_a_strs[++_a_current_index])
-            };
-            not _l_next_arg.has_value())
-        {
-            if (const bool _l_terminate{_a_cli_info.process_args(
-                    _a_option_class,
-                    _a_flag,
-                    {_a_strs[_a_current_index]},
-                    *this,
-                    _a_cli_results
-                )};
-                _l_terminate)
-            {
-                return true;
-            }
-            if (auto _l_opt_print(_a_cli_info.print(_a_option_class));
-                _l_opt_print.has_value())
-            {
-                _a_cli_results.add_memoized_data(
-                    false,
-                    _a_flag,
-                    _l_opt_print.value(),
-                    (_a_source.has_value()
-                         ? _a_source.value()
-                         : fmt::format(
-                               "command line arguments {0} and {1}",
-                               _a_current_index - 1,
-                               _a_current_index
-                           ))
-                );
-            }
+            break;
         }
         else
         {
-            _a_cli_results.add_error(
-                fmt::format("Expected a single argument, however the argument "
-                            "found is a flag.")
-            );
-            return true;
+            _l_strs_to_pass.push_back(_a_strs[_a_current_index++]);
         }
     }
-    break;
-    default:
-        // Could be an unlimited number.
-        {
-            size_t _l_index_of_flag{_a_current_index};
-            ++_a_current_index;
-            vector<string_view> _l_strs_to_pass;
-            while (_a_current_index < _a_strs.size())
-            {
-                expected<string_view, string> _l_next_arg
-                    = normalise_str_from_cli_to_flag(_a_strs[_a_current_index]);
-                if (_l_next_arg.has_value())
-                {
-                    break;
-                }
-                else
-                {
-                    _l_strs_to_pass.push_back(_a_strs[_a_current_index++]);
-                }
-            }
-            --_a_current_index;
-            if (_a_cli_info.min_arguments().has_value()
-                && _a_cli_info.min_arguments().value() > _l_strs_to_pass.size())
-            {
-                _a_cli_results.add_error(fmt::format(
-                    "Flag requires at least {0} arguments, however only "
-                    "{1} "
-                    "was able be parsed. Arguments successfully parsed =.",
-                    _a_cli_info.min_arguments().value(),
-                    _l_strs_to_pass.size()
-                ));
-                return true;
-            }
-            else if (_a_cli_info.max_arguments().has_value()
-                     && _a_cli_info.max_arguments().value()
-                            < _l_strs_to_pass.size())
-            {
-                _a_cli_results.add_error(fmt::format(
-                    "Flag requires at most {0} arguments, however {1} "
-                    "were able be parsed. Arguments successfully parsed.",
-                    _a_cli_info.min_arguments().value(),
-                    _l_strs_to_pass.size()
-                ));
-                return true;
-            }
-            if (const bool _l_terminate{_a_cli_info.process_args(
-                    _a_option_class,
-                    _a_flag,
-                    _l_strs_to_pass,
-                    *this,
-                    _a_cli_results
-                )};
-                _l_terminate)
-            {
-                return true;
-            }
-            if (auto _l_opt_print(_a_cli_info.print(_a_option_class));
-                _l_opt_print.has_value())
-            {
-                _a_cli_results.add_memoized_data(
-                    true,
-                    _a_flag,
-                    _l_opt_print.value(),
-                    (_a_source.has_value()
-                         ? _a_source.value()
-                         : fmt::format(
-                               "command line arguments {0} to {1}",
-                               _l_index_of_flag,
-                               _a_current_index
-                           ))
-                );
-            }
-        }
+    --_a_current_index;
+    if (const bool _l_terminate{_a_cli_info.process_args(
+            _a_option_class, _a_flag, _l_strs_to_pass, *this, _a_cli_results
+        )};
+        _l_terminate)
+    {
+        return true;
+    }
+    if (auto _l_opt_print(_a_cli_info.print(_a_option_class));
+        _l_opt_print.has_value())
+    {
+        _a_cli_results.add_memoized_data(
+            true,
+            _a_flag,
+            _l_opt_print.value(),
+            (_a_source.has_value() ? _a_source.value()
+                                   : fmt::format(
+                                         "command line arguments {0} to {1}",
+                                         _l_index_of_flag,
+                                         _a_current_index
+                                     ))
+        );
     }
     return false;
 }
@@ -1156,6 +981,97 @@ __constexpr_imp std::vector<std::string_view>
         _l_strs[_l_idx - 1] = string_view(_a_argv[_l_idx]);
     }
     return _l_strs;
+}
+
+__no_constexpr_imp std::optional<std::string>
+                   found_data_t::process_lines(
+        std::fstream&          _a_fstream,
+        const std::string_view _a_str_to_find
+    ) noexcept
+{
+    using namespace std;
+    string _l_line;
+    while (getline(_a_fstream, _l_line))
+    {
+        if (_l_line.starts_with(_a_str_to_find))
+        {
+            return _l_line;
+        }
+        else
+        {
+            configuration_data.push_back(_l_line);
+        }
+    }
+    return nullopt;
+}
+
+__constexpr_imp std::optional<found_data_t>
+                find_data(
+                    const std::filesystem::path&      _a_path,
+                    const std::optional<std::size_t>& _a_index
+                ) noexcept
+{
+    using namespace std;
+    fstream                _l_file_input(_a_path);
+    string                 _l_line;
+    optional<found_data_t> _l_rv;
+    string                 _l_str_to_find{"metadata_"};
+    optional<string>       _l_unprocessed_line;
+    while (_l_unprocessed_line.has_value() || getline(_l_file_input, _l_line))
+    {
+        const string& _l_line_to_get = _l_unprocessed_line.has_value()
+                                           ? _l_unprocessed_line.value()
+                                           : _l_line;
+        if (_l_unprocessed_line.has_value())
+        {
+            _l_unprocessed_line = nullopt;
+        }
+        if (_l_line_to_get.starts_with(_l_str_to_find))
+        {
+            auto _l_res = utility::parser::parse<pair<bool, size_t>>(
+                _l_line_to_get.substr(_l_str_to_find.size())
+            );
+            if (_l_res.has_value())
+            {
+                auto& [_l_passed, _l_index]{_l_res.value()};
+                if (_a_index.has_value())
+                {
+                    if (_a_index.value() == _l_index)
+                    {
+                        // We've found the correct configuration.
+                        found_data_t _l_fd{_l_passed, _l_index};
+                        // Process its line, close the stream and return it.
+                        _l_fd.process_lines(_l_file_input, _l_str_to_find);
+                        _l_file_input.close();
+                        return _l_fd;
+                    }
+                }
+                else
+                {
+                    if (_l_rv.has_value())
+                    {
+                        found_data_t& _l_fd{_l_rv.value()};
+                        if (_l_fd.configuration_index < _l_index)
+                        {
+                            _l_fd = found_data_t{_l_passed, _l_index};
+                            _l_unprocessed_line = _l_fd.process_lines(
+                                _l_file_input, _l_str_to_find
+                            );
+                        }
+                    }
+                    else
+                    {
+                        _l_rv               = found_data_t{_l_passed, _l_index};
+                        _l_unprocessed_line = _l_rv.value().process_lines(
+                            _l_file_input, _l_str_to_find
+                        );
+                    }
+                }
+            }
+        }
+    }
+    return _l_rv;
+    // Carry on reading until either EOF or another metadata line.
 }
 } // namespace detail
 

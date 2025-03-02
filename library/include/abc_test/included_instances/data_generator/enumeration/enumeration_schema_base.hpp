@@ -41,6 +41,8 @@ public:
                 n_advancements_per_advancement(
                     const enumeration_t<T>& _a_edo
                 ) const noexcept;
+    template<typename R>
+    __constexpr R enumerate_all_values(const enumeration_t<T>& _a_edo) const noexcept;
 protected:
     T _m_start_value;
 };
@@ -93,6 +95,19 @@ enumeration_schema_base_t<T>::n_advancements_per_advancement(
 {
     using namespace std;
     return enumerate_index_t{ 1 };
+}
+template<typename T>
+template<typename R>
+__constexpr_imp R enumeration_schema_base_t<T>::enumerate_all_values(const enumeration_t<T>& _a_edo) const noexcept
+{
+    return R{};
+    /*if (_m_has_current_element)
+    {
+        _m_tertiary_data++;
+        _m_has_current_element
+            = next_element(_m_n_advancements_per_generate_next);
+    }
+    return _m_has_current_element;*/
 }
 _END_ABC_DG_NS
 _BEGIN_ABC_NS

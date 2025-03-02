@@ -149,10 +149,23 @@ template <
     bool Generate_Permutations      = false,
     bool Allow_Duplicates           = false,
     bool Generate_Elements_Forwards = true,
+    typename... Args>
+__constexpr _ABC_NS_DG::data_generator_collection_t<
+    _ABC_NS_DG::combinatorics_return_type<T>>
+    using_combinatorics_generator_(
+        const _ABC_NS_DG::enumeration_schema_t<T>& _a_es,
+        const _ABC_NS_DG::enumeration_t<T>&        _a_edo,
+        Args... _a_file_reader_writers
+    );
+template <
+    typename T,
+    bool Generate_Permutations      = false,
+    bool Allow_Duplicates           = false,
+    bool Generate_Elements_Forwards = true,
     typename R                      = std::initializer_list<T>,
     typename... Args>
-__constexpr _ABC_NS_DG::
-    data_generator_collection_t<_ABC_NS_DG::combinatorics_return_type<T>>
+__constexpr _ABC_NS_DG::data_generator_collection_t<
+    _ABC_NS_DG::combinatorics_return_type<T>>
     using_combinatorics_generator(
         R&& _a_collection_of_elements,
         Args... _a_file_reader_writers
@@ -164,8 +177,8 @@ template <
     bool Generate_Elements_Forwards = true,
     typename R                      = std::initializer_list<T>,
     typename... Args>
-__constexpr _ABC_NS_DG::
-    data_generator_collection_t<_ABC_NS_DG::combinatorics_return_type<T>>
+__constexpr _ABC_NS_DG::data_generator_collection_t<
+    _ABC_NS_DG::combinatorics_return_type<T>>
     using_combinatorics_generator(
         R&&                                       _a_collection_of_elements,
         const _ABC_NS_DG::combinatorics_schema_t& _a_combinations_sizes,
@@ -443,7 +456,7 @@ __constexpr_imp void
 {
     while (_m_tertiary_data < _a_tertiary_data)
     {
-        const bool _l_res{ generate_next() };
+        const bool _l_res{generate_next()};
         if (not _l_res)
         {
             return;
@@ -906,10 +919,36 @@ template <
     bool Generate_Permutations,
     bool Allow_Duplicates,
     bool Generate_Elements_Forwards,
+    typename... Args>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<
+    _ABC_NS_DG::combinatorics_return_type<T>>
+    using_combinatorics_generator_(
+        const _ABC_NS_DG::enumeration_schema_t<T>& _a_es,
+        const _ABC_NS_DG::enumeration_t<T>&        _a_edo,
+        Args... _a_file_reader_writers
+    )
+{
+    using namespace _ABC_NS_DG;
+    auto ki = _a_es.get()->enumerate_all_values<std::vector<T>>(_a_edo);
+    const std::size_t _l_range_size{std::ranges::size(ki)};
+    return using_combinatorics_generator<
+        T,
+        Generate_Permutations,
+        Allow_Duplicates,
+        Generate_Elements_Forwards,
+        std::vector<T>,
+        Args...>(std::move(ki), {0, _l_range_size}, _a_file_reader_writers...);
+}
+
+template <
+    typename T,
+    bool Generate_Permutations,
+    bool Allow_Duplicates,
+    bool Generate_Elements_Forwards,
     typename R,
     typename... Args>
-__constexpr_imp _ABC_NS_DG::
-    data_generator_collection_t<_ABC_NS_DG::combinatorics_return_type<T>>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<
+    _ABC_NS_DG::combinatorics_return_type<T>>
     using_combinatorics_generator(
         R&& _a_collection_of_elements,
         Args... _a_file_reader_writers
@@ -938,8 +977,8 @@ template <
     bool Generate_Elements_Forwards,
     typename R,
     typename... Args>
-__constexpr_imp _ABC_NS_DG::
-    data_generator_collection_t<_ABC_NS_DG::combinatorics_return_type<T>>
+__constexpr_imp _ABC_NS_DG::data_generator_collection_t<
+    _ABC_NS_DG::combinatorics_return_type<T>>
     using_combinatorics_generator(
         R&&                                       _a_collection_of_elements,
         const _ABC_NS_DG::combinatorics_schema_t& _a_combinations_sizes,

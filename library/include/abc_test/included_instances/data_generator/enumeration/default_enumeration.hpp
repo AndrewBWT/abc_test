@@ -2,6 +2,10 @@
 #include "abc_test/external/bigint/BigIntegerUtils.hpp"
 #include "abc_test/included_instances/data_generator/enumeration/enumeration_base.hpp"
 #include "abc_test/included_instances/data_generator/enumeration/enumeration_schema_base.hpp"
+#include "abc_test/internal/utility/enum.hpp"
+
+#include "abc_test/internal/utility/limits/min_value_concept.hpp"
+#include "abc_test/internal/utility/limits/max_value_concept.hpp"
 
 #include <numeric>
 _BEGIN_ABC_DG_NS
@@ -906,39 +910,39 @@ public:
         ) noexcept
     {
         using namespace std;
-        enumeration_diff_t _l_rv{ 0, 0 };
+        enumeration_diff_t _l_rv{0, 0};
         // Find the lesser of the two, then copy the lesser.
-        const bool              _l_arg_1_lesser{ less_than(_a_arg1, _a_arg2) };
-        auto& _l_lesser{ _l_arg_1_lesser ? _a_arg1 : _a_arg2 };
-        auto& _l_greater{ _l_arg_1_lesser ? _a_arg2 : _a_arg1 };
+        const bool              _l_arg_1_lesser{less_than(_a_arg1, _a_arg2)};
+        auto&                   _l_lesser{_l_arg_1_lesser ? _a_arg1 : _a_arg2};
+        auto&                   _l_greater{_l_arg_1_lesser ? _a_arg2 : _a_arg1};
         const enumerate_index_t _l_divisor{
             _m_enumeration_schema->n_advancements_per_advancement(_m_enumerate)
         };
-        size_t             _l_greater_idx{ _l_greater.size() - 1 };
-        vector<T>          _l_local_lesser{ _l_lesser };
-        enumeration_diff_t _l_biggest_difference{ _m_enumerate->difference(
+        size_t             _l_greater_idx{_l_greater.size() - 1};
+        vector<T>          _l_local_lesser{_l_lesser};
+        enumeration_diff_t _l_biggest_difference{_m_enumerate->difference(
             _m_enumeration_schema->start_value(),
             _m_enumeration_schema->end_value(_m_enumerate)
-        ) };
+        )};
         _l_biggest_difference.second += 1;
-        for (size_t _l_idx{ _l_lesser.size() }; _l_idx > 0; --_l_idx)
+        for (size_t _l_idx{_l_lesser.size()}; _l_idx > 0; --_l_idx)
         {
-            size_t _l_idx_offset{ _l_idx - 1 };
+            size_t _l_idx_offset{_l_idx - 1};
             // To get to i requires (X,Y).
-            enumeration_diff_t _l_this_diff{ 0, 0 };
+            enumeration_diff_t _l_this_diff{0, 0};
             if (_m_enumerate->equal(
-                _l_lesser[_l_idx_offset], _l_greater[_l_greater_idx]
-            ))
+                    _l_lesser[_l_idx_offset], _l_greater[_l_greater_idx]
+                ))
             {
             }
             else if (_m_enumerate->less_than(
-                _l_lesser[_l_idx_offset], _l_greater[_l_greater_idx]
-            ))
+                         _l_lesser[_l_idx_offset], _l_greater[_l_greater_idx]
+                     ))
             {
                 enumeration_diff_t _l_local_diff = _m_enumerate->difference(
                     _l_lesser[_l_idx_offset], _l_greater[_l_greater_idx]
                 );
-                _l_rv.first += _l_local_diff.first;
+                _l_rv.first  += _l_local_diff.first;
                 _l_rv.second += _l_local_diff.second;
             }
             else
@@ -953,34 +957,86 @@ public:
                     _l_local_diff_2.second += _l_divisor;
                 }
                 _l_local_diff_2.second -= _l_local_diff.second;
-                _l_local_diff_2.first -= _l_local_diff.first;
-                _l_rv.first += _l_local_diff_2.first;
-                _l_rv.second += _l_local_diff_2.second;
+                _l_local_diff_2.first  -= _l_local_diff.first;
+                _l_rv.first            += _l_local_diff_2.first;
+                _l_rv.second           += _l_local_diff_2.second;
             }
             _l_greater_idx--;
         }
-        enumeration_diff_t _l_rolling_product{ 1,1 };
+        enumeration_diff_t _l_rolling_product{1, 1};
         // Gone through all of them. Now gotta go through the remaining indexes.
-        for (size_t _l_idx{ _l_greater.size() - _l_lesser.size() }; _l_idx > 0;
-            --_l_idx)
+        for (size_t _l_idx{_l_greater.size() - _l_lesser.size()}; _l_idx > 0;
+             --_l_idx)
         {
             enumeration_diff_t _l_local_diff = _m_enumerate->difference(
                 _m_enumeration_schema->start_value(), _l_greater[_l_idx - 1]
             );
             _l_local_diff.second += 1;
-            _l_rv.first += _l_local_diff.first * _l_rolling_product.first;
+            _l_rv.first  += _l_local_diff.first * _l_rolling_product.first;
             _l_rv.second += _l_local_diff.second * _l_rolling_product.second;
-            _l_rolling_product.first *= _l_biggest_difference.first;
+            _l_rolling_product.first  *= _l_biggest_difference.first;
             _l_rolling_product.second *= _l_biggest_difference.second;
         }
-        enumerate_index_t _l_remainder{ _l_rv.second };
-        _l_rv.first += (_l_remainder / _l_divisor);
-        _l_rv.second = (_l_remainder % _l_divisor);
-        string si = bigUnsignedToString(_l_rv.first);
+        enumerate_index_t _l_remainder{_l_rv.second};
+        _l_rv.first  += (_l_remainder / _l_divisor);
+        _l_rv.second  = (_l_remainder % _l_divisor);
+        string si     = bigUnsignedToString(_l_rv.first);
         return _l_rv;
     }
 };
-
+template <typename T>
+    requires _ABC_NS_UTILITY::enum_has_list_c<T>
+struct default_enumeration_t<T> : public enumeration_base_t<T>
+{
+public:
+    using value_type_t = T;
+    __constexpr_imp virtual bool
+        less_than(
+            const T& _a_l,
+            const T& _a_r
+        ) const noexcept
+    {
+        const auto& _l_ti{ utility::get_thread_local_enumerate_enum_helper<T>() };
+        return (_l_ti.less_than(_a_l, _a_r));
+    }
+    __constexpr_imp virtual bool
+        equal(
+            const T& _a_l,
+            const T& _a_r
+        ) const noexcept
+    {
+        const auto& _l_ti{ utility::get_thread_local_enumerate_enum_helper<T>() };
+        return (_l_ti.equal(_a_l, _a_r));
+    }
+    __constexpr virtual bool
+        increment(
+            T& _a_element,
+            enumerate_index_t& _a_n_times_to_increment,
+            const std::optional<T>& _a_max_value
+        )
+    {
+        const auto& _l_ti{ utility::get_thread_local_enumerate_enum_helper<T>() };
+        return (_l_ti.increment(_a_element, _a_n_times_to_increment, _a_max_value));
+    }
+    __constexpr virtual bool
+        decrement(
+            T& _a_element,
+            enumerate_index_t& _a_n_times_to_increment,
+            const std::optional<T>& _a_max_value
+        )
+    {
+        const auto& _l_ti{ utility::get_thread_local_enumerate_enum_helper<T>() };
+        return (_l_ti.decrement(_a_element, _a_n_times_to_increment, _a_max_value));
+    }
+    __constexpr virtual enumeration_diff_t difference(
+        const T& _a_arg1,
+        const T& _a_arg2
+    ) noexcept
+    {
+        const auto& _l_ti{ utility::get_thread_local_enumerate_enum_helper<T>() };
+        return std::make_pair(_l_ti.difference(_a_arg1, _a_arg2),0);
+    }
+};
 _END_ABC_DG_NS
 
 _BEGIN_ABC_DG_NS

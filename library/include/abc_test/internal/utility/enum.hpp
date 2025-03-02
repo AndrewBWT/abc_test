@@ -22,6 +22,11 @@ struct enumerate_enum_helper_t
         enumerate_enum_helper_t(enum_list_t<T>&& _a_enum_list);
     __constexpr_imp bool
         less_than(const T& _a_l, const T& _a_r) const noexcept;
+    __constexpr_imp bool
+        equal(const T& _a_l, const T& _a_r) const noexcept
+    {
+        return _m_elements_to_idx.at(_a_l) == _m_elements_to_idx.at(_a_r);
+    }
     __constexpr T
         min() const noexcept;
     __constexpr T
@@ -170,6 +175,21 @@ enumerate_enum_helper_t<T>::decrement(
         _a_times_called = 0;
         return true;
     }
+}
+
+template <typename T>
+    requires enum_has_list_c<T>
+__constexpr_imp std::size_t
+enumerate_enum_helper_t<T>::difference(
+    const T& _a_arg1,
+    const T& _a_arg2
+) const noexcept
+{
+    const size_t _l_arg1_idx{ _m_elements_to_idx.at(_a_arg1) };
+    const size_t _l_arg2_idx{ _m_elements_to_idx.at(_a_arg2) };
+    return (_l_arg1_idx < _l_arg2_idx) ?
+        (_l_arg2_idx - _l_arg1_idx) :
+        (_l_arg1_idx - _l_arg2_idx);
 }
 
 template <typename T>
