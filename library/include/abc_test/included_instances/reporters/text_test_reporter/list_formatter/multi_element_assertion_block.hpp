@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/multi_element_assertion_block.hpp"
-#include "abc_test/internal/test_reports/multi_element_assertion_block.hpp"
-#include "abc_test/internal/utility/str/string_table.hpp"
+#include "abc_test/core/test_reports/multi_element_assertion_block.hpp"
+#include "abc_test/utility/str/string_table.hpp"
 _BEGIN_ABC_REPORTERS_NS
 
 template <typename Assertion_Status>

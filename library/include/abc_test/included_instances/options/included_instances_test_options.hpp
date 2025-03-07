@@ -2,7 +2,7 @@
 
 #include "abc_test/included_instances/reporters/text_error_reporter.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter.hpp"
-#include "abc_test/internal/options/test_options_base.hpp"
+#include "abc_test/core/options/test_options_base.hpp"
 
 _BEGIN_ABC_NS
 

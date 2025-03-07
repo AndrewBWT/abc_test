@@ -2,7 +2,7 @@
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/finalised_test_set_data_report.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/print_config.hpp"
-#include "abc_test/internal/ds/test_data/finalised_test_set_data.hpp"
+#include "abc_test/core/ds/test_data/finalised_test_set_data.hpp"
 _BEGIN_ABC_REPORTERS_NS
 
 struct finalised_test_set_data_list_formatter

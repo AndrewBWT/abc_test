@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/internal/utility/rng.hpp"
+#include "abc_test/utility/rng.hpp"
 
 #include <memory>
 

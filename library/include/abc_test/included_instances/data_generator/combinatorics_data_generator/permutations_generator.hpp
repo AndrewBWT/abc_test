@@ -1,5 +1,5 @@
 #pragma once
-#include "abc_test/internal/utility/internal/macros.hpp"
+#include "abc_test/utility/internal/macros.hpp"
 
 _BEGIN_ABC_DG_NS
 

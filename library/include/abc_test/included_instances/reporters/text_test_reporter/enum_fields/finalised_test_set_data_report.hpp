@@ -1,5 +1,5 @@
 #pragma once
-#include "abc_test/internal/utility/internal/macros.hpp"
+#include "abc_test/utility/internal/macros.hpp"
 _BEGIN_ABC_REPORTERS_NS
 enum class enum_finalised_test_set_data_fields_t
 {

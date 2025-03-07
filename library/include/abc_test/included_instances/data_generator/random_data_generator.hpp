@@ -1,12 +1,12 @@
 #pragma once
 
 #include "abc_test/included_instances/data_generator/random_generator/random_generator_base.hpp"
-#include "abc_test/internal/data_generator/data_generator.hpp"
-#include "abc_test/internal/test_runner.hpp"
-#include "abc_test/internal/utility/io/file/file_line_reader.hpp"
-#include "abc_test/internal/utility/io/file/file_line_writer.hpp"
-#include "abc_test/internal/utility/io/file/file_name.hpp"
-#include "abc_test/internal/utility/str/rw_info.hpp"
+#include "abc_test/core/data_generator/data_generator.hpp"
+#include "abc_test/core/test_runner.hpp"
+#include "abc_test/utility/io/file/file_line_reader.hpp"
+#include "abc_test/utility/io/file/file_line_writer.hpp"
+#include "abc_test/utility/io/file/file_name.hpp"
+#include "abc_test/utility/str/rw_info.hpp"
 
 #include <concepts>
 #include <random>

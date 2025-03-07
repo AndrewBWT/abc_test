@@ -1,7 +1,7 @@
 #pragma once
 
 #include "abc_test/included_instances/data_generator/random_generator/default_random_generator.hpp"
-#include "abc_test/internal/utility/enum.hpp"
+#include "abc_test/utility/enum.hpp"
 #include "concepts"
 
 _BEGIN_ABC_DG_NS

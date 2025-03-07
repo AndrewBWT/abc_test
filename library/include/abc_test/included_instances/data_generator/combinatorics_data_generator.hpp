@@ -1,8 +1,8 @@
 #pragma once
 
 #include "abc_test/included_instances/data_generator/combinatorics_data_generator/permutations_generator.hpp"
-#include "abc_test/internal/data_generator/data_generator_collection.hpp"
-#include "abc_test/internal/data_generator/data_generator_with_file_support.hpp"
+#include "abc_test/core/data_generator/data_generator_collection.hpp"
+#include "abc_test/core/data_generator/data_generator_with_file_support.hpp"
 
 #include <unordered_set>
 

@@ -3,8 +3,8 @@
 #include "abc_test/included_instances/data_generator/enumeration/enumeration_base.hpp"
 #include "abc_test/included_instances/data_generator/enumeration/default_enumeration.hpp"
 #include "abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_to_n.hpp"
-#include "abc_test/internal/data_generator/data_generator_collection.hpp"
-#include "abc_test/internal/data_generator/data_generator_with_file_support.hpp"
+#include "abc_test/core/data_generator/data_generator_collection.hpp"
+#include "abc_test/core/data_generator/data_generator_with_file_support.hpp"
 
 _BEGIN_ABC_DG_NS
 

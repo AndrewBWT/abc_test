@@ -12,17 +12,17 @@
 
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/pre_test_set_data_report.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/print_config.hpp"
-#include "abc_test/internal/ds/test_data/invoked_test_data.hpp"
-#include "abc_test/internal/reporters/test_reporter.hpp"
-#include "abc_test/internal/test_reports/assertion_status/fail.hpp"
-#include "abc_test/internal/test_reports/assertion_status/pass.hpp"
-#include "abc_test/internal/test_reports/assertion_status/pass_or_fail.hpp"
-#include "abc_test/internal/test_reports/assertion_status/pass_or_terminate.hpp"
-#include "abc_test/internal/test_reports/assertion_status/terminate.hpp"
-#include "abc_test/internal/test_reports/unexpected_thrown_exception.hpp"
-#include "abc_test/internal/test_reports/unexpected_thrown_non_descript_entity.hpp"
-#include "abc_test/internal/utility/io/threaded_text_output_reporter.hpp"
-#include "abc_test/internal/utility/str/string_table.hpp"
+#include "abc_test/core/ds/test_data/invoked_test_data.hpp"
+#include "abc_test/core/reporters/test_reporter.hpp"
+#include "abc_test/core/test_reports/assertion_status/fail.hpp"
+#include "abc_test/core/test_reports/assertion_status/pass.hpp"
+#include "abc_test/core/test_reports/assertion_status/pass_or_fail.hpp"
+#include "abc_test/core/test_reports/assertion_status/pass_or_terminate.hpp"
+#include "abc_test/core/test_reports/assertion_status/terminate.hpp"
+#include "abc_test/core/test_reports/unexpected_thrown_exception.hpp"
+#include "abc_test/core/test_reports/unexpected_thrown_non_descript_entity.hpp"
+#include "abc_test/utility/io/threaded_text_output_reporter.hpp"
+#include "abc_test/utility/str/string_table.hpp"
 
 #include <array>
 #include <fmt/color.h>

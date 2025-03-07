@@ -1,7 +1,7 @@
 #pragma once
-#include "abc_test/internal/test_reports/assertion_status/pass_or_terminate.hpp"
-#include "abc_test/internal/test_reports/assertion_status/terminate.hpp"
-#include "abc_test/internal/test_reports/static_assertion.hpp"
+#include "abc_test/core/test_reports/assertion_status/pass_or_terminate.hpp"
+#include "abc_test/core/test_reports/assertion_status/terminate.hpp"
+#include "abc_test/core/test_reports/static_assertion.hpp"
 _BEGIN_ABC_REPORTERS_NS
 template<
 	typename Assertion_Status

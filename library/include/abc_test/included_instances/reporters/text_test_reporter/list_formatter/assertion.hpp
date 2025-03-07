@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/assertion.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/user_initialised_report.hpp"
-#include "abc_test/internal/test_reports/assertion.hpp"
+#include "abc_test/core/test_reports/assertion.hpp"
 _BEGIN_ABC_REPORTERS_NS
 template<
 	bool Single_Source,

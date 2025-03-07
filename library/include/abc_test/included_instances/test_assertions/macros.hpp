@@ -1,5 +1,5 @@
 #pragma once
-#include "abc_test/internal/test_assertions/macros.hpp"
+#include "abc_test/core/test_assertions/macros.hpp"
 
 #define _BEGIN_NO_THROW(_a_name)                     \
     _BEGIN_SINGLE_ELEMENT_BBA_CUSTOM_SOURCE(         \

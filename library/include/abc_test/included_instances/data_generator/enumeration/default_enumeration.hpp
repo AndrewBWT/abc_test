@@ -2,10 +2,10 @@
 #include "abc_test/external/bigint/BigIntegerUtils.hpp"
 #include "abc_test/included_instances/data_generator/enumeration/enumeration_base.hpp"
 #include "abc_test/included_instances/data_generator/enumeration/enumeration_schema_base.hpp"
-#include "abc_test/internal/utility/enum.hpp"
+#include "abc_test/utility/enum.hpp"
 
-#include "abc_test/internal/utility/limits/min_value_concept.hpp"
-#include "abc_test/internal/utility/limits/max_value_concept.hpp"
+#include "abc_test/utility/limits/min_value_concept.hpp"
+#include "abc_test/utility/limits/max_value_concept.hpp"
 
 #include <numeric>
 _BEGIN_ABC_DG_NS

@@ -2,8 +2,8 @@
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_report.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/print_config.hpp"
-#include "abc_test/internal/test_reports/unexpected_report.hpp"
-#include "abc_test/internal/utility/internal/macros.hpp"
+#include "abc_test/core/test_reports/unexpected_report.hpp"
+#include "abc_test/utility/internal/macros.hpp"
 _BEGIN_ABC_REPORTERS_NS
 
 template <bool Terminating>

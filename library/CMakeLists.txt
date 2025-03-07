@@ -8,108 +8,108 @@ set(REQUIRED_LIBS
 # The set of all files included with the library.
 set(LIBRARY_FILES
   # Global file
-  include/abc_test/internal/global.hpp
-      src/abc_test/internal/global.cpp
+  include/abc_test/core/global.hpp
+      src/abc_test/core/global.cpp
   # The core subfolder; contains the core logic for how the library works.
   include/abc_test/core.hpp
   include/abc_test/included_instances.hpp
-  include/abc_test/internal/test_main.hpp
-  include/abc_test/internal/options/test_options_base.hpp
-  include/abc_test/internal/options/validated_test_options.hpp
-  include/abc_test/internal/test_runner.hpp
-      src/abc_test/internal/test_runner.cpp
+  include/abc_test/core/test_main.hpp
+  include/abc_test/core/options/test_options_base.hpp
+  include/abc_test/core/options/validated_test_options.hpp
+  include/abc_test/core/test_runner.hpp
+      src/abc_test/core/test_runner.cpp
   # Logging messages, associated with tests
-  include/abc_test/internal/logging/macros.hpp 
-  include/abc_test/internal/logging/log_msg.hpp
-  include/abc_test/internal/test_assertions/test_block.hpp
-  include/abc_test/internal/test_assertions/macros.hpp
-  include/abc_test/internal/test_assertions/functions.hpp
+  include/abc_test/core/logging/macros.hpp 
+  include/abc_test/core/logging/log_msg.hpp
+  include/abc_test/core/test_assertions/test_block.hpp
+  include/abc_test/core/test_assertions/macros.hpp
+  include/abc_test/core/test_assertions/functions.hpp
   # Subfolder contains objects and functions pertaining to how repetition data is stored.
-  include/abc_test/internal/ds/data_generator_memoization/indexed_data_generator_collection_memoized_element.hpp
-  include/abc_test/internal/ds/data_generator_memoization/typeless_data_generator_collection_stack_trie.hpp
-  include/abc_test/internal/ds/data_generator_memoization/typeless_data_generator_collection_stack.hpp
-  include/abc_test/internal/ds/data_generator_memoization/data_generator_collection_memoized_element.hpp 
-  include/abc_test/internal/ds/data_generator_memoization/data_generator_memoized_element.hpp
-  include/abc_test/internal/ds/data_generator_memoization/map_unique_id_to_tdg_collection_stack_trie.hpp
+  include/abc_test/core/ds/data_generator_memoization/indexed_data_generator_collection_memoized_element.hpp
+  include/abc_test/core/ds/data_generator_memoization/typeless_data_generator_collection_stack_trie.hpp
+  include/abc_test/core/ds/data_generator_memoization/typeless_data_generator_collection_stack.hpp
+  include/abc_test/core/ds/data_generator_memoization/data_generator_collection_memoized_element.hpp 
+  include/abc_test/core/ds/data_generator_memoization/data_generator_memoized_element.hpp
+  include/abc_test/core/ds/data_generator_memoization/map_unique_id_to_tdg_collection_stack_trie.hpp
   # Contains code for test data - e.g. name, location, repetition data.
-  include/abc_test/internal/ds/test_data/invoked_test_data.hpp
-  include/abc_test/internal/ds/test_data/registered_test_data.hpp
-  include/abc_test/internal/ds/test_data/post_setup_test_data.hpp
-  include/abc_test/internal/ds/test_data/user_defined_test_data.hpp
-  include/abc_test/internal/ds/test_data/checked_user_defined_test_data.hpp
-  include/abc_test/internal/ds/test_data/test_function_object.hpp
-  include/abc_test/internal/ds/test_data/test_function_callable_object.hpp
-  include/abc_test/internal/ds/test_data/enum_test_status.hpp
-  include/abc_test/internal/ds/test_data/macros.hpp
-  include/abc_test/internal/ds/test_data/test_set_data.hpp
-      src/abc_test/internal/ds/test_data/test_set_data.cpp
-  include/abc_test/internal/ds/test_data/finalised_test_set_data.hpp
-      src/abc_test/internal/ds/test_data/finalised_test_set_data.cpp
-  include/abc_test/internal/ds/test_data/pre_test_run_report.hpp
+  include/abc_test/core/ds/test_data/invoked_test_data.hpp
+  include/abc_test/core/ds/test_data/registered_test_data.hpp
+  include/abc_test/core/ds/test_data/post_setup_test_data.hpp
+  include/abc_test/core/ds/test_data/user_defined_test_data.hpp
+  include/abc_test/core/ds/test_data/checked_user_defined_test_data.hpp
+  include/abc_test/core/ds/test_data/test_function_object.hpp
+  include/abc_test/core/ds/test_data/test_function_callable_object.hpp
+  include/abc_test/core/ds/test_data/enum_test_status.hpp
+  include/abc_test/core/ds/test_data/macros.hpp
+  include/abc_test/core/ds/test_data/test_set_data.hpp
+      src/abc_test/core/ds/test_data/test_set_data.cpp
+  include/abc_test/core/ds/test_data/finalised_test_set_data.hpp
+      src/abc_test/core/ds/test_data/finalised_test_set_data.cpp
+  include/abc_test/core/ds/test_data/pre_test_run_report.hpp
   # Bespoke data structures for the library for storing tests in various forms.
-  include/abc_test/internal/ds/test_collections/test_collection.hpp
-  include/abc_test/internal/ds/test_collections/test_tree.hpp
-      src/abc_test/internal/ds/test_collections/test_tree.cpp
-  include/abc_test/internal/ds/test_collections/test_tree_sentinel.hpp
-  include/abc_test/internal/ds/test_collections/test_tree_iterator.hpp
-  include/abc_test/internal/ds/source/single_source.hpp
-  include/abc_test/internal/ds/source/source_pair.hpp
-  include/abc_test/internal/ds/type_synonyms.hpp
+  include/abc_test/core/ds/test_collections/test_collection.hpp
+  include/abc_test/core/ds/test_collections/test_tree.hpp
+      src/abc_test/core/ds/test_collections/test_tree.cpp
+  include/abc_test/core/ds/test_collections/test_tree_sentinel.hpp
+  include/abc_test/core/ds/test_collections/test_tree_iterator.hpp
+  include/abc_test/core/ds/source/single_source.hpp
+  include/abc_test/core/ds/source/source_pair.hpp
+  include/abc_test/core/ds/type_synonyms.hpp
   # Contains objects and functions pertaining to recoverable and unrecoverable errors,
   # as well as errors encountered when evaluating tests.
-  include/abc_test/internal/errors/test_library_exception.hpp
-  include/abc_test/internal/errors/test_library_setup_error.hpp
-  include/abc_test/internal/errors/test_assertion_exception.hpp
+  include/abc_test/core/errors/test_library_exception.hpp
+  include/abc_test/core/errors/test_library_setup_error.hpp
+  include/abc_test/core/errors/test_assertion_exception.hpp
   # Contains code for reporting errors and test results to the user.
-  include/abc_test/internal/reporters/error_reporter.hpp
-  include/abc_test/internal/reporters/error_reporter_controller.hpp
-  include/abc_test/internal/reporters/test_reporter.hpp
-  include/abc_test/internal/reporters/test_reporter_controller.hpp
+  include/abc_test/core/reporters/error_reporter.hpp
+  include/abc_test/core/reporters/error_reporter_controller.hpp
+  include/abc_test/core/reporters/test_reporter.hpp
+  include/abc_test/core/reporters/test_reporter_controller.hpp
   # Contains data structures representing things reported from a test. e.g. assertions, unexpected exceptions
-  include/abc_test/internal/test_reports/user_initialised_report.hpp
-  include/abc_test/internal/test_reports/assertion.hpp
-  include/abc_test/internal/test_reports/assertion_base.hpp
-  include/abc_test/internal/test_reports/matcher_based_assertion_single_line.hpp
-  include/abc_test/internal/test_reports/multi_element_assertion_block.hpp
-  include/abc_test/internal/test_reports/static_assertion.hpp
-  include/abc_test/internal/test_reports/unexpected_report.hpp
-  include/abc_test/internal/test_reports/basic_text_warning.hpp
-  include/abc_test/internal/test_reports/unexpected_thrown_non_descript_entity.hpp
-  include/abc_test/internal/test_reports/unexpected_thrown_exception.hpp
-  include/abc_test/internal/test_reports/assertion_status/assertion_status_base.hpp
-  include/abc_test/internal/test_reports/assertion_status/dynamic_status.hpp
-  include/abc_test/internal/test_reports/assertion_status/static_status.hpp
-  include/abc_test/internal/test_reports/assertion_status/pass.hpp
-  include/abc_test/internal/test_reports/assertion_status/fail.hpp
-  include/abc_test/internal/test_reports/assertion_status/terminate.hpp
-  include/abc_test/internal/test_reports/assertion_status/pass_or_fail.hpp
-  include/abc_test/internal/test_reports/assertion_status/pass_or_terminate.hpp
-  include/abc_test/internal/test_reports/matcher_based_assertion_block.hpp
+  include/abc_test/core/test_reports/user_initialised_report.hpp
+  include/abc_test/core/test_reports/assertion.hpp
+  include/abc_test/core/test_reports/assertion_base.hpp
+  include/abc_test/core/test_reports/matcher_based_assertion_single_line.hpp
+  include/abc_test/core/test_reports/multi_element_assertion_block.hpp
+  include/abc_test/core/test_reports/static_assertion.hpp
+  include/abc_test/core/test_reports/unexpected_report.hpp
+  include/abc_test/core/test_reports/basic_text_warning.hpp
+  include/abc_test/core/test_reports/unexpected_thrown_non_descript_entity.hpp
+  include/abc_test/core/test_reports/unexpected_thrown_exception.hpp
+  include/abc_test/core/test_reports/assertion_status/assertion_status_base.hpp
+  include/abc_test/core/test_reports/assertion_status/dynamic_status.hpp
+  include/abc_test/core/test_reports/assertion_status/static_status.hpp
+  include/abc_test/core/test_reports/assertion_status/pass.hpp
+  include/abc_test/core/test_reports/assertion_status/fail.hpp
+  include/abc_test/core/test_reports/assertion_status/terminate.hpp
+  include/abc_test/core/test_reports/assertion_status/pass_or_fail.hpp
+  include/abc_test/core/test_reports/assertion_status/pass_or_terminate.hpp
+  include/abc_test/core/test_reports/matcher_based_assertion_block.hpp
   # The core logic for the data generators. There are no objects here, only abstract objects and iterators.
-  include/abc_test/internal/data_generator/data_generator.hpp
-  include/abc_test/internal/data_generator/data_generator_with_file_support_concept.hpp
-  include/abc_test/internal/data_generator/data_generator_with_file_support.hpp
-  include/abc_test/internal/data_generator/data_generator_collection.hpp
-  include/abc_test/internal/data_generator/data_generator_collection_iterator.hpp
-  include/abc_test/internal/data_generator/typeless_data_generator_collection_iterator.hpp
-  include/abc_test/internal/data_generator/data_generator_collection_sentinel.hpp
-  include/abc_test/internal/data_generator/data_generator_file_reader_and_writer.hpp
+  include/abc_test/core/data_generator/data_generator.hpp
+  include/abc_test/core/data_generator/data_generator_with_file_support_concept.hpp
+  include/abc_test/core/data_generator/data_generator_with_file_support.hpp
+  include/abc_test/core/data_generator/data_generator_collection.hpp
+  include/abc_test/core/data_generator/data_generator_collection_iterator.hpp
+  include/abc_test/core/data_generator/typeless_data_generator_collection_iterator.hpp
+  include/abc_test/core/data_generator/data_generator_collection_sentinel.hpp
+  include/abc_test/core/data_generator/data_generator_file_reader_and_writer.hpp
   # Core matcher files
-  include/abc_test/internal/matchers/matcher_wrapper.hpp
-  include/abc_test/internal/matchers/simulated_logic_expr.hpp
-  include/abc_test/internal/matchers/bool_matcher.hpp
-  include/abc_test/internal/matchers/static_matcher.hpp
-      src/abc_test/internal/matchers/static_matcher.cpp
-  include/abc_test/internal/matchers/comparison/macros.hpp
-  include/abc_test/internal/matchers/matcher_result.hpp
-  include/abc_test/internal/matchers/comparison/comparison_functions.hpp
-  include/abc_test/internal/matchers/comparison/comparison_enum.hpp
-  include/abc_test/internal/matchers/comparison/operators.hpp
-  include/abc_test/internal/matchers/comparison/comparison_placeholder.hpp
-  include/abc_test/internal/matchers/comparison/comparison_wrapper.hpp
-  include/abc_test/internal/matchers/logic_enum.hpp
-  include/abc_test/internal/matchers/source_map.hpp
-      src/abc_test/internal/matchers/source_map.cpp
+  include/abc_test/core/matchers/matcher_wrapper.hpp
+  include/abc_test/core/matchers/simulated_logic_expr.hpp
+  include/abc_test/core/matchers/bool_matcher.hpp
+  include/abc_test/core/matchers/static_matcher.hpp
+      src/abc_test/core/matchers/static_matcher.cpp
+  include/abc_test/core/matchers/comparison/macros.hpp
+  include/abc_test/core/matchers/matcher_result.hpp
+  include/abc_test/core/matchers/comparison/comparison_functions.hpp
+  include/abc_test/core/matchers/comparison/comparison_enum.hpp
+  include/abc_test/core/matchers/comparison/operators.hpp
+  include/abc_test/core/matchers/comparison/comparison_placeholder.hpp
+  include/abc_test/core/matchers/comparison/comparison_wrapper.hpp
+  include/abc_test/core/matchers/logic_enum.hpp
+  include/abc_test/core/matchers/source_map.hpp
+      src/abc_test/core/matchers/source_map.cpp
   # Matcher subfolder. Code contains logic for writing individual assertions.
   include/abc_test/included_instances/matchers/ranges.hpp
   # gen_data subfolder. Contains the logic that allow the gen_data for loops to work.
@@ -143,71 +143,71 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_move_k_elements.hpp
   # utility subfolder. Contains axillary helper classes and functions not necessary
   # related to the core testing framework.
-  include/abc_test/internal/utility/ptr_utility.hpp
-  include/abc_test/internal/utility/do_not_optimise.hpp
-  include/abc_test/internal/utility/rng.hpp
+  include/abc_test/utility/ptr_utility.hpp
+  include/abc_test/utility/do_not_optimise.hpp
+  include/abc_test/utility/rng.hpp
   # BigInteger files. Currently we do not use these. We should determine whether we will
   # need these and, if not, remove them from the library.
   # Combinatorics files. Currently these are unused, however we plan to re-engineer them
   # and make them compatible with gen_data.
-  include/abc_test/internal/utility/combinatorics.hpp
+  include/abc_test/utility/combinatorics.hpp
   # Internal subfolder. Contains functions used for either internal debugging or
   # internal macros. These shouldn't really be used by the user, used for development.
-  include/abc_test/internal/utility/internal/log/enum.hpp
-  include/abc_test/internal/utility/internal/log/params.hpp
-  include/abc_test/internal/utility/internal/log.hpp
-  include/abc_test/internal/utility/internal/macros.hpp
+  include/abc_test/utility/internal/log/enum.hpp
+  include/abc_test/utility/internal/log/params.hpp
+  include/abc_test/utility/internal/log.hpp
+  include/abc_test/utility/internal/macros.hpp
   # Utility io functions and objects.
-  include/abc_test/internal/utility/io/threaded_text_output_reporter.hpp
-  include/abc_test/internal/utility/io/threaded_ostream_output_reporter.hpp
+  include/abc_test/utility/io/threaded_text_output_reporter.hpp
+  include/abc_test/utility/io/threaded_ostream_output_reporter.hpp
   # Utility file functions and objects.
-  include/abc_test/internal/utility/io/file/file_name.hpp
-  include/abc_test/internal/utility/io/file/file_line_reader.hpp
-  include/abc_test/internal/utility/io/file/file_line_writer.hpp
-  include/abc_test/internal/utility/io/file/general_data_with_rw_info.hpp
-  include/abc_test/internal/utility/io/file/general_data.hpp
-  include/abc_test/internal/utility/io/file/tertiary_data.hpp
-  include/abc_test/internal/utility/io/file/file_line_writer_with_optional_rw_info.hpp
+  include/abc_test/utility/io/file/file_name.hpp
+  include/abc_test/utility/io/file/file_line_reader.hpp
+  include/abc_test/utility/io/file/file_line_writer.hpp
+  include/abc_test/utility/io/file/general_data_with_rw_info.hpp
+  include/abc_test/utility/io/file/general_data.hpp
+  include/abc_test/utility/io/file/tertiary_data.hpp
+  include/abc_test/utility/io/file/file_line_writer_with_optional_rw_info.hpp
   # Utility functions and objects for strings including parsing and printing.
-  include/abc_test/internal/utility/parsers/types.hpp
-  include/abc_test/internal/utility/parsers/parser_input.hpp
-  include/abc_test/internal/utility/parsers/parser_exceptions.hpp
-  include/abc_test/internal/utility/parsers/function_parser.hpp
-  include/abc_test/internal/utility/parsers/parser_base.hpp
-  include/abc_test/internal/utility/parsers/default_parser.hpp
-  include/abc_test/internal/utility/parsers/specializations/fundamental_types.hpp
-  include/abc_test/internal/utility/parsers/specializations/stl_98.hpp
-  include/abc_test/internal/utility/parsers/specializations/stl_11.hpp
-  include/abc_test/internal/utility/printers/function_printer.hpp
-  include/abc_test/internal/utility/printers/printer_base.hpp
-  include/abc_test/internal/utility/printers/default_printer.hpp
-  include/abc_test/internal/utility/printers/specializations/fundamental_types.hpp
-  include/abc_test/internal/utility/printers/specializations/stl_98.hpp
-  include/abc_test/internal/utility/printers/specializations/stl_11.hpp
-  include/abc_test/internal/utility/object_printer_parser.hpp
-  include/abc_test/internal/utility/str/parser_utility.hpp
-  include/abc_test/internal/utility/str/string_utility.hpp
-  include/abc_test/internal/utility/str/string_table.hpp
-  include/abc_test/internal/utility/ranges.hpp
-  include/abc_test/internal/utility/str/rw_info.hpp
-  include/abc_test/internal/utility/enum.hpp
-  include/abc_test/internal/utility/concepts.hpp
-  include/abc_test/internal/utility/limits/min_value_object.hpp
-  include/abc_test/internal/utility/limits/max_value_object.hpp
-  include/abc_test/internal/utility/limits/min_value_concept.hpp
-  include/abc_test/internal/utility/limits/max_value_concept.hpp
+  include/abc_test/utility/parsers/types.hpp
+  include/abc_test/utility/parsers/parser_input.hpp
+  include/abc_test/utility/parsers/parser_exceptions.hpp
+  include/abc_test/utility/parsers/function_parser.hpp
+  include/abc_test/utility/parsers/parser_base.hpp
+  include/abc_test/utility/parsers/default_parser.hpp
+  include/abc_test/utility/parsers/specializations/fundamental_types.hpp
+  include/abc_test/utility/parsers/specializations/stl_98.hpp
+  include/abc_test/utility/parsers/specializations/stl_11.hpp
+  include/abc_test/utility/printers/function_printer.hpp
+  include/abc_test/utility/printers/printer_base.hpp
+  include/abc_test/utility/printers/default_printer.hpp
+  include/abc_test/utility/printers/specializations/fundamental_types.hpp
+  include/abc_test/utility/printers/specializations/stl_98.hpp
+  include/abc_test/utility/printers/specializations/stl_11.hpp
+  include/abc_test/utility/object_printer_parser.hpp
+  include/abc_test/utility/str/parser_utility.hpp
+  include/abc_test/utility/str/string_utility.hpp
+  include/abc_test/utility/str/string_table.hpp
+  include/abc_test/utility/ranges.hpp
+  include/abc_test/utility/str/rw_info.hpp
+  include/abc_test/utility/enum.hpp
+  include/abc_test/utility/concepts.hpp
+  include/abc_test/utility/limits/min_value_object.hpp
+  include/abc_test/utility/limits/max_value_object.hpp
+  include/abc_test/utility/limits/min_value_concept.hpp
+  include/abc_test/utility/limits/max_value_concept.hpp
   # Command line parser
-  include/abc_test/internal/utility/cli.hpp
-  include/abc_test/internal/utility/cli/cli_info.hpp
-      src/abc_test/internal/utility/cli/cli_info.cpp
-  include/abc_test/internal/utility/cli/cli_help.hpp
-  include/abc_test/internal/utility/cli/cli_help.hpp
-      src/abc_test/internal/utility/cli/cli_help.cpp
-  include/abc_test/internal/utility/cli/cli_option_config.hpp
-  include/abc_test/internal/utility/cli/cli_output.hpp
-  include/abc_test/internal/utility/cli/cli_auto_configuration.hpp
-      src/abc_test/internal/utility/cli/cli_auto_configuration.cpp
-  #Included instances utility files  include/abc_test/internal/utility/limits/min_value_object.hpp
+  include/abc_test/utility/cli.hpp
+  include/abc_test/utility/cli/cli_info.hpp
+      src/abc_test/utility/cli/cli_info.cpp
+  include/abc_test/utility/cli/cli_help.hpp
+  include/abc_test/utility/cli/cli_help.hpp
+      src/abc_test/utility/cli/cli_help.cpp
+  include/abc_test/utility/cli/cli_option_config.hpp
+  include/abc_test/utility/cli/cli_output.hpp
+  include/abc_test/utility/cli/cli_auto_configuration.hpp
+      src/abc_test/utility/cli/cli_auto_configuration.cpp
+  #Included instances utility files  include/abc_test/utility/limits/min_value_object.hpp
   include/abc_test/included_instances/utility/limits/array.hpp
   include/abc_test/included_instances/utility/limits/enum.hpp
   include/abc_test/included_instances/utility/limits/fundamental_types.hpp

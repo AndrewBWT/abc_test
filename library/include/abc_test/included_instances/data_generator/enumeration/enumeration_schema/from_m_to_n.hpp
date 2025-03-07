@@ -1,8 +1,8 @@
 #pragma once
 
 #include "abc_test/included_instances/data_generator/enumeration/enumeration_schema_base.hpp"
-#include "abc_test/internal/utility/limits/max_value_concept.hpp"
-#include "abc_test/internal/utility/limits/min_value_concept.hpp"
+#include "abc_test/utility/limits/max_value_concept.hpp"
+#include "abc_test/utility/limits/min_value_concept.hpp"
 // #include
 // "abc_test/included_instances/data_generator/enumeration_data_object/max_value_concept.hpp"
 // #include

@@ -1,6 +1,6 @@
 #pragma once
-#include "abc_test/internal/errors/test_library_exception.hpp"
-#include "abc_test/internal/utility/internal/macros.hpp"
+#include "abc_test/core/errors/test_library_exception.hpp"
+#include "abc_test/utility/internal/macros.hpp"
 
 #include <functional>
 #include <variant>

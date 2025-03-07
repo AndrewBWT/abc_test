@@ -1,11 +1,11 @@
 #pragma once
 
 #include "abc_test/core.hpp"
-#include "abc_test/internal/data_generator/data_generator_collection.hpp"
-#include "abc_test/internal/global.hpp"
-#include "abc_test/internal/test_runner.hpp"
-#include "abc_test/internal/utility/io/file/file_line_writer.hpp"
-#include "abc_test/internal/utility/io/file/file_name.hpp"
+#include "abc_test/core/data_generator/data_generator_collection.hpp"
+#include "abc_test/core/global.hpp"
+#include "abc_test/core/test_runner.hpp"
+#include "abc_test/utility/io/file/file_line_writer.hpp"
+#include "abc_test/utility/io/file/file_name.hpp"
 
 #include <filesystem>
 #include <fmt/format.h>

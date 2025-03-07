@@ -1,8 +1,8 @@
 #pragma once
 
-#include "abc_test/internal/data_generator/data_generator_collection.hpp"
-#include "abc_test/internal/errors/test_library_exception.hpp"
-#include "abc_test/internal/utility/internal/macros.hpp"
+#include "abc_test/core/data_generator/data_generator_collection.hpp"
+#include "abc_test/core/errors/test_library_exception.hpp"
+#include "abc_test/utility/internal/macros.hpp"
 
 /*!
  * Code to run a manual for loop iteration. The manual_for_loop object is given

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "abc_test/internal/utility/io/threaded_text_output_reporter.hpp"
-#include "abc_test/internal/reporters/error_reporter.hpp"
+#include "abc_test/utility/io/threaded_text_output_reporter.hpp"
+#include "abc_test/core/reporters/error_reporter.hpp"
 
 
 _BEGIN_ABC_REPORTERS_NS

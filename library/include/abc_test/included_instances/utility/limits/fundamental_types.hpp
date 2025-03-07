@@ -1,6 +1,6 @@
 #pragma once
-#include "abc_test/internal/utility/limits/min_value_object.hpp"
-#include "abc_test/internal/utility/limits/max_value_object.hpp"
+#include "abc_test/utility/limits/min_value_object.hpp"
+#include "abc_test/utility/limits/max_value_object.hpp"
 
 _BEGIN_ABC_UTILITY_NS
 template <typename T>

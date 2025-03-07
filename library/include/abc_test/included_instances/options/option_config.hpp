@@ -1,5 +1,5 @@
 #pragma once
-#include "abc_test/internal/utility/cli/cli_option_config.hpp"
+#include "abc_test/utility/cli/cli_option_config.hpp"
 
 _BEGIN_ABC_NS
 
