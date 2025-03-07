@@ -187,7 +187,6 @@ struct abc::utility::printer::default_printer_t<S>
         );
     }
 };
-#endif
 
 // This is a bespoke printer_base_t instance for int. It prints the data out in
 // hex.
@@ -201,6 +200,7 @@ struct int_printer_t : abc::utility::printer::printer_base_t<int>
         return fmt::format("{:x}", _a_object);
     }
 };
+#endif
 #if 0
 
 // This is a bespoke printer for S.
@@ -408,6 +408,7 @@ struct abc::utility::parser::default_parser_t<S>
     }
 };
 #endif
+#if 0
 // This is a bespoke printer_base_t instance for int. It prints the data out in
 // hex.
 struct int_parser_t : abc::utility::parser::parser_base_t<int>
@@ -434,7 +435,6 @@ struct int_parser_t : abc::utility::parser::parser_base_t<int>
         }
     }
 };
-#if 0
 // This is a bespoke printer for S.
 struct s_parser : public abc::utility::parser::parser_base_t<S>
 {
@@ -575,7 +575,7 @@ _TEST_CASE(
     _END_BBA_CHECK(to_string_check);
 }
 #endif
-
+#if 0
 _TEST_CASE(
     abc::test_case_t({.name = "File data generator examples"})
 )
@@ -709,7 +709,6 @@ struct abc::data_gen::default_random_generator_t<S>
     abc::data_gen::random_generator_t<int> m_int_generator
         = default_random_generator<int>();
 };
-
 _TEST_CASE(
     abc::test_case_t({.name = "Enumeration data generator examples"})
 )
@@ -766,6 +765,7 @@ _TEST_CASE(
     }
     _END_BBA_CHECK(character_tester);
 }
+#endif
 
 _TEST_CASE(
     abc::test_case_t({.name = "Random data generator examples"})
@@ -773,15 +773,32 @@ _TEST_CASE(
 {
     using namespace abc;
     using namespace std;
+    _SUCCEED_WITH_MSG("SUCCESS");
+    _CHECK(_EXPR(1 == 2));
+    _CHECK(annotate("hello annotation", _EXPR(1 == 2)));
+    matcher_t x1 = _MATCHER(_EXPR(1 == 2) && _EXPR(2 == 3));
+    _CHECK(annotate("hi", x1));
     _BEGIN_MULTI_ELEMENT_BBA(
         check_integer_overflow, "Testing integers do not overflow"
     );
+    check_integer_overflow += _BLOCK_FAIL();
+    check_integer_overflow += _BLOCK_FAIL_WITH_MSG("fail is failure");
+    check_integer_overflow += _BLOCK_CHECK(annotate("hello2", _EXPR(1 == 2)));
     // This random generator uses the default_random_generator_t instance for
     // int.
     for (auto integer : generate_data_randomly<int>())
     {
+        check_integer_overflow += _BLOCK_CHECK(
+            annotate("hello", _EXPR(integer + integer > integer))
+        );
+        check_integer_overflow += _BLOCK_SUCCESS();
+        check_integer_overflow += _BLOCK_REQUIRE(_EXPR(1 == 2));
+        check_integer_overflow += _BLOCK_TERMINATE();
+    }
+    for (auto integer : generate_data_randomly<int>())
+    {
         check_integer_overflow
-            += _BLOCK_CHECK(_EXPR(integer + integer > integer));
+            += _BLOCK_FAIL_WITH_MSG(fmt::format("Failure with {0}", integer));
     }
     // There are two other overloads of generate_data_randomly. The first of
     // these takes an unbounded list of files to write failing data to. As with
@@ -823,10 +840,6 @@ _TEST_CASE(
     {
         check_integer_overflow
             += _BLOCK_CHECK(_EXPR(integer + integer > integer));
-    }
-    for (auto integer :
-         generate_data_randomly<int>(mk_random_generator(int_generator_t(100))))
-    {
     }
     _END_BBA_CHECK(check_integer_overflow);
 }

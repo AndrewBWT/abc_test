@@ -126,7 +126,9 @@ __constexpr_imp std::vector<std::string>
         }
         case MATCHER_OUTPUT:
             return {
-                _a_pc.matcher_output_str(_a_element.get_pass_status()),
+                _a_pc.matcher_output_str(_a_element.get_pass_status(),
+                    (std::same_as<Assertion_Status,_ABC_NS_REPORTS::terminate_t> ||
+                        std::same_as<Assertion_Status,_ABC_NS_REPORTS::pass_or_terminate_t>)),
                 _a_pc.indent(_a_pc.matcher_output(
                     _a_element.matcher_info().matcher_result().str()
                 ))
@@ -163,7 +165,7 @@ __constexpr_imp std::string
             const print_config_t&                               _a_pc
         ) const
 {
-    return construct_str_representation(_a_element, "Single-line assertion");
+    return construct_str_representation(_a_element, "Matcher-based assertion");
 }
 
 _END_ABC_REPORTERS_NS

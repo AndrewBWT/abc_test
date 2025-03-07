@@ -9,7 +9,7 @@ _BEGIN_ABC_REPORTS_NS
  * from dynamic_status_t.
  */
     template <typename Assertion_Status>
-    requires std::derived_from<Assertion_Status, dynamic_status_t>
+    requires std::derived_from<Assertion_Status, assertion_status_base_t>
 struct multi_element_assertion_block_t
     : public assertion_t<false, Assertion_Status>
 
@@ -34,7 +34,7 @@ _END_ABC_REPORTS_NS
 
 _BEGIN_ABC_REPORTS_NS
 template <typename Assertion_Status>
-    requires std::derived_from<Assertion_Status, dynamic_status_t>
+    requires std::derived_from<Assertion_Status, assertion_status_base_t>
 __constexpr_imp
 multi_element_assertion_block_t<Assertion_Status>::
 multi_element_assertion_block_t(
@@ -54,7 +54,7 @@ multi_element_assertion_block_t(
     , _m_matcher_info(_a_matcher_info)
 {}
 template <typename Assertion_Status>
-    requires std::derived_from<Assertion_Status, dynamic_status_t>
+    requires std::derived_from<Assertion_Status, assertion_status_base_t>
 __constexpr_imp
 const _ABC_NS_MATCHER::matcher_res_infos_t&
 multi_element_assertion_block_t<Assertion_Status>::get_matcher() const noexcept

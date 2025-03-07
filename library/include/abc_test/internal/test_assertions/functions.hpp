@@ -2,6 +2,7 @@
 
 #include "abc_test/internal/errors/test_assertion_exception.hpp"
 #include "abc_test/internal/matchers/matcher_wrapper.hpp"
+#include "abc_test/internal/matchers/simulated_logic_expr.hpp"
 #include "abc_test/internal/test_assertions/test_block.hpp"
 #include "abc_test/internal/test_reports/assertion.hpp"
 #include "abc_test/internal/test_reports/assertion_status/fail.hpp"
@@ -15,8 +16,6 @@
 #include "abc_test/internal/test_reports/static_assertion.hpp"
 #include "abc_test/internal/test_runner.hpp"
 #include "abc_test/internal/utility/str/string_utility.hpp"
-
-#include "abc_test/internal/matchers/simulated_logic_expr.hpp"
 
 #include <concepts>
 
@@ -43,12 +42,12 @@ __constexpr _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>
             ) noexcept;
 template <_ABC_NS_MATCHER::logic_enum_t Logic_Enum>
 __constexpr _ABC_NS_MATCHER::matcher_wrapper_t<false>
-matcher_macro(
-    const _ABC_NS_MATCHER::simulated_logic_expr_t<Logic_Enum>& _a_element,
-    const std::string_view                                    _a_macro_str,
-    const std::string_view      _a_matcher_str,
-    const std::source_location& _a_sl
-) noexcept;
+            matcher_macro(
+                const _ABC_NS_MATCHER::simulated_logic_expr_t<Logic_Enum>& _a_element,
+                const std::string_view                                     _a_macro_str,
+                const std::string_view      _a_matcher_str,
+                const std::source_location& _a_sl
+            ) noexcept;
 /*!
  * @brief function to create an assertion.
  *
@@ -178,14 +177,15 @@ __constexpr_imp _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>
         _a_element, _a_macro_str, _a_matcher_str, _a_sl
     );
 }
+
 template <_ABC_NS_MATCHER::logic_enum_t Logic_Enum>
 __constexpr_imp _ABC_NS_MATCHER::matcher_wrapper_t<false>
-matcher_macro(
-    const _ABC_NS_MATCHER::simulated_logic_expr_t<Logic_Enum>& _a_element,
-    const std::string_view                                    _a_macro_str,
-    const std::string_view      _a_matcher_str,
-    const std::source_location& _a_sl
-) noexcept
+                matcher_macro(
+                    const _ABC_NS_MATCHER::simulated_logic_expr_t<Logic_Enum>& _a_element,
+                    const std::string_view                                     _a_macro_str,
+                    const std::string_view      _a_matcher_str,
+                    const std::source_location& _a_sl
+                ) noexcept
 {
     using namespace _ABC_NS_MATCHER;
     matcher_wrapper_t<false> _l_matcher(_a_element.matcher());
@@ -226,7 +226,7 @@ create_assertion(
     _l_gur    = make_unique<const matcher_based_assertion_single_line_t<T>>(
         _l_source,
         _a_test_runner.get_log_infos(false),
-        matcher_result_with_annotation_and_source_info_t(
+        bba_inner_assertion_type_t(
             _l_mr, _l_source, _l_matcher_annotation, _l_msm
         )
     );
@@ -268,8 +268,13 @@ create_assertion(
     _l_gur    = make_unique<const matcher_based_assertion_single_line_t<T>>(
         _l_source,
         _a_test_runner.get_log_infos(false),
-        matcher_result_with_annotation_and_source_info_t(
-            _l_mr, _l_source, _l_matcher_annotation, _l_msm
+        bba_inner_assertion_type_t(
+            ( std::same_as<T, _ABC_NS_REPORTS::terminate_t>
+              || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t> ),
+            _l_mr,
+            _l_source,
+            _l_matcher_annotation,
+            _l_msm
         )
     );
     _a_test_runner.add_assertion(_l_gur);
@@ -358,9 +363,7 @@ create_assertion_block(
     _a_test_block.set_processed();
     assertion_ptr_t<false, T> _l_gur;
     bool _l_passed{_a_test_block.get_matcher().matcher_result().passed()};
-    matcher_result_with_annotation_and_source_info_t _l_mtr{
-        _a_test_block.get_matcher()
-    };
+    bba_inner_assertion_type_t _l_mtr{_a_test_block.get_matcher()};
     _l_gur = make_unique<matcher_based_assertion_block_t<T>>(
         _l_passed,
         _a_test_block.source(),
@@ -389,9 +392,7 @@ create_assertion_block(
     using namespace std;
     assertion_ptr_t<false, T> _l_gur;
     bool _l_passed{_a_test_block.get_matcher().matcher_result().passed()};
-    matcher_result_with_annotation_and_source_info_t _l_mtr{
-        _a_test_block.get_matcher()
-    };
+    bba_inner_assertion_type_t _l_mtr{_a_test_block.get_matcher()};
     _l_gur = make_unique<matcher_based_assertion_block_t<T>>(
         _l_passed,
         _a_test_block.source(),
@@ -424,8 +425,7 @@ create_assertion_block(
     _a_test_block.set_processed();
     assertion_ptr_t<false, T> _l_gur;
     bool                      _l_passed{true};
-    for (const matcher_result_with_annotation_and_source_info_t& _l_ki :
-         _a_test_block.get_matcher())
+    for (const bba_inner_assertion_type_t& _l_ki : _a_test_block.get_matcher())
     {
         if (not _l_ki.matcher_result().passed())
         {

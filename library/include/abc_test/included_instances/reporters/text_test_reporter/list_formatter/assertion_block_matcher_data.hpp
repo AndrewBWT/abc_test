@@ -6,7 +6,7 @@ _BEGIN_ABC_REPORTERS_NS
 
 struct assertion_block_matcher_data_list_formatter_t
     : public list_formattable_t<
-          _ABC_NS_MATCHER::matcher_result_with_annotation_and_source_info_t,
+          _ABC_NS_MATCHER::bba_inner_assertion_type_t,
           enum_assertion_block_matcher_data_fields_t,
           print_config_t>
 {
@@ -17,16 +17,14 @@ public:
     ) noexcept;
     __constexpr virtual bool
         check_data(
-            const enum_assertion_block_matcher_data_fields_t& _a_fid,
-            const _ABC_NS_MATCHER::
-                matcher_result_with_annotation_and_source_info_t& _a_element
+            const enum_assertion_block_matcher_data_fields_t&  _a_fid,
+            const _ABC_NS_MATCHER::bba_inner_assertion_type_t& _a_element
         ) const override;
     __constexpr virtual std::vector<std::string>
         get_data(
-            const enum_assertion_block_matcher_data_fields_t& _a_fid,
-            const _ABC_NS_MATCHER::
-                matcher_result_with_annotation_and_source_info_t& _a_element,
-            const print_config_t&                                 _a_pc
+            const enum_assertion_block_matcher_data_fields_t&  _a_fid,
+            const _ABC_NS_MATCHER::bba_inner_assertion_type_t& _a_element,
+            const print_config_t&                              _a_pc
         ) const override;
 private:
     std::size_t _m_indent_offset;
@@ -45,9 +43,8 @@ assertion_block_matcher_data_list_formatter_t::
 
 __constexpr bool
     assertion_block_matcher_data_list_formatter_t::check_data(
-        const enum_assertion_block_matcher_data_fields_t& _a_fid,
-        const _ABC_NS_MATCHER::matcher_result_with_annotation_and_source_info_t&
-            _a_element
+        const enum_assertion_block_matcher_data_fields_t&  _a_fid,
+        const _ABC_NS_MATCHER::bba_inner_assertion_type_t& _a_element
     ) const
 {
     using enum enum_assertion_block_matcher_data_fields_t;
@@ -70,35 +67,79 @@ __constexpr bool
 
 __constexpr std::vector<std::string>
             assertion_block_matcher_data_list_formatter_t::get_data(
-        const enum_assertion_block_matcher_data_fields_t& _a_fid,
-        const _ABC_NS_MATCHER::matcher_result_with_annotation_and_source_info_t&
-                              _a_element,
-        const print_config_t& _a_pc
+        const enum_assertion_block_matcher_data_fields_t&  _a_fid,
+        const _ABC_NS_MATCHER::bba_inner_assertion_type_t& _a_element,
+        const print_config_t&                              _a_pc
     ) const
 {
     using enum enum_assertion_block_matcher_data_fields_t;
+    using enum _ABC_NS_MATCHER::enum_bba_inner_assertion_type_t;
     switch (_a_fid)
     {
     case MATCHER_ANNOTATION:
-        return {
-            _a_pc.indent(
-                _a_pc.colon(_a_pc.matcher_annotation()), _m_indent_offset
-            ),
-            _a_pc.indent(
-                _a_pc.message_str(_a_element.annotation()), _m_indent_offset + 1
-            )
-        };
+        switch (_a_element.assertion_type())
+        {
+        case MATCHER_BASED_ASSERTION:
+        {
+            return {
+                _a_pc.indent(
+                    _a_pc.colon(_a_pc.matcher_annotation()), _m_indent_offset
+                ),
+                _a_pc.indent(
+                    _a_pc.message_str(_a_element.annotation()), _m_indent_offset + 1
+                )
+            };
+        }
+        case STATIC_ASSERTION:
+        {
+            return {
+                _a_pc.indent(
+                    _a_pc.colon(_a_pc.static_test_annotation_str()), _m_indent_offset
+                ),
+                _a_pc.indent(
+                    _a_pc.message_str(_a_element.annotation()), _m_indent_offset + 1
+                )
+            };
+        }
+        default:
+            return {};
+        }
     case MATCHER_RESULT_STRING:
-        return {
-            _a_pc.indent(
-                _a_pc.matcher_output_str(_a_element.matcher_result().passed()),
-                _m_indent_offset
-            ),
-            _a_pc.indent(
-                _a_pc.matcher_output(_a_element.matcher_result().str()),
-                _m_indent_offset + 1
-            )
-        };
+        switch (_a_element.assertion_type())
+        {
+        case MATCHER_BASED_ASSERTION:
+        {
+            const _ABC_NS_MATCHER::matcher_result_t& _l_matcher_result{
+                _a_element.matcher_result()
+            };
+            return {
+                _a_pc.indent(
+                    _a_pc.matcher_output_str(_l_matcher_result.passed(),
+                        _a_element.terminate()),
+                    _m_indent_offset
+                ),
+                _a_pc.indent(
+                    _a_pc.matcher_output(_l_matcher_result.str()),
+                    _m_indent_offset + 1
+                )
+            };
+        }
+        case STATIC_ASSERTION:
+        {
+            const _ABC_NS_MATCHER::matcher_result_t& _l_matcher_result{
+                _a_element.matcher_result()
+            };
+            return {
+                _a_pc.indent(
+                    _a_pc.static_assertion_output_str(_l_matcher_result.passed()),
+                    _m_indent_offset
+                )
+            };
+        }
+
+        default:
+            return {};
+        }
     case MATCHER_SOURCE_MAP:
     {
         using namespace std;
@@ -144,7 +185,8 @@ __constexpr std::vector<std::string>
                 _a_pc.colon(_a_pc.source_location_str()), _m_indent_offset
             ),
             _a_pc.indent(
-                _a_pc.source_location(_a_element.source().value().source_location()
+                _a_pc.source_location(
+                    _a_element.source().value().source_location()
                 ),
                 _m_indent_offset + 1
             )

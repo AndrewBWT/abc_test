@@ -53,61 +53,152 @@ public:
 private:
     // bool        _m_ran    = false;
     bool        _m_passed = false;
-    std::string _m_str = "false";
+    std::string _m_str    = "false";
+};
+enum class enum_bba_inner_assertion_type_t
+{
+    STATIC_ASSERTION,
+    MATCHER_BASED_ASSERTION
 };
 
-class matcher_result_with_annotation_and_source_info_t
+__constexpr std::string
+            get_str(
+                const enum_bba_inner_assertion_type_t _a_enum
+            )
+{
+    using enum enum_bba_inner_assertion_type_t;
+    switch (_a_enum)
+    {
+    case STATIC_ASSERTION:
+        return "static";
+    case MATCHER_BASED_ASSERTION:
+        return "matcher-based";
+    default:
+        throw errors::unaccounted_for_enum_exception(_a_enum);
+    }
+}
+
+class bba_inner_assertion_type_t
 {
 public:
-    __no_constexpr_imp matcher_result_with_annotation_and_source_info_t() noexcept
-        : matcher_result_with_annotation_and_source_info_t(
-            matcher_result_t(),
-            std::optional<ds::single_source_t>(),
-            std::optional<std::string>(),
-            matcher_source_map_t())
+    __no_constexpr_imp
+        bba_inner_assertion_type_t() noexcept
+        : bba_inner_assertion_type_t(
+            false,
+              matcher_result_t(),
+              std::optional<ds::single_source_t>(),
+              std::optional<std::string>(),
+              matcher_source_map_t()
+          )
     {}
-    __no_constexpr_imp matcher_result_with_annotation_and_source_info_t(
-        const matcher_result_t& _a_matcher_result,
-        const std::optional<ds::single_source_t>& _a_source = std::optional<ds::single_source_t>{},
-        const std::optional<std::string>& _a_annotation = std::optional<std::string>{},
-        const matcher_source_map_t& _a_matcher_source_map = matcher_source_map_t()
-    ) noexcept
+
+    __no_constexpr_imp
+        bba_inner_assertion_type_t(
+            const bool _a_terminate,
+            const bool                                _a_pass_or_failure,
+            const std::optional<std::string>&         _a_opt_msg,
+            const std::optional<ds::single_source_t>& _a_source
+            = std::optional<ds::single_source_t>{}
+        ) noexcept
+        : _m_matcher_result(matcher_result_t(_a_pass_or_failure, ""))
+        , _m_annotation(_a_opt_msg)
+        , _m_source(_a_source)
+        , _m_source_map(matcher_source_map_t{})
+        , _m_enum_bba_inner_assertion_type(
+              enum_bba_inner_assertion_type_t::STATIC_ASSERTION
+          )
+        , _m_terminate(_a_terminate)
+    {}
+
+    __no_constexpr_imp
+        bba_inner_assertion_type_t(
+            const bool _a_terminate,
+            const matcher_result_t&                   _a_matcher_result,
+            const std::optional<ds::single_source_t>& _a_source
+            = std::optional<ds::single_source_t>{},
+            const std::optional<std::string>& _a_annotation
+            = std::optional<std::string>{},
+            const matcher_source_map_t& _a_matcher_source_map
+            = matcher_source_map_t()
+        ) noexcept
         : _m_matcher_result(_a_matcher_result)
         , _m_annotation(_a_annotation)
         , _m_source(_a_source)
         , _m_source_map(_a_matcher_source_map)
-    {
+        , _m_enum_bba_inner_assertion_type(
+              enum_bba_inner_assertion_type_t::MATCHER_BASED_ASSERTION
+          )
+        , _m_terminate(_a_terminate)
+    {}
 
-    }
-    __constexpr_imp const matcher_result_t& matcher_result() const noexcept
+    __no_constexpr_imp
+        bba_inner_assertion_type_t(
+            const bool _a_terminate,
+            const matcher_result_t&                   _a_matcher_result,
+            const std::optional<ds::single_source_t>& _a_source,
+            const std::optional<std::string>&         _a_annotation,
+            const matcher_source_map_t&               _a_matcher_source_map,
+            const enum_bba_inner_assertion_type_t
+                _a_enum_bba_inner_assertion_type
+        ) noexcept
+        : _m_matcher_result(_a_matcher_result)
+        , _m_annotation(_a_annotation)
+        , _m_source(_a_source)
+        , _m_source_map(_a_matcher_source_map)
+        , _m_enum_bba_inner_assertion_type(_a_enum_bba_inner_assertion_type)
+        , _m_terminate(_a_terminate)
+    {}
+
+    __constexpr_imp const matcher_result_t&
+        matcher_result() const noexcept
     {
         return _m_matcher_result;
     }
-    __constexpr_imp const std::optional<std::string>& annotation() const noexcept
+
+    __constexpr_imp const std::optional<std::string>&
+                          annotation() const noexcept
     {
         return _m_annotation;
     }
-    __constexpr_imp const matcher_source_map_t& source_map() const noexcept
+
+    __constexpr_imp const matcher_source_map_t&
+        source_map() const noexcept
     {
         return _m_source_map;
     }
-    __constexpr_imp const std::optional<ds::single_source_t>& source() const noexcept
+
+    __constexpr_imp const std::optional<ds::single_source_t>&
+                          source() const noexcept
     {
         return _m_source;
     }
+
+    __constexpr_imp enum_bba_inner_assertion_type_t
+        assertion_type() const noexcept
+    {
+        return _m_enum_bba_inner_assertion_type;
+    }
+    __constexpr_imp bool terminate() const noexcept
+    {
+        return _m_terminate;
+    }
 private:
-    matcher_result_t _m_matcher_result;
-    std::optional<std::string> _m_annotation;
-    matcher_source_map_t _m_source_map;
+    matcher_result_t                   _m_matcher_result;
+    std::optional<std::string>         _m_annotation;
+    matcher_source_map_t               _m_source_map;
     std::optional<ds::single_source_t> _m_source;
+    enum_bba_inner_assertion_type_t    _m_enum_bba_inner_assertion_type;
+    bool _m_terminate;
 };
 
-//using matcher_result_with_annotation_and_source_info_t = std::tuple<
- //   matcher_result_t,
-  //  std::optional<std::string>,
-   // matcher_source_map_t>;
-//using matcher_res_info_with_caller_t = std::pair<std::optional<ds::single_source_t>, matcher_result_with_annotation_and_source_info_t>;
-using matcher_res_infos_t = std::vector<matcher_result_with_annotation_and_source_info_t>;
+// using matcher_result_with_annotation_and_source_info_t = std::tuple<
+//    matcher_result_t,
+//   std::optional<std::string>,
+//  matcher_source_map_t>;
+// using matcher_res_info_with_caller_t =
+// std::pair<std::optional<ds::single_source_t>,
+// matcher_result_with_annotation_and_source_info_t>;
+using matcher_res_infos_t = std::vector<bba_inner_assertion_type_t>;
 /*class assertion_wrapper_pc_t
 {
 

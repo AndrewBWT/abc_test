@@ -126,16 +126,19 @@ __constexpr_imp std::vector<std::string>
                 _a_pc.colon(_a_pc.multi_element_collection_grouped_str())
             );
             vector<pair<
-                pair<optional<ds::single_source_t>, matcher_source_map_t>,
+                tuple<bool,enum_bba_inner_assertion_type_t,optional<ds::single_source_t>, matcher_source_map_t>,
                 vector<tuple<size_t, matcher_result_t, optional<string>>>>>
                    _l_info;
             size_t _l_idx{1};
-            for (const matcher_result_with_annotation_and_source_info_t&
+            for (const bba_inner_assertion_type_t&
                      _l_matcher : _a_element.get_matcher())
             {
-                pair<optional<ds::single_source_t>, matcher_source_map_t>
+                tuple<bool,enum_bba_inner_assertion_type_t,optional<ds::single_source_t>, matcher_source_map_t>
                     _l_first
-                    = make_pair(_l_matcher.source(), _l_matcher.source_map());
+                    = make_tuple(
+                        _l_matcher.terminate(),
+                        _l_matcher.assertion_type(),
+                        _l_matcher.source(), _l_matcher.source_map());
                 tuple<size_t, matcher_result_t, optional<string>>
                     _l_single_element = make_tuple(
                         _l_idx++,
@@ -157,7 +160,7 @@ __constexpr_imp std::vector<std::string>
                 }
             }
             for (const pair<
-                     pair<optional<ds::single_source_t>, matcher_source_map_t>,
+                     tuple<bool,enum_bba_inner_assertion_type_t,optional<ds::single_source_t>, matcher_source_map_t>,
                      vector<tuple<size_t, matcher_result_t, optional<string>>>>&
                      _l_element : _l_info)
             {
@@ -168,11 +171,13 @@ __constexpr_imp std::vector<std::string>
                         matcher_result_t,
                         std::optional<std::string>,
                         matcher_source_map_t>;
-                    matcher_result_with_annotation_and_source_info_t _l_matcher(
+                    bba_inner_assertion_type_t _l_matcher(
+                        get<0>(_l_element.first),
                     get<1>(_l_element.second[0]),
-                        _l_element.first.first,
+                        get<2>(_l_element.first),
                         get<2>(_l_element.second[0]),
-                        _l_element.first.second
+                        get<3>(_l_element.first),
+                        get<1>(_l_element.first)
                     );
                     vector<string> _l_data = get_all_data(
                         _a_pc
@@ -206,19 +211,22 @@ __constexpr_imp std::vector<std::string>
                 else
                 {
                     _l_rv.push_back(_a_pc.indent(fmt::format(
-                        "The following {0} matchers have the same source data, "
+                        "The following {0} {1} assertions have the same source data, "
                         "which is as follows:",
-                        _l_element.second.size()
+                        _l_element.second.size(),
+                        get_str(get<1>(_l_element.first))
                     )));
                     std::tuple<
                         matcher_result_t,
                         std::optional<std::string>,
                         matcher_source_map_t>;
-                    matcher_result_with_annotation_and_source_info_t _l_matcher(
+                    bba_inner_assertion_type_t _l_matcher(
+                        get<0>(_l_element.first),
                         get<1>(_l_element.second[0]),
-                        _l_element.first.first,
+                        get<2>(_l_element.first),
                         get<2>(_l_element.second[0]),
-                        _l_element.first.second
+                        get<3>(_l_element.first),
+                        get<1>(_l_element.first)
                     );
                     vector<string> _l_data = get_all_data(
                         _l_shared_data,
@@ -230,19 +238,22 @@ __constexpr_imp std::vector<std::string>
 
                     _l_rv.push_back(_a_pc.indent(
                         fmt::format(
-                            "The data of the {0} matchers:",
-                            _l_element.second.size()
+                            "The data of the {0} {1} assertions:",
+                            _l_element.second.size(),
+                            get_str(get<1>(_l_element.first))
                         ),
                         1
                     ));
                     str::string_table_t _l_st({0});
                     for (auto& _l_ki : _l_element.second)
                     {
-                        matcher_result_with_annotation_and_source_info_t _l_matcher(
+                        bba_inner_assertion_type_t _l_matcher(
+                            get<0>(_l_element.first),
                             get<1>(_l_ki),
-                            _l_element.first.first,
+                            get<2>(_l_element.first),
                             get<2>(_l_ki),
-                            _l_element.first.second
+                            get<3>(_l_element.first),
+                            get<1>(_l_element.first)
                         );
                         vector<string> _l_data = get_all_data(
                             _l_individual_data,
@@ -341,7 +352,7 @@ __constexpr_imp std::string
             _a_element
         )};
     std::size_t _l_passed{0};
-    for (const matcher_result_with_annotation_and_source_info_t& _l_ki : _l_element.get_matcher())
+    for (const bba_inner_assertion_type_t& _l_ki : _l_element.get_matcher())
     {
         if (_l_ki.matcher_result().passed())
         {
@@ -352,7 +363,7 @@ __constexpr_imp std::string
         _a_element,
         "Multi-element block-based assertion",
         fmt::format(
-            " {0}/{1} matchers passed.",
+            " {0}/{1} assertions passed.",
             _l_passed,
             _l_element.get_matcher().size()
         )

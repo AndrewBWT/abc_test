@@ -30,7 +30,10 @@ public:
     __constexpr       std::string
                       line_break() const noexcept;
     __constexpr const std::string
-                      matcher_output_str(const bool _a_passed) const noexcept;
+        matcher_output_str(const bool _a_passed, const bool _a_terminate)
+            const noexcept;
+    __constexpr std::string
+        static_assertion_output_str(const bool _a_passed) const noexcept;
     __constexpr const std::string_view
                       matcher_source_map_str() const noexcept;
     __constexpr       std::string
@@ -430,11 +433,31 @@ __constexpr_imp std::string
 
 __constexpr_imp const std::string
                       print_config_t::matcher_output_str(
+        const bool _a_passed,
+        const bool _a_terminate
+    ) const noexcept
+{
+    return _a_passed
+               ? highlight_pass(
+                     colon("Matcher-based assertion passed with output")
+                 )
+               : (_a_terminate
+                      ? highlight_fail(
+                            colon("Matcher-based assertion failed, assertion "
+                                  "terminated function with output")
+                        )
+                      : highlight_fail(
+                            colon("Matcher-based assertion failed with output")
+                        ));
+}
+
+__constexpr std::string
+            print_config_t::static_assertion_output_str(
         const bool _a_passed
     ) const noexcept
 {
-    return _a_passed ? highlight_pass(colon("Matcher passed with output"))
-                     : highlight_fail(colon("Matcher failed with output"));
+    return _a_passed ? highlight_pass("Static assertion passed.")
+                     : highlight_fail("Static assertion failed.");
 }
 
 __constexpr_imp const std::string_view
@@ -903,7 +926,7 @@ __constexpr_imp const std::string_view
 __constexpr const std::string_view
                   print_config_t::matcher_annotation() const noexcept
 {
-    return "Matcher's annotation";
+    return "Assertion's annotation";
 }
 
 __constexpr const std::string_view
@@ -1086,13 +1109,13 @@ __constexpr_imp const std::string_view
 __constexpr_imp const std::string_view
                       print_config_t::test_description_str() const noexcept
 {
-    return "Assertion description";
+    return "Assertion's annotation";
 }
 
 __constexpr const std::string_view
                   print_config_t::static_test_annotation_str() const noexcept
 {
-    return "Test annotation";
+    return "Assertion's annotation";
 }
 
 /*__constexpr_imp
@@ -1276,13 +1299,13 @@ __constexpr_imp std::string
 __constexpr_imp std::string
                 print_config_t::multi_element_collection_str() const noexcept
 {
-    return "Matchers data";
+    return "Assertion data";
 }
 
 __constexpr_imp std::string
     print_config_t::multi_element_collection_grouped_str() const noexcept
 {
-    return "Matchers data (grouped by source)";
+    return "Assertion data (grouped by source)";
 }
 
 __constexpr const std::string_view

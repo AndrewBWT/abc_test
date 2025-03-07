@@ -1,5 +1,5 @@
-#include "abc_test/included_instances.hpp"
 #include "abc_test/core.hpp"
+#include "abc_test/included_instances.hpp"
 #include "abc_test/internal/utility/cli.hpp"
 
 namespace test
@@ -23,12 +23,13 @@ enum class enum_cli_add_instr_t
 
 namespace abc
 {
-    template<>
-    auto utility::get_enum_list() -> utility::enum_list_t<test::enum_cli_add_instr_t>
-    {
-        return {};
-    }
+template <>
+auto
+    utility::get_enum_list() -> utility::enum_list_t<test::enum_cli_add_instr_t>
+{
+    return {};
 }
+} // namespace abc
 
 _TEST_CASE(
     abc::test_case_t(
@@ -49,6 +50,9 @@ _TEST_CASE(
     using namespace test;
     using test_data_t = tuple<char, string, bool>;
     using cli_type_t  = cli_t<abc_test_option_class_t>;
+    _BEGIN_MULTI_ELEMENT_BBA(
+        _l_cli_bba, "Testing cli_t object with different arguments"
+    );
     for (const auto& [_l_char, _l_string, _l_constructable] :
          iterate_over<test_data_t>({}))
     {
@@ -58,7 +62,7 @@ _TEST_CASE(
         if (_l_cli_result.has_value())
         {
             cli_type_t _l_cli{_l_cli_result.value()};
-            _CHECK(annotate(
+            _l_cli_bba += _BLOCK_CHECK(annotate(
                 "Checking that constructable data matches "
                 "with the function",
                 _EXPR(_l_constructable == true)
@@ -82,7 +86,7 @@ _TEST_CASE(
                     switch (_l_add_instr)
                     {
                     default:
-                        _FAIL_WITH_MSG(
+                        _l_cli_bba += _BLOCK_FAIL_WITH_MSG(
                             "Failure caused by unhandled enum_cli_add_instr_t"
                         );
                     }
@@ -95,11 +99,12 @@ _TEST_CASE(
         }
         else
         {
-            _CHECK(annotate(
+            _l_cli_bba += _BLOCK_CHECK(annotate(
                 "As cli_t is not constructable, checking that data matches "
                 "with the function",
                 _EXPR(_l_constructable == false)
             ));
         }
     }
+    _END_BBA_CHECK(_l_cli_bba);
 }

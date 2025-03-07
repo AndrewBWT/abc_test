@@ -218,6 +218,17 @@
         _a_matcher, _a_str_representation, std::source_location::current() \
     )
 
+#define __GENERIC_STATIC_BBA_TRANSFORM(                           \
+    _a_pass, _a_opt_msg, _a_assertion_type, _a_str_representation \
+)                                                                 \
+    abc::make_entity_bba_compatable<_a_assertion_type>(           \
+        _a_pass,                                                  \
+        _a_opt_msg,                                               \
+        _a_str_representation,                                    \
+        std::source_location::current()                           \
+    )
+
+
 #define _BLOCK_REQUIRE(_a_matcher)                \
     __GENERIC_MATCHER_BBA_TRANSFORM(              \
         _a_matcher,                               \
@@ -225,6 +236,60 @@
         _ABC_NS_UTILITY::str::create_string(      \
             {"_BLOCK_REQUIRE(", #_a_matcher, ")"} \
         )                                         \
+    )
+
+#define _BLOCK_SUCCESS()                                          \
+    __GENERIC_STATIC_BBA_TRANSFORM(                               \
+        true,                                                     \
+        optional<std::string>{},                                  \
+        _ABC_NS_REPORTS::pass_t,                                  \
+        _ABC_NS_UTILITY::str::create_string({"_BLOCK_SUCCESS()"}) \
+    )
+
+#define _BLOCK_FAIL()                                          \
+    __GENERIC_STATIC_BBA_TRANSFORM(                            \
+        false,                                                 \
+        optional<std::string>{},                               \
+        _ABC_NS_REPORTS::fail_t,                               \
+        _ABC_NS_UTILITY::str::create_string({"_BLOCK_FAIL()"}) \
+    )
+
+#define _BLOCK_TERMINATE()                                          \
+    __GENERIC_STATIC_BBA_TRANSFORM(                                 \
+        false,                                                      \
+        optional<std::string>{},                                    \
+        _ABC_NS_REPORTS::terminate_t,                               \
+        _ABC_NS_UTILITY::str::create_string({"_BLOCK_TERMINATE()"}) \
+    )
+
+#define _BLOCK_SUCCESS_WITH_MSG(_a_msg)                \
+    __GENERIC_STATIC_BBA_TRANSFORM(                    \
+        true,                                          \
+        optional<std::string>{_a_msg},                 \
+        _ABC_NS_REPORTS::pass_t,                       \
+        _ABC_NS_UTILITY::str::create_string(           \
+            {"_BLOCK_SUCCESS_WITH_MSG(", #_a_msg, ")"} \
+        )                                              \
+    )
+
+#define _BLOCK_FAIL_WITH_MSG(_a_msg)                \
+    __GENERIC_STATIC_BBA_TRANSFORM(                 \
+        false,                                      \
+        optional<std::string>{_a_msg},              \
+        _ABC_NS_REPORTS::fail_t,                    \
+        _ABC_NS_UTILITY::str::create_string(        \
+            {"_BLOCK_FAIL_WITH_MSG(", #_a_msg, ")"} \
+        )                                           \
+    )
+
+#define _BLOCK_TERMINATE_WITH_MSG(_a_msg)                \
+    __GENERIC_STATIC_BBA_TRANSFORM(                      \
+        false,                                           \
+        optional<std::string>{_a_msg},                   \
+        _ABC_NS_REPORTS::terminate_t,                    \
+        _ABC_NS_UTILITY::str::create_string(             \
+            {"_BLOCK_TERMINATE_WITH_MSG(", #_a_msg, ")"} \
+        )                                                \
     )
 
 #define _BLOCK_CHECK(_a_matcher)                \
