@@ -20,8 +20,8 @@ class typeless_data_generator_collection_stack_trie_t;
  * for_loop_stack_trie_t object.
  */
 
-using parse_for_loop_stack_trie_result_t = std::
-    expected<typeless_data_generator_collection_stack_trie_t, std::string>;
+using parse_for_loop_stack_trie_result_t = result_t
+    <typeless_data_generator_collection_stack_trie_t>;
 
 namespace
 {
@@ -636,7 +636,7 @@ __constexpr_imp parse_for_loop_stack_trie_result_t
     using namespace utility::str;
     using namespace std;
     using enum utility::internal::internal_log_enum_t;
-    expected<string, string> _l_hex_result{abc::utility::str::from_hex(_a_str)};
+    result_t<string> _l_hex_result{abc::utility::str::from_hex(_a_str)};
     if (_l_hex_result.has_value())
     {
         return parse_repetition_tree_node(_l_hex_result.value(), true);
@@ -925,7 +925,7 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
         vector<shared_ptr<tdg_collection_stack_trie_t>> _l_kids;
         for (const string& _l_st : _l_str)
         {
-            const expected<tdg_collection_stack_trie_t, string> _l_op{
+            const result_t<tdg_collection_stack_trie_t> _l_op{
                 parse_repetition_tree_node(_l_st, false)
             };
             if (_l_op.has_value())

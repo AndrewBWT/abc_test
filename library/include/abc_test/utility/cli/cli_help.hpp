@@ -207,10 +207,10 @@ public:
         using namespace std;
         tuple<string, rep_file_index_t, rep_write_data_type_t> _l_rep_data{};
         get<0>(_l_rep_data) = _a_args[0];
-        abc::utility::parser::parse_result_t<rep_file_index_t> _l_rfli{
+        abc::result_t<rep_file_index_t> _l_rfli{
             abc::utility::parser::parse<rep_file_index_t>(_a_args[1])
         };
-        abc::utility::parser::parse_result_t<rep_write_data_type_t> _l_rf{
+        abc::result_t<rep_write_data_type_t> _l_rf{
             abc::utility::parser::parse<rep_write_data_type_t>(_a_args[2])
         };
         get<1>(_l_rep_data) = _l_rfli.value();

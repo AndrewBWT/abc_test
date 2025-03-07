@@ -23,7 +23,7 @@ struct default_parser_t<std::tuple<Ts...>>
         : _m_parsers(std::make_tuple(mk_parser(default_parser_t<Ts>())...))
     {}
 
-    __constexpr virtual parse_result_t<value_type>
+    __constexpr virtual result_t<value_type>
                 run_parser(parser_input_t& _a_parse_input) const;
 
     __constexpr std::tuple<parser_t<Ts>...>&
@@ -56,7 +56,7 @@ struct default_parser_t<std::variant<Ts...>>
         : _m_parsers(std::make_tuple(mk_parser(default_parser_t<Ts>())...))
     {}
 
-    __constexpr virtual parse_result_t<value_type>
+    __constexpr virtual result_t<value_type>
                 run_parser(parser_input_t& _a_parse_input) const;
 
     __constexpr std::tuple<parser_t<Ts>...>&
@@ -79,7 +79,7 @@ template<>
 struct default_parser_t<std::filesystem::path>
     : public parser_base_t<std::filesystem::path>
 {
-    __constexpr virtual parse_result_t<std::filesystem::path>
+    __constexpr virtual result_t<std::filesystem::path>
         run_parser(parser_input_t& _a_parse_input) const;
 };
 
@@ -96,7 +96,7 @@ default_parser_t<std::tuple<Ts...>>::default_parser_t(
 
 template <typename... Ts>
 __constexpr
-    parse_result_t<typename default_parser_t<std::tuple<Ts...>>::value_type>
+result_t<typename default_parser_t<std::tuple<Ts...>>::value_type>
     default_parser_t<std::tuple<Ts...>>::run_parser(
         parser_input_t& _a_parse_input
     ) const
@@ -107,10 +107,10 @@ __constexpr
     auto _l_res{run_parser_internal<0>(_l_rv, _a_parse_input)};
     if (_l_res.has_value())
     {
-        return parse_error<value_type>(_l_res.value());
+        return unexpected(_l_res.value());
     }
     _a_parse_input.check_advance_and_throw(")");
-    return parse_result_t<value_type>(_l_rv);
+    return result_t<value_type>(_l_rv);
 }
 
 template <typename... Ts>
@@ -157,7 +157,7 @@ default_parser_t<std::variant<Ts...>>::default_parser_t(
 
 template <typename... Ts>
 __constexpr
-    parse_result_t<typename default_parser_t<std::variant<Ts...>>::value_type>
+result_t<typename default_parser_t<std::variant<Ts...>>::value_type>
     default_parser_t<std::variant<Ts...>>::run_parser(
         parser_input_t& _a_parse_input
     ) const
@@ -165,7 +165,7 @@ __constexpr
     using namespace std;
     value_type               _l_rv;
     default_parser_t<size_t> _l_size_t_parser;
-    parse_result_t<size_t>   _l_size_t_result{
+    result_t<size_t>   _l_size_t_result{
         _l_size_t_parser.run_parser(_a_parse_input)
     };
     _a_parse_input.check_advance_and_throw(" ");
@@ -174,11 +174,11 @@ __constexpr
     };
     if (_l_res.has_value())
     {
-        return parse_error<value_type>(_l_res.value());
+        return unexpected(_l_res.value());
     }
     else
     {
-        return parse_result_t<value_type>(_l_rv);
+        return result_t<value_type>(_l_rv);
     }
 }
 
@@ -224,7 +224,7 @@ __constexpr std::optional<std::string>
     }
 }
 
-__constexpr parse_result_t<std::filesystem::path>
+__constexpr result_t<std::filesystem::path>
 default_parser_t<std::filesystem::path>::run_parser(
         parser_input_t& _a_parse_input
     ) const

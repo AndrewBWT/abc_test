@@ -1,7 +1,7 @@
 #pragma once
 
 #include "abc_test/utility/parsers/parser_input.hpp"
-#include "abc_test/utility/parsers/types.hpp"
+#include "abc_test/utility/types.hpp"
 #include "abc_test/core/errors/test_library_exception.hpp"
 
 #include <memory>
@@ -14,7 +14,7 @@ struct parser_base_t
 {
 public:
     using value_type_t = T;
-    __constexpr virtual parse_result_t<T>
+    __constexpr virtual result_t<T>
         run_parser(parser_input_t& _a_parse_input) const = 0;
 };
 template<typename T>
@@ -25,7 +25,7 @@ template <typename T>
 __constexpr parser_t<typename T::value_type_t>
 mk_parser(T) noexcept;
 template <typename T>
-__constexpr_imp parse_result_t<T>
+__constexpr_imp result_t<T>
                 parse(
                     const std::string_view _a_str,
                     const parser_t<T>&     _a_parser = mk_parser(default_parser_t<T>())
@@ -52,7 +52,7 @@ _END_ABC_UTILITY_PARSER_NS
 
 _BEGIN_ABC_UTILITY_PARSER_NS
 template <typename T>
-__constexpr_imp utility::parser::parse_result_t<T>
+__constexpr_imp result_t<T>
                 parse(
                     const std::string_view              _a_str,
                     const utility::parser::parser_t<T>& _a_parser
@@ -63,14 +63,14 @@ __constexpr_imp utility::parser::parse_result_t<T>
     parser_input_t _l_pit(_a_str);
     try
     {
-        const parse_result_t<T> _l_inner_parser_result{
+        const result_t<T> _l_inner_parser_result{
             _a_parser->run_parser(_l_pit)
         };
         if (_l_inner_parser_result.has_value())
         {
             if (not _l_pit.at_end())
             {
-                return parse_result_t<T>{
+                return result_t<T>{
                     unexpected("Parser okay but not at end of string")
                 };
             }
@@ -79,7 +79,7 @@ __constexpr_imp utility::parser::parse_result_t<T>
     }
     catch (const parser_could_not_match_string_t& _a_exception)
     {
-        return parse_result_t<T>{unexpected("Parser threw unexpected exception")
+        return result_t<T>{unexpected("Parser threw unexpected exception")
         };
     }
 }
@@ -94,7 +94,7 @@ parse_with_exception(
     using namespace std;
     using namespace errors;
     using namespace utility::parser;
-    const parse_result_t<T> _l_parse_result{parse(_a_str, _a_parser)};
+    const result_t<T> _l_parse_result{parse(_a_str, _a_parser)};
     if (_l_parse_result.has_value())
     {
         return _l_parse_result.value();

@@ -9,7 +9,7 @@ struct default_parser_t : public parser_base_t<T>
 {
 public:
     using value_type_t = T;
-    __constexpr virtual parse_result_t<T>
+    __constexpr virtual result_t<T>
         run_parser(parser_input_t& _a_parse_input) const override;
 };
 
@@ -20,7 +20,7 @@ _END_ABC_UTILITY_PARSER_NS
 
 _BEGIN_ABC_UTILITY_PARSER_NS
 template <typename T>
-__constexpr parse_result_t<T>
+__constexpr result_t<T>
             default_parser_t<T>::run_parser(
         parser_input_t& _a_parse_input
     ) const

@@ -145,7 +145,7 @@ __constexpr_imp parse_result_t<T>
     if (ec == std::errc())
     {
         _a_parse_input.advance((ptr - _l_str.data()) + 0);
-        return expected<T, string>(result);
+        return expsectsed<T, string>(result);
     }
     else
     {

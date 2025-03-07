@@ -31,8 +31,7 @@ namespace detail
 {
 struct found_data_t;
 } // namespace detail
-template<typename T>
-using result_t = std::expected<T, std::string>;
+
 template <typename Option_Class>
 class cli_t
 {
@@ -120,10 +119,10 @@ private:
     std::map<char, std::string>                            _m_char_to_clp_info;
     std::map<std::string_view, std::reference_wrapper<cli_info_t<Option_Class>>>
                 _m_sv_to_clp_info;
-    __constexpr std::expected<std::string_view, std::string>
+    __constexpr result_t<std::string_view>
                 normalise_str_from_cli_to_flag(const std::string_view _a_str
                 ) const noexcept;
-    __constexpr std::expected<std::string_view, std::string>
+    __constexpr result_t<std::string_view>
                 normalise_str_from_config_to_flag(const std::string_view _a_str
                 ) const noexcept;
     __constexpr const
@@ -156,14 +155,19 @@ private:
                 get_config_file_data(const Option_Class& _a_option_class
                 ) const noexcept;
 };
-template<typename Option_Class>
-__no_constexpr_imp result_t<cli_t<Option_Class>> make_cli(
-    const char _a_single_char_cli_identifier = '-',
-    const std::string_view _a_multi_char_cli_identifier = "--"
-) noexcept
+
+template <typename Option_Class>
+__no_constexpr_imp result_t<cli_t<Option_Class>>
+                   make_cli(
+                       const char             _a_single_char_cli_identifier = '-',
+                       const std::string_view _a_multi_char_cli_identifier = "--"
+                   ) noexcept
 {
-    return cli_t<Option_Class>(_a_single_char_cli_identifier, _a_multi_char_cli_identifier);
+    return cli_t<Option_Class>(
+        _a_single_char_cli_identifier, _a_multi_char_cli_identifier
+    );
 }
+
 namespace detail
 {
 __constexpr std::vector<std::string_view>
@@ -233,7 +237,7 @@ __no_constexpr_imp void
     for (size_t _l_idx{0}; _l_idx < _l_strs_size; ++_l_idx)
     {
         const string_view _l_str{_a_args[_l_idx]};
-        if (const expected<string_view, string> _l_opt_normalised_str{
+        if (const result_t<string_view> _l_opt_normalised_str{
                 normalise_str_from_cli_to_flag(_l_str)
             };
             _l_opt_normalised_str.has_value())
@@ -373,7 +377,7 @@ __constexpr_imp bool
     ) const noexcept
 {
     using namespace std;
-    if (const expected<string_view, string> _l_opt_normalised_str{
+    if (const result_t<string_view> _l_opt_normalised_str{
             normalise_str_from_config_to_flag(_a_field_name)
         };
         _l_opt_normalised_str.has_value())
@@ -715,7 +719,7 @@ __no_constexpr_imp bool
 }
 
 template <typename Option_Class>
-__constexpr_imp std::expected<std::string_view, std::string>
+__constexpr_imp result_t<std::string_view>
                 cli_t<Option_Class>::normalise_str_from_cli_to_flag(
         const std::string_view _a_str
     ) const noexcept
@@ -773,7 +777,7 @@ __constexpr_imp std::expected<std::string_view, std::string>
 }
 
 template <typename Option_Class>
-__constexpr_imp std::expected<std::string_view, std::string>
+__constexpr_imp result_t<std::string_view>
                 cli_t<Option_Class>::normalise_str_from_config_to_flag(
         const std::string_view _a_str
     ) const noexcept
@@ -828,7 +832,7 @@ __constexpr_imp bool
     vector<string_view> _l_strs_to_pass;
     while (_a_current_index < _a_strs.size())
     {
-        expected<string_view, string> _l_next_arg
+        const result_t<string_view> _l_next_arg
             = normalise_str_from_cli_to_flag(_a_strs[_a_current_index]);
         if (_l_next_arg.has_value())
         {

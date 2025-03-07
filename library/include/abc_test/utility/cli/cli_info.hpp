@@ -36,7 +36,7 @@ __constexpr std::function<std::optional<T>(const std::string_view)>
         }
         else
         {
-            const parse_result_t<T> _l_pr{parse(_a_str, default_parser<T>())};
+            const result_t<T> _l_pr{parse(_a_str, default_parser<T>())};
             if (_l_pr.has_value())
             {
                 return make_optional(_l_pr.value());

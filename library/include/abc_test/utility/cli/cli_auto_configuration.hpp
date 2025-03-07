@@ -66,7 +66,7 @@ template <>
 struct utility::parser::default_parser_t<rep_write_data_type_t>
     : public parser_base_t<rep_write_data_type_t>
 {
-    __constexpr parse_result_t<rep_write_data_type_t>
+    __constexpr result_t<rep_write_data_type_t>
                 run_parser(
                     parser_input_t& _a_parse_input
                 ) const
@@ -95,7 +95,7 @@ template <>
 struct utility::parser::default_parser_t<rep_file_index_t>
     : public parser_base_t<rep_file_index_t>
 {
-    __constexpr parse_result_t<rep_file_index_t>
+    __constexpr result_t<rep_file_index_t>
                 run_parser(
                     parser_input_t& _a_parse_input
                 ) const
@@ -115,7 +115,7 @@ struct utility::parser::default_parser_t<rep_file_index_t>
         }
         else
         {
-            parse_result_t<size_t> _l_res{
+            result_t<size_t> _l_res{
                 default_parser_t<size_t>().run_parser(_a_parse_input)
             };
             if (_l_res.has_value())

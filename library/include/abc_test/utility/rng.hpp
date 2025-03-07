@@ -119,7 +119,7 @@ private:
         = std::vector<uint32_t>();
 };
 
-__constexpr std::expected<complete_global_seed_t, std::string>
+__constexpr result_t<complete_global_seed_t>
             parse_complete_global_string_in_hex(
                 const std::string_view _a_str
             )
@@ -354,26 +354,26 @@ template <>
 struct default_parser_t<global_seed_t>
     : public parser_base_t<global_seed_t>
 {
-    __constexpr parse_result_t<global_seed_t>
+    __constexpr result_t<global_seed_t>
         run_parser(
             parser_input_t& _a_parse_input
         ) const
     {
         using namespace std;
-        const parse_result_t<unsigned int>
+        const result_t<unsigned int>
             _l_variant_result{ utility::parser::default_parser_t<
                                   unsigned int>(
             )
                                   .run_parser(_a_parse_input) };
         if (_l_variant_result.has_value())
         {
-            return parse_result_t<global_seed_t>(
+            return result_t<global_seed_t>(
                 complete_global_seed_t(_l_variant_result.value())
             );
         }
         else
         {
-            return parse_error<global_seed_t>(_l_variant_result.error());
+            return unexpected(_l_variant_result.error());
         }
     }
 };
@@ -381,26 +381,26 @@ template <>
 struct default_parser_t<complete_global_seed_t>
     : public parser_base_t<complete_global_seed_t>
 {
-    __constexpr parse_result_t<complete_global_seed_t>
+    __constexpr result_t<complete_global_seed_t>
                 run_parser(
                     parser_input_t& _a_parse_input
                 ) const
     {
         using namespace std;
-        const parse_result_t<variant<unsigned int, std::vector<uint32_t>>>
+        const result_t<variant<unsigned int, std::vector<uint32_t>>>
             _l_variant_result{utility::parser::default_parser_t<
                                   variant<unsigned int, std::vector<uint32_t>>>(
             )
                                   .run_parser(_a_parse_input)};
         if (_l_variant_result.has_value())
         {
-            return parse_result_t<complete_global_seed_t>(
+            return result_t<complete_global_seed_t>(
                 complete_global_seed_t(_l_variant_result.value())
             );
         }
         else
         {
-            return parse_error<complete_global_seed_t>(_l_variant_result.error());
+            return unexpected(_l_variant_result.error());
         }
     }
 };

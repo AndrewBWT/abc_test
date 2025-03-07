@@ -8,7 +8,7 @@
 _BEGIN_ABC_DS_NS
 struct map_unique_id_to_tdg_collection_stack_trie_t;
 using parse_map_unique_id_to_tdg_collection_stack_trie_result_t
-    = std::expected<map_unique_id_to_tdg_collection_stack_trie_t, std::string>;
+    = result_t<map_unique_id_to_tdg_collection_stack_trie_t>;
 using key_t = std::string;
 
 class map_unique_id_to_tdg_collection_stack_trie_t
@@ -45,7 +45,7 @@ struct default_parser_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
     : public parser_base_t<
           abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
 {
-    __no_constexpr virtual parse_result_t<
+    __no_constexpr virtual result_t<
         abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
         run_parser(parser_input_t& _a_parse_input) const;
     // using namespace abc::ds;
@@ -248,7 +248,7 @@ _END_ABC_UTILITY_PRINTER_NS
 
 _BEGIN_ABC_UTILITY_PARSER_NS
 __no_constexpr_imp
-    parse_result_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
+result_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
     default_parser_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>::
         run_parser(
             parser_input_t& _a_parse_input

@@ -9,6 +9,8 @@
 #include <source_location>
 #include <charconv>
 
+#include "abc_test/utility/types.hpp"
+
 _BEGIN_ABC_UTILITY_STR_NS
 /*!
  * Appends together a set of strings into a single output string.
@@ -42,7 +44,7 @@ __constexpr const std::string_view
                   ) noexcept;
 __constexpr std::string
             to_hex(const std::string_view _a_str) noexcept;
-__constexpr std::expected<std::string, std::string>
+__constexpr result_t<std::string>
             from_hex(const std::string_view _a_str);
 __constexpr std::string
             from_hex_with_exception(const std::string_view _a_str);
@@ -173,7 +175,7 @@ __constexpr_imp std::string
     return _l_rv;
 }
 
-__constexpr_imp std::expected<std::string, std::string>
+__constexpr_imp result_t<std::string>
                 from_hex(
                     const std::string_view _a_str
                 )
@@ -228,7 +230,7 @@ __constexpr_imp std::string
                 )
 {
     using namespace std;
-    expected<string, string> _l_res{from_hex(_a_str)};
+    result_t<string> _l_res{from_hex(_a_str)};
     if (not _l_res.has_value())
     {
         throw errors::test_library_exception_t(fmt::format(

@@ -146,6 +146,7 @@ set(LIBRARY_FILES
   include/abc_test/utility/ptr_utility.hpp
   include/abc_test/utility/do_not_optimise.hpp
   include/abc_test/utility/rng.hpp
+  include/abc_test/utility/types.hpp
   # BigInteger files. Currently we do not use these. We should determine whether we will
   # need these and, if not, remove them from the library.
   # Combinatorics files. Currently these are unused, however we plan to re-engineer them
@@ -169,7 +170,6 @@ set(LIBRARY_FILES
   include/abc_test/utility/io/file/tertiary_data.hpp
   include/abc_test/utility/io/file/file_line_writer_with_optional_rw_info.hpp
   # Utility functions and objects for strings including parsing and printing.
-  include/abc_test/utility/parsers/types.hpp
   include/abc_test/utility/parsers/parser_input.hpp
   include/abc_test/utility/parsers/parser_exceptions.hpp
   include/abc_test/utility/parsers/function_parser.hpp

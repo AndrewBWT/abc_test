@@ -7,7 +7,7 @@ template <typename T>
 requires (std::convertible_to<T, std::string_view>)
 struct default_parser_t<T> : public parser_base_t<T>
 {
-    __constexpr parse_result_t<T>
+    __constexpr result_t<T>
                 run_parser(
                     parser_input_t& _a_parse_input
                 ) const
@@ -30,7 +30,7 @@ struct default_parser_t<T> : public parser_base_t<T>
             }
         }
         _a_parse_input.check_advance_and_throw('"');
-        return parse_result_t<T>(_l_rv);
+        return result_t<T>(_l_rv);
     }
 };
 
@@ -53,7 +53,7 @@ public:
         : _m_parsers(std::make_pair(default_parser<T>(), default_parser<U>()))
     {}
 
-    __constexpr virtual parse_result_t<value_type>
+    __constexpr virtual result_t<value_type>
         run_parser(parser_input_t& _a_parse_input) const;
 };
 
@@ -75,7 +75,7 @@ public:
         : _m_parser(mk_parser(default_parser_t<T>()))
     {}
 
-    __constexpr virtual parse_result_t<std::vector<T>>
+    __constexpr virtual result_t<std::vector<T>>
         run_parser(parser_input_t& _a_parse_input) const;
 };
 
@@ -125,11 +125,12 @@ __constexpr_imp
 
 template <typename T, typename U>
 __constexpr_imp
-    parse_result_t<typename default_parser_t<std::pair<T, U>>::value_type>
+result_t<typename default_parser_t<std::pair<T, U>>::value_type>
     default_parser_t<std::pair<T, U>>::run_parser(
         parser_input_t& _a_parse_input
     ) const
 {
+    using namespace std;
     value_type _l_rv;
     _a_parse_input.check_advance_and_throw("(");
     if (auto _l_first_result{_m_parsers.first->run_parser(_a_parse_input)};
@@ -143,11 +144,11 @@ __constexpr_imp
         {
             _l_rv.second = _l_second_result.value();
             _a_parse_input.check_advance_and_throw(")");
-            return parse_result_t<value_type>(_l_rv);
+            return result_t<value_type>(_l_rv);
         }
         else
         {
-            return parse_error<value_type>(fmt::format(
+            return unexpected(fmt::format(
                 "Could not parse std::tuple element 2. Failed with error "
                 "message: {0}",
                 _l_second_result.error()
@@ -156,7 +157,7 @@ __constexpr_imp
     }
     else
     {
-        return parse_error<value_type>(fmt::format(
+        return unexpected(fmt::format(
             "Could not parse std::tuple element 1. Failed with error "
             "message: {0}",
             _l_first_result.error()
@@ -165,7 +166,7 @@ __constexpr_imp
 }
 
 template <typename T>
-__constexpr_imp parse_result_t<std::vector<T>>
+__constexpr_imp result_t<std::vector<T>>
                 default_parser_t<std::vector<T>>::run_parser(
         parser_input_t& _a_parse_input
     ) const
@@ -187,7 +188,7 @@ __constexpr_imp parse_result_t<std::vector<T>>
             auto _l_result{_m_parser->run_parser(_a_parse_input)};
             if (not _l_result.has_value())
             {
-                return parse_error<vector<T>>(_l_result.error());
+                return unexpected(_l_result.error());
             }
             _l_rv.push_back(_l_result.value());
             if (_a_parse_input.check_and_advance(", "))
@@ -201,10 +202,10 @@ __constexpr_imp parse_result_t<std::vector<T>>
             }
             else
             {
-                return parse_error<vector<T>>("unexpected character");
+                return unexpected("unexpected character");
             }
         }
-        return parse_error<vector<T>>("Shouldn't be poissibel to get here");
+        return unexpected("Shouldn't be poissibel to get here");
     }
 }
 

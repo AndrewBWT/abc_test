@@ -8,7 +8,7 @@ _BEGIN_ABC_UTILITY_PARSER_NS
 template <>
 struct default_parser_t<bool> : public parser_base_t<bool>
 {
-    __constexpr parse_result_t<bool>
+    __constexpr result_t<bool>
                 run_parser(
                     parser_input_t& _a_parse_input
                 ) const
@@ -17,15 +17,15 @@ struct default_parser_t<bool> : public parser_base_t<bool>
         string_view sv{_a_parse_input.sv()};
         if (_a_parse_input.check_and_advance("true"))
         {
-            return parse_result_t<bool>(true);
+            return result_t<bool>(true);
         }
         else if (_a_parse_input.check_and_advance("false"))
         {
-            return parse_result_t<bool>(false);
+            return result_t<bool>(false);
         }
         else
         {
-            return parse_error<bool>("Couldn't parse bool");
+            return result_t<bool>("Couldn't parse bool");
         }
     }
 };
@@ -34,7 +34,7 @@ template <typename T>
 requires is_from_chars_convertable_c<T>
 struct default_parser_t<T> : public parser_base_t<T>
 {
-    __constexpr parse_result_t<T>
+    __constexpr result_t<T>
                 run_parser(
                     parser_input_t& _a_parse_input
                 ) const
@@ -48,13 +48,13 @@ struct default_parser_t<T> : public parser_base_t<T>
         if (ec == std::errc())
         {
             _a_parse_input.advance((ptr - _l_str.data()) + 0);
-            return expected<T, string>(result);
+            return result_t<T>(result);
         }
         else
         {
-            return parse_error<T>(fmt::format(
+            return result_t<T>(unexpected(fmt::format(
                 "Could not parse \"{0}\" using std::from_chars", _l_str
-            )
+            ))
 
             );
         }
@@ -62,7 +62,7 @@ struct default_parser_t<T> : public parser_base_t<T>
 };
 
 template <typename T, typename... Ts>
-__constexpr parse_result_t<T>
+__constexpr result_t<T>
             object_printer_with_custom_parsers(
                 const utility::object_printer_parser_t& _a_object_print_parser,
                 const std::string_view&                 _a_begin_str,
@@ -71,7 +71,7 @@ __constexpr parse_result_t<T>
             );
 
 template <typename T, typename... Ts>
-__constexpr parse_result_t<T>
+__constexpr result_t<T>
             object_parser(
                 const utility::object_printer_parser_t& _a_object_print_parser,
                 const std::string_view&                 _a_begin_str,
@@ -79,7 +79,7 @@ __constexpr parse_result_t<T>
             );
 
 template <typename T, typename... Ts>
-__constexpr parse_result_t<T>
+__constexpr result_t<T>
             object_parser_with_field_names_and_custom_parsers(
                 const utility::object_printer_parser_t& _a_object_print_parser,
                 const std::string_view&                 _a_begin_str,
@@ -89,7 +89,7 @@ __constexpr parse_result_t<T>
             );
 
 template <typename T, typename... Ts>
-__constexpr parse_result_t<T>
+__constexpr result_t<T>
             object_parser_with_field_names(
                 const utility::object_printer_parser_t& _a_object_print_parser,
                 const std::string_view&                 _a_begin_str,
@@ -100,7 +100,7 @@ __constexpr parse_result_t<T>
 namespace
 {
 template <typename T, typename... Ts>
-__constexpr parse_result_t<T>
+__constexpr result_t<T>
             object_parser_internal(
                 const utility::object_printer_parser_t& _a_object_print_parser,
                 const std::string_view&                 _a_begin_str,
@@ -142,7 +142,7 @@ __constexpr_imp parse_result_t<T>
     if (ec == std::errc())
     {
         _a_parse_input.advance((ptr - _l_str.data()) + 0);
-        return expected<T, string>(result);
+        return expescted<T, string>(result);
     }
     else
     {
@@ -154,7 +154,7 @@ __constexpr_imp parse_result_t<T>
 }*/
 
 template <typename T, typename... Ts>
-__constexpr parse_result_t<T>
+__constexpr result_t<T>
             object_printer_with_custom_parsers(
                 const utility::object_printer_parser_t& _a_object_print_parser,
                 const std::string_view&                 _a_begin_str,
@@ -173,7 +173,7 @@ __constexpr parse_result_t<T>
 }
 
 template <typename T, typename... Ts>
-__constexpr parse_result_t<T>
+__constexpr result_t<T>
             object_parser(
                 const utility::object_printer_parser_t& _a_object_print_parser,
                 const std::string_view&                 _a_begin_str,
@@ -193,7 +193,7 @@ __constexpr parse_result_t<T>
 }
 
 template <typename T, typename... Ts>
-__constexpr parse_result_t<T>
+__constexpr result_t<T>
             object_parser_with_field_names_and_custom_parsers(
                 const utility::object_printer_parser_t& _a_object_print_parser,
                 const std::string_view&                 _a_begin_str,
@@ -213,7 +213,7 @@ __constexpr parse_result_t<T>
 }
 
 template <typename T, typename... Ts>
-__constexpr parse_result_t<T>
+__constexpr result_t<T>
             object_parser_with_field_names(
                 const utility::object_printer_parser_t& _a_object_print_parser,
                 const std::string_view&                 _a_begin_str,
@@ -236,7 +236,7 @@ __constexpr parse_result_t<T>
 namespace
 {
 template <typename T, typename... Ts>
-__constexpr parse_result_t<T>
+__constexpr result_t<T>
             object_parser_internal(
                 const utility::object_printer_parser_t& _a_object_print_parser,
                 const std::string_view&                 _a_begin_str,
