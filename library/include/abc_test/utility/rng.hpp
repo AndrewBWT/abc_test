@@ -3,7 +3,6 @@
 #include "abc_test/core/errors/test_library_exception.hpp"
 #include "abc_test/utility/internal/macros.hpp"
 #include "abc_test/utility/parsers/default_parser.hpp"
-#include "abc_test/utility/parsers/specializations/stl_11.hpp"
 #include "abc_test/utility/printers/default_printer.hpp"
 
 #include <random>

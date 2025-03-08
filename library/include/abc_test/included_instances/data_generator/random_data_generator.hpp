@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/included_instances/data_generator/random_generator/random_generator_base.hpp"
+#include "abc_test/included_instances/data_generator/random_generator/default_random_generator.hpp"
 #include "abc_test/core/data_generator/data_generator.hpp"
 #include "abc_test/core/test_runner.hpp"
 #include "abc_test/utility/io/file/file_line_reader.hpp"
@@ -154,7 +154,6 @@ __constexpr const T&
 {
     return _m_element;
 }
-
 _END_ABC_DG_NS
 
 _BEGIN_ABC_NS

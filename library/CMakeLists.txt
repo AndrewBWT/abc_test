@@ -123,14 +123,7 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/data_generator/random_generator/default_random_generator.hpp
   include/abc_test/included_instances/data_generator/random_generator/random_generator_function.hpp
   
-  include/abc_test/included_instances/data_generator/random_generator/specializations.hpp
   include/abc_test/included_instances/data_generator/random_generator/enumeration_based_random_generator_object.hpp
-  # Folder containing random data specializations for std types.
-  include/abc_test/included_instances/data_generator/random_generator/specializations/stl_11.hpp
-  include/abc_test/included_instances/data_generator/random_generator/specializations/stl_14.hpp
-  include/abc_test/included_instances/data_generator/random_generator/specializations/stl_17.hpp
-  include/abc_test/included_instances/data_generator/random_generator/specializations/stl_98.hpp
-  include/abc_test/included_instances/data_generator/random_generator/specializations/fundamental_types.hpp
   # Static data files
   include/abc_test/included_instances/data_generator/static_data_generator.hpp
   # Enumeration files
@@ -175,15 +168,9 @@ set(LIBRARY_FILES
   include/abc_test/utility/parsers/function_parser.hpp
   include/abc_test/utility/parsers/parser_base.hpp
   include/abc_test/utility/parsers/default_parser.hpp
-  include/abc_test/utility/parsers/specializations/fundamental_types.hpp
-  include/abc_test/utility/parsers/specializations/stl_98.hpp
-  include/abc_test/utility/parsers/specializations/stl_11.hpp
   include/abc_test/utility/printers/function_printer.hpp
   include/abc_test/utility/printers/printer_base.hpp
   include/abc_test/utility/printers/default_printer.hpp
-  include/abc_test/utility/printers/specializations/fundamental_types.hpp
-  include/abc_test/utility/printers/specializations/stl_98.hpp
-  include/abc_test/utility/printers/specializations/stl_11.hpp
   include/abc_test/utility/object_printer_parser.hpp
   include/abc_test/utility/str/parser_utility.hpp
   include/abc_test/utility/str/string_utility.hpp

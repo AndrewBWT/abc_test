@@ -5,13 +5,7 @@
 #include "abc_test/utility/cli/cli_help.hpp"
 #include "abc_test/utility/cli/cli_info.hpp"
 #include "abc_test/utility/internal/macros.hpp"
-#include "abc_test/utility/parsers/specializations/fundamental_types.hpp"
-#include "abc_test/utility/parsers/specializations/stl_11.hpp"
-#include "abc_test/utility/parsers/specializations/stl_98.hpp"
 #include "abc_test/utility/printers/default_printer.hpp"
-#include "abc_test/utility/printers/specializations/fundamental_types.hpp"
-#include "abc_test/utility/printers/specializations/stl_11.hpp"
-#include "abc_test/utility/printers/specializations/stl_98.hpp"
 #include "abc_test/utility/str/string_table.hpp"
 #include "abc_test/utility/str/string_utility.hpp"
 
