@@ -8,19 +8,21 @@ struct default_printer_t<std::tuple<Ts...>>
     : public printer_base_t<std::tuple<Ts...>>
 {
     using value_type = std::tuple<Ts...>;
-    static constexpr bool is_specialized{ true };
+    static constexpr bool is_specialized{true};
     __constexpr
     default_printer_t(printer_t<Ts>... _a_printers);
+
     __constexpr
     default_printer_t()
-        requires (std::is_default_constructible_v<default_printer_t<Ts>> && ...)
-    : _m_printers(std::make_tuple(mk_printer(default_printer_t<Ts>())...))
-    {
+    requires (std::is_default_constructible_v<default_printer_t<Ts>> && ...)
+        : _m_printers(std::make_tuple(mk_printer(default_printer_t<Ts>())...))
+    {}
 
-    }
     __constexpr virtual std::string
-        run_printer(const value_type& _a_parse_input) const;
-    __constexpr std::tuple<printer_t<Ts>...>& get_printers_ref() noexcept
+                run_printer(const value_type& _a_parse_input) const;
+
+    __constexpr std::tuple<printer_t<Ts>...>&
+                get_printers_ref() noexcept
     {
         return _m_printers;
     }
@@ -31,27 +33,70 @@ private:
         run_internal_printer(std::string& _a_str, const value_type& _a_object)
             const;
 };
+
 template <>
 struct default_printer_t<std::filesystem::path>
     : public printer_base_t<std::filesystem::path>
 {
     using value_type = std::filesystem::path;
+
     __no_constexpr_imp virtual std::string
-        run_printer(const value_type& _a_parse_input) const
+        run_printer(
+            const value_type& _a_parse_input
+        ) const
     {
         return _a_parse_input.string();
     }
 };
 
+template <typename T>
+struct default_printer_t<std::optional<T>>
+    : public printer_base_t<std::optional<T>>
+{
+    using value_type = std::optional<T>;
+    static constexpr bool is_specialized{true};
+
+    __constexpr
+    default_printer_t(
+        printer_t<T> _a_printer
+    )
+        : _m_printer(_a_printer)
+    {}
+
+    __constexpr
+    default_printer_t()
+    requires (std::is_default_constructible_v<default_printer_t<T>>)
+        : _m_printer(mk_printer(default_printer_t<T>()))
+    {}
+
+    __constexpr virtual std::string
+        run_printer(
+            const value_type& _a_object
+        ) const
+    {
+        using namespace std;
+        string _l_rv;
+        _l_rv.append("{");
+        if (_a_object.has_value())
+        {
+            _l_rv.append(_m_printer->run_printer(_a_object.value()));
+        }
+        _l_rv.append("}");
+        return _l_rv;
+    }
+private:
+    printer_t<T> _m_printer;
+};
+
 _END_ABC_UTILITY_PRINTER_NS
 
-_BEGIN_ABC_UTILITY_PRINTER_NS
-template <typename... Ts>
+_BEGIN_ABC_UTILITY_PRINTER_NS template <typename... Ts>
 __constexpr
 default_printer_t<std::tuple<Ts...>>::default_printer_t(
     printer_t<Ts>... _a_printers
 )
     : _m_printers{std::move(_a_printers)...}
+
 {}
 
 template <typename... Ts>

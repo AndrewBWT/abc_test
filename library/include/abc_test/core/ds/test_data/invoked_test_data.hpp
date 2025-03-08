@@ -638,7 +638,8 @@ normalise_for_file_use(
     vector<pair<string, string>> _l_strs_to_replace =
     {
         {":","_"},
-        {" ", "_"}
+        {" ", "_"},
+        {"\"",""},
     };
     string _l_rv(_a_str);
     for (auto& [_l_to_find, _l_to_replace_with] : _l_strs_to_replace)

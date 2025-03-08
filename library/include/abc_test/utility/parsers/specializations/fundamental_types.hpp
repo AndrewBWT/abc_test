@@ -30,8 +30,42 @@ struct default_parser_t<bool> : public parser_base_t<bool>
     }
 };
 
+template <>
+struct default_parser_t<char> : public parser_base_t<char>
+{
+    __constexpr result_t<char>
+                run_parser(
+                    parser_input_t& _a_parse_input
+                ) const
+    {
+        using namespace std;
+        string_view sv{_a_parse_input.sv()};
+        if (_a_parse_input.check_and_advance("`"))
+        {
+            char _l_rv{*_a_parse_input};
+            _a_parse_input.advance(1);
+            if (_a_parse_input.check_and_advance("`"))
+            {
+                return _l_rv;
+            }
+            else
+            {
+                return unexpected(
+                    fmt::format("Could not find expected character `{0}`.", "`")
+                );
+            }
+        }
+        else
+        {
+            return unexpected(
+                fmt::format("Could not find expected character `{0}`.", "`")
+            );
+        }
+    }
+};
+
 template <typename T>
-requires is_from_chars_convertable_c<T>
+requires is_from_chars_convertable_c<T> && (not std::same_as<T,char>)
 struct default_parser_t<T> : public parser_base_t<T>
 {
     __constexpr result_t<T>

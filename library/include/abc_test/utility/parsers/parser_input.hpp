@@ -17,6 +17,7 @@ public:
         check_advance_and_throw(const char _a_char_to_check_against);
     __constexpr void
         check_advance_and_throw(const std::string_view _a_str_to_check_against);
+    __no_constexpr void process_whitespace() noexcept;
     __constexpr void
                       advance(const std::size_t _a_new_itereator) noexcept;
     __constexpr const std::string_view
@@ -85,7 +86,13 @@ __constexpr void
         );
     }
 }
-
+__no_constexpr_imp void parser_input_t::process_whitespace() noexcept
+{
+    while (std::isspace(*_m_cur_itt))
+    {
+        ++_m_cur_itt;
+    }
+}
 __constexpr bool
     parser_input_t::check_and_advance(
         const char _a_char_to_check_against

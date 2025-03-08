@@ -7,7 +7,7 @@
 _BEGIN_ABC_DG_NS
 template <typename T>
 class enumeration_base_t;
-template<typename T>
+template <typename T>
 using enumeration_t = std::shared_ptr<enumeration_base_t<T>>;
 
 template <typename T>
@@ -15,39 +15,37 @@ class enumeration_schema_base_t
 {
 public:
     __constexpr
-        enumeration_schema_base_t(const T& _a_start_value) noexcept;
+    enumeration_schema_base_t(const T& _a_start_value) noexcept;
     __constexpr
-        enumeration_schema_base_t() noexcept
+    enumeration_schema_base_t() noexcept
         = delete;
-    __constexpr T virtual end_value(
-        const enumeration_t<T>& _a_edo
+    __constexpr T virtual end_value(const enumeration_t<T>& _a_edo
     ) const noexcept
         = 0;
-    __constexpr bool virtual is_direction_forward(
-        const enumeration_t<T>& _a_edo
+    __constexpr bool virtual is_direction_forward(const enumeration_t<T>& _a_edo
     ) const noexcept
         = 0;
     __no_constexpr enumerate_index_t
-                number_of_complete_advancements(
-                    const enumeration_t<T>& _a_edo
-                ) const noexcept;
+        number_of_complete_advancements(const enumeration_t<T>& _a_edo
+        ) const noexcept;
     __no_constexpr enumerate_index_t
-                remaining_entities_after_maximum_advancements(
-                    const enumeration_t<T>& _a_edo
-                ) const noexcept;
+        remaining_entities_after_maximum_advancements(
+            const enumeration_t<T>& _a_edo
+        ) const noexcept;
     __constexpr const T&
-                start_value() const noexcept;
+        start_value() const noexcept;
     __no_constexpr virtual enumerate_index_t
-                n_advancements_per_advancement(
-                    const enumeration_t<T>& _a_edo
-                ) const noexcept;
-    template<typename R>
-    __constexpr R enumerate_all_values(const enumeration_t<T>& _a_edo) const noexcept;
+        n_advancements_per_advancement(const enumeration_t<T>& _a_edo
+        ) const noexcept;
+    template <typename R>
+    __constexpr R
+        enumerate_all_values(const enumeration_t<T>& _a_edo) const noexcept;
 protected:
     T _m_start_value;
 };
-template<typename T>
-using enumeration_schema_t = std::shared_ptr< enumeration_schema_base_t<T>>;
+
+template <typename T>
+using enumeration_schema_t = std::shared_ptr<enumeration_schema_base_t<T>>;
 
 _END_ABC_DG_NS
 _BEGIN_ABC_NS
@@ -57,7 +55,7 @@ _END_ABC_NS
 _BEGIN_ABC_DG_NS
 template <typename T>
 __constexpr_imp
-enumeration_schema_base_t<T>::enumeration_schema_base_t(
+    enumeration_schema_base_t<T>::enumeration_schema_base_t(
         const T& _a_start_value
     ) noexcept
     : _m_start_value(_a_start_value)
@@ -65,7 +63,7 @@ enumeration_schema_base_t<T>::enumeration_schema_base_t(
 
 template <typename T>
 __no_constexpr_imp enumerate_index_t
-enumeration_schema_base_t<T>::number_of_complete_advancements(
+    enumeration_schema_base_t<T>::number_of_complete_advancements(
         const enumeration_t<T>& _a_edo
     ) const noexcept
 {
@@ -74,8 +72,8 @@ enumeration_schema_base_t<T>::number_of_complete_advancements(
 
 template <typename T>
 __no_constexpr_imp enumerate_index_t
-enumeration_schema_base_t<T>::remaining_entities_after_maximum_advancements(
-        const enumeration_t<T >& _a_edo
+    enumeration_schema_base_t<T>::remaining_entities_after_maximum_advancements(
+        const enumeration_t<T>& _a_edo
     ) const noexcept
 {
     return _a_edo->difference(_m_start_value, end_value(_a_edo)).second;
@@ -83,32 +81,54 @@ enumeration_schema_base_t<T>::remaining_entities_after_maximum_advancements(
 
 template <typename T>
 __constexpr_imp const T&
-enumeration_schema_base_t<T>::start_value() const noexcept
+    enumeration_schema_base_t<T>::start_value() const noexcept
 {
     return _m_start_value;
 }
+
 template <typename T>
 __no_constexpr_imp enumerate_index_t
-enumeration_schema_base_t<T>::n_advancements_per_advancement(
-    const enumeration_t<T>& _a_edo
-) const noexcept
+    enumeration_schema_base_t<T>::n_advancements_per_advancement(
+        const enumeration_t<T>& _a_edo
+    ) const noexcept
 {
     using namespace std;
-    return enumerate_index_t{ 1 };
+    return enumerate_index_t{1};
 }
-template<typename T>
-template<typename R>
-__constexpr_imp R enumeration_schema_base_t<T>::enumerate_all_values(const enumeration_t<T>& _a_edo) const noexcept
+
+template <typename T>
+template <typename R>
+__constexpr_imp R
+    enumeration_schema_base_t<T>::enumerate_all_values(
+        const enumeration_t<T>& _a_edo
+    ) const noexcept
 {
-    return R{};
-    /*if (_m_has_current_element)
+    R       _l_rv{};
+    T       _l_current_value{start_value()};
+    const T _l_last_value{end_value(_a_edo)};
+    if (is_direction_forward(_a_edo))
     {
-        _m_tertiary_data++;
-        _m_has_current_element
-            = next_element(_m_n_advancements_per_generate_next);
+        do
+        {
+            _l_rv.push_back(_l_current_value);
+            auto ki = n_advancements_per_advancement(_a_edo);
+            _a_edo->increment(_l_current_value, ki, _l_last_value);
+        }
+        while (_a_edo->less_than(_l_current_value, _l_last_value));
     }
-    return _m_has_current_element;*/
+    else
+    {
+        do
+        {
+            _l_rv.push_back(_l_current_value);
+            auto ki = n_advancements_per_advancement(_a_edo);
+            _a_edo->decrement(_l_current_value, ki, _l_last_value);
+        }
+        while (_a_edo->less_than(_l_last_value, _l_current_value));
+    }
+    return _l_rv;
 }
+
 _END_ABC_DG_NS
 _BEGIN_ABC_NS
 _END_ABC_NS

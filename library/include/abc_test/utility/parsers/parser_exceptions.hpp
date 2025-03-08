@@ -7,33 +7,35 @@
 
 _BEGIN_ABC_UTILITY_PARSER_NS
 
-class parser_at_end_of_string_exception_t : std::runtime_error
+class parser_at_end_of_string_exception_t : public std::runtime_error
 {
 public:
     __constexpr
     parser_at_end_of_string_exception_t()
         = delete;
     __no_constexpr
-    parser_at_end_of_string_exception_t(
-        const std::string_view _a_str,
-        const std::size_t      _a_elements_read
-    ) noexcept;
+        parser_at_end_of_string_exception_t(
+            const std::string_view _a_str,
+            const std::size_t      _a_elements_read
+        ) noexcept;
 };
 
-class parser_could_not_match_string_t : std::runtime_error
+class parser_could_not_match_string_t : public std::runtime_error
 {
 public:
     __constexpr
     parser_could_not_match_string_t()
         = delete;
     __no_constexpr
-    parser_could_not_match_string_t(
-        const std::string_view _a_str,
-        const std::string_view _a_remaining_string,
-        const std::string_view _a_str_failed_to_match
-    ) noexcept;
+        parser_could_not_match_string_t(
+            const std::string_view _a_str,
+            const std::string_view _a_remaining_string,
+            const std::string_view _a_str_failed_to_match
+        ) noexcept;
 };
+
 _END_ABC_UTILITY_PARSER_NS
+
 _BEGIN_ABC_UTILITY_PARSER_NS
 __no_constexpr_imp
     parser_at_end_of_string_exception_t::parser_at_end_of_string_exception_t(

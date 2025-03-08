@@ -1,8 +1,8 @@
 #pragma once
 
+#include "abc_test/core/errors/test_library_exception.hpp"
 #include "abc_test/utility/parsers/parser_input.hpp"
 #include "abc_test/utility/types.hpp"
-#include "abc_test/core/errors/test_library_exception.hpp"
 
 #include <memory>
 
@@ -17,13 +17,12 @@ public:
     __constexpr virtual result_t<T>
         run_parser(parser_input_t& _a_parse_input) const = 0;
 };
-template<typename T>
+template <typename T>
 struct default_parser_t;
 template <typename T>
 using parser_t = std::shared_ptr<parser_base_t<T>>;
 template <typename T>
-__constexpr parser_t<typename T::value_type_t>
-mk_parser(T) noexcept;
+__constexpr parser_t<typename T::value_type_t> mk_parser(T) noexcept;
 template <typename T>
 __constexpr_imp result_t<T>
                 parse(
@@ -32,7 +31,7 @@ __constexpr_imp result_t<T>
                 ) noexcept;
 template <typename T>
 __constexpr_imp T
-parse_with_exception(
+    parse_with_exception(
         const std::string_view              _a_str,
         const utility::parser::parser_t<T>& _a_parser
         = mk_parser(default_parser_t<T>())
@@ -63,9 +62,7 @@ __constexpr_imp result_t<T>
     parser_input_t _l_pit(_a_str);
     try
     {
-        const result_t<T> _l_inner_parser_result{
-            _a_parser->run_parser(_l_pit)
-        };
+        const result_t<T> _l_inner_parser_result{_a_parser->run_parser(_l_pit)};
         if (_l_inner_parser_result.has_value())
         {
             if (not _l_pit.at_end())
@@ -79,14 +76,15 @@ __constexpr_imp result_t<T>
     }
     catch (const parser_could_not_match_string_t& _a_exception)
     {
-        return result_t<T>{unexpected("Parser threw unexpected exception")
-        };
+        return unexpected(fmt::format(
+            "Parser threw unexpected exception: \"{0}\"", _a_exception.what()
+        ));
     }
 }
 
 template <typename T>
 __constexpr_imp T
-parse_with_exception(
+    parse_with_exception(
         const std::string_view              _a_str,
         const utility::parser::parser_t<T>& _a_parser
     )

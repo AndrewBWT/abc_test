@@ -10,9 +10,16 @@
 _BEGIN_ABC_DG_NS
 
 template <typename T>
-struct default_random_generator_t<std::optional<T>> : public random_generator_base_t<std::optional<T>>
+struct default_random_generator_t<std::optional<T>>
+    : public random_generator_base_t<std::optional<T>>
 {
 public:
+    __constexpr
+    default_random_generator_t()
+    requires (std::is_default_constructible_v<default_random_generator_t<T>>)
+        : _m_rng(mk_random_generator(default_random_generator_t<T>()))
+    {}
+
     __no_constexpr virtual std::optional<T>
         operator()(utility::rng& _a_rnd_generator, const std::size_t _a_index);
 private:
@@ -24,7 +31,7 @@ _END_ABC_DG_NS
 _BEGIN_ABC_DG_NS
 template <typename T>
 __no_constexpr_imp std::optional<T>
-default_random_generator_t<std::optional<T>>::operator()(
+                   default_random_generator_t<std::optional<T>>::operator()(
         utility::rng&     _a_rnd_generator,
         const std::size_t _a_index
     )
@@ -36,14 +43,14 @@ default_random_generator_t<std::optional<T>>::operator()(
     }
     else
     {
-        bool            _l_is_opt{ (_a_rnd_generator() % 2) == 0};
+        bool _l_is_opt{(_a_rnd_generator() % 2) == 0};
         if (_l_is_opt)
         {
             return optional<T>{};
         }
         else
         {
-            const T _l_elem{ _m_rng(_a_rnd_generator,_a_index) };
+            const T _l_elem{_m_rng->operator()(_a_rnd_generator, _a_index)};
             return optional<T>{_l_elem};
         }
     }
