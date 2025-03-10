@@ -35,7 +35,7 @@ public:
     __no_constexpr
         test_main_t(
             const validated_test_options_t<T>& _a_validated_test_options,
-            const cli_t<T>&                    _a_cli
+            const _ABC_NS_UTILITY_CLI::cli_t<T>&                    _a_cli
         ) noexcept;
     /*!
      * @brief This function runs the tests.
@@ -48,7 +48,7 @@ public:
     __no_constexpr void
         run_tests(ds::pre_test_run_report_t& _a_test_set_data) noexcept;
 private:
-    cli_t<T>           _m_cli;
+    _ABC_NS_UTILITY_CLI::cli_t<T>           _m_cli;
     _ABC_NS_DS::test_lists_t             _m_test_list_collection;
     T                  _m_options;
     _ABC_NS_REPORTERS::test_reporters_t  _m_test_reporters;
@@ -71,7 +71,7 @@ private:
     __no_constexpr
         test_main_t(
             const T&        _a_test_opts,
-            const cli_t<T>& _a_cli
+            const _ABC_NS_UTILITY_CLI::cli_t<T>& _a_cli
         ) noexcept;
     /*!
      * @brief Runs an individual test in an individual thread.
@@ -112,7 +112,7 @@ template <typename T>
 __no_constexpr_imp
     test_main_t<T>::test_main_t(
         const validated_test_options_t<T>& _a_validated_test_options,
-        const cli_t<T>&                    _a_cli
+        const _ABC_NS_UTILITY_CLI::cli_t<T>&                    _a_cli
     ) noexcept
     : test_main_t<T>(_a_validated_test_options.get_options(), _a_cli)
 {}
@@ -120,7 +120,7 @@ template<typename T>
 __no_constexpr_imp
     test_main_t<T>::test_main_t(
         const T&        _a_to,
-        const cli_t<T>& _a_cli
+        const _ABC_NS_UTILITY_CLI::cli_t<T>& _a_cli
     ) noexcept
     : _m_test_list_collection(make_test_list_collection(
           _a_to.test_lists,

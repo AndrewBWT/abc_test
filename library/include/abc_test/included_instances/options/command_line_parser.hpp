@@ -13,8 +13,8 @@ namespace detail
 __no_constexpr void
     add_all_options(
         included_instances_test_options_t&        _a_opts,
-        cli_t<included_instances_test_options_t>& _a_cli,
-        cli_results_t&                            _a_cli_results
+        _ABC_NS_UTILITY_CLI::cli_t<included_instances_test_options_t>& _a_cli,
+        _ABC_NS_UTILITY_CLI::cli_results_t&                            _a_cli_results
     ) noexcept;
 } // namespace detail
 
@@ -32,6 +32,7 @@ __no_constexpr_imp int
     using namespace _ABC_NS_REPORTERS;
     using namespace _ABC_NS_DS;
     using namespace _ABC_NS_UTILITY;
+    using namespace _ABC_NS_UTILITY_CLI;
     included_instances_test_options_t                  _l_iito;
     cli_results_t                                      _l_cli_results;
     result_t<cli_t<included_instances_test_options_t>> _l_cli_res{
@@ -40,7 +41,7 @@ __no_constexpr_imp int
     if (_l_cli_res.has_value())
     {
         cli_t<included_instances_test_options_t>& _l_cli{ _l_cli_res.value() };
-        detail::add_all_options(_l_iito, _l_cli, _l_cli_results);
+        _ABC_NS::detail::add_all_options(_l_iito, _l_cli, _l_cli_results);
         _l_cli.parse_arguments(_l_iito, argc, argv, _l_cli_results);
         if (_l_cli_results.has_errors())
         {
@@ -121,11 +122,13 @@ namespace detail
 __no_constexpr_imp void
     add_all_options(
         included_instances_test_options_t&        _a_opts,
-        cli_t<included_instances_test_options_t>& _a_cli,
-        cli_results_t&                            _a_cli_results
+        _ABC_NS_UTILITY_CLI::cli_t<included_instances_test_options_t>& _a_cli,
+        _ABC_NS_UTILITY_CLI::cli_results_t&                            _a_cli_results
     ) noexcept
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_CLI;
+    using namespace _ABC_NS_UTILITY_CLI::detail;
     _a_cli.add_help_flag();
     _a_cli.add_file_config_flag();
     _a_cli.add_option(

@@ -19,7 +19,7 @@ public:
             const included_instances_test_options_t& _a_test_options
         ) noexcept;
     __constexpr const std::vector<std::string>&
-                      get_option_data(const abc::cli_option_config_t& _a_element
+                      get_option_data(const _ABC_NS_CLI::cli_option_config_t& _a_element
                       ) const noexcept;
     __constexpr const included_instances_test_options_t&
         get_options() const noexcept;
@@ -59,7 +59,7 @@ __constexpr void
 
 __constexpr const std::vector<std::string>&
                   pre_test_run_report_t::get_option_data(
-                      const abc::cli_option_config_t& _a_element
+                      const _ABC_NS_UTILITY_CLI::cli_option_config_t& _a_element
     ) const noexcept
 {
     using namespace std;

@@ -24,42 +24,42 @@ __no_constexpr_or_inline_imp std::vector<std::string>
             return {
                 "",
                 _a_pc.indent(_a_pc.slight_highlight(_a_pc.make_source_info(
-                    _a_element.get_option_data(detail::_s_global_test_list)
+                    _a_element.get_option_data(_ABC_NS_UTILITY_CLI::detail::_s_global_test_list)
                 )))
             };
         case WRITE_DATA_TO_FILES:
             return {
                 "",
                 _a_pc.indent(_a_pc.slight_highlight(_a_pc.make_source_info(
-                    _a_element.get_option_data(detail::_s_write_data_to_files)
+                    _a_element.get_option_data(_ABC_NS_UTILITY_CLI::detail::_s_write_data_to_files)
                 )))
             };
         case PATH_DELIMITER:
             return {
                 "",
                 _a_pc.indent(_a_pc.slight_highlight(_a_pc.make_source_info(
-                    _a_element.get_option_data(detail::_s_path_delimiter)
+                    _a_element.get_option_data(_ABC_NS_UTILITY_CLI::detail::_s_path_delimiter)
                 )))
             };
         case ROOT_PATH:
             return {
                 "",
                 _a_pc.indent(_a_pc.slight_highlight(_a_pc.make_source_info(
-                    _a_element.get_option_data(detail::_s_root_path)
+                    _a_element.get_option_data(_ABC_NS_UTILITY_CLI::detail::_s_root_path)
                 )))
             };
         case THREADS:
             return {
                 "",
                 _a_pc.indent(_a_pc.slight_highlight(_a_pc.make_source_info(
-                    _a_element.get_option_data(detail::_s_threads)
+                    _a_element.get_option_data(_ABC_NS_UTILITY_CLI::detail::_s_threads)
                 )))
             };
         case COMMENT_STR:
             return {
                 "",
                 _a_pc.indent(_a_pc.slight_highlight(_a_pc.make_source_info(
-                    _a_element.get_option_data(detail::_s_comment_str)
+                    _a_element.get_option_data(_ABC_NS_UTILITY_CLI::detail::_s_comment_str)
                 )))
             };
         case GENERAL_DATA_FILE_EXTENSION:
@@ -67,7 +67,7 @@ __no_constexpr_or_inline_imp std::vector<std::string>
                 "",
                 _a_pc.indent(_a_pc.slight_highlight(
                     _a_pc.make_source_info(_a_element.get_option_data(
-                        detail::_s_general_data_file_extension
+                        _ABC_NS_UTILITY_CLI::detail::_s_general_data_file_extension
                     ))
                 ))
             };
@@ -76,7 +76,7 @@ __no_constexpr_or_inline_imp std::vector<std::string>
                 "",
                 _a_pc.indent(_a_pc.slight_highlight(
                     _a_pc.make_source_info(_a_element.get_option_data(
-                        detail::_s_integers_used_for_rng_generation
+                        _ABC_NS_UTILITY_CLI::detail::_s_integers_used_for_rng_generation
                     ))
                 ))
             };
@@ -84,7 +84,7 @@ __no_constexpr_or_inline_imp std::vector<std::string>
             return {
                 "",
                 _a_pc.indent(_a_pc.slight_highlight(_a_pc.make_source_info(
-                    _a_element.get_option_data(detail::_s_repetition_config)
+                    _a_element.get_option_data(_ABC_NS_UTILITY_CLI::detail::_s_repetition_config)
                 )))
             };
         case GLOBAL_SEED:
@@ -92,21 +92,21 @@ __no_constexpr_or_inline_imp std::vector<std::string>
             return {
                 "",
                 _a_pc.indent(_a_pc.slight_highlight(_a_pc.make_source_info(
-                    _a_element.get_option_data(detail::_s_global_seed)
+                    _a_element.get_option_data(_ABC_NS_UTILITY_CLI::detail::_s_global_seed)
                 )))
             };
         case FORCE_RUN_ALL_TESTS:
             return {
                 "",
                 _a_pc.indent(_a_pc.slight_highlight(_a_pc.make_source_info(
-                    _a_element.get_option_data(detail::_s_force_run_all_tests)
+                    _a_element.get_option_data(_ABC_NS_UTILITY_CLI::detail::_s_force_run_all_tests)
                 )))
             };
         case TEST_PATHS_TO_RUN:
             return {
                 "",
                 _a_pc.indent(_a_pc.slight_highlight(_a_pc.make_source_info(
-                    _a_element.get_option_data(detail::_c_test_paths_to_run)
+                    _a_element.get_option_data(_ABC_NS_UTILITY_CLI::detail::_c_test_paths_to_run)
                 )))
             };
 

@@ -31,7 +31,10 @@ auto
     utility::get_enum_list() -> utility::enum_list_t<test::enum_cli_add_instr_t>
 {
     using enum test::enum_cli_add_instr_t;
-    return {ADD_GENERIC_OPTION};
+    return
+    {
+        _ENUM_LIST_ENTRY(ADD_GENERIC_OPTION)
+    };
 }
 } // namespace abc
 
@@ -50,6 +53,7 @@ _TEST_CASE(
     using namespace abc;
     using namespace std;
     using namespace test;
+    using namespace _ABC_NS_UTILITY_CLI;
     using test_data_t = tuple<char, string, optional<string>>;
     using cli_type_t  = cli_t<abc_test_option_class_t>;
     using enum enum_cli_add_instr_t;
@@ -156,6 +160,7 @@ _TEST_CASE(
     using namespace abc;
     using namespace std;
     using namespace test;
+    using namespace _ABC_NS_UTILITY_CLI;
     using test_data_t = tuple<char, string, bool>;
     using cli_type_t  = cli_t<abc_test_option_class_t>;
     using enum enum_cli_add_instr_t;

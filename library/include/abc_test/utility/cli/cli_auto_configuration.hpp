@@ -1,39 +1,56 @@
 #pragma once
 
+#include "abc_test/utility/enum.hpp"
 #include "abc_test/utility/internal/macros.hpp"
 #include "abc_test/utility/parsers/default_parser.hpp"
 #include "abc_test/utility/printers/default_printer.hpp"
 
 #include <filesystem>
+#include <fstream>
 #include <variant>
 
-#include <fstream>
-
-_BEGIN_ABC_NS
-enum class enum_rep_file_index_t
+_BEGIN_ABC_UTILITY_CLI_NS
+enum class enum_auto_configuration_load_type_t
 {
     LATEST,
     LATEST_IF_FAILURE,
+    AUTO
 };
+_END_ABC_UTILITY_CLI_NS
 
-class rep_file_index_t
+_BEGIN_ABC_NS
+template <>
+auto
+    utility::get_enum_list(
+    ) -> utility::enum_list_t<utility::cli::enum_auto_configuration_load_type_t>
+{
+    using enum utility::cli::enum_auto_configuration_load_type_t;
+    return {_ENUM_LIST_ENTRY(LATEST), _ENUM_LIST_ENTRY(LATEST_IF_FAILURE),
+    _ENUM_LIST_ENTRY(AUTO) };
+}
+
+_END_ABC_NS
+
+_BEGIN_ABC_UTILITY_CLI_NS
+
+class auto_configuration_load_configuration_t
 {
 public:
     __constexpr
-    rep_file_index_t()
-        : rep_file_index_t(0)
+    auto_configuration_load_configuration_t()
+        : auto_configuration_load_configuration_t(0)
     {}
 
     __constexpr
-    rep_file_index_t(
+    auto_configuration_load_configuration_t(
         const std::size_t _a_data
     )
         : _m_data(_a_data)
     {}
 
     __constexpr
-    rep_file_index_t(
-        const enum_rep_file_index_t _a_data
+    auto_configuration_load_configuration_t(
+        const enum_auto_configuration_load_type_t _a_data
     )
         : _m_data(_a_data)
     {}
@@ -42,46 +59,60 @@ public:
                 index() const noexcept
     {
         using namespace std;
-        if (holds_alternative<std::size_t>(_m_data))
-        {
-            return make_optional(get<size_t>(_m_data));
-        }
-        else
-        {
-            return nullopt;
-        }
+        return (holds_alternative<size_t>(_m_data))
+                   ? make_optional(get<size_t>(_m_data))
+                   : nullopt;
     }
 private:
-    std::variant<std::size_t, enum_rep_file_index_t> _m_data;
+    std::variant<std::size_t, enum_auto_configuration_load_type_t> _m_data;
 };
-enum class rep_write_data_type_t
+enum class enum_auto_configuration_write_to_file_t
 {
     ALWAYS_WRITE,
     AUTO,
     DO_NOT_WRITE
 };
+_END_ABC_UTILITY_CLI_NS
+
+_BEGIN_ABC_NS
+template <>
+auto
+    utility::get_enum_list() -> utility::enum_list_t<
+        utility::cli::enum_auto_configuration_write_to_file_t>
+{
+    using enum utility::cli::enum_auto_configuration_write_to_file_t;
+    return {
+        _ENUM_LIST_ENTRY(ALWAYS_WRITE),
+        _ENUM_LIST_ENTRY(AUTO),
+        _ENUM_LIST_ENTRY(DO_NOT_WRITE)
+    };
+}
+
+_END_ABC_NS
+/*_BEGIN_ABC_UTILITY_PARSER_NS
 
 template <>
-struct utility::parser::default_parser_t<rep_write_data_type_t>
-    : public parser_base_t<rep_write_data_type_t>
+struct default_parser_t<cli::enum_auto_configuration_write_to_file_t>
+    : public parser_base_t<cli::enum_auto_configuration_write_to_file_t>
 {
-    __constexpr result_t<rep_write_data_type_t>
+    __constexpr result_t<cli::enum_auto_configuration_write_to_file_t>
                 run_parser(
                     parser_input_t& _a_parse_input
                 ) const
     {
         using namespace std;
+        using namespace _ABC_NS_CLI;
         if (_a_parse_input.check_and_advance("always_write"))
         {
-            return rep_write_data_type_t::ALWAYS_WRITE;
+            return enum_auto_configuration_write_to_file_t::ALWAYS_WRITE;
         }
         else if (_a_parse_input.check_and_advance("auto"))
         {
-            return rep_write_data_type_t::AUTO;
+            return enum_auto_configuration_write_to_file_t::AUTO;
         }
         else if (_a_parse_input.check_and_advance("do_not_write"))
         {
-            return rep_write_data_type_t::DO_NOT_WRITE;
+            return enum_auto_configuration_write_to_file_t::DO_NOT_WRITE;
         }
         else
         {
@@ -90,44 +121,53 @@ struct utility::parser::default_parser_t<rep_write_data_type_t>
     }
 };
 
+_END_ABC_UTILITY_PARSER_NS*/
+_BEGIN_ABC_UTILITY_PARSER_NS
+
 template <>
-struct utility::parser::default_parser_t<rep_file_index_t>
-    : public parser_base_t<rep_file_index_t>
+struct default_parser_t<cli::auto_configuration_load_configuration_t>
+    : public parser_base_t<cli::auto_configuration_load_configuration_t>
 {
-    __constexpr result_t<rep_file_index_t>
+    __constexpr result_t<cli::auto_configuration_load_configuration_t>
                 run_parser(
                     parser_input_t& _a_parse_input
                 ) const
     {
         using namespace std;
-        if (_a_parse_input.check_and_advance("latest"))
+        using namespace _ABC_NS_CLI;
+        if (const result_t<enum_auto_configuration_load_type_t> _l_result{
+                default_parser_t<enum_auto_configuration_load_type_t>(
+                    enum_helper_string_case_t::lower
+                )
+                    .run_parser(_a_parse_input)
+            };
+            _l_result.has_value())
         {
-            return rep_file_index_t(enum_rep_file_index_t::LATEST);
+            return auto_configuration_load_configuration_t(_l_result.value());
         }
-        else if (_a_parse_input.check_and_advance("latest_if_failure"))
+        else if (const result_t<size_t> _l_result{
+                     default_parser_t<size_t>().run_parser(_a_parse_input)
+                 };
+                 _l_result.has_value())
         {
-            return rep_file_index_t(enum_rep_file_index_t::LATEST_IF_FAILURE);
-        }
-        else if (_a_parse_input.check_and_advance("auto"))
-        {
-            return rep_file_index_t(enum_rep_file_index_t::LATEST_IF_FAILURE);
+            return auto_configuration_load_configuration_t(_l_result.value());
         }
         else
         {
-            result_t<size_t> _l_res{
-                default_parser_t<size_t>().run_parser(_a_parse_input)
-            };
-            if (_l_res.has_value())
-            {
-                return rep_file_index_t{_l_res.value()};
-            }
-            else
-            {
-                return unexpected("Couldn't parse");
-            }
+            return unexpected(fmt::format(
+                "Couldn't parse string {0} to either a {1} or a {2}, which the "
+                "constructor for {3} requires.",
+                _a_parse_input.sv(),
+                typeid(enum_auto_configuration_load_type_t).name(),
+                typeid(std::size_t).name(),
+                typeid(auto_configuration_load_configuration_t).name()
+            ));
         }
     }
 };
+
+_END_ABC_UTILITY_PARSER_NS
+_BEGIN_ABC_UTILITY_CLI_NS
 
 class cli_auto_configuration_file_info_t
 {
@@ -151,48 +191,33 @@ class cli_auto_configuration_t
 public:
     __constexpr
     cli_auto_configuration_t(
-        const std::filesystem::path& _a_repetition_folder,
-        const rep_file_index_t       _a_rep_file_index,
-        const rep_write_data_type_t  _a_rep_write_data_type,
+        const std::filesystem::path&                  _a_repetition_folder,
+        const auto_configuration_load_configuration_t _a_rep_file_index,
+        const enum_auto_configuration_write_to_file_t _a_rep_write_data_type,
         const std::optional<cli_auto_configuration_file_info_t>& _l_loaded_file,
         const std::optional<cli_auto_configuration_file_last_loaded_info_t>&
             _l_last_config_info
     ) noexcept;
-   // __no_constexpr void
-   //     setup_next_file(
-   //         const std::vector<std::pair<std::string, std::string>>&
-   //         _a_strs_to_print,
-   //         const bool _a_test_success
-   //     ) const noexcept;
     std::filesystem::path _m_repetition_folder;
     // Either auto, or auto with specific element.
-    rep_file_index_t _m_rep_file_index;
+    auto_configuration_load_configuration_t _m_rep_file_index;
     // Whether to write information.
-    rep_write_data_type_t _m_rep_write_data_type;
+    enum_auto_configuration_write_to_file_t _m_rep_write_data_type;
     // The loaded configuration
     std::optional<cli_auto_configuration_file_info_t> _m_loaded_configuration;
     // The file containing the last index.
     std::optional<cli_auto_configuration_file_last_loaded_info_t>
         _m_last_config_info;
-//    template<typename Option_Object>
-//    __constexpr void
- //       prepare_file(
- //           const std::string_view _a_autofile_name,
- //           const std::size_t _a_autofile_size,
- //           const std::vector<std::pair<std::string, std::string>>&
-   //         _a_strs_to_print,
-   //         const bool _a_test_success
-   //     ) const noexcept;
 };
 
-_END_ABC_NS
+_END_ABC_UTILITY_CLI_NS
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_UTILITY_CLI_NS
 __constexpr_imp
     cli_auto_configuration_t::cli_auto_configuration_t(
-        const std::filesystem::path& _a_repetition_folder,
-        const rep_file_index_t       _a_rep_file_index,
-        const rep_write_data_type_t  _a_rep_write_data_type,
+        const std::filesystem::path&                  _a_repetition_folder,
+        const auto_configuration_load_configuration_t _a_rep_file_index,
+        const enum_auto_configuration_write_to_file_t _a_rep_write_data_type,
         const std::optional<cli_auto_configuration_file_info_t>&
             _a_loaded_configuration,
         const std::optional<cli_auto_configuration_file_last_loaded_info_t>&
@@ -205,85 +230,4 @@ __constexpr_imp
     , _m_loaded_configuration(_a_loaded_configuration)
 {}
 
-/*template<typename Option_Object>
-__no_constexpr_imp void
-cli_auto_configuration_t::setup_next_file(
-    const Option_Object&
-    _a_strs_to_print,
-    const bool _a_test_success
-) const noexcept
-{
-    switch (_m_rep_write_data_type)
-    {
-    case rep_write_data_type_t::ALWAYS_WRITE:
-        prepare_file(_a_strs_to_print, _a_test_success);
-        break;
-    case rep_write_data_type_t::AUTO:
-        if ((not this->_m_loaded_configuration.has_value() && not _a_test_success) ||
-            (_m_loaded_configuration.has_value() && _a_test_success))
-        {
-            prepare_file(_a_strs_to_print, _a_test_success);
-        }
-    default:
-        break;
-    }
-}
-
-__constexpr void
-    cli_auto_configuration_t::prepare_file(
-        const std::string_view _a_autofile_name,
-        const std::size_t _a_autofile_size,
-        const std::vector<std::pair<std::string, std::string>>&
-                   _a_strs_to_print,
-        const bool _a_test_success
-    ) const noexcept
-{
-    using namespace std;
-    ofstream _l_output;
-    size_t   _l_next_index;
-    if (_m_last_config_info.has_value())
-    {
-        _l_next_index = _m_last_config_info.value().last_index + 1;
-        if (_l_next_index > _m_last_config_info.value().max_index)
-        {
-            const filesystem::path _l_new_path{
-                filesystem::path(_m_repetition_folder)
-                    .append(fmt::format(
-                        "{0}_{1}_{2}",
-                        _a_autofile_name,
-                        _m_last_config_info.value().max_index + 1,
-                        _m_last_config_info.value().max_index
-                            + _a_autofile_size
-                    ))
-            };
-            _l_output.open(_l_new_path, ios::app);
-            // Create new file.
-        }
-        else
-        {
-            _l_output.open(this->_m_last_config_info.value().file, ios::app);
-        }
-    }
-    else
-    {
-        _l_next_index = 1;
-        const filesystem::path _l_new_path{
-            filesystem::path(_m_repetition_folder)
-                .append(fmt::format(
-                    "{0}_{1}_{2}",
-                    _a_autofile_name,
-                    1,
-                    +_a_autofile_size
-                ))
-        };
-        _l_output.open(_l_new_path, ios::app);
-    }
-    using namespace detail;
-    for (const auto& [_l_field_name, _l_field] : _a_strs_to_print)
-    {
-        _l_output << fmt::format("{0} = {1}", _l_field_name, _l_field) << std::endl;
-    }
-    _l_output.close();
-}*/
-
-_END_ABC_NS
+_END_ABC_UTILITY_CLI_NS

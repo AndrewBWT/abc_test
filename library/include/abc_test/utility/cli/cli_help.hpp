@@ -7,7 +7,7 @@
 #include <fstream>
 #include <optional>
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_UTILITY_CLI_NS
 template <typename Option_Class>
 class cli_t;
 
@@ -27,7 +27,9 @@ public:
                   "signals to the output that processing should not "
                   "continue.",
                   _a_char_flag
-              },0,0,
+              },
+              0,
+              0,
               false
           )
     {}
@@ -61,7 +63,9 @@ public:
                   "Specifies a configuration file for the command line parser "
                   "to read from.",
                   _a_char_flag
-              },1,1,
+              },
+              1,
+              1,
               false
           )
     {}
@@ -190,7 +194,9 @@ public:
                   "\"do_not_write\", the configuration is never written to any "
                   "files. ",
                   _a_char_flag
-              },3,3,
+              },
+              3,
+              3,
               false
           )
     {}
@@ -205,25 +211,60 @@ public:
         ) const noexcept
     {
         using namespace std;
-        tuple<string, rep_file_index_t, rep_write_data_type_t> _l_rep_data{};
+        tuple<
+            string,
+            auto_configuration_load_configuration_t,
+            enum_auto_configuration_write_to_file_t>
+            _l_rep_data{};
         get<0>(_l_rep_data) = _a_args[0];
-        abc::result_t<rep_file_index_t> _l_rfli{
-            abc::utility::parser::parse<rep_file_index_t>(_a_args[1])
+        abc::result_t<auto_configuration_load_configuration_t> _l_rfli{
+            abc::utility::parser::parse<
+                auto_configuration_load_configuration_t>(_a_args[1])
         };
-        abc::result_t<rep_write_data_type_t> _l_rf{
-            abc::utility::parser::parse<rep_write_data_type_t>(_a_args[2])
+        abc::result_t<enum_auto_configuration_write_to_file_t> _l_rf{
+            abc::utility::parser::parse<
+                enum_auto_configuration_write_to_file_t>(
+                _a_args[2],
+                abc::utility::parser::mk_parser(
+                    utility::parser::default_parser_t<
+                        enum_auto_configuration_write_to_file_t>(
+                        enum_helper_string_case_t::lower
+                    )
+                )
+            )
         };
-        get<1>(_l_rep_data) = _l_rfli.value();
-        get<2>(_l_rep_data) = _l_rf.value();
-        if (const bool _l_terminate{_a_cli.process_repetition_data(
-                _a_option_class, _l_rep_data, _a_cli_results
-            )};
-            _l_terminate)
+        if (not _l_rfli.has_value())
         {
+            _a_cli_results.add_error(fmt::format(
+                "Error parsing {0}. Parser reported error: \"{1}\".",
+                typeid(auto_configuration_load_configuration_t).name(),
+                _l_rfli.error()
+            ));
             return true;
         }
-        return false;
+        else if (not _l_rf.has_value())
+        {
+            _a_cli_results.add_error(fmt::format(
+                "Error parsing {0}. Parser reported error: \"{1}\".",
+                typeid(enum_auto_configuration_write_to_file_t).name(),
+                _l_rf.error()
+            ));
+            return true;
+        }
+        else
+        {
+            get<1>(_l_rep_data) = _l_rfli.value();
+            get<2>(_l_rep_data) = _l_rf.value();
+            if (const bool _l_terminate{_a_cli.process_repetition_data(
+                    _a_option_class, _l_rep_data, _a_cli_results
+                )};
+                _l_terminate)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 };
 
-_END_ABC_NS
+_END_ABC_UTILITY_CLI_NS

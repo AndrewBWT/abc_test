@@ -78,6 +78,28 @@ struct default_printer_t<char> : public printer_base_t<char>
 };
 
 template <typename T>
+    requires enum_has_list_c<T>
+struct default_printer_t<T> : public printer_base_t<T>
+{
+    default_printer_t<T>(
+        const enum_helper_string_case_t _a_enum_helper_string_case
+    )
+        : _m_enum_helper_string_case(_a_enum_helper_string_case)
+    {
+
+    }
+    enum_helper_string_case_t _m_enum_helper_string_case;
+    __constexpr std::string
+        run_printer(
+            const T& _a_element
+        ) const
+    {
+        return _ABC_NS_UTILITY::get_thread_local_enumerate_enum_helper<T>()
+            .print(_a_element, _m_enum_helper_string_case);
+    }
+};
+
+template <typename T>
     requires (std::is_same_v<std::remove_cvref_t<T>, T>&& is_to_string_convertable_c<T> && (not std::same_as<T, bool>) && (not std::same_as<char, T>)) && (not std::floating_point<T>)
 struct default_printer_t<T> : public printer_base_t<T>
 {

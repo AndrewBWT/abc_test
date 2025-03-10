@@ -5,8 +5,11 @@
 #include "abc_test/utility/internal/macros.hpp"
 #include "abc_test/utility/str/string_table.hpp"
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_UTILITY_CLI_NS
 
+/*!
+ * @brief Structure which holds result information about a cli_t object.
+ */
 class cli_results_t
 {
 public:
@@ -99,7 +102,7 @@ public:
 
     __no_constexpr_imp void
         add_memoized_data(
-            const bool _a_retain_previous_results,
+            const bool             _a_retain_previous_results,
             const std::string_view _a_flag,
             const std::string_view _a_printed_value,
             const std::string_view _a_source
@@ -110,13 +113,12 @@ public:
         {
             if (_a_retain_previous_results)
             {
-                vector<string> _l_prev = get<1>(_m_memoized_processed_flags.at(string(_a_flag)).back());
+                vector<string> _l_prev = get<1>(
+                    _m_memoized_processed_flags.at(string(_a_flag)).back()
+                );
                 _l_prev.push_back(string(_a_source));
                 _m_memoized_processed_flags.at(string(_a_flag))
-                    .push_back(make_tuple(
-                        string(_a_printed_value),
-                        _l_prev
-                    ));
+                    .push_back(make_tuple(string(_a_printed_value), _l_prev));
             }
             else
             {
@@ -130,9 +132,9 @@ public:
         else
         {
             _m_memoized_processed_flags.insert(
-                { string(_a_flag),
+                {string(_a_flag),
                  {{string(_a_printed_value),
-                   vector<string>(1, string(_a_source))}} }
+                   vector<string>(1, string(_a_source))}}}
             );
         }
     }
@@ -149,4 +151,4 @@ public:
     }
 };
 
-_END_ABC_NS
+_END_ABC_UTILITY_CLI_NS

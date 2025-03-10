@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_UTILITY_CLI_NS
 template <typename Option_Class>
 class cli_t;
 class cli_output_t;
@@ -153,7 +153,7 @@ public:
             const std::string_view               _a_flag,
             const std::vector<std::string_view>& _a_args,
             const cli_t<Option_Class>&           _a_cli,
-            cli_results_t&                       _a_cli_results
+            _ABC_NS_UTILITY_CLI::cli_results_t&  _a_cli_results
         ) const noexcept
     {
         using namespace std;
@@ -272,8 +272,7 @@ public:
         T Option_Class::*                           _a_member_var,
         const cli_argument_processing_info_t<T, U>& _a_processing_info
     ) noexcept
-        : cli_info_t<Option_Class>( _a_cli_option_config,
-            1,1)
+        : cli_info_t<Option_Class>(_a_cli_option_config, 1, 1)
         , _m_member_var(_a_member_var)
         , _m_processing_info(_a_processing_info)
     {}
@@ -347,8 +346,8 @@ public:
     ) noexcept
         : cli_info_t<Option_Class>(
               _a_cli_option_config,
-            0,
-            std::numeric_limits<std::size_t>::max()
+              0,
+              std::numeric_limits<std::size_t>::max()
           )
         , _m_member_var(_a_member_var)
         , _m_processing_info(_a_processing_info)
@@ -416,4 +415,4 @@ private:
     cli_argument_processing_info_t<T, U> _m_processing_info;
 };
 
-_END_ABC_NS
+_END_ABC_UTILITY_CLI_NS

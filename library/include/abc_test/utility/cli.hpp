@@ -19,7 +19,7 @@
 #include <string>
 #include <variant>
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_UTILITY_CLI_NS
 
 namespace detail
 {
@@ -87,8 +87,8 @@ public:
             Option_Class& _a_option_class,
             const std::tuple<
                 std::filesystem::path,
-                rep_file_index_t,
-                rep_write_data_type_t>& _a_tuple_data,
+                auto_configuration_load_configuration_t,
+                enum_auto_configuration_write_to_file_t>& _a_tuple_data,
             cli_results_t&              _a_cli_results
         ) const noexcept;
     __constexpr const std::optional<cli_auto_configuration_t>&
@@ -189,9 +189,9 @@ __constexpr std::optional<found_data_t>
             ) noexcept;
 } // namespace detail
 
-_END_ABC_NS
+_END_ABC_UTILITY_CLI_NS
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_UTILITY_CLI_NS
 template <typename Option_Class>
 __no_constexpr_imp
     cli_t<Option_Class>::cli_t(
@@ -416,8 +416,8 @@ __no_constexpr_imp bool
         Option_Class& _a_option_class,
         const std::tuple<
             std::filesystem::path,
-            rep_file_index_t,
-            rep_write_data_type_t>& _a_tuple_data,
+            auto_configuration_load_configuration_t,
+            enum_auto_configuration_write_to_file_t>& _a_tuple_data,
         cli_results_t&              _a_cli_results
     ) const noexcept
 {
@@ -630,7 +630,7 @@ __no_constexpr void
         auto& _l_rep_data{_m_rep_data.value()};
         switch (_l_rep_data._m_rep_write_data_type)
         {
-        case rep_write_data_type_t::ALWAYS_WRITE:
+        case enum_auto_configuration_write_to_file_t::ALWAYS_WRITE:
             write_file(
                 _a_autofile_name,
                 _a_autofile_size,
@@ -638,7 +638,7 @@ __no_constexpr void
                 _a_test_success
             );
             break;
-        case rep_write_data_type_t::AUTO:
+        case enum_auto_configuration_write_to_file_t::AUTO:
             if ((not _l_rep_data._m_loaded_configuration.has_value()
                  && not _a_test_success)
                 || (_l_rep_data._m_loaded_configuration.has_value()
@@ -1073,4 +1073,4 @@ __constexpr_imp std::optional<found_data_t>
 }
 } // namespace detail
 
-_END_ABC_NS
+_END_ABC_UTILITY_CLI_NS

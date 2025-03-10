@@ -107,25 +107,31 @@
     namespace utility         \
     {
 #define _BEGIN_ABC_UTILITY_INTERNAL_NS \
-    _BEGIN_ABC_INTERNAL_NS             \
-    namespace utility::internal        \
+    _BEGIN_ABC_UTILITY_NS             \
+    namespace internal        \
     {
+
+#define _BEGIN_ABC_UTILITY_CLI_NS \
+    _BEGIN_ABC_UTILITY_NS \
+    namespace cli         \
+    {
+
 #define _BEGIN_ABC_UTILITY_IO_NS \
-    _BEGIN_ABC_INTERNAL_NS       \
-    namespace utility::io        \
+    _BEGIN_ABC_UTILITY_NS       \
+    namespace io        \
     {
 #define _BEGIN_ABC_UTILITY_STR_NS \
-    _BEGIN_ABC_INTERNAL_NS        \
-    namespace utility::str        \
+    _BEGIN_ABC_UTILITY_NS        \
+    namespace str        \
     {
 
 #define _BEGIN_ABC_UTILITY_PARSER_NS \
-    _BEGIN_ABC_INTERNAL_NS           \
-    namespace utility::parser        \
+    _BEGIN_ABC_UTILITY_NS           \
+    namespace parser        \
     {
 #define _BEGIN_ABC_UTILITY_PRINTER_NS \
-    _BEGIN_ABC_INTERNAL_NS           \
-    namespace utility::printer        \
+    _BEGIN_ABC_UTILITY_NS            \
+    namespace printer        \
     {
 
 #define _BEGIN_ABC_GLOBAL_NS \
@@ -145,12 +151,16 @@
 
 #define _ABC_NS_DG _ABC_NS::data_gen
 
+#define _ABC_NS_UTILITY_CLI _ABC_NS_UTILITY::cli
+
 #define _BEGIN_ABC_MATCHER_NS \
     _BEGIN_ABC_INTERNAL_NS    \
     namespace matcher         \
     {
 
 #define _ABC_NS_MATCHER _ABC_NS::matcher
+
+#define _ABC_NS_CLI _ABC_NS_UTILITY::cli
 
 #define _BEGIN_ABC_LOGGING_NS \
     _BEGIN_ABC_INTERNAL_NS    \
@@ -171,20 +181,24 @@
     _END_ABC_INTERNAL_NS    \
     }
 #define _END_ABC_UTILITY_INTERNAL_NS \
-    _END_ABC_INTERNAL_NS             \
+    _END_ABC_UTILITY_NS             \
     }
 #define _END_ABC_UTILITY_IO_NS \
-    _END_ABC_INTERNAL_NS       \
+    _END_ABC_UTILITY_NS       \
     }
 #define _END_ABC_UTILITY_STR_NS \
-    _END_ABC_INTERNAL_NS        \
+    _END_ABC_UTILITY_NS        \
     }
 #define _END_ABC_UTILITY_PARSER_NS \
-    _END_ABC_INTERNAL_NS           \
+    _END_ABC_UTILITY_NS           \
     }
 
 #define _END_ABC_UTILITY_PRINTER_NS \
-    _END_ABC_INTERNAL_NS           \
+    _END_ABC_UTILITY_NS            \
+    }
+
+#define _END_ABC_UTILITY_CLI_NS \
+    _END_ABC_UTILITY_NS        \
     }
 
 #define _END_ABC_GLOBAL_NS \

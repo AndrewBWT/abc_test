@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/utility/cli/cli_option_config.hpp"
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_UTILITY_CLI_NS
 
 namespace detail
 {
@@ -55,4 +55,4 @@ static constexpr cli_option_config_t _c_test_paths_to_run
     = {"test_paths_to_run", "Which test paths are to be ran. ", {}};
 } // namespace detail
 
-_END_ABC_NS
+_END_ABC_UTILITY_CLI_NS
