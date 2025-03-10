@@ -4,6 +4,8 @@
 #include "included_instances/data_generator/random_data_generator.hpp"
 #include "included_instances/data_generator/enumeration_data_generator.hpp"
 #include "included_instances/matchers/ranges.hpp"
+#include "included_instances/matchers/str.hpp"
+#include "included_instances/matchers/source.hpp"
 #include "included_instances/reporters/text_error_reporter.hpp"
 #include "included_instances/reporters/text_test_reporter.hpp"
 #include "included_instances/test_assertions/macros.hpp"

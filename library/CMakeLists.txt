@@ -110,8 +110,10 @@ set(LIBRARY_FILES
   include/abc_test/core/matchers/logic_enum.hpp
   include/abc_test/core/matchers/source_map.hpp
       src/abc_test/core/matchers/source_map.cpp
-  # Matcher subfolder. Code contains logic for writing individual assertions.
+  # Matcher subfolder. Code contains logic for assertions written using the stl.
   include/abc_test/included_instances/matchers/ranges.hpp
+  include/abc_test/included_instances/matchers/str.hpp
+  include/abc_test/included_instances/matchers/source.hpp
   # gen_data subfolder. Contains the logic that allow the gen_data for loops to work.
   include/abc_test/included_instances/data_generator/manual_data_generator.hpp
   include/abc_test/included_instances/data_generator/file_data_generator.hpp

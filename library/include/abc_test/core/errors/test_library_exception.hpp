@@ -14,7 +14,7 @@ _BEGIN_ABC_ERRORS_NS
  * clear, these aren't created by user code. Rather, thse are errors through
  * inproper use, or developer errors.
  */
-struct test_library_exception_t : public std::exception
+struct test_library_exception_t : public std::runtime_error
 {
 public:
     __constexpr
@@ -27,7 +27,7 @@ public:
      */
     __no_constexpr
         test_library_exception_t(
-            const std::string_view _a_error,
+            const std::string _a_error,
             const std::stacktrace& _a_stacktrace = std::stacktrace::current()
         ) noexcept;
     /*!
@@ -37,14 +37,7 @@ public:
      */
     __constexpr const std::stacktrace&
                       stacktrace() const noexcept;
-    /*!
-     * @brief Gets a cref to the underlying test_library_excption's error.
-     * @return A cref to the underlying test_library_excption_t's error.
-     */
-    __constexpr const std::string_view
-                      error() noexcept;
 private:
-    std::string     _m_error;
     std::stacktrace _m_stacktrace;
 };
 
@@ -85,22 +78,16 @@ _BEGIN_ABC_ERRORS_NS
 
 __no_constexpr_imp
     test_library_exception_t::test_library_exception_t(
-        const std::string_view _a_error,
+        const std::string _a_error,
         const std::stacktrace& _a_stacktrace
     ) noexcept
-    : std::exception(), _m_error(_a_error), _m_stacktrace(_a_stacktrace)
+    : std::runtime_error(_a_error), _m_stacktrace(_a_stacktrace)
 {}
 
 __constexpr_imp const std::stacktrace&
                       test_library_exception_t::stacktrace() const noexcept
 {
     return _m_stacktrace;
-}
-
-__constexpr_imp const std::string_view
-                      test_library_exception_t::error() noexcept
-{
-    return _m_error;
 }
 
 template <typename T>

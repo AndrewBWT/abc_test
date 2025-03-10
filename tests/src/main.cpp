@@ -1,8 +1,10 @@
 #pragma once
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
-#include "abc_test_test/utility/cli.hpp"
-#include "abc_test_test/included_instances/data_generator/enumeration/default_enumeration.hpp"
+
+#include "abc_test_test/core.hpp"
+#include "abc_test_test/included_instances.hpp"
+#include "abc_test_test/utility.hpp"
 
 int main(
         int   argc,

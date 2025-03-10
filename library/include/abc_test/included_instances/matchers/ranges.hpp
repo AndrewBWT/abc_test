@@ -23,13 +23,15 @@ __constexpr matcher_t
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
-    const bool _l_contains{ ranges::find(_a_range, _a_value) != _a_range.end() };
+    const bool _l_contains{ranges::find(_a_range, _a_value) != _a_range.end()};
     return matcher_t(matcher_result_t(
         _l_contains,
-        fmt::format("{0} {1} {2}", 
-            _a_range, 
+        fmt::format(
+            "{0} {1} {2}",
+            _a_range,
             _l_contains ? "contains" : "does not contain",
-            _a_value)
+            _a_value
+        )
     ));
 }
 

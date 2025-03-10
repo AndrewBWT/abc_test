@@ -1,13 +1,13 @@
 #pragma once
 
-#include "abc_test/included_instances/reporters/text_error_reporter.hpp"
-#include "abc_test/included_instances/reporters/text_test_reporter.hpp"
 #include "abc_test/core/ds/test_collections/test_collection.hpp"
 #include "abc_test/core/global.hpp"
 #include "abc_test/core/options/validated_test_options.hpp"
 #include "abc_test/core/reporters/test_reporter.hpp"
 #include "abc_test/core/reporters/test_reporter_controller.hpp"
 #include "abc_test/core/test_runner.hpp"
+#include "abc_test/included_instances/reporters/text_error_reporter.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter.hpp"
 #include "abc_test/utility/cli.hpp"
 
 #include <memory>
@@ -20,7 +20,7 @@ _BEGIN_ABC_NS
 /*!
  * @brief This class controls the core logic of the test suite.
  */
-template<typename T>
+template <typename T>
 struct test_main_t
 {
 public:
@@ -34,8 +34,8 @@ public:
      */
     __no_constexpr
         test_main_t(
-            const validated_test_options_t<T>& _a_validated_test_options,
-            const _ABC_NS_UTILITY_CLI::cli_t<T>&                    _a_cli
+            const validated_test_options_t<T>&   _a_validated_test_options,
+            const _ABC_NS_UTILITY_CLI::cli_t<T>& _a_cli
         ) noexcept;
     /*!
      * @brief This function runs the tests.
@@ -48,9 +48,9 @@ public:
     __no_constexpr void
         run_tests(ds::pre_test_run_report_t& _a_test_set_data) noexcept;
 private:
-    _ABC_NS_UTILITY_CLI::cli_t<T>           _m_cli;
+    _ABC_NS_UTILITY_CLI::cli_t<T>        _m_cli;
     _ABC_NS_DS::test_lists_t             _m_test_list_collection;
-    T                  _m_options;
+    T                                    _m_options;
     _ABC_NS_REPORTERS::test_reporters_t  _m_test_reporters;
     _ABC_NS_REPORTERS::error_reporters_t _m_error_reporters;
     std::mutex                           _m_mutex;
@@ -70,7 +70,7 @@ private:
      */
     __no_constexpr
         test_main_t(
-            const T&        _a_test_opts,
+            const T&                             _a_test_opts,
             const _ABC_NS_UTILITY_CLI::cli_t<T>& _a_cli
         ) noexcept;
     /*!
@@ -111,15 +111,15 @@ _BEGIN_ABC_NS
 template <typename T>
 __no_constexpr_imp
     test_main_t<T>::test_main_t(
-        const validated_test_options_t<T>& _a_validated_test_options,
-        const _ABC_NS_UTILITY_CLI::cli_t<T>&                    _a_cli
+        const validated_test_options_t<T>&   _a_validated_test_options,
+        const _ABC_NS_UTILITY_CLI::cli_t<T>& _a_cli
     ) noexcept
     : test_main_t<T>(_a_validated_test_options.get_options(), _a_cli)
 {}
-template<typename T>
+template <typename T>
 __no_constexpr_imp
     test_main_t<T>::test_main_t(
-        const T&        _a_to,
+        const T&                             _a_to,
         const _ABC_NS_UTILITY_CLI::cli_t<T>& _a_cli
     ) noexcept
     : _m_test_list_collection(make_test_list_collection(
@@ -136,7 +136,8 @@ __no_constexpr_imp
     , _m_cli(_a_cli)
 //, _m_test_set_data(std::vector<_ABC_NS_DS::test_set_data_t>(_a_to.threads))
 {}
-template<typename T>
+
+template <typename T>
 __no_constexpr_imp void
     test_main_t<T>::run_tests(
         ds::pre_test_run_report_t& _a_test_set_data
@@ -295,7 +296,8 @@ __no_constexpr_imp void
     _LIBRARY_LOG(MAIN_INFO, "Finalising reports.");
     _l_trc.finalise_reports(_l_final_report);
 }
-template<typename T>
+
+template <typename T>
 __no_constexpr_imp void
     test_main_t<T>::run_individual_test(
         const _ABC_NS_DS::post_setup_test_data_t& _a_prtd,
@@ -327,7 +329,7 @@ __no_constexpr_imp void
             get_global_error_reporter_controller()
         };
         _l_erc.report_error(
-            setup_error_t(_l_the.error(), true, _l_the.stacktrace())
+            setup_error_t(_l_the.what(), true, _l_the.stacktrace())
         );
     }
     catch (...)
