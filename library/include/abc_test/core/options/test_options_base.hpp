@@ -24,6 +24,7 @@ using rep_data_file_info_t = std::tuple<
     std::filesystem::path,
     std::size_t,
     std::size_t>;
+
 /*!
  * @brief Strcutre which holds the basic options for the library.
  *
@@ -38,8 +39,8 @@ public:
     __no_constexpr
         test_options_base_t() noexcept
         = default;
-    std::size_t autofile_size = 1000;
-    std::string autofile_name  = "autofile";
+    std::size_t autofile_size                      = 1'000;
+    std::string autofile_name                      = "autofile";
     /*!
      * @brief Path delimiter used to separate tests into their components.
      *
@@ -108,7 +109,7 @@ public:
      * @brief Denotes whether to attach the global test list to the interanl
      * test_list collection when validating.
      */
-    bool use_global_test_list = true;
+    bool use_global_test_list            = true;
     bool show_configuration_explanations = false;
     /*!
      * @brief A collection of shared pointers to test_reporter_t elements; each
@@ -155,8 +156,17 @@ public:
      * @return Nullopt if there are no errors. Otherwise a string representation
      * of the error.
      */
-    __no_constexpr std::optional<std::vector<std::string>>
-                   validate_and_pre_process() noexcept;
+    __no_constexpr     std::optional<std::vector<std::string>>
+                       validate_and_pre_process() noexcept;
+
+    __no_constexpr_imp utility::rng
+                       make_rng() const noexcept
+    {
+        return utility::rng::make_rng<utility::inner_rng_mt19937_64_t>(
+            global::get_global_seed(),
+            number_of_integers_used_to_seed_random_generators
+        );
+    }
 protected:
     __no_constexpr void virtual validate_and_pre_process_(
         std::vector<std::string>& _a_error_ref

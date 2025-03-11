@@ -185,7 +185,7 @@ __no_constexpr_imp void
 
     _m_test_runners = vector<test_runner_t>(
         _l_global_test_options.threads,
-        test_runner_t(_l_trc, _l_global_test_options)
+        test_runner_t(_l_trc, _l_global_test_options, _l_global_test_options.make_rng())
     );
     size_t _l_order_ran_id_counter{0};
     _l_trc.report_pre_test_data(_a_test_set_data);

@@ -34,7 +34,9 @@ public:
     ) noexcept
         : _m_inner_seed(_a_seed)
     {}
-    __constexpr std::optional<unsigned int> integer() const noexcept
+
+    __constexpr std::optional<unsigned int>
+                integer() const noexcept
     {
         using namespace std;
         if (holds_alternative<unsigned int>(_m_inner_seed))
@@ -46,7 +48,9 @@ public:
             return nullopt;
         }
     }
-    __constexpr std::optional<std::vector<uint32_t>> vector_of_integers() const noexcept
+
+    __constexpr std::optional<std::vector<uint32_t>>
+                vector_of_integers() const noexcept
     {
         using namespace std;
         if (holds_alternative<vector<uint32_t>>(_m_inner_seed))
@@ -58,6 +62,7 @@ public:
             return nullopt;
         }
     }
+
     __constexpr utility::seed_t
                 get_seed(
                     const std::size_t _a_seed_to_create_size
@@ -241,17 +246,21 @@ public:
             throw errors::unaccounted_for_variant_exception(_m_inner_seed);
         }
     }
-    __constexpr bool is_not_set() const noexcept
+
+    __constexpr bool
+        is_not_set() const noexcept
     {
         using namespace std;
         return holds_alternative<monostate>(_m_inner_seed);
     }
-    __constexpr std::optional< complete_global_seed_t> complete_global_seed() const noexcept
+
+    __constexpr std::optional<complete_global_seed_t>
+                complete_global_seed() const noexcept
     {
         using namespace std;
         if (holds_alternative<complete_global_seed_t>(_m_inner_seed))
         {
-            return get< complete_global_seed_t>(_m_inner_seed);
+            return get<complete_global_seed_t>(_m_inner_seed);
         }
         else
         {
@@ -261,6 +270,46 @@ public:
 private:
     std::variant<std::monostate, complete_global_seed_t> _m_inner_seed
         = std::monostate{};
+};
+
+class inner_rng_t
+{
+public:
+    virtual void
+        set_seed(const seed_t& _a_seed) noexcept
+        = 0;
+    virtual std::mt19937_64::result_type
+        operator()() noexcept
+        = 0;
+};
+
+class inner_rng_mt19937_64_t : public inner_rng_t
+{
+public:
+    inline inner_rng_mt19937_64_t(
+        const utility::seed_t& _a_seed
+    )
+    {
+        std::seed_seq _l_seed_seq(_a_seed.begin(), _a_seed.end());
+        _m_rng.seed(_l_seed_seq);
+    }
+
+    virtual void
+        set_seed(
+            const seed_t& _a_seed
+        ) noexcept
+    {
+        std::seed_seq _l_seed_seq(_a_seed.begin(), _a_seed.end());
+        _m_rng.seed(_l_seed_seq);
+    }
+
+    virtual std::mt19937_64::result_type
+        operator()() noexcept
+    {
+        return _m_rng();
+    }
+private:
+    std::mt19937_64 _m_rng;
 };
 
 struct rng
@@ -280,6 +329,21 @@ public:
         return std::mt19937_64::max();
     }
 
+    inline rng
+        make_rng(
+            const std::size_t _a_n_elements_to_take
+        )
+    {
+        seed_t _l_seed(_a_n_elements_to_take);
+        for (size_t _l_idx{0}; _l_idx < _a_n_elements_to_take; ++_l_idx)
+        {
+            _l_seed[_l_idx] = _m_rng.get()->operator()();
+        }
+        std::shared_ptr<inner_rng_t> _l_rng_cpy{_m_rng};
+        _l_rng_cpy->set_seed(_l_seed);
+        return utility::rng(_l_rng_cpy, _l_seed);
+    }
+
     inline void
         progress(
             const size_t _a_expected_calls
@@ -288,18 +352,18 @@ public:
         if (_m_calls > _a_expected_calls)
         {
             std::seed_seq _l_seed_seq(_m_seed.begin(), _m_seed.end());
-            _m_rnd   = std::mt19937_64(_l_seed_seq);
+            _m_rng   = _m_original_rng;
             _m_calls = 0;
             while (_m_calls < _a_expected_calls)
             {
                 ++_m_calls;
-                auto _l_res = _m_rnd();
+                auto _l_res = _m_rng.get()->operator()();
             }
         }
         while (_m_calls < _a_expected_calls)
         {
             ++_m_calls;
-            auto _l_res = _m_rnd();
+            auto _l_res = _m_rng.get()->operator()();
         }
     }
 
@@ -307,14 +371,33 @@ public:
         operator()()
     {
         ++_m_calls;
-        return _m_rnd();
+        return _m_rng.get()->operator()();
     }
 
-    inline rng() noexcept
-        : rng(seed_t())
-    {}
+    template <typename Rng>
+    static rng
+        make_rng(
+            const complete_global_seed_t& _a_global_seed,
+            const std::size_t             _a_seed_size
+        ) noexcept
+    {
+        using namespace std;
+        const utility::seed_t _l_seed{ _a_global_seed.get_seed(_a_seed_size) };
+        return rng(make_shared<Rng>(_l_seed), _l_seed);
+    }
 
-    inline rng(
+    template <typename Rng>
+    static rng
+        make_rng(
+            const seed_t& _a_seed
+        ) noexcept
+    {
+        return rng(make_shared<Rng>(_a_seed), _a_seed);
+    }
+
+    inline rng() noexcept = delete;
+
+    /*inline rng(
         const complete_global_seed_t& _a_global_seed,
         const std::size_t             _a_seed_to_create_size
     )
@@ -325,16 +408,16 @@ public:
         using namespace std;
         std::seed_seq _l_seed_seq(_m_seed.begin(), _m_seed.end());
         _m_rnd = std::mt19937_64(_l_seed_seq);
-    }
+    }*/
 
-    inline rng(
-        const seed_t& _a_seed
-    ) noexcept
-        : _m_rnd(), _m_seed(_a_seed), _m_calls(0)
-    {
-        std::seed_seq _l_seed_seq(_m_seed.begin(), _m_seed.end());
-        _m_rnd = std::mt19937_64(_l_seed_seq);
-    }
+    // inline rng(
+    // const seed_t& _a_seed
+    // ) noexcept
+    // : _m_rnd(), _m_seed(_a_seed), _m_calls(0)
+    //{
+    // std::seed_seq _l_seed_seq(_m_seed.begin(), _m_seed.end());
+    // _m_rnd = std::mt19937_64(_l_seed_seq);
+    // }
 
     constexpr size_t
         calls() const noexcept
@@ -342,28 +425,39 @@ public:
         return _m_calls;
     }
 private:
-    std::mt19937_64 _m_rnd;
+    std::shared_ptr<inner_rng_t> _m_rng;
+    std::shared_ptr<inner_rng_t> _m_original_rng;
+    // std::mt19937_64 _m_rnd;
     utility::seed_t _m_seed;
     size_t          _m_calls;
+
+    inline rng(
+        const std::shared_ptr<inner_rng_t>& _a_rng,
+        const utility::seed_t& _a_seed
+    )
+        : _m_rng(_a_rng), _m_original_rng(_a_rng)
+        , _m_seed(_a_seed)
+        , _m_calls(0)
+    {}
 };
 
 _END_ABC_UTILITY_NS
 _BEGIN_ABC_UTILITY_PARSER_NS
+
 template <>
-struct default_parser_t<global_seed_t>
-    : public parser_base_t<global_seed_t>
+struct default_parser_t<global_seed_t> : public parser_base_t<global_seed_t>
 {
     __constexpr result_t<global_seed_t>
-        run_parser(
-            parser_input_t& _a_parse_input
-        ) const
+                run_parser(
+                    parser_input_t& _a_parse_input
+                ) const
     {
         using namespace std;
-        const result_t<unsigned int>
-            _l_variant_result{ utility::parser::default_parser_t<
-                                  unsigned int>(
+        const result_t<unsigned int> _l_variant_result{
+            utility::parser::default_parser_t<unsigned int>().run_parser(
+                _a_parse_input
             )
-                                  .run_parser(_a_parse_input) };
+        };
         if (_l_variant_result.has_value())
         {
             return result_t<global_seed_t>(
@@ -376,6 +470,7 @@ struct default_parser_t<global_seed_t>
         }
     }
 };
+
 template <>
 struct default_parser_t<complete_global_seed_t>
     : public parser_base_t<complete_global_seed_t>
@@ -406,32 +501,34 @@ struct default_parser_t<complete_global_seed_t>
 
 _END_ABC_UTILITY_PARSER_NS
 _BEGIN_ABC_UTILITY_PRINTER_NS
+
 template <>
-struct default_printer_t<global_seed_t>
-    : public printer_base_t<global_seed_t>
+struct default_printer_t<global_seed_t> : public printer_base_t<global_seed_t>
 {
     __constexpr std::string
-        run_printer(
-            const global_seed_t& _a_parse_input
-        ) const
+                run_printer(
+                    const global_seed_t& _a_parse_input
+                ) const
     {
         using namespace std;
         return "global_seed_t";
     }
 };
+
 template <>
 struct default_printer_t<complete_global_seed_t>
     : public printer_base_t<complete_global_seed_t>
 {
     __constexpr std::string
-        run_printer(
-            const complete_global_seed_t& _a_parse_input
-        ) const
+                run_printer(
+                    const complete_global_seed_t& _a_parse_input
+                ) const
     {
         using namespace std;
         return "complete_global_seed_t";
     }
 };
+
 _END_ABC_UTILITY_PRINTER_NS
 
 /*!

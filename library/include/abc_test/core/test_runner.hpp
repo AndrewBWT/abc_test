@@ -42,7 +42,8 @@ public:
     __no_constexpr
         test_runner_t(
             _ABC_NS_REPORTERS::test_reporter_controller_t& _a_trc,
-            const test_options_base_t&                     _a_test_options
+            const test_options_base_t&                     _a_test_options,
+            const utility::rng& _a_rng
         ) noexcept;
     /*!
      * @brief Adds a log message to the current set of log messages.
@@ -133,7 +134,7 @@ public:
      * @return A random seed generated from this test_runner_t's random
      * generator.
      */
-    __no_constexpr _ABC_NS_UTILITY::seed_t
+    __no_constexpr _ABC_NS_UTILITY::rng
         generate_random_seeds(const std::size_t _a_order_ran_id) noexcept;
     /*!
      * @brief Returns to the caller this test_runner_t's most recent source.
@@ -207,14 +208,12 @@ _BEGIN_ABC_NS
 __no_constexpr_imp
     test_runner_t::test_runner_t(
         _ABC_NS_REPORTERS::test_reporter_controller_t& _a_trc,
-        const test_options_base_t&                     _a_test_options
+        const test_options_base_t&                     _a_test_options,
+        const utility::rng& _a_rng
     ) noexcept
     : _m_trc(_a_trc)
     , _m_current_test(nullptr)
-    , _m_random_generator(_ABC_NS_UTILITY::rng(
-          global::get_global_seed(),
-          _a_test_options.number_of_integers_used_to_seed_random_generators
-      ))
+    , _m_random_generator(_a_rng)
     // , _m_test_options(_a_test_options)
     , _m_tests_most_recent_source(_ABC_NS_DS::single_source_t())
 {}
@@ -266,7 +265,7 @@ __no_constexpr_imp _ABC_NS_DS::invoked_test_data_t&
     return *_m_current_test;
 }
 
-__no_constexpr_imp _ABC_NS_UTILITY::seed_t
+__no_constexpr_imp _ABC_NS_UTILITY::rng
                    test_runner_t::generate_random_seeds(
         const std::size_t _a_order_ran_id
     ) noexcept
@@ -279,14 +278,7 @@ __no_constexpr_imp _ABC_NS_UTILITY::seed_t
     _m_random_generator.progress(
         _a_order_ran_id * _l_n_elements_used_to_seed_random_generators
     );
-    seed_t _l_seed(_l_n_elements_used_to_seed_random_generators);
-    for (size_t _l_idx{0};
-         _l_idx < _l_n_elements_used_to_seed_random_generators;
-         ++_l_idx)
-    {
-        _l_seed[_l_idx] = _m_random_generator();
-    }
-    return _l_seed;
+    return _m_random_generator.make_rng(_l_n_elements_used_to_seed_random_generators);
 }
 
 __constexpr_imp const std::optional<_ABC_NS_DS::single_source_t>&
