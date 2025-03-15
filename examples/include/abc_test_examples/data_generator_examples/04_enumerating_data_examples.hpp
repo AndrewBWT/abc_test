@@ -70,8 +70,8 @@ _TEST_CASE(
     }
     for (auto&& _l_input : generate_data_randomly<test_data_t>(
         using_enumeration_generator<test_data_t>(),
-             tertiary_data_file("file5"),
-             general_data_file("file6")
+             tdf("file5"),
+             gdf("file6")
          ))
     {
         _CHECK(annotate(

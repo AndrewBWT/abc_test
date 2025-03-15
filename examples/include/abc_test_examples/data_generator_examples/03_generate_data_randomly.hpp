@@ -42,8 +42,7 @@ _TEST_CASE(
     // ));
     // }
 
-    for (auto&& _l_input :
-         generate_data_randomly<test_data_t>(general_data_file("file1x")))
+    for (auto&& _l_input : generate_data_randomly<test_data_t>(gdf("file1x")))
     {
         _CHECK(annotate(
             _EXPR(_l_f(_l_input) == _l_output),
@@ -51,26 +50,23 @@ _TEST_CASE(
         ));
     }
 
+    for (auto&& _l_input : generate_data_randomly<test_data_t>(tdf("file2")))
+    {
+        _CHECK(annotate(
+            _EXPR(_l_f(_l_input) == _l_output),
+            fmt::format("Testing _l_f({0}) == {1}", _l_input, _l_output)
+        ));
+    }
     for (auto&& _l_input :
-         generate_data_randomly<test_data_t>(tertiary_data_file("file2")))
+         generate_data_randomly<test_data_t>(gdf("file3"), tdf("file4")))
     {
         _CHECK(annotate(
             _EXPR(_l_f(_l_input) == _l_output),
             fmt::format("Testing _l_f({0}) == {1}", _l_input, _l_output)
         ));
     }
-    for (auto&& _l_input : generate_data_randomly<test_data_t>(
-             general_data_file("file3"), tertiary_data_file("file4")
-         ))
-    {
-        _CHECK(annotate(
-            _EXPR(_l_f(_l_input) == _l_output),
-            fmt::format("Testing _l_f({0}) == {1}", _l_input, _l_output)
-        ));
-    }
-    for (auto&& _l_input : generate_data_randomly<test_data_t>(
-             tertiary_data_file("file5"), general_data_file("file6")
-         ))
+    for (auto&& _l_input :
+         generate_data_randomly<test_data_t>(tdf("file5"), gdf("file6")))
     {
         _CHECK(annotate(
             _EXPR(_l_f(_l_input) == _l_output),

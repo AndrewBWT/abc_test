@@ -64,7 +64,7 @@ _TEST_CASE(
 
     std::cout << "<true,true,true>" << std::endl;
     vector<test_data_t> _l_vector = { 1, 2, 3, 4, 5 };
-    for (auto& _l_vect : using_combinatorics_generator<test_data_t, true, true, true>(_l_init,tertiary_data_file("hugh")))
+    for (auto& _l_vect : using_combinatorics_generator<test_data_t, true, true, true>(_l_init,tdf("hugh")))
     {
         _CHECK(_EXPR(_l_vect == _l_vector));
         std::cout << fmt::format("{0}", _l_vect) << std::endl;

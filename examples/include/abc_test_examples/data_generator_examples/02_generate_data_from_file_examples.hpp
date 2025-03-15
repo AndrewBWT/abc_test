@@ -33,7 +33,7 @@ _TEST_CASE(
      * of test_data_t elements.
      */
     for (auto&& [_l_input, _l_output] : read_data_from_file<test_data_t>(
-             general_data_file("file1"),
+             gdf("file1"),
              {
                  {0, 0},
                  {1, 2},
@@ -48,7 +48,7 @@ _TEST_CASE(
         ));
     }
     for (auto&& [_l_input, _l_output] : read_data_from_file<test_data_t>(
-             general_data_file("file1"),
+             gdf("file1"),
              {
                  {0, 0},
                  {1, 2},

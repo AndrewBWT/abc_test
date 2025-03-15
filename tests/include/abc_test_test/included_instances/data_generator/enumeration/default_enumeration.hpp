@@ -45,24 +45,25 @@ inline void
     using namespace abc;
     using namespace std;
     using unit_test_t = tuple<vector<T>, T, T, T>;
-    for (auto& _l_element :
-         read_data_from_file<unit_test_t>(
+    for (auto& _l_element : read_data_from_file<unit_test_t>(
              gdf(string("vector_difference_").append(typeid(T).name()))
          ))
     {
-        auto& [_l_end_vector, _l_t_inner_increment, _l_t_inner_min_val, _l_t_inner_max_val] = _l_element;
+        auto& [_l_end_vector, _l_t_inner_increment, _l_t_inner_min_val, _l_t_inner_max_val]
+            = _l_element;
         _TVLOG(_l_element);
         data_gen::enumeration_t<vector<T>> _l_enumeration
-            = default_enumeration<vector<T>>(
-                default_enumeration<T>(_l_t_inner_increment),
-                from_m_to_n(_l_t_inner_min_val, _l_t_inner_max_val)
-            );
+            = default_enumeration<vector<T>>(from_m_to_n(
+                _l_t_inner_min_val,
+                _l_t_inner_max_val,
+                default_enumeration<T>(_l_t_inner_increment)
+            ));
         data_gen::enumeration_diff_t _l_diff{
             _l_enumeration->difference({}, _l_end_vector)
         };
         data_gen::enumerate_index_t _l_idx{0};
         for (auto& _l_vector : enumerate_data<vector<T>>(
-                 from_min_to_val(_l_end_vector), _l_enumeration
+                 from_min_to_val(_l_end_vector, _l_enumeration)
              ))
         {
             ++_l_idx;

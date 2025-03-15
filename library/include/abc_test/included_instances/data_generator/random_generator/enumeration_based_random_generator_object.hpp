@@ -13,19 +13,18 @@ struct enumeration_based_random_generator_object_t
 public:
     __constexpr
     enumeration_based_random_generator_object_t(
-        const _ABC_NS_DG::enumeration_schema_t<T>& _a_es,
-        const _ABC_NS_DG::enumeration_t<T>&        _a_edo
+        const _ABC_NS_DG::enumeration_schema_t<T>& _a_es
     ) noexcept;
     __no_constexpr virtual T
         operator()(utility::rng& _a_rnd_generator, const std::size_t _a_index);
 private:
-    enumeration_t<T> _m_enum_object;
-    T                _m_start_value;
-    T                _m_end_value;
-    bool             _m_forward_direction;
-    std::size_t      _m_number_of_complete_advancements_to_end;
-    std::size_t      _m_remainder_after_all_advancements;
-    std::size_t      _m_n_advancements_per_generate_next;
+    enumeration_schema_t<T> _m_enum_object;
+    T                       _m_start_value;
+    T                       _m_end_value;
+    bool                    _m_forward_direction;
+    std::size_t             _m_number_of_complete_advancements_to_end;
+    std::size_t             _m_remainder_after_all_advancements;
+    std::size_t             _m_n_advancements_per_generate_next;
 };
 
 _END_ABC_DG_NS
@@ -35,8 +34,7 @@ template <typename T>
 __constexpr _ABC_NS_DG::random_generator_t<T>
             using_enumeration_generator(
                 const _ABC_NS_DG::enumeration_schema_t<T>& _a_es,
-                const _ABC_NS_DG::enumeration_t<T >&
-                    _a_enumerate_base
+                const _ABC_NS_DG::enumeration_t<T>&        _a_enumerate_base
             ) noexcept;
 
 template <typename T>
@@ -57,22 +55,20 @@ _BEGIN_ABC_DG_NS template <typename T>
 __constexpr_imp
     enumeration_based_random_generator_object_t<T>::
         enumeration_based_random_generator_object_t(
-            const _ABC_NS_DG::enumeration_schema_t<T>& _a_es,
-            const _ABC_NS_DG::enumeration_t<T>&        _a_edo
+            const _ABC_NS_DG::enumeration_schema_t<T>& _a_es
         ) noexcept
-    : _m_enum_object(_a_edo)
+    : _m_enum_object(_a_es)
     , _m_start_value(_a_es->start_value())
-    , _m_end_value(_a_es->end_value(_a_edo))
-    , _m_forward_direction(_a_es->is_direction_forward(_a_edo))
+    , _m_end_value(_a_es->end_value())
+    , _m_forward_direction(_a_es->is_direction_forward())
     , _m_number_of_complete_advancements_to_end(
-          _a_es->number_of_complete_advancements(_a_edo)
+          _a_es->number_of_complete_advancements()
       )
     , _m_remainder_after_all_advancements(
-          _a_es->remaining_entities_after_maximum_advancements(_a_edo)
+          _a_es->remaining_entities_after_maximum_advancements()
       )
-    , _m_n_advancements_per_generate_next(
-          _a_es->n_advancements_per_advancement(_a_edo)
-      )
+    , _m_n_advancements_per_generate_next(_a_es->n_advancements_per_advancement(
+      ))
 {}
 
 template <typename T>
@@ -95,20 +91,6 @@ __no_constexpr T
 _END_ABC_DG_NS
 
 _BEGIN_ABC_NS
-template <typename T>
-__constexpr_imp _ABC_NS_DG::random_generator_t<T>
-                using_enumeration_generator(
-                    const _ABC_NS_DG::enumeration_schema_t<T>& _a_es,
-                    const _ABC_NS_DG::enumeration_t<T>&
-                        _a_enumerate_base
-                ) noexcept
-{
-    using namespace std;
-    using namespace _ABC_NS_DG;
-    return make_shared<enumeration_based_random_generator_object_t<T>>(
-        _a_es, _a_enumerate_base
-    );
-}
 
 template <typename T>
 __constexpr_imp _ABC_NS_DG::random_generator_t<T>
@@ -118,21 +100,7 @@ __constexpr_imp _ABC_NS_DG::random_generator_t<T>
 {
     using namespace std;
     using namespace _ABC_NS_DG;
-    return using_enumeration_generator(
-        _a_es, default_enumeration<T>()
-    );
-}
-
-template <typename T>
-__constexpr_imp _ABC_NS_DG::random_generator_t<T>
-                using_enumeration_generator(
-                    const _ABC_NS_DG::enumeration_t<T>&
-                        _a_enumerate_base
-                ) noexcept
-{
-    using namespace std;
-    using namespace _ABC_NS_DG;
-    return using_enumeration_generator(all_values<T>(), _a_enumerate_base);
+    return make_shared<enumeration_based_random_generator_object_t<T>>(_a_es);
 }
 
 template <typename T>

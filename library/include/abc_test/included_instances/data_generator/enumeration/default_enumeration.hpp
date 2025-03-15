@@ -813,13 +813,13 @@ struct default_enumeration_t<std::array<T, N>>
     : public enumeration_base_t<std::array<T, N>>
 {
 private:
-    enumeration_t<T> _m_enumerate;
-    std::size_t      _m_n_jumps;
+    enumeration_schema_t<T> _m_enumerate;
+    std::size_t             _m_n_jumps;
 public:
     __constexpr_imp
         default_enumeration_t(
-            const std::size_t       _a_n_jumps   = std::size_t{1},
-            const enumeration_t<T>& _a_enumerate = all_values<T>()
+            const std::size_t              _a_n_jumps   = std::size_t{1},
+            const enumeration_schema_t<T>& _a_enumerate = all_values<T>()
         );
     __constexpr_imp virtual bool
         less_than(const std::array<T, N>& _a_l, const std::array<T, N>& _a_r)
@@ -855,22 +855,15 @@ struct default_enumeration_t<std::vector<T>>
     : public enumeration_base_t<std::vector<T>>
 {
 private:
-    enumeration_t<T>        _m_enumerate;
-    enumeration_schema_t<T> _m_enumeration_schema;
+    enumeration_schema_t<T> _m_enumerate;
     std::size_t             _m_n_jumps;
 public:
     __constexpr_imp
-        default_enumeration_t(
-            const enumeration_t<T>&        _a_enumerate,
-            const enumeration_schema_t<T>& _a_schema
-        );
-    __constexpr_imp
-        default_enumeration_t(const enumeration_schema_t<T>& _a_schema);
+        default_enumeration_t(const enumeration_schema_t<T>& _a_enumerate);
     __constexpr_imp
         default_enumeration_t(
-            const std::size_t       _a_n_jumps       = std::size_t{1},
-            const enumeration_t<T>& _a_enumerate     = default_enumeration<T>(),
-            const enumeration_schema_t<T>& _a_schema = all_values<T>()
+            const std::size_t              _a_n_jumps = std::size_t{1},
+            const enumeration_schema_t<T>& _a_schema  = all_values<T>()
         );
     __constexpr_imp virtual bool
         less_than(const std::vector<T>& _a_l, const std::vector<T>& _a_r)
@@ -915,13 +908,12 @@ public:
         auto&                   _l_lesser{_l_arg_1_lesser ? _a_arg1 : _a_arg2};
         auto&                   _l_greater{_l_arg_1_lesser ? _a_arg2 : _a_arg1};
         const enumerate_index_t _l_divisor{
-            _m_enumeration_schema->n_advancements_per_advancement(_m_enumerate)
+            _m_enumerate->n_advancements_per_advancement()
         };
         size_t             _l_greater_idx{_l_greater.size() - 1};
         vector<T>          _l_local_lesser{_l_lesser};
         enumeration_diff_t _l_biggest_difference{_m_enumerate->difference(
-            _m_enumeration_schema->start_value(),
-            _m_enumeration_schema->end_value(_m_enumerate)
+            _m_enumerate->start_value(), _m_enumerate->end_value()
         )};
         _l_biggest_difference.second += 1;
         for (size_t _l_idx{_l_lesser.size()}; _l_idx > 0; --_l_idx)
@@ -968,7 +960,7 @@ public:
              --_l_idx)
         {
             enumeration_diff_t _l_local_diff = _m_enumerate->difference(
-                _m_enumeration_schema->start_value(), _l_greater[_l_idx - 1]
+                _m_enumerate->start_value(), _l_greater[_l_idx - 1]
             );
             _l_local_diff.second += 1;
             _l_rv.first  += _l_local_diff.first * _l_rolling_product.first;
@@ -1254,8 +1246,8 @@ __no_constexpr_imp bool
 template <typename T, std::size_t N>
 __constexpr_imp
     default_enumeration_t<std::array<T, N>>::default_enumeration_t(
-        const std::size_t       _a_n_jumps,
-        const enumeration_t<T>& _a_enumerate
+        const std::size_t              _a_n_jumps,
+        const enumeration_schema_t<T>& _a_enumerate
     )
     : _m_enumerate(_a_enumerate), _m_n_jumps(_a_n_jumps)
 {}
@@ -1438,38 +1430,18 @@ __constexpr_imp bool
 template <typename T>
 __constexpr_imp
     default_enumeration_t<std::vector<T>>::default_enumeration_t(
-        const enumeration_t<T>&        _a_enumerate,
         const enumeration_schema_t<T>& _a_schema
     )
-    : _m_enumerate(_a_enumerate)
-    , _m_n_jumps(1)
-    , _m_enumeration_schema(_a_schema)
-{}
-template <typename T>
-__constexpr_imp
-    default_enumeration_t<std::vector<T>>::default_enumeration_t(
-        const enumeration_schema_t<T>& _a_schema
-    )
-    : _m_enumerate(default_enumeration<T>())
-    , _m_n_jumps(1)
-    , _m_enumeration_schema(_a_schema)
-// : default_enumeration_t<T>(
-//      std::size_t{1},
-// default_enumeration<T>(),
-// _a_schema
-// )
+    : default_enumeration_t<std::vector<T>>(std::size_t{1}, _a_schema)
 {}
 
 template <typename T>
 __constexpr_imp
     default_enumeration_t<std::vector<T>>::default_enumeration_t(
         const std::size_t              _a_n_jumps,
-        const enumeration_t<T>&        _a_enumerate,
         const enumeration_schema_t<T>& _a_schema
     )
-    : _m_enumerate(_a_enumerate)
-    , _m_n_jumps(_a_n_jumps)
-    , _m_enumeration_schema(_a_schema)
+    : _m_n_jumps(_a_n_jumps), _m_enumerate(_a_schema)
 {}
 
 template <typename T>
@@ -1533,14 +1505,12 @@ __constexpr_imp void
     bool _l_change_made{false};
     if (_a_vector.size() > 0)
     {
-        _a_vector.back() = _m_enumeration_schema->start_value();
+        _a_vector.back() = _m_enumerate->start_value();
         for (size_t _l_idx{_a_vector.size() - 1}; _l_idx > 0; --_l_idx)
         {
             enumerate_index_t _l_arg{1};
             if (_m_enumerate->increment(
-                    _a_vector[_l_idx - 1],
-                    _l_arg,
-                    _m_enumeration_schema->end_value(_m_enumerate)
+                    _a_vector[_l_idx - 1], _l_arg, _m_enumerate->end_value()
                 ))
             {
                 --_a_n_times_to_increment;
@@ -1549,7 +1519,7 @@ __constexpr_imp void
             }
             else
             {
-                _a_vector[_l_idx - 1] = _m_enumeration_schema->start_value();
+                _a_vector[_l_idx - 1] = _m_enumerate->start_value();
             }
         }
     }
@@ -1559,7 +1529,7 @@ __constexpr_imp void
         _a_vector.resize(_a_vector.size() + 1);
         for (size_t _l_idx{0}; _l_idx < _a_vector.size(); ++_l_idx)
         {
-            _a_vector[_l_idx] = _m_enumeration_schema->start_value();
+            _a_vector[_l_idx] = _m_enumerate->start_value();
         }
     }
 }
@@ -1627,9 +1597,7 @@ __constexpr_imp bool
         {
             T& _l_elem{_a_array.back()};
             if (_m_enumerate->increment(
-                    _l_elem,
-                    _a_n_times_to_increment,
-                    _m_enumeration_schema->end_value(_m_enumerate)
+                    _l_elem, _a_n_times_to_increment, _m_enumerate->end_value()
                 ))
             {
                 if (_a_n_times_to_increment == 0)
@@ -1688,7 +1656,7 @@ __constexpr_imp bool
             else
             {
                 // Set it to min, increment.
-                _l_elem = _m_enumeration_schema->end_value(_m_enumerate);
+                _l_elem = _m_enumerate->end_value();
                 for (size_t _l_idx{_a_array.size() - 1}; _l_idx > 0; --_l_idx)
                 {
                     enumerate_index_t _l_arg{1};
@@ -1701,8 +1669,7 @@ __constexpr_imp bool
                     }
                     else
                     {
-                        _a_array[_l_idx - 1]
-                            = _m_enumeration_schema->end_value(_m_enumerate);
+                        _a_array[_l_idx - 1] = _m_enumerate->end_value();
                         if (_l_idx == 1)
                         {
                             // time to reset!
@@ -1711,10 +1678,7 @@ __constexpr_imp bool
                             for (size_t _l_idx{0}; _l_idx < _a_array.size();
                                  ++_l_idx)
                             {
-                                _a_array[_l_idx]
-                                    = _m_enumeration_schema->end_value(
-                                        _m_enumerate
-                                    );
+                                _a_array[_l_idx] = _m_enumerate->end_value();
                             }
                         }
                     }
@@ -1723,7 +1687,7 @@ __constexpr_imp bool
         }
         else
         {
-            _l_elem = _m_enumeration_schema->end_value(_m_enumerate);
+            _l_elem = _m_enumerate->end_value();
             for (size_t _l_idx{_a_array.size() - 1}; _l_idx > 0; --_l_idx)
             {
                 enumerate_index_t _l_arg{1};
@@ -1736,8 +1700,7 @@ __constexpr_imp bool
                 }
                 else
                 {
-                    _a_array[_l_idx - 1]
-                        = _m_enumeration_schema->end_value(_m_enumerate);
+                    _a_array[_l_idx - 1] = _m_enumerate->end_value();
                     if (_l_idx == 1)
                     {
                         // time to reset!
@@ -1746,9 +1709,7 @@ __constexpr_imp bool
                         for (size_t _l_idx{0}; _l_idx < _a_array.size();
                              ++_l_idx)
                         {
-                            _a_array[_l_idx]
-                                = _m_enumeration_schema->end_value(_m_enumerate
-                                );
+                            _a_array[_l_idx] = _m_enumerate->end_value();
                         }
                     }
                 }
@@ -1773,11 +1734,10 @@ struct default_enumeration_t<std::tuple<Ts...>>
 public:
     using value_type_t = std::tuple<Ts...>;
     __constexpr
-    default_enumeration_t(enumeration_t<Ts>... _a_enumerators) noexcept;
+    default_enumeration_t(enumeration_schema_t<Ts>... _a_enumerators) noexcept;
     __constexpr
     default_enumeration_t() noexcept
-    requires (std::is_default_constructible_v<default_enumeration_t<Ts>> && ...)
-    ;
+    requires (std::is_default_constructible_v<enumeration_schema_t<Ts>> && ...);
     __constexpr_imp virtual bool
         less_than(const value_type_t& _a_l, const value_type_t& _a_r)
             const noexcept;
@@ -1800,7 +1760,6 @@ public:
         difference(const value_type_t& _a_arg1, const value_type_t& _a_arg2)
             noexcept;
 private:
-    std::tuple<enumeration_t<Ts>...>        _m_enumerations;
     std::tuple<enumeration_schema_t<Ts>...> _m_enumeration_schemas;
     template <std::size_t I>
     __constexpr bool
@@ -1847,17 +1806,16 @@ _BEGIN_ABC_DG_NS
 template <typename... Ts>
 __constexpr_imp
     default_enumeration_t<std::tuple<Ts...>>::default_enumeration_t(
-        enumeration_t<Ts>... _a_enums
+        enumeration_schema_t<Ts>... _a_enums
     ) noexcept
-    : _m_enumerations(_a_enums)
+    : _m_enumeration_schemas(_a_enums)
 {}
 
 template <typename... Ts>
 __constexpr_imp
     default_enumeration_t<std::tuple<Ts...>>::default_enumeration_t() noexcept
-requires (std::is_default_constructible_v<default_enumeration_t<Ts>> && ...)
-    : _m_enumerations(std::make_tuple(mk_enumeration(default_enumeration_t<Ts>()
-      )...))
+requires (std::is_default_constructible_v<enumeration_schema_t<Ts>> && ...)
+    : _m_enumeration_schemas(std::make_tuple(all_values<Ts>()...))
 {}
 
 template <typename... Ts>
@@ -1893,12 +1851,9 @@ __constexpr bool
     {
         constexpr size_t I = tuple_size<value_type_t>{} - 1;
         auto&            _l_last_element{get<I>(_a_element)};
-        const auto&      _l_enum{get<I>(_m_enumerations)};
-        const auto&      _l_schema{get<I>(_m_enumeration_schemas)};
+        const auto&      _l_enum{get<I>(_m_enumeration_schemas)};
         if (_l_enum->increment(
-                _l_last_element,
-                _a_n_times_to_increment,
-                _l_schema->end_value(_l_enum)
+                _l_last_element, _a_n_times_to_increment, _l_enum->end_value()
             ))
         {
             if (_a_n_times_to_increment == 0)
@@ -1915,11 +1870,12 @@ __constexpr bool
         else
         {
             // Set it to min, increment.
-            _l_last_element = _l_schema->start_value();
+            _l_last_element = _l_enum->start_value();
             increment_<I>(_a_element, _a_n_times_to_increment, _a_max_value);
         }
         return _a_element <= _a_max_value;
     }
+    return false;
 }
 
 template <typename... Ts>
@@ -1968,7 +1924,7 @@ __constexpr bool
     ) const noexcept
 {
     using namespace std;
-    const auto& _l_enum{get<I>(_m_enumerations)};
+    const auto& _l_enum{get<I>(_m_enumeration_schemas)};
     const auto& _l_l_i{get<I>(_a_l)};
     const auto& _l_r_i{get<I>(_a_r)};
     if (_l_enum->less_than(_l_l_i, _l_r_i))
@@ -1998,7 +1954,7 @@ __constexpr bool
     ) const noexcept
 {
     using namespace std;
-    const auto& _l_enum{get<I>(_m_enumerations)};
+    const auto& _l_enum{get<I>(_m_enumeration_schemas)};
     const auto& _l_l_i{get<I>(_a_l)};
     const auto& _l_r_i{get<I>(_a_r)};
     if (_l_enum->less_than(_l_l_i, _l_r_i))
@@ -2029,14 +1985,13 @@ __constexpr bool
     )
 {
     using namespace std;
-    const auto& _l_enum{get<I>(_m_enumerations)};
-    const auto& _l_schema{get<I>(_m_enumeration_schemas)};
+    const auto& _l_enum{get<I>(_m_enumeration_schemas)};
     auto&       _l_elem{get<I>(_a_element)};
     // for (size_t _l_idx{ N - 1 }; _l_idx > 0; --_l_idx)
     // {
     std::size_t _l_arg{1};
     if (_l_enum->increment(
-            _l_elem, _a_n_times_to_increment, _l_schema->end_value(_l_enum)
+            _l_elem, _a_n_times_to_increment, _l_enum->end_value()
         ))
     {
         --_a_n_times_to_increment;
@@ -2044,7 +1999,7 @@ __constexpr bool
     }
     else
     {
-        _l_elem = _l_schema->start_value();
+        _l_elem = _l_enum->start_value();
         if constexpr (I == 1)
         {
             return false;
@@ -2063,8 +2018,7 @@ __constexpr_imp void
         const value_type_t& _a_greater
     ) const noexcept
 {
-    const auto& _l_schema{get<I>(_m_enumeration_schemas)};
-    const auto& _l_enum{get<I>(_m_enumerations)};
+    const auto& _l_enum{get<I>(_m_enumeration_schemas)};
     auto        _l_lesser_elem{get<I>(_a_lesser)};
     // _l_enum->increment(_l_lesser_elem, _a_previous_index_diff);
     const auto& _l_greater_elem{get<I>(_a_greater)};
@@ -2072,9 +2026,8 @@ __constexpr_imp void
     {
         enumeration_diff_t _l_local_diff
             = _l_enum->difference(_l_lesser_elem, _l_greater_elem);
-        enumeration_diff_t _l_full_difference = _l_enum->difference(
-            _l_schema->start_value(), _l_schema->end_value(_l_enum)
-        );
+        enumeration_diff_t _l_full_difference
+            = _l_enum->difference(_l_enum->start_value(), _l_enum->end_value());
         if (_l_enum->less_than(_l_lesser_elem, _l_greater_elem))
         {
             _l_local_diff.first  *= _a_previous_index_diff.first;
@@ -2082,13 +2035,13 @@ __constexpr_imp void
         }
         else
         {
-            _l_local_diff.first -= _l_local_diff.first;
+            _l_local_diff.first  -= _l_local_diff.first;
             _l_local_diff.second -= _l_local_diff.second;
         }
         _a_previous_index_diff.first  *= _l_full_difference.first;
         _a_previous_index_diff.second *= _l_full_difference.second;
-        _a_total_diff.first += _l_local_diff.first;
-        _a_total_diff.first += _l_local_diff.second;
+        _a_total_diff.first           += _l_local_diff.first;
+        _a_total_diff.first           += _l_local_diff.second;
     }
     if constexpr (I + 1 < std::tuple_size<value_type_t>{})
     {

@@ -20,22 +20,23 @@ public:
     enumeration_schema_from_m_to_n_t(
         const T&                          _a_start_value,
         const T&                          _a_end_value,
-        const std::optional<std::size_t>& _a_n_advancements
-        = std::optional<std::size_t>()
+        const std::optional<std::size_t>& _a_n_advancements = std::nullopt,
+        const enumeration_t<T>& _a_enumeration = default_enumeration<T>()
     ) noexcept;
-    __constexpr T virtual end_value(
-        const enumeration_t<T>& _a_edo
-    ) const noexcept override;
-    __constexpr bool virtual is_direction_forward(
-        const enumeration_t<T>& _a_edo
-    ) const noexcept override;
+    __constexpr
+    enumeration_schema_from_m_to_n_t(
+        const T&                _a_start_value,
+        const T&                _a_end_value,
+        const enumeration_t<T>& _a_enumeration
+    ) noexcept;
+    __constexpr T virtual end_value() const noexcept override;
+    __constexpr bool virtual is_direction_forward() const noexcept override;
     __no_constexpr enumerate_index_t virtual n_advancements_per_advancement(
-        const enumeration_t<T>& _a_edo
     ) const noexcept override;
 private:
-    T                           _m_end_value;
-    mutable std::optional<bool> _m_is_direction_forwards;
-    std::optional<enumerate_index_t>  _m_n_advancements_to_make;
+    T                                _m_end_value;
+    mutable std::optional<bool>      _m_is_direction_forwards;
+    std::optional<enumerate_index_t> _m_n_advancements_to_make;
 };
 
 _END_ABC_DG_NS
@@ -43,75 +44,120 @@ _BEGIN_ABC_NS
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
 __constexpr _ABC_NS_DG::enumeration_schema_t<T>
-            all_values() noexcept;
+            all_values(
+                const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
+                = default_enumeration<T>()
+            ) noexcept;
 template <typename T>
 __constexpr _ABC_NS_DG::enumeration_schema_t<T>
-            from_m_to_n(const T& _a_lower, const T& _a_upper) noexcept;
+            from_m_to_n(
+                const T&                            _a_lower,
+                const T&                            _a_upper,
+                const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
+                = default_enumeration<T>()
+            ) noexcept;
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T>
 __constexpr _ABC_NS_DG::enumeration_schema_t<T>
-            from_val_to_max(const T& _a_value) noexcept;
+            from_val_to_max(
+                const T&                            _a_value,
+                const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
+                = default_enumeration<T>()
+            ) noexcept;
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T>
 __constexpr _ABC_NS_DG::enumeration_schema_t<T>
-            from_max_to_val(const T& _a_value) noexcept;
+            from_max_to_val(
+                const T&                      _a_valueconst,
+                _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
+                = default_enumeration<T>()
+            ) noexcept;
 template <typename T>
 requires _ABC_NS_UTILITY::min_value_c<T>
 __constexpr _ABC_NS_DG::enumeration_schema_t<T>
-            from_val_to_min(const T& _a_value) noexcept;
+            from_val_to_min(
+                const T&                            _a_value,
+                const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
+                = default_enumeration<T>()
+            ) noexcept;
 template <typename T>
 requires _ABC_NS_UTILITY::min_value_c<T>
 __constexpr _ABC_NS_DG::enumeration_schema_t<T>
-            from_min_to_val(const T& _a_value) noexcept;
+            from_min_to_val(
+                const T&                            _a_value,
+                const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
+                = default_enumeration<T>()
+            ) noexcept;
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
 __constexpr _ABC_NS_DG::enumeration_schema_t<T>
-            all_values_moving_forward() noexcept;
+            all_values_moving_forward(
+                const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
+                = default_enumeration<T>()
+            ) noexcept;
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
 __constexpr _ABC_NS_DG::enumeration_schema_t<T>
-            all_values_moving_backward() noexcept;
+            all_values_moving_backward(
+                const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
+                = default_enumeration<T>()
+            ) noexcept;
 template <typename T>
 __constexpr _ABC_NS_DG::enumeration_schema_t<T>
             from_m_to_n_using_k_values(
-                const T&          _a_lower,
-                const T&          _a_upper,
-                const std::size_t _a_k
+                const T&                            _a_lower,
+                const T&                            _a_upper,
+                const std::size_t                   _a_k,
+                const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
+                = default_enumeration<T>()
             ) noexcept;
 _END_ABC_NS
 
 _BEGIN_ABC_DG_NS
 template <typename T>
-__constexpr_imp
-    enumeration_schema_from_m_to_n_t<T>::enumeration_schema_from_m_to_n_t(
-        const T&                          _a_start_value,
-        const T&                          _a_end_value,
-        const std::optional<std::size_t>& _a_n_advancements
-    ) noexcept
-    : enumeration_schema_base_t<T>(_a_start_value)
+__constexpr
+enumeration_schema_from_m_to_n_t<T>::enumeration_schema_from_m_to_n_t(
+    const T&                          _a_start_value,
+    const T&                          _a_end_value,
+    const std::optional<std::size_t>& _a_n_advancements,
+    const enumeration_t<T>&           _a_enumeration
+) noexcept
+    : enumeration_schema_base_t<T>(_a_start_value, _a_enumeration)
     , _m_end_value(_a_end_value)
     , _m_n_advancements_to_make(_a_n_advancements)
 {}
 
 template <typename T>
+__constexpr
+enumeration_schema_from_m_to_n_t<T>::enumeration_schema_from_m_to_n_t(
+    const T&                _a_start_value,
+    const T&                _a_end_value,
+    const enumeration_t<T>& _a_enumeration
+) noexcept
+    : enumeration_schema_from_m_to_n_t<T>(
+          _a_start_value,
+          _a_end_value,
+          std::nullopt,
+          _a_enumeration
+      )
+{}
+
+template <typename T>
 __constexpr_imp T
-    enumeration_schema_from_m_to_n_t<T>::end_value(
-        const enumeration_t<T>& _a_edo
-    ) const noexcept
+    enumeration_schema_from_m_to_n_t<T>::end_value() const noexcept
 {
     return _m_end_value;
 }
 
 template <typename T>
 __constexpr_imp bool
-    enumeration_schema_from_m_to_n_t<T>::is_direction_forward(
-        const enumeration_t<T>& _a_edo
-    ) const noexcept
+    enumeration_schema_from_m_to_n_t<T>::is_direction_forward() const noexcept
 {
     if (not _m_is_direction_forwards.has_value())
     {
-        _m_is_direction_forwards
-            = _a_edo->less_than(this->_m_start_value, _m_end_value);
+        _m_is_direction_forwards = this->_m_enumeration->less_than(
+            this->_m_start_value, _m_end_value
+        );
         ;
     }
     return _m_is_direction_forwards.value();
@@ -120,16 +166,19 @@ __constexpr_imp bool
 template <typename T>
 __no_constexpr_imp enumerate_index_t
     enumeration_schema_from_m_to_n_t<T>::n_advancements_per_advancement(
-        const enumeration_t<T>& _a_edo
     ) const noexcept
 {
     if (_m_n_advancements_to_make.has_value())
     {
-        const enumerate_index_t _l_n_advancements_to_make{ _m_n_advancements_to_make.value() };
-        const auto [_l_divisor, _l_remainder]{
-            _a_edo->difference(this->_m_start_value, _m_end_value)
+        const enumerate_index_t _l_n_advancements_to_make{
+            _m_n_advancements_to_make.value()
         };
-        const enumerate_index_t _l_difference{ _l_divisor % _l_n_advancements_to_make };
+        const auto [_l_divisor, _l_remainder]{
+            this->_m_enumeration->difference(this->_m_start_value, _m_end_value)
+        };
+        const enumerate_index_t _l_difference{
+            _l_divisor % _l_n_advancements_to_make
+        };
         const enumerate_index_t _l_divider{
             _l_n_advancements_to_make - (_l_difference == 0 ? 1 : 2)
         };
@@ -148,104 +197,130 @@ _BEGIN_ABC_NS
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
 __constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
-                all_values() noexcept
+                all_values(
+                    const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
+                ) noexcept
 {
-    return all_values_moving_forward<T>();
+    return all_values_moving_forward<T>(_a_enumerate_base);
 }
 
 template <typename T>
 __constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 from_m_to_n(
-                    const T& _a_lower,
-                    const T& _a_upper
+                    const T&                            _a_lower,
+                    const T&                            _a_upper,
+                    const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
                 ) noexcept
 {
     using namespace _ABC_NS_DG;
     using namespace std;
-    return make_shared<enumeration_schema_from_m_to_n_t<T>>(_a_lower, _a_upper);
+    return make_shared<enumeration_schema_from_m_to_n_t<T>>(
+        _a_lower, _a_upper, _a_enumerate_base
+    );
 }
 
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T>
 __constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 from_val_to_max(
-                    const T& _a_value
+                    const T&                            _a_value,
+                    const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
                 ) noexcept
 {
     using namespace _ABC_NS_DG;
-    return from_m_to_n(_a_value, max_value_t<T>().max_value());
+    return from_m_to_n(
+        _a_value, max_value_t<T>().max_value(), _a_enumerate_base
+    );
 }
 
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T>
 __constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 from_max_to_val(
-                    const T& _a_value
+                    const T&                            _a_value,
+                    const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
                 ) noexcept
 {
     using namespace _ABC_NS_DG;
-    return from_m_to_n(max_value_t<T>().max_value(), _a_value);
+    return from_m_to_n(
+        max_value_t<T>().max_value(), _a_value, _a_enumerate_base
+    );
 }
 
 template <typename T>
 requires _ABC_NS_UTILITY::min_value_c<T>
 __constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 from_val_to_min(
-                    const T& _a_value
+                    const T&                            _a_value,
+                    const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
                 ) noexcept
 {
     using namespace _ABC_NS_DG;
-    return from_m_to_n(_a_value, min_value_t<T>().min_value());
+    return from_m_to_n(
+        _a_value, min_value_t<T>().min_value(), _a_enumerate_base
+    );
 }
 
 template <typename T>
 requires _ABC_NS_UTILITY::min_value_c<T>
 __constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 from_min_to_val(
-                    const T& _a_value
+                    const T&                            _a_value,
+                    const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
                 ) noexcept
 {
     using namespace _ABC_NS_DG;
     using namespace _ABC_NS_UTILITY;
-    return from_m_to_n(min_value_t<T>().min_value(), _a_value);
-}
-
-template <typename T>
-requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
-__constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
-                all_values_moving_forward() noexcept
-{
-    using namespace _ABC_NS_DG;
-    using namespace _ABC_NS_UTILITY;
     return from_m_to_n(
-        min_value_t<T>().min_value(), max_value_t<T>().max_value()
+        min_value_t<T>().min_value(), _a_value, _a_enumerate_base
     );
 }
 
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
 __constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
-                all_values_moving_backward() noexcept
+                all_values_moving_forward(
+                    const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
+                ) noexcept
 {
     using namespace _ABC_NS_DG;
     using namespace _ABC_NS_UTILITY;
     return from_m_to_n(
-        max_value_t<T>().max_value(), min_value_t<T>().min_value()
+        min_value_t<T>().min_value(),
+        max_value_t<T>().max_value(),
+        _a_enumerate_base
+    );
+}
+
+template <typename T>
+requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
+__constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
+                all_values_moving_backward(
+                    const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
+                ) noexcept
+{
+    using namespace _ABC_NS_DG;
+    using namespace _ABC_NS_UTILITY;
+    return from_m_to_n(
+        max_value_t<T>().max_value(),
+        min_value_t<T>().min_value(),
+        _a_enumerate_base
     );
 }
 
 template <typename T>
 __constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 from_m_to_n_using_k_values(
-                    const T&          _a_lower,
-                    const T&          _a_upper,
-                    const std::size_t _a_k
+                    const T&                            _a_lower,
+                    const T&                            _a_upper,
+                    const std::size_t                   _a_k,
+                    const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
                 ) noexcept
 {
     using namespace _ABC_NS_DG;
     using namespace std;
     return make_shared<enumeration_schema_from_m_to_n_t<T>>(
-        _a_lower, _a_upper, optional<size_t>(_a_k)
+        _a_lower, _a_upper, optional<size_t>(_a_k), _a_enumerate_base
     );
 }
 
