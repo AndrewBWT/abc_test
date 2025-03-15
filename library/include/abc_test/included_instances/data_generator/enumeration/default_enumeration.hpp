@@ -903,10 +903,11 @@ public:
     {
         using namespace std;
         enumeration_diff_t _l_rv{0, 0};
-        // Find the lesser of the two, then copy the lesser.
-        const bool              _l_arg_1_lesser{less_than(_a_arg1, _a_arg2)};
-        auto&                   _l_lesser{_l_arg_1_lesser ? _a_arg1 : _a_arg2};
-        auto&                   _l_greater{_l_arg_1_lesser ? _a_arg2 : _a_arg1};
+        // Find the lesser of the two arguments.
+        const bool _l_arg_1_lesser{less_than(_a_arg1, _a_arg2)};
+        auto&      _l_lesser{_l_arg_1_lesser ? _a_arg1 : _a_arg2};
+        auto&      _l_greater{_l_arg_1_lesser ? _a_arg2 : _a_arg1};
+        // Find out how many advancements per "increment".
         const enumerate_index_t _l_divisor{
             _m_enumerate->n_advancements_per_advancement()
         };
@@ -915,6 +916,9 @@ public:
         enumeration_diff_t _l_biggest_difference{_m_enumerate->difference(
             _m_enumerate->start_value(), _m_enumerate->end_value()
         )};
+        // This is the "size" of the enumerator. Think of it as an entity with
+        // ten elements would have a biggest_difference of 10. It is like the
+        // arity of the entity.
         _l_biggest_difference.second += 1;
         for (size_t _l_idx{_l_lesser.size()}; _l_idx > 0; --_l_idx)
         {
@@ -954,6 +958,8 @@ public:
             }
             _l_greater_idx--;
         }
+        // Gone through all of the shared indexes. What remains is how to
+        // increment the lesser vector to the greater's value.
         enumeration_diff_t _l_rolling_product{1, 1};
         // Gone through all of them. Now gotta go through the remaining indexes.
         for (size_t _l_idx{_l_greater.size() - _l_lesser.size()}; _l_idx > 0;
@@ -1779,10 +1785,16 @@ private:
     template <std::size_t I>
     __constexpr void
         difference_(
-            enumeration_diff_t& _a_previous_index_diff,
-            enumeration_diff_t& _a_total_diff,
             const value_type_t& _a_lesser,
-            const value_type_t& _a_greater
+            const value_type_t& _a_greater,
+            enumeration_diff_t&  _a_total_diff,
+            enumeration_diff_t& _a_running_total
+        ) const noexcept;
+    template <std::size_t I>
+    __constexpr void
+        initialize_divisors(
+            std::array<enumerate_index_t, std::tuple_size<value_type_t>{}>&
+                _a_divisors
         ) const noexcept;
 };
 
@@ -1898,20 +1910,13 @@ __constexpr enumeration_diff_t
 {
     using namespace std;
     enumeration_diff_t _l_rv{0, 0};
-    // Find the lesser of the two, then copy the lesser.
+    // Find the lesser of the two arguments.
     const bool _l_arg_1_lesser{less_than(_a_arg1, _a_arg2)};
     auto&      _l_lesser{_l_arg_1_lesser ? _a_arg1 : _a_arg2};
     auto&      _l_greater{_l_arg_1_lesser ? _a_arg2 : _a_arg1};
-    auto       _l_current{_l_lesser};
-    array<enumeration_diff_t, tuple_size<value_type_t>{}> _l_increment_array;
-    for (size_t _l_idx{0}; _l_idx < tuple_size<value_type_t>{}; ++_l_idx)
-    {
-        // _l_increment_array[_l_idx];
-    }
-    enumeration_diff_t _l_previous_index_diff{0, 0};
-    difference_<tuple_size<value_type_t>{} - 1>(
-        _l_previous_index_diff, _l_rv, _l_lesser, _l_greater
-    );
+    // Find out how many advancements per "increment".
+    enumeration_diff_t _l_running_total{ 1, 0 };
+    difference_ < tuple_size<value_type_t>{} - 1 > (_l_lesser, _l_greater, _l_rv, _l_running_total);
     return _l_rv;
 }
 
@@ -2012,80 +2017,59 @@ template <typename... Ts>
 template <std::size_t I>
 __constexpr_imp void
     default_enumeration_t<std::tuple<Ts...>>::difference_(
-        enumeration_diff_t& _a_previous_index_diff,
-        enumeration_diff_t& _a_total_diff,
         const value_type_t& _a_lesser,
-        const value_type_t& _a_greater
+        const value_type_t& _a_greater,
+        enumeration_diff_t&  _a_total_diff,
+        enumeration_diff_t& _a_running_total
     ) const noexcept
 {
-    const auto& _l_enum{get<I>(_m_enumeration_schemas)};
-    auto        _l_lesser_elem{get<I>(_a_lesser)};
-    // _l_enum->increment(_l_lesser_elem, _a_previous_index_diff);
-    const auto& _l_greater_elem{get<I>(_a_greater)};
-    if (not _l_enum->equal(_l_lesser_elem, _l_greater_elem))
+    using namespace std;
+    using i_type_t = tuple_element_t<I, value_type_t>;
+    const i_type_t&                       _l_lesser_elem{get<I>(_a_lesser)};
+    const i_type_t&                       _l_greater_elem{get<I>(_a_greater)};
+    const enumeration_schema_t<i_type_t>& _l_schema{
+        get<I>(_m_enumeration_schemas)
+    };
+    enumeration_diff_t _l_total_diff = _l_schema->difference(
+        _l_schema->start_value(), _l_schema->end_value()
+    );
+    _l_total_diff.first++;
+    if (_l_schema->equal(_l_lesser_elem, _l_greater_elem))
+    {
+    }
+    else if (_l_schema->less_than(_l_lesser_elem, _l_greater_elem))
     {
         enumeration_diff_t _l_local_diff
-            = _l_enum->difference(_l_lesser_elem, _l_greater_elem);
-        enumeration_diff_t _l_full_difference
-            = _l_enum->difference(_l_enum->start_value(), _l_enum->end_value());
-        if (_l_enum->less_than(_l_lesser_elem, _l_greater_elem))
-        {
-            _l_local_diff.first  *= _a_previous_index_diff.first;
-            _l_local_diff.second *= _a_previous_index_diff.second;
-        }
-        else
-        {
-            _l_local_diff.first  -= _l_local_diff.first;
-            _l_local_diff.second -= _l_local_diff.second;
-        }
-        _a_previous_index_diff.first  *= _l_full_difference.first;
-        _a_previous_index_diff.second *= _l_full_difference.second;
-        _a_total_diff.first           += _l_local_diff.first;
-        _a_total_diff.first           += _l_local_diff.second;
+            = _l_schema->difference(_l_lesser_elem, _l_greater_elem);
+        _l_local_diff.first *= _a_running_total.first;
+        _l_local_diff.second *= _a_running_total.second;
+        _a_total_diff.first  += _l_local_diff.first;
+        _a_total_diff.second += _l_local_diff.second;
     }
-    if constexpr (I + 1 < std::tuple_size<value_type_t>{})
+    else
     {
-        difference_<I + 1>(
-            _a_previous_index_diff, _a_total_diff, _a_lesser, _a_greater
+        enumeration_diff_t _l_local_diff
+            = _l_schema->difference(_l_lesser_elem, _l_greater_elem);
+        enumeration_diff_t _l_local_diff_2 = _l_schema->difference(
+            _l_schema->start_value(), _l_schema->end_value()
         );
+        if (_l_local_diff_2.second > _l_local_diff.second)
+        {
+            _l_local_diff_2.first--;
+            _l_local_diff_2.second
+                += _l_schema->n_advancements_per_advancement();
+        }
+        _l_local_diff_2.second -= _l_local_diff.second;
+        _l_local_diff_2.first  -= _l_local_diff.first;
+        _a_total_diff.first    += _l_local_diff_2.first;
+        _a_total_diff.second   += _l_local_diff_2.second;
     }
-    /*if (_l_enum->equal(_l_lesser_elem, _l_greater_elem))
+    _a_running_total.first *= _l_total_diff.first;
+    _a_running_total.second *= _l_total_diff.second;
+    if constexpr (I > 0)
     {
-        size_t _l_idx_offset{_l_idx - 1};
-        // To get to i requires (X,Y).
-        enumeration_diff_t _l_this_diff{0, 0};
-        if (_m_enumerate->equal(
-                _l_lesser[_l_idx_offset], _l_greater[_l_greater_idx]
-            ))
-        {
-        }
-        else if (_m_enumerate->less_than(
-                     _l_lesser[_l_idx_offset], _l_greater[_l_greater_idx]
-                 ))
-        {
-            enumeration_diff_t _l_local_diff = _m_enumerate->difference(
-                _l_lesser[_l_idx_offset], _l_greater[_l_greater_idx]
-            );
-            _l_rv.first  += _l_local_diff.first;
-            _l_rv.second += _l_local_diff.second;
-        }
-        else
-        {
-            enumeration_diff_t _l_local_diff = _m_enumerate->difference(
-                _l_lesser[_l_idx_offset], _l_greater[_l_greater_idx]
-            );
-            enumeration_diff_t _l_local_diff_2 = _l_biggest_difference;
-            if (_l_local_diff_2.second > _l_local_diff.second)
-            {
-                _l_local_diff_2.first--;
-                _l_local_diff_2.second += _l_divisor;
-            }
-            _l_local_diff_2.second -= _l_local_diff.second;
-            _l_local_diff_2.first  -= _l_local_diff.first;
-            _l_rv.first            += _l_local_diff_2.first;
-            _l_rv.second           += _l_local_diff_2.second;
-        }
-        _l_greater_idx--;*/
+        difference_<I - 1>(_a_lesser, _a_greater, _a_total_diff, _a_running_total);
+    }
 }
 
 _END_ABC_DG_NS

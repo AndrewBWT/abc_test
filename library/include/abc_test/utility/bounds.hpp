@@ -109,7 +109,7 @@ __constexpr_imp
               : _a_second
       )
     , _m_max(
-          _a_ordering_enum == bounds_ordering_enum_t::second_less_than_first
+          _a_ordering_enum == bounds_ordering_enum_t::first_less_than_second
               ? _a_second
               : _a_first
       )
