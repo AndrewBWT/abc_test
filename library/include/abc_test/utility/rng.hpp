@@ -275,6 +275,7 @@ private:
 class inner_rng_t
 {
 public:
+    virtual void progress(const std::size_t _a_n_to_progress) noexcept = 0;
     virtual void
         set_seed(const seed_t& _a_seed) noexcept
         = 0;
@@ -286,6 +287,10 @@ public:
 class inner_rng_mt19937_64_t : public inner_rng_t
 {
 public:
+    inline virtual void progress(const std::size_t _a_n_to_progress) noexcept
+    {
+        _m_rng.discard(_a_n_to_progress);
+    }
     inline inner_rng_mt19937_64_t(
         const utility::seed_t& _a_seed
     )
@@ -351,20 +356,13 @@ public:
     {
         if (_m_calls > _a_expected_calls)
         {
-            std::seed_seq _l_seed_seq(_m_seed.begin(), _m_seed.end());
-            _m_rng   = _m_original_rng;
+            _m_rng->set_seed(_m_seed);
             _m_calls = 0;
-            while (_m_calls < _a_expected_calls)
-            {
-                ++_m_calls;
-                auto _l_res = _m_rng.get()->operator()();
-            }
+            _m_calls += _a_expected_calls;
+            _m_rng.get()->progress(_a_expected_calls);
         }
-        while (_m_calls < _a_expected_calls)
-        {
-            ++_m_calls;
-            auto _l_res = _m_rng.get()->operator()();
-        }
+        _m_calls += _a_expected_calls;
+        _m_rng.get()->progress(_a_expected_calls);
     }
 
     inline result_type
@@ -426,7 +424,6 @@ public:
     }
 private:
     std::shared_ptr<inner_rng_t> _m_rng;
-    std::shared_ptr<inner_rng_t> _m_original_rng;
     // std::mt19937_64 _m_rnd;
     utility::seed_t _m_seed;
     size_t          _m_calls;
@@ -435,7 +432,7 @@ private:
         const std::shared_ptr<inner_rng_t>& _a_rng,
         const utility::seed_t& _a_seed
     )
-        : _m_rng(_a_rng), _m_original_rng(_a_rng)
+        : _m_rng(_a_rng)
         , _m_seed(_a_seed)
         , _m_calls(0)
     {}

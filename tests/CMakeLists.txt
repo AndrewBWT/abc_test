@@ -7,14 +7,19 @@ set(TEST_LIB_NAME testlib)
 
 #There are some additional entries at the end which are not mirrored by files in the library.
 set(TEST_FILES
+  # Files which test their abc_test counterparts.
   include/abc_test_test/utility.hpp
   include/abc_test_test/utility/cli.hpp
+  include/abc_test_test/utility/bounds.hpp
   include/abc_test_test/included_instances.hpp
   include/abc_test_test/included_instances/data_generator/enumeration/default_enumeration.hpp
+  include/abc_test_test/included_instances/data_generator/random_generator/default_random_generator.hpp
   include/abc_test_test/core/ds/test_data/user_defined_test_data.hpp
       src/main.cpp
   include/abc_test_test/core.hpp
   include/abc_test_test/core/errors/test_library_exception.hpp
+  # Contains simple random generator for testing randomly generated data.
+  include/abc_test_test/testing_utilities/simple_random_generator.hpp
 )
 
 # These are the libs required for the testing suite.

@@ -267,6 +267,7 @@ __constexpr_imp bool check_if_element_in_path_set(
                 _l_prefix_matches = false;
                 break;
             }
+            ++_l_idx;
         }
         if (_l_prefix_matches)
         {

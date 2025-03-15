@@ -3,9 +3,8 @@
 #include "abc_test/included_instances/data_generator/enumeration/enumeration_base.hpp"
 #include "abc_test/included_instances/data_generator/enumeration/enumeration_schema_base.hpp"
 #include "abc_test/utility/enum.hpp"
-
-#include "abc_test/utility/limits/min_value_concept.hpp"
 #include "abc_test/utility/limits/max_value_concept.hpp"
+#include "abc_test/utility/limits/min_value_concept.hpp"
 
 #include <numeric>
 _BEGIN_ABC_DG_NS
@@ -984,59 +983,71 @@ public:
         return _l_rv;
     }
 };
+
 template <typename T>
-    requires _ABC_NS_UTILITY::enum_has_list_c<T>
+requires _ABC_NS_UTILITY::enum_has_list_c<T>
 struct default_enumeration_t<T> : public enumeration_base_t<T>
 {
 public:
     using value_type_t = T;
+
     __constexpr_imp virtual bool
         less_than(
             const T& _a_l,
             const T& _a_r
         ) const noexcept
     {
-        const auto& _l_ti{ utility::get_thread_local_enumerate_enum_helper<T>() };
-        return (_l_ti.less_than(_a_l, _a_r));
+        const auto& _l_ti{utility::get_thread_local_enumerate_enum_helper<T>()};
+        return _l_ti.less_than(_a_l, _a_r);
     }
+
     __constexpr_imp virtual bool
         equal(
             const T& _a_l,
             const T& _a_r
         ) const noexcept
     {
-        const auto& _l_ti{ utility::get_thread_local_enumerate_enum_helper<T>() };
-        return (_l_ti.equal(_a_l, _a_r));
+        const auto& _l_ti{utility::get_thread_local_enumerate_enum_helper<T>()};
+        return _l_ti.equal(_a_l, _a_r);
     }
+
     __constexpr virtual bool
         increment(
-            T& _a_element,
-            enumerate_index_t& _a_n_times_to_increment,
+            T&                      _a_element,
+            enumerate_index_t&      _a_n_times_to_increment,
             const std::optional<T>& _a_max_value
         )
     {
-        const auto& _l_ti{ utility::get_thread_local_enumerate_enum_helper<T>() };
-        return (_l_ti.increment(_a_element, _a_n_times_to_increment, _a_max_value));
+        const auto& _l_ti{utility::get_thread_local_enumerate_enum_helper<T>()};
+        return _l_ti.increment(
+            _a_element, _a_n_times_to_increment, _a_max_value
+        );
     }
+
     __constexpr virtual bool
         decrement(
-            T& _a_element,
-            enumerate_index_t& _a_n_times_to_increment,
+            T&                      _a_element,
+            enumerate_index_t&      _a_n_times_to_increment,
             const std::optional<T>& _a_max_value
         )
     {
-        const auto& _l_ti{ utility::get_thread_local_enumerate_enum_helper<T>() };
-        return (_l_ti.decrement(_a_element, _a_n_times_to_increment, _a_max_value));
+        const auto& _l_ti{utility::get_thread_local_enumerate_enum_helper<T>()};
+        return _l_ti.decrement(
+            _a_element, _a_n_times_to_increment, _a_max_value
+        );
     }
-    __constexpr virtual enumeration_diff_t difference(
-        const T& _a_arg1,
-        const T& _a_arg2
-    ) noexcept
+
+    __constexpr virtual enumeration_diff_t
+        difference(
+            const T& _a_arg1,
+            const T& _a_arg2
+        ) noexcept
     {
-        const auto& _l_ti{ utility::get_thread_local_enumerate_enum_helper<T>() };
-        return std::make_pair(_l_ti.difference(_a_arg1, _a_arg2),0);
+        const auto& _l_ti{utility::get_thread_local_enumerate_enum_helper<T>()};
+        return std::make_pair(_l_ti.difference(_a_arg1, _a_arg2), 0);
     }
 };
+
 _END_ABC_DG_NS
 
 _BEGIN_ABC_DG_NS
@@ -1755,6 +1766,67 @@ __constexpr_imp bool
     }
 }
 
+template <typename... Ts>
+struct default_enumeration_t<std::tuple<Ts...>>
+    : public enumeration_base_t<std::tuple<Ts...>>
+{
+public:
+    using value_type_t = std::tuple<Ts...>;
+    __constexpr
+    default_enumeration_t(enumeration_t<Ts>... _a_enumerators) noexcept;
+    __constexpr
+    default_enumeration_t() noexcept
+    requires (std::is_default_constructible_v<default_enumeration_t<Ts>> && ...)
+    ;
+    __constexpr_imp virtual bool
+        less_than(const value_type_t& _a_l, const value_type_t& _a_r)
+            const noexcept;
+    __constexpr_imp virtual bool
+        equal(const value_type_t& _a_l, const value_type_t& _a_r)
+            const noexcept;
+    __constexpr virtual bool
+        increment(
+            value_type_t&                      _a_element,
+            enumerate_index_t&                 _a_n_times_to_increment,
+            const std::optional<value_type_t>& _a_max_value
+        );
+    __constexpr virtual bool
+        decrement(
+            value_type_t&                      _a_element,
+            enumerate_index_t&                 _a_n_times_to_increment,
+            const std::optional<value_type_t>& _a_max_value
+        );
+    __constexpr virtual enumeration_diff_t
+        difference(const value_type_t& _a_arg1, const value_type_t& _a_arg2)
+            noexcept;
+private:
+    std::tuple<enumeration_t<Ts>...>        _m_enumerations;
+    std::tuple<enumeration_schema_t<Ts>...> _m_enumeration_schemas;
+    template <std::size_t I>
+    __constexpr bool
+        less_than_(const value_type_t& _a_l, const value_type_t& _a_r)
+            const noexcept;
+    template <std::size_t I>
+    __constexpr bool
+        equal_(const value_type_t& _a_l, const value_type_t& _a_r)
+            const noexcept;
+    template <std::size_t I>
+    __constexpr bool
+        increment_(
+            value_type_t&                      _a_element,
+            enumerate_index_t&                 _a_n_times_to_increment,
+            const std::optional<value_type_t>& _a_max_value
+        );
+    template <std::size_t I>
+    __constexpr void
+        difference_(
+            enumeration_diff_t& _a_previous_index_diff,
+            enumeration_diff_t& _a_total_diff,
+            const value_type_t& _a_lesser,
+            const value_type_t& _a_greater
+        ) const noexcept;
+};
+
 _END_ABC_DG_NS
 
 _BEGIN_ABC_NS
@@ -1770,3 +1842,297 @@ __constexpr_imp data_gen::enumeration_t<T>
 }
 
 _END_ABC_NS
+
+_BEGIN_ABC_DG_NS
+template <typename... Ts>
+__constexpr_imp
+    default_enumeration_t<std::tuple<Ts...>>::default_enumeration_t(
+        enumeration_t<Ts>... _a_enums
+    ) noexcept
+    : _m_enumerations(_a_enums)
+{}
+
+template <typename... Ts>
+__constexpr_imp
+    default_enumeration_t<std::tuple<Ts...>>::default_enumeration_t() noexcept
+requires (std::is_default_constructible_v<default_enumeration_t<Ts>> && ...)
+    : _m_enumerations(std::make_tuple(mk_enumeration(default_enumeration_t<Ts>()
+      )...))
+{}
+
+template <typename... Ts>
+__constexpr_imp bool
+    default_enumeration_t<std::tuple<Ts...>>::less_than(
+        const value_type_t& _a_l,
+        const value_type_t& _a_r
+    ) const noexcept
+{
+    return less_than_<0>(_a_l, _a_r);
+}
+
+template <typename... Ts>
+__constexpr_imp bool
+    default_enumeration_t<std::tuple<Ts...>>::equal(
+        const value_type_t& _a_l,
+        const value_type_t& _a_r
+    ) const noexcept
+{
+    return equal_<0>(_a_l, _a_r);
+}
+
+template <typename... Ts>
+__constexpr bool
+    default_enumeration_t<std::tuple<Ts...>>::increment(
+        value_type_t&                      _a_element,
+        enumerate_index_t&                 _a_n_times_to_increment,
+        const std::optional<value_type_t>& _a_max_value
+    )
+{
+    using namespace std;
+    while (_a_n_times_to_increment > 0)
+    {
+        constexpr size_t I = tuple_size<value_type_t>{} - 1;
+        auto&            _l_last_element{get<I>(_a_element)};
+        const auto&      _l_enum{get<I>(_m_enumerations)};
+        const auto&      _l_schema{get<I>(_m_enumeration_schemas)};
+        if (_l_enum->increment(
+                _l_last_element,
+                _a_n_times_to_increment,
+                _l_schema->end_value(_l_enum)
+            ))
+        {
+            if (_a_n_times_to_increment == 0)
+            {
+                return _a_element <= _a_max_value;
+            }
+            else
+            {
+                increment_<I>(
+                    _a_element, _a_n_times_to_increment, _a_max_value
+                );
+            }
+        }
+        else
+        {
+            // Set it to min, increment.
+            _l_last_element = _l_schema->start_value();
+            increment_<I>(_a_element, _a_n_times_to_increment, _a_max_value);
+        }
+        return _a_element <= _a_max_value;
+    }
+}
+
+template <typename... Ts>
+__constexpr bool
+    default_enumeration_t<std::tuple<Ts...>>::decrement(
+        value_type_t&                      _a_element,
+        enumerate_index_t&                 _a_n_times_to_increment,
+        const std::optional<value_type_t>& _a_max_value
+    )
+{
+    return true;
+}
+
+template <typename... Ts>
+__constexpr enumeration_diff_t
+    default_enumeration_t<std::tuple<Ts...>>::difference(
+        const value_type_t& _a_arg1,
+        const value_type_t& _a_arg2
+    ) noexcept
+{
+    using namespace std;
+    enumeration_diff_t _l_rv{0, 0};
+    // Find the lesser of the two, then copy the lesser.
+    const bool _l_arg_1_lesser{less_than(_a_arg1, _a_arg2)};
+    auto&      _l_lesser{_l_arg_1_lesser ? _a_arg1 : _a_arg2};
+    auto&      _l_greater{_l_arg_1_lesser ? _a_arg2 : _a_arg1};
+    auto       _l_current{_l_lesser};
+    array<enumeration_diff_t, tuple_size<value_type_t>{}> _l_increment_array;
+    for (size_t _l_idx{0}; _l_idx < tuple_size<value_type_t>{}; ++_l_idx)
+    {
+        // _l_increment_array[_l_idx];
+    }
+    enumeration_diff_t _l_previous_index_diff{0, 0};
+    difference_<tuple_size<value_type_t>{} - 1>(
+        _l_previous_index_diff, _l_rv, _l_lesser, _l_greater
+    );
+    return _l_rv;
+}
+
+template <typename... Ts>
+template <std::size_t I>
+__constexpr bool
+    default_enumeration_t<std::tuple<Ts...>>::less_than_(
+        const value_type_t& _a_l,
+        const value_type_t& _a_r
+    ) const noexcept
+{
+    using namespace std;
+    const auto& _l_enum{get<I>(_m_enumerations)};
+    const auto& _l_l_i{get<I>(_a_l)};
+    const auto& _l_r_i{get<I>(_a_r)};
+    if (_l_enum->less_than(_l_l_i, _l_r_i))
+    {
+        return true;
+    }
+    else if (not _l_enum->equal(_l_l_i, _l_r_i))
+    {
+        return false;
+    }
+    else if constexpr (I + 1 < tuple_size<value_type_t>{})
+    {
+        return less_than_<I + 1>(_a_l, _a_r);
+    }
+    else
+    {
+        return false;
+    }
+}
+
+template <typename... Ts>
+template <std::size_t I>
+__constexpr bool
+    default_enumeration_t<std::tuple<Ts...>>::equal_(
+        const value_type_t& _a_l,
+        const value_type_t& _a_r
+    ) const noexcept
+{
+    using namespace std;
+    const auto& _l_enum{get<I>(_m_enumerations)};
+    const auto& _l_l_i{get<I>(_a_l)};
+    const auto& _l_r_i{get<I>(_a_r)};
+    if (_l_enum->less_than(_l_l_i, _l_r_i))
+    {
+        return false;
+    }
+    else if (not _l_enum->equal(_l_l_i, _l_r_i))
+    {
+        return false;
+    }
+    else if constexpr (I + 1 < tuple_size<value_type_t>{})
+    {
+        return equal_<I + 1>(_a_l, _a_r);
+    }
+    else
+    {
+        return true;
+    }
+}
+
+template <typename... Ts>
+template <std::size_t I>
+__constexpr bool
+    default_enumeration_t<std::tuple<Ts...>>::increment_(
+        value_type_t&                      _a_element,
+        enumerate_index_t&                 _a_n_times_to_increment,
+        const std::optional<value_type_t>& _a_max_value
+    )
+{
+    using namespace std;
+    const auto& _l_enum{get<I>(_m_enumerations)};
+    const auto& _l_schema{get<I>(_m_enumeration_schemas)};
+    auto&       _l_elem{get<I>(_a_element)};
+    // for (size_t _l_idx{ N - 1 }; _l_idx > 0; --_l_idx)
+    // {
+    std::size_t _l_arg{1};
+    if (_l_enum->increment(
+            _l_elem, _a_n_times_to_increment, _l_schema->end_value(_l_enum)
+        ))
+    {
+        --_a_n_times_to_increment;
+        return true;
+    }
+    else
+    {
+        _l_elem = _l_schema->start_value();
+        if constexpr (I == 1)
+        {
+            return false;
+        }
+    }
+    // }
+}
+
+template <typename... Ts>
+template <std::size_t I>
+__constexpr_imp void
+    default_enumeration_t<std::tuple<Ts...>>::difference_(
+        enumeration_diff_t& _a_previous_index_diff,
+        enumeration_diff_t& _a_total_diff,
+        const value_type_t& _a_lesser,
+        const value_type_t& _a_greater
+    ) const noexcept
+{
+    const auto& _l_schema{get<I>(_m_enumeration_schemas)};
+    const auto& _l_enum{get<I>(_m_enumerations)};
+    auto        _l_lesser_elem{get<I>(_a_lesser)};
+    // _l_enum->increment(_l_lesser_elem, _a_previous_index_diff);
+    const auto& _l_greater_elem{get<I>(_a_greater)};
+    if (not _l_enum->equal(_l_lesser_elem, _l_greater_elem))
+    {
+        enumeration_diff_t _l_local_diff
+            = _l_enum->difference(_l_lesser_elem, _l_greater_elem);
+        enumeration_diff_t _l_full_difference = _l_enum->difference(
+            _l_schema->start_value(), _l_schema->end_value(_l_enum)
+        );
+        if (_l_enum->less_than(_l_lesser_elem, _l_greater_elem))
+        {
+            _l_local_diff.first  *= _a_previous_index_diff.first;
+            _l_local_diff.second *= _a_previous_index_diff.second;
+        }
+        else
+        {
+            _l_local_diff.first -= _l_local_diff.first;
+            _l_local_diff.second -= _l_local_diff.second;
+        }
+        _a_previous_index_diff.first  *= _l_full_difference.first;
+        _a_previous_index_diff.second *= _l_full_difference.second;
+        _a_total_diff.first += _l_local_diff.first;
+        _a_total_diff.first += _l_local_diff.second;
+    }
+    if constexpr (I + 1 < std::tuple_size<value_type_t>{})
+    {
+        difference_<I + 1>(
+            _a_previous_index_diff, _a_total_diff, _a_lesser, _a_greater
+        );
+    }
+    /*if (_l_enum->equal(_l_lesser_elem, _l_greater_elem))
+    {
+        size_t _l_idx_offset{_l_idx - 1};
+        // To get to i requires (X,Y).
+        enumeration_diff_t _l_this_diff{0, 0};
+        if (_m_enumerate->equal(
+                _l_lesser[_l_idx_offset], _l_greater[_l_greater_idx]
+            ))
+        {
+        }
+        else if (_m_enumerate->less_than(
+                     _l_lesser[_l_idx_offset], _l_greater[_l_greater_idx]
+                 ))
+        {
+            enumeration_diff_t _l_local_diff = _m_enumerate->difference(
+                _l_lesser[_l_idx_offset], _l_greater[_l_greater_idx]
+            );
+            _l_rv.first  += _l_local_diff.first;
+            _l_rv.second += _l_local_diff.second;
+        }
+        else
+        {
+            enumeration_diff_t _l_local_diff = _m_enumerate->difference(
+                _l_lesser[_l_idx_offset], _l_greater[_l_greater_idx]
+            );
+            enumeration_diff_t _l_local_diff_2 = _l_biggest_difference;
+            if (_l_local_diff_2.second > _l_local_diff.second)
+            {
+                _l_local_diff_2.first--;
+                _l_local_diff_2.second += _l_divisor;
+            }
+            _l_local_diff_2.second -= _l_local_diff.second;
+            _l_local_diff_2.first  -= _l_local_diff.first;
+            _l_rv.first            += _l_local_diff_2.first;
+            _l_rv.second           += _l_local_diff_2.second;
+        }
+        _l_greater_idx--;*/
+}
+
+_END_ABC_DG_NS

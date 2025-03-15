@@ -180,6 +180,7 @@ set(LIBRARY_FILES
   include/abc_test/utility/ranges.hpp
   include/abc_test/utility/str/rw_info.hpp
   include/abc_test/utility/enum.hpp
+  include/abc_test/utility/bounds.hpp
   include/abc_test/utility/concepts.hpp
   include/abc_test/utility/limits/min_value_object.hpp
   include/abc_test/utility/limits/max_value_object.hpp

@@ -619,8 +619,9 @@ __constexpr_imp result_t<std::vector<T>>
                 return unexpected(_l_result.error());
             }
             _l_rv.push_back(_l_result.value());
-            if (_a_parse_input.check_and_advance(", "))
+            if (_a_parse_input.check_and_advance(","))
             {
+                _a_parse_input.process_whitespace();
                 continue;
             }
             else if (*_a_parse_input == '}')

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "abc_test/included_instances/data_generator/random_generator/random_generator_base.hpp"
+#include "abc_test/utility/bounds.hpp"
 #include "abc_test/utility/enum.hpp"
 #include "abc_test/utility/limits/max_value_concept.hpp"
 #include "abc_test/utility/limits/min_value_concept.hpp"
@@ -180,10 +181,10 @@ struct default_random_generator_t<std::tuple<Ts...>>
     __constexpr
     default_random_generator_t(random_generator_t<Ts>... _a_rngs);
     __constexpr
-        default_random_generator_t();
-  //  requires (
- //       std::is_default_constructible_v<default_random_generator_t<Ts>> && ...
- //   );
+    default_random_generator_t()
+     requires (
+     std::is_default_constructible_v<default_random_generator_t<Ts>> && ...
+     );
     template <std::size_t I>
     __constexpr void
         run_rng_internal(
@@ -311,17 +312,18 @@ struct default_random_generator_t<std::basic_string<T>>
 {
 public:
     __constexpr_imp
-        default_random_generator_t() noexcept
-        : _m_rng(mk_random_generator(default_random_generator_t<T>()))
-    {
-
-    }
+        default_random_generator_t() noexcept;
     __constexpr
-    default_random_generator_t(const random_generator_t<T>& _a_rng) noexcept;
+    default_random_generator_t(
+        const random_generator_t<T>&          _a_rnd_gen,
+        const utility::bounds_t<std::size_t>& _a_size_bounds
+        = utility::bounds_t<std::size_t>()
+    ) noexcept;
     __no_constexpr virtual std::basic_string<T>
         operator()(utility::rng& _a_rnd_generator, const std::size_t _a_index);
 private:
-    random_generator_t<T> _m_rng;
+    random_generator_t<T>          _m_rng;
+    utility::bounds_t<std::size_t> _m_bounds;
 };
 
 template <typename T>
@@ -343,11 +345,23 @@ _BEGIN_ABC_DG_NS
 template <typename T>
 requires _ABC_NS_UTILITY::min_value_c<T> && _ABC_NS_UTILITY::max_value_c<T>
 __constexpr_imp
+    default_random_generator_t<
+        std::basic_string<T>>::default_random_generator_t() noexcept
+    : default_random_generator_t<std::basic_string<T>>(
+          default_random_generator<T>(),
+          utility::bounds_t<std::size_t>()
+      )
+{}
+
+template <typename T>
+requires _ABC_NS_UTILITY::min_value_c<T> && _ABC_NS_UTILITY::max_value_c<T>
+__constexpr_imp
     default_random_generator_t<std::basic_string<T>>::
         default_random_generator_t(
-            const random_generator_t<T>& _a_rnd_gen
+            const random_generator_t<T>&          _a_rnd_gen,
+            const utility::bounds_t<std::size_t>& _a_size_bounds
         ) noexcept
-    : _m_rng(_a_rnd_gen)
+    : _m_rng(_a_rnd_gen), _m_bounds(_a_size_bounds)
 {}
 
 template <typename T>
@@ -359,20 +373,20 @@ __no_constexpr_imp std::basic_string<T>
     )
 {
     using namespace std;
-    if (_a_index == 0)
+    // Decide on offset size. Use _a_index as upper bound. We add 1 so that we
+    // don't go over the limit.
+    const size_t _l_str_size_offset{
+        _a_index == 0 ? 0 : (_a_rnd_generator() % (_a_index + 1))
+    };
+    const size_t _l_str_size{
+        _m_bounds.lower() + (_l_str_size_offset % _m_bounds.difference())
+    };
+    basic_string<T> _l_rv(_l_str_size, T{});
+    for (size_t _l_idx{0}; _l_idx < _l_str_size; ++_l_idx)
     {
-        return basic_string<T>{};
+        _l_rv[_l_idx] = _m_rng->operator()(_a_rnd_generator, _a_index);
     }
-    else
-    {
-        size_t          _l_size{1 + (_a_rnd_generator() % (_a_index + 1))};
-        basic_string<T> _l_rv;
-        for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
-        {
-            _l_rv.push_back(_m_rng->operator()(_a_rnd_generator, _a_index));
-        }
-        return _l_rv;
-    }
+    return _l_rv;
 }
 
 /*template <typename T>
@@ -575,9 +589,10 @@ __constexpr_imp
 template <typename... Ts>
 __constexpr_imp
     default_random_generator_t<std::tuple<Ts...>>::default_random_generator_t()
-//requires (
-//    std::is_default_constructible_v<default_random_generator_t<Ts>> && ...
-//)
+     requires (
+         std::is_default_constructible_v<default_random_generator_t<Ts>> &&
+         ...
+    )
     : _m_rngs(std::make_tuple(
           mk_random_generator(default_random_generator_t<Ts>())...
       ))
