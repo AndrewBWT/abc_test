@@ -5,8 +5,13 @@
 #include "abc_test/utility/limits/min_value_object.hpp"
 
 _BEGIN_ABC_UTILITY_NS
-
+namespace detail
+{
+    template<typename T>
+    concept bounds_c = std::unsigned_integral<T> && (not std::same_as<T,bool>);
+}
 template <typename T>
+    requires detail::bounds_c<T>
 class bounds_t
 {
 public:
@@ -43,12 +48,14 @@ _END_ABC_UTILITY_NS
 
 _BEGIN_ABC_UTILITY_NS
 template <typename T>
+requires detail::bounds_c<T>
 __constexpr_imp
     bounds_t<T>::bounds_t()
     : bounds_t(min_value_t<T>{}.min_value(), max_value_t<T>{}.max_value())
 {}
 
 template <typename T>
+    requires detail::bounds_c<T>
 __constexpr_imp
     bounds_t<T>::bounds_t(
         const T& _a_first_and_second
@@ -61,6 +68,7 @@ __constexpr_imp
 {}
 
 template <typename T>
+    requires detail::bounds_c<T>
 __constexpr_imp
     bounds_t<T>::bounds_t(
         const T& _a_first,
@@ -75,6 +83,7 @@ __constexpr_imp
 {}
 
 template <typename T>
+    requires detail::bounds_c<T>
 __constexpr_imp const T&
     bounds_t<T>::lower() const noexcept
 {
@@ -82,6 +91,7 @@ __constexpr_imp const T&
 }
 
 template <typename T>
+    requires detail::bounds_c<T>
 __constexpr_imp const T&
     bounds_t<T>::higher() const noexcept
 {
@@ -89,6 +99,7 @@ __constexpr_imp const T&
 }
 
 template <typename T>
+    requires detail::bounds_c<T>
 __constexpr_imp const T&
     bounds_t<T>::difference() const noexcept
 
@@ -97,6 +108,7 @@ __constexpr_imp const T&
 }
 
 template <typename T>
+    requires detail::bounds_c<T>
 __constexpr_imp
     bounds_t<T>::bounds_t(
         const T&                     _a_first,
