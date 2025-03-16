@@ -1,9 +1,7 @@
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
-#include "abc_test/utility/bounds.hpp"
 #include "abc_test/included_instances/data_generator/enumeration/default_enumeration.hpp"
-
-
+#include "abc_test/utility/bounds.hpp"
 
 template <typename T>
 inline void
@@ -38,7 +36,7 @@ inline void
     {
         _l_data_gen = enumerate_data<test_data_t>();
     }
-   else
+    else
     {
         _l_data_gen = generate_data_randomly<test_data_t>();
     }
@@ -49,7 +47,7 @@ inline void
         bounds_t<T> _l_bounds(_l_first_val, _l_second_val);
         const bool  _l_first_val_smallest{_l_first_val < _l_second_val};
         const T& _l_lower{_l_first_val_smallest ? _l_first_val : _l_second_val};
-        const T& _l_upper{_l_first_val_smallest ? _l_second_val : _l_first_val };
+        const T& _l_upper{_l_first_val_smallest ? _l_second_val : _l_first_val};
         const T  _l_difference{static_cast<T>(
             _l_first_val_smallest ? (_l_second_val - _l_first_val)
                                   : (_l_first_val - _l_second_val)
@@ -64,6 +62,7 @@ inline void
     }
     _END_BBA_CHECK(_l_bounds_tests);
 }
+
 _TEST_CASE(
     abc::test_case_t(
         {.name = "Testing bounds_t constructors using hand-picked values",

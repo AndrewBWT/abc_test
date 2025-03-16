@@ -31,6 +31,7 @@
 - Add functionality to allow the user to filter tests based on a path. When this is addressed, update DECLARING_TESTS.md.
 - Check that same pairs of test paths and test names are dealt with properly. Update DECLARING_TESTS.md when this is addressed.
 - We're using a function from Google Benchmark, who use an apache licence. Need to look into whether we need to include the original licence when providing our library.
+- We should have a way to "turn off" computationally expensive tests.
 
 ## Information
 

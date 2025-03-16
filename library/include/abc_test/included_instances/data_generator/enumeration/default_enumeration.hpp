@@ -1778,16 +1778,15 @@ private:
     template <std::size_t I>
     __constexpr bool
         increment_(
-            value_type_t&                      _a_element,
-            enumerate_index_t&                 _a_n_times_to_increment,
-            const std::optional<value_type_t>& _a_max_value
+            value_type_t&      _a_element,
+            enumerate_index_t& _a_n_times_to_increment
         );
     template <std::size_t I>
     __constexpr void
         difference_(
             const value_type_t& _a_lesser,
             const value_type_t& _a_greater,
-            enumeration_diff_t&  _a_total_diff,
+            enumeration_diff_t& _a_total_diff,
             enumeration_diff_t& _a_running_total
         ) const noexcept;
     template <std::size_t I>
@@ -1861,33 +1860,17 @@ __constexpr bool
     using namespace std;
     while (_a_n_times_to_increment > 0)
     {
-        constexpr size_t I = tuple_size<value_type_t>{} - 1;
-        auto&            _l_last_element{get<I>(_a_element)};
-        const auto&      _l_enum{get<I>(_m_enumeration_schemas)};
-        if (_l_enum->increment(
-                _l_last_element, _a_n_times_to_increment, _l_enum->end_value()
+        if (not increment_<tuple_size<value_type_t>{} - 1>(
+                _a_element, _a_n_times_to_increment
             ))
         {
-            if (_a_n_times_to_increment == 0)
-            {
-                return _a_element <= _a_max_value;
-            }
-            else
-            {
-                increment_<I>(
-                    _a_element, _a_n_times_to_increment, _a_max_value
-                );
-            }
+            return false;
         }
-        else
-        {
-            // Set it to min, increment.
-            _l_last_element = _l_enum->start_value();
-            increment_<I>(_a_element, _a_n_times_to_increment, _a_max_value);
-        }
+    }
+    if (_a_n_times_to_increment == 0)
+    {
         return _a_element <= _a_max_value;
     }
-    return false;
 }
 
 template <typename... Ts>
@@ -1915,8 +1898,10 @@ __constexpr enumeration_diff_t
     auto&      _l_lesser{_l_arg_1_lesser ? _a_arg1 : _a_arg2};
     auto&      _l_greater{_l_arg_1_lesser ? _a_arg2 : _a_arg1};
     // Find out how many advancements per "increment".
-    enumeration_diff_t _l_running_total{ 1, 0 };
-    difference_ < tuple_size<value_type_t>{} - 1 > (_l_lesser, _l_greater, _l_rv, _l_running_total);
+    enumeration_diff_t _l_running_total{1, 0};
+    difference_<tuple_size<value_type_t>{} - 1>(
+        _l_lesser, _l_greater, _l_rv, _l_running_total
+    );
     return _l_rv;
 }
 
@@ -1984,19 +1969,16 @@ template <typename... Ts>
 template <std::size_t I>
 __constexpr bool
     default_enumeration_t<std::tuple<Ts...>>::increment_(
-        value_type_t&                      _a_element,
-        enumerate_index_t&                 _a_n_times_to_increment,
-        const std::optional<value_type_t>& _a_max_value
+        value_type_t&      _a_element,
+        enumerate_index_t& _a_n_times_to_increment
     )
 {
     using namespace std;
     const auto& _l_enum{get<I>(_m_enumeration_schemas)};
     auto&       _l_elem{get<I>(_a_element)};
-    // for (size_t _l_idx{ N - 1 }; _l_idx > 0; --_l_idx)
-    // {
-    std::size_t _l_arg{1};
+    size_t      _l_n_times_to_increment{1};
     if (_l_enum->increment(
-            _l_elem, _a_n_times_to_increment, _l_enum->end_value()
+            _l_elem, _l_n_times_to_increment, _l_enum->end_value()
         ))
     {
         --_a_n_times_to_increment;
@@ -2005,12 +1987,15 @@ __constexpr bool
     else
     {
         _l_elem = _l_enum->start_value();
-        if constexpr (I == 1)
+        if constexpr (I == 0)
         {
             return false;
         }
+        else
+        {
+            return increment_<I - 1>(_a_element, _a_n_times_to_increment);
+        }
     }
-    // }
 }
 
 template <typename... Ts>
@@ -2019,7 +2004,7 @@ __constexpr_imp void
     default_enumeration_t<std::tuple<Ts...>>::difference_(
         const value_type_t& _a_lesser,
         const value_type_t& _a_greater,
-        enumeration_diff_t&  _a_total_diff,
+        enumeration_diff_t& _a_total_diff,
         enumeration_diff_t& _a_running_total
     ) const noexcept
 {
@@ -2041,7 +2026,7 @@ __constexpr_imp void
     {
         enumeration_diff_t _l_local_diff
             = _l_schema->difference(_l_lesser_elem, _l_greater_elem);
-        _l_local_diff.first *= _a_running_total.first;
+        _l_local_diff.first  *= _a_running_total.first;
         _l_local_diff.second *= _a_running_total.second;
         _a_total_diff.first  += _l_local_diff.first;
         _a_total_diff.second += _l_local_diff.second;
@@ -2064,11 +2049,13 @@ __constexpr_imp void
         _a_total_diff.first    += _l_local_diff_2.first;
         _a_total_diff.second   += _l_local_diff_2.second;
     }
-    _a_running_total.first *= _l_total_diff.first;
+    _a_running_total.first  *= _l_total_diff.first;
     _a_running_total.second *= _l_total_diff.second;
     if constexpr (I > 0)
     {
-        difference_<I - 1>(_a_lesser, _a_greater, _a_total_diff, _a_running_total);
+        difference_<I - 1>(
+            _a_lesser, _a_greater, _a_total_diff, _a_running_total
+        );
     }
 }
 
