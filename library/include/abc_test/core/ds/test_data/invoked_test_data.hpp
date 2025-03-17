@@ -40,7 +40,7 @@ public:
      */
     __no_constexpr
         invoked_test_data_t(
-            const utility::rng& _a_rng,
+            const utility::rng_t& _a_rng,
             const post_setup_test_data_t& _a_test_info,
             const size_t                  _a_order_ran_id,
             const std::filesystem::path&  _a_root_path
@@ -62,7 +62,7 @@ public:
      * @brief Returns a cref to the invoked_test_data_t's utility::rng object.
      * @return Cref to the invoked_test_data_t's utility::rng object.
      */
-    __constexpr utility::rng&
+    __constexpr utility::rng_t&
                 get_random_generator() noexcept;
     /*!
      * @brief Returns a cref to the invoked_test_data_t's post_setup_tst_data_t
@@ -294,7 +294,7 @@ private:
     ds::tdg_collection_stack_trie_t _m_tests_for_loop_stack_trie;
     ds::tdg_collection_stack_t      _m_for_loop_data_collection;
     std::size_t                     _m_order_ran_id;
-    utility::rng                    _m_this_tests_random_generator;
+    utility::rng_t                    _m_this_tests_random_generator;
     std::filesystem::path           _m_path;
     enum_test_status_t              _m_test_status
         = enum_test_status_t::NO_TERMINATION_TEST_PASSED;
@@ -336,7 +336,7 @@ struct fmt::formatter<_ABC_NS_DS::invoked_test_data_t> : formatter<string_view>
 _BEGIN_ABC_DS_NS
 __no_constexpr_imp
     invoked_test_data_t::invoked_test_data_t(
-        const utility::rng&        _a_rng,
+        const utility::rng_t&        _a_rng,
         const post_setup_test_data_t& _a_post_setup_test_data,
         const size_t                  _a_order_ran_id,
         const std::filesystem::path&  _a_root_path
@@ -355,7 +355,7 @@ __constexpr_imp const std::filesystem::path&
     return _m_path;
 }
 
-__constexpr_imp utility::rng&
+__constexpr_imp utility::rng_t&
                 invoked_test_data_t::get_random_generator() noexcept
 {
     return _m_this_tests_random_generator;

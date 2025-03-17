@@ -8,6 +8,8 @@
 #include "abc_test/utility/internal/log.hpp"
 #include "abc_test/utility/parsers/default_parser.hpp"
 #include "abc_test/utility/rng.hpp"
+#include "abc_test/utility/rng/global_seed.hpp"
+#include "abc_test/utility/rng/inner_rng_mt19937_64.hpp"
 
 #include <filesystem>
 #include <fmt/color.h>
@@ -159,10 +161,10 @@ public:
     __no_constexpr     std::optional<std::vector<std::string>>
                        validate_and_pre_process() noexcept;
 
-    __no_constexpr_imp utility::rng
+    __no_constexpr_imp utility::rng_t
                        make_rng() const noexcept
     {
-        return utility::rng::make_rng<utility::inner_rng_mt19937_64_t>(
+        return utility::rng_t::make_rng<utility::inner_rng_mt19937_64_t>(
             global::get_global_seed(),
             number_of_integers_used_to_seed_random_generators
         );

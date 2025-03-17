@@ -16,7 +16,7 @@ public:
         const _ABC_NS_DG::enumeration_schema_t<T>& _a_es
     ) noexcept;
     __no_constexpr virtual T
-        operator()(utility::rng& _a_rnd_generator, const std::size_t _a_index);
+        operator()(utility::rng_t& _a_rnd_generator, const std::size_t _a_index);
 private:
     enumeration_schema_t<T> _m_enum_object;
     T                       _m_start_value;
@@ -74,7 +74,7 @@ __constexpr_imp
 template <typename T>
 __no_constexpr T
     enumeration_based_random_generator_object_t<T>::operator()(
-        utility::rng&     _a_rnd_generator,
+        utility::rng_t&     _a_rnd_generator,
         const std::size_t _a_index
     )
 {

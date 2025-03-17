@@ -43,7 +43,7 @@ public:
         test_runner_t(
             _ABC_NS_REPORTERS::test_reporter_controller_t& _a_trc,
             const test_options_base_t&                     _a_test_options,
-            const utility::rng& _a_rng
+            const utility::rng_t& _a_rng
         ) noexcept;
     /*!
      * @brief Adds a log message to the current set of log messages.
@@ -134,7 +134,7 @@ public:
      * @return A random seed generated from this test_runner_t's random
      * generator.
      */
-    __no_constexpr _ABC_NS_UTILITY::rng
+    __no_constexpr _ABC_NS_UTILITY::rng_t
         generate_random_seeds(const std::size_t _a_order_ran_id) noexcept;
     /*!
      * @brief Returns to the caller this test_runner_t's most recent source.
@@ -181,7 +181,7 @@ private:
         _m_trc;
     // std::size_t                                      _m_tests_ran;
     std::shared_ptr<_ABC_NS_DS::invoked_test_data_t> _m_current_test;
-    _ABC_NS_UTILITY::rng                             _m_random_generator;
+    _ABC_NS_UTILITY::rng_t                             _m_random_generator;
     // const test_options_base_t&                       _m_test_options;
     _ABC_NS_DS::test_set_data_t _m_test_data;
     std::optional<_ABC_NS_DS::single_source_t> _m_tests_most_recent_source;
@@ -209,7 +209,7 @@ __no_constexpr_imp
     test_runner_t::test_runner_t(
         _ABC_NS_REPORTERS::test_reporter_controller_t& _a_trc,
         const test_options_base_t&                     _a_test_options,
-        const utility::rng& _a_rng
+        const utility::rng_t& _a_rng
     ) noexcept
     : _m_trc(_a_trc)
     , _m_current_test(nullptr)
@@ -265,7 +265,7 @@ __no_constexpr_imp _ABC_NS_DS::invoked_test_data_t&
     return *_m_current_test;
 }
 
-__no_constexpr_imp _ABC_NS_UTILITY::rng
+__no_constexpr_imp _ABC_NS_UTILITY::rng_t
                    test_runner_t::generate_random_seeds(
         const std::size_t _a_order_ran_id
     ) noexcept

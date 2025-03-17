@@ -18,7 +18,7 @@ struct default_random_generator_t : public random_generator_base_t<T>
 public:
     __constexpr virtual T
         operator()(
-            utility::rng&                 _a_rnd_generator,
+            utility::rng_t&                 _a_rnd_generator,
             const utility::rng_counter_t& _a_index
         )
     {
@@ -44,7 +44,7 @@ struct default_random_generator_t<bool> : public random_generator_base_t<bool>
 {
     __no_constexpr virtual bool
         operator()(
-            utility::rng&                 _a_rnd_generator,
+            utility::rng_t&                 _a_rnd_generator,
             const utility::rng_counter_t& _a_index
         );
 };
@@ -64,7 +64,7 @@ public:
 
     __constexpr_imp virtual T
         operator()(
-            utility::rng&                 _a_rnd_generator,
+            utility::rng_t&                 _a_rnd_generator,
             const utility::rng_counter_t& _a_index
         )
     {
@@ -97,7 +97,7 @@ public:
 
     __no_constexpr_imp virtual T
         operator()(
-            utility::rng&                 _a_rnd_generator,
+            utility::rng_t&                 _a_rnd_generator,
             const utility::rng_counter_t& _a_index
         )
     {
@@ -117,7 +117,7 @@ private:
 template <typename T, typename... Ts>
 __constexpr T
     make_random_object(
-        utility::rng&                         _a_rng,
+        utility::rng_t&                         _a_rng,
         const utility::rng_counter_t&         _a_size,
         std::tuple<random_generator_t<Ts>...> _a_generators
     ) noexcept;
@@ -127,7 +127,7 @@ namespace
 template <std::size_t I, typename... Ts>
 __constexpr void
     run_internal_make_object(
-        utility::rng&                         _a_rng,
+        utility::rng_t&                         _a_rng,
         const utility::rng_counter_t&         _a_size,
         std::tuple<Ts...>&                    _a_tuple,
         std::tuple<random_generator_t<Ts>...> _a_generators
@@ -147,7 +147,7 @@ public:
     default_random_generator_t(const random_generator_t<T>& _a_gen) noexcept;
     __no_constexpr virtual std::array<T, N>
         operator()(
-            utility::rng&                 _a_rnd_generator,
+            utility::rng_t&                 _a_rnd_generator,
             const utility::rng_counter_t& _a_index
         );
 private:
@@ -160,7 +160,7 @@ struct default_random_generator_t<T> : public random_generator_base_t<T>
 {
     __no_constexpr virtual T
         operator()(
-            utility::rng&                 _a_rnd_generator,
+            utility::rng_t&                 _a_rnd_generator,
             const utility::rng_counter_t& _a_index
         )
     {
@@ -195,12 +195,12 @@ struct default_random_generator_t<std::tuple<Ts...>>
     __constexpr void
         run_rng_internal(
             value_type&                   _a_object,
-            utility::rng&                 _a_rnd_generator,
+            utility::rng_t&                 _a_rnd_generator,
             const utility::rng_counter_t& _a_index
         ) const;
     __no_constexpr virtual value_type
         operator()(
-            utility::rng&                 _a_rnd_generator,
+            utility::rng_t&                 _a_rnd_generator,
             const utility::rng_counter_t& _a_index
         );
 private:
@@ -222,7 +222,7 @@ __constexpr_imp
 template <typename T, std::size_t N>
 __no_constexpr_imp std::array<T, N>
                    default_random_generator_t<std::array<T, N>>::operator()(
-        utility::rng&                 _a_rnd_generator,
+        utility::rng_t&                 _a_rnd_generator,
         const utility::rng_counter_t& _a_index
     )
 {
@@ -254,7 +254,7 @@ public:
 
     __no_constexpr virtual std::optional<T>
         operator()(
-            utility::rng&                 _a_rnd_generator,
+            utility::rng_t&                 _a_rnd_generator,
             const utility::rng_counter_t& _a_index
         );
 private:
@@ -267,7 +267,7 @@ _BEGIN_ABC_DG_NS
 template <typename T>
 __no_constexpr_imp std::optional<T>
                    default_random_generator_t<std::optional<T>>::operator()(
-        utility::rng&                 _a_rnd_generator,
+        utility::rng_t&                 _a_rnd_generator,
         const utility::rng_counter_t& _a_index
     )
 {
@@ -305,7 +305,7 @@ template <typename T>
 requires std::integral<T>
 __no_constexpr_imp T
     random_generator_object_t<T>::operator()(
-        utility::rng& _a_rnd_generator
+        utility::rng_t& _a_rnd_generator
     )
 {
     using namespace std;
@@ -333,7 +333,7 @@ public:
     ) noexcept;
     __no_constexpr virtual std::basic_string<T>
         operator()(
-            utility::rng&                 _a_rnd_generator,
+            utility::rng_t&                 _a_rnd_generator,
             const utility::rng_counter_t& _a_index
         );
 private:
@@ -350,7 +350,7 @@ public:
     default_random_generator_t(const random_generator_t<T>& _a_gen) noexcept;
     __no_constexpr virtual std::vector<T>
         operator()(
-            utility::rng&                 _a_rnd_generator,
+            utility::rng_t&                 _a_rnd_generator,
             const utility::rng_counter_t& _a_index
         );
 private:
@@ -386,7 +386,7 @@ template <typename T>
 requires _ABC_NS_UTILITY::min_value_c<T> && _ABC_NS_UTILITY::max_value_c<T>
 __no_constexpr_imp std::basic_string<T>
                    default_random_generator_t<std::basic_string<T>>::operator()(
-        utility::rng&                 _a_rnd_generator,
+        utility::rng_t&                 _a_rnd_generator,
         const utility::rng_counter_t& _a_index
     )
 {
@@ -424,7 +424,7 @@ template <typename T>
 requires std::integral<T>
 __no_constexpr_imp T
     random_generator_object_t<T>::operator()(
-        utility::rng& _a_rnd_generator
+        utility::rng_t& _a_rnd_generator
     )
 {
     using namespace std;
@@ -444,7 +444,7 @@ __constexpr_imp
 template <typename T>
 __no_constexpr_imp std::vector<T>
                    default_random_generator_t<std::vector<T>>::operator()(
-        utility::rng&                 _a_rnd_generator,
+        utility::rng_t&                 _a_rnd_generator,
         const utility::rng_counter_t& _a_index
     )
 {
@@ -466,7 +466,7 @@ _BEGIN_ABC_DG_NS
 /*template <typename T>
 __constexpr_imp T
     default_random_generator_t<T>::operator()(
-        utility::rng&     _a_rnd_generator,
+        utility::rng_t&     _a_rnd_generator,
         const std::size_t _a_index
     )
 {
@@ -496,7 +496,7 @@ _END_ABC_NS
 _BEGIN_ABC_DG_NS
 __no_constexpr_imp bool
     default_random_generator_t<bool>::operator()(
-        utility::rng&                 _a_rnd_generator,
+        utility::rng_t&                 _a_rnd_generator,
         const utility::rng_counter_t& _a_index
     )
 {
@@ -519,7 +519,7 @@ template <typename T>
 requires std::integral<T>
 __no_constexpr_imp T
     random_generator_object_t<T>::operator()(
-        utility::rng& _a_rnd_generator
+        utility::rng_t& _a_rnd_generator
     )
 {
     using namespace std;
@@ -549,7 +549,7 @@ _ABC_NS_UTILITY::min_value_c<T>
 && _ABC_NS_UTILITY::max_value_c<T>
 __no_constexpr_imp T
 default_random_generator_t<T>::operator()(
-    utility::rng& _a_rnd_generator,
+    utility::rng_t& _a_rnd_generator,
     const std::size_t _a_index
     )
 {
@@ -564,7 +564,7 @@ default_random_generator_t<T>::operator()(
 template <typename T, typename... Ts>
 __constexpr_imp T
     make_random_object(
-        utility::rng&                         _a_rng,
+        utility::rng_t&                         _a_rng,
         const utility::rng_counter_t&         _a_size,
         std::tuple<random_generator_t<Ts>...> _a_generators
     ) noexcept
@@ -582,7 +582,7 @@ namespace
 template <std::size_t I, typename... Ts>
 __constexpr void
     run_internal_make_object(
-        utility::rng&                         _a_rng,
+        utility::rng_t&                         _a_rng,
         const utility::rng_counter_t&         _a_size,
         std::tuple<Ts...>&                    _a_tuple,
         std::tuple<random_generator_t<Ts>...> _a_generators
@@ -623,7 +623,7 @@ template <std::size_t I>
 __constexpr void
     default_random_generator_t<std::tuple<Ts...>>::run_rng_internal(
         value_type&                   _a_object,
-        utility::rng&                 _a_rnd_generator,
+        utility::rng_t&                 _a_rnd_generator,
         const utility::rng_counter_t& _a_index
     ) const
 {
@@ -638,7 +638,7 @@ __constexpr void
 template <typename... Ts>
 __no_constexpr_imp default_random_generator_t<std::tuple<Ts...>>::value_type
                    default_random_generator_t<std::tuple<Ts...>>::operator()(
-        utility::rng&                 _a_rnd_generator,
+        utility::rng_t&                 _a_rnd_generator,
         const utility::rng_counter_t& _a_index
     )
 {

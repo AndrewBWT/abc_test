@@ -27,7 +27,7 @@ _TEST_CASE(
         "std::string, to ensure no crashes"
     );
     default_random_generator_t<string> _l_rdg;
-    rng _l_rng        = rng::make_rng<simple_rng_t>(vector<uint32_t>());
+    rng_t _l_rng        = rng_t::make_rng<simple_rng_t>(vector<uint32_t>());
     using test_data_t = tuple<size_t, size_t>;
     for (const auto& _l_tuple : generate_data_randomly<test_data_t>())
     {
@@ -62,7 +62,7 @@ _TEST_CASE(
         "correct values"
     );
     default_random_generator_t<string> _l_rdg;
-    rng _l_rng        = rng::make_rng<simple_rng_t>(vector<uint32_t>());
+    rng_t _l_rng        = rng_t::make_rng<simple_rng_t>(vector<uint32_t>());
     using test_data_t = tuple<size_t, size_t, vector<signed char>>;
     for (const auto& _l_tuple :
          read_data_from_file<test_data_t>("string_test_data"))
@@ -115,7 +115,7 @@ _TEST_CASE(
     default_random_generator_t<string> _l_rdg(
         default_random_generator<char>(' ', '~')
     );
-    rng _l_rng        = rng::make_rng<simple_rng_t>(vector<uint32_t>());
+    rng_t _l_rng        = rng_t::make_rng<simple_rng_t>(vector<uint32_t>());
     using test_data_t = tuple<size_t, size_t, string>;
     for (const auto& _l_tuple :
          read_data_from_file<test_data_t>("string_test_data"))
