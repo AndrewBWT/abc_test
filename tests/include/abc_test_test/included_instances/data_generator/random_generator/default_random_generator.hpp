@@ -35,7 +35,7 @@ _TEST_CASE(
         // Seed the random generator function with the given seed value.
         _l_rng.progress(_l_rng_seed_value);
         // Generate the string.
-        string _l_rv{_l_rdg.operator()(_l_rng, _l_size_index)};
+        string _l_rv{_l_rdg.operator()(_l_rng, rng_counter_t(_l_size_index))};
         // Ensure values are not optimized away.
         do_not_optimise(_l_rv);
     }
@@ -75,7 +75,7 @@ _TEST_CASE(
         // Seed the random generator function with the given seed value.
         _l_rng.progress(_l_rng_seed_value);
         // Generate the string.
-        string _l_rv{_l_rdg.operator()(_l_rng, _l_size_index)};
+        string _l_rv{_l_rdg.operator()(_l_rng, utility::rng_counter_t(_l_size_index))};
         // Convert the gotten string to a vector of signed chars.
         auto _l_str_gotten{convert_type<vector<signed char>>(_l_rv)};
         // Run the test.
@@ -124,7 +124,7 @@ _TEST_CASE(
         // Seed the random generator function with the given seed value.
         _l_rng.progress(_l_rng_seed_value);
         // Generate the string.
-        string _l_rv{_l_rdg.operator()(_l_rng, _l_size_index)};
+        string _l_rv{_l_rdg.operator()(_l_rng, rng_counter_t(_l_size_index))};
         // Run the test.
         _l_string_tests += _BLOCK_CHECK(annotate(
             fmt::format(

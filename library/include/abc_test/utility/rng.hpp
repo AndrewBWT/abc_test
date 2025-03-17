@@ -317,6 +317,38 @@ private:
     std::mt19937_64 _m_rng;
 };
 
+class rng_counter_t
+{
+public:
+    __constexpr rng_counter_t() noexcept
+        : rng_counter_t(0)
+    {
+
+    }
+    __constexpr explicit rng_counter_t(const std::size_t _a_start) noexcept
+        : _m_index(_a_start)
+    {
+    }
+    __constexpr std::size_t operator()() const noexcept
+    {
+        return _m_index;
+    }
+    __constexpr void increment() noexcept
+    {
+        _m_index++;
+    }
+    __constexpr bool operator<(const rng_counter_t& _a_counter) const noexcept
+    {
+        return this->_m_index < _a_counter._m_index;
+    }
+    __constexpr rng_counter_t offset(const std::size_t _a_offset) const noexcept
+    {
+        return rng_counter_t(_m_index + _a_offset);
+    }
+private:
+    std::size_t _m_index;
+};
+
 struct rng
 {
 public:
@@ -496,6 +528,33 @@ struct default_parser_t<complete_global_seed_t>
     }
 };
 
+template <>
+struct default_parser_t<rng_counter_t>
+    : public parser_base_t<rng_counter_t>
+{
+    __constexpr result_t<rng_counter_t>
+        run_parser(
+            parser_input_t& _a_parse_input
+        ) const
+    {
+        using namespace std;
+        const result_t<rng_counter_t>
+            _l_result{ utility::parser::default_parser_t<std::size_t>(
+            )
+                                  .run_parser(_a_parse_input) };
+        if (_l_result.has_value())
+        {
+            return result_t<rng_counter_t>(
+                rng_counter_t(_l_result.value())
+            );
+        }
+        else
+        {
+            return unexpected(_l_result.error());
+        }
+    }
+};
+
 _END_ABC_UTILITY_PARSER_NS
 _BEGIN_ABC_UTILITY_PRINTER_NS
 
@@ -509,6 +568,19 @@ struct default_printer_t<global_seed_t> : public printer_base_t<global_seed_t>
     {
         using namespace std;
         return "global_seed_t";
+    }
+};
+
+template <>
+struct default_printer_t<rng_counter_t> : public printer_base_t<rng_counter_t>
+{
+    __no_constexpr_imp std::string
+        run_printer(
+            const rng_counter_t& _a_element
+        ) const
+    {
+        using namespace std;
+        return to_string(_a_element());
     }
 };
 

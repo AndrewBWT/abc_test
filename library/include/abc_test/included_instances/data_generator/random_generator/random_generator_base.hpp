@@ -12,7 +12,7 @@ struct random_generator_base_t
 public:
     using value_type_t = T;
     __constexpr_imp virtual T
-        operator()(utility::rng& _a_rnd_generator, const std::size_t _a_index)
+        operator()(utility::rng& _a_rnd_generator, const utility::rng_counter_t& _a_index)
         = 0;
 };
 
