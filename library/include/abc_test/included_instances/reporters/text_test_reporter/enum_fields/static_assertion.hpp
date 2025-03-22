@@ -30,5 +30,4 @@ __constexpr_imp enum_print_pair_collection_t<combined_enum_static_assertion_fiel
         {STATUS,             DONT_PRINT      },
     };
 }
-
 _END_ABC_REPORTERS_NS

@@ -1,17 +1,15 @@
 #pragma once
 #include "abc_test/core/ds/source/single_source.hpp"
+#include "abc_test/core/ds/source/source_pair.hpp"
+#include "abc_test/core/errors/test_assertion_exception.hpp"
 #include "abc_test/core/matchers/matcher_wrapper.hpp"
 #include "abc_test/core/matchers/static_matcher.hpp"
-#include "abc_test/utility/internal/macros.hpp"
-
-#include "abc_test/core/ds/source/source_pair.hpp"
 #include "abc_test/core/test_reports/assertion_status/pass_or_fail.hpp"
-
-#include "abc_test/core/test_reports/assertion_status/terminate.hpp"
 #include "abc_test/core/test_reports/assertion_status/pass_or_terminate.hpp"
-
-#include "abc_test/core/errors/test_assertion_exception.hpp"
+#include "abc_test/core/test_reports/assertion_status/terminate.hpp"
 #include "abc_test/core/test_reports/multi_element_assertion_block.hpp"
+#include "abc_test/utility/do_not_optimise.hpp"
+#include "abc_test/utility/internal/macros.hpp"
 
 #include <optional>
 
@@ -215,8 +213,8 @@ __constexpr assertion_wp_t<T>
     global::get_this_threads_current_test().add_current_for_loop_stack_to_trie(
     );
     bba_inner_assertion_type_t _l_tuple(
-        (std::same_as<T, _ABC_NS_REPORTS::terminate_t>
-            || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t>),
+        ( std::same_as<T, _ABC_NS_REPORTS::terminate_t>
+          || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t> ),
         _a_pass,
         _a_opt_str_msg,
         ds::single_source_t(_a_str_representation, _a_source_location)
@@ -241,8 +239,8 @@ __constexpr assertion_wp_t<T>
     if constexpr (Annotated)
     {
         bba_inner_assertion_type_t _l_tuple(
-            (std::same_as<T, _ABC_NS_REPORTS::terminate_t>
-                || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t>),
+            ( std::same_as<T, _ABC_NS_REPORTS::terminate_t>
+              || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t> ),
             _a_matcher.matcher_result(),
             ds::single_source_t(_a_str_representation, _a_source_location),
             std::optional<std::string>(_a_matcher.annotation()),
@@ -253,8 +251,8 @@ __constexpr assertion_wp_t<T>
     else
     {
         bba_inner_assertion_type_t _l_tuple(
-            (std::same_as<T, _ABC_NS_REPORTS::terminate_t>
-                || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t>),
+            ( std::same_as<T, _ABC_NS_REPORTS::terminate_t>
+              || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t> ),
             _a_matcher.matcher_result(),
             ds::single_source_t(_a_str_representation, _a_source_location),
             std::optional<std::string>{},
@@ -264,8 +262,7 @@ __constexpr assertion_wp_t<T>
     }
 }
 
-// template <typename T>
-// requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
+
 class multi_element_test_block_t : public test_block_t //<T>
 {
 public:
@@ -276,7 +273,7 @@ public:
     __constexpr_imp test_block_t&
         operator+=(
             const assertion_wp_t<T2>& _a_element
-            )
+        )
     {
         _m_assertions.push_back(_a_element._m_matcher_info);
         if constexpr (std::same_as<T2, _ABC_NS_REPORTS::pass_or_terminate_t>)
@@ -286,16 +283,19 @@ public:
                 using namespace _ABC_NS_REPORTS;
                 using namespace _ABC_NS_MATCHER;
                 assertion_ptr_t<false, T2> _l_gur;
-                bool                      _l_passed{ true };
-                matcher_res_infos_t       _l_mtr{ get_matcher() };
+                bool                       _l_passed{true};
+                matcher_res_infos_t        _l_mtr{get_matcher()};
                 _l_gur = std::make_unique<multi_element_assertion_block_t<T2>>(
                     _a_element._m_matcher_info.matcher_result().passed(),
                     source(),
-                    global::get_this_threads_test_runner_ref().get_log_infos(false),
+                    global::get_this_threads_test_runner_ref().get_log_infos(
+                        false
+                    ),
                     _l_mtr,
                     test_annotation()
                 );
-                global::get_this_threads_test_runner_ref().add_assertion(_l_gur);
+                global::get_this_threads_test_runner_ref().add_assertion(_l_gur
+                );
                 throw _ABC_NS_ERRORS::test_assertion_exception_t();
             }
         }
@@ -304,8 +304,8 @@ public:
             using namespace _ABC_NS_REPORTS;
             using namespace _ABC_NS_MATCHER;
             assertion_ptr_t<false, T2> _l_gur;
-            bool                      _l_passed{ true };
-            matcher_res_infos_t       _l_mtr{ get_matcher() };
+            bool                       _l_passed{true};
+            matcher_res_infos_t        _l_mtr{get_matcher()};
             _l_gur = std::make_unique<multi_element_assertion_block_t<T2>>(
                 std::monostate(),
                 source(),

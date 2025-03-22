@@ -902,7 +902,6 @@ __constexpr_imp
 {
     return _m_static_assertion_fields;
 }
-
 __constexpr_imp enum_print_pair_collection_t<
     combined_enum_unexpected_thrown_non_descript_entity_fields_t>
     print_config_t::unexpected_thrown_non_descript_entity_fields(

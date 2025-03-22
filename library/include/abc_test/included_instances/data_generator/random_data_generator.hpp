@@ -109,7 +109,7 @@ random_data_generator_t<T>::random_data_generator_t(
     );
     get<1>(_m_random_calls_before_after
     ) = global::get_this_threads_current_test().get_random_generator().calls();
-    _m_elements_generated.increment();
+    _m_elements_generated++;
 }
 
 template <typename T>
@@ -123,7 +123,7 @@ template <typename T>
 __constexpr bool
     random_data_generator_t<T>::generate_next()
 {
-    if (_m_elements_generated.offset(1) < _m_elemnets_to_randomly_generate)
+    if (_m_elements_generated + 1 < _m_elemnets_to_randomly_generate)
     {
         get<0>(_m_random_calls_before_after)
             = global::get_this_threads_current_test()
@@ -138,7 +138,7 @@ __constexpr bool
             = global::get_this_threads_current_test()
                   .get_random_generator()
                   .calls();
-        _m_elements_generated.increment();
+        _m_elements_generated++;
         return true;
     }
     else

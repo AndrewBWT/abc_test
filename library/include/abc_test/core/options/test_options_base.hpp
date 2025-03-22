@@ -150,6 +150,7 @@ public:
      */
     std::vector<std::string> test_paths_to_run;
     std::string              autofile_metadata_string = "metadata";
+    std::size_t maximum_individual_alloctable_memory = 2'147;// 483'648;
     /*!
      * @brief Function to validate the input.
      *
@@ -168,6 +169,27 @@ public:
             global::get_global_seed(),
             number_of_integers_used_to_seed_random_generators
         );
+    }
+
+    template <typename T>
+    __constexpr std::size_t
+                maximum_individual_allocatable_memory() const
+    {
+        if constexpr (sizeof(T) == 0)
+        {
+            __STATIC_ASSERT(T, "Cannot allocate to T, as T has sizeof 0");
+            return 0;
+        }
+        else if (maximum_individual_alloctable_memory == 0)
+        {
+            throw abc::errors::test_library_exception_t(
+                "Cannot determine allocation as size == 0"
+            );
+        }
+        else
+        {
+            return maximum_individual_alloctable_memory / sizeof(T);
+        }
     }
 protected:
     __no_constexpr void virtual validate_and_pre_process_(

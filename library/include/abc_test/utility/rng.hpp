@@ -24,7 +24,8 @@ public:
 
     __constexpr void
         progress(const size_t _a_expected_calls) noexcept;
-
+    template<typename T>
+    __constexpr T in_range_inclusive(const T& _a_lower, const T& _a_higher) const noexcept;
     __constexpr result_type
         operator()();
 
@@ -103,7 +104,12 @@ __constexpr_imp void
     _m_calls += _a_expected_calls;
     _m_rng.get()->progress(_a_expected_calls);
 }
+template<typename T>
+__constexpr T rng_t::in_range_inclusive(const T& _a_lower, const T& _a_higher) const noexcept
+{
+    const result_type _l_rv{ operator() };
 
+}
 __constexpr_imp rng_t::result_type
                 rng_t::operator()()
 {

@@ -84,7 +84,7 @@ public:
     __no_constexpr_imp
         bba_inner_assertion_type_t() noexcept
         : bba_inner_assertion_type_t(
-            false,
+              false,
               matcher_result_t(),
               std::optional<ds::single_source_t>(),
               std::optional<std::string>(),
@@ -94,7 +94,7 @@ public:
 
     __no_constexpr_imp
         bba_inner_assertion_type_t(
-            const bool _a_terminate,
+            const bool                                _a_terminate,
             const bool                                _a_pass_or_failure,
             const std::optional<std::string>&         _a_opt_msg,
             const std::optional<ds::single_source_t>& _a_source
@@ -112,7 +112,7 @@ public:
 
     __no_constexpr_imp
         bba_inner_assertion_type_t(
-            const bool _a_terminate,
+            const bool                                _a_terminate,
             const matcher_result_t&                   _a_matcher_result,
             const std::optional<ds::single_source_t>& _a_source
             = std::optional<ds::single_source_t>{},
@@ -133,7 +133,7 @@ public:
 
     __no_constexpr_imp
         bba_inner_assertion_type_t(
-            const bool _a_terminate,
+            const bool                                _a_terminate,
             const matcher_result_t&                   _a_matcher_result,
             const std::optional<ds::single_source_t>& _a_source,
             const std::optional<std::string>&         _a_annotation,
@@ -178,7 +178,9 @@ public:
     {
         return _m_enum_bba_inner_assertion_type;
     }
-    __constexpr_imp bool terminate() const noexcept
+
+    __constexpr_imp bool
+        terminate() const noexcept
     {
         return _m_terminate;
     }
@@ -188,7 +190,7 @@ private:
     matcher_source_map_t               _m_source_map;
     std::optional<ds::single_source_t> _m_source;
     enum_bba_inner_assertion_type_t    _m_enum_bba_inner_assertion_type;
-    bool _m_terminate;
+    bool                               _m_terminate;
 };
 
 // using matcher_result_with_annotation_and_source_info_t = std::tuple<
@@ -198,7 +200,7 @@ private:
 // using matcher_res_info_with_caller_t =
 // std::pair<std::optional<ds::single_source_t>,
 // matcher_result_with_annotation_and_source_info_t>;
-using matcher_res_infos_t = std::vector<bba_inner_assertion_type_t>;
+using matcher_res_infos_t     = std::vector<bba_inner_assertion_type_t>;
 /*class assertion_wrapper_pc_t
 {
 

@@ -3,8 +3,10 @@
 #include "abc_test/utility/parsers/default_parser.hpp"
 #include "abc_test/utility/printers/default_printer.hpp"
 _BEGIN_ABC_UTILITY_NS
+using rng_counter_t = std::size_t;
+_END_ABC_UTILITY_NS
 
-class rng_counter_t
+/*class rng_counter_t
 {
 public:
     __constexpr
@@ -122,4 +124,4 @@ __no_constexpr_imp std::string
     return to_string(_a_element());
 }
 
-_END_ABC_UTILITY_PRINTER_NS
+_END_ABC_UTILITY_PRINTER_NS*/

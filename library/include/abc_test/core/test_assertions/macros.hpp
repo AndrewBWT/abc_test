@@ -228,7 +228,6 @@
         std::source_location::current()                           \
     )
 
-
 #define _BLOCK_REQUIRE(_a_matcher)                \
     __GENERIC_MATCHER_BBA_TRANSFORM(              \
         _a_matcher,                               \
@@ -291,6 +290,7 @@
             {"_BLOCK_TERMINATE_WITH_MSG(", #_a_msg, ")"} \
         )                                                \
     )
+
 
 #define _BLOCK_CHECK(_a_matcher)                \
     __GENERIC_MATCHER_BBA_TRANSFORM(            \
