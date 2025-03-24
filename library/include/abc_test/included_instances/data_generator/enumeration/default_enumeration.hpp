@@ -1819,7 +1819,7 @@ __constexpr_imp
     default_enumeration_t<std::tuple<Ts...>>::default_enumeration_t(
         enumeration_schema_t<Ts>... _a_enums
     ) noexcept
-    : _m_enumeration_schemas(_a_enums)
+    : _m_enumeration_schemas(_a_enums...)
 {}
 
 template <typename... Ts>
@@ -1871,6 +1871,7 @@ __constexpr bool
     {
         return _a_element <= _a_max_value;
     }
+    return true;
 }
 
 template <typename... Ts>

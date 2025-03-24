@@ -1,6 +1,45 @@
 #pragma once
 #include "abc_test/core/test_assertions/macros.hpp"
 
+#define _BEGIN_NO_THROW_MATCHER(_a_matcher_name)                  \
+    abc::matcher_t _a_matcher_name{abc::expected_no_exception()}; \
+    _a_matcher_name.add_source_info(                              \
+        "_BEGIN_NO_THROW_MATCHER",                                \
+        #_a_matcher_name,                                         \
+        std::source_location::current()                           \
+    );                                                            \
+    try                                                           \
+    {
+#define _END_NO_THROW_MATCHER(_a_matcher_name)            \
+    _a_matcher_name.add_source_info(                      \
+        "_END_NO_THROW_MATCHER",                          \
+        #_a_matcher_name,                                 \
+        std::source_location::current()                   \
+    );                                                    \
+    }                                                     \
+    catch (const std::exception& _a_exception)            \
+    {                                                     \
+        _a_matcher_name.override_matcher(                 \
+            unexpected_exception_thrown(_a_exception)     \
+        );                                                \
+        _a_matcher_name.add_source_info(                  \
+            "_END_NO_THROW_MATCHER",                      \
+            #_a_matcher_name,                             \
+            std::source_location::current()               \
+        );                                                \
+    }                                                     \
+    catch (...)                                           \
+    {                                                     \
+        _a_matcher_name.override_matcher(                 \
+            unexpected_exception_of_unknown_type_thrown() \
+        );                                                \
+        _a_matcher_name.add_source_info(                  \
+            "_END_NO_THROW_MATCHER",                      \
+            #_a_matcher_name,                             \
+            std::source_location::current()               \
+        );                                                \
+    }
+
 #define _BEGIN_NO_THROW(_a_name)                     \
     _BEGIN_SINGLE_ELEMENT_BBA_CUSTOM_SOURCE(         \
         _a_name,                                     \
@@ -23,7 +62,9 @@
         );                                                                     \
     }
 
-
+#define _NO_THROW_BBA_BEGIN() \
+    try                       \
+    {
 #define _END_CHECK_NO_THROW(_a_name)                \
     __INTERNAL_END_NO_THROW(_a_name)                \
     _END_BBA_CHECK_CUSTOM_SOURCE(                   \

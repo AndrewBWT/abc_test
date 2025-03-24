@@ -42,6 +42,7 @@ _BEGIN_ABC_DG_NS
 namespace detail
 {
 template <typename T>
+requires std::unsigned_integral<T>
 __constexpr T
     generate_rng_value_between_bounds(
         const utility::bounds_t<T>&   _a_bounds,
@@ -51,7 +52,7 @@ __constexpr T
 {
     using namespace std;
     const T _l_denominator{
-        _a_bounds.difference() > _a_rng_counter ? _a_rng_counter
+        _a_bounds.difference() > _a_rng_counter ? static_cast<T>(_a_rng_counter)
                                                 : _a_bounds.difference()
     };
     return
@@ -65,7 +66,7 @@ __constexpr T
             : _a_bounds.lower()
                   + (_a_rng()
                      % (_l_denominator
-                        + (_l_denominator == numeric_limits<T>::max() ? 0 : 1))
+                        + +(_l_denominator == numeric_limits<T>::max() ? 0 : 1))
                   );
 }
 } // namespace detail
@@ -231,7 +232,9 @@ struct default_random_generator_t<std::tuple<Ts...>>
             utility::rng_t&               _a_rnd_generator,
             const utility::rng_counter_t& _a_index
         );
-    __constexpr std::tuple<random_generator_t<Ts>...>& get_ref_to_inner_rngs() noexcept
+
+    __constexpr std::tuple<random_generator_t<Ts>...>&
+                get_ref_to_inner_rngs() noexcept
     {
         return _m_rngs;
     }
@@ -432,7 +435,7 @@ __no_constexpr_imp std::basic_string<T>
             _m_bounds, _a_index, _a_rnd_generator
         )
     };
-    auto ki = std::basic_string<T>{}.max_size();
+    auto            ki = std::basic_string<T>{}.max_size();
     basic_string<T> _l_rv(_l_size, T{});
     for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
     {

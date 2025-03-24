@@ -133,6 +133,7 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/data_generator/enumeration/enumeration_base.hpp
   include/abc_test/included_instances/data_generator/enumeration/default_enumeration.hpp
   include/abc_test/included_instances/data_generator/enumeration/enumeration_from_functions.hpp
+  include/abc_test/included_instances/data_generator/enumeration/enumeration_from_list.hpp
   include/abc_test/included_instances/data_generator/enumeration/enumeration_schema_base.hpp
   include/abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_to_n.hpp
   include/abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_move_k_elements.hpp

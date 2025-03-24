@@ -26,7 +26,14 @@ public:
     template <typename = typename std::enable_if_t<not Has_Annotation>>
     __no_constexpr
         matcher_wrapper_t() noexcept;
-
+    template<bool Arg_Has_Annotation>
+    __no_constexpr_imp void 
+        override_matcher(
+            const matcher_wrapper_t< Arg_Has_Annotation>& _a_matcher_result
+        ) noexcept
+    {
+        this->_m_test_result = _a_matcher_result.matcher_result();
+    }
     /*!
      * @brief Gets the sourses attached to this matcher.
      * @return Cref to the vector of single_source_t objects.

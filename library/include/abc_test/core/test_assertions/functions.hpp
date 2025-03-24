@@ -227,7 +227,12 @@ create_assertion(
         _l_source,
         _a_test_runner.get_log_infos(false),
         bba_inner_assertion_type_t(
-            _l_mr, _l_source, _l_matcher_annotation, _l_msm
+            ( std::same_as<T, _ABC_NS_REPORTS::terminate_t>
+              || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t> ),
+            _l_mr,
+            _l_source,
+            _l_matcher_annotation,
+            _l_msm
         )
     );
     _a_test_runner.add_assertion(_l_gur);

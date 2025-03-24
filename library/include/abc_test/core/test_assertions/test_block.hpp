@@ -179,6 +179,8 @@ __constexpr assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>
     if constexpr (Annotated)
     {
         bba_inner_assertion_type_t _l_tuple(
+            (std::same_as<T, _ABC_NS_REPORTS::terminate_t>
+                || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t>),
             _a_matcher.matcher_result(),
             std::optional<ds::single_source_t>{},
             std::optional<std::string>(_a_matcher.annotation()),
@@ -189,6 +191,8 @@ __constexpr assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>
     else
     {
         bba_inner_assertion_type_t _l_tuple(
+            (std::same_as<T, _ABC_NS_REPORTS::terminate_t>
+                || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t>),
             _a_matcher.matcher_result(),
             std::optional<ds::single_source_t>{},
             std::optional<std::string>{},
