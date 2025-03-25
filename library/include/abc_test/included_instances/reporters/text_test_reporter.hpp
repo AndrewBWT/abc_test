@@ -166,21 +166,6 @@ __no_constexpr_imp void
             }
             _l_idx++;
         }
-        /*for (const function_report_ptr_t& _l_report : _l_reports)
-        {
-            const vector<string> _l_strs =
-        _m_text_test_options.process_function_report(_l_report.get()); size_t
-        _l_data_idx{ 0 }; for (const string_view _l_str : _l_strs)
-            {
-                _l_st.push_back(
-                    _l_data_idx++ == 0 ?
-                    fmt::format(" {0})  ", _l_idx) :
-                    "");
-                _l_st.push_back(_l_str);
-                _l_st.new_line();
-            }
-            _l_idx++;
-        }*/
         _l_rv.append(fmt::format(
             "{2}{1}{0}{1}", _l_st(), _l_line_break, "ASSERTION INFO\n"
         ));

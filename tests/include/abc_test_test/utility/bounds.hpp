@@ -91,7 +91,7 @@ inline void
     );
     using test_data_t = std::tuple<T, T>;
     _ABC_NS_DG::data_generator_collection_t<test_data_t> _l_data_gen;
-    if constexpr (sizeof(T) == 0)
+    if constexpr (sizeof(T) == 1)
     {
         _l_data_gen = enumerate_data<test_data_t>();
     }
@@ -185,8 +185,12 @@ _TEST_CASE(
     using namespace abc::data_gen;
     using namespace std;
     manual_data_generator_t _l_mdg;
-    RUN(_l_mdg, run_bounds_constructor_tests<std::size_t>());
-    RUN(_l_mdg, run_bounds_constructor_tests<std::uint8_t>());
+    RUN(_l_mdg, run_bounds_constructor_tests<bool>());
+    RUN(_l_mdg, run_bounds_constructor_tests<unsigned char>());
+    RUN(_l_mdg, run_bounds_constructor_tests<unsigned short>());
+    RUN(_l_mdg, run_bounds_constructor_tests<unsigned int>());
+    RUN(_l_mdg, run_bounds_constructor_tests<unsigned long>());
+    RUN(_l_mdg, run_bounds_constructor_tests<unsigned long long>());
 }
 
 template <typename T>
@@ -218,9 +222,11 @@ _TEST_CASE(
         _l_bounds_tests, "Testing concepts around bounds_t"
     );
     manual_data_generator_t _l_mdg;
-    RUN(_l_mdg, run_concept_checks<std::size_t>(_l_bounds_tests, true));
-    RUN(_l_mdg, run_concept_checks<std::uint8_t>(_l_bounds_tests, true));
-    RUN(_l_mdg, run_concept_checks<std::int8_t>(_l_bounds_tests, false));
-    RUN(_l_mdg, run_concept_checks<bool>(_l_bounds_tests, false));
+    RUN(_l_mdg, run_concept_checks<bool>(_l_bounds_tests, true));
+    RUN(_l_mdg, run_concept_checks<unsigned char>(_l_bounds_tests, true));
+    RUN(_l_mdg, run_concept_checks<unsigned short>(_l_bounds_tests, true));
+    RUN(_l_mdg, run_concept_checks<unsigned int>(_l_bounds_tests, true));
+    RUN(_l_mdg, run_concept_checks<unsigned long>(_l_bounds_tests, true));
+    RUN(_l_mdg, run_concept_checks<unsigned long long>(_l_bounds_tests, true));
     _END_BBA_CHECK(_l_bounds_tests);
 }
