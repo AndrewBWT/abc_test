@@ -52,8 +52,9 @@ __constexpr T
 {
     using namespace std;
     const T _l_denominator{
-        _a_bounds.difference() > _a_rng_counter ? static_cast<T>(_a_rng_counter)
-                                                : _a_bounds.difference()
+        _a_bounds.difference() > static_cast<T>(_a_rng_counter)
+            ? static_cast<T>(_a_rng_counter)
+            : _a_bounds.difference()
     };
     return
         // If denominator is 0, no point in calling rng

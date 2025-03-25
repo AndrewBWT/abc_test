@@ -26,21 +26,17 @@ inline void
             typeid(Rng)
         )
     );
-    for (auto& _l_tuple : // generate_data_randomly<test_data_t>()
-                          //                       &
-         enumerate_data<test_data_t>(
-             all_values<test_data_t>(default_enumeration<test_data_t>(
-                 all_values<size_t>(mk_enumeration_list<size_t>(
-                     {size_t{0}, numeric_limits<size_t>::max()}
-                 )),
-                 all_values<T>(
-                     mk_enumeration_list<T>({T{0}, numeric_limits<T>::max()})
-                 ),
-                 all_values<T>(
-                     mk_enumeration_list<T>({T{0}, numeric_limits<T>::max()})
-                 )
+    for (auto& _l_tuple :
+         generate_data_randomly<test_data_t>()
+             & enumerate_data<test_data_t>(
+                 all_values<test_data_t>(default_enumeration<test_data_t>(
+                     enumerate_list<size_t>(
+                         {size_t{0}, numeric_limits<size_t>::max()}
+                     ),
+                     enumerate_list<T>({T{0}, numeric_limits<T>::max()}),
+                     enumerate_list<T>({T{0}, numeric_limits<T>::max()})
+                 ))
              ))
-         ))
     {
         const auto& [_l_rng_counter, _l_lower_bound, _l_higher_bound]{_l_tuple};
         _BEGIN_NO_THROW_MATCHER(_l_matcher);
@@ -88,7 +84,11 @@ _TEST_CASE(
     using namespace std;
     using namespace test::detail;
     manual_data_generator_t _l_mdg;
+    RUN(_l_mdg, test_generate_rng_value_between_bounds<bool>());
+    RUN(_l_mdg, test_generate_rng_value_between_bounds<unsigned char>());
+    RUN(_l_mdg, test_generate_rng_value_between_bounds<unsigned short>());
     RUN(_l_mdg, test_generate_rng_value_between_bounds<unsigned int>());
+    RUN(_l_mdg, test_generate_rng_value_between_bounds<unsigned long>());
     RUN(_l_mdg, test_generate_rng_value_between_bounds<unsigned long long>());
 }
 

@@ -48,6 +48,16 @@ __constexpr _ABC_NS_DG::enumeration_schema_t<T>
                 const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
                 = default_enumeration<T>()
             ) noexcept;
+
+template <typename T, typename R = std::initializer_list<T>>
+__constexpr _ABC_NS_DG::enumeration_schema_t<T>
+            enumerate_list(
+                const R&& _a_elements
+            ) noexcept
+{
+    return all_values_moving_forward<T>(mk_enumeration_list<T>(_a_elements));
+}
+
 template <typename T>
 __constexpr _ABC_NS_DG::enumeration_schema_t<T>
             from_m_to_n(

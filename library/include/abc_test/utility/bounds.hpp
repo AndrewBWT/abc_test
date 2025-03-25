@@ -8,7 +8,7 @@ _BEGIN_ABC_UTILITY_NS
 namespace detail
 {
     template<typename T>
-    concept bounds_c = std::unsigned_integral<T> && (not std::same_as<T,bool>);
+    concept bounds_c = std::unsigned_integral<T>;// && (not std::same_as<T, bool>);
 }
 template <typename T>
     requires detail::bounds_c<T>
