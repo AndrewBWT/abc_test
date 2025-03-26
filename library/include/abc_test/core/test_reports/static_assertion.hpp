@@ -27,12 +27,14 @@ public:
     static_assertion_t(
         const user_initialised_report_t<true>::source_t& _a_source,
         const ds::log_infos_t&                           _a_log_infos,
-        const std::optional<std::string>&                _a_annotation
+        const std::optional<std::string>&                _a_annotation,
+        const std::size_t _a_index
     ) noexcept;
     __constexpr
     static_assertion_t(
         const user_initialised_report_t<true>::source_t& _a_source,
-        const ds::log_infos_t&                           _a_log_infos
+        const ds::log_infos_t&                           _a_log_infos,
+        const std::size_t _a_index
     ) noexcept;
     __constexpr const std::optional<std::string>&
                 annotation() const noexcept;
@@ -49,15 +51,15 @@ __constexpr_imp
     static_assertion_t<Assertion_Status>::static_assertion_t(
         const user_initialised_report_t<true>::source_t& _a_source,
         const ds::log_infos_t&                           _a_log_infos,
-        const std::optional<std::string>&                _a_annotation
+        const std::optional<std::string>&                _a_annotation,
+        const std::size_t _a_index
     ) noexcept
     : assertion_t<true, Assertion_Status>(
           std::monostate{},
           _a_source,
           _a_log_infos,
-          // make_tuple(_ABC_NS_MATCHER::matcher_result_t(), _a_annotation,
-          // _ABC_NS_MATCHER::matcher_source_map_t{}),
-          std::monostate{}
+          std::monostate{},
+        _a_index
       )
     , _m_static_assertion_annotation(_a_annotation)
 {}
@@ -67,13 +69,15 @@ requires std::derived_from<Assertion_Status, static_status_t>
 __constexpr_imp
     static_assertion_t<Assertion_Status>::static_assertion_t(
         const user_initialised_report_t<true>::source_t& _a_source,
-        const ds::log_infos_t&                           _a_log_infos
+        const ds::log_infos_t&                           _a_log_infos,
+        const std::size_t _a_index
     ) noexcept
     : assertion_t<true, Assertion_Status>(
           std::monostate{},
           _a_source,
           _a_log_infos,
-          std::monostate{}
+          std::monostate{},
+        _a_index
       )
 {}
 

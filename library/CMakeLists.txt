@@ -44,7 +44,6 @@ set(LIBRARY_FILES
   include/abc_test/core/ds/test_data/test_set_data.hpp
       src/abc_test/core/ds/test_data/test_set_data.cpp
   include/abc_test/core/ds/test_data/finalised_test_set_data.hpp
-      src/abc_test/core/ds/test_data/finalised_test_set_data.cpp
   include/abc_test/core/ds/test_data/pre_test_run_report.hpp
   # Bespoke data structures for the library for storing tests in various forms.
   include/abc_test/core/ds/test_collections/test_collection.hpp

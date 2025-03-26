@@ -6,6 +6,7 @@
 #include "abc_test/core/test_reports/assertion.hpp"
 #include "abc_test/core/test_reports/unexpected_report.hpp"
 #include "abc_test/utility/rng.hpp"
+#include "abc_test/core/global.hpp"
 
 #include <fmt/ranges.h>
 #include <functional>
@@ -273,6 +274,7 @@ public:
      */
     __constexpr const reports::assertion_base_collection_t&
                       assertions() const noexcept;
+    __constexpr std::size_t largest_assertion_index_added() const noexcept;
     __constexpr void
         add_warning(reports::unexpected_non_terminating_report_ptr_t&& _a_pstr
         ) noexcept;
@@ -301,6 +303,7 @@ private:
     std::size_t _m_total_number_assertions_recieved = 0;
     std::size_t _m_total_number_assertions_passed   = 0;
     std::size_t _m_total_number_assertions_failed   = 0;
+    std::size_t _m_largest_assertion_index_added{ 0 };
     reports::assertion_base_collection_t _m_assertions;
     reports::opt_unexpected_report_t     _m_termination_report;
     reports::unexpected_non_terminating_report_collection_t     _m_warnings;
@@ -514,7 +517,11 @@ __constexpr_imp void
             }
         }
         // This has to be the last thing, or accessing _a_ptr would be invalid.
-        _m_assertions.push_back(assertion_base_ptr_t(std::move(_a_ptr)));
+        if (global::get_global_test_options().retain_passed_assertions)
+        {
+            _m_largest_assertion_index_added = _l_ref.assertion_index();
+            _m_assertions.push_back(assertion_base_ptr_t(std::move(_a_ptr)));
+        }
     }
 }
 
@@ -594,7 +601,10 @@ __constexpr_imp const reports::assertion_base_collection_t&
 {
     return _m_assertions;
 }
-
+__constexpr_imp std::size_t invoked_test_data_t::largest_assertion_index_added() const noexcept
+{
+    return _m_largest_assertion_index_added;
+}
 __constexpr_imp void
     invoked_test_data_t::add_warning(
         reports::unexpected_non_terminating_report_ptr_t&& _a_pstr

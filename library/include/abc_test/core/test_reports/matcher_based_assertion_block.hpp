@@ -36,11 +36,11 @@ public:
         typename const user_initialised_report_t<false>::source_t& _a_source,
         const ds::log_infos_t&                                     _a_log_infos,
         const _ABC_NS_MATCHER::bba_inner_assertion_type_t& _a_matcher_info,
-        const opt_description_t<false>&              _a_opt_description
+        const opt_description_t<false>&                    _a_opt_description,
+        const std::size_t                                  _a_index
     ) noexcept;
-    __constexpr
-        const _ABC_NS_MATCHER::bba_inner_assertion_type_t&
-        get_matcher() const noexcept;
+    __constexpr const _ABC_NS_MATCHER::bba_inner_assertion_type_t&
+                      get_matcher() const noexcept;
 private:
     _ABC_NS_MATCHER::bba_inner_assertion_type_t _m_matcher_info;
 };
@@ -55,24 +55,27 @@ __constexpr_imp
         matcher_based_assertion_block_t(
             const status_t<Assertion_Status>& _a_status,
             typename const user_initialised_report_t<false>::source_t&
-                                   _a_source,
-            const ds::log_infos_t& _a_log_infos,
+                                                               _a_source,
+            const ds::log_infos_t&                             _a_log_infos,
             const _ABC_NS_MATCHER::bba_inner_assertion_type_t& _a_matcher_info,
-            const opt_description_t<false>&              _a_opt_description
+            const opt_description_t<false>& _a_opt_description,
+            const std::size_t               _a_index
         ) noexcept
     : assertion_t<false, Assertion_Status>(
           _a_status,
           _a_source,
           _a_log_infos,
-          _a_opt_description
+          _a_opt_description,
+          _a_index
       )
     , _m_matcher_info(_a_matcher_info)
 {}
+
 template <typename Assertion_Status>
-    requires std::derived_from<Assertion_Status, dynamic_status_t>
-__constexpr_imp
-const _ABC_NS_MATCHER::bba_inner_assertion_type_t&
-matcher_based_assertion_block_t<Assertion_Status>::get_matcher() const noexcept
+requires std::derived_from<Assertion_Status, dynamic_status_t>
+__constexpr_imp const _ABC_NS_MATCHER::bba_inner_assertion_type_t&
+    matcher_based_assertion_block_t<Assertion_Status>::get_matcher(
+    ) const noexcept
 {
     return _m_matcher_info;
 }

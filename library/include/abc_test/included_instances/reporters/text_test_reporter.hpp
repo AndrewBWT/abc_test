@@ -131,18 +131,16 @@ __no_constexpr_imp void
             "{2}{0}{1}{0}", _l_line_break, _l_warning_str, "WARNINGS\n"
         ));
     }
-    if (_a_itd.assertions_recieved() > 0)
+    const assertion_base_collection_t& _l_reports{ _a_itd.assertions() };
+    if (_l_reports.size() > 0)
     {
         string_table_t                     _l_st({0});
-        size_t                             _l_idx{1};
-        const assertion_base_collection_t& _l_reports{_a_itd.assertions()};
         write(fmt::format(
             "{0}\n{1}\n{0}", _l_line_break, "ASSERTION INFO"
         ));
         for (const assertion_base_ptr_t& _l_report : _l_reports)
         {
-            process_assertion(_l_report.get(), _l_idx, _l_reports.size());
-            _l_idx++;
+            process_assertion(_l_report.get(), _l_report.get()->assertion_index(), _a_itd.largest_assertion_index_added());
         }
     }
     write( _l_line_break);

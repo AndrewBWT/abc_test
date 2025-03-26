@@ -63,6 +63,10 @@ public:
      */
     __constexpr bool
         terminated() const noexcept;
+    __constexpr_imp virtual std::size_t assertion_index() const noexcept
+    {
+        return _m_index;
+    }
 protected:
     __constexpr
     assertion_t() noexcept
@@ -72,26 +76,12 @@ protected:
         const status_t<Assertion_Status>&                         _a_status,
         const user_initialised_report_t<Single_Source>::source_t& _a_source,
         const ds::log_infos_t&                                    _a_log_infos,
-        const opt_description_t<Single_Source>&               _a_annotation
+        const opt_description_t<Single_Source>&               _a_annotation,
+        const std::size_t _a_index
     ) noexcept;
-    /*template <typename = typename std::enable_if<Single_Source>::type>
-    __constexpr
-    assertion_t(
-        const Assertion_Status&                                   _a_status,
-        const user_initialised_report_t<Single_Source>::source_t& _a_source,
-        const ds::log_infos_t&                                    _a_log_infos
-    ) noexcept;
-    template <typename = typename std::enable_if<not Single_Source>::type>
-    __constexpr
-    assertion_t(
-        const Assertion_Status&                                   _a_status,
-        const user_initialised_report_t<Single_Source>::source_t& _a_source,
-        const ds::log_infos_t&                                    _a_log_infos,
-        const std::string_view                                    _a_annotation
-    ) noexcept;*/
     status_t<Assertion_Status> _m_status;
-    // Assertion_Status           _m_status;
     opt_description_t<Single_Source> _m_test_description;
+    std::size_t _m_index;
 private:
 };
 
@@ -102,31 +92,6 @@ using assertion_ptr_t = std::unique_ptr<
 _END_ABC_REPORTS_NS
 
 _BEGIN_ABC_REPORTS_NS
-
-/*template<
-    bool Single_Source,
-    typename Assertion_Status
->
-    requires std::derived_from<Assertion_Status, assertion_status_base_t>
-__constexpr_imp
-const std::optional<std::string>&
-generic_assertion_t<Single_Source, Assertion_Status>::fail_message(
-) const noexcept
-{
-    return _m_fail_message;
-}
-template<
-    bool Single_Source,
-    typename Assertion_Status
->
-    requires std::derived_from<Assertion_Status, assertion_status_base_t>
-__constexpr_imp
-const std::optional<std::string>&
-generic_assertion_t<Single_Source, Assertion_Status>::pass_message(
-) const noexcept
-{
-    return _m_pass_message;
-}*/
 template <bool Single_Source, typename Assertion_Status>
 requires std::derived_from<Assertion_Status, assertion_status_base_t>
 __constexpr_imp const opt_description_t<Single_Source>&
@@ -168,7 +133,6 @@ __constexpr_imp bool
     else
     {
         __STATIC_ASSERT(Assertion_Status, "Cannot instantiate");
-        // static_assert(false, "Cannot instantiate");
     }
 }
 
@@ -191,34 +155,6 @@ __constexpr_imp bool
         return false;
     }
 }
-
-/*template <bool Single_Source, typename Assertion_Status>
-requires std::derived_from<Assertion_Status, assertion_status_base_t>
-template <typename>
-__constexpr_imp
-    assertion_t<Single_Source, Assertion_Status>::assertion_t(
-        const Assertion_Status&                                   _a_status,
-        const user_initialised_report_t<Single_Source>::source_t& _a_source,
-        const ds::log_infos_t&                                    _a_log_infos
-    ) noexcept
-    : user_initialised_report_t<Single_Source>(_a_source, _a_log_infos)
-    , _m_status(_a_status)
-{}
-
-template <bool Single_Source, typename Assertion_Status>
-requires std::derived_from<Assertion_Status, assertion_status_base_t>
-template <typename>
-__constexpr_imp
-    assertion_t<Single_Source, Assertion_Status>::assertion_t(
-        const Assertion_Status&                                   _a_status,
-        const user_initialised_report_t<Single_Source>::source_t& _a_source,
-        const ds::log_infos_t&                                    _a_log_infos,
-        const std::string_view _a_test_annotation
-    ) noexcept
-    : user_initialised_report_t<Single_Source>(_a_source, _a_log_infos)
-    , _m_test_description(_a_test_annotation)
-    , _m_status(_a_status)
-{}*/
 template <bool Single_Source, typename Assertion_Status>
 requires std::derived_from<Assertion_Status, assertion_status_base_t>
 __constexpr_imp
@@ -226,11 +162,13 @@ __constexpr_imp
         const status_t<Assertion_Status>&                         _a_status,
         const user_initialised_report_t<Single_Source>::source_t& _a_source,
         const ds::log_infos_t&                                    _a_log_infos,
-        const opt_description_t<Single_Source>&               _a_annotation
+        const opt_description_t<Single_Source>&               _a_annotation,
+        const std::size_t _a_index
     ) noexcept
     : user_initialised_report_t<Single_Source>(_a_source, _a_log_infos)
     , _m_test_description(_a_annotation)
     , _m_status(_a_status)
+    , _m_index(_a_index)
 {}
 
 _END_ABC_REPORTS_NS

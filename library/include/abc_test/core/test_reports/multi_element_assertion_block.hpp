@@ -21,7 +21,8 @@ public:
             typename const user_initialised_report_t<false>::source_t& _a_source,
             const ds::log_infos_t& _a_log_infos,
             const _ABC_NS_MATCHER::matcher_res_infos_t& _a_matcher_info,
-            const opt_description_t<false>& _a_opt_description
+            const opt_description_t<false>& _a_opt_description,
+            const std::size_t _a_index
         ) noexcept;
     __constexpr
         const _ABC_NS_MATCHER::matcher_res_infos_t&
@@ -43,13 +44,15 @@ multi_element_assertion_block_t(
     _a_source,
     const ds::log_infos_t& _a_log_infos,
     const _ABC_NS_MATCHER::matcher_res_infos_t& _a_matcher_info,
-    const opt_description_t<false>& _a_opt_description
+    const opt_description_t<false>& _a_opt_description,
+    const std::size_t _a_index
 ) noexcept
     : assertion_t<false, Assertion_Status>(
         _a_status,
         _a_source,
         _a_log_infos,
-        _a_opt_description
+        _a_opt_description,
+        _a_index
     )
     , _m_matcher_info(_a_matcher_info)
 {}

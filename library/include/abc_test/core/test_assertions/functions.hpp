@@ -280,7 +280,8 @@ create_assertion(
             _l_source,
             _l_matcher_annotation,
             _l_msm
-        )
+        ),
+        _a_test_runner.current_assertion_index()
     );
     _a_test_runner.add_assertion(_l_gur);
     _a_matcher.remove_primary_source();
@@ -443,7 +444,8 @@ create_assertion_block(
         _a_test_block.source(),
         _a_test_runner.get_log_infos(false),
         _l_mtr,
-        _a_test_block.test_annotation()
+        _a_test_block.test_annotation(),
+        _a_test_runner.current_assertion_index()
     );
     _a_test_runner.add_assertion(_l_gur);
     return_result<T>(_l_passed);

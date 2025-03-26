@@ -174,15 +174,15 @@ public:
         ) noexcept;
     __no_constexpr void
         set_data_process_test() noexcept;
+    __constexpr std::size_t
+        current_assertion_index() const noexcept;
 private:
     _ABC_NS_LOGGING::log_msg_ptrs_t _m_current_log_msgs;
     std::vector<std::string>        _m_cached_log_msgs;
     std::reference_wrapper<_ABC_NS_REPORTERS::test_reporter_controller_t>
         _m_trc;
-    // std::size_t                                      _m_tests_ran;
     std::shared_ptr<_ABC_NS_DS::invoked_test_data_t> _m_current_test;
     _ABC_NS_UTILITY::rng_t                             _m_random_generator;
-    // const test_options_base_t&                       _m_test_options;
     _ABC_NS_DS::test_set_data_t _m_test_data;
     std::optional<_ABC_NS_DS::single_source_t> _m_tests_most_recent_source;
     template <bool Single_Source, typename Assertion_Status>
@@ -317,7 +317,11 @@ __no_constexpr_imp void
 {
     _m_test_data.process_invoked_test(*_m_current_test);
 }
-
+__constexpr_imp std::size_t
+test_runner_t::current_assertion_index() const noexcept
+{
+    return _m_current_test.get()->assertions_recieved()+1;
+}
 template <bool Single_Source, typename Assertion_Status>
 __constexpr_imp void
     test_runner_t::add_assertion_and_optional_warning(

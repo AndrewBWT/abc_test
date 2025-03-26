@@ -20,6 +20,7 @@ public:
      * derived subclass instances.
      */
     __constexpr virtual ~assertion_base_t() noexcept;
+    __constexpr virtual std::size_t assertion_index() const noexcept = 0;
 };
 /*!
  * @brief Type synonym for a pointer to a assertion_base_t type.

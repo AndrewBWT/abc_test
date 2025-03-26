@@ -151,6 +151,7 @@ public:
     std::vector<std::string> test_paths_to_run;
     std::string              autofile_metadata_string = "metadata";
     std::size_t maximum_individual_alloctable_memory = 2'147;// 483'648;
+    bool retain_passed_assertions = false;
     /*!
      * @brief Function to validate the input.
      *
