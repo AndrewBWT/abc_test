@@ -15,18 +15,21 @@ struct matcher_based_assertion_block_list_formatter_t
     , public assertion_block_matcher_data_list_formatter_t
 {
 public:
+    using assertion_list_formatter_t<false, Assertion_Status>::assertion_list_formatter_t;
     __constexpr virtual bool
         check_data(
             const combined_enum_matcher_based_assertion_block_fields_t& _a_fid,
             const reports::matcher_based_assertion_block_t<Assertion_Status>&
                 _a_element
         ) const override;
-    __constexpr virtual std::vector<std::string>
+    __constexpr virtual void
         get_data(
             const combined_enum_matcher_based_assertion_block_fields_t& _a_fid,
             const reports::matcher_based_assertion_block_t<Assertion_Status>&
                                   _a_element,
-            const print_config_t& _a_pc
+            const print_config_t& _a_pc,
+            const utility::io::threated_text_output_reporter_t& _a_ttor,
+            const std::size_t _a_idx
         ) const override;
 protected:
     __constexpr virtual std::string
@@ -76,12 +79,14 @@ __constexpr_imp bool
 }
 
 template <typename Assertion_Status>
-__constexpr_imp std::vector<std::string>
+__constexpr_imp void
     matcher_based_assertion_block_list_formatter_t<Assertion_Status>::get_data(
         const combined_enum_matcher_based_assertion_block_fields_t& _a_fid,
         const reports::matcher_based_assertion_block_t<Assertion_Status>&
                               _a_element,
-        const print_config_t& _a_pc
+        const print_config_t& _a_pc,
+        const utility::io::threated_text_output_reporter_t& _a_ttor,
+        const std::size_t _a_idx
     ) const
 {
     using namespace std;
@@ -96,13 +101,12 @@ __constexpr_imp std::vector<std::string>
         {
             vector<string> _l_rv;
             _l_rv.push_back("Matcher's data:");
-            _l_rv.append_range(get_all_data(
+            assertion_block_matcher_data_list_formatter_t(1,1,1,true).process_all_data(
                 _a_pc.matcher_assertion_single_block_assertion_list_fields(),
                 _a_element.get_matcher(),
                 _a_pc,
-                assertion_block_matcher_data_list_formatter_t(1)
-            ));
-            return _l_rv;
+                _a_ttor
+            );
         }
         default:
             throw errors::unaccounted_for_enum_exception(*_l_ptr);
@@ -112,7 +116,7 @@ __constexpr_imp std::vector<std::string>
              _l_ptr != nullptr)
     {
         return assertion_list_formatter_t<false, Assertion_Status>::get_data(
-            *_l_ptr, _a_element, _a_pc
+            *_l_ptr, _a_element, _a_pc, _a_ttor, _a_idx
         );
     }
     else

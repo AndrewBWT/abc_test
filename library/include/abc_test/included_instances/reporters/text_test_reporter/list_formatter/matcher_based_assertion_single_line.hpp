@@ -13,6 +13,7 @@ struct matcher_based_assertion_single_line_list_formatter_t
     , public assertion_list_formatter_t<true, Assertion_Status>
 {
 public:
+    using assertion_list_formatter_t<true,Assertion_Status>::assertion_list_formatter_t;
     __constexpr virtual bool
         check_data(
             const combined_enum_matcher_based_assertion_single_line_fields_t&
@@ -20,13 +21,15 @@ public:
             const reports::matcher_based_assertion_single_line_t<
                 Assertion_Status>& _a_element
         ) const override;
-    __constexpr virtual std::vector<std::string>
+    __constexpr virtual void
         get_data(
             const combined_enum_matcher_based_assertion_single_line_fields_t&
                 _a_fid,
             const reports::matcher_based_assertion_single_line_t<
                 Assertion_Status>& _a_element,
-            const print_config_t&  _a_pc
+            const print_config_t&  _a_pc,
+            const utility::io::threated_text_output_reporter_t& _a_ttor,
+            const std::size_t _a_idx
         ) const override;
 protected:
     __constexpr virtual std::string
@@ -82,14 +85,16 @@ __constexpr_imp bool
 }
 
 template <typename Assertion_Status>
-__constexpr_imp std::vector<std::string>
+__constexpr_imp void
     matcher_based_assertion_single_line_list_formatter_t<Assertion_Status>::
         get_data(
             const combined_enum_matcher_based_assertion_single_line_fields_t&
                 _a_fid,
             const reports::matcher_based_assertion_single_line_t<
                 Assertion_Status>& _a_element,
-            const print_config_t&  _a_pc
+            const print_config_t&  _a_pc,
+            const utility::io::threated_text_output_reporter_t& _a_ttor,
+            const std::size_t _a_idx
         ) const
 {
     using namespace std;
@@ -103,43 +108,41 @@ __constexpr_imp std::vector<std::string>
         {
         case MATCHER_SOURCE_MAP:
         {
-            vector<string> _l_rv{_a_pc.colon(_a_pc.matcher_source_map_str())};
+            _a_ttor.write(this->prefix(_a_idx) + _a_pc.colon(_a_pc.matcher_source_map_str()));
             for (const pair<std::source_location, vector<string>>& _l_element :
                  _a_element.matcher_info().source_map().map())
             {
-                _l_rv.push_back(
+                _a_ttor.write(this->prefix(_a_idx+1) +
                     _a_pc.indent(_a_pc.colon(_a_pc.source_location_str()))
                 );
-                _l_rv.push_back(
+                _a_ttor.write(this->prefix(_a_idx + 1) +
                     _a_pc.indent(_a_pc.source_location(_l_element.first), 2)
                 );
-                _l_rv.push_back(_a_pc.indent(_a_pc.colon(_a_pc.source_code_str()
+                _a_ttor.write(this->prefix(_a_idx + 1) + _a_pc.indent(_a_pc.colon(_a_pc.source_code_str()
                 )));
                 for (const string_view _l_str : _l_element.second)
                 {
-                    _l_rv.push_back(
+                    _a_ttor.write(this->prefix(_a_idx + 1) +
                         _a_pc.indent(_a_pc.source_representation(_l_str), 2)
                     );
                 }
             }
-            return _l_rv;
         }
+        break;
         case MATCHER_OUTPUT:
-            return {
-                _a_pc.matcher_output_str(_a_element.get_pass_status(),
-                    (std::same_as<Assertion_Status,_ABC_NS_REPORTS::terminate_t> ||
-                        std::same_as<Assertion_Status,_ABC_NS_REPORTS::pass_or_terminate_t>)),
-                _a_pc.indent(_a_pc.matcher_output(
-                    _a_element.matcher_info().matcher_result().str()
-                ))
-            };
+            _a_ttor.write(this->prefix(_a_idx) + _a_pc.matcher_output_str(_a_element.get_pass_status(),
+                (std::same_as<Assertion_Status, _ABC_NS_REPORTS::terminate_t> ||
+                    std::same_as<Assertion_Status, _ABC_NS_REPORTS::pass_or_terminate_t>)));
+            _a_ttor.write(this->prefix(_a_idx+1) + _a_pc.indent(_a_pc.matcher_output(
+                _a_element.matcher_info().matcher_result().str()
+            )));
+            break;
         case MATCHER_ANNOTATION:
-            return {
-                _a_pc.colon(_a_pc.matcher_annotation()),
-                _a_pc.indent(
-                    _a_pc.message_str(_a_element.matcher_info().annotation())
-                )
-            };
+            _a_ttor.write(this->prefix(_a_idx) + _a_pc.colon(_a_pc.matcher_annotation()));
+            _a_ttor.write(this->prefix(_a_idx+1) + _a_pc.indent(
+                _a_pc.message_str(_a_element.matcher_info().annotation())
+            ));
+            break;
         default:
             throw errors::unaccounted_for_enum_exception(*_l_ptr);
         }
@@ -148,7 +151,7 @@ __constexpr_imp std::vector<std::string>
              _l_ptr != nullptr)
     {
         return assertion_list_formatter_t<true, Assertion_Status>::get_data(
-            *_l_ptr, _a_element, _a_pc
+            *_l_ptr, _a_element, _a_pc,_a_ttor, _a_idx
         );
     }
     else

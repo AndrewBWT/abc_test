@@ -1,6 +1,6 @@
 #pragma once
-#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/multi_element_assertion_block.hpp"
 #include "abc_test/core/test_reports/multi_element_assertion_block.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/multi_element_assertion_block.hpp"
 #include "abc_test/utility/str/string_table.hpp"
 _BEGIN_ABC_REPORTERS_NS
 
@@ -11,21 +11,24 @@ struct multi_element_test_block_list_formatter_t
           combined_enum_multi_element_assertion_block_fields_t,
           print_config_t>
     , public assertion_list_formatter_t<false, Assertion_Status>
-    , public assertion_block_matcher_data_list_formatter_t
 {
 public:
+    using assertion_list_formatter_t<false, Assertion_Status>::
+        assertion_list_formatter_t;
     __constexpr virtual bool
         check_data(
             const combined_enum_multi_element_assertion_block_fields_t& _a_fid,
             const reports::multi_element_assertion_block_t<Assertion_Status>&
                 _a_element
         ) const override;
-    __constexpr virtual std::vector<std::string>
+    __constexpr virtual void
         get_data(
             const combined_enum_multi_element_assertion_block_fields_t& _a_fid,
             const reports::multi_element_assertion_block_t<Assertion_Status>&
-                                  _a_element,
-            const print_config_t& _a_pc
+                                                                _a_element,
+            const print_config_t&                               _a_pc,
+            const utility::io::threated_text_output_reporter_t& _a_ttor,
+            const std::size_t _a_idx
         ) const override;
 protected:
     __constexpr virtual std::string
@@ -75,12 +78,14 @@ __constexpr_imp bool
 }
 
 template <typename Assertion_Status>
-__constexpr_imp std::vector<std::string>
+__constexpr_imp void
     multi_element_test_block_list_formatter_t<Assertion_Status>::get_data(
         const combined_enum_multi_element_assertion_block_fields_t& _a_fid,
         const reports::multi_element_assertion_block_t<Assertion_Status>&
-                              _a_element,
-        const print_config_t& _a_pc
+                                                            _a_element,
+        const print_config_t&                               _a_pc,
+        const utility::io::threated_text_output_reporter_t& _a_ttor,
+        const std::size_t _a_idx
     ) const
 {
     using namespace std;
@@ -121,28 +126,37 @@ __constexpr_imp std::vector<std::string>
                     break;
                 }
             }
-            vector<string> _l_rv;
-            _l_rv.push_back(
-                _a_pc.colon(_a_pc.multi_element_collection_grouped_str())
-            );
+            _a_ttor.write(fmt::format(
+                "{0}{1}",this->prefix(_a_idx), _a_pc.colon(_a_pc.multi_element_collection_grouped_str())
+            ));
             vector<pair<
-                tuple<bool,enum_bba_inner_assertion_type_t,optional<ds::single_source_t>, matcher_source_map_t>,
+                tuple<
+                    bool,
+                    enum_bba_inner_assertion_type_t,
+                    optional<ds::single_source_t>,
+                    matcher_source_map_t>,
                 vector<tuple<size_t, matcher_result_t, optional<string>>>>>
                    _l_info;
             size_t _l_idx{1};
-            for (const bba_inner_assertion_type_t&
-                     _l_matcher : _a_element.get_matcher())
+            for (const bba_inner_assertion_type_t& _l_matcher :
+                 _a_element.get_matcher())
             {
-                tuple<bool,enum_bba_inner_assertion_type_t,optional<ds::single_source_t>, matcher_source_map_t>
-                    _l_first
-                    = make_tuple(
+                tuple<
+                    bool,
+                    enum_bba_inner_assertion_type_t,
+                    optional<ds::single_source_t>,
+                    matcher_source_map_t>
+                    _l_first = make_tuple(
                         _l_matcher.terminate(),
                         _l_matcher.assertion_type(),
-                        _l_matcher.source(), _l_matcher.source_map());
+                        _l_matcher.source(),
+                        _l_matcher.source_map()
+                    );
                 tuple<size_t, matcher_result_t, optional<string>>
                     _l_single_element = make_tuple(
                         _l_idx++,
-                        _l_matcher.matcher_result(),_l_matcher.annotation()
+                        _l_matcher.matcher_result(),
+                        _l_matcher.annotation()
                     );
                 if (_l_info.size() == 0 || _l_first != _l_info.back().first)
                 {
@@ -160,7 +174,11 @@ __constexpr_imp std::vector<std::string>
                 }
             }
             for (const pair<
-                     tuple<bool,enum_bba_inner_assertion_type_t,optional<ds::single_source_t>, matcher_source_map_t>,
+                     tuple<
+                         bool,
+                         enum_bba_inner_assertion_type_t,
+                         optional<ds::single_source_t>,
+                         matcher_source_map_t>,
                      vector<tuple<size_t, matcher_result_t, optional<string>>>>&
                      _l_element : _l_info)
             {
@@ -173,49 +191,34 @@ __constexpr_imp std::vector<std::string>
                         matcher_source_map_t>;
                     bba_inner_assertion_type_t _l_matcher(
                         get<0>(_l_element.first),
-                    get<1>(_l_element.second[0]),
+                        get<1>(_l_element.second[0]),
                         get<2>(_l_element.first),
                         get<2>(_l_element.second[0]),
                         get<3>(_l_element.first),
                         get<1>(_l_element.first)
                     );
-                    vector<string> _l_data = get_all_data(
-                        _a_pc
-                            .matcher_assertion_multi_block_assertion_list_fields(
-                            ),
-                        _l_matcher,
-                        _a_pc,
-                        assertion_block_matcher_data_list_formatter_t()
-                    );
-                    size_t _l_data_idx{0};
-                    if (_l_data.size() != 0)
-                    {
-                        for (const string_view _l_sv : _l_data)
-                        {
-                            _l_st.push_back(
-                                _l_data_idx++ == 0
-                                    ? fmt::format(
-                                          "{0}) ", get<0>(_l_element.second[0])
-                                      )
-                                    : ""
-                            );
-                            _l_st.push_back(_l_sv);
-                            _l_st.new_line();
-                        }
-                    }
-                    for (string _l_s : _l_st.as_lines())
-                    {
-                        _l_rv.push_back(_l_s);
-                    }
+                    assertion_block_matcher_data_list_formatter_t(
+                        get<0>(_l_element.second[0]), _l_info.size(), this->_m_max_str_size, true
+                    )
+                        .process_all_data(
+                            _a_pc
+                                .matcher_assertion_multi_block_assertion_list_fields(
+                                ),
+                            _l_matcher,
+                            _a_pc,
+                            _a_ttor
+                        );
                 }
                 else
                 {
-                    _l_rv.push_back(_a_pc.indent(fmt::format(
-                        "The following {0} {1} assertions have the same source data, "
+                    _a_ttor.write(fmt::format(
+                        "{0}{1}", this->prefix(_a_idx), _a_pc.indent(fmt::format(
+                        "The following {0} {1} assertions have the same source "
+                        "data, "
                         "which is as follows:",
                         _l_element.second.size(),
                         get_str(get<1>(_l_element.first))
-                    )));
+                    ))));
                     std::tuple<
                         matcher_result_t,
                         std::optional<std::string>,
@@ -228,15 +231,18 @@ __constexpr_imp std::vector<std::string>
                         get<3>(_l_element.first),
                         get<1>(_l_element.first)
                     );
-                    vector<string> _l_data = get_all_data(
-                        _l_shared_data,
-                        _l_matcher,
-                        _a_pc,
-                        assertion_block_matcher_data_list_formatter_t(2)
-                    );
-                    _l_rv.append_range(_l_data);
+                    assertion_block_matcher_data_list_formatter_t(
+                        get<0>(_l_element.second[0]), _l_info.size(), this->_m_max_str_size, false, 2
+                    )
+                        .process_all_data(
+                            _l_shared_data,
+                            _l_matcher,
+                            _a_pc,
+                            _a_ttor
+                        );
+                    // _l_rv.append_range(_l_data);
 
-                    _l_rv.push_back(_a_pc.indent(
+                    _a_ttor.write(this->prefix(_a_idx) + _a_pc.indent(
                         fmt::format(
                             "The data of the {0} {1} assertions:",
                             _l_element.second.size(),
@@ -244,7 +250,6 @@ __constexpr_imp std::vector<std::string>
                         ),
                         1
                     ));
-                    str::string_table_t _l_st({0});
                     for (auto& _l_ki : _l_element.second)
                     {
                         bba_inner_assertion_type_t _l_matcher(
@@ -255,71 +260,42 @@ __constexpr_imp std::vector<std::string>
                             get<3>(_l_element.first),
                             get<1>(_l_element.first)
                         );
-                        vector<string> _l_data = get_all_data(
-                            _l_individual_data,
-                            _l_matcher,
-                            _a_pc,
-                            assertion_block_matcher_data_list_formatter_t(0)
-                        );
-                        size_t _l_data_idx{0};
-                        if (_l_data.size() != 0)
-                        {
-                            for (const string_view _l_sv : _l_data)
-                            {
-                                _l_st.push_back(
-                                    _l_data_idx++ == 0
-                                        ? fmt::format("{0}) ", get<0>(_l_ki))
-                                        : ""
-                                );
-                                _l_st.push_back(_l_sv);
-                                _l_st.new_line();
-                            }
-                        }
-                    }
-                    for (string _l_s : _l_st.as_lines())
-                    {
-                        _l_rv.push_back(_a_pc.indent(_l_s, 2));
+                        assertion_block_matcher_data_list_formatter_t(
+                            get<0>(_l_ki), _l_info.size(), this->_m_max_str_size, true
+                        )
+                            .process_all_data(
+                                _l_individual_data,
+                                _l_matcher,
+                                _a_pc,
+                                _a_ttor
+                            );
                     }
                 }
             }
-            return _l_rv;
         }
+        break;
         case SHOW_ALL_ASSERTIONS:
         {
             using namespace _ABC_NS_UTILITY;
-            vector<string> _l_rv;
-            _l_rv.push_back(_a_pc.colon(_a_pc.multi_element_collection_str()));
-            str::string_table_t _l_st({0});
+            _a_ttor.write(_a_pc.colon(_a_pc.multi_element_collection_str()));
             size_t              _l_idx{1};
             for (auto& _l_matcher : _a_element.get_matcher())
             {
-                vector<string> _l_data = get_all_data(
-                    _a_pc.matcher_assertion_multi_block_assertion_list_fields(),
-                    _l_matcher,
-                    _a_pc,
-                    assertion_block_matcher_data_list_formatter_t(0)
-                );
-                size_t _l_data_idx{0};
-                if (_l_data.size() != 0)
-                {
-                    for (const string_view _l_sv : _l_data)
-                    {
-                        _l_st.push_back(
-                            _l_data_idx++ == 0 ? fmt::format("{0}) ", _l_idx)
-                                               : ""
-                        );
-                        _l_st.push_back(_l_sv);
-                        _l_st.new_line();
-                    }
-                }
+                assertion_block_matcher_data_list_formatter_t(
+                    _l_idx, _a_element.get_matcher().size(), this->_m_max_str_size, true
+                )
+                    .process_all_data(
+                        _a_pc
+                            .matcher_assertion_multi_block_assertion_list_fields(
+                            ),
+                        _l_matcher,
+                        _a_pc,
+                        _a_ttor
+                    );
                 ++_l_idx;
             }
-            for (string _l_s : _l_st.as_lines())
-            {
-                _l_rv.push_back(_l_s);
-            }
-            return _l_rv;
         }
+        break;
         default:
             throw errors::unaccounted_for_enum_exception(*_l_ptr);
         }
@@ -328,7 +304,7 @@ __constexpr_imp std::vector<std::string>
              _l_ptr != nullptr)
     {
         return assertion_list_formatter_t<false, Assertion_Status>::get_data(
-            *_l_ptr, _a_element, _a_pc
+            *_l_ptr, _a_element, _a_pc, _a_ttor, _a_idx
         );
     }
     else

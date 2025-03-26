@@ -1,15 +1,16 @@
 #pragma once
 
+#include "abc_test/core/ds/test_data/pre_test_run_report.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/pre_test_set_data_report.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/print_config.hpp"
-#include "abc_test/core/ds/test_data/pre_test_run_report.hpp"
 #include "abc_test/utility/internal/macros.hpp"
+#include "abc_test/utility/io/threaded_text_output_reporter.hpp"
 
 _BEGIN_ABC_REPORTERS_NS
 
 struct pre_test_set_data_list_formatter
-    : public list_formattable_t<
+    : public list_vertical_formattable_t<
           ds::pre_test_run_report_t,
           enum_pre_test_set_data_fields_t,
           print_config_t>
@@ -20,29 +21,30 @@ public:
             const enum_pre_test_set_data_fields_t& _a_fid,
             const ds::pre_test_run_report_t&       _a_element
         ) const;
-        __no_constexpr_or_inline std::vector<std::string>
-        get_cli_info(
-            const enum_pre_test_set_data_fields_t& _a_fid,
-            const ds::pre_test_run_report_t& _a_element,
-            const print_config_t& _a_pc
-        ) const;
-        __no_constexpr_or_inline std::vector<std::string>
-        get_explanation_data(
-            const enum_pre_test_set_data_fields_t& _a_fid,
-            const ds::pre_test_run_report_t& _a_element,
-            const print_config_t& _a_pc
-        ) const;
-    __no_constexpr_or_inline std::vector<std::string>
-        get_output(
-            const enum_pre_test_set_data_fields_t& _a_fid,
-            const ds::pre_test_run_report_t& _a_element,
-            const print_config_t& _a_pc
-        ) const;
-    __no_constexpr_or_inline virtual std::vector<std::string>
+    __no_constexpr_or_inline std::optional<std::string>
+                             get_cli_info(
+                                 const enum_pre_test_set_data_fields_t& _a_fid,
+                                 const ds::pre_test_run_report_t&       _a_element,
+                                 const print_config_t&                  _a_pc
+                             ) const;
+    __no_constexpr_or_inline std::optional<std::string>
+                             get_explanation_data(
+                                 const enum_pre_test_set_data_fields_t& _a_fid,
+                                 const ds::pre_test_run_report_t&       _a_element,
+                                 const print_config_t&                  _a_pc
+                             ) const;
+    __no_constexpr_or_inline std::pair<std::string, std::string>
+                             get_output(
+                                 const enum_pre_test_set_data_fields_t& _a_fid,
+                                 const ds::pre_test_run_report_t&       _a_element,
+                                 const print_config_t&                  _a_pc
+                             ) const;
+    __no_constexpr_or_inline virtual std::pair<std::string, std::vector<std::string>>
         get_data(
-            const enum_pre_test_set_data_fields_t& _a_fid,
-            const ds::pre_test_run_report_t&       _a_element,
-            const print_config_t&                  _a_pc
+            const enum_pre_test_set_data_fields_t&                   _a_fid,
+            const ds::pre_test_run_report_t&                         _a_element,
+            const print_config_t&                                    _a_pc
+           
         ) const;
 };
 

@@ -1,8 +1,8 @@
 #pragma once
+#include "abc_test/core/test_reports/unexpected_report.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_report.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/print_config.hpp"
-#include "abc_test/core/test_reports/unexpected_report.hpp"
 #include "abc_test/utility/internal/macros.hpp"
 _BEGIN_ABC_REPORTERS_NS
 
@@ -19,11 +19,13 @@ public:
             const enum_unexpected_report_fields_t&           _a_fid,
             const reports::unexpected_report_t<Terminating>& _a_element
         ) const;
-    __constexpr virtual std::vector<std::string>
+    __constexpr virtual void
         get_data(
-            const enum_unexpected_report_fields_t&           _a_fid,
-            const reports::unexpected_report_t<Terminating>& _a_element,
-            const print_config_t&                            _a_pc
+            const enum_unexpected_report_fields_t&              _a_fid,
+            const reports::unexpected_report_t<Terminating>&    _a_element,
+            const print_config_t&                               _a_pc,
+            const utility::io::threated_text_output_reporter_t& _a_ttor,
+            const std::size_t _a_idx
         ) const;
 protected:
     __constexpr virtual std::string
@@ -57,11 +59,13 @@ __constexpr_imp bool
 }
 
 template <bool Terminating>
-__constexpr_imp std::vector<std::string>
+__constexpr_imp void
                 unexpected_report_list_formatter_t<Terminating>::get_data(
-        const enum_unexpected_report_fields_t&           _a_fid,
-        const reports::unexpected_report_t<Terminating>& _a_element,
-        const print_config_t&                            _a_pc
+        const enum_unexpected_report_fields_t&              _a_fid,
+        const reports::unexpected_report_t<Terminating>&    _a_element,
+        const print_config_t&                               _a_pc,
+        const utility::io::threated_text_output_reporter_t& _a_ttor,
+                    const std::size_t _a_idx
     ) const
 {
     /**/ using namespace std;
@@ -69,7 +73,7 @@ __constexpr_imp std::vector<std::string>
     using enum enum_unexpected_report_fields_t;
     switch (_a_fid)
     {
-    case SOURCE:
+    /*case SOURCE:
         return {
             _a_pc.indent(_a_pc.colon(
                 _a_pc.potential_source_str(_a_element.exact_source())
@@ -101,7 +105,7 @@ __constexpr_imp std::vector<std::string>
         };
     case STR_REPRESENTATION:
         return {_a_pc.highlight_fail(get_str_representation(_a_element, _a_pc))
-        };
+        };*/
     default:
         throw unaccounted_for_enum_exception(_a_fid);
     }

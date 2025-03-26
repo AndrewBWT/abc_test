@@ -1,17 +1,5 @@
 #pragma once
 
-#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/multi_element_assertion_block.hpp"
-#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/after_execution_test_report.hpp"
-#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/finalised_test_set_data_report.hpp"
-#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_block.hpp"
-#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_single_line.hpp"
-#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/multi_element_assertion_block.hpp"
-#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/static_assertion.hpp"
-#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_thrown_exception.hpp"
-#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_thrown_non_descript_entity.hpp"
-
-#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/pre_test_set_data_report.hpp"
-#include "abc_test/included_instances/reporters/text_test_reporter/print_config.hpp"
 #include "abc_test/core/ds/test_data/invoked_test_data.hpp"
 #include "abc_test/core/reporters/test_reporter.hpp"
 #include "abc_test/core/test_reports/assertion_status/fail.hpp"
@@ -21,6 +9,17 @@
 #include "abc_test/core/test_reports/assertion_status/terminate.hpp"
 #include "abc_test/core/test_reports/unexpected_thrown_exception.hpp"
 #include "abc_test/core/test_reports/unexpected_thrown_non_descript_entity.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/multi_element_assertion_block.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/after_execution_test_report.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/finalised_test_set_data_report.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_block.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/matcher_based_assertion_single_line.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/multi_element_assertion_block.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/pre_test_set_data_report.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/static_assertion.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_thrown_exception.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_thrown_non_descript_entity.hpp"
+#include "abc_test/included_instances/reporters/text_test_reporter/print_config.hpp"
 #include "abc_test/utility/io/threaded_text_output_reporter.hpp"
 #include "abc_test/utility/str/string_table.hpp"
 
@@ -62,12 +61,16 @@ public:
 private:
     bool           _m_has_colour_output;
     print_config_t _m_print_config;
-    __constexpr    std::vector<std::string>
-                   process_termination(
-                       const reports::unexpected_report_t<true>& _a_unexpected_report
-                   ) const;
-    __constexpr std::vector<std::string>
-        process_assertion(const reports::assertion_base_t* _a_gur) const;
+    __constexpr void
+        process_termination(
+            const reports::unexpected_report_t<true>& _a_unexpected_report
+        ) const;
+    __constexpr void
+        process_assertion(
+            const reports::assertion_base_t* _a_gur,
+            const std::size_t                _a_idx,
+            const std::size_t                _a_total_indexes
+        ) const;
 };
 
 _END_ABC_REPORTERS_NS
@@ -100,42 +103,23 @@ __no_constexpr_imp void
     using namespace utility::str;
     using namespace reporters;
     using namespace reports;
-    const string                 _l_line_break{_m_print_config.line_break()};
-    string_table_t               _l_st({0});
-    const vector<vector<string>> _l_strs = get_all_data<false>(
+    const string _l_line_break{_m_print_config.line_break()};
+    write(fmt::format("{1}\n{0}", _l_line_break, "TEST INFO"));
+    test_report_list_formatter().process_all_data(
         _m_print_config.after_execution_test_report_fields(),
         _a_itd,
         _m_print_config,
-        test_report_list_formatter()
+        *this
     );
-    for (const vector<string>& _l_row : _l_strs)
-    {
-        for (const string& _l_cell : _l_row)
-        {
-            _l_st.push_back(_l_cell);
-        }
-        _l_st.new_line();
-    }
     // Print the output
-    string _l_rv{
-        fmt::format("{0}{1}{0}{2}{0}", _l_line_break, "TEST INFO\n", _l_st())
-    };
-    _l_st = string_table_t({0});
     if (_a_itd.unexpected_termination() != nullptr)
     {
         const unexpected_report_t<true>& _l_unexpected_termination{
             *_a_itd.unexpected_termination()
         };
-        const vector<string> _l_strs
-            = process_termination(_l_unexpected_termination);
-        for (const string_view _l_str : _l_strs)
-        {
-            _l_st.push_back(_l_str);
-            _l_st.new_line();
-        }
-        _l_rv.append(fmt::format(
-            "{2}{1}{0}{1}",
-            _l_st(),
+        process_termination(_l_unexpected_termination);
+        write(fmt::format(
+            "{1}{0}{0}",
             _l_line_break,
             "UNEXPECTED TERMINATION INFORMATION\n"
         ));
@@ -143,7 +127,7 @@ __no_constexpr_imp void
     if (_a_itd.warnings_recieved() > 0)
     {
         string _l_warning_str;
-        _l_rv.append(fmt::format(
+        write(fmt::format(
             "{2}{0}{1}{0}", _l_line_break, _l_warning_str, "WARNINGS\n"
         ));
     }
@@ -152,25 +136,16 @@ __no_constexpr_imp void
         string_table_t                     _l_st({0});
         size_t                             _l_idx{1};
         const assertion_base_collection_t& _l_reports{_a_itd.assertions()};
+        write(fmt::format(
+            "{0}\n{1}\n{0}", _l_line_break, "ASSERTION INFO"
+        ));
         for (const assertion_base_ptr_t& _l_report : _l_reports)
         {
-            const vector<string> _l_strs = process_assertion(_l_report.get());
-            size_t               _l_data_idx{0};
-            for (const string_view _l_str : _l_strs)
-            {
-                _l_st.push_back(
-                    _l_data_idx++ == 0 ? fmt::format(" {0})  ", _l_idx) : ""
-                );
-                _l_st.push_back(_l_str);
-                _l_st.new_line();
-            }
+            process_assertion(_l_report.get(), _l_idx, _l_reports.size());
             _l_idx++;
         }
-        _l_rv.append(fmt::format(
-            "{2}{1}{0}{1}", _l_st(), _l_line_break, "ASSERTION INFO\n"
-        ));
     }
-    write(_l_rv);
+    write( _l_line_break);
 }
 
 __no_constexpr_imp void
@@ -184,30 +159,21 @@ __no_constexpr_imp void
     using namespace utility::str;
     using namespace reporters;
     using namespace reports;
-    const string                 _l_line_break{_m_print_config.line_break()};
-    string_table_t               _l_st({0});
-    const vector<vector<string>> _l_strs = get_all_data<false>(
+    const string _l_line_break{_m_print_config.line_break()};
+    write(fmt::format("{0}\n{1}\n{0}", _l_line_break, "TEST SUITE RESULTS"));
+    finalised_test_set_data_list_formatter().process_all_data(
         _m_print_config.finalised_test_set_data_fields(),
         _a_test_set_data,
         _m_print_config,
-        finalised_test_set_data_list_formatter()
+        *this
     );
-    for (const vector<string>& _l_row : _l_strs)
-    {
-        for (const string& _l_cell : _l_row)
-        {
-            _l_st.push_back(_l_cell);
-        }
-        _l_st.new_line();
-    }
-    // Print the output
-    string _l_rv{fmt::format(
-        "{0}{1}{0}{2}{0}", _l_line_break, "TEST SUITE RESULTS\n", _l_st()
-    )};
-    write(_l_rv);
+    write(_l_line_break);
 }
+
 __no_constexpr_imp void
-text_test_reporter_t::pre_test_run_report(ds::pre_test_run_report_t& _a_pre_test_run_report) const noexcept
+    text_test_reporter_t::pre_test_run_report(
+        ds::pre_test_run_report_t& _a_pre_test_run_report
+    ) const noexcept
 {
     using namespace std;
     using namespace ds;
@@ -215,46 +181,21 @@ text_test_reporter_t::pre_test_run_report(ds::pre_test_run_report_t& _a_pre_test
     using namespace utility::str;
     using namespace reporters;
     using namespace reports;
-    const string                 _l_line_break{ _m_print_config.line_break() };
-    string_table_t               _l_st({ 0 });
-    const vector<vector<string>> _l_strs = get_all_data<false>(
+    const string _l_line_break{_m_print_config.line_break()};
+    write(
+        fmt::format("{0}\n{1}\n{0}", _l_line_break, "TEST SUITE CONFIGURATION")
+    );
+    pre_test_set_data_list_formatter().process_all_data(
         _m_print_config.pre_test_set_data_fields(),
         _a_pre_test_run_report,
         _m_print_config,
-        pre_test_set_data_list_formatter()
+        *this
     );
-    for (const vector<string>& _l_row : _l_strs)
-    {
-        if ((_l_row.size() % 2) == 0)
-        {
-            size_t _l_idx{ 0 };
-            for (const string& _l_cell : _l_row)
-            {
-                ++_l_idx;
-                _l_st.push_back(_l_cell);
-                if ((_l_idx % 2) == 0)
-                {
-                    _l_st.new_line();
-                }
-            }
-        }
-        else
-        {
-            for (const string& _l_cell : _l_row)
-            {
-                _l_st.push_back(_l_cell);
-            }
-            _l_st.new_line();
-        }
-    }
-    // Print the output
-    string _l_rv{ fmt::format(
-        "{0}{1}{0}{2}{0}", _l_line_break, "TEST SUITE CONFIGURATION\n", _l_st()
-    ) };
-    write(_l_rv);
+    write(_l_line_break);
 }
-__constexpr std::vector<std::string>
-            text_test_reporter_t::process_termination(
+
+__constexpr void
+    text_test_reporter_t::process_termination(
         const reports::unexpected_report_t<true>& _a_unexpected_report
     ) const
 {
@@ -264,12 +205,17 @@ __constexpr std::vector<std::string>
         )};
         _l_ptr != nullptr)
     {
-        return get_all_data(
-            _m_print_config.unexpected_thrown_exception_fields(),
-            *_l_ptr,
-            _m_print_config,
-            unexpected_thrown_exception_list_formatter_t()
-        );
+        unexpected_thrown_exception_list_formatter_t()
+            .list_formattable_t<
+                reports::unexpected_thrown_exception_t,
+                combined_enum_unexpected_exception_fields_t,
+                print_config_t>::
+                process_all_data(
+                    _m_print_config.unexpected_thrown_exception_fields(),
+                    *_l_ptr,
+                    _m_print_config,
+                    *this
+                );
     }
     else if (auto _l_ptr{dynamic_cast<
                  const unexpected_thrown_not_derived_from_std_exception_t*>(
@@ -277,30 +223,37 @@ __constexpr std::vector<std::string>
              )};
              _l_ptr != nullptr)
     {
-        return get_all_data(
-            _m_print_config.unexpected_thrown_non_descript_entity_fields(),
-            *_l_ptr,
-            _m_print_config,
-            unexpected_thrown_non_descript_entity_list_formatter_t()
-        );
+        unexpected_thrown_non_descript_entity_list_formatter_t()
+            .list_formattable_t<
+                reports::unexpected_thrown_not_derived_from_std_exception_t,
+                combined_enum_unexpected_thrown_non_descript_entity_fields_t,
+                print_config_t>::
+                process_all_data(
+                    _m_print_config
+                        .unexpected_thrown_non_descript_entity_fields(),
+                    *_l_ptr,
+                    _m_print_config,
+                    *this
+                );
     }
     else
     {
         //	return
-        //get_all_data(_m_print_config.unexpected_thrown_non_descript_entity_fields(),
+        // get_all_data(_m_print_config.unexpected_thrown_non_descript_entity_fields(),
         //*_l_ptr, 		_m_print_config,
-        //unexpected_thrown_non_descript_entity_list_formatter_t());
+        // unexpected_thrown_non_descript_entity_list_formatter_t());
         throw errors::test_library_exception_t(fmt::format(
             "Could not find function to format item of abstract class {0}. ",
             typeid(_a_unexpected_report).name()
         ));
     }
-    return {};
 }
 
-__constexpr_imp std::vector<std::string>
-                text_test_reporter_t::process_assertion(
-        const reports::assertion_base_t* _a_gur
+__constexpr_imp void
+    text_test_reporter_t::process_assertion(
+        const reports::assertion_base_t* _a_gur,
+        const std::size_t                _a_idx,
+        const std::size_t                _a_total_indexes
     ) const
 {
     using namespace reports;
@@ -309,13 +262,19 @@ __constexpr_imp std::vector<std::string>
         )};
         _l_ptr != nullptr)
     {
-        return get_all_data(
-            _m_print_config.matcher_based_assertion_fields(),
-            *_l_ptr,
-            _m_print_config,
-            matcher_based_assertion_single_line_list_formatter_t<
-                pass_or_fail_t>()
-        );
+        matcher_based_assertion_single_line_list_formatter_t<pass_or_fail_t>(
+            _a_idx, _a_total_indexes
+        )
+            .list_formattable_t<
+                reports::matcher_based_assertion_single_line_t<pass_or_fail_t>,
+                combined_enum_matcher_based_assertion_single_line_fields_t,
+                print_config_t>::
+                process_all_data(
+                    _m_print_config.matcher_based_assertion_fields(),
+                    *_l_ptr,
+                    _m_print_config,
+                    *this
+                );
     }
     else if (auto _l_ptr{
                  dynamic_cast<const matcher_based_assertion_single_line_t<
@@ -323,25 +282,38 @@ __constexpr_imp std::vector<std::string>
              };
              _l_ptr != nullptr)
     {
-        return get_all_data(
-            _m_print_config.matcher_based_assertion_fields(),
-            *_l_ptr,
-            _m_print_config,
-            matcher_based_assertion_single_line_list_formatter_t<
-                pass_or_terminate_t>()
-        );
+        matcher_based_assertion_single_line_list_formatter_t<
+            pass_or_terminate_t>(_a_idx, _a_total_indexes)
+            .list_formattable_t<
+                reports::matcher_based_assertion_single_line_t<
+                    pass_or_terminate_t>,
+                combined_enum_matcher_based_assertion_single_line_fields_t,
+                print_config_t>::
+                process_all_data(
+                    _m_print_config.matcher_based_assertion_fields(),
+                    *_l_ptr,
+                    _m_print_config,
+                    *this
+                );
     }
     else if (auto _l_ptr{dynamic_cast<
                  const matcher_based_assertion_block_t<pass_or_fail_t>*>(_a_gur)
              };
              _l_ptr != nullptr)
     {
-        return get_all_data(
-            _m_print_config.matcher_based_assertion_block_fields(),
-            *_l_ptr,
-            _m_print_config,
-            matcher_based_assertion_block_list_formatter_t<pass_or_fail_t>()
-        );
+        matcher_based_assertion_block_list_formatter_t<pass_or_fail_t>(
+            _a_idx, _a_total_indexes
+        )
+            .list_formattable_t<
+                reports::matcher_based_assertion_block_t<pass_or_fail_t>,
+                combined_enum_matcher_based_assertion_block_fields_t,
+                print_config_t>::
+                process_all_data(
+                    _m_print_config.matcher_based_assertion_block_fields(),
+                    *_l_ptr,
+                    _m_print_config,
+                    *this
+                );
     }
     else if (auto _l_ptr{dynamic_cast<
                  const matcher_based_assertion_block_t<pass_or_terminate_t>*>(
@@ -349,25 +321,38 @@ __constexpr_imp std::vector<std::string>
              )};
              _l_ptr != nullptr)
     {
-        return get_all_data(
-            _m_print_config.matcher_based_assertion_block_fields(),
-            *_l_ptr,
-            _m_print_config,
-            matcher_based_assertion_block_list_formatter_t<pass_or_terminate_t>(
-            )
-        );
+        matcher_based_assertion_block_list_formatter_t<pass_or_terminate_t>(
+            _a_idx, _a_total_indexes
+        )
+            .list_formattable_t<
+                reports::matcher_based_assertion_block_t<pass_or_terminate_t>,
+                combined_enum_matcher_based_assertion_block_fields_t,
+                print_config_t>::
+                process_all_data(
+                    _m_print_config.matcher_based_assertion_block_fields(),
+                    *_l_ptr,
+                    _m_print_config,
+                    *this
+                );
     }
     else if (auto _l_ptr{dynamic_cast<
                  const multi_element_assertion_block_t<pass_or_fail_t>*>(_a_gur)
              };
              _l_ptr != nullptr)
     {
-        return get_all_data(
-            _m_print_config.multi_element_test_block_fields(),
-            *_l_ptr,
-            _m_print_config,
-            multi_element_test_block_list_formatter_t<pass_or_fail_t>()
-        );
+        multi_element_test_block_list_formatter_t<pass_or_fail_t>(
+            _a_idx, _a_total_indexes
+        )
+            .list_formattable_t<
+                reports::multi_element_assertion_block_t<pass_or_fail_t>,
+                combined_enum_multi_element_assertion_block_fields_t,
+                print_config_t>::
+                process_all_data(
+                    _m_print_config.multi_element_test_block_fields(),
+                    *_l_ptr,
+                    _m_print_config,
+                    *this
+                );
     }
     else if (auto _l_ptr{dynamic_cast<
                  const multi_element_assertion_block_t<pass_or_terminate_t>*>(
@@ -375,46 +360,68 @@ __constexpr_imp std::vector<std::string>
              )};
              _l_ptr != nullptr)
     {
-        return get_all_data(
-            _m_print_config.multi_element_test_block_fields(),
-            *_l_ptr,
-            _m_print_config,
-            multi_element_test_block_list_formatter_t<pass_or_terminate_t>()
-        );
+        multi_element_test_block_list_formatter_t<pass_or_terminate_t>(
+            _a_idx, _a_total_indexes
+        )
+            .list_formattable_t<
+                reports::multi_element_assertion_block_t<pass_or_terminate_t>,
+                combined_enum_multi_element_assertion_block_fields_t,
+                print_config_t>::
+                process_all_data(
+                    _m_print_config.multi_element_test_block_fields(),
+                    *_l_ptr,
+                    _m_print_config,
+                    *this
+                );
     }
     else if (auto _l_ptr{dynamic_cast<const static_assertion_t<pass_t>*>(_a_gur)
              };
              _l_ptr != nullptr)
     {
-        return get_all_data(
-            _m_print_config.static_assertion_fields(),
-            *_l_ptr,
-            _m_print_config,
-            static_assertion_list_formatter_t<pass_t>()
-        );
+        static_assertion_list_formatter_t<pass_t>(_a_idx, _a_total_indexes)
+            .list_formattable_t<
+                reports::static_assertion_t<pass_t>,
+                combined_enum_static_assertion_fields_t,
+                print_config_t>::
+                process_all_data(
+                    _m_print_config.static_assertion_fields(),
+                    *_l_ptr,
+                    _m_print_config,
+                    *this
+                );
     }
     else if (auto _l_ptr{dynamic_cast<const static_assertion_t<fail_t>*>(_a_gur)
              };
              _l_ptr != nullptr)
     {
-        return get_all_data(
-            _m_print_config.static_assertion_fields(),
-            *_l_ptr,
-            _m_print_config,
-            static_assertion_list_formatter_t<fail_t>()
-        );
+        static_assertion_list_formatter_t<fail_t>(_a_idx, _a_total_indexes)
+            .list_formattable_t<
+                reports::static_assertion_t<fail_t>,
+                combined_enum_static_assertion_fields_t,
+                print_config_t>::
+                process_all_data(
+                    _m_print_config.static_assertion_fields(),
+                    *_l_ptr,
+                    _m_print_config,
+                    *this
+                );
     }
     else if (auto _l_ptr{
                  dynamic_cast<const static_assertion_t<terminate_t>*>(_a_gur)
              };
              _l_ptr != nullptr)
     {
-        return get_all_data(
-            _m_print_config.static_assertion_fields(),
-            *_l_ptr,
-            _m_print_config,
-            static_assertion_list_formatter_t<terminate_t>()
-        );
+        static_assertion_list_formatter_t<terminate_t>(_a_idx, _a_total_indexes)
+            .list_formattable_t<
+                reports::static_assertion_t<terminate_t>,
+                combined_enum_static_assertion_fields_t,
+                print_config_t>::
+                process_all_data(
+                    _m_print_config.static_assertion_fields(),
+                    *_l_ptr,
+                    _m_print_config,
+                    *this
+                );
     }
     else
     {
@@ -424,7 +431,6 @@ __constexpr_imp std::vector<std::string>
             typeid(*_a_gur).name()
         ));
     }
-    return {};
 }
 
 _END_ABC_REPORTERS_NS

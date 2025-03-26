@@ -14,16 +14,19 @@ struct static_assertion_list_formatter_t
     , public assertion_list_formatter_t<true, Assertion_Status>
 {
 public:
+    using assertion_list_formatter_t<true, Assertion_Status>::assertion_list_formatter_t;
     __constexpr virtual bool
         check_data(
             const combined_enum_static_assertion_fields_t&       _a_fid,
             const reports::static_assertion_t<Assertion_Status>& _a_element
         ) const override;
-    __constexpr virtual std::vector<std::string>
+    __constexpr virtual void
         get_data(
             const combined_enum_static_assertion_fields_t&       _a_fid,
             const reports::static_assertion_t<Assertion_Status>& _a_element,
-            const print_config_t&                                _a_pc
+            const print_config_t&                                _a_pc,
+            const utility::io::threated_text_output_reporter_t&  _a_ttor,
+            const std::size_t _a_idx
         ) const override;
 protected:
     __constexpr virtual std::string
@@ -71,11 +74,13 @@ __constexpr_imp bool
 }
 
 template <typename Assertion_Status>
-__constexpr_imp std::vector<std::string>
+__constexpr_imp void
                 static_assertion_list_formatter_t<Assertion_Status>::get_data(
         const combined_enum_static_assertion_fields_t&       _a_fid,
         const reports::static_assertion_t<Assertion_Status>& _a_element,
-        const print_config_t&                                _a_pc
+        const print_config_t&                                _a_pc,
+        const utility::io::threated_text_output_reporter_t&  _a_ttor,
+                    const std::size_t _a_idx
     ) const
 {
     using namespace std;
@@ -85,11 +90,11 @@ __constexpr_imp std::vector<std::string>
         using enum enum_static_assertion_fields_t;
         switch (*_l_ptr)
         {
-        case TEST_ANNOTATION:
+        /*case TEST_ANNOTATION:
             return {
                 _a_pc.colon(_a_pc.static_test_annotation_str()),
                 _a_pc.indent(_a_pc.message_str(_a_element.annotation()))
-            };
+            };*/
         default:
             throw errors::unaccounted_for_enum_exception(*_l_ptr);
         }
@@ -98,7 +103,7 @@ __constexpr_imp std::vector<std::string>
              _l_ptr != nullptr)
     {
         return assertion_list_formatter_t<true, Assertion_Status>::get_data(
-            *_l_ptr, _a_element, _a_pc
+            *_l_ptr, _a_element, _a_pc, _a_ttor, _a_idx
         );
     }
     else

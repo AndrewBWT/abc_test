@@ -429,7 +429,7 @@ __constexpr_imp std::string
                 print_config_t::line_break() const noexcept
 {
     using namespace std;
-    return string(_m_line_break_len, _m_line_break_char).append("\n");
+    return string(_m_line_break_len, _m_line_break_char);
 }
 
 __constexpr_imp const std::string
