@@ -3,10 +3,10 @@
 #include "abc_test/core/ds/data_generator_memoization/typeless_data_generator_collection_stack.hpp"
 #include "abc_test/core/ds/test_data/enum_test_status.hpp"
 #include "abc_test/core/ds/test_data/post_setup_test_data.hpp"
+#include "abc_test/core/global.hpp"
 #include "abc_test/core/test_reports/assertion.hpp"
 #include "abc_test/core/test_reports/unexpected_report.hpp"
 #include "abc_test/utility/rng.hpp"
-#include "abc_test/core/global.hpp"
 
 #include <fmt/ranges.h>
 #include <functional>
@@ -41,7 +41,7 @@ public:
      */
     __no_constexpr
         invoked_test_data_t(
-            const utility::rng_t& _a_rng,
+            const utility::rng_t&         _a_rng,
             const post_setup_test_data_t& _a_test_info,
             const size_t                  _a_order_ran_id,
             const std::filesystem::path&  _a_root_path
@@ -274,7 +274,8 @@ public:
      */
     __constexpr const reports::assertion_base_collection_t&
                       assertions() const noexcept;
-    __constexpr std::size_t largest_assertion_index_added() const noexcept;
+    __constexpr       std::size_t
+                      largest_assertion_index_added() const noexcept;
     __constexpr void
         add_warning(reports::unexpected_non_terminating_report_ptr_t&& _a_pstr
         ) noexcept;
@@ -296,14 +297,14 @@ private:
     ds::tdg_collection_stack_trie_t _m_tests_for_loop_stack_trie;
     ds::tdg_collection_stack_t      _m_for_loop_data_collection;
     std::size_t                     _m_order_ran_id;
-    utility::rng_t                    _m_this_tests_random_generator;
+    utility::rng_t                  _m_this_tests_random_generator;
     std::filesystem::path           _m_path;
     enum_test_status_t              _m_test_status
         = enum_test_status_t::NO_TERMINATION_TEST_PASSED;
     std::size_t _m_total_number_assertions_recieved = 0;
     std::size_t _m_total_number_assertions_passed   = 0;
     std::size_t _m_total_number_assertions_failed   = 0;
-    std::size_t _m_largest_assertion_index_added{ 0 };
+    std::size_t _m_largest_assertion_index_added{0};
     reports::assertion_base_collection_t _m_assertions;
     reports::opt_unexpected_report_t     _m_termination_report;
     reports::unexpected_non_terminating_report_collection_t     _m_warnings;
@@ -339,7 +340,7 @@ struct fmt::formatter<_ABC_NS_DS::invoked_test_data_t> : formatter<string_view>
 _BEGIN_ABC_DS_NS
 __no_constexpr_imp
     invoked_test_data_t::invoked_test_data_t(
-        const utility::rng_t&        _a_rng,
+        const utility::rng_t&         _a_rng,
         const post_setup_test_data_t& _a_post_setup_test_data,
         const size_t                  _a_order_ran_id,
         const std::filesystem::path&  _a_root_path
@@ -517,7 +518,8 @@ __constexpr_imp void
             }
         }
         // This has to be the last thing, or accessing _a_ptr would be invalid.
-        if (global::get_global_test_options().retain_passed_assertions)
+        if (_l_ref.get_pass_status() == false
+            || global::get_global_test_options().retain_passed_assertions)
         {
             _m_largest_assertion_index_added = _l_ref.assertion_index();
             _m_assertions.push_back(assertion_base_ptr_t(std::move(_a_ptr)));
@@ -601,10 +603,13 @@ __constexpr_imp const reports::assertion_base_collection_t&
 {
     return _m_assertions;
 }
-__constexpr_imp std::size_t invoked_test_data_t::largest_assertion_index_added() const noexcept
+
+__constexpr_imp std::size_t
+    invoked_test_data_t::largest_assertion_index_added() const noexcept
 {
     return _m_largest_assertion_index_added;
 }
+
 __constexpr_imp void
     invoked_test_data_t::add_warning(
         reports::unexpected_non_terminating_report_ptr_t&& _a_pstr
@@ -640,31 +645,33 @@ __constexpr const std::chrono::time_point<std::chrono::high_resolution_clock>&
 namespace
 {
 __constexpr std::string
-normalise_for_file_use(
-    const std::string_view _a_str
-) noexcept
+            normalise_for_file_use(
+                const std::string_view _a_str
+            ) noexcept
 {
     using namespace std;
-    vector<pair<string, string>> _l_strs_to_replace =
-    {
-        {":","_"},
-        {" ", "_"},
-        {"\"",""},
+    vector<pair<string, string>> _l_strs_to_replace = {
+        {":",  "_"},
+        {" ",  "_"},
+        {"\"", "" },
     };
     string _l_rv(_a_str);
     for (auto& [_l_to_find, _l_to_replace_with] : _l_strs_to_replace)
     {
-        bool _l_replaced{ false };
+        bool _l_replaced{false};
         do
         {
             _l_replaced = false;
-            if (auto _l_str_pos{ _l_rv.find(_l_to_find) };
+            if (auto _l_str_pos{_l_rv.find(_l_to_find)};
                 _l_str_pos != string::npos)
             {
                 _l_replaced = true;
-                _l_rv.replace(_l_str_pos, _l_to_find.size(), _l_to_replace_with);
+                _l_rv.replace(
+                    _l_str_pos, _l_to_find.size(), _l_to_replace_with
+                );
             }
-        } while (_l_replaced);
+        }
+        while (_l_replaced);
     }
     return _l_rv;
 }
@@ -683,7 +690,9 @@ __no_constexpr_imp std::filesystem::path
     {
         _l_path /= normalise_for_file_use(_a_test_path_component);
     }
-    _l_path /= normalise_for_file_use(_a_test_info.registered_test_data()._m_user_data.name);
+    _l_path /= normalise_for_file_use(
+        _a_test_info.registered_test_data()._m_user_data.name
+    );
     if (not exists(_l_path))
     {
         create_directories(_l_path);

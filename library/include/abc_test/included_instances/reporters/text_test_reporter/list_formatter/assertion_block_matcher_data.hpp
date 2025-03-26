@@ -118,6 +118,8 @@ __constexpr bool
         return _a_element.source().has_value();
     case MATCHER_MAIN_SOURCE_LOCATION:
         return _a_element.source().has_value();
+    case LOG_INFOS:
+        return _a_element.log_infos().size() > 0;
     default:
         throw errors::unaccounted_for_enum_exception(_a_fid);
     }
@@ -263,6 +265,15 @@ __no_constexpr_imp void
                    _m_indent_offset + 1
                )};
         break;
+    case LOG_INFOS:
+        _a_ttor.write(fmt::format("{0}{1}", prefix(_a_idx), _a_pc.colon(_a_pc.log_info_str())));
+        for (const string_view& _l_str : _a_element.log_infos())
+        {
+            _a_ttor.write(
+                fmt::format("{0}{1}", prefix(_a_idx), _a_pc.indent(_a_pc.log_info(_l_str)))
+            );
+        }
+        return;
     case MATCHER_MAIN_SOURCE_LOCATION:
         _l_pair
             = {_a_pc.indent(

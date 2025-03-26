@@ -55,6 +55,7 @@ __constexpr_imp
         {MATCHER_SOURCE_MAP,           CONTEXTUAL_PRINT},
         {MATCHER_MAIN_SOURCE_REP,      CONTEXTUAL_PRINT},
         {MATCHER_MAIN_SOURCE_LOCATION, CONTEXTUAL_PRINT},
+                {LOG_INFOS, CONTEXTUAL_PRINT},
     };
 }
 

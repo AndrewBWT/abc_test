@@ -214,7 +214,6 @@ __no_constexpr_imp
     : _m_trc(_a_trc)
     , _m_current_test(nullptr)
     , _m_random_generator(_a_rng)
-    // , _m_test_options(_a_test_options)
     , _m_tests_most_recent_source(_ABC_NS_DS::single_source_t())
 {}
 

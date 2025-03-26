@@ -30,7 +30,6 @@ default_matcher_based_assertion_block_fields(
 	using enum enum_assertion_fields_t;
 	using enum enum_user_initialised_report_fields_t;
 	using enum reporters::enum_print_data_t;
-	using enum enum_assertion_block_matcher_data_fields_t;
 	using enum enum_single_element_assertion_block_fields_t;
 	return
 	{
@@ -56,6 +55,7 @@ default_matcher_based_assertion_single_block_assertion_fields(
 		{MATCHER_SOURCE_MAP,CONTEXTUAL_PRINT},
 		{MATCHER_MAIN_SOURCE_REP,CONTEXTUAL_PRINT},
 		{MATCHER_MAIN_SOURCE_LOCATION,CONTEXTUAL_PRINT},
+		{LOG_INFOS, CONTEXTUAL_PRINT},
 	};
 }
 _END_ABC_REPORTERS_NS

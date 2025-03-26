@@ -115,6 +115,7 @@ __constexpr_imp void
                 {
                 case MATCHER_ANNOTATION:
                 case MATCHER_RESULT_STRING:
+                case LOG_INFOS:
                     _l_individual_data.push_back(_l_x);
                     break;
                 case MATCHER_SOURCE_MAP:
@@ -135,7 +136,7 @@ __constexpr_imp void
                     enum_bba_inner_assertion_type_t,
                     optional<ds::single_source_t>,
                     matcher_source_map_t>,
-                vector<tuple<size_t, matcher_result_t, optional<string>>>>>
+                vector<tuple<size_t, matcher_result_t, optional<string>, _ABC_NS_DS::log_infos_t>>>>
                    _l_info;
             size_t _l_idx{1};
             for (const bba_inner_assertion_type_t& _l_matcher :
@@ -152,18 +153,19 @@ __constexpr_imp void
                         _l_matcher.source(),
                         _l_matcher.source_map()
                     );
-                tuple<size_t, matcher_result_t, optional<string>>
+                tuple<size_t, matcher_result_t, optional<string>, _ABC_NS_DS::log_infos_t>
                     _l_single_element = make_tuple(
                         _l_idx++,
                         _l_matcher.matcher_result(),
-                        _l_matcher.annotation()
+                        _l_matcher.annotation(),
+                        _l_matcher.log_infos()
                     );
                 if (_l_info.size() == 0 || _l_first != _l_info.back().first)
                 {
                     _l_info.push_back(make_pair(
                         _l_first,
                         vector<
-                            tuple<size_t, matcher_result_t, optional<string>>>(
+                            tuple<size_t, matcher_result_t, optional<string>,_ABC_NS_DS::log_infos_t>>(
                             1, _l_single_element
                         )
                     ));
@@ -179,7 +181,7 @@ __constexpr_imp void
                          enum_bba_inner_assertion_type_t,
                          optional<ds::single_source_t>,
                          matcher_source_map_t>,
-                     vector<tuple<size_t, matcher_result_t, optional<string>>>>&
+                     vector<tuple<size_t, matcher_result_t, optional<string>,_ABC_NS_DS::log_infos_t>>>&
                      _l_element : _l_info)
             {
                 if (_l_element.second.size() == 1)
@@ -190,6 +192,7 @@ __constexpr_imp void
                         std::optional<std::string>,
                         matcher_source_map_t>;
                     bba_inner_assertion_type_t _l_matcher(
+                        get<3>(_l_element.second[0]),
                         get<0>(_l_element.first),
                         get<1>(_l_element.second[0]),
                         get<2>(_l_element.first),
@@ -224,6 +227,7 @@ __constexpr_imp void
                         std::optional<std::string>,
                         matcher_source_map_t>;
                     bba_inner_assertion_type_t _l_matcher(
+                        get<3>(_l_element.second[0]),
                         get<0>(_l_element.first),
                         get<1>(_l_element.second[0]),
                         get<2>(_l_element.first),
@@ -253,6 +257,7 @@ __constexpr_imp void
                     for (auto& _l_ki : _l_element.second)
                     {
                         bba_inner_assertion_type_t _l_matcher(
+                            get<3>(_l_ki),
                             get<0>(_l_element.first),
                             get<1>(_l_ki),
                             get<2>(_l_element.first),

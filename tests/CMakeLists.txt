@@ -14,6 +14,8 @@ set(TEST_FILES
   include/abc_test_test/included_instances.hpp
   include/abc_test_test/included_instances/data_generator/enumeration/default_enumeration.hpp
   include/abc_test_test/included_instances/data_generator/random_generator/default_random_generator.hpp
+  include/abc_test_test/included_instances/data_generator/random_generator/default_random_generator/detail.hpp
+  include/abc_test_test/included_instances/data_generator/random_generator/default_random_generator/basic_string.hpp
   include/abc_test_test/core/ds/test_data/user_defined_test_data.hpp
       src/main.cpp
   include/abc_test_test/core.hpp

@@ -239,6 +239,7 @@ __constexpr assertion_wp_t<T>
     matcher_source_map_t _l_msm;
     global::get_this_threads_current_test().add_current_for_loop_stack_to_trie(
     );
+    auto ki = global::get_this_threads_test_runner_ref().get_log_infos(false);
     _a_matcher.gather_map_source(_l_msm);
     if constexpr (Annotated)
     {
@@ -246,6 +247,7 @@ __constexpr assertion_wp_t<T>
             ( std::same_as<T, _ABC_NS_REPORTS::terminate_t>
               || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t> ),
             _a_matcher.matcher_result(),
+            ki,
             ds::single_source_t(_a_str_representation, _a_source_location),
             std::optional<std::string>(_a_matcher.annotation()),
             _l_msm
@@ -258,6 +260,7 @@ __constexpr assertion_wp_t<T>
             ( std::same_as<T, _ABC_NS_REPORTS::terminate_t>
               || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t> ),
             _a_matcher.matcher_result(),
+            ki,
             ds::single_source_t(_a_str_representation, _a_source_location),
             std::optional<std::string>{},
             _l_msm

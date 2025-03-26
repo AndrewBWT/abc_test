@@ -270,6 +270,7 @@ create_assertion(
     matcher_source_map_t _l_msm;
     _a_matcher.gather_map_source(_l_msm);
     _l_passed = _l_mr.passed();
+    auto ki = _a_test_runner.get_log_infos(false);
     _l_gur    = make_unique<const matcher_based_assertion_single_line_t<T>>(
         _l_source,
         _a_test_runner.get_log_infos(false),
@@ -277,6 +278,7 @@ create_assertion(
             ( std::same_as<T, _ABC_NS_REPORTS::terminate_t>
               || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t> ),
             _l_mr,
+            ki,
             _l_source,
             _l_matcher_annotation,
             _l_msm
