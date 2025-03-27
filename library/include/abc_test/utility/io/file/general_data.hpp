@@ -55,7 +55,7 @@ __no_constexpr_imp abc::utility::io::general_data_t
                    ) noexcept
 {
     return gdf_from_path(
-        (global::get_this_threads_current_test().path() / _a_str)
+        (std::filesystem::absolute(global::get_this_threads_current_test().path()) / _a_str)
             .concat(".").concat(global::get_global_test_options().general_data_extension)
     );
 }
@@ -69,8 +69,9 @@ __no_constexpr_imp abc::utility::io::general_data_t
     using namespace std;
     using namespace std::filesystem;
     return gdf_from_path(
-        (global::get_global_test_options().root_path / _a_folder / _a_str)
-        .concat(".").concat(global::get_global_test_options().general_data_extension)
+        (absolute(global::get_global_test_options().root_path) / _a_folder / _a_str)
+            .concat(".")
+            .concat(global::get_global_test_options().general_data_extension)
     );
 }
 

@@ -6,12 +6,12 @@
 
 // Detail tests.
 
-namespace test::detail
+namespace test
 {
 
 template <typename T, typename Rng>
 inline void
-    test_generate_rng_value_between_bounds()
+    fuzzy_test_generate_rng_value_between_bounds()
 {
     using namespace std;
     using namespace abc;
@@ -56,22 +56,23 @@ inline void
 
 template <typename T>
 inline void
-    test_generate_rng_value_between_bounds()
+    fuzzy_test_generate_rng_value_between_bounds()
 {
     using namespace abc;
     using namespace std;
-    using namespace test::str;
+    using namespace test;
     manual_data_generator_t _l_mdg;
     RUN(_l_mdg,
-        (test_generate_rng_value_between_bounds<T, utility::simple_rng_t>()));
+        (fuzzy_test_generate_rng_value_between_bounds<T, utility::simple_rng_t>(
+        )));
     RUN(_l_mdg,
-        (test_generate_rng_value_between_bounds<
+        (fuzzy_test_generate_rng_value_between_bounds<
             T,
             utility::inner_rng_mt19937_64_t>()));
 }
 } // namespace test::detail
 
-/*_TEST_CASE(
+_TEST_CASE(
     abc::test_case_t(
         {.name = "Fuzzy testing detail::generate_rng_value_between_bounds for "
                  "various types and values",
@@ -83,17 +84,18 @@ inline void
 {
     using namespace abc;
     using namespace std;
-    using namespace test::detail;
+    using namespace test;
     manual_data_generator_t _l_mdg;
-    RUN(_l_mdg, test_generate_rng_value_between_bounds<bool>());
-    RUN(_l_mdg, test_generate_rng_value_between_bounds<unsigned char>());
-    RUN(_l_mdg, test_generate_rng_value_between_bounds<unsigned short>());
-    RUN(_l_mdg, test_generate_rng_value_between_bounds<unsigned int>());
-    RUN(_l_mdg, test_generate_rng_value_between_bounds<unsigned long>());
-    RUN(_l_mdg, test_generate_rng_value_between_bounds<unsigned long long>());
-}*/
+    RUN(_l_mdg, fuzzy_test_generate_rng_value_between_bounds<bool>());
+    RUN(_l_mdg, fuzzy_test_generate_rng_value_between_bounds<unsigned char>());
+    RUN(_l_mdg, fuzzy_test_generate_rng_value_between_bounds<unsigned short>());
+    RUN(_l_mdg, fuzzy_test_generate_rng_value_between_bounds<unsigned int>());
+    RUN(_l_mdg, fuzzy_test_generate_rng_value_between_bounds<unsigned long>());
+    RUN(_l_mdg,
+        fuzzy_test_generate_rng_value_between_bounds<unsigned long long>());
+}
 
-namespace test::detail
+namespace test
 {
 
 template <typename T>
@@ -151,7 +153,7 @@ _TEST_CASE(
 {
     using namespace abc;
     using namespace std;
-    using namespace test::detail;
+    using namespace test;
     manual_data_generator_t _l_mdg;
     RUN(_l_mdg, unit_test_rng_value_between_bounds<bool>());
     RUN(_l_mdg, unit_test_rng_value_between_bounds<unsigned char>());

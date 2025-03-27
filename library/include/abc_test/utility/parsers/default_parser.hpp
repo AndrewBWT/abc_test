@@ -83,19 +83,20 @@ requires enum_has_list_c<T>
 struct default_parser_t<T> : public parser_base_t<T>
 {
     using value_type_t = T;
+
     default_parser_t(
-        const enum_helper_string_case_t _a_enum_helper_string_case =
-        enum_helper_string_case_t::unchanged
+        const enum_helper_string_case_t _a_enum_helper_string_case
+        = enum_helper_string_case_t::unchanged
     )
         : _m_enum_helper_string_case(_a_enum_helper_string_case)
-    {
+    {}
 
-    }
     enum_helper_string_case_t _m_enum_helper_string_case;
-    __constexpr result_t<T>
-                run_parser(
-                    parser_input_t& _a_parse_input
-                ) const
+
+    __constexpr               result_t<T>
+                              run_parser(
+                                  parser_input_t& _a_parse_input
+                              ) const
     {
         return _ABC_NS_UTILITY::get_thread_local_enumerate_enum_helper<T>()
             .parse_enum(_a_parse_input, _m_enum_helper_string_case);
@@ -133,6 +134,42 @@ struct default_parser_t<char> : public parser_base_t<char>
                 fmt::format("Could not find expected character `{0}`.", "`")
             );
         }
+    }
+};
+
+template <>
+struct default_parser_t<wchar_t> : public parser_base_t<wchar_t>
+{
+    __constexpr result_t<wchar_t>
+        run_parser(
+            parser_input_t& _a_parse_input
+        ) const
+    {
+        using namespace std;
+        return unexpected("Couldn't parse wchar_t");
+        /*using namespace std;
+        string_view sv{ _a_parse_input.sv() };
+        if (_a_parse_input.check_and_advance("`"))
+        {
+            wchar_t _l_rv{ *_a_parse_input };
+            _a_parse_input.advance(1);
+            if (_a_parse_input.check_and_advance("`"))
+            {
+                return _l_rv;
+            }
+            else
+            {
+                return unexpected(
+                    fmt::format("Could not find expected character `{0}`.", "`")
+                );
+            }
+        }
+        else
+        {
+            return unexpected(
+                fmt::format("Could not find expected character `{0}`.", "`")
+            );
+        }*/
     }
 };
 
@@ -433,18 +470,30 @@ _END_ABC_UTILITY_PARSER_NS
 _BEGIN_ABC_UTILITY_PARSER_NS
 
 template <typename T>
-requires (std::convertible_to<T, std::string_view>)
-struct default_parser_t<T> : public parser_base_t<T>
+struct default_parser_t<std::basic_string<T>>
+    : public parser_base_t<std::basic_string<T>>
 {
-    __constexpr result_t<T>
+    __constexpr
+    default_parser_t()
+        : default_parser_t<std::basic_string<T>>(default_parser<T>())
+    {}
+
+    __constexpr
+    default_parser_t(
+        const parser_t<T>& _a_parser
+    ) noexcept
+        : _m_parser(_a_parser)
+    {}
+
+    __constexpr result_t<std::basic_string<T>>
                 run_parser(
                     parser_input_t& _a_parse_input
                 ) const
     {
         using namespace std;
         _a_parse_input.check_advance_and_throw('"');
-        char _l_prev_char{'"'};
-        T    _l_rv;
+        T                    _l_prev_char{'"'};
+        std::basic_string<T> _l_rv;
         while (true)
         {
             if (*_a_parse_input == '"' && _l_prev_char != '\\')
@@ -453,14 +502,20 @@ struct default_parser_t<T> : public parser_base_t<T>
             }
             else
             {
-                _l_rv.push_back(*_a_parse_input);
-                _l_prev_char = *_a_parse_input;
-                ++_a_parse_input;
+                const result_t<T> _l_result{_m_parser->run_parser(_a_parse_input
+                )};
+                if (_l_result.has_value())
+                {
+                    _l_rv.push_back(_l_result.value());
+                    _l_prev_char = _l_result.value();
+                }
             }
         }
         _a_parse_input.check_advance_and_throw('"');
-        return result_t<T>(_l_rv);
+        return result_t<std::basic_string<T>>(_l_rv);
     }
+private:
+    parser_t<T> _m_parser;
 };
 
 template <typename T, typename U>
