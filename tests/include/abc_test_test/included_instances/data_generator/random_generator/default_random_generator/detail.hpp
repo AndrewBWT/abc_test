@@ -103,7 +103,7 @@ inline void
     using namespace std;
     using namespace abc;
     using namespace utility;
-    using test_data_t = tuple<size_t, T, T, T>;
+    using test_data_t = tuple<size_t, size_t, T, T, size_t, T>;
     _BEGIN_MULTI_ELEMENT_BBA(
         _l_unit_tests,
         fmt::format(
@@ -116,17 +116,24 @@ inline void
              fmt::format("generate_rng_value_between_bounds_{0}", typeid(T))
          ))
     {
-        const auto& [_l_rng_counter, _l_lower_bound, _l_higher_bound, _l_expected_result]{
+        const auto& [_l_rng_counter, _l_rng_progress_to, _l_lower_bound, _l_higher_bound, _l_rng_after_running, _l_expected_result]{
             _l_tuple
         };
-        _TVLOG_(_l_rng_counter);
+        _TVLOG_(_l_tuple);
         rng_t       _l_rng = rng_t::make_rng<simple_rng_t>(vector<uint32_t>());
         bounds_t<T> _l_bounds(_l_lower_bound, _l_higher_bound);
-        const T     _l_result
+        _l_rng.progress(_l_rng_progress_to);
+        _TVLOG_(_l_bounds);
+        const T _l_result
             = abc::data_gen::detail::generate_rng_value_between_bounds(
                 _l_bounds, _l_rng_counter, _l_rng
             );
-        _l_unit_tests += _BLOCK_CHECK(_EXPR(_l_expected_result == _l_result));
+        _l_unit_tests += _BLOCK_CHECK(
+            _EXPR(_l_expected_result == _l_result)
+            && _EXPR(
+                _l_rng_after_running == (_l_rng.calls() - _l_rng_progress_to)
+            )
+        );
     }
     _END_BBA_CHECK(_l_unit_tests);
 }

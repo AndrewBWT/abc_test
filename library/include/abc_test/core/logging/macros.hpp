@@ -1,6 +1,6 @@
 #pragma once
-#include "abc_test/utility/internal/macros.hpp"
 #include "abc_test/core/logging/log_msg.hpp"
+#include "abc_test/utility/internal/macros.hpp"
 
 /*!
  * @brief Internal macro, used to assign a random name to the annonymous
@@ -63,13 +63,19 @@
  * @param _a_delete_after_use Whether to delete this variable after its first
  * used.
  */
-#define __ABC_INTERNAL_VLOG(                                 \
-    _a_variable, _a_delete_after_use, _a_str_representation  \
-)                                                            \
-    __ABC_INTERNAL_LOG(                                      \
-        fmt::format("{0} = {1}", #_a_variable, _a_variable), \
-        _a_delete_after_use,                                 \
-        _a_str_representation                                \
+#define __ABC_INTERNAL_VLOG(                                  \
+    _a_variable, _a_delete_after_use, _a_str_representation   \
+)                                                             \
+    __ABC_INTERNAL_LOG(                                       \
+        fmt::format(                                          \
+            "{0} = {1}",                                      \
+            #_a_variable,                                     \
+            abc::utility::printer::default_printer_t<         \
+                std::remove_cvref_t<decltype(_a_variable)>>() \
+                .run_printer(_a_variable)                     \
+        ),                                                    \
+        _a_delete_after_use,                                  \
+        _a_str_representation                                 \
     )
 /*!
  * @brief Macro used to log a single variable to an assertion.

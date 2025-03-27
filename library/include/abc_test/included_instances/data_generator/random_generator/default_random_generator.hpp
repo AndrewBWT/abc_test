@@ -51,24 +51,38 @@ __constexpr T
     )
 {
     using namespace std;
-    const T _l_denominator{
-        _a_bounds.difference() > static_cast<T>(_a_rng_counter)
-            ? static_cast<T>(_a_rng_counter)
-            : _a_bounds.difference()
-    };
-    return
-        // If denominator is 0, no point in calling rng
-        _l_denominator == 0
-            ? _a_bounds.lower()
-            // Else pick a value from lower to higher. We use modulus +1 so that
-            // it is within that range.
-            // If the denominator == numeric_limits::max, don't add 1 as
-            // it will cause division by 0.
-            : _a_bounds.lower()
-                  + (_a_rng()
-                     % (_l_denominator
-                        + +(_l_denominator == numeric_limits<T>::max() ? 0 : 1))
-                  );
+    if constexpr (std::same_as<T, std::uintmax_t>)
+    {
+        const size_t _l_denominator{
+            std::min(_a_bounds.difference(), _a_rng_counter)
+        };
+        return
+            // If denominator is max, then difference must be max. And lower==0.
+            (_l_denominator == numeric_limits< std::uintmax_t>::max()) ?
+            _a_rng() :
+            // If denominator is 0, no point in calling rng
+            _l_denominator == 0
+                ? _a_bounds.lower()
+            // Otherwise, pick the value we want.
+                : _a_bounds.lower()
+                      + static_cast<T>(_a_rng() % (_l_denominator + 1));
+    }
+    else
+    {
+        const size_t _l_denominator{std::min(
+            static_cast<size_t>(_a_bounds.difference()), _a_rng_counter
+        )};
+        return
+            // If denominator is 0, no point in calling rng
+            _l_denominator == 0
+                ? _a_bounds.lower()
+                // Else pick a value from lower to higher. We use modulus +1 so
+                // that it is within that range. If the denominator ==
+                // numeric_limits::max, don't add 1 as it will cause division by
+                // 0.
+                : _a_bounds.lower()
+                      + static_cast<T>(_a_rng() % (_l_denominator + 1));
+    }
 }
 } // namespace detail
 
