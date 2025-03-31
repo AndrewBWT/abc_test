@@ -41,41 +41,39 @@ protected:
     std::size_t        _m_index;
     std::size_t        _m_global_indent;
     std::size_t        _m_max_index;
-    bool _m_use_indexes;
-    __no_constexpr_imp std::string
+    bool               _m_use_indexes;
+
+    __no_constexpr_imp std::u8string
                        prefix(
                            const std::size_t _a_idx
                        ) const noexcept
     {
         using namespace std;
-        string _l_max_str{fmt::format("  {0})  ", _m_max_index)};
+        u8string _l_max_str{fmt::format(u8"  {0})  ", _m_max_index)};
         if (_m_use_indexes)
         {
             if (_a_idx == 0)
             {
-                string _l_s1{ fmt::format("  {0})", _m_index) };
+                u8string _l_s1{fmt::format(u8"  {0})", _m_index)};
                 return fmt::format(
-                    "{0}{1}{2}",
-                    string(_m_global_indent, ' '),
+                    u8"{0}{1}{2}",
+                    u8string(_m_global_indent, char8_t(' ')),
                     _l_s1,
-                    string(_l_max_str.size() - _l_s1.size(), ' ')
+                    u8string(_l_max_str.size() - _l_s1.size(), ' ')
                 );
             }
             else
             {
                 return fmt::format(
-                    "{0}{1}",
-                    string(_m_global_indent, ' '),
-                    string(_l_max_str.size(), ' ')
+                    u8"{0}{1}",
+                    u8string(_m_global_indent, char8_t(' ')),
+                    u8string(_l_max_str.size(), char8_t(' '))
                 );
             }
         }
         else
         {
-            return fmt::format(
-                "{0}",
-                string(_m_global_indent, ' ')
-            );
+            return fmt::format(u8"{0}", u8string(_m_global_indent, char8_t(' ')));
         }
     }
 };
@@ -137,7 +135,7 @@ __no_constexpr_imp void
     using enum enum_assertion_block_matcher_data_fields_t;
     using enum _ABC_NS_MATCHER::enum_bba_inner_assertion_type_t;
     using namespace std;
-    pair<string, string> _l_pair;
+    pair<u8string, u8string> _l_pair;
     switch (_a_fid)
     {
     case MATCHER_ANNOTATION:
@@ -150,7 +148,15 @@ __no_constexpr_imp void
                        _a_pc.colon(_a_pc.matcher_annotation()), _m_indent_offset
                    ),
                    _a_pc.indent(
-                       _a_pc.message_str(_a_element.annotation()),
+                       _a_pc.message_str(
+                           _a_element.annotation().has_value()
+                               ?
+
+                               optional<u8string>(string_view_to_u8string(
+                                   _a_element.annotation().value()
+                               ))
+                               : optional<u8string>{}
+                       ),
                        _m_indent_offset + 1
                    )};
         }
@@ -163,7 +169,15 @@ __no_constexpr_imp void
                        _m_indent_offset
                    ),
                    _a_pc.indent(
-                       _a_pc.message_str(_a_element.annotation()),
+                       _a_pc.message_str(
+                           _a_element.annotation().has_value()
+                               ?
+
+                               optional<u8string>(string_view_to_u8string(
+                                   _a_element.annotation().value()
+                               ))
+                               : optional<u8string>{}
+                       ),
                        _m_indent_offset + 1
                    )};
         }
@@ -188,7 +202,9 @@ __no_constexpr_imp void
                        _m_indent_offset
                    ),
                    _a_pc.indent(
-                       _a_pc.matcher_output(_l_matcher_result.str()),
+                       _a_pc.matcher_output(
+                           _l_matcher_result.str()
+                       ),
                        _m_indent_offset + 1
                    )};
         }
@@ -211,44 +227,51 @@ __no_constexpr_imp void
     case MATCHER_SOURCE_MAP:
     {
         using namespace std;
-        _a_ttor.write(
-            prefix(_a_idx)
-            + _a_pc.indent(
+        _a_ttor.write(fmt::format(
+            u8"{0}{1}",
+            prefix(_a_idx),
+            _a_pc.indent(
                 _a_pc.colon(_a_pc.matcher_source_map_str()), _m_indent_offset
             )
-        );
+        ));
         for (const pair<std::source_location, vector<string>>& _l_element :
              _a_element.source_map().map())
         {
-            _a_ttor.write(
-                prefix(_a_idx + 1)
-                + _a_pc.indent(
+            _a_ttor.write(fmt::format(
+                u8"{0}{1}",
+                prefix(_a_idx + 1),
+                _a_pc.indent(
                     _a_pc.colon(_a_pc.source_location_str()),
                     _m_indent_offset + 1
                 )
-            );
-            _a_ttor.write(
-                prefix(_a_idx + 1)
-                + _a_pc.indent(
+            ));
+            _a_ttor.write(fmt::format(
+                u8"{0}{1}",
+                prefix(_a_idx + 1),
+                _a_pc.indent(
                     _a_pc.source_location(_l_element.first),
-                    _m_indent_offset + 2
+                    _m_indent_offset + 1
                 )
-            );
-            _a_ttor.write(
-                prefix(_a_idx + 1)
-                + _a_pc.indent(
+            ));
+            _a_ttor.write(fmt::format(
+                u8"{0}{1}",
+                prefix(_a_idx + 1),
+                _a_pc.indent(
                     _a_pc.colon(_a_pc.source_code_str()), _m_indent_offset + 1
                 )
-            );
+            ));
             for (const string_view _l_str : _l_element.second)
             {
-                _a_ttor.write(
-                    prefix(_a_idx + 1)
-                    + _a_pc.indent(
-                        _a_pc.source_representation(_l_str),
+                _a_ttor.write(fmt::format(
+                    u8"{0}{1}",
+                    prefix(_a_idx + 1),
+                    _a_pc.indent(
+                        _a_pc.source_representation(
+                            string_view_to_u8string(_l_str)
+                        ),
                         _m_indent_offset + 2
                     )
-                );
+                ));
             }
         }
     }
@@ -259,19 +282,23 @@ __no_constexpr_imp void
                    _a_pc.colon(_a_pc.source_code_str()), _m_indent_offset
                ),
                _a_pc.indent(
-                   _a_pc.source_representation(
+                   _a_pc.source_representation(string_view_to_u8string(
                        _a_element.source().value().source_code_representation()
-                   ),
+                   )),
                    _m_indent_offset + 1
                )};
         break;
     case LOG_INFOS:
-        _a_ttor.write(fmt::format("{0}{1}", prefix(_a_idx), _a_pc.colon(_a_pc.log_info_str())));
-        for (const string_view& _l_str : _a_element.log_infos())
+        _a_ttor.write(fmt::format(
+            u8"{0}{1}", prefix(_a_idx), _a_pc.colon(_a_pc.log_info_str())
+        ));
+        for (const u8string_view& _l_str : _a_element.log_infos())
         {
-            _a_ttor.write(
-                fmt::format("{0}{1}", prefix(_a_idx), _a_pc.indent(_a_pc.log_info(_l_str)))
-            );
+            _a_ttor.write(fmt::format(
+                u8"{0}{1}",
+                prefix(_a_idx),
+                _a_pc.indent(_a_pc.log_info(_l_str))
+            ));
         }
         return;
     case MATCHER_MAIN_SOURCE_LOCATION:
@@ -289,9 +316,13 @@ __no_constexpr_imp void
     default:
         throw errors::unaccounted_for_enum_exception(_a_fid);
     }
-    _a_ttor.write(
-        fmt::format("{0}{1}\n{3}{2}", prefix(_a_idx), _l_pair.first, _l_pair.second, prefix(_a_idx+1))
-    );
+    _a_ttor.write(fmt::format(
+        u8"{0}{1}\n{3}{2}",
+        prefix(_a_idx),
+        _l_pair.first,
+        _l_pair.second,
+        prefix(_a_idx + 1)
+    ));
 }
 
 _END_ABC_REPORTERS_NS

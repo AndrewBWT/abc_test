@@ -11,7 +11,7 @@ test_set_data_t::process_invoked_test(
 {
     using namespace std;
     using enum enum_test_status_t;
-    const string_view _l_delimiter{
+    const u8string_view _l_delimiter{
         global::get_global_test_options().path_delimiter
     };
     const enum_test_status_t _l_test_status{ _a_invoked_test.test_status() };

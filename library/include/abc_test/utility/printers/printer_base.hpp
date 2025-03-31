@@ -19,13 +19,13 @@ struct printer_base_t
 {
 public:
     using value_type = T;
-    __constexpr virtual std::string
+    __constexpr virtual std::u8string
         run_printer(const T& _a_parse_input) const
         = 0;
 };
 
 template <typename T>
-__constexpr_imp std::string
+__constexpr_imp std::u8string
                 print(
                     const T&                              _a_object,
                     const utility::printer::printer_t<T>& _a_printer
@@ -39,7 +39,7 @@ _END_ABC_UTILITY_PRINTER_NS
 _BEGIN_ABC_UTILITY_PRINTER_NS
 
 template <typename T>
-__constexpr_imp std::string
+__constexpr_imp std::u8string
                 print(
                     const T&                              _a_object,
                     const utility::printer::printer_t<T>& _a_printer

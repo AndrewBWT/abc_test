@@ -31,7 +31,7 @@ public:
             const std::size_t _a_idx
         ) const override;
 protected:
-    __constexpr virtual std::string
+    __constexpr virtual std::u8string
         get_str_representation(
             const reports::assertion_t<false, Assertion_Status>& _a_element,
             const print_config_t&                                _a_pc
@@ -128,7 +128,7 @@ __constexpr_imp void
                 }
             }
             _a_ttor.write(fmt::format(
-                "{0}{1}",this->prefix(_a_idx), _a_pc.colon(_a_pc.multi_element_collection_grouped_str())
+                u8"{0}{1}",this->prefix(_a_idx), _a_pc.colon(_a_pc.multi_element_collection_grouped_str())
             ));
             vector<pair<
                 tuple<
@@ -215,10 +215,10 @@ __constexpr_imp void
                 else
                 {
                     _a_ttor.write(fmt::format(
-                        "{0}{1}", this->prefix(_a_idx), _a_pc.indent(fmt::format(
-                        "The following {0} {1} assertions have the same source "
-                        "data, "
-                        "which is as follows:",
+                        u8"{0}{1}", this->prefix(_a_idx), _a_pc.indent(fmt::format(
+                        u8"The following {0} {1} assertions have the same source "
+                        u8"data, "
+                        u8"which is as follows:",
                         _l_element.second.size(),
                         get_str(get<1>(_l_element.first))
                     ))));
@@ -248,7 +248,7 @@ __constexpr_imp void
 
                     _a_ttor.write(this->prefix(_a_idx) + _a_pc.indent(
                         fmt::format(
-                            "The data of the {0} {1} assertions:",
+                            u8"The data of the {0} {1} assertions:",
                             _l_element.second.size(),
                             get_str(get<1>(_l_element.first))
                         ),
@@ -319,7 +319,7 @@ __constexpr_imp void
 }
 
 template <typename Assertion_Status>
-__constexpr_imp std::string
+__constexpr_imp std::u8string
                 multi_element_test_block_list_formatter_t<Assertion_Status>::
         get_str_representation(
             const reports::assertion_t<false, Assertion_Status>& _a_element,
@@ -342,9 +342,9 @@ __constexpr_imp std::string
     }
     return construct_str_representation(
         _a_element,
-        "Multi-element block-based assertion",
+        u8"Multi-element block-based assertion",
         fmt::format(
-            " {0}/{1} assertions passed.",
+            u8" {0}/{1} assertions passed.",
             _l_passed,
             _l_element.get_matcher().size()
         )

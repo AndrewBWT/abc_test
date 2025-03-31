@@ -224,9 +224,9 @@ __constexpr_imp const ds::tdg_collection_stack_trie_t&
     if (_m_for_loop_stack_trie == nullptr)
     {
         throw errors::test_library_exception_t(
-            "Attempted to access post_setup_test_data_t's repetition data. "
-            "However, the for_loop_stack_trie contains a nullptr. "
-            "Use has_for_loop_stack_trie to check this."
+            u8"Attempted to access post_setup_test_data_t's repetition data. "
+            u8"However, the for_loop_stack_trie contains a nullptr. "
+            u8"Use has_for_loop_stack_trie to check this."
         );
     }
     else
@@ -255,7 +255,7 @@ __constexpr_imp bool check_if_element_in_path_set(
     for (const test_path_hierarchy_t& _l_path_set_element : _a_test_path_set)
     {
         bool _l_prefix_matches{ true };
-        for (size_t _l_idx{ 0 }; const string_view _l_str : _l_path_set_element)
+        for (size_t _l_idx{ 0 }; const u8string_view _l_str : _l_path_set_element)
         {
             if (_l_idx >= _l_test_path_hierarchy_size)
             {
@@ -299,7 +299,8 @@ __no_constexpr_imp auto
         "_m_registered_test_data",
         _a_pstd.registered_test_data(),
         "_m_test_path_hierarchy",
-        _a_pstd.test_path_hierarchy(),
+        "placeholder for test path hierarhcy",
+        //_a_pstd.test_path_hierarchy(),
         "_m_discovery_id",
         _a_pstd.discovery_id(),
         "_m_is_test_to_be_ran",

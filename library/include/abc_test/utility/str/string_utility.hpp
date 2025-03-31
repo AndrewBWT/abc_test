@@ -11,6 +11,8 @@
 
 #include "abc_test/utility/types.hpp"
 
+#include <fmt/xchar.h>
+
 _BEGIN_ABC_UTILITY_STR_NS
 /*!
  * Appends together a set of strings into a single output string.
@@ -20,11 +22,12 @@ __constexpr std::string
 /*!
  * Splits a string using the given delimiter
  */
-__constexpr std::vector<std::string>
-            split_string(
-                const std::string_view _a_str,
-                const std::string_view delimiter
-            ) noexcept;
+template<typename T>
+__constexpr std::vector<std::basic_string<T>>
+split_string(
+    const std::basic_string_view<T> _a_str,
+    const std::basic_string_view<T> _a_delimiter
+) noexcept;
 __constexpr std::vector<std::string_view>
 split_string_sv(
     const std::string_view _a_str,
@@ -36,14 +39,14 @@ __constexpr    std::string
                quote(const std::string_view _a_str) noexcept;
 __constexpr    std::string
     indent(const std::size_t _a_size, const std::string_view _a_str) noexcept;
-__constexpr const std::string_view
+__constexpr const std::u8string_view
                   return_str_if_next_index_in_bound(
                       const std::size_t      _a_index_to_check,
                       const std::size_t      _a_max_index,
-                      const std::string_view _a_str
+                      const std::u8string_view _a_str
                   ) noexcept;
-__constexpr std::string
-            to_hex(const std::string_view _a_str) noexcept;
+__constexpr std::u8string
+            to_hex(const std::u8string_view _a_str) noexcept;
 __constexpr result_t<std::string>
             from_hex(const std::string_view _a_str);
 __constexpr std::string
@@ -67,28 +70,29 @@ __constexpr_imp std::string
     return _l_rv;
 }
 
-__constexpr_imp std::vector<std::string>
+template<typename T>
+__constexpr_imp std::vector<std::basic_string<T>>
                 split_string(
-                    const std::string_view _a_str,
-                    const std::string_view _a_delimiter
+                    const std::basic_string_view<T> _a_str,
+                    const std::basic_string_view<T> _a_delimiter
                 ) noexcept
 {
     using namespace std;
-    if (_a_str == "")
+    if (_a_str.empty())
     {
         return {};
     }
     size_t         pos_start = 0, pos_end, delim_len = _a_delimiter.size();
-    string         token;
-    vector<string> res;
+    basic_string<T> token;
+    vector<basic_string<T>> res;
 
-    while ((pos_end = _a_str.find(_a_delimiter, pos_start)) != string::npos)
+    while ((pos_end = _a_str.find(_a_delimiter, pos_start)) != basic_string<T>::npos)
     {
         token     = _a_str.substr(pos_start, pos_end - pos_start);
         pos_start = pos_end + delim_len;
         res.push_back(token);
     }
-    res.push_back(string(_a_str.substr(pos_start)));
+    res.push_back(basic_string<T>(_a_str.substr(pos_start)));
     return res;
 }
 
@@ -146,19 +150,19 @@ __constexpr_imp std::string
     return string(_a_size, ' ').append(_a_str);
 }
 
-__constexpr_imp const std::string_view
+__constexpr_imp const std::u8string_view
                       return_str_if_next_index_in_bound(
                           const std::size_t      _a_index_to_check,
                           const std::size_t      _a_max_index,
-                          const std::string_view _a_str
+                          const std::u8string_view _a_str
                       ) noexcept
 {
-    return _a_index_to_check + 1 < _a_max_index ? _a_str : "";
+    return _a_index_to_check + 1 < _a_max_index ? _a_str : u8"";
 }
 
-__constexpr_imp std::string
+__constexpr_imp std::u8string
                 to_hex(
-                    const std::string_view _a_str
+                    const std::u8string_view _a_str
                 ) noexcept
 {
     using namespace std;
@@ -167,10 +171,10 @@ __constexpr_imp std::string
     {
         _l_chars.push_back(static_cast<unsigned char>(_l_char));
     }
-    string _l_rv;
+    u8string _l_rv;
     for (unsigned char _l_char : _l_chars)
     {
-        _l_rv.append(fmt::format("{:x}", _l_char));
+        _l_rv.append(fmt::format(u8"{:x}", _l_char));
     }
     return _l_rv;
 }
@@ -185,11 +189,11 @@ __constexpr_imp result_t<std::string>
     if ((_a_str.size() % 2) != 0)
     {
         return unexpected(
-            fmt::format("Compressed repetition_tree_t is in the form a "
-                        "string in hex. As "
-                        "each hex digit requires two bytes, the total size "
-                        "of the string "
-                        "must be divisble by 2. This string is not")
+            fmt::format(u8"Compressed repetition_tree_t is in the form a "
+                        u8"string in hex. As "
+                        u8"each hex digit requires two bytes, the total size "
+                        u8"of the string "
+                        u8"must be divisble by 2. This string is not")
         );
     }
     else
@@ -214,7 +218,7 @@ __constexpr_imp result_t<std::string>
             {
                 // Else return failure
                 return unexpected{fmt::format(
-                    "Could not parse byte pair {0}{1}",
+                    u8"Could not parse byte pair {0}{1}",
                     *_l_position,
                     *(_l_position + 1)
                 )};
@@ -234,8 +238,8 @@ __constexpr_imp std::string
     if (not _l_res.has_value())
     {
         throw errors::test_library_exception_t(fmt::format(
-            "Could not parse \"{0}\" from hex. Reason given is \"{1}\".",
-            _a_str,
+            u8"Could not parse \"{0}\" from hex. Reason given is \"{1}\".",
+            string_view_to_u8string(_a_str),
             _l_res.error()
         ));
     }
@@ -245,13 +249,13 @@ __constexpr_imp std::string
     }
 }
 
-__no_constexpr_imp std::string
+__no_constexpr_imp std::u8string
                 remove_whitespace(
-                    const std::string_view _a_str
+                    const std::u8string_view _a_str
                 ) noexcept
 {
     using namespace std;
-    string _l_rv{_a_str};
+    u8string _l_rv{_a_str};
     _l_rv.erase(
         std::remove_if(
             _l_rv.begin(),

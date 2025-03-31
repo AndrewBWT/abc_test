@@ -16,9 +16,9 @@ public:
     file_line_writer_t() noexcept
         = default;
     __no_constexpr void
-        write_comment(const std::string_view _a_str_to_write) noexcept;
+        write_comment(const std::u8string_view _a_str_to_write) noexcept;
     __no_constexpr void
-        write_line(const std::string_view _a_str_to_write) noexcept;
+        write_line(const std::u8string_view _a_str_to_write) noexcept;
 private:
     size_t                         _m_current_line_idx;
     std::shared_ptr<std::ofstream> _m_file_handler;
@@ -53,8 +53,8 @@ __no_constexpr_imp
         if (not _m_file_handler.get()->is_open())
         {
             throw test_library_exception_t(fmt::format(
-                "Unable to open file_line_writer_t object as file \"{0}\", "
-                "even though all checks suggest we should be able to.",
+                u8"Unable to open file_line_writer_t object as file \"{0}\", "
+                u8"even though all checks suggest we should be able to.",
                 _m_file_name
             ));
         }
@@ -79,24 +79,24 @@ __no_constexpr_imp
 }*/
 __no_constexpr_imp void
     file_line_writer_t::write_comment(
-        const std::string_view _a_str_to_write
+        const std::u8string_view _a_str_to_write
     ) noexcept
 {
     write_line(fmt::format(
-        "{0}{1}", global::get_global_test_options().comment_str, _a_str_to_write
+        u8"{0}{1}", global::get_global_test_options().comment_str, _a_str_to_write
     ));
 }
 
 __no_constexpr_imp void
     file_line_writer_t::write_line(
-        const std::string_view _a_str_to_write
+        const std::u8string_view _a_str_to_write
     ) noexcept
 {
     using namespace std;
     if (global::get_global_test_options().write_data_to_files)
     {
         ofstream& _l_out{ *_m_file_handler.get() };
-        _l_out << _a_str_to_write << std::endl;
+        _l_out << string(_a_str_to_write.begin(), _a_str_to_write.end()) << std::endl;
     }
 }
 

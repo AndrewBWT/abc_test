@@ -20,7 +20,7 @@ __no_constexpr_imp matcher_t
     using namespace _ABC_NS_MATCHER;
     return mk_matcher_using_result(matcher_result_t(
         true,
-        fmt::format("No exception thrown, which was the expected behaviour")
+        fmt::format(u8"No exception thrown, which was the expected behaviour")
     ));
 }
 
@@ -34,10 +34,10 @@ __no_constexpr_imp matcher_t
     return mk_matcher_using_result(matcher_result_t(
         false,
         fmt::format(
-            "An unexpected exception, of a type derived from {0} was thrown. "
-            "The exception's what() function returned \"{1}\".",
-            typeid(std::exception).name(),
-            _a_exception.what()
+            u8"An unexpected exception, of a type derived from {0} was thrown. "
+            u8"The exception's what() function returned \"{1}\".",
+            string_view_to_u8string(typeid(std::exception).name()),
+            string_view_to_u8string(_a_exception.what())
         )
     ));
 }
@@ -49,7 +49,7 @@ __no_constexpr_imp matcher_t
     using namespace _ABC_NS_MATCHER;
     return mk_matcher_using_result(matcher_result_t(
         false,
-        fmt::format("An unexpected exception of an unknown type was thrown.")
+        fmt::format(u8"An unexpected exception of an unknown type was thrown.")
     ));
 }
 
@@ -69,7 +69,10 @@ __no_constexpr_imp matcher_t
     return mk_matcher_using_result(matcher_result_t(
         _l_equal,
         fmt::format(
-            "{0} {1} {2}", string(_a_str1), _l_equal ? "==" : "!=", _a_str2
+            u8"{0} {1} {2}",
+            string_view_to_u8string(_a_str1),
+            _l_equal ? u8"==" : u8"!=",
+            string_view_to_u8string(_a_str2)
         )
     ));
 }

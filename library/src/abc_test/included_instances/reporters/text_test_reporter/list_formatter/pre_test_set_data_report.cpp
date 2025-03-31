@@ -8,7 +8,7 @@
 
 _BEGIN_ABC_REPORTERS_NS
 
-__no_constexpr_or_inline_imp std::optional<std::string>
+__no_constexpr_or_inline_imp std::optional<std::u8string>
                              pre_test_set_data_list_formatter::get_cli_info(
         const enum_pre_test_set_data_fields_t& _a_fid,
         const ds::pre_test_run_report_t&       _a_element,
@@ -106,7 +106,7 @@ __no_constexpr_or_inline_imp std::optional<std::string>
     }
 }
 
-__no_constexpr_or_inline_imp std::optional<std::string>
+__no_constexpr_or_inline_imp std::optional<std::u8string>
     pre_test_set_data_list_formatter::get_explanation_data(
         const enum_pre_test_set_data_fields_t& _a_fid,
         const ds::pre_test_run_report_t&       _a_element,
@@ -179,7 +179,7 @@ __no_constexpr_or_inline_imp std::optional<std::string>
     }
 }
 
-__no_constexpr_or_inline_imp std::pair<std::string,std::string>
+__no_constexpr_or_inline_imp std::pair<std::u8string, std::u8string>
                              pre_test_set_data_list_formatter::get_output(
         const enum_pre_test_set_data_fields_t& _a_fid,
         const ds::pre_test_run_report_t&       _a_element,
@@ -268,26 +268,31 @@ __no_constexpr_or_inline_imp std::pair<std::string,std::string>
     }
 }
 
-__no_constexpr_or_inline_imp std::pair<std::string, std::vector<std::string>>
-                             pre_test_set_data_list_formatter::get_data(
-        const enum_pre_test_set_data_fields_t&                   _a_fid,
-        const ds::pre_test_run_report_t&                         _a_element,
-        const print_config_t&                                    _a_pc
+__no_constexpr_or_inline_imp
+    std::pair<std::u8string, std::vector<std::u8string>>
+    pre_test_set_data_list_formatter::get_data(
+        const enum_pre_test_set_data_fields_t& _a_fid,
+        const ds::pre_test_run_report_t&       _a_element,
+        const print_config_t&                  _a_pc
     ) const
 {
     using namespace std;
     using enum enum_pre_test_set_data_fields_t;
 
-    const pair<string, string>   _l_pair{get_output(_a_fid, _a_element, _a_pc)};
-    pair<string, vector<string>> _l_rv{
-        _l_pair.first, vector<string>(1, _l_pair.second)
+    const pair<u8string, u8string> _l_pair{get_output(_a_fid, _a_element, _a_pc)
     };
-    const optional<string> _l_explanation_data{ get_explanation_data(_a_fid, _a_element, _a_pc) };
+    pair<u8string, vector<u8string>> _l_rv{
+        _l_pair.first, vector<u8string>(1, _l_pair.second)
+    };
+    const optional<u8string> _l_explanation_data{
+        get_explanation_data(_a_fid, _a_element, _a_pc)
+    };
     if (_l_explanation_data.has_value())
     {
         _l_rv.second.push_back(_l_explanation_data.value());
     }
-    const optional<string> _l_cli_info{ get_cli_info(_a_fid, _a_element, _a_pc) };
+    const optional<u8string> _l_cli_info{get_cli_info(_a_fid, _a_element, _a_pc)
+    };
     if (_l_cli_info.has_value())
     {
         _l_rv.second.push_back(_l_cli_info.value());

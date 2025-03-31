@@ -18,7 +18,7 @@ public:
     __no_constexpr
         file_line_reader_t() noexcept
         = default;
-    __constexpr const std::string_view
+    __constexpr const std::u8string
                       current_line() noexcept;
     __constexpr bool
         has_current_line() const noexcept;
@@ -26,7 +26,7 @@ public:
         get_next_line();
 private:
     size_t                         _m_current_line_idx;
-    std::string                    _m_current_line;
+    std::u8string                    _m_current_line;
     std::shared_ptr<std::ifstream> _m_file_handler;
     std::filesystem::path          _m_file_name;
     bool                           _m_finished_reading;
@@ -40,7 +40,7 @@ file_line_reader_t::file_line_reader_t(
     const std::filesystem::path& _a_file_name
 )
     : _m_current_line_idx(0)
-    , _m_current_line("")
+    , _m_current_line(u8"")
     , _m_file_handler(std::shared_ptr<std::ifstream>())
     , _m_file_name(_a_file_name)
     , _m_finished_reading(false)
@@ -52,9 +52,9 @@ file_line_reader_t::file_line_reader_t(
     if (not exists(_m_file_name))
     {
         throw test_library_exception_t(fmt::format(
-            "Unable to open file_line_reader_t object as file \"{0}\" does "
-            "not exist",
-            _m_file_name
+            u8"Unable to open file_line_reader_t object as file \"{0}\" does "
+            u8"not exist",
+            _m_file_name.u8string()
         ));
     }
     _m_file_handler = make_shared<ifstream>(_m_file_name);
@@ -65,9 +65,9 @@ file_line_reader_t::file_line_reader_t(
     else
     {
         throw test_library_exception_t(fmt::format(
-            "Unable to open file_line_reader_t object as file \"{0}\", "
-            "even though file exists.",
-            _m_file_name
+            u8"Unable to open file_line_reader_t object as file \"{0}\", "
+            u8"even though file exists.",
+            _m_file_name.u8string()
         ));
     }
 }
@@ -83,7 +83,7 @@ file_line_reader_t::file_line_reader_t(
 {
 
 }*/
-__constexpr_imp const std::string_view
+__constexpr_imp const std::u8string
                       file_line_reader_t::current_line() noexcept
 {
     return _m_current_line;
@@ -109,7 +109,9 @@ __constexpr_imp bool
     do
     {
         ++_m_current_line_idx;
-        std::getline(_l_file_hander, _m_current_line);
+        string _l_unprocessed_line;
+        std::getline(_l_file_hander, _l_unprocessed_line);
+        _m_current_line = string_view_to_u8string(_l_unprocessed_line);
         const bool _l_error_reading_file{
             _l_file_hander.fail() || _l_file_hander.bad()
         };
@@ -118,7 +120,7 @@ __constexpr_imp bool
         {
             _m_finished_reading = true;
         }
-        if (_m_finished_reading == true && _m_current_line == "")
+        if (_m_finished_reading == true && _m_current_line.empty())
         {
             // eof found, empty line.
             break;
@@ -126,13 +128,13 @@ __constexpr_imp bool
         else if (_l_error_reading_file)
         {
             // Some other reading error.
-            _m_current_line     = "";
+            _m_current_line = u8"";
             _m_current_line_idx = 0;
             _m_finished_reading = true;
             throw test_library_exception_t(fmt::format(
-                "Error encountered reading line {0} in file \"{1}\". "
-                "The fail bit of the file was set to {2} and the bad_bit of "
-                "the file was set to {3}",
+                u8"Error encountered reading line {0} in file \"{1}\". "
+                u8"The fail bit of the file was set to {2} and the bad_bit of "
+                u8"the file was set to {3}",
                 _m_current_line_idx,
                 _m_file_name,
                 _l_file_hander.fail(),
@@ -159,7 +161,7 @@ __constexpr_imp bool
     }
     while (_l_exit);
     _m_current_line_idx = 0;
-    _m_current_line     = "";
+    _m_current_line     = u8"";
     return false;
 }
 

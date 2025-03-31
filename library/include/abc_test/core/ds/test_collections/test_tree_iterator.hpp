@@ -91,7 +91,7 @@ __no_constexpr_imp test_tree_iterator_t&
     if (_m_stack.size() == 0)
     {
         throw test_library_exception_t(
-            "Could not increment tree_iterator_t as internal stack is empty"
+            u8"Could not increment tree_iterator_t as internal stack is empty"
         );
     }
     else
@@ -195,7 +195,7 @@ __no_constexpr_imp const post_setup_test_data_t&
     if (_m_stack.size() == 0
         || _m_current_text_itt == _m_stack.top().get()._m_nodes_tests.end())
     {
-        throw test_library_exception_t("Could not dereference tree_iterator.");
+        throw test_library_exception_t(u8"Could not dereference tree_iterator.");
     }
     else
     {

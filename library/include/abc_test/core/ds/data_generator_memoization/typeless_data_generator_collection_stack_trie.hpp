@@ -100,7 +100,7 @@ public:
      *
      * @return Compressed string representing the for_loop_stack_trie_t object.
      */
-    __no_constexpr std::string
+    __no_constexpr std::u8string
                    print_for_loop_stack_trie_compressed() const noexcept;
     /*!
      * @brief Returns a string representing the for_loop_stack_trie_t object.
@@ -112,7 +112,7 @@ public:
      *
      * @return String representing the for_loop_stack_trie_t object.
      */
-    __no_constexpr std::string
+    __no_constexpr std::u8string
                    print_for_loop_stack_trie() const noexcept;
     /*!
      * @brief This function firstly finds the trie node representing the
@@ -269,7 +269,7 @@ private:
      * on the root.
      * @return std::string representing the for_loop_stack_trie.
      */
-    __no_constexpr std::string
+    __no_constexpr std::u8string
         inner_print_for_loop_stack_trie(const bool _a_is_root = false)
             const noexcept;
 };
@@ -296,16 +296,16 @@ struct fmt::formatter<
 
 _BEGIN_ABC_DS_NS
 
-__no_constexpr_imp std::string
+__no_constexpr_imp std::u8string
                    typeless_data_generator_collection_stack_trie_t::
         print_for_loop_stack_trie_compressed() const noexcept
 {
     using namespace std;
-    string _l_rv{print_for_loop_stack_trie()};
+    u8string _l_rv{print_for_loop_stack_trie()};
     return abc::utility::str::to_hex(_l_rv);
 }
 
-__no_constexpr_imp std::string
+__no_constexpr_imp std::u8string
     typeless_data_generator_collection_stack_trie_t::print_for_loop_stack_trie(
     ) const noexcept
 {
@@ -584,7 +584,7 @@ __constexpr_imp opt_itt_t
     }
 }
 
-__no_constexpr_imp std::string
+__no_constexpr_imp std::u8string
                    typeless_data_generator_collection_stack_trie_t::
         inner_print_for_loop_stack_trie(
             const bool _a_is_root
@@ -592,26 +592,26 @@ __no_constexpr_imp std::string
 {
     using namespace std;
     using namespace utility::str;
-    string _l_children_str{_c_l_square_bracket};
+    u8string _l_children_str{u8"["};
     for (size_t                                _l_idx{0};
          const for_loop_stack_trie_children_t& _l_for_loop_at_idx : _m_children)
     {
-        _l_children_str.append(_c_l_square_bracket);
+        _l_children_str.append(u8"[");
         for (size_t                             _l_jdx{0};
              const for_loop_stack_trie_child_t& _l_child : _l_for_loop_at_idx)
         {
             _l_children_str.append(_l_child->inner_print_for_loop_stack_trie());
             _l_children_str.append(return_str_if_next_index_in_bound(
-                _l_jdx++, _l_for_loop_at_idx.size(), _c_comma
+                _l_jdx++, _l_for_loop_at_idx.size(), u8","
             ));
         }
-        _l_children_str.append(_c_r_square_bracket);
+        _l_children_str.append(u8"]");
         _l_children_str.append(return_str_if_next_index_in_bound(
-            _l_idx++, _m_children.size(), _c_comma
+            _l_idx++, _m_children.size(), u8","
         ));
     }
 
-    _l_children_str.append(_c_r_square_bracket);
+    _l_children_str.append(u8"]");
     if (_a_is_root)
     {
         return _l_children_str;
@@ -619,7 +619,7 @@ __no_constexpr_imp std::string
     else
     {
         return fmt::format(
-            "({0},{1},\"{2}\",{3})",
+            u8"({0},{1},\"{2}\",{3})",
             _m_for_loop_data.generation_collection_index,
             _m_for_loop_data.flied.mode,
             _m_for_loop_data.flied.additional_data,
@@ -682,7 +682,7 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
     string                 _l_error_string;
     size_t                 _l_old_pos;
     vector<string>         _l_current_strs;
-    tuple<string, string, string, string> _l_node;
+    tuple<string, string, u8string, string> _l_node;
     std::size_t _l_mode_zero_next_mode = _a_head_node ? 1 : 0;
     while (_l_current_pos < _l_str.size())
     {
@@ -756,7 +756,7 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
             if (_l_error_string.empty())
             {
                 get<2>(_l_node)
-                    = _l_str.substr(_l_old_pos, _l_current_pos - _l_old_pos);
+                    = string_view_to_u8string(_l_str.substr(_l_old_pos, _l_current_pos - _l_old_pos));
             }
             break;
         case 5:
@@ -880,15 +880,15 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
         case 13:
             if (_l_current_pos != _a_str.size())
             {
-                return unexpected("Should have been at end. Not");
+                return unexpected(u8"Should have been at end. Not");
             }
             break;
         default:
-            return unexpected("default case");
+            return unexpected(u8"default case");
         }
         if (not _l_error_string.empty())
         {
-            return unexpected(_l_error_string);
+            return unexpected(string_view_to_u8string(_l_error_string));
         }
         _l_current_pos++;
     }
@@ -901,18 +901,18 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
         if (not _l_result_1.has_value())
         {
             return unexpected(fmt::format(
-                "Could not parse generation_collection_index using string "
-                "\"{0}\"",
-                get<0>(_l_node)
+                u8"Could not parse generation_collection_index using string "
+                u8"\"{0}\"",
+                string_view_to_u8string(get<0>(_l_node))
             ));
         }
         auto _l_result_2{scn::scan<std::size_t>(get<1>(_l_node), "{0}")};
         if (not _l_result_2.has_value())
         {
             return unexpected(fmt::format(
-                "Could not parse generation_collection_index using string "
-                "\"{0}\"",
-                get<1>(_l_node)
+                u8"Could not parse generation_collection_index using string "
+                u8"\"{0}\"",
+                string_view_to_u8string(get<1>(_l_node))
             ));
         }
         _l_rv._m_for_loop_data.generation_collection_index
@@ -959,7 +959,7 @@ __no_constexpr_imp auto
         "}}",
         typeid(_a_rt).name(),
         "_m_children",
-        _a_rt.print_for_loop_stack_trie()
+        abc::u8string_to_string(_a_rt.print_for_loop_stack_trie())
     )};
     return formatter<string_view>::format(_l_rv, _a_cxt);
 }

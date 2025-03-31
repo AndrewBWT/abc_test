@@ -18,7 +18,7 @@ public:
         text_error_reporter_file_names;
 protected:
     __no_constexpr virtual void
-        validate_and_pre_process_(std::vector<std::string>& _a_error_ref
+        validate_and_pre_process_(std::vector<std::u8string>& _a_error_ref
         ) noexcept;
 };
 
@@ -26,7 +26,7 @@ namespace
 {
 __no_constexpr std::vector<std::filesystem::path>
                check_files(
-                   std::vector<std::string>& _a_error_ref,
+                   std::vector<std::u8string>& _a_error_ref,
                    const std::vector<std::pair<std::filesystem::path, bool>>&
                                                 _a_potential_files,
                    const std::filesystem::path& _a_root_path,
@@ -52,7 +52,7 @@ struct fmt::formatter<abc::included_instances_test_options_t>
 _BEGIN_ABC_NS
 __no_constexpr_imp void
     included_instances_test_options_t::validate_and_pre_process_(
-        std::vector<std::string>& _a_error_ref
+        std::vector<std::u8string>& _a_error_ref
     ) noexcept
 {
     using namespace _ABC_NS_REPORTERS;
@@ -104,7 +104,7 @@ namespace
 {
 __no_constexpr_imp std::vector<std::filesystem::path>
                    check_files(
-                       std::vector<std::string>& _a_error_ref,
+                       std::vector<std::u8string>& _a_error_ref,
                        const std::vector<std::pair<std::filesystem::path, bool>>&
                                                     _a_potential_files,
                        const std::filesystem::path& _a_root_path,
@@ -121,9 +121,9 @@ __no_constexpr_imp std::vector<std::filesystem::path>
         if (not exists(_l_parent_folder))
         {
             _a_error_ref.push_back(fmt::format(
-                "File for {0} \"{1}\" unable to be created because parent "
-                "path {2} does not exist",
-                _a_identifier,
+                u8"File for {0} \"{1}\" unable to be created because parent "
+                u8"path {2} does not exist",
+                string_view_to_u8string(_a_identifier),
                 _l_file_to_be_made,
                 _l_parent_folder
             ));
@@ -131,9 +131,9 @@ __no_constexpr_imp std::vector<std::filesystem::path>
         else if (_l_duplicates_allowed == false && exists(_l_file_to_be_made))
         {
             _a_error_ref.push_back(fmt::format(
-                "File for {0} \"{1}\" unable to be created because it already "
-                "exists",
-                "hello",
+                u8"File for {0} \"{1}\" unable to be created because it already "
+                u8"exists",
+                u8"hello",
                 _l_file_to_be_made
             ));
         }

@@ -68,8 +68,8 @@
 )                                                             \
     __ABC_INTERNAL_LOG(                                       \
         fmt::format(                                          \
-            "{0} = {1}",                                      \
-            #_a_variable,                                     \
+            u8"{0} = {1}",                                      \
+            u8#_a_variable,                                     \
             abc::utility::printer::default_printer_t<         \
                 std::remove_cvref_t<decltype(_a_variable)>>() \
                 .run_printer(_a_variable)                     \

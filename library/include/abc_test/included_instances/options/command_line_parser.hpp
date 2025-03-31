@@ -1,7 +1,7 @@
 #pragma once
+#include "abc_test/core/options/test_options_base.hpp"
 #include "abc_test/included_instances/options/included_instances_test_options.hpp"
 #include "abc_test/included_instances/options/option_config.hpp"
-#include "abc_test/core/options/test_options_base.hpp"
 #include "abc_test/utility/cli.hpp"
 
 _BEGIN_ABC_NS
@@ -12,9 +12,9 @@ namespace detail
 {
 __no_constexpr void
     add_all_options(
-        included_instances_test_options_t&        _a_opts,
+        included_instances_test_options_t&                             _a_opts,
         _ABC_NS_UTILITY_CLI::cli_t<included_instances_test_options_t>& _a_cli,
-        _ABC_NS_UTILITY_CLI::cli_results_t&                            _a_cli_results
+        _ABC_NS_UTILITY_CLI::cli_results_t& _a_cli_results
     ) noexcept;
 } // namespace detail
 
@@ -40,7 +40,7 @@ __no_constexpr_imp int
     };
     if (_l_cli_res.has_value())
     {
-        cli_t<included_instances_test_options_t>& _l_cli{ _l_cli_res.value() };
+        cli_t<included_instances_test_options_t>& _l_cli{_l_cli_res.value()};
         _ABC_NS::detail::add_all_options(_l_iito, _l_cli, _l_cli_results);
         _l_cli.parse_arguments(_l_iito, argc, argv, _l_cli_results);
         if (_l_cli_results.has_errors())
@@ -49,7 +49,8 @@ __no_constexpr_imp int
                 << "Errors encountered when parsing command line parameters. "
                    "These are as follows:"
                 << std::endl;
-            std::cout << "\t" << _l_cli_results.errors();
+            const u8string _l_errors{ _l_cli_results.errors() };
+            std::cout << "\t" << string(_l_errors.begin(), _l_errors.end());
             return -1;
         }
         if (_l_cli_results.has_warnings())
@@ -64,7 +65,8 @@ __no_constexpr_imp int
         {
             for (auto& k : _l_cli_results.text_output())
             {
-                std::cout << k << std::endl;
+                string _l_str{ k.begin(), k.end()};
+                std::cout << _l_str << std::endl;
             }
             return -1;
         }
@@ -89,20 +91,21 @@ __no_constexpr_imp int
             {
                 str::string_table_t _l_st({1});
                 for (size_t _l_idx{0};
-                     string & _l_error : _l_validated_test_options.error())
+                    u8string& _l_error : _l_validated_test_options.error())
                 {
-                    _l_st.push_back(fmt::format(" {0})  ", ++_l_idx));
+                    _l_st.push_back(fmt::format(u8" {0})  ", ++_l_idx));
                     _l_st.push_back(_l_error);
                     _l_st.new_line();
                 }
-                std::cout << fmt::format(
-                    "Error(s) encountered when validating test_options_t. "
-                    "The following errors were returned from the validation "
-                    "function:\n{0}\nThe program will now terminate. "
-                    "included_instances_test_options_t = {1}",
+                const u8string _l_rv{ fmt::format(
+                    u8"Error(s) encountered when validating test_options_t. "
+                    u8"The following errors were returned from the validation "
+                    u8"function:\n{0}\nThe program will now terminate. "
+                    u8"included_instances_test_options_t = {1}",
                     _l_st(),
-                    _l_iito
-                );
+                    string_view_to_u8string(fmt::format("{}",_l_iito))
+                ) };
+                std::cout << string(_l_rv.begin(),_l_rv.end()) << std::endl;
                 return -1;
             }
         }
@@ -121,9 +124,9 @@ namespace detail
 {
 __no_constexpr_imp void
     add_all_options(
-        included_instances_test_options_t&        _a_opts,
+        included_instances_test_options_t&                             _a_opts,
         _ABC_NS_UTILITY_CLI::cli_t<included_instances_test_options_t>& _a_cli,
-        _ABC_NS_UTILITY_CLI::cli_results_t&                            _a_cli_results
+        _ABC_NS_UTILITY_CLI::cli_results_t& _a_cli_results
     ) noexcept
 {
     using namespace std;
@@ -182,26 +185,28 @@ __no_constexpr_imp void
     );
     _a_cli.add_option<
         _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t,
-        string>(
+        u8string>(
         _s_repetition_config,
         &included_instances_test_options_t::
             map_of_unique_ids_and_for_loop_stack_tries,
         _a_cli_results,
         cli_argument_processing_info_t<
             _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t,
-            std::string>{
+            std::u8string>{
             .process_parsed_value_func =
                 [](ds::map_unique_id_to_tdg_collection_stack_trie_t& _a_ref,
-                   const string&                                     _a_str)
+                   const u8string&                                   _a_str)
             {
-                auto _l_res = ds::
-                    parse_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
-                        _a_str
-                    );
+                ds::parse_map_unique_id_to_tdg_collection_stack_trie_result_t
+                    _l_res
+                    = ds::
+                        parse_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
+                            _a_str
+                        );
                 if (_l_res.has_value())
                 {
                     _a_ref = _l_res.value();
-                    return optional<string>{};
+                    return optional<u8string>{};
                 }
                 else
                 {
@@ -234,14 +239,14 @@ __no_constexpr_imp void
                                .integer()
                                .has_value()
                            ? fmt::format(
-                                 "{0}",
+                                 u8"{0}",
                                  _a_global_seed.complete_global_seed()
                                      .value()
                                      .integer()
                                      .value()
                              )
                            : fmt::format(
-                                 "{0}",
+                                 u8"{0}",
                                  _a_global_seed.complete_global_seed()
                                      .value()
                                      .vector_of_integers()
@@ -276,25 +281,25 @@ __no_constexpr_imp void
         _a_cli_results
     );
     _a_cli.add_auto_configuration();
-    _a_cli.add_multi_element_option<vector<string>, string>(
+    _a_cli.add_multi_element_option<vector<u8string>, u8string>(
         _c_test_paths_to_run,
         &included_instances_test_options_t::test_paths_to_run,
         _a_cli_results,
-        cli_argument_processing_info_t<vector<string>, string>{
+        cli_argument_processing_info_t<vector<u8string>, u8string>{
             .print_func =
-                [](const vector<string>& _a_strs)
+                [](const vector<u8string>& _a_strs)
             {
-                string _l_rv;
-                for (size_t _l_idx{0}; const string_view _l_str : _a_strs)
+                    u8string _l_rv;
+                for (size_t _l_idx{0}; const u8string_view _l_str : _a_strs)
                 {
-                    if (_l_str == "")
+                    if (_l_str.empty())
                     {
                         continue;
                     }
                     _l_rv.append(_l_str);
                     if (_l_idx + 1 < _a_strs.size())
                     {
-                        _l_rv.append(" ");
+                        _l_rv.append(u8" ");
                     }
                     ++_l_idx;
                 }

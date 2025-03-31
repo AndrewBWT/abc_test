@@ -26,13 +26,13 @@ __constexpr parser_t<typename T::value_type_t> mk_parser(T) noexcept;
 template <typename T>
 __constexpr_imp result_t<T>
                 parse(
-                    const std::string_view _a_str,
-                    const parser_t<T>&     _a_parser = mk_parser(default_parser_t<T>())
+                    const std::u8string_view _a_str,
+                    const parser_t<T>&       _a_parser = mk_parser(default_parser_t<T>())
                 ) noexcept;
 template <typename T>
 __constexpr_imp T
     parse_with_exception(
-        const std::string_view              _a_str,
+        const std::u8string_view            _a_str,
         const utility::parser::parser_t<T>& _a_parser
         = mk_parser(default_parser_t<T>())
     );
@@ -53,7 +53,7 @@ _BEGIN_ABC_UTILITY_PARSER_NS
 template <typename T>
 __constexpr_imp result_t<T>
                 parse(
-                    const std::string_view              _a_str,
+                    const std::u8string_view            _a_str,
                     const utility::parser::parser_t<T>& _a_parser
                 ) noexcept
 {
@@ -68,7 +68,7 @@ __constexpr_imp result_t<T>
             if (not _l_pit.at_end())
             {
                 return result_t<T>{
-                    unexpected("Parser okay but not at end of string")
+                    unexpected(u8"Parser okay but not at end of string")
                 };
             }
         }
@@ -77,7 +77,8 @@ __constexpr_imp result_t<T>
     catch (const parser_could_not_match_string_t& _a_exception)
     {
         return unexpected(fmt::format(
-            "Parser threw unexpected exception: \"{0}\"", _a_exception.what()
+            u8"Parser threw unexpected exception: \"{0}\"",
+            char_star_to_u8string(_a_exception.what())
         ));
     }
 }
@@ -85,7 +86,7 @@ __constexpr_imp result_t<T>
 template <typename T>
 __constexpr_imp T
     parse_with_exception(
-        const std::string_view              _a_str,
+        const std::u8string_view            _a_str,
         const utility::parser::parser_t<T>& _a_parser
     )
 {

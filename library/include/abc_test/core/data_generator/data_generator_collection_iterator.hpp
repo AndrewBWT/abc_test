@@ -137,16 +137,16 @@ __constexpr_imp
         };
         if (_l_initial_idgc_element.has_value())
         {
-            increment_iterator(
-                _l_initial_idgc_element.value()
-            );
+            increment_iterator(_l_initial_idgc_element.value());
         }
         else
         {
             throw errors::test_library_exception_t(fmt::format(
-                "Could not initialise tests for loop stack. For loop stack = "
-                "{0}",
-                _l_current_test.for_loop_stack_trie()
+                u8"Could not initialise tests for loop stack. For loop stack = "
+                u8"{0}",
+                string_view_to_u8string(
+                    fmt::format("{}", _l_current_test.for_loop_stack_trie())
+                )
             ));
         }
     }
@@ -184,11 +184,11 @@ __constexpr_imp data_generator_collection_iterator_t<T>&
         else
         {
             ++_m_generation_collection_index;
-       //     throw errors::test_library_exception_t(fmt::format(
-      //          "Could not increment tests for loop stack. For loop stack = "
-       //         "{0}",
-      //          _l_current_test.for_loop_stack_trie()
-       //     ));
+            // throw errors::test_library_exception_t(fmt::format(
+            // "Could not increment tests for loop stack. For loop stack = "
+            // "{0}",
+            // _l_current_test.for_loop_stack_trie()
+            // ));
         }
     }
     else

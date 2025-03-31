@@ -28,7 +28,7 @@ public:
      */
     __constexpr
     setup_error_t(
-        const std::string_view      _a_error_msg,
+        const std::u8string_view      _a_error_msg,
         const bool                  _a_unrecoverable_error,
         const std::source_location& _a_source_location
         = std::source_location::current()
@@ -43,7 +43,7 @@ public:
      */
     __constexpr
     setup_error_t(
-        const std::string_view      _a_error_msg,
+        const std::u8string_view      _a_error_msg,
         const bool                  _a_unrecoverable_error,
         const std::stacktrace&      _a_stacktrace,
         const std::source_location& _a_source_location
@@ -60,7 +60,7 @@ public:
      * message.
      * @return A cref to the object's error message.
      */
-    __constexpr const std::string_view
+    __constexpr const std::u8string_view
                       error_msg() const noexcept;
     /*!
      * @brief Returns to the caller a cref to the object's optional stacktrace.
@@ -75,13 +75,13 @@ public:
     __constexpr const std::source_location&
                       source_location() const noexcept;
 private:
-    std::string                    _m_error_msg;
+    std::u8string                    _m_error_msg;
     bool                           _m_unrecoverable_error;
     std::optional<std::stacktrace> _m_opt_stacktrace;
     std::source_location           _m_source_location;
     __constexpr
     setup_error_t(
-        const std::string_view                _a_error_msg,
+        const std::u8string_view                _a_error_msg,
         const bool                            _a_unrecoverable_error,
         const std::optional<std::stacktrace>& _a_opt_stacktrace,
         const std::source_location&           _a_source_location
@@ -94,7 +94,7 @@ _END_ABC_ERRORS_NS
 _BEGIN_ABC_ERRORS_NS
 __constexpr_imp
     setup_error_t::setup_error_t(
-        const std::string_view      _a_error_msg,
+        const std::u8string_view      _a_error_msg,
         const bool                  _a_unrecoverable_error,
         const std::source_location& _a_source_location
     ) noexcept
@@ -108,7 +108,7 @@ __constexpr_imp
 
 __constexpr_imp
     setup_error_t::setup_error_t(
-        const std::string_view      _a_error_msg,
+        const std::u8string_view      _a_error_msg,
         const bool                  _a_unrecoverable_error,
         const std::stacktrace&      _a_stacktrace,
         const std::source_location& _a_source_location
@@ -127,7 +127,7 @@ __constexpr_imp bool
     return _m_unrecoverable_error;
 }
 
-__constexpr_imp const std::string_view
+__constexpr_imp const std::u8string_view
                       setup_error_t::error_msg() const noexcept
 {
     return _m_error_msg;
@@ -147,7 +147,7 @@ __constexpr_imp const std::source_location&
 
 __constexpr_imp
     setup_error_t::setup_error_t(
-        const std::string_view                _a_error_msg,
+        const std::u8string_view                _a_error_msg,
         const bool                            _a_unrecoverable_error,
         const std::optional<std::stacktrace>& _a_opt_stacktrace,
         const std::source_location&           _a_source_location

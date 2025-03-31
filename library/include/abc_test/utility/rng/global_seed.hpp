@@ -31,7 +31,7 @@ _BEGIN_ABC_UTILITY_PRINTER_NS
 template <>
 struct default_printer_t<global_seed_t> : public printer_base_t<global_seed_t>
 {
-    __constexpr std::string
+    __constexpr std::u8string
                 run_printer(const global_seed_t& _a_parse_input) const;
 };
 
@@ -115,13 +115,13 @@ _END_ABC_UTILITY_NS
 
 _BEGIN_ABC_UTILITY_PRINTER_NS
 
-__constexpr std::string
+__constexpr std::u8string
             default_printer_t<global_seed_t>::run_printer(
         const global_seed_t& _a_parse_input
     ) const
 {
     using namespace std;
-    return "global_seed_t";
+    return u8"global_seed_t";
 }
 
 _END_ABC_UTILITY_PRINTER_NS

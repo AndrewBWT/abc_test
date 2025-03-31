@@ -123,9 +123,9 @@ struct enumerate_enum_helper_t
             }
         }
         return unexpected(fmt::format(
-            "Could not parse string {0} to enum {1}.",
+            u8"Could not parse string {0} to enum {1}.",
             _a_parse_input.sv(),
-            typeid(T).name()
+            string_view_to_u8string(typeid(T).name())
         ));
     }
 private:
@@ -190,7 +190,7 @@ __constexpr_imp
     if (_a_enum_list.size() == 0)
     {
         throw test_library_exception_t(fmt::format(
-            "Could not create enumerate_enum_helper_t using enum_list of size 0"
+            u8"Could not create enumerate_enum_helper_t using enum_list of size 0"
         ));
     }
 }

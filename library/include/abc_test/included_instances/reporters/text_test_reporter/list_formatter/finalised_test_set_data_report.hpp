@@ -66,7 +66,7 @@ __no_constexpr_imp void
 {
     using namespace std;
     using enum enum_finalised_test_set_data_fields_t;
-    pair<string, string> _l_pair;
+    pair<u8string, u8string> _l_pair;
     switch (_a_fid)
     {
     case TOTAL_TESTS_RAN:
@@ -162,7 +162,7 @@ __no_constexpr_imp void
     default:
         throw errors::unaccounted_for_enum_exception(_a_fid);
     }
-    _a_ttor.write(fmt::format("{0}{1}", _l_pair.first, _l_pair.second));
+    _a_ttor.write(fmt::format(u8"{0}{1}", _l_pair.first, _l_pair.second));
 }
 
 _END_ABC_REPORTERS_NS

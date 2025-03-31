@@ -16,7 +16,7 @@ public:
             const enum_after_execution_test_report_fields_t& _a_fid,
             const ds::invoked_test_data_t&                   _a_element
         ) const;
-    __no_constexpr virtual std::pair<std::string, std::vector<std::string>>
+    __no_constexpr virtual std::pair<std::u8string, std::vector<std::u8string>>
         get_data(
             const enum_after_execution_test_report_fields_t& _a_fid,
             const ds::invoked_test_data_t&                   _a_element,
@@ -63,7 +63,7 @@ __constexpr_imp bool
     }
 }
 
-__no_constexpr_imp std::pair<std::string, std::vector<std::string>>
+__no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
                    test_report_list_formatter::get_data(
         const enum_after_execution_test_report_fields_t& _a_fid,
         const ds::invoked_test_data_t&                   _a_element,
@@ -87,9 +87,14 @@ __no_constexpr_imp std::pair<std::string, std::vector<std::string>>
         return {
             _a_pc.space(_a_pc.colon(_a_pc.test_description_str())),
             {_a_pc.slight_highlight(
-                _a_pc.message_str(_a_element.post_setup_test_data()
+                _a_pc.message_str(
+                    _a_element.post_setup_test_data()
                                       .registered_test_data()
-                                      ._m_user_data.description)
+                                      ._m_user_data.description.has_value() ?
+                    optional<u8string>{} : 
+                    string_view_to_u8string(_a_element.post_setup_test_data()
+                                      .registered_test_data()
+                                      ._m_user_data.description.value()))
             )}
         };
     case STR_STATUS:
@@ -105,9 +110,10 @@ __no_constexpr_imp std::pair<std::string, std::vector<std::string>>
     case NAME:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.name_str())),
-            {_a_pc.name(_a_element.post_setup_test_data()
-                            .registered_test_data()
-                            ._m_user_data.name)}
+            {_a_pc.name(string_view_to_u8string(_a_element
+                                                    .post_setup_test_data()
+                                                    .registered_test_data()
+                                                    ._m_user_data.name))}
         };
     case SOURCE_LOCATION:
     {
@@ -133,9 +139,10 @@ __no_constexpr_imp std::pair<std::string, std::vector<std::string>>
             _a_pc.space(_a_pc.colon(_a_pc.source_code_str())),
             {_a_pc.source_representation(
                 _l_opt.has_value()
-                    ? optional<string_view>{_l_opt.value()
-                                                .source_code_representation()}
-                    : optional<string_view>{}
+                    ? optional<u8string>{string_view_to_u8string(
+                          _l_opt.value().source_code_representation()
+                      )}
+                    : optional<u8string>{}
             )}
         };
     }
@@ -143,19 +150,19 @@ __no_constexpr_imp std::pair<std::string, std::vector<std::string>>
     case TEST_PATH:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.test_path_str())),
-            {_a_pc.test_path(_a_element.post_setup_test_data()
+            {_a_pc.test_path(string_view_to_u8string(_a_element.post_setup_test_data()
                                  .registered_test_data()
-                                 ._m_user_data.path)}
+                                 ._m_user_data.path))}
         };
     case SEED_USED:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.seed_used_str())),
             {_a_pc.seed_used(
                 _a_element.post_setup_test_data().has_for_loop_stack_trie()
-                    ? optional<string>(_a_element.post_setup_test_data()
+                    ? optional<u8string>(_a_element.post_setup_test_data()
                                            .for_loop_stack_trie()
                                            .print_for_loop_stack_trie())
-                    : optional<string>()
+                    : optional<u8string>()
             )}
         };
     case SEED_USED_HEX:
@@ -163,12 +170,12 @@ __no_constexpr_imp std::pair<std::string, std::vector<std::string>>
             _a_pc.space(_a_pc.colon(_a_pc.seed_used_in_hex_str())),
             {_a_pc.seed_used_in_hex(
                 _a_element.post_setup_test_data().has_for_loop_stack_trie()
-                    ? optional<string>(
+                    ? optional<u8string>(
                           _a_element.post_setup_test_data()
                               .for_loop_stack_trie()
                               .print_for_loop_stack_trie_compressed()
                       )
-                    : optional<string>()
+                    : optional<u8string>()
             )}
         };
     case SEED_TO_USE_TO_RE_RUN_TEST:

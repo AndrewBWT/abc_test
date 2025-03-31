@@ -32,7 +32,7 @@ public:
             const std::size_t _a_idx
         ) const override;
 protected:
-    __constexpr virtual std::string
+    __constexpr virtual std::u8string
         get_str_representation(
             const reports::assertion_t<false, Assertion_Status>& _a_element,
             const print_config_t&                                _a_pc
@@ -126,7 +126,7 @@ __constexpr_imp void
 }
 
 template <typename Assertion_Status>
-__constexpr_imp std::string
+__constexpr_imp std::u8string
     matcher_based_assertion_block_list_formatter_t<Assertion_Status>::
         get_str_representation(
             const reports::assertion_t<false, Assertion_Status>& _a_element,
@@ -134,7 +134,7 @@ __constexpr_imp std::string
         ) const
 {
     return construct_str_representation(
-        _a_element, "Single-element block-based assertion"
+        _a_element, u8"Single-element block-based assertion"
     );
 }
 

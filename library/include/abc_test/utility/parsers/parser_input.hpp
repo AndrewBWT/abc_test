@@ -7,22 +7,29 @@ struct parser_input_t
 {
 public:
     __constexpr
-    parser_input_t(const std::string_view _a_str) noexcept;
+    parser_input_t(const std::u8string_view _a_str) noexcept;
     __constexpr bool
         check_and_advance(const char _a_char_to_check_against) noexcept;
+    __constexpr bool
+        check_and_advance(const std::u8string_view _a_str_to_check_against
+        ) noexcept;
     __constexpr bool
         check_and_advance(const std::string_view _a_str_to_check_against
         ) noexcept;
     __constexpr void
         check_advance_and_throw(const char _a_char_to_check_against);
     __constexpr void
+        check_advance_and_throw(const std::u8string_view _a_str_to_check_against
+        );
+    __constexpr void
         check_advance_and_throw(const std::string_view _a_str_to_check_against);
-    __no_constexpr void process_whitespace() noexcept;
+    __no_constexpr void
+        process_whitespace() noexcept;
     __constexpr void
                       advance(const std::size_t _a_new_itereator) noexcept;
-    __constexpr const std::string_view
+    __constexpr const std::u8string_view
                       sv() const noexcept;
-    __constexpr const std::string_view
+    __constexpr const std::u8string_view
                       sv(const std::size_t _a_size) const noexcept;
     __constexpr       std::size_t
                       size() const noexcept;
@@ -35,10 +42,10 @@ public:
     __constexpr bool
         at_end() const noexcept;
 private:
-    std::string_view                 _m_complete_string;
-    std::size_t                      _m_elements_processed{0};
-    std::string_view::const_iterator _m_cur_itt;
-    std::string_view::const_iterator _m_end_itt;
+    std::u8string_view                 _m_complete_string;
+    std::size_t                        _m_elements_processed{0};
+    std::u8string_view::const_iterator _m_cur_itt;
+    std::u8string_view::const_iterator _m_end_itt;
 };
 
 __no_constexpr auto
@@ -48,7 +55,7 @@ _END_ABC_UTILITY_PARSER_NS
 _BEGIN_ABC_UTILITY_PARSER_NS
 __constexpr
 parser_input_t::parser_input_t(
-    const std::string_view _a_str
+    const std::u8string_view _a_str
 ) noexcept
     : _m_cur_itt(_a_str.begin())
     , _m_end_itt(_a_str.end())
@@ -65,8 +72,24 @@ __constexpr void
     {
         throw parser_could_not_match_string_t(
             _m_complete_string,
-            string_view(_m_cur_itt, _m_end_itt),
-            string(1, _a_char_to_check_against)
+            u8string_view(_m_cur_itt, _m_end_itt),
+            u8string(1, _a_char_to_check_against)
+        );
+    }
+}
+
+__constexpr void
+    parser_input_t::check_advance_and_throw(
+        const std::u8string_view _a_str_to_check_against
+    )
+{
+    using namespace std;
+    if (not check_and_advance(_a_str_to_check_against))
+    {
+        throw parser_could_not_match_string_t(
+            _m_complete_string,
+            u8string_view(_m_cur_itt, _m_end_itt),
+            _a_str_to_check_against
         );
     }
 }
@@ -76,23 +99,18 @@ __constexpr void
         const std::string_view _a_str_to_check_against
     )
 {
-    using namespace std;
-    if (not check_and_advance(_a_str_to_check_against))
-    {
-        throw parser_could_not_match_string_t(
-            _m_complete_string,
-            string_view(_m_cur_itt, _m_end_itt),
-            _a_str_to_check_against
-        );
-    }
+    check_advance_and_throw(string_view_to_u8string(_a_str_to_check_against));
 }
-__no_constexpr_imp void parser_input_t::process_whitespace() noexcept
+
+__no_constexpr_imp void
+    parser_input_t::process_whitespace() noexcept
 {
     while (std::isspace(*_m_cur_itt))
     {
         ++_m_cur_itt;
     }
 }
+
 __constexpr bool
     parser_input_t::check_and_advance(
         const char _a_char_to_check_against
@@ -111,13 +129,13 @@ __constexpr bool
 
 __constexpr bool
     parser_input_t::check_and_advance(
-        const std::string_view _a_str_to_check_against
+        const std::u8string_view _a_str_to_check_against
     ) noexcept
 {
     using namespace std;
     const size_t _l_str_len{_a_str_to_check_against.size()};
-    if ( _l_str_len <= std::distance(_m_cur_itt, _m_end_itt)
-        && string_view(_m_cur_itt, _m_cur_itt + _l_str_len)
+    if (_l_str_len <= std::distance(_m_cur_itt, _m_end_itt)
+        && u8string_view(_m_cur_itt, _m_cur_itt + _l_str_len)
                == _a_str_to_check_against)
     {
         _m_cur_itt += _l_str_len;
@@ -129,6 +147,14 @@ __constexpr bool
     }
 }
 
+__constexpr bool
+    parser_input_t::check_and_advance(
+        const std::string_view _a_str_to_check_against
+    ) noexcept
+{
+    return check_and_advance(string_view_to_u8string(_a_str_to_check_against));
+}
+
 __constexpr void
     parser_input_t::advance(
         const std::size_t _a_new_itereator
@@ -137,18 +163,18 @@ __constexpr void
     _m_cur_itt += _a_new_itereator;
 }
 
-__constexpr const std::string_view
+__constexpr const std::u8string_view
                   parser_input_t::sv() const noexcept
 {
-    return std::string_view(_m_cur_itt, _m_end_itt);
+    return std::u8string_view(_m_cur_itt, _m_end_itt);
 }
 
-__constexpr const std::string_view
+__constexpr const std::u8string_view
                   parser_input_t::sv(
         const std::size_t _a_size
     ) const noexcept
 {
-    return std::string_view(_m_cur_itt, _m_cur_itt + _a_size);
+    return std::u8string_view(_m_cur_itt, _m_cur_itt + _a_size);
 }
 
 __constexpr std::size_t

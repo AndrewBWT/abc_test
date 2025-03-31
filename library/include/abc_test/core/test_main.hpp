@@ -185,7 +185,9 @@ __no_constexpr_imp void
 
     _m_test_runners = vector<test_runner_t>(
         _l_global_test_options.threads,
-        test_runner_t(_l_trc, _l_global_test_options, _l_global_test_options.make_rng())
+        test_runner_t(
+            _l_trc, _l_global_test_options, _l_global_test_options.make_rng()
+        )
     );
     size_t _l_order_ran_id_counter{0};
     _l_trc.report_pre_test_data(_a_test_set_data);
@@ -318,19 +320,22 @@ __no_constexpr_imp void
     // run in try
     try
     {
-        _LIBRARY_LOG(MAIN_INFO, "Running test.");
+        _LIBRARY_LOG(MAIN_INFO, u8"Running test.");
         _l_threads_runner.run_test(_a_prtd, _a_order_ran_id);
     }
     // Catch if its a library error.
     catch (test_library_exception_t& _l_the)
     {
-        _LIBRARY_LOG(MAIN_INFO, "Exception encountered when running test.");
+        _LIBRARY_LOG(MAIN_INFO, u8"Exception encountered when running test.");
         error_reporter_controller_t& _l_erc{
             get_global_error_reporter_controller()
         };
-        _l_erc.report_error(
-            setup_error_t(_l_the.what(), true, _l_the.stacktrace())
-        );
+        const string_view _l_error{_l_the.what()};
+        _l_erc.report_error(setup_error_t(
+            u8string(_l_error.begin(), _l_error.end()),
+            true,
+            _l_the.stacktrace()
+        ));
     }
     catch (...)
     {
@@ -339,7 +344,7 @@ __no_constexpr_imp void
             get_global_error_reporter_controller()
         };
         _l_erc.report_error(
-            setup_error_t("Unknown exception thrown from test_runner_t.", true)
+            setup_error_t(u8"Unknown exception thrown from test_runner_t.", true)
         );
     }
     _LIBRARY_LOG(MAIN_INFO, "Test finished.");

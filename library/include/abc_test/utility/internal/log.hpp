@@ -1,10 +1,13 @@
 #pragma once
 #include "abc_test/utility/internal/log/params.hpp"
 #include "abc_test/utility/io/threaded_ostream_output_reporter.hpp"
+#include "abc_test/utility/types.hpp"
 
 #include <fmt/std.h>
 #include <iostream>
 #include <map>
+
+#include <fmt/xchar.h>
 
 
 #ifndef __LOGGING_ON
@@ -128,10 +131,10 @@ __constexpr_imp void
     if (_m_internal_logger_params.is_set(_a_internal_logger_enum))
     {
         threaded_ostream_output_reporter_t::write(fmt::format(
-            "LOG: {0}: {1} - {2}",
+            u8"LOG: {0}: {1} - {2}",
             get_thread_id(),
             to_str(_a_internal_logger_enum),
-            _a_str
+            string_view_to_u8string(_a_str)
         ));
     }
 }
@@ -145,15 +148,14 @@ __no_constexpr_imp std::size_t
     if (not _m_thread_map.contains(_l_id))
     {
         const size_t _l_new_thread_id{_m_thread_map.size()};
-        threaded_ostream_output_reporter_t::write(
-            "LOG: " + to_string(_l_new_thread_id) + " : "
-            + to_str(THREAD_MAPPING) + " - "
-            + fmt::format(
-                "Mapping new thread ID (thread::id = {0}) to {1}",
-                _l_id,
-                _l_new_thread_id
-            )
-        );
+        threaded_ostream_output_reporter_t::write(fmt::format(
+            u8"LOG: {0} : {1} - "
+            u8"Mapping new thread ID (thread::id = {2}) to {3}",
+            _l_new_thread_id,
+            to_str(THREAD_MAPPING),
+            _l_id,
+            _l_new_thread_id
+        ));
         _m_thread_map.insert({_l_id, _l_new_thread_id});
     }
     return _m_thread_map.at(_l_id);

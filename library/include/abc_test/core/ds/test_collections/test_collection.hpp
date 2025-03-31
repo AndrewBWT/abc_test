@@ -60,15 +60,17 @@ private:
 
 __constexpr std::vector<ds::test_path_hierarchy_t>
             process_test_path_hierarchies(
-                const std::vector<std::string>& _a_strs,
-                const std::string_view          _a_delimiter
+                const std::vector<std::u8string>& _a_strs,
+                const std::u8string               _a_delimiter
             ) noexcept
 {
     using namespace std;
     vector<test_path_hierarchy_t> _l_rv;
-    for (const std::string_view _l_str : _a_strs)
+    for (const std::u8string_view _l_str : _a_strs)
     {
-        _l_rv.emplace_back(utility::str::split_string(_l_str, _a_delimiter));
+        _l_rv.emplace_back(
+            utility::str::split_string<char8_t>(_l_str, _a_delimiter)
+        );
     }
     return _l_rv;
 }
@@ -122,8 +124,9 @@ __no_constexpr_imp void
                 || global::get_global_test_options().force_run_all_tests
             };
             const test_path_hierarchy_t _l_test_path_hierarchy{
-                abc::utility::str::split_string(
-                    _l_test_element._m_user_data.path, _m_options.path_delimiter
+                abc::utility::str::split_string<char8_t>(
+                    string_view_to_u8string(_l_test_element._m_user_data.path),
+                    _m_options.path_delimiter
                 )
             };
             const bool _l_test_in_path_set{check_if_element_in_path_set(

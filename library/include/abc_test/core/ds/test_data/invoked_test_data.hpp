@@ -479,9 +479,9 @@ __constexpr_imp void
         // In the incorrect status; a termination has been thrown from this
         // test, why is it still running?
         throw errors::test_library_exception_t(fmt::format(
-            "add_assertions function has been entered, however should have "
-            "already termianted. _m_test_status = {0}",
-            _m_test_status
+            u8"add_assertions function has been entered, however should have "
+            u8"already termianted. _m_test_status = {0}",
+            string_view_to_u8string(fmt::format("{}",_m_test_status))
         ));
     }
     else if (_a_ptr == nullptr)
@@ -539,16 +539,16 @@ __constexpr_imp void
         // In the incorrect status; a termination has been thrown from this
         // test, why is it still running?
         throw errors::test_library_exception_t(fmt::format(
-            "set_unexpected_termination function has been entered, however "
-            "should have already termianted. _m_test_status = {0}",
-            _m_test_status
+            u8"set_unexpected_termination function has been entered, however "
+            u8"should have already termianted. _m_test_status = {0}",
+            string_view_to_u8string(fmt::format("{}", _m_test_status))
         ));
     }
     else if (_m_termination_report != nullptr)
     {
         throw errors::test_library_exception_t(
-            "Attempting to call set_unexpected_termination, however an "
-            "unexpected termination has already been registered."
+            u8"Attempting to call set_unexpected_termination, however an "
+            u8"unexpected termination has already been registered."
         );
     }
     else if (_a_ur == nullptr)
@@ -644,18 +644,18 @@ __constexpr const std::chrono::time_point<std::chrono::high_resolution_clock>&
 
 namespace
 {
-__constexpr std::string
+__constexpr std::u8string
             normalise_for_file_use(
-                const std::string_view _a_str
+                const std::u8string_view _a_str
             ) noexcept
 {
     using namespace std;
-    vector<pair<string, string>> _l_strs_to_replace = {
-        {":",  "_"},
-        {" ",  "_"},
-        {"\"", "" },
+    vector<pair<u8string, u8string>> _l_strs_to_replace = {
+        {u8":",  u8"_"},
+        {u8" ",  u8"_"},
+        {u8"\"", u8"" },
     };
-    string _l_rv(_a_str);
+    u8string _l_rv(_a_str);
     for (auto& [_l_to_find, _l_to_replace_with] : _l_strs_to_replace)
     {
         bool _l_replaced{false};
@@ -663,7 +663,7 @@ __constexpr std::string
         {
             _l_replaced = false;
             if (auto _l_str_pos{_l_rv.find(_l_to_find)};
-                _l_str_pos != string::npos)
+                _l_str_pos != u8string::npos)
             {
                 _l_replaced = true;
                 _l_rv.replace(
@@ -690,9 +690,9 @@ __no_constexpr_imp std::filesystem::path
     {
         _l_path /= normalise_for_file_use(_a_test_path_component);
     }
-    _l_path /= normalise_for_file_use(
+    _l_path /= normalise_for_file_use(string_view_to_u8string(
         _a_test_info.registered_test_data()._m_user_data.name
-    );
+    ));
     if (not exists(_l_path))
     {
         create_directories(_l_path);

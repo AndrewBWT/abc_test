@@ -35,7 +35,7 @@ public:
     __constexpr utility::seed_t
                 get_seed(const std::size_t _a_seed_to_create_size) const;
 
-    __constexpr std::string
+    __constexpr std::u8string
                 print_in_hex() const;
 private:
     std::variant<unsigned int, std::vector<uint32_t>> _m_inner_seed
@@ -52,7 +52,7 @@ template <>
 struct default_printer_t<complete_global_seed_t>
     : public printer_base_t<complete_global_seed_t>
 {
-    __constexpr std::string
+    __constexpr std::u8string
                 run_printer(const complete_global_seed_t& _a_parse_input) const;
 };
 
@@ -147,24 +147,24 @@ __constexpr utility::seed_t
     return _l_rv;
 }
 
-__constexpr std::string
+__constexpr std::u8string
             complete_global_seed_t::print_in_hex() const
 {
     std::variant<unsigned int, std::vector<uint32_t>>;
     using namespace std;
-    string _l_rv;
+    u8string _l_rv;
     if (auto _l_ptr{get_if<unsigned int>(&_m_inner_seed)}; _l_ptr != nullptr)
     {
-        _l_rv.append("0");
-        _l_rv.append(fmt::format("{:x}", *_l_ptr));
+        _l_rv.append(u8"0");
+        _l_rv.append(fmt::format(u8"{:x}", *_l_ptr));
     }
     else if (auto _l_ptr{get_if<vector<uint32_t>>(&_m_inner_seed)};
              _l_ptr != nullptr)
     {
-        _l_rv.append("1");
+        _l_rv.append(u8"1");
         for (const uint32_t& _l_seed_val : *_l_ptr)
         {
-            _l_rv.append(fmt::format("{:x}", _l_seed_val));
+            _l_rv.append(fmt::format(u8"{:x}", _l_seed_val));
         }
     }
     else
@@ -183,9 +183,9 @@ __constexpr result_t<complete_global_seed_t>
     if (_a_str.size() == 0)
     {
         return unexpected(fmt::format(
-            "Size of string representing seed must not be empty. String = "
-            "{0}",
-            _a_str
+            u8"Size of string representing seed must not be empty. String = "
+            u8"{0}",
+            string_view_to_u8string(_a_str)
         ));
     }
     else
@@ -204,9 +204,9 @@ __constexpr result_t<complete_global_seed_t>
             else
             {
                 return unexpected(fmt::format(
-                    "Couldn't parse substring {0} in string {1}.",
-                    _l_rest_of_str,
-                    _a_str
+                    u8"Couldn't parse substring {0} in string {1}.",
+                    string_view_to_u8string(_l_rest_of_str),
+                    string_view_to_u8string(_a_str)
                 ));
             }
         }
@@ -217,11 +217,11 @@ __constexpr result_t<complete_global_seed_t>
             if ((_l_rest_of_str.size() % 8) != 0)
             {
                 return unexpected(fmt::format(
-                    "Reading a hex string of 32 bit integers. Each integer "
-                    "is 8 characters. The string's size must be a multiple "
-                    "of 8, but is not. String size = {0}, string = {1}",
+                    u8"Reading a hex string of 32 bit integers. Each integer "
+                    u8"is 8 characters. The string's size must be a multiple "
+                    u8"of 8, but is not. String size = {0}, string = {1}",
                     _l_rest_of_str.size(),
-                    _l_rest_of_str
+                    string_view_to_u8string(_l_rest_of_str)
                 ));
             }
             else
@@ -241,9 +241,9 @@ __constexpr result_t<complete_global_seed_t>
                     else
                     {
                         return unexpected(fmt::format(
-                            "Couldn't parse substring {0} in string {1}.",
-                            _l_integer_str,
-                            _a_str
+                            u8"Couldn't parse substring {0} in string {1}.",
+                            string_view_to_u8string(_l_integer_str),
+                            string_view_to_u8string(_a_str)
                         ));
                     }
                 }
@@ -253,11 +253,11 @@ __constexpr result_t<complete_global_seed_t>
         else
         {
             return unexpected(fmt::format(
-                "String representing seed's first character denotes mode. "
-                "mode "
-                "\"{0}\" not recognised. String = {1}",
-                _a_str[0],
-                _a_str
+                u8"String representing seed's first character denotes mode. "
+                u8"mode "
+                u8"\"{0}\" not recognised. String = {1}",
+                string_view_to_u8string(string(1,_a_str[0])),
+                string_view_to_u8string(_a_str)
             ));
         }
     }
@@ -267,13 +267,13 @@ _END_ABC_UTILITY_NS
 
 _BEGIN_ABC_UTILITY_PRINTER_NS
 
-__constexpr_imp std::string
+__constexpr_imp std::u8string
                 default_printer_t<complete_global_seed_t>::run_printer(
         const complete_global_seed_t& _a_parse_input
     ) const
 {
     using namespace std;
-    return "complete_global_seed_t";
+    return u8"complete_global_seed_t";
 }
 
 _END_ABC_UTILITY_PRINTER_NS

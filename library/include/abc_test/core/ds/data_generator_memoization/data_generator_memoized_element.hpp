@@ -5,6 +5,7 @@
 
 #include <tuple>
 #include <vector>
+#include "abc_test/utility/types.hpp"
 
 _BEGIN_ABC_DS_NS
 
@@ -51,7 +52,7 @@ public:
      * gen_data_t generates its data. However, it can be retrieved and stored
      * and used to re-generate that data. This variable holds that string.
      */
-    std::string additional_data;
+    std::u8string additional_data;
 };
 
 /*!
@@ -95,7 +96,7 @@ __no_constexpr_imp auto
         "}}",
         typeid(_a_rd).name(),
         "_m_additional_data",
-        _a_rd.additional_data,
+        abc::u8string_to_string(_a_rd.additional_data),
         "_m_mode",
         _a_rd.mode
     )};

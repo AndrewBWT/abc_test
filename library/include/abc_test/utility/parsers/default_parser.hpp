@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <variant>
 
+#include <fmt/xchar.h>
 
 _BEGIN_ABC_UTILITY_PARSER_NS
 
@@ -62,7 +63,6 @@ struct default_parser_t<bool> : public parser_base_t<bool>
                 ) const
     {
         using namespace std;
-        string_view sv{_a_parse_input.sv()};
         if (_a_parse_input.check_and_advance("true"))
         {
             return result_t<bool>(true);
@@ -73,7 +73,7 @@ struct default_parser_t<bool> : public parser_base_t<bool>
         }
         else
         {
-            return result_t<bool>("Couldn't parse bool");
+            return result_t<bool>(u8"Couldn't parse bool");
         }
     }
 };
@@ -112,7 +112,6 @@ struct default_parser_t<char> : public parser_base_t<char>
                 ) const
     {
         using namespace std;
-        string_view sv{_a_parse_input.sv()};
         if (_a_parse_input.check_and_advance("`"))
         {
             char _l_rv{*_a_parse_input};
@@ -123,55 +122,33 @@ struct default_parser_t<char> : public parser_base_t<char>
             }
             else
             {
-                return unexpected(
-                    fmt::format("Could not find expected character `{0}`.", "`")
-                );
+                return unexpected(fmt::format(
+                    u8"Could not find expected character `{0}`.", string_view_to_u8string("`")
+                ));
             }
         }
         else
         {
             return unexpected(
-                fmt::format("Could not find expected character `{0}`.", "`")
+                fmt::format(u8"Could not find expected character `{0}`.", string_view_to_u8string("`"))
             );
         }
     }
 };
 
-template <>
+/*template <>
 struct default_parser_t<wchar_t> : public parser_base_t<wchar_t>
 {
-    __constexpr result_t<wchar_t>
-        run_parser(
-            parser_input_t& _a_parse_input
-        ) const
+    __no_constexpr_imp result_t<wchar_t>
+                run_parser(
+                    parser_input_t& _a_parse_input
+                ) const
     {
-        using namespace std;
-        return unexpected("Couldn't parse wchar_t");
-        /*using namespace std;
-        string_view sv{ _a_parse_input.sv() };
-        if (_a_parse_input.check_and_advance("`"))
-        {
-            wchar_t _l_rv{ *_a_parse_input };
-            _a_parse_input.advance(1);
-            if (_a_parse_input.check_and_advance("`"))
-            {
-                return _l_rv;
-            }
-            else
-            {
-                return unexpected(
-                    fmt::format("Could not find expected character `{0}`.", "`")
-                );
-            }
-        }
-        else
-        {
-            return unexpected(
-                fmt::format("Could not find expected character `{0}`.", "`")
-            );
-        }*/
+        __STATIC_ASSERT(
+            wchar_t, "wchar_t not supported by abc::utility::run_parser"
+        );
     }
-};
+};*/
 
 template <typename T>
     requires is_from_chars_convertable_c<T> && (not std::same_as<T, char>)
@@ -184,7 +161,7 @@ struct default_parser_t<T> : public parser_base_t<T>
     {
         using namespace std;
         T                 result{};
-        const string_view _l_str{_a_parse_input.sv()};
+        const string _l_str{ u8string_to_string(_a_parse_input.sv())};
         auto [ptr, ec]
             = from_chars(_l_str.data(), _l_str.data() + _l_str.size(), result);
 
@@ -196,7 +173,7 @@ struct default_parser_t<T> : public parser_base_t<T>
         else
         {
             return result_t<T>(unexpected(fmt::format(
-                "Could not parse \"{0}\" using std::from_chars", _l_str
+                u8"Could not parse \"{0}\" using std::from_chars", _a_parse_input.sv()
             ))
 
             );
@@ -632,8 +609,8 @@ __constexpr_imp result_t<typename default_parser_t<std::pair<T, U>>::value_type>
         else
         {
             return unexpected(fmt::format(
-                "Could not parse std::tuple element 2. Failed with error "
-                "message: {0}",
+                u8"Could not parse std::tuple element 2. Failed with error "
+                u8"message: {0}",
                 _l_second_result.error()
             ));
         }
@@ -641,8 +618,8 @@ __constexpr_imp result_t<typename default_parser_t<std::pair<T, U>>::value_type>
     else
     {
         return unexpected(fmt::format(
-            "Could not parse std::tuple element 1. Failed with error "
-            "message: {0}",
+            u8"Could not parse std::tuple element 1. Failed with error "
+            u8"message: {0}",
             _l_first_result.error()
         ));
     }
@@ -686,10 +663,10 @@ __constexpr_imp result_t<std::vector<T>>
             }
             else
             {
-                return unexpected("unexpected character");
+                return unexpected(u8"unexpected character");
             }
         }
-        return unexpected("Shouldn't be poissibel to get here");
+        return unexpected(u8"Shouldn't be poissibel to get here");
     }
 }
 
@@ -723,7 +700,7 @@ struct default_parser_t<std::tuple<Ts...>>
 private:
     std::tuple<parser_t<Ts>...> _m_parsers;
     template <std::size_t I>
-    __constexpr std::optional<std::string>
+    __constexpr std::optional<std::u8string>
                 run_parser_internal(
                     value_type&     _a_object,
                     parser_input_t& _a_parse_input
@@ -756,7 +733,7 @@ struct default_parser_t<std::variant<Ts...>>
 private:
     std::tuple<parser_t<Ts>...> _m_parsers;
     template <std::size_t I>
-    __constexpr std::optional<std::string>
+    __constexpr std::optional<std::u8string>
                 run_parser_internal(
                     value_type&       _a_object,
                     const std::size_t _a_idx,
@@ -852,7 +829,7 @@ __constexpr result_t<typename default_parser_t<std::tuple<Ts...>>::value_type>
 
 template <typename... Ts>
 template <std::size_t I>
-__constexpr std::optional<std::string>
+__constexpr std::optional<std::u8string>
             default_parser_t<std::tuple<Ts...>>::run_parser_internal(
         value_type&     _a_object,
         parser_input_t& _a_parse_input
@@ -871,14 +848,14 @@ __constexpr std::optional<std::string>
         }
         else
         {
-            return optional<string>{};
+            return nullopt;
         }
     }
     else
     {
-        return optional<string>(fmt::format(
-            "Could not parse std::tuple element {0}. Failed with error "
-            "message: {1}",
+        return optional<u8string>(fmt::format(
+            u8"Could not parse std::tuple element {0}. Failed with error "
+            u8"message: {1}",
             I,
             _l_result.error()
         ));
@@ -920,7 +897,7 @@ __constexpr result_t<typename default_parser_t<std::variant<Ts...>>::value_type>
 
 template <typename... Ts>
 template <std::size_t I>
-__constexpr std::optional<std::string>
+__constexpr std::optional<std::u8string>
             default_parser_t<std::variant<Ts...>>::run_parser_internal(
         value_type&       _a_object,
         const std::size_t _a_idx,
@@ -934,13 +911,13 @@ __constexpr std::optional<std::string>
             _l_result.has_value())
         {
             std::get<I>(_a_object) = _l_result.value();
-            return optional<string>{};
+            return nullopt;
         }
         else
         {
-            return optional<string>(fmt::format(
-                "Could not parse std::variant element {0}. Failed with error "
-                "message: {1}",
+            return optional<u8string>(fmt::format(
+                u8"Could not parse std::variant element {0}. Failed with error "
+                u8"message: {1}",
                 I,
                 _l_result.error()
             ));
@@ -948,9 +925,9 @@ __constexpr std::optional<std::string>
     }
     else if constexpr (I + 1 == tuple_size<std::tuple<Ts...>>{})
     {
-        return optional<string>(fmt::format(
-            "Could not parse std::variant element {0}. Tuple does not contain "
-            "index",
+        return optional<u8string>(fmt::format(
+            u8"Could not parse std::variant element {0}. Tuple does not contain "
+            u8"index",
             I
         ));
     }

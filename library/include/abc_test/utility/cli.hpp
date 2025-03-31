@@ -32,8 +32,8 @@ class cli_t
 public:
     __no_constexpr
         cli_t(
-            const char             _a_single_char_cml_identifier,
-            const std::string_view _a_multi_char_cml_identifier
+            const char8_t            _a_single_char_cml_identifier,
+            const std::u8string_view _a_multi_char_cml_identifier
         ) noexcept;
     __no_constexpr void
         parse_arguments(
@@ -44,9 +44,9 @@ public:
         ) const noexcept;
     __no_constexpr void
         parse_arguments(
-            Option_Class&                        _a_option_class,
-            const std::vector<std::string_view>& _a_args,
-            cli_results_t&                       _a_cli_results
+            Option_Class&                          _a_option_class,
+            const std::vector<std::u8string>& _a_args,
+            cli_results_t&                         _a_cli_results
         ) const noexcept;
     template <typename T, typename U = T>
     __no_constexpr void
@@ -76,11 +76,11 @@ public:
                    make_help_output() const noexcept;
     __constexpr bool
         process_config_line(
-            Option_Class&                   _a_option_class,
-            const std::string_view          _a_field_name,
-            const std::vector<std::string>& _a_args,
-            const std::string_view          _a_source_line,
-            cli_results_t&                  _a_cli_results
+            Option_Class&                     _a_option_class,
+            const std::u8string_view          _a_field_name,
+            const std::vector<std::u8string>& _a_args,
+            const std::u8string_view          _a_source_line,
+            cli_results_t&                    _a_cli_results
         ) const noexcept;
     __no_constexpr bool
         process_repetition_data(
@@ -89,7 +89,7 @@ public:
                 std::filesystem::path,
                 auto_configuration_load_configuration_t,
                 enum_auto_configuration_write_to_file_t>& _a_tuple_data,
-            cli_results_t&              _a_cli_results
+            cli_results_t&                                _a_cli_results
         ) const noexcept;
     __constexpr const std::optional<cli_auto_configuration_t>&
                       auto_configuration() const noexcept;
@@ -110,31 +110,33 @@ private:
         ) const noexcept;
     mutable std::optional<cli_auto_configuration_t>        _m_rep_data;
     std::vector<std::shared_ptr<cli_info_t<Option_Class>>> _m_clp_info;
-    std::map<char, std::string>                            _m_char_to_clp_info;
-    std::map<std::string_view, std::reference_wrapper<cli_info_t<Option_Class>>>
+    std::map<char8_t, std::u8string>                       _m_char_to_clp_info;
+    std::map<
+        std::u8string_view,
+        std::reference_wrapper<cli_info_t<Option_Class>>>
                 _m_sv_to_clp_info;
-    __constexpr result_t<std::string_view>
-                normalise_str_from_cli_to_flag(const std::string_view _a_str
+    __constexpr result_t<std::u8string_view>
+                normalise_str_from_cli_to_flag(const std::u8string_view _a_str
                 ) const noexcept;
-    __constexpr result_t<std::string_view>
-                normalise_str_from_config_to_flag(const std::string_view _a_str
-                ) const noexcept;
+    __constexpr result_t<std::u8string_view>
+        normalise_str_from_config_to_flag(const std::u8string_view _a_str
+        ) const noexcept;
     __constexpr const
         std::optional<std::reference_wrapper<cli_info_t<Option_Class>>>
-        find_clp_info(const std::string_view& _a_info) const noexcept;
+        find_clp_info(const std::u8string_view& _a_info) const noexcept;
     __constexpr bool
         process_args(
-            Option_Class&                          _a_option_class,
-            const std::string_view                 _a_flag,
-            const cli_info_t<Option_Class>&        _a_cli_info,
-            const std::vector<std::string_view>&   _a_strs,
-            const std::size_t                      _a_strs_size,
-            std::size_t&                           _a_current_index,
-            const std::optional<std::string_view>& _a_source,
-            cli_results_t&                         _a_cli_results
+            Option_Class&                            _a_option_class,
+            const std::u8string_view                 _a_flag,
+            const cli_info_t<Option_Class>&          _a_cli_info,
+            const std::vector<std::u8string>&   _a_strs,
+            const std::size_t                        _a_strs_size,
+            std::size_t&                             _a_current_index,
+            const std::optional<std::u8string_view>& _a_source,
+            cli_results_t&                           _a_cli_results
         ) const noexcept;
-    char        _m_single_char_identifier = '-';
-    std::string _m_multi_char_identifier  = "--";
+    char8_t       _m_single_char_identifier = '-';
+    std::u8string _m_multi_char_identifier  = "--";
     __no_constexpr void
         inner_add_option(const std::shared_ptr<cli_info_t<Option_Class>> _a_cli
         ) noexcept;
@@ -145,7 +147,7 @@ private:
             const Option_Class&    _a_option_class,
             const bool             _a_test_success
         ) const noexcept;
-    __constexpr std::vector<std::pair<std::string, std::string>>
+    __constexpr std::vector<std::pair<std::u8string, std::u8string>>
                 get_config_file_data(const Option_Class& _a_option_class
                 ) const noexcept;
 };
@@ -153,32 +155,33 @@ private:
 template <typename Option_Class>
 __no_constexpr_imp result_t<cli_t<Option_Class>>
                    make_cli(
-                       const char             _a_single_char_cli_identifier = '-',
-                       const std::string_view _a_multi_char_cli_identifier = "--"
+                       const char8_t            _a_single_char_cli_identifier = char8_t('-'),
+                       const std::u8string_view _a_multi_char_cli_identifier = u8"--"
                    ) noexcept
 {
-    return cli_t<Option_Class>(
+    using namespace std;
+    return result_t<cli_t<Option_Class>>(cli_t<Option_Class>(
         _a_single_char_cli_identifier, _a_multi_char_cli_identifier
-    );
+    ));
 }
 
 namespace detail
 {
-__constexpr std::vector<std::string_view>
+__constexpr std::vector<std::u8string>
             make_strs_from_command_line_args(const int _a_argc, char** _a_argv)
         noexcept;
 
 struct found_data_t
 {
-    bool                     test_passed;
-    std::size_t              configuration_index;
-    std::vector<std::string> configuration_data;
+    bool                       test_passed;
+    std::size_t                configuration_index;
+    std::vector<std::u8string> configuration_data;
 
-    __no_constexpr           std::optional<std::string>
-                             process_lines(
-                                 std::fstream&          _a_fstream,
-                                 const std::string_view _a_str_to_find
-                             ) noexcept;
+    __no_constexpr             std::optional<std::string>
+                               process_lines(
+                                   std::fstream&            _a_fstream,
+                                   const std::u8string_view _a_str_to_find
+                               ) noexcept;
 };
 
 __constexpr std::optional<found_data_t>
@@ -195,8 +198,8 @@ _BEGIN_ABC_UTILITY_CLI_NS
 template <typename Option_Class>
 __no_constexpr_imp
     cli_t<Option_Class>::cli_t(
-        const char             _a_single_char_cml_identifier,
-        const std::string_view _a_multi_char_cml_identifier
+        const char8_t            _a_single_char_cml_identifier,
+        const std::u8string_view _a_multi_char_cml_identifier
     ) noexcept
     : _m_single_char_identifier(_a_single_char_cml_identifier)
     , _m_multi_char_identifier(_a_multi_char_cml_identifier)
@@ -221,17 +224,17 @@ __no_constexpr_imp void
 template <typename Option_Class>
 __no_constexpr_imp void
     cli_t<Option_Class>::parse_arguments(
-        Option_Class&                        _a_option_class,
-        const std::vector<std::string_view>& _a_args,
-        cli_results_t&                       _a_cli_results
+        Option_Class&                          _a_option_class,
+        const std::vector<std::u8string>& _a_args,
+        cli_results_t&                         _a_cli_results
     ) const noexcept
 {
     using namespace std;
     const size_t _l_strs_size{_a_args.size()};
     for (size_t _l_idx{0}; _l_idx < _l_strs_size; ++_l_idx)
     {
-        const string_view _l_str{_a_args[_l_idx]};
-        if (const result_t<string_view> _l_opt_normalised_str{
+        const u8string_view _l_str{_a_args[_l_idx]};
+        if (const result_t<u8string_view> _l_opt_normalised_str{
                 normalise_str_from_cli_to_flag(_l_str)
             };
             _l_opt_normalised_str.has_value())
@@ -247,7 +250,7 @@ __no_constexpr_imp void
                         _a_args,
                         _l_strs_size,
                         _l_idx,
-                        optional<string_view>{},
+                        optional<u8string_view>{},
                         _a_cli_results
                     )};
                     _l_terminate)
@@ -328,32 +331,32 @@ __no_constexpr_imp abc::utility::str::string_table_t
 {
     using namespace abc::utility::str;
     string_table_t _l_st({0, 1});
-    _l_st.push_back("Flag(s):");
-    _l_st.push_back("    ");
-    _l_st.push_back("Description:");
+    _l_st.push_back(u8"Flag(s):");
+    _l_st.push_back(u8"    ");
+    _l_st.push_back(u8"Description:");
     _l_st.new_line();
     for (const std::shared_ptr<cli_info_t<Option_Class>>& _l_flag : _m_clp_info)
     {
         const cli_info_t<Option_Class>& _l_cli_info{*_l_flag.get()};
         _l_st.push_back(fmt::format(
-            "{0}{1}{2}",
+            u8"{0}{1}{2}",
             _m_multi_char_identifier,
             _l_cli_info.flag(),
             (_l_cli_info.char_flag().has_value()
                  ? fmt::format(
-                       ", {0}{1}",
+                       u8", {0}{1}",
                        _m_single_char_identifier,
                        _l_cli_info.char_flag().value()
                    )
-                 : "")
+                 : u8"")
         ));
         _l_st.push_empty();
         _l_st.push_back(fmt::format(
-            "{0}{1}",
+            u8"{0}{1}",
             _l_cli_info.description(),
             not _l_cli_info.enabled_for_config_file()
-                ? " Option will not be recognised in a configuration file."
-                : ""
+                ? u8" Option will not be recognised in a configuration file."
+                : u8""
         ));
         _l_st.new_line();
     }
@@ -363,15 +366,15 @@ __no_constexpr_imp abc::utility::str::string_table_t
 template <typename Option_Class>
 __constexpr_imp bool
     cli_t<Option_Class>::process_config_line(
-        Option_Class&                   _a_option_class,
-        const std::string_view          _a_field_name,
-        const std::vector<std::string>& _a_args,
-        const std::string_view          _a_source_line,
-        cli_results_t&                  _a_cli_results
+        Option_Class&                     _a_option_class,
+        const std::u8string_view          _a_field_name,
+        const std::vector<std::u8string>& _a_args,
+        const std::u8string_view          _a_source_line,
+        cli_results_t&                    _a_cli_results
     ) const noexcept
 {
     using namespace std;
-    if (const result_t<string_view> _l_opt_normalised_str{
+    if (const result_t<u8string_view> _l_opt_normalised_str{
             normalise_str_from_config_to_flag(_a_field_name)
         };
         _l_opt_normalised_str.has_value())
@@ -380,8 +383,8 @@ __constexpr_imp bool
                 _l_clp_info{find_clp_info(_l_opt_normalised_str.value())};
             _l_clp_info.has_value())
         {
-            size_t              _l_idx{0};
-            vector<string_view> _l_strs;
+            size_t                _l_idx{0};
+            vector<u8string> _l_strs;
             for (auto& _l_arg : _a_args)
             {
                 _l_strs.push_back(_l_arg);
@@ -418,7 +421,7 @@ __no_constexpr_imp bool
             std::filesystem::path,
             auto_configuration_load_configuration_t,
             enum_auto_configuration_write_to_file_t>& _a_tuple_data,
-        cli_results_t&              _a_cli_results
+        cli_results_t&                                _a_cli_results
     ) const noexcept
 {
     using namespace std;
@@ -434,8 +437,8 @@ __no_constexpr_imp bool
         if (not filesystem::exists(_l_folder.parent_path()))
         {
             _a_cli_results.add_error(fmt::format(
-                "Parent folder {0} does not exist",
-                _l_folder.parent_path().string()
+                u8"Parent folder {0} does not exist",
+                _l_folder.parent_path().u8string()
             ));
             return true;
         }
@@ -529,8 +532,9 @@ __no_constexpr_imp bool
         && not _l_file_containing_index_to_run.has_value())
     {
         _a_cli_results.add_error(fmt::format(
-            "The file containing index {0} was required, however it could not "
-            "be found",
+            u8"The file containing index {0} was required, however it could "
+            u8"not "
+            u8"be found",
             _l_rep_file_idx.index().value()
         ));
         return true;
@@ -561,7 +565,7 @@ __no_constexpr_imp bool
         }
         else
         {
-            _a_cli_results.add_error("Couldn't work it out");
+            _a_cli_results.add_error(u8"Couldn't work it out");
             return true;
         }
     }
@@ -595,7 +599,7 @@ __no_constexpr_imp bool
         }
         else
         {
-            _a_cli_results.add_error("Couldn't work it out");
+            _a_cli_results.add_error(u8"Couldn't work it out");
             return true;
         }
     }
@@ -668,34 +672,34 @@ __no_constexpr_imp bool
 {
     using namespace std;
     size_t _l_line_idx{1};
-    for (const string_view _l_line : _l_data.configuration_data)
+    for (const u8string_view _l_line : _l_data.configuration_data)
     {
         // Split string into parts. Then process.
-        if (_l_line.size() == 0 || _l_line[0] == '#')
+        if (_l_line.size() == 0 || _l_line[0] == char8_t('#'))
         {
             continue;
         }
-        const size_t _l_equals_pos{_l_line.find_first_of("=")};
-        if (_l_equals_pos == string::npos)
+        const size_t _l_equals_pos{_l_line.find_first_of(u8"=")};
+        if (_l_equals_pos == u8string::npos)
         {
-            _a_cli_results.add_error(fmt::format("couldn't run file"));
+            _a_cli_results.add_error(fmt::format(u8"couldn't run file"));
             return true;
         }
         else
         {
-            const string   _l_field_name{abc::utility::str::remove_whitespace(
+            const u8string   _l_field_name{abc::utility::str::remove_whitespace(
                 _l_line.substr(0, _l_equals_pos - 1)
             )};
-            vector<string> _l_strs = abc::utility::str::split_string(
-                _l_line.substr(_l_equals_pos + 1), " "
+            vector<u8string> _l_strs = abc::utility::str::split_string<char8_t>(
+                _l_line.substr(_l_equals_pos + 1), u8" "
             );
             if (bool _l_terminate{process_config_line(
                     _a_option_class,
                     _l_field_name,
                     _l_strs,
                     fmt::format(
-                        "memoized configuration {0} from file \"{1}\", line "
-                        "{2}",
+                        u8"memoized configuration {0} from file \"{1}\", line "
+                        u8"{2}",
                         _l_data.configuration_index,
                         _a_path,
                         _l_line_idx
@@ -713,16 +717,16 @@ __no_constexpr_imp bool
 }
 
 template <typename Option_Class>
-__constexpr_imp result_t<std::string_view>
+__constexpr_imp result_t<std::u8string_view>
                 cli_t<Option_Class>::normalise_str_from_cli_to_flag(
-        const std::string_view _a_str
+        const std::u8string_view _a_str
     ) const noexcept
 {
     using namespace std;
     if (_a_str.size() == 0)
     {
         return unexpected(
-            "Could not normalise string to flag, as string is empty."
+            u8"Could not normalise string to flag, as string is empty."
         );
     }
     else if (_a_str.size() > _m_multi_char_identifier.size()
@@ -738,7 +742,7 @@ __constexpr_imp result_t<std::string_view>
         else
         {
             return unexpected(fmt::format(
-                "Could not find multi-character option \"{0}\".", _l_str
+                u8"Could not find multi-character option \"{0}\".", _l_str
             ));
         }
     }
@@ -752,17 +756,17 @@ __constexpr_imp result_t<std::string_view>
         else
         {
             return unexpected(fmt::format(
-                "Could not find single character option '{0}'.", _a_str[1]
+                u8"Could not find single character option '{0}'.", _a_str[1]
             ));
         }
     }
     else
     {
         return unexpected(fmt::format(
-            "Could not match string to flag. String given as \"{0}\". "
-            "Multi-line identifier is \"{1}\", and single line identifier "
-            "is "
-            "`{2}`.",
+            u8"Could not match string to flag. String given as \"{0}\". "
+            u8"Multi-line identifier is \"{1}\", and single line identifier "
+            u8"is "
+            u8"`{2}`.",
             _a_str,
             _m_multi_char_identifier,
             _m_single_char_identifier
@@ -771,16 +775,16 @@ __constexpr_imp result_t<std::string_view>
 }
 
 template <typename Option_Class>
-__constexpr_imp result_t<std::string_view>
+__constexpr_imp result_t<std::u8string_view>
                 cli_t<Option_Class>::normalise_str_from_config_to_flag(
-        const std::string_view _a_str
+        const std::u8string_view _a_str
     ) const noexcept
 {
     using namespace std;
     if (_a_str.size() == 0)
     {
         return unexpected(
-            "Could not normalise string to flag, as string is empty."
+            u8"Could not normalise string to flag, as string is empty."
         );
     }
     else if (auto _l_finder{_m_sv_to_clp_info.find(_a_str)};
@@ -791,7 +795,8 @@ __constexpr_imp result_t<std::string_view>
     else
     {
         return unexpected(fmt::format(
-            "Could not match string to flag. String given as \"{0}\". ", _a_str
+            u8"Could not match string to flag. String given as \"{0}\". ",
+            _a_str
         ));
     }
 }
@@ -800,7 +805,7 @@ template <typename Option_Class>
 __constexpr_imp const
     std::optional<std::reference_wrapper<cli_info_t<Option_Class>>>
     cli_t<Option_Class>::find_clp_info(
-        const std::string_view& _a_info
+        const std::u8string_view& _a_info
     ) const noexcept
 {
     using namespace std;
@@ -810,23 +815,23 @@ __constexpr_imp const
 template <typename Option_Class>
 __constexpr_imp bool
     cli_t<Option_Class>::process_args(
-        Option_Class&                          _a_option_class,
-        const std::string_view                 _a_flag,
-        const cli_info_t<Option_Class>&        _a_cli_info,
-        const std::vector<std::string_view>&   _a_strs,
-        const std::size_t                      _a_strs_size,
-        std::size_t&                           _a_current_index,
-        const std::optional<std::string_view>& _a_source,
-        cli_results_t&                         _a_cli_results
+        Option_Class&                            _a_option_class,
+        const std::u8string_view                 _a_flag,
+        const cli_info_t<Option_Class>&          _a_cli_info,
+        const std::vector<std::u8string>&   _a_strs,
+        const std::size_t                        _a_strs_size,
+        std::size_t&                             _a_current_index,
+        const std::optional<std::u8string_view>& _a_source,
+        cli_results_t&                           _a_cli_results
     ) const noexcept
 {
     using namespace std;
     size_t _l_index_of_flag{_a_current_index};
     ++_a_current_index;
-    vector<string_view> _l_strs_to_pass;
+    vector<u8string_view> _l_strs_to_pass;
     while (_a_current_index < _a_strs.size())
     {
-        const result_t<string_view> _l_next_arg
+        const result_t<u8string_view> _l_next_arg
             = normalise_str_from_cli_to_flag(_a_strs[_a_current_index]);
         if (_l_next_arg.has_value())
         {
@@ -854,7 +859,7 @@ __constexpr_imp bool
             _l_opt_print.value(),
             (_a_source.has_value() ? _a_source.value()
                                    : fmt::format(
-                                         "command line arguments {0} to {1}",
+                                         u8"command line arguments {0} to {1}",
                                          _l_index_of_flag,
                                          _a_current_index
                                      ))
@@ -873,7 +878,7 @@ __no_constexpr_imp void
     if (_a_cli->char_flag().has_value())
     {
         _m_char_to_clp_info.insert(
-            {_a_cli->char_flag().value(), string(_a_cli->flag())}
+            {_a_cli->char_flag().value(), u8string(_a_cli->flag())}
         );
     }
     _m_clp_info.push_back(_a_cli);
@@ -930,34 +935,38 @@ __no_constexpr_imp void
         };
         _l_output.open(_l_new_path, ios::app);
     }
+    u8string _l_printed_str{
+        abc::utility::printer::default_printer_t<pair<bool, size_t>>{}
+            .run_printer(make_pair(_a_test_success, _l_next_index))
+    };
     _l_output << _a_option_class.autofile_metadata_string << "_"
-              << abc::utility::printer::default_printer_t<pair<bool, size_t>>{}
-                     .run_printer(make_pair(_a_test_success, _l_next_index))
+              << string(_l_printed_str.begin(), _l_printed_str.end())
               << std::endl;
     for (const auto& [_l_field, _l_data] :
          get_config_file_data(_a_option_class))
     {
-        _l_output << fmt::format("{0} = {1}", _l_field, _l_data) << endl;
+        const u8string _l_str{ fmt::format(u8"{0} = {1}", _l_field, _l_data) };
+        _l_output << string(_l_str.begin(), _l_str.end()) << endl;
     }
     _l_output.close();
 }
 
 template <typename Option_Class>
-__constexpr_imp std::vector<std::pair<std::string, std::string>>
+__constexpr_imp std::vector<std::pair<std::u8string, std::u8string>>
                 cli_t<Option_Class>::get_config_file_data(
         const Option_Class& _a_option_class
     ) const noexcept
 {
     using namespace std;
-    vector<pair<string, string>> _l_rv;
+    vector<pair<u8string, u8string>> _l_rv;
     for (const shared_ptr<cli_info_t<Option_Class>>& _l_ptr : _m_clp_info)
     {
         const cli_info_t<Option_Class>& _l_info{*_l_ptr.get()};
-        const optional<string> _l_opt_str{_l_info.print(_a_option_class)};
+        const optional<u8string> _l_opt_str{_l_info.print(_a_option_class)};
         if (_l_opt_str.has_value())
         {
             _l_rv.push_back(
-                make_pair(string(_l_info.flag()), _l_opt_str.value())
+                make_pair(u8string(_l_info.flag()), _l_opt_str.value())
             );
         }
     }
@@ -966,34 +975,35 @@ __constexpr_imp std::vector<std::pair<std::string, std::string>>
 
 namespace detail
 {
-__constexpr_imp std::vector<std::string_view>
+__constexpr_imp std::vector<std::u8string>
                 make_strs_from_command_line_args(
                     const int _a_argc,
                     char**    _a_argv
                 ) noexcept
 {
     using namespace std;
-    vector<string_view> _l_strs(_a_argc > 1 ? (_a_argc - 1) : 0);
+    vector<u8string> _l_strs(_a_argc > 1 ? (_a_argc - 1) : 0);
     for (size_t _l_idx{1}; _l_idx < _a_argc; ++_l_idx)
     {
-        _l_strs[_l_idx - 1] = string_view(_a_argv[_l_idx]);
+        _l_strs[_l_idx - 1] = string_view_to_u8string(_a_argv[_l_idx]);
     }
     return _l_strs;
 }
 
 __no_constexpr_imp std::optional<std::string>
                    found_data_t::process_lines(
-        std::fstream&          _a_fstream,
-        const std::string_view _a_str_to_find
+        std::fstream&            _a_fstream,
+        const std::u8string_view _a_str_to_find
     ) noexcept
 {
     using namespace std;
-    string _l_line;
-    while (getline(_a_fstream, _l_line))
+    string _l_unprocessed_line;
+    while (getline(_a_fstream, _l_unprocessed_line))
     {
+        u8string _l_line{abc::string_view_to_u8string(_l_unprocessed_line)};
         if (_l_line.starts_with(_a_str_to_find))
         {
-            return _l_line;
+            return _l_unprocessed_line;
         }
         else
         {
@@ -1013,13 +1023,16 @@ __constexpr_imp std::optional<found_data_t>
     fstream                _l_file_input(_a_path);
     string                 _l_line;
     optional<found_data_t> _l_rv;
-    string                 _l_str_to_find{"metadata_"};
+    u8string               _l_str_to_find{u8"metadata_"};
     optional<string>       _l_unprocessed_line;
     while (_l_unprocessed_line.has_value() || getline(_l_file_input, _l_line))
     {
-        const string& _l_line_to_get = _l_unprocessed_line.has_value()
-                                           ? _l_unprocessed_line.value()
-                                           : _l_line;
+        const string&  _l_line_to_get_as_str = _l_unprocessed_line.has_value()
+                                                   ? _l_unprocessed_line.value()
+                                                   : _l_line;
+        const u8string _l_line_to_get{
+            abc::string_view_to_u8string(_l_line_to_get_as_str)
+        };
         if (_l_unprocessed_line.has_value())
         {
             _l_unprocessed_line = nullopt;

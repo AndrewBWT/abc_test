@@ -15,10 +15,10 @@ struct user_initialised_report_list_formatter_t
 {
 public:
     __constexpr
-        user_initialised_report_list_formatter_t(
-            const std::size_t _a_index,
-            const std::size_t _a_max_index
-        ) noexcept;
+    user_initialised_report_list_formatter_t(
+        const std::size_t _a_index,
+        const std::size_t _a_max_index
+    ) noexcept;
     __constexpr virtual bool
         check_data(
             const enum_user_initialised_report_fields_t&             _a_fid,
@@ -30,25 +30,34 @@ public:
             const reports::user_initialised_report_t<Single_Source>& _a_element,
             const print_config_t&                                    _a_pc,
             const utility::io::threated_text_output_reporter_t&      _a_ttor,
-            const std::size_t _a_idx
+            const std::size_t                                        _a_idx
         ) const;
 protected:
     std::size_t _m_index;
     std::size_t _m_max_index;
     std::size_t _m_max_str_size;
 public:
-    __constexpr std::string prefix(const std::size_t _a_idx) const noexcept
+    __constexpr std::u8string
+                prefix(
+                    const std::size_t _a_idx
+                ) const noexcept
     {
         using namespace std;
-        string _l_max_str{ fmt::format("  {0})  ", _m_max_index) };
+        u8string _l_max_str{fmt::format(u8"  {0})  ", _m_max_index)};
         if (_a_idx == 0)
         {
-            string _l_s1{ fmt::format("  {0})", _m_index) };
-            return fmt::format("{0}{1}", _l_s1, string(_l_max_str.size() - _l_s1.size(), ' '));
+            u8string _l_s1{fmt::format(u8"  {0})", _m_index)};
+            return fmt::format(
+                u8"{0}{1}",
+                _l_s1,
+                u8string(_l_max_str.size() - _l_s1.size(), char8_t(' '))
+            );
         }
         else
         {
-            return fmt::format("{0}", string(_l_max_str.size(), ' '));
+            return fmt::format(
+                u8"{0}", u8string(_l_max_str.size(), char8_t(' '))
+            );
         }
     }
 };
@@ -58,16 +67,16 @@ _END_ABC_REPORTERS_NS
 _BEGIN_ABC_REPORTERS_NS
 template <bool Single_Source>
 __constexpr_imp
-user_initialised_report_list_formatter_t<Single_Source>::
-user_initialised_report_list_formatter_t(
-    const std::size_t _a_index,
-    const std::size_t _a_max_index
-) noexcept
+    user_initialised_report_list_formatter_t<Single_Source>::
+        user_initialised_report_list_formatter_t(
+            const std::size_t _a_index,
+            const std::size_t _a_max_index
+        ) noexcept
     : _m_index(_a_index)
     , _m_max_index(_a_max_index)
     , _m_max_str_size(fmt::format("  {0})  ", _a_max_index).size())
-{
-}
+{}
+
 template <bool Single_Source>
 __constexpr_imp bool
     user_initialised_report_list_formatter_t<Single_Source>::check_data(
@@ -96,7 +105,7 @@ __constexpr_imp void
         const reports::user_initialised_report_t<Single_Source>& _a_element,
         const print_config_t&                                    _a_pc,
         const utility::io::threated_text_output_reporter_t&      _a_ttor,
-        const std::size_t _a_idx
+        const std::size_t                                        _a_idx
     ) const
 {
     using namespace std;
@@ -112,35 +121,47 @@ __constexpr_imp void
     case SOURCE:
         if constexpr (Single_Source)
         {
-            _a_ttor.write(
-                fmt::format("{0}{1}", prefix(_a_idx), _a_pc.colon(_a_pc.source_location_str()))
-            );
             _a_ttor.write(fmt::format(
-                "{0}{1}", prefix(_a_idx),
+                u8"{0}{1}",
+                prefix(_a_idx),
+                _a_pc.colon(_a_pc.source_location_str())
+            ));
+            _a_ttor.write(fmt::format(
+                u8"{0}{1}",
+                prefix(_a_idx),
                 _a_pc.indent(
                     _a_pc.source_location(_a_element.source().source_location())
                 )
             ));
-            _a_ttor.write(
-                fmt::format("{0}{1}", prefix(_a_idx), _a_pc.colon(_a_pc.source_code_str()))
-            );
             _a_ttor.write(fmt::format(
-                "{0}{1}", prefix(_a_idx),
+                u8"{0}{1}", prefix(_a_idx), _a_pc.colon(_a_pc.source_code_str())
+            ));
+            _a_ttor.write(fmt::format(
+                u8"{0}{1}",
+                prefix(_a_idx),
                 _a_pc.indent(_a_pc.source_representation(
-                    _a_element.source().source_code_representation()
+                    string_view_to_u8string(
+                        _a_element.source().source_code_representation()
+                    )
+
                 ))
             ));
         }
         else
         {
             _a_ttor.write(fmt::format(
-                "{0}{1}", prefix(_a_idx), _a_pc.colon(_a_pc.source_location_pair_begin_str())
+                u8"{0}{1}",
+                prefix(_a_idx),
+                _a_pc.colon(_a_pc.source_location_pair_begin_str())
             ));
             _a_ttor.write(fmt::format(
-                "{0}{1}", prefix(_a_idx), _a_pc.indent(_a_pc.colon(_a_pc.source_location_str()))
+                u8"{0}{1}",
+                prefix(_a_idx),
+                _a_pc.indent(_a_pc.colon(_a_pc.source_location_str()))
             ));
             _a_ttor.write(fmt::format(
-                "{0}{1}", prefix(_a_idx),
+                u8"{0}{1}",
+                prefix(_a_idx),
                 _a_pc.indent(
                     _a_pc.source_location(
                         _a_element.source().begin_source().source_location()
@@ -149,15 +170,19 @@ __constexpr_imp void
                 )
             ));
             _a_ttor.write(fmt::format(
-                "{0}{1}", prefix(_a_idx), _a_pc.indent(_a_pc.colon(_a_pc.source_code_str()))
+                u8"{0}{1}",
+                prefix(_a_idx),
+                _a_pc.indent(_a_pc.colon(_a_pc.source_code_str()))
             ));
             _a_ttor.write(fmt::format(
-                "{0}{1}", prefix(_a_idx),
+                u8"{0}{1}",
+                prefix(_a_idx),
                 _a_pc.indent(
-                    _a_pc.source_representation(_a_element.source()
-                                                    .begin_source()
-                                                    .source_code_representation(
-                                                    )),
+                    _a_pc.source_representation(abc::string_view_to_u8string(
+                        _a_element.source()
+                            .begin_source()
+                            .source_code_representation()
+                    )),
                     2
                 )
             ));
@@ -171,23 +196,30 @@ __constexpr_imp void
                     _a_element.source().end_source().value()
                 };
                 _a_ttor.write(fmt::format(
-                    "{0}{1}", prefix(_a_idx),
+                    u8"{0}{1}",
+                    prefix(_a_idx),
                     _a_pc.indent(_a_pc.colon(_a_pc.source_location_str()))
                 ));
                 _a_ttor.write(fmt::format(
-                    "{0}{1}", prefix(_a_idx),
+                    u8"{0}{1}",
+                    prefix(_a_idx),
                     _a_pc.indent(
                         _a_pc.source_location(_l_end.source_location()), 2
                     )
                 ));
                 _a_ttor.write(fmt::format(
-                    "{0}{1}", prefix(_a_idx), _a_pc.indent(_a_pc.colon(_a_pc.source_code_str()))
+                    u8"{0}{1}",
+                    prefix(_a_idx),
+                    _a_pc.indent(_a_pc.colon(_a_pc.source_code_str()))
                 ));
                 _a_ttor.write(fmt::format(
-                    "{0}{1}", prefix(_a_idx),
+                    u8"{0}{1}",
+                    prefix(_a_idx),
                     _a_pc.indent(
                         _a_pc.source_representation(
-                            _l_end.source_code_representation()
+                            abc::string_view_to_u8string(
+                                _l_end.source_code_representation()
+                            )
                         ),
                         2
                     )
@@ -197,12 +229,17 @@ __constexpr_imp void
         break;
     case LOG_INFOS:
     {
-        _a_ttor.write(fmt::format("{0}{1}", prefix(_a_idx), _a_pc.colon(_a_pc.log_info_str())));
-        for (const string_view& _l_str : _a_element.log_infos())
+        _a_ttor.write(fmt::format(
+            u8"{0}{1}", prefix(_a_idx), _a_pc.colon(_a_pc.log_info_str())
+        ));
+        for (const u8string_view& _l_str : _a_element.log_infos())
         {
-            _a_ttor.write(
-                fmt::format("{0}{1}", prefix(_a_idx), _a_pc.indent(_a_pc.log_info(_l_str)))
-            );
+            _a_ttor.write(fmt::format(
+                u8"{0}{1}",
+                prefix(_a_idx),
+                _a_pc.indent(_a_pc.log_info(_l_str
+                ))
+            ));
         }
     }
     break;

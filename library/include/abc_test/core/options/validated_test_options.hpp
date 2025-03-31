@@ -12,7 +12,7 @@ class validated_test_options_t;
  */
 template <typename T>
 using validated_test_options_or_error_t
-    = std::expected<validated_test_options_t<T>, std::vector<std::string>>;
+    = std::expected<validated_test_options_t<T>, std::vector<std::u8string>>;
 
 /*!
  * @brief Class to hold a validated test_options_base_t variable.
@@ -62,7 +62,7 @@ __no_constexpr_imp validated_test_options_or_error_t<T>
     ) noexcept
 {
     using namespace std;
-    if (optional<vector<string>> _l_error_msg{
+    if (optional<vector<u8string>> _l_error_msg{
             _a_test_options.validate_and_pre_process()
         };
         _l_error_msg.has_value())

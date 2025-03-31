@@ -63,7 +63,7 @@ public:
         _m_output.push_back(_a_table());
     }
 
-    __constexpr const std::vector<std::string>&
+    __constexpr const std::vector<std::u8string>&
                       text_output() const noexcept
     {
         return _m_output;
@@ -79,23 +79,23 @@ public:
 
     __constexpr void
         add_error(
-            const std::string_view _a_str
+            const std::u8string_view _a_str
         ) noexcept
     {
         using namespace std;
-        _m_errors.push_back(string(_a_str));
+        _m_errors.push_back(u8string(_a_str));
         _m_terminate_early = true;
     }
 
-    __constexpr std::string
+    __constexpr std::u8string
                 errors() const noexcept
     {
         using namespace std;
-        string _l_rv{};
-        for (const string_view _a_str : _m_errors)
+        u8string _l_rv{};
+        for (const u8string_view _a_str : _m_errors)
         {
             _l_rv.append(_a_str);
-            _l_rv.append("\n");
+            _l_rv.append(u8"\n");
         }
         return _l_rv;
     }
@@ -103,46 +103,46 @@ public:
     __no_constexpr_imp void
         add_memoized_data(
             const bool             _a_retain_previous_results,
-            const std::string_view _a_flag,
-            const std::string_view _a_printed_value,
-            const std::string_view _a_source
+            const std::u8string_view _a_flag,
+            const std::u8string_view _a_printed_value,
+            const std::u8string_view _a_source
         ) noexcept
     {
         using namespace std;
-        if (_m_memoized_processed_flags.contains(string(_a_flag)))
+        if (_m_memoized_processed_flags.contains(u8string(_a_flag)))
         {
             if (_a_retain_previous_results)
             {
-                vector<string> _l_prev = get<1>(
-                    _m_memoized_processed_flags.at(string(_a_flag)).back()
+                vector<u8string> _l_prev = get<1>(
+                    _m_memoized_processed_flags.at(u8string(_a_flag)).back()
                 );
-                _l_prev.push_back(string(_a_source));
-                _m_memoized_processed_flags.at(string(_a_flag))
-                    .push_back(make_tuple(string(_a_printed_value), _l_prev));
+                _l_prev.push_back(u8string(_a_source));
+                _m_memoized_processed_flags.at(u8string(_a_flag))
+                    .push_back(make_tuple(u8string(_a_printed_value), _l_prev));
             }
             else
             {
-                _m_memoized_processed_flags.at(string(_a_flag))
+                _m_memoized_processed_flags.at(u8string(_a_flag))
                     .push_back(make_tuple(
-                        string(_a_printed_value),
-                        vector<string>(1, string(_a_source))
+                        u8string(_a_printed_value),
+                        vector<u8string>(1, u8string(_a_source))
                     ));
             }
         }
         else
         {
             _m_memoized_processed_flags.insert(
-                {string(_a_flag),
-                 {{string(_a_printed_value),
-                   vector<string>(1, string(_a_source))}}}
+                { u8string(_a_flag),
+                 {{u8string(_a_printed_value),
+                   vector<u8string>(1, u8string(_a_source))}}}
             );
         }
     }
 
     ds::memoized_cli_history_t _m_memoized_processed_flags;
-    std::vector<std::string>   _m_output;
+    std::vector<std::u8string>   _m_output;
     bool                       _m_terminate_early = false;
-    std::vector<std::string>   _m_errors;
+    std::vector<std::u8string>   _m_errors;
 
     __constexpr const          ds::memoized_cli_history_t&
                                memoized_data() const noexcept

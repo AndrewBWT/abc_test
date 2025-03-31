@@ -3,6 +3,7 @@
 #include "abc_test/utility/parsers/default_parser.hpp"
 #include "abc_test/utility/printers/default_printer.hpp"
 
+#include <cuchar>
 #include <scn/scan.h>
 
 _BEGIN_ABC_DS_NS
@@ -25,9 +26,9 @@ public:
     friend __no_constexpr
         parse_map_unique_id_to_tdg_collection_stack_trie_result_t
         parse_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
-            const std::string_view _a_str
+            const std::u8string_view _a_str
         ) noexcept;
-    friend __no_constexpr std::string
+    friend __no_constexpr std::u8string
         print_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
             const map_unique_id_to_tdg_collection_stack_trie_t& _a_map
         ) noexcept;
@@ -64,7 +65,7 @@ struct default_printer_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
 {
     static constexpr bool is_specialized{true};
 
-    __no_constexpr virtual std::string
+    __no_constexpr virtual std::u8string
         run_printer(const abc::ds::map_unique_id_to_tdg_collection_stack_trie_t&
                         _a_parse_input) const;
 };
@@ -116,26 +117,29 @@ __no_constexpr_imp std::size_t
 
 __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
     parse_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
-        const std::string_view _a_str
+        const std::u8string_view _a_u8_str
     ) noexcept
 {
     using namespace std;
     vector<pair<string_view, string_view>> _l_strs;
     size_t                                 _l_idx{0};
+    string _a_str{u8string_to_string(_a_u8_str)};
     while (_l_idx < _a_str.size())
     {
         size_t _l_next_colon{_a_str.find(':', _l_idx)};
         if (_l_next_colon == string::npos)
         {
             return unexpected(fmt::format(
-                "Failure to parse part of "
-                "map_unique_id_to_tdg_collection_stack_trie_t string. "
-                "Unable to find colon (':') in text, even though there should "
-                "be atleast one in the string. "
-                "This error occoured after index {0}, containing the subtring "
-                "\"{1}\".",
+                u8"Failure to parse part of "
+                u8"map_unique_id_to_tdg_collection_stack_trie_t string. "
+                u8"Unable to find colon (':') in text, even though there "
+                u8"should "
+                u8"be atleast one in the string. "
+                u8"This error occoured after index {0}, containing the "
+                u8"subtring "
+                u8"\"{1}\".",
                 _l_idx,
-                _a_str.substr(_l_idx)
+                string_view_to_u8string(_a_str.substr(_l_idx))
             ));
         }
         else
@@ -176,21 +180,21 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
             if (not _l_result)
             {
                 return unexpected(fmt::format(
-                    "Could not add element {0} to internal map. This is "
-                    "because there is already an element with that unique ID "
-                    "in the map. Unique ID = {1}",
+                    u8"Could not add element {0} to internal map. This is "
+                    u8"because there is already an element with that unique ID "
+                    u8"in the map. Unique ID = {1}",
                     (_l_idx + 1),
-                    _l_str
+                    string_view_to_u8string(_l_str)
                 ));
             }
         }
         else
         {
             return unexpected(fmt::format(
-                "Could not parse compressed string \"{0}\", which is element "
-                "{1}. "
-                "internal parser returned error message \"{2}\".",
-                _l_compressed_str,
+                u8"Could not parse compressed string \"{0}\", which is element "
+                u8"{1}. "
+                u8"internal parser returned error message \"{2}\".",
+                string_view_to_u8string(_l_compressed_str),
                 (_l_idx + 1),
                 _l_compressed_scan_result.error()
             ));
@@ -199,27 +203,27 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
     return _l_map;
 }
 
-__no_constexpr_imp std::string
+__no_constexpr_imp std::u8string
     print_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
         const map_unique_id_to_tdg_collection_stack_trie_t& _a_map
     ) noexcept
 {
     using namespace std;
-    string _l_rv;
+    u8string _l_rv;
     for (const pair<key_t, tdg_collection_stack_trie_t>& _l_element :
          _a_map.map())
     {
-        string _l_key_compressed, _l_key_compressed_2;
+        u8string _l_key_compressed, _l_key_compressed_2;
         for (char _l_char : _l_element.first)
         {
             _l_key_compressed.push_back(static_cast<unsigned char>(_l_char));
         }
         for (unsigned char _l_char : _l_key_compressed)
         {
-            _l_key_compressed_2.append(fmt::format("{:x}", _l_char));
+            _l_key_compressed_2.append(fmt::format(u8"{:x}", _l_char));
         }
         _l_rv.append(fmt::format(
-            "{0}:{1}:",
+            u8"{0}:{1}:",
             _l_key_compressed_2,
             _l_element.second.print_for_loop_stack_trie_compressed()
         ));
@@ -234,21 +238,22 @@ __no_constexpr_imp std::string
 _END_ABC_DS_NS
 
 _BEGIN_ABC_UTILITY_PRINTER_NS
-__no_constexpr_imp std::string
+__no_constexpr_imp std::u8string
     default_printer_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>::
         run_printer(
             const abc::ds::map_unique_id_to_tdg_collection_stack_trie_t&
                 _a_parse_input
         ) const
 {
-    return fmt::format("{}", _a_parse_input.map());
+    return fmt::format(u8"{}", string_view_to_u8string(
+        fmt::format("{0}",_a_parse_input.map())));
 }
 
 _END_ABC_UTILITY_PRINTER_NS
 
 _BEGIN_ABC_UTILITY_PARSER_NS
 __no_constexpr_imp
-result_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
+    result_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
     default_parser_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>::
         run_parser(
             parser_input_t& _a_parse_input

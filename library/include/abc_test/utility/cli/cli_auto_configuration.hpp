@@ -9,6 +9,10 @@
 #include <fstream>
 #include <variant>
 
+#include <fmt/xchar.h>
+
+
+
 _BEGIN_ABC_UTILITY_CLI_NS
 enum class enum_auto_configuration_load_type_t
 {
@@ -155,12 +159,12 @@ struct default_parser_t<cli::auto_configuration_load_configuration_t>
         else
         {
             return unexpected(fmt::format(
-                "Couldn't parse string {0} to either a {1} or a {2}, which the "
-                "constructor for {3} requires.",
+                u8"Couldn't parse string {0} to either a {1} or a {2}, which the "
+                u8"constructor for {3} requires.",
                 _a_parse_input.sv(),
-                typeid(enum_auto_configuration_load_type_t).name(),
-                typeid(std::size_t).name(),
-                typeid(auto_configuration_load_configuration_t).name()
+                char_star_to_u8string(typeid(enum_auto_configuration_load_type_t).name()),
+                char_star_to_u8string(typeid(std::size_t).name()),
+                char_star_to_u8string(typeid(auto_configuration_load_configuration_t).name())
             ));
         }
     }

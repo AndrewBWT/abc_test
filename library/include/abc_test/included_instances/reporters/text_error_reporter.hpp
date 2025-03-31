@@ -80,20 +80,20 @@ __no_constexpr_imp
 		) const noexcept
 	{
 		write(fmt::format(
-			"ERROR:\n"
-			"   Error Message: \"{0}\"\n"
-			"   Source of error:\n"
-			"      File: {1}\n"
-			"      Function: {2}\n"
-			"      Line: {3}\n"
-			"   Stacktrace: {4}"
+			u8"ERROR:\n"
+			u8"   Error Message: \"{0}\"\n"
+			u8"   Source of error:\n"
+			u8"      File: {1}\n"
+			u8"      Function: {2}\n"
+			u8"      Line: {3}\n"
+			u8"   Stacktrace: {4}"
 			, _a_setup_test_error.error_msg()
-			, _a_setup_test_error.source_location().file_name()
-			, _a_setup_test_error.source_location().function_name()
+			, string_view_to_u8string(_a_setup_test_error.source_location().file_name())
+			, string_view_to_u8string(_a_setup_test_error.source_location().function_name())
 			, _a_setup_test_error.source_location().line()
 			, _a_setup_test_error.opt_stacktrace().has_value() ?
-			 to_string(_a_setup_test_error.opt_stacktrace().value()) :
-			"No stacktrace"
+			string_view_to_u8string(to_string(_a_setup_test_error.opt_stacktrace().value())) :
+			u8"No stacktrace"
 			));
 	}
 __no_constexpr_imp
@@ -102,13 +102,13 @@ __no_constexpr_imp
 			const std::string_view _a_str
 		) const noexcept
 	{
-		write("WARNING: " + std::string(_a_str));
+		write(u8"WARNING: " + string_view_to_u8string(_a_str));
 	}
 __no_constexpr_imp
 		void
 		text_error_reporter_t::exit(
 		) const noexcept
 	{
-		write("Preparing to exit...");
+		write(u8"Preparing to exit...");
 	}
 	_END_ABC_REPORTERS_NS

@@ -94,7 +94,7 @@ public:
      * @param _a_str The string to log.
      */
     __constexpr void
-        add_cached_log_msg(const std::string_view _a_str) noexcept;
+        add_cached_log_msg(const std::u8string_view _a_str) noexcept;
 
     /*!
      * @brief Gets the set of log messages for the caller.
@@ -178,7 +178,7 @@ public:
         current_assertion_index() const noexcept;
 private:
     _ABC_NS_LOGGING::log_msg_ptrs_t _m_current_log_msgs;
-    std::vector<std::string>        _m_cached_log_msgs;
+    std::vector<std::u8string>        _m_cached_log_msgs;
     std::reference_wrapper<_ABC_NS_REPORTERS::test_reporter_controller_t>
         _m_trc;
     std::shared_ptr<_ABC_NS_DS::invoked_test_data_t> _m_current_test;
@@ -369,11 +369,11 @@ __constexpr_imp void
 
 __constexpr_imp void
     test_runner_t::add_cached_log_msg(
-        const std::string_view _a_str
+        const std::u8string_view _a_str
     ) noexcept
 {
     using namespace std;
-    _m_cached_log_msgs.push_back(string(_a_str));
+    _m_cached_log_msgs.push_back(u8string(_a_str));
 }
 
 _END_ABC_NS

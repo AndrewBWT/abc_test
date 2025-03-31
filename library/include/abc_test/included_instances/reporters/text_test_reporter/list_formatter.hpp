@@ -43,7 +43,7 @@ template <typename T, typename Formattable_Identifier, typename Print_Config>
 struct list_vertical_formattable_t
 {
 public:
-    __constexpr virtual std::pair<std::string, std::vector<std::string>>
+    __constexpr virtual std::pair<std::u8string, std::vector<std::u8string>>
         get_data(
             const Formattable_Identifier& _a_collection,
             const T&                      _a_element,
@@ -61,7 +61,7 @@ public:
         ) const noexcept
     {
         using namespace std;
-        vector<pair<string, vector<string>>> _l_strs;
+        vector<pair<u8string, vector<u8string>>> _l_strs;
         size_t                       _l_biggest_first_element{0};
         for (const enum_print_pair_t<Formattable_Identifier>& _l_pair :
              _a_collection)
@@ -70,7 +70,7 @@ public:
                 || (constexual_print(_l_pair.second)
                     && check_data(_l_pair.first, _a_element)))
             {
-                const pair<string, vector<string>> _l_str_pair{ get_data(_l_pair.first, _a_element, _a_pc) };
+                const pair<u8string, vector<u8string>> _l_str_pair{ get_data(_l_pair.first, _a_element, _a_pc) };
                 _l_biggest_first_element
                     = std::max(_l_str_pair.first.size(), _l_biggest_first_element);
                 _l_strs.push_back(_l_str_pair);
@@ -83,17 +83,17 @@ public:
                 if (_l_idx++ == 0)
                 {
                     _a_ttor.write(fmt::format(
-                        "{0}{1}{2}",
+                        u8"{0}{1}{2}",
                         _l_field,
-                        string(_l_biggest_first_element - _l_field.size(), ' '),
+                        u8string(_l_biggest_first_element - _l_field.size(), char8_t(' ')),
                         _l_data
                     ));
                 }
                 else
                 {
                     _a_ttor.write(fmt::format(
-                        "{0}{1}",
-                        string(_l_biggest_first_element, ' '),
+                        u8"{0}{1}",
+                        u8string(_l_biggest_first_element, char8_t(' ')),
                         _l_data
                     ));
                 }

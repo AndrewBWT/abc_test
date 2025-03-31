@@ -112,7 +112,7 @@ __no_constexpr_or_inline_imp _ABC_NS_DS::log_infos_t
              ++_l_itt)
         {
             const log_msg_t& _l_elem{(*_l_itt).get()};
-            _l_rv.push_back(string(_l_elem.str()));
+            _l_rv.push_back(u8string(_l_elem.str()));
             if (_l_elem.delete_after_use())
             {
                 _l_to_deletes.push_back(_l_itt);

@@ -21,7 +21,7 @@ __no_constexpr_imp matcher_t
 {
     using namespace _ABC_NS_MATCHER;
     return mk_matcher_using_result(
-        matcher_result_t(_a_bool, fmt::format("{0}", _a_bool))
+        matcher_result_t(_a_bool, fmt::format(u8"{0}", _a_bool))
     );
 }
 

@@ -103,8 +103,8 @@ __no_constexpr_imp void
     using namespace utility::str;
     using namespace reporters;
     using namespace reports;
-    const string _l_line_break{_m_print_config.line_break()};
-    write(fmt::format("{1}\n{0}", _l_line_break, "TEST INFO"));
+    const u8string _l_line_break{_m_print_config.line_break()};
+    write(fmt::format(u8"{1}\n{0}", _l_line_break, u8"TEST INFO"));
     test_report_list_formatter().process_all_data(
         _m_print_config.after_execution_test_report_fields(),
         _a_itd,
@@ -119,30 +119,30 @@ __no_constexpr_imp void
         };
         process_termination(_l_unexpected_termination);
         write(fmt::format(
-            "{1}{0}{0}",
-            _l_line_break,
-            "UNEXPECTED TERMINATION INFORMATION\n"
+            u8"{1}{0}{0}", _l_line_break, u8"UNEXPECTED TERMINATION INFORMATION\n"
         ));
     }
     if (_a_itd.warnings_recieved() > 0)
     {
-        string _l_warning_str;
+        u8string _l_warning_str;
         write(fmt::format(
-            "{2}{0}{1}{0}", _l_line_break, _l_warning_str, "WARNINGS\n"
+            u8"{2}{0}{1}{0}", _l_line_break, _l_warning_str, u8"WARNINGS\n"
         ));
     }
-    const assertion_base_collection_t& _l_reports{ _a_itd.assertions() };
+    const assertion_base_collection_t& _l_reports{_a_itd.assertions()};
     if (_l_reports.size() > 0)
     {
-        write(fmt::format(
-            "{0}\n{1}\n{0}", _l_line_break, "ASSERTION INFO"
-        ));
+        write(fmt::format(u8"{0}\n{1}\n{0}", _l_line_break, u8"ASSERTION INFO"));
         for (const assertion_base_ptr_t& _l_report : _l_reports)
         {
-            process_assertion(_l_report.get(), _l_report.get()->assertion_index(), _a_itd.largest_assertion_index_added());
+            process_assertion(
+                _l_report.get(),
+                _l_report.get()->assertion_index(),
+                _a_itd.largest_assertion_index_added()
+            );
         }
     }
-    write( _l_line_break);
+    write(_l_line_break);
 }
 
 __no_constexpr_imp void
@@ -156,8 +156,8 @@ __no_constexpr_imp void
     using namespace utility::str;
     using namespace reporters;
     using namespace reports;
-    const string _l_line_break{_m_print_config.line_break()};
-    write(fmt::format("{0}\n{1}\n{0}", _l_line_break, "TEST SUITE RESULTS"));
+    const u8string _l_line_break{_m_print_config.line_break()};
+    write(fmt::format(u8"{0}\n{1}\n{0}", _l_line_break, u8"TEST SUITE RESULTS"));
     finalised_test_set_data_list_formatter().process_all_data(
         _m_print_config.finalised_test_set_data_fields(),
         _a_test_set_data,
@@ -178,9 +178,9 @@ __no_constexpr_imp void
     using namespace utility::str;
     using namespace reporters;
     using namespace reports;
-    const string _l_line_break{_m_print_config.line_break()};
+    const u8string _l_line_break{_m_print_config.line_break()};
     write(
-        fmt::format("{0}\n{1}\n{0}", _l_line_break, "TEST SUITE CONFIGURATION")
+        fmt::format(u8"{0}\n{1}\n{0}", _l_line_break, u8"TEST SUITE CONFIGURATION")
     );
     pre_test_set_data_list_formatter().process_all_data(
         _m_print_config.pre_test_set_data_fields(),
@@ -236,8 +236,8 @@ __constexpr void
     else
     {
         throw errors::test_library_exception_t(fmt::format(
-            "Could not find function to format item of abstract class {0}. ",
-            typeid(_a_unexpected_report).name()
+            u8"Could not find function to format item of abstract class {0}. ",
+            string_view_to_u8string(typeid(_a_unexpected_report).name())
         ));
     }
 }
@@ -420,8 +420,8 @@ __constexpr_imp void
     {
         const std::string _l_i = typeid(*_a_gur).name();
         throw errors::test_library_exception_t(fmt::format(
-            "Could not find function to format item of abstract class {0}. ",
-            typeid(*_a_gur).name()
+            u8"Could not find function to format item of abstract class {0}. ",
+            string_view_to_u8string(typeid(*_a_gur).name())
         ));
     }
 }

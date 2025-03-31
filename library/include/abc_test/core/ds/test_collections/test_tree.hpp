@@ -164,14 +164,15 @@ __no_constexpr_imp errors::opt_setup_error_t
     {
         return opt_setup_error_t(setup_error_t(
             fmt::format(
-                "setup_test_error: post_setup_test_data_t's required thread "
-                "resourses greater than those allocated to the system. "
-                "post_setup_test_data_t requires {0} threads, while the system "
-                "has {1} threads available. "
-                "post_setup_test_data_t = {2}",
+                u8"setup_test_error: post_setup_test_data_t's required thread "
+                u8"resourses greater than those allocated to the system. "
+                u8"post_setup_test_data_t requires {0} threads, while the "
+                u8"system "
+                u8"has {1} threads available. "
+                u8"post_setup_test_data_t = {2}",
                 _l_test.thread_resourses_required(),
                 _a_options.threads,
-                _l_test
+                string_view_to_u8string(fmt::format("{0}", _l_test))
             ),
             false
         ));
@@ -179,8 +180,8 @@ __no_constexpr_imp errors::opt_setup_error_t
     else
     {
         vector<size_t> _l_empty_indexes{};
-        for (size_t            _l_idx{0};
-             const string_view _l_element : _l_test.test_path_hierarchy())
+        for (size_t              _l_idx{0};
+             const u8string_view _l_element : _l_test.test_path_hierarchy())
         {
             if (_l_element.empty())
             {
@@ -192,13 +193,14 @@ __no_constexpr_imp errors::opt_setup_error_t
         {
             return opt_setup_error_t(setup_error_t(
                 fmt::format(
-                    "setup_test_error: post_setup_test_data_t's "
-                    "test_path_hierarchy contains empty strings. Specifically "
-                    "at indexes {0}. Complete test_path_hierarchy = {1}. "
-                    "post_setup_test_data_t = {2}",
+                    u8"setup_test_error: post_setup_test_data_t's "
+                    u8"test_path_hierarchy contains empty strings. "
+                    u8"Specifically "
+                    u8"at indexes {0}. Complete test_path_hierarchy = {1}. "
+                    u8"post_setup_test_data_t = {2}",
                     _l_empty_indexes,
                     _l_test.test_path_hierarchy(),
-                    _l_test
+                    string_view_to_u8string(fmt::format("{0}", _l_test))
                 ),
                 false
             ));
@@ -320,15 +322,17 @@ __no_constexpr_imp errors::opt_setup_error_t
             // error.
             return opt_setup_error_t(setup_error_t(
                 fmt::format(
-                    "setup_test_error: post_setup_test_data_t's "
-                    "registered_test_data has the same name as a "
-                    "current entry in the test_tree_t object. "
-                    "The post_setup_test_data object we are attempting to "
-                    "insert is {0}, "
-                    "while the post_setup_test_data_t object blocking its "
-                    "insertion is {1}. ",
-                    _a_test.get(),
-                    (_l_name_range_itts.begin()->get())
+                    u8"setup_test_error: post_setup_test_data_t's "
+                    u8"registered_test_data has the same name as a "
+                    u8"current entry in the test_tree_t object. "
+                    u8"The post_setup_test_data object we are attempting to "
+                    u8"insert is {0}, "
+                    u8"while the post_setup_test_data_t object blocking its "
+                    u8"insertion is {1}. ",
+                    string_view_to_u8string(fmt::format("{0}", _a_test.get())),
+                    string_view_to_u8string(
+                        fmt::format("{0}", (_l_name_range_itts.begin()->get()))
+                    )
                 ),
                 false
             ));

@@ -41,10 +41,10 @@ stacktraces_equal(
     return mk_matcher_using_result(matcher_result_t(
         _l_equal,
         fmt::format(
-            "{0} {1} {2}",
-            to_string(_a_st1),
-            _l_equal ? "==" : "!=",
-            to_string(_a_st2)
+            u8"{0} {1} {2}",
+            string_view_to_u8string(to_string(_a_st1)),
+            _l_equal ? u8"==" : u8"!=",
+            string_view_to_u8string(to_string(_a_st2))
         )
     ));
 }

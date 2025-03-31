@@ -19,7 +19,7 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 	* Converts the given enum to a string representation.
 	*/
 	__constexpr
-		std::string
+		std::u8string
 		to_str(
 			const internal_log_enum_t _a_internal_logger_enum
 		) noexcept;
@@ -27,7 +27,7 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 
 _BEGIN_ABC_UTILITY_INTERNAL_NS
 	__constexpr_imp
-		std::string
+		std::u8string
 		to_str(
 			const internal_log_enum_t _a_internal_logger_enum
 		) noexcept
@@ -36,19 +36,19 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 		switch (_a_internal_logger_enum)
 		{
 		case NONE:
-			return "NONE";
+			return u8"NONE";
 		case PARSING_SEED:
-			return "PARSING_SEED";
+			return u8"PARSING_SEED";
 		case TEST_INFO:
-			return "TEST_INFO";
+			return u8"TEST_INFO";
 		case REPETITION_INFO:
-			return "REPETITION_INFO";
+			return u8"REPETITION_INFO";
 		case MAIN_INFO:
-			return "MAIN_INFO";
+			return u8"MAIN_INFO";
 		case THREAD_MAPPING:
-			return "THREAD_MAPPING";
+			return u8"THREAD_MAPPING";
 		default:
-			return "UNKNOWN";
+			return u8"UNKNOWN";
 		}
 	}
 	_END_ABC_UTILITY_INTERNAL_NS

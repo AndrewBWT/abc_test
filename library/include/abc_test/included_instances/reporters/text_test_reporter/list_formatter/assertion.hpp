@@ -2,6 +2,7 @@
 #include "abc_test/core/test_reports/assertion.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/assertion.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/user_initialised_report.hpp"
+#include "abc_test/utility/types.hpp"
 _BEGIN_ABC_REPORTERS_NS
 
 template <bool Single_Source, typename Assertion_Status>
@@ -30,7 +31,7 @@ public:
             const utility::io::threated_text_output_reporter_t& _a_ttor,
             const std::size_t                                   _a_idx
         ) const;
-    __constexpr virtual std::string
+    __constexpr virtual std::u8string
         get_str_representation(
             const reports::assertion_t<Single_Source, Assertion_Status>&
                                   _a_element,
@@ -40,11 +41,11 @@ public:
 };
 
 template <bool Single_Source, typename Assertion_Status>
-__constexpr std::string
+__constexpr std::u8string
             construct_str_representation(
                 const reports::assertion_t<Single_Source, Assertion_Status>& _a_element,
-                const std::string_view                                       _a_str,
-                const std::string_view _a_suffix_str = ""
+                const std::u8string_view                                     _a_str,
+                const std::u8string_view _a_suffix_str = u8""
             ) noexcept;
 _END_ABC_REPORTERS_NS
 
@@ -96,7 +97,7 @@ __constexpr_imp void
     ) const
 {
     using namespace std;
-    pair<string, string> _l_pair;
+    pair<u8string, u8string> _l_pair;
     if (auto _l_ptr{get_if<enum_user_initialised_report_fields_t>(&_a_fid)};
         _l_ptr != nullptr)
     {
@@ -134,13 +135,13 @@ __constexpr_imp void
             {
                 _l_pair
                     = {_a_pc.colon(_a_pc.test_description_str()),
-                       _a_pc.indent(
-                           _a_pc.message_str(_a_element.test_description())
-                       )};
+                       _a_pc.indent(_a_pc.message_str(abc::string_view_to_u8string(
+                           _a_element.test_description()
+                       )))};
             }
             else
             {
-                _l_pair = {"", ""};
+                _l_pair = {u8"", u8""};
             }
             break;
         case STR_REPRESENTATION:
@@ -157,10 +158,10 @@ __constexpr_imp void
     {
         throw errors::unaccounted_for_variant_exception(_a_fid);
     }
-    if (_l_pair.first != "" || _l_pair.second != "")
+    if (not _l_pair.first.empty() || not _l_pair.second.empty())
     {
         _a_ttor.write(fmt::format(
-            "{0}{1}{2}", this->prefix(_a_idx), _l_pair.first, _l_pair.second
+            u8"{0}{1}{2}", this->prefix(_a_idx), _l_pair.first, _l_pair.second
         ));
     }
     else
@@ -170,25 +171,25 @@ __constexpr_imp void
 }
 
 template <bool Single_Source, typename Assertion_Status>
-__constexpr_imp std::string
+__constexpr_imp std::u8string
                 construct_str_representation(
                     const reports::assertion_t<Single_Source, Assertion_Status>& _a_element,
-                    const std::string_view                                       _a_str,
-                    const std::string_view _a_suffix_str
+                    const std::u8string_view                                     _a_str,
+                    const std::u8string_view _a_suffix_str
                 ) noexcept
 {
     using namespace std;
     using namespace reports;
     const bool   _l_passed{_a_element.get_pass_status()};
-    const string _l_terminate_function_str{
+    const u8string _l_terminate_function_str{
         (not _l_passed && same_as<Assertion_Status, pass_or_terminate_t>
          || same_as<Assertion_Status, terminate_t>)
-            ? " Assertion terminated function."
-            : ""
+            ? u8" Assertion terminated function."
+            : u8""
     };
-    const string _l_status_str{_l_passed ? "passed" : "failed"};
+    const u8string _l_status_str{_l_passed ? u8"passed" : u8"failed"};
     return fmt::format(
-        "{0} {1}.{2}{3}",
+        u8"{0} {1}.{2}{3}",
         _a_str,
         _l_status_str,
         _a_suffix_str,

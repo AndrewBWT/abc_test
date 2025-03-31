@@ -49,7 +49,7 @@ public:
      * Given the string "aa::bb::cc", this string would be split into "aa",
      * "bb", "cc".
      */
-    _ABC_NS_DS::test_path_delimiter path_delimiter = "::";
+    _ABC_NS_DS::test_path_delimiter path_delimiter = u8"::";
     /*!
      * @brief The root folder. It is from this folder all relative paths in the
      * test library are navigated from.
@@ -77,7 +77,7 @@ public:
      * elements. This is specifically for those files where the reader and
      * writer uses fmt::format and scn::scan.
      */
-    std::string general_data_extension                       = "gd";
+    std::u8string general_data_extension                       = u8"gd";
     std::string tertiary_data_file_extension                 = "td";
     /*!
      * @brief The comment line string.
@@ -85,7 +85,7 @@ public:
      * In read data files, lines beginning with this string are identified as
      * comments and ignored.
      */
-    std::string comment_str                                  = "#";
+    std::u8string comment_str                                  = u8"#";
     /*!
      * @brief Turn on (or off) the ability for the system to write data to
      * files.
@@ -148,7 +148,7 @@ public:
     /*!
      * Test paths to run
      */
-    std::vector<std::string> test_paths_to_run;
+    std::vector<std::u8string> test_paths_to_run;
     std::string              autofile_metadata_string = "metadata";
     std::size_t maximum_individual_alloctable_memory = 2'147;// 483'648;
     bool retain_passed_assertions = false;
@@ -160,7 +160,7 @@ public:
      * @return Nullopt if there are no errors. Otherwise a string representation
      * of the error.
      */
-    __no_constexpr     std::optional<std::vector<std::string>>
+    __no_constexpr     std::optional<std::vector<std::u8string>>
                        validate_and_pre_process() noexcept;
 
     __no_constexpr_imp utility::rng_t
@@ -184,7 +184,7 @@ public:
         else if (maximum_individual_alloctable_memory == 0)
         {
             throw abc::errors::test_library_exception_t(
-                "Cannot determine allocation as size == 0"
+                u8"Cannot determine allocation as size == 0"
             );
         }
         else
@@ -194,7 +194,7 @@ public:
     }
 protected:
     __no_constexpr void virtual validate_and_pre_process_(
-        std::vector<std::string>& _a_error_ref
+        std::vector<std::u8string>& _a_error_ref
     ) noexcept;
     std::optional<std::filesystem::path> _m_file_to_write_to;
 };
@@ -226,25 +226,25 @@ struct fmt::formatter<abc::test_options_base_t> : formatter<string_view>
 };
 
 _BEGIN_ABC_NS
-__no_constexpr_imp std::optional<std::vector<std::string>>
+__no_constexpr_imp std::optional<std::vector<std::u8string>>
                    test_options_base_t::validate_and_pre_process() noexcept
 {
     using namespace std;
-    vector<string> _l_rv{};
+    vector<u8string> _l_rv{};
     validate_and_pre_process_(_l_rv);
     if (_l_rv.size() == 0)
     {
-        return optional<vector<string>>{};
+        return optional<vector<u8string>>{};
     }
     else
     {
-        return optional<vector<string>>{_l_rv};
+        return optional<vector<u8string>>{_l_rv};
     }
 }
 
 __no_constexpr_imp void
     test_options_base_t::validate_and_pre_process_(
-        std::vector<std::string>& _a_error_ref
+        std::vector<std::u8string>& _a_error_ref
     ) noexcept
 {
     using namespace std;
@@ -253,11 +253,11 @@ __no_constexpr_imp void
     if (error_reporters.size() == 0)
     {
         _a_error_ref.push_back(fmt::format(
-            "Error reporters must have atleast one element. Otherwise errors "
-            "cannot be reported. "
-            "If no others are available, "
-            "included_instances/reporters/text_error_reporter.h contains an "
-            "instance which prints errors to the console."
+            u8"Error reporters must have atleast one element. Otherwise errors "
+            u8"cannot be reported. "
+            u8"If no others are available, "
+            u8"included_instances/reporters/text_error_reporter.h contains an "
+            u8"instance which prints errors to the console."
         ));
     }
     else
@@ -268,8 +268,8 @@ __no_constexpr_imp void
         if (_l_indexes_of_nullptrs.size() > 0)
         {
             _a_error_ref.push_back(fmt::format(
-                "error_reporters has some elemnets which point to nullptr. "
-                "Specifically those elements at the following indexes: {0}",
+                u8"error_reporters has some elemnets which point to nullptr. "
+                u8"Specifically those elements at the following indexes: {0}",
                 _l_indexes_of_nullptrs
             ));
         }
@@ -277,11 +277,11 @@ __no_constexpr_imp void
     if (test_reporters.size() == 0)
     {
         _a_error_ref.push_back(fmt::format(
-            "test_reporters must have atleast one element. Otherwise tests "
-            "cannot be reported. "
-            "If no others are available, "
-            "included_instances/reporters/text_test_reporter.h contains an "
-            "instance which prints tests to the console."
+            u8"test_reporters must have atleast one element. Otherwise tests "
+            u8"cannot be reported. "
+            u8"If no others are available, "
+            u8"included_instances/reporters/text_test_reporter.h contains an "
+            u8"instance which prints tests to the console."
         ));
     }
     else
@@ -292,8 +292,8 @@ __no_constexpr_imp void
         if (_l_indexes_of_nullptrs.size() > 0)
         {
             _a_error_ref.push_back(fmt::format(
-                "test_reporters has some elemnets which point to nullptr. "
-                "Specifically those elements at the following indexes: {0}",
+                u8"test_reporters has some elemnets which point to nullptr. "
+                u8"Specifically those elements at the following indexes: {0}",
                 _l_indexes_of_nullptrs
             ));
         }
@@ -301,8 +301,8 @@ __no_constexpr_imp void
     if (test_lists.size() == 0 && use_global_test_list == false)
     {
         _a_error_ref.push_back(fmt::format(
-            "test_lists must have atleast one element or use_global_test_list "
-            "must be set to true. use_global_test_list = {0}",
+            u8"test_lists must have atleast one element or use_global_test_list "
+            u8"must be set to true. use_global_test_list = {0}",
             use_global_test_list
         ));
     }
@@ -313,8 +313,8 @@ __no_constexpr_imp void
         if (_l_indexes_of_nullptrs.size() > 0)
         {
             _a_error_ref.push_back(fmt::format(
-                "test_lists has some elemnets which point to nullptr. "
-                "Specifically those elements at the following indexes: {0}",
+                u8"test_lists has some elemnets which point to nullptr. "
+                u8"Specifically those elements at the following indexes: {0}",
                 _l_indexes_of_nullptrs
             ));
         }
@@ -324,48 +324,48 @@ __no_constexpr_imp void
         && write_data_to_files)
     {
         _a_error_ref.push_back(fmt::format(
-            "map_of_unique_ids_and_for_loop_stack_tries has elements in it - "
-            "thus this run of the test suite corresponds to some test "
-            "repetitions. However, we have set write_data_to_files to true. "
-            "These two options are incompatable, as it will cause already "
-            "written test data to be re-written to files."
+            u8"map_of_unique_ids_and_for_loop_stack_tries has elements in it - "
+            u8"thus this run of the test suite corresponds to some test "
+            u8"repetitions. However, we have set write_data_to_files to true. "
+            u8"These two options are incompatable, as it will cause already "
+            u8"written test data to be re-written to files."
         ));
     }
     if (threads == 0 || threads > std::thread::hardware_concurrency())
     {
         _a_error_ref.push_back(fmt::format(
-            "threads = {0}. This value must be between 1 and the number of "
-            "threads available on the system ({1}",
+            u8"threads = {0}. This value must be between 1 and the number of "
+            u8"threads available on the system ({1}",
             threads,
             std::thread::hardware_concurrency()
         ));
     }
-    if (comment_str == "" || comment_str == "\\n")
+    if (comment_str.empty() || comment_str == u8"\\n")
     {
         _a_error_ref.push_back(fmt::format(
-            "comment_str = \"{0}\". It cannot be empty or equal to \"\\n\"",
+            u8"comment_str = \"{0}\". It cannot be empty or equal to \"\\n\"",
             comment_str
         ));
     }
-    if (general_data_extension == "" || general_data_extension.contains("\n")
-        || general_data_extension.contains("."))
+    if (general_data_extension.empty() || general_data_extension.contains(u8"\n")
+        || general_data_extension.contains(u8"."))
     {
         _a_error_ref.push_back(fmt::format(
-            "Invalid general_data_extension ({0}). Cannot be empty or contain "
-            "any of the following: {{\\n,'.'",
+            u8"Invalid general_data_extension ({0}). Cannot be empty or contain "
+            u8"any of the following: {{\\n,'.'",
             general_data_extension
         ));
     }
-    if (path_delimiter == "")
+    if (path_delimiter.empty())
     {
         _a_error_ref.push_back(fmt::format(
-            "Invalid path_delimiter ({0}). Cannot be empty", path_delimiter
+            u8"Invalid path_delimiter ({0}). Cannot be empty", path_delimiter
         ));
     }
     if (not filesystem::is_directory(root_path))
     {
         _a_error_ref.push_back(
-            fmt::format("Root folder \"{0}\" does not exist", root_path)
+            fmt::format(u8"Root folder \"{0}\" does not exist", root_path)
         );
     }
     /*if (automatic_file_line_index.has_value()
@@ -376,7 +376,7 @@ __no_constexpr_imp void
     if (test_paths_to_run.size() == 0)
     {
         using namespace ds;
-        test_paths_to_run = vector<string>(1, "");
+        test_paths_to_run = vector<u8string>(1, u8string{});
     }
 }
 
@@ -431,9 +431,9 @@ __no_constexpr_imp std::string
         "number_of_integers_used_to_seed_random_generators",
         _a_opts.number_of_integers_used_to_seed_random_generators,
         "general_data_extension",
-        _a_opts.general_data_extension,
+        u8string_to_string(_a_opts.general_data_extension),
         "comment_str",
-        _a_opts.comment_str,
+        u8string_to_string(_a_opts.comment_str),
         "write_data_to_files",
         _a_opts.write_data_to_files,
         "threads",

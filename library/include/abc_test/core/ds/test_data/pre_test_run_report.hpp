@@ -16,7 +16,7 @@ public:
             const memoized_cli_history_t&            _a_memoized_data,
             const included_instances_test_options_t& _a_test_options
         ) noexcept;
-    __constexpr const std::vector<std::string>&
+    __constexpr const std::vector<std::u8string>&
                       get_option_data(const _ABC_NS_CLI::cli_option_config_t& _a_element
                       ) const noexcept;
     __constexpr const included_instances_test_options_t&
@@ -55,13 +55,13 @@ __constexpr void
     _m_n_tests = _a_size;
 }
 
-__constexpr const std::vector<std::string>&
+__constexpr const std::vector<std::u8string>&
                   pre_test_run_report_t::get_option_data(
                       const _ABC_NS_UTILITY_CLI::cli_option_config_t& _a_element
     ) const noexcept
 {
     using namespace std;
-    return get<1>(_m_memoized_option_data.at(string(_a_element.flag)).back()
+    return get<1>(_m_memoized_option_data.at(u8string(_a_element.flag)).back()
     );
 }
 

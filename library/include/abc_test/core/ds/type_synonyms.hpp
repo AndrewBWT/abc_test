@@ -20,11 +20,11 @@ struct post_setup_test_data_t;
 /*!
  * @brief Type synonym for a test_path_t element.
  */
-using test_path_element_t     = std::string;
+using test_path_element_t     = std::u8string;
 /*!
  * @brief Type synonym for a reference to a test_path_element_t.
  */
-using test_path_element_ref_t = std::string_view;
+using test_path_element_ref_t = std::u8string_view;
 /*!
  * @brief The type hierarchy type synonym. Conceptually it is a vector of
  * test_path_element_t's.
@@ -61,14 +61,14 @@ using post_setup_test_list_itt_t = post_setup_test_list_t::const_iterator;
 /*!
  * @brief Type synonym for a set of log info.
  */
-using log_infos_t                = std::vector<std::string>;
+using log_infos_t                = std::vector<std::u8string>;
 
-using test_path_delimiter        = std::string;
+using test_path_delimiter        = std::u8string;
 using test_path_delimiter_ref    = std::string_view;
 using path_t                     = std::filesystem::path;
 using memoized_cli_history_t     = std::map<
-        std::string,
-        std::vector<std::tuple<std::string, std::vector<std::string>>>>;
+        std::u8string,
+        std::vector<std::tuple<std::u8string, std::vector<std::u8string>>>>;
 _END_ABC_DS_NS
 _BEGIN_ABC_NS
 struct test_options_base_t;

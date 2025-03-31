@@ -33,7 +33,7 @@ public:
     __no_constexpr
         log_msg_t(
             const ds::single_source_t& _a_single_source,
-            const std::string_view     _a_str,
+            const std::u8string_view     _a_str,
             const bool                 _a_delete_after_use
         ) noexcept;
     /*!
@@ -52,7 +52,7 @@ public:
      * @brief Returns a cref to the string component of the log_msg_t object.
      * @return A cref to the string component of the object.
      */
-    __constexpr const std::string_view
+    __constexpr const std::u8string_view
                       str() const noexcept;
     /*!
      * @brief Returns true if this message should be deleted after its first
@@ -63,7 +63,7 @@ public:
     __constexpr bool
         delete_after_use() const noexcept;
 protected:
-    std::string   _m_str;
+    std::u8string   _m_str;
     log_msg_itt_t _m_iterator;
     bool          _m_delete_after_use;
 };
@@ -92,7 +92,7 @@ _BEGIN_ABC_LOGGING_NS
 __no_constexpr_imp
     log_msg_t::log_msg_t(
         const ds::single_source_t& _a_single_source,
-        const std::string_view     _a_str,
+        const std::u8string_view     _a_str,
         const bool                 _a_delete_after_use
     ) noexcept
     : _m_str(_a_str)
@@ -115,7 +115,7 @@ __no_constexpr_imp log_msg_t::~log_msg_t() noexcept
     }
 }
 
-__constexpr_imp const std::string_view
+__constexpr_imp const std::u8string_view
                       log_msg_t::str() const noexcept
 {
     return _m_str;

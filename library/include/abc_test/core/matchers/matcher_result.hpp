@@ -30,7 +30,7 @@ public:
     matcher_result_t(
         // const bool             _a_ran,
         const bool             _a_passed,
-        const std::string_view _a_str
+        const std::u8string_view _a_str
     ) noexcept;
     /*!
      * @brief Tells the caller whether the associated mathcer_t passed.
@@ -42,7 +42,7 @@ public:
      * @brief Gets a cref to the string associated with this matcher_result_t.
      * @return A cref to the internal object's string.
      */
-    __constexpr const std::string_view
+    __constexpr const std::u8string_view
                       str() const noexcept;
     /*!
      * @brief Tells the caller whether the matcher_t this matcher_result_t is
@@ -54,7 +54,7 @@ public:
 private:
     // bool        _m_ran    = false;
     bool        _m_passed = false;
-    std::string _m_str    = "false";
+    std::u8string _m_str    = u8"false";
 };
 enum class enum_bba_inner_assertion_type_t
 {
@@ -62,7 +62,7 @@ enum class enum_bba_inner_assertion_type_t
     MATCHER_BASED_ASSERTION
 };
 
-__constexpr std::string
+__constexpr std::u8string
             get_str(
                 const enum_bba_inner_assertion_type_t _a_enum
             )
@@ -71,9 +71,9 @@ __constexpr std::string
     switch (_a_enum)
     {
     case STATIC_ASSERTION:
-        return "static";
+        return u8"static";
     case MATCHER_BASED_ASSERTION:
-        return "matcher-based";
+        return u8"matcher-based";
     default:
         throw errors::unaccounted_for_enum_exception(_a_enum);
     }
@@ -103,7 +103,7 @@ public:
             const std::optional<ds::single_source_t>& _a_source
             = std::optional<ds::single_source_t>{}
         ) noexcept
-        : _m_matcher_result(matcher_result_t(_a_pass_or_failure, ""))
+        : _m_matcher_result(matcher_result_t(_a_pass_or_failure, u8""))
         , _m_annotation(_a_opt_msg)
         , _m_source(_a_source)
         , _m_source_map(matcher_source_map_t{})
@@ -245,7 +245,7 @@ __constexpr_imp
     matcher_result_t::matcher_result_t(
         // const bool             _a_ran,
         const bool             _a_passed,
-        const std::string_view _a_str
+        const std::u8string_view _a_str
     ) noexcept
     //: _m_ran(_a_ran)
     : _m_passed(_a_passed), _m_str(_a_str)
@@ -257,7 +257,7 @@ __constexpr_imp bool
     return _m_passed;
 }
 
-__constexpr_imp const std::string_view
+__constexpr_imp const std::u8string_view
                       matcher_result_t::str() const noexcept
 {
     return _m_str;

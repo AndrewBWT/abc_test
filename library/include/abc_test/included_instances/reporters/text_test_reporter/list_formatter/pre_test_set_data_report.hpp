@@ -21,25 +21,25 @@ public:
             const enum_pre_test_set_data_fields_t& _a_fid,
             const ds::pre_test_run_report_t&       _a_element
         ) const;
-    __no_constexpr_or_inline std::optional<std::string>
+    __no_constexpr_or_inline std::optional<std::u8string>
                              get_cli_info(
                                  const enum_pre_test_set_data_fields_t& _a_fid,
                                  const ds::pre_test_run_report_t&       _a_element,
                                  const print_config_t&                  _a_pc
                              ) const;
-    __no_constexpr_or_inline std::optional<std::string>
+    __no_constexpr_or_inline std::optional<std::u8string>
                              get_explanation_data(
                                  const enum_pre_test_set_data_fields_t& _a_fid,
                                  const ds::pre_test_run_report_t&       _a_element,
                                  const print_config_t&                  _a_pc
                              ) const;
-    __no_constexpr_or_inline std::pair<std::string, std::string>
+    __no_constexpr_or_inline std::pair<std::u8string, std::u8string>
                              get_output(
                                  const enum_pre_test_set_data_fields_t& _a_fid,
                                  const ds::pre_test_run_report_t&       _a_element,
                                  const print_config_t&                  _a_pc
                              ) const;
-    __no_constexpr_or_inline virtual std::pair<std::string, std::vector<std::string>>
+    __no_constexpr_or_inline virtual std::pair<std::u8string, std::vector<std::u8string>>
         get_data(
             const enum_pre_test_set_data_fields_t&                   _a_fid,
             const ds::pre_test_run_report_t&                         _a_element,

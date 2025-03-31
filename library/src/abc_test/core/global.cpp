@@ -61,7 +61,8 @@ __no_constexpr_or_inline_imp ds::invoked_test_data_t&
     test_runner_t* _l_tr{get_this_threads_test_runner_ptr()};
     if (_l_tr == nullptr)
     {
-        throw test_library_exception_t("This threads test_runner_t is a nullptr"
+        throw test_library_exception_t(
+            u8"This threads test_runner_t is a nullptr"
         );
     }
     else
@@ -100,7 +101,7 @@ __no_constexpr_or_inline_imp reporters::error_reporter_controller_t&
 }
 
 __no_constexpr_or_inline_imp utility::complete_global_seed_t&
-                         get_inner_global_seed() noexcept
+                             get_inner_global_seed() noexcept
 {
     using namespace utility;
     static complete_global_seed_t _s_complete_global_seed;
@@ -139,20 +140,25 @@ __no_constexpr_or_inline_imp void
     using namespace std;
     using namespace utility;
     complete_global_seed_t& _l_complete_global_seed{get_inner_global_seed()};
-    global::get_global_test_options().global_seed.set_complete_seed(_l_complete_global_seed);
+    global::get_global_test_options().global_seed.set_complete_seed(
+        _l_complete_global_seed
+    );
 }
+
 __no_constexpr_or_inline_imp const utility::complete_global_seed_t&
-get_global_seed()
+                                   get_global_seed()
 {
     return get_inner_global_seed();
 }
+
 __no_constexpr_or_inline_imp _ABC_NS_UTILITY::volatilte_volatile_void_ptr_t&
-get_threads_volatie_ptr_ref()
+                             get_threads_volatie_ptr_ref()
 {
     using namespace _ABC_NS_UTILITY;
-    thread_local volatilte_volatile_void_ptr_t _tl_tr{ nullptr };
+    thread_local volatilte_volatile_void_ptr_t _tl_tr{nullptr};
     return _tl_tr;
 }
+
 namespace
 {
 

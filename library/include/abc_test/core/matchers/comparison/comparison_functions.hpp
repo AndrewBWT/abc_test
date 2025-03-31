@@ -12,7 +12,7 @@ template <comparison_enum_t Cmp, typename T1, typename T2>
 __constexpr matcher_result_t
     make_matcher_result(T1&& _a_t1, T2&& _a_t2) noexcept;
 template <typename T>
-__constexpr std::string
+__constexpr std::u8string
             format_str(const T& _a_element) noexcept;
 template <typename T1, typename T2, comparison_enum_t Cmp_Enum>
 __constexpr matcher_t
@@ -102,30 +102,30 @@ __constexpr matcher_result_t
     ) noexcept
 {
     using namespace std;
-    string     _l_left_str{format_str<T1>(forward<T1>(_a_t1))};
-    string     _l_right_str{format_str<T2>(forward<T2>(_a_t2))};
+    u8string     _l_left_str{format_str<T1>(forward<T1>(_a_t1))};
+    u8string     _l_right_str{format_str<T2>(forward<T2>(_a_t2))};
     const bool _l_result{
         cmp<T1, T2, Cmp>(forward<T1>(_a_t1), forward<T2>(_a_t2))
     };
     return matcher_result_t(
         _l_result,
         fmt::format(
-            "{0} {1} {2}",
+            u8"{0} {1} {2}",
             _l_left_str,
-            (_l_result ? cmp_str<Cmp>() : not_cmp_str<Cmp>()),
+            abc::string_view_to_u8string(_l_result ? cmp_str<Cmp>() : not_cmp_str<Cmp>()),
             _l_right_str
         )
     );
 }
 
 template <typename T>
-__constexpr_imp std::string
+__constexpr_imp std::u8string
                 format_str(
                     const T& _a_element
                 ) noexcept
 {
     using namespace std;
-    string _l_rv{"[?]"};
+    u8string _l_rv{u8"[?]"};
     if constexpr (abc::utility::printer::default_printable<
                       typename std::remove_cvref<T>::type>)
     {
@@ -135,7 +135,7 @@ __constexpr_imp std::string
     }
     else if constexpr (fmt::formattable<T>)
     {
-        _l_rv = fmt::format("{}", _a_element);
+        _l_rv = fmt::format(u8"{}", _a_element);
     }
     return _l_rv;
 }

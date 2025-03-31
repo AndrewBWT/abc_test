@@ -1,11 +1,14 @@
 #pragma once
 #include "abc_test/utility/internal/macros.hpp"
-#include <fmt/ranges.h>
 
 #include <exception>
+#include <fmt/ranges.h>
 #include <optional>
 #include <stacktrace>
 #include <type_traits>
+#include "abc_test/utility/types.hpp"
+
+#include <fmt/xchar.h>
 
 _BEGIN_ABC_ERRORS_NS
 
@@ -27,7 +30,7 @@ public:
      */
     __no_constexpr
         test_library_exception_t(
-            const std::string _a_error,
+            const std::u8string    _a_error,
             const std::stacktrace& _a_stacktrace = std::stacktrace::current()
         ) noexcept;
     /*!
@@ -78,10 +81,11 @@ _BEGIN_ABC_ERRORS_NS
 
 __no_constexpr_imp
     test_library_exception_t::test_library_exception_t(
-        const std::string _a_error,
+        const std::u8string    _a_error,
         const std::stacktrace& _a_stacktrace
     ) noexcept
-    : std::runtime_error(_a_error), _m_stacktrace(_a_stacktrace)
+    : std::runtime_error(u8string_to_string(_a_error))
+    , _m_stacktrace(_a_stacktrace)
 {}
 
 __constexpr_imp const std::stacktrace&
@@ -98,9 +102,9 @@ __constexpr_imp test_library_exception_t
     ) noexcept
 {
     return test_library_exception_t(fmt::format(
-        "Switch does not contain enum value. Enum type = {0}, underlying value "
-        "= {1}",
-        typeid(T).name(),
+        u8"Switch does not contain enum value. Enum type = {0}, underlying "
+        u8"value = {1}",
+        string_view_to_u8string(typeid(T).name()),
         std::to_underlying(_a_integer_value)
     ));
 }
@@ -112,8 +116,8 @@ __constexpr_imp test_library_exception_t
     ) noexcept
 {
     return test_library_exception_t(fmt::format(
-        "Variant's type is not accounted for. Variant has type {0}",
-        typeid(T).name()
+        u8"Variant's type is not accounted for. Variant has type {0}",
+        string_view_to_u8string(typeid(T).name())
     ));
 }
 
@@ -124,7 +128,8 @@ __constexpr test_library_exception_t
     ) noexcept
 {
     return test_library_exception_t(fmt::format(
-        "Unaccounted for nullptr encountered. Type is {0}", typeid(T).name()
+        u8"Unaccounted for nullptr encountered. Type is {0}", 
+        string_view_to_u8string(typeid(T).name())
     ));
 }
 

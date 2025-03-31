@@ -181,7 +181,7 @@ __constexpr_imp void
     else
     {
         throw test_library_exception_t(fmt::format(
-            "decrement called when _m_for_loop_pointers.size() == 0"
+            u8"decrement called when _m_for_loop_pointers.size() == 0"
         ));
     }
 }
@@ -199,7 +199,7 @@ __no_constexpr_imp void
     else
     {
         throw test_library_exception_t(
-            fmt::format("update called when _m_for_loop_pointers.size() == 0")
+            fmt::format(u8"update called when _m_for_loop_pointers.size() == 0")
         );
     }
 }

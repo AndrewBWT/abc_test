@@ -21,14 +21,14 @@ class cli_output_t;
 namespace detail
 {
 template <typename T>
-__constexpr std::function<std::optional<T>(const std::string_view)>
+__constexpr std::function<std::optional<T>(const std::u8string_view)>
             make_parser_func()
 {
     using namespace std;
     using namespace abc::utility::parser;
-    return [](const string_view _a_str)
+    return [](const u8string_view _a_str)
     {
-        if constexpr (std::same_as<T, std::string>
+        if constexpr (std::same_as<T, std::u8string>
                       || std::same_as<T, std::filesystem::path>)
         {
             return make_optional(T(_a_str));
@@ -49,18 +49,18 @@ __constexpr std::function<std::optional<T>(const std::string_view)>
 }
 
 template <typename T>
-__constexpr std::function<std::string(const T&)>
+__constexpr std::function<std::u8string(const T&)>
             make_printer_func() noexcept
 {
     return [](const T& _a_element)
     {
-        if constexpr (std::same_as<T, std::string>)
+        if constexpr (std::same_as<T, std::u8string>)
         {
             return _a_element;
         }
         else if constexpr (std::same_as<T, std::filesystem::path>)
         {
-            return _a_element.string();
+            return _a_element.u8string();
         }
         else
         {
@@ -72,7 +72,7 @@ __constexpr std::function<std::string(const T&)>
 }
 
 template <typename T, typename U>
-__constexpr std::function<std::optional<std::string>(T&, const U&)>
+__constexpr std::function<std::optional<std::u8string>(T&, const U&)>
             process_value()
 {
     using namespace std;
@@ -94,11 +94,11 @@ __constexpr std::function<std::optional<std::string>(T&, const U&)>
 template <typename T, typename U>
 struct cli_argument_processing_info_t
 {
-    std::function<std::optional<U>(const std::string_view)> parser_func
+    std::function<std::optional<U>(const std::u8string_view)> parser_func
         = detail::make_parser_func<U>();
-    std::function<std::optional<std::string>(T&, const U&)>
+    std::function<std::optional<std::u8string>(T&, const U&)>
         process_parsed_value_func = detail::process_value<T, U>();
-    std::function<std::string(const T&)> print_func
+    std::function<std::u8string(const T&)> print_func
         = detail::make_printer_func<T>();
 };
 
@@ -123,13 +123,13 @@ public:
         , _m_max_arguments(_a_max_args)
     {}
 
-    __constexpr std::string_view
+    __constexpr std::u8string_view
                 flag() const noexcept
     {
         return _m_option_config.flag;
     }
 
-    __constexpr std::optional<char>
+    __constexpr std::optional<char8_t>
                 char_flag() const noexcept
     {
         return _m_option_config.single_char_flag;
@@ -149,11 +149,11 @@ public:
 
     __no_constexpr_imp virtual bool
         process_args(
-            Option_Class&                        _a_option_class,
-            const std::string_view               _a_flag,
-            const std::vector<std::string_view>& _a_args,
-            const cli_t<Option_Class>&           _a_cli,
-            _ABC_NS_UTILITY_CLI::cli_results_t&  _a_cli_results
+            Option_Class&                          _a_option_class,
+            const std::u8string_view               _a_flag,
+            const std::vector<std::u8string_view>& _a_args,
+            const cli_t<Option_Class>&             _a_cli,
+            _ABC_NS_UTILITY_CLI::cli_results_t&    _a_cli_results
         ) const noexcept
     {
         using namespace std;
@@ -163,22 +163,24 @@ public:
             _a_cli_results.add_error(
                 (_m_min_arguments == _m_max_arguments)
                     ? fmt::format(
-                          "The flag {0} expected exactly {1} {2}, however {3} "
-                          "{4} provided",
+                          u8"The flag {0} expected exactly {1} {2}, however "
+                          u8"{3} "
+                          u8"{4} provided",
                           _a_flag,
                           _m_min_arguments,
-                          (_m_min_arguments == 1) ? "argument" : "arguments",
+                          (_m_min_arguments == 1) ? u8"argument"
+                                                  : u8"arguments",
                           _a_args.size(),
-                          (_a_args.size() == 1) ? "was" : "were"
+                          (_a_args.size() == 1) ? u8"was" : u8"were"
                       )
                     : fmt::format(
-                          "The flag {0} expected between {1} and {2} "
-                          "arguments, however {3} {4} provided",
+                          u8"The flag {0} expected between {1} and {2} "
+                          u8"arguments, however {3} {4} provided",
                           _a_flag,
                           _m_min_arguments,
                           _m_max_arguments,
                           _a_args.size(),
-                          (_a_args.size() == 1) ? "was" : "were"
+                          (_a_args.size() == 1) ? u8"was" : u8"were"
                       )
             );
             return true;
@@ -194,14 +196,14 @@ public:
     __no_constexpr_imp virtual bool
         process_args_(
             Option_Class&                        _a_option_class,
-            const std::string_view               _a_flag,
-            const std::vector<std::string_view>& _a_args,
+            const std::u8string_view               _a_flag,
+            const std::vector<std::u8string_view>& _a_args,
             const cli_t<Option_Class>&           _a_cli,
             cli_results_t&                       _a_cli_results
         ) const noexcept
         = 0;
 
-    __constexpr virtual std::optional<std::string>
+    __constexpr virtual std::optional<std::u8string>
         print(
             const Option_Class& _a_option_class
         ) const noexcept
@@ -209,7 +211,7 @@ public:
         return std::nullopt;
     }
 
-    __constexpr std::string_view
+    __constexpr std::u8string_view
                 description() const noexcept
     {
         return _m_option_config.description;
@@ -245,11 +247,11 @@ public:
 
     __no_constexpr_imp virtual bool
         process_args_(
-            Option_Class&                        _a_option_class,
-            const std::string_view               _a_flag,
-            const std::vector<std::string_view>& _a_args,
-            const cli_t<Option_Class>&           _a_cli,
-            cli_results_t&                       _a_cli_results
+            Option_Class&                          _a_option_class,
+            const std::u8string_view               _a_flag,
+            const std::vector<std::u8string_view>& _a_args,
+            const cli_t<Option_Class>&             _a_cli,
+            cli_results_t&                         _a_cli_results
         ) const noexcept
     {
         using namespace std;
@@ -277,7 +279,7 @@ public:
         , _m_processing_info(_a_processing_info)
     {}
 
-    __constexpr virtual std::optional<std::string>
+    __constexpr virtual std::optional<std::u8string>
         print(
             const Option_Class& _a_option_class
         ) const noexcept
@@ -288,11 +290,11 @@ public:
 
     __no_constexpr_imp virtual bool
         process_args_(
-            Option_Class&                        _a_option_class,
-            const std::string_view               _a_flag,
-            const std::vector<std::string_view>& _a_args,
-            const cli_t<Option_Class>&           _a_cli,
-            cli_results_t&                       _a_cli_results
+            Option_Class&                          _a_option_class,
+            const std::u8string_view               _a_flag,
+            const std::vector<std::u8string_view>& _a_args,
+            const cli_t<Option_Class>&             _a_cli,
+            cli_results_t&                         _a_cli_results
         ) const noexcept
     {
         using namespace std;
@@ -301,7 +303,7 @@ public:
             };
             _l_parse_result.has_value())
         {
-            if (const optional<string> _l_process_okay{
+            if (const optional<u8string> _l_process_okay{
                     _m_processing_info.process_parsed_value_func(
                         _a_option_class.*_m_member_var, _l_parse_result.value()
                     )
@@ -309,7 +311,7 @@ public:
                 _l_process_okay)
             {
                 _a_cli_results.add_error(fmt::format(
-                    "Some post-parsing processing error encountered. "
+                    u8"Some post-parsing processing error encountered. "
                 ));
                 return true;
             }
@@ -321,10 +323,10 @@ public:
         else
         {
             _a_cli_results.add_error(fmt::format(
-                "Could not parse std::string \"{0}\" to type {1}. "
-                "Reason:",
+                u8"Could not parse std::string \"{0}\" to type {1}. "
+                u8"Reason:",
                 _a_args[0],
-                typeid(T).name()
+                string_view_to_u8string(typeid(T).name())
             ));
             return true;
         }
@@ -353,7 +355,7 @@ public:
         , _m_processing_info(_a_processing_info)
     {}
 
-    __constexpr virtual std::optional<std::string>
+    __constexpr virtual std::optional<std::u8string>
         print(
             const Option_Class& _a_option_class
         ) const noexcept
@@ -364,18 +366,20 @@ public:
 
     __no_constexpr_imp virtual bool
         process_args_(
-            Option_Class&                        _a_option_class,
-            const std::string_view               _a_flag,
-            const std::vector<std::string_view>& _a_args,
-            const cli_t<Option_Class>&           _a_cli,
-            cli_results_t&                       _a_cli_results
+            Option_Class&                          _a_option_class,
+            const std::u8string_view               _a_flag,
+            const std::vector<std::u8string_view>& _a_args,
+            const cli_t<Option_Class>&             _a_cli,
+            cli_results_t&                         _a_cli_results
         ) const noexcept
     {
         using namespace std;
-        for (const string_view _l_arg : _a_args)
+        for (const u8string_view _l_arg : _a_args)
         {
             if (const optional<U> _l_parse_result{
-                    _m_processing_info.parser_func(_l_arg)
+                    _m_processing_info.parser_func(
+                        _l_arg
+                    )
                 };
                 _l_parse_result.has_value())
             {
@@ -388,7 +392,7 @@ public:
                     _l_process_okay)
                 {
                     _a_cli_results.add_error(fmt::format(
-                        "Some post-parsing processing error encountered. "
+                        u8"Some post-parsing processing error encountered. "
                     ));
                     return true;
                 }
@@ -400,10 +404,10 @@ public:
             else
             {
                 _a_cli_results.add_error(fmt::format(
-                    "Could not parse std::string \"{0}\" to type {1}. "
-                    "Reason:",
+                    u8"Could not parse std::string \"{0}\" to type {1}. "
+                    u8"Reason:",
                     _l_arg,
-                    typeid(T).name()
+                    string_view_to_u8string(typeid(T).name())
                 ));
                 return true;
             }
