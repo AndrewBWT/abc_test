@@ -1,11 +1,11 @@
 #pragma once
 #include "abc_test/utility/internal/macros.hpp"
+#include "abc_test/utility/types.hpp"
 
 #include <fmt/base.h>
 #include <optional>
 #include <string>
 #include <typeinfo>
-#include "abc_test/utility/types.hpp"
 
 _BEGIN_ABC_DS_NS
 
@@ -33,8 +33,8 @@ public:
     __constexpr bool
         operator==(const user_defined_test_data_t& _a_rhs) const noexcept
         = default;
-    __constexpr std::string
-        make_uid(const std::u8string_view _a_delimiter) const noexcept;
+    __constexpr std::u8string
+                make_uid(const std::u8string_view _a_delimiter) const noexcept;
     /*!
      * @brief The name of the test. There are some conditions on the name of the
      * test, however these are only relevant when considering groups of tests.
@@ -86,12 +86,18 @@ struct fmt::formatter<_ABC_NS_DS::user_defined_test_data_t>
 };
 
 _BEGIN_ABC_DS_NS
-__constexpr std::string
-user_defined_test_data_t::make_uid(const std::u8string_view _a_delimiter) const noexcept
+__constexpr std::u8string
+            user_defined_test_data_t::make_uid(
+        const std::u8string_view _a_delimiter
+    ) const noexcept
 {
     using namespace std;
-    return string{}.append(this->name).append(u8string_to_string(_a_delimiter)).append(this->path);
+    return u8string{}
+        .append(convert_string_to_u8string(this->name).value())
+        .append(_a_delimiter)
+        .append(convert_string_to_u8string(this->path).value());
 }
+
 _END_ABC_DS_NS
 
 __no_constexpr_imp auto

@@ -481,7 +481,7 @@ __constexpr_imp void
         throw errors::test_library_exception_t(fmt::format(
             u8"add_assertions function has been entered, however should have "
             u8"already termianted. _m_test_status = {0}",
-            string_view_to_u8string(fmt::format("{}",_m_test_status))
+            convert_string_to_u8string(fmt::format("{}",_m_test_status)).value()
         ));
     }
     else if (_a_ptr == nullptr)
@@ -541,7 +541,7 @@ __constexpr_imp void
         throw errors::test_library_exception_t(fmt::format(
             u8"set_unexpected_termination function has been entered, however "
             u8"should have already termianted. _m_test_status = {0}",
-            string_view_to_u8string(fmt::format("{}", _m_test_status))
+            convert_string_to_u8string(fmt::format("{}", _m_test_status)).value()
         ));
     }
     else if (_m_termination_report != nullptr)
@@ -690,9 +690,9 @@ __no_constexpr_imp std::filesystem::path
     {
         _l_path /= normalise_for_file_use(_a_test_path_component);
     }
-    _l_path /= normalise_for_file_use(string_view_to_u8string(
+    _l_path /= normalise_for_file_use(convert_string_to_u8string(
         _a_test_info.registered_test_data()._m_user_data.name
-    ));
+    ).value());
     if (not exists(_l_path))
     {
         create_directories(_l_path);

@@ -78,7 +78,7 @@ __constexpr_imp result_t<T>
     {
         return unexpected(fmt::format(
             u8"Parser threw unexpected exception: \"{0}\"",
-            char_star_to_u8string(_a_exception.what())
+            convert_string_to_u8string(_a_exception.what()).value()
         ));
     }
 }

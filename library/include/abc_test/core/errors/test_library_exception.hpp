@@ -84,7 +84,7 @@ __no_constexpr_imp
         const std::u8string    _a_error,
         const std::stacktrace& _a_stacktrace
     ) noexcept
-    : std::runtime_error(u8string_to_string(_a_error))
+    : std::runtime_error(pack_u8string_into_string(_a_error))
     , _m_stacktrace(_a_stacktrace)
 {}
 
@@ -104,7 +104,7 @@ __constexpr_imp test_library_exception_t
     return test_library_exception_t(fmt::format(
         u8"Switch does not contain enum value. Enum type = {0}, underlying "
         u8"value = {1}",
-        string_view_to_u8string(typeid(T).name()),
+        type_id<T>(),
         std::to_underlying(_a_integer_value)
     ));
 }
@@ -117,7 +117,7 @@ __constexpr_imp test_library_exception_t
 {
     return test_library_exception_t(fmt::format(
         u8"Variant's type is not accounted for. Variant has type {0}",
-        string_view_to_u8string(typeid(T).name())
+        type_id<T>()
     ));
 }
 
@@ -129,7 +129,7 @@ __constexpr test_library_exception_t
 {
     return test_library_exception_t(fmt::format(
         u8"Unaccounted for nullptr encountered. Type is {0}", 
-        string_view_to_u8string(typeid(T).name())
+        type_id<T>()
     ));
 }
 

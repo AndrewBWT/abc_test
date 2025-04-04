@@ -92,9 +92,9 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
                                       .registered_test_data()
                                       ._m_user_data.description.has_value() ?
                     optional<u8string>{} : 
-                    string_view_to_u8string(_a_element.post_setup_test_data()
+                    convert_string_to_u8string(_a_element.post_setup_test_data()
                                       .registered_test_data()
-                                      ._m_user_data.description.value()))
+                                      ._m_user_data.description.value()).value())
             )}
         };
     case STR_STATUS:
@@ -110,10 +110,10 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
     case NAME:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.name_str())),
-            {_a_pc.name(string_view_to_u8string(_a_element
+            {_a_pc.name(convert_string_to_u8string(_a_element
                                                     .post_setup_test_data()
                                                     .registered_test_data()
-                                                    ._m_user_data.name))}
+                                                    ._m_user_data.name).value())}
         };
     case SOURCE_LOCATION:
     {
@@ -139,9 +139,9 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
             _a_pc.space(_a_pc.colon(_a_pc.source_code_str())),
             {_a_pc.source_representation(
                 _l_opt.has_value()
-                    ? optional<u8string>{string_view_to_u8string(
+                    ? optional<u8string>{convert_string_to_u8string(
                           _l_opt.value().source_code_representation()
-                      )}
+                      ).value()}
                     : optional<u8string>{}
             )}
         };
@@ -150,9 +150,9 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
     case TEST_PATH:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.test_path_str())),
-            {_a_pc.test_path(string_view_to_u8string(_a_element.post_setup_test_data()
+            {_a_pc.test_path(convert_string_to_u8string(_a_element.post_setup_test_data()
                                  .registered_test_data()
-                                 ._m_user_data.path))}
+                                 ._m_user_data.path).value())}
         };
     case SEED_USED:
         return {

@@ -52,7 +52,7 @@ public:
         const bool                             _a_is_test_to_be_ran,
         const ds::tdg_collection_stack_trie_t* _a_for_loop_stack_trie,
         const size_t                           _a_maximum_threads_allowed,
-        const std::string_view _a_unique_id
+        const std::u8string_view _a_unique_id
     ) noexcept;
     /*!
      * @brief Returns a cref to the registered_test_data_t member variable.
@@ -110,7 +110,7 @@ public:
      */
     __constexpr std::size_t
                 thread_resourses_required() const noexcept;
-    __constexpr const std::string_view
+    __constexpr const std::u8string_view
         unique_id() const noexcept;
     /*!
      * @brief Equality operator for post_setup_test_data_t objects.
@@ -135,7 +135,7 @@ private:
     // A pointer to the trie associated with this test.
     const ds::tdg_collection_stack_trie_t* _m_for_loop_stack_trie;
     // The tests unique ID
-    std::string _m_unique_id;
+    std::u8string _m_unique_id;
 };
 
 __constexpr bool check_if_element_in_path_set(
@@ -170,7 +170,7 @@ __constexpr_imp
         const bool                             _a_is_test_to_be_ran,
         const ds::tdg_collection_stack_trie_t* _a_repetition_data,
         const size_t                           _a_maximum_threads_allowed,
-        const std::string_view _a_unique_id
+        const std::u8string_view _a_unique_id
     ) noexcept
     : _m_registered_test_data(_a_registered_test_data)
     , _m_test_path_hierarchy(_a_test_path_hierarchy)
@@ -240,7 +240,7 @@ __constexpr_imp std::size_t
 {
     return _m_thread_resourses_required;
 }
-__constexpr_imp const std::string_view
+__constexpr_imp const std::u8string_view
 post_setup_test_data_t::unique_id() const noexcept
 {
     return _m_unique_id;

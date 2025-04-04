@@ -42,30 +42,30 @@ constexpr void
  */
 constexpr void
     locate_relevant_character(
-        const std::string_view _a_str,
-        const char*            _l_c_string_to_locate,
+        const std::u8string_view _a_str,
+        const std::u8string_view            _l_c_string_to_locate,
         std::size_t&           _a_current_pos_ref,
-        std::string&           _a_error_string
+        std::u8string&           _a_error_string
     ) noexcept;
 __no_constexpr void
     locate_relevant_characters_and_change_mode(
-        const std::string_view _a_str,
+        const std::u8string_view _a_str,
         std::size_t&           _a_current_pos_ref,
-        const std::initializer_list<std::pair<char, std::size_t>>&
+        const std::initializer_list<std::pair<char8_t, std::size_t>>&
                      _a_char_and_mode_list,
-        std::string& _a_error_string,
+        std::u8string& _a_error_string,
         std::size_t& _a_mode_ref
     ) noexcept;
 __no_constexpr void
 skip_chars_and_strings_until_found(
-    const std::string_view _a_str,
+    const std::u8string_view _a_str,
     std::size_t& _a_current_pos_ref,
-    const std::initializer_list<std::pair<char, char>>& _a_ignore_mode,
-    char _a_increment_counter,
-    char _a_decrement_counter,
+    const std::initializer_list<std::pair<char8_t, char8_t>>& _a_ignore_mode,
+    char8_t _a_increment_counter,
+    char8_t _a_decrement_counter,
     const std::size_t _a_new_mode,
     const std::size_t _a_init_depth,
-    std::string& _A_error_string,
+    std::u8string& _A_error_string,
     std::size_t& _a_mode_ref
 ) noexcept;
 constexpr std::size_t
@@ -84,20 +84,20 @@ constexpr std::size_t
  */
 constexpr void
     process_string(
-        const std::string_view _a_str,
+        const std::u8string_view _a_str,
         std::size_t&           _a_current_pos,
-        std::string&           _a_error_string,
+        std::u8string&           _a_error_string,
         std::size_t&           _a_mode,
         const std::size_t      _a_finish_string_mode
     ) noexcept;
 
 constexpr void
     process_list_elements(
-        const std::string_view    _a_str,
+        const std::u8string_view    _a_str,
         std::size_t&              _a_current_pos,
-        std::string&              _a_error_string,
+        std::u8string&              _a_error_string,
         std::size_t&              _a_depth,
-        std::vector<std::string>& _a_strs,
+        std::vector<std::u8string>& _a_strs,
         const std::size_t         _a_start_pos,
         std::size_t&              _a_mode,
         const std::size_t         _a_mode_for_escape_string,
@@ -106,7 +106,7 @@ constexpr void
 {
     using namespace std;
     locate_relevant_character(
-        _a_str, _c_quote_and_round_brackets, _a_current_pos, _a_error_string
+        _a_str, u8"()\"", _a_current_pos, _a_error_string
     );
     _a_depth = (_a_current_pos == string::npos) ? _a_depth
                : (_a_str[_a_current_pos] == _c_quote_and_round_brackets[1]
@@ -125,7 +125,7 @@ constexpr void
     if (_a_depth == 0
         && _a_str[_a_current_pos] == _c_quote_and_round_brackets[1])
     {
-        _a_strs.push_back(string(
+        _a_strs.push_back(u8string(
             _a_str.substr(_a_start_pos, (_a_current_pos - _a_start_pos) + 1)
         ));
     }
@@ -133,16 +133,16 @@ constexpr void
 
 constexpr void
     process_end_of_list(
-        const std::string_view _a_str,
+        const std::u8string_view _a_str,
         std::size_t&           _a_current_pos,
-        std::string&           _a_error_string,
+        std::u8string&           _a_error_string,
         std::size_t&           _a_mode,
         const std::size_t      _a_mode_if_comma_found
     ) noexcept
 {
     using namespace std;
     locate_relevant_character(
-        _a_str, _c_end_or_comma, _a_current_pos, _a_error_string
+        _a_str, u8",]", _a_current_pos, _a_error_string
     );
     _a_mode = (_a_current_pos == string::npos
                || _a_str[_a_current_pos] == _c_end_or_comma[1])
@@ -167,10 +167,10 @@ constexpr void
 
 constexpr void
     locate_relevant_character(
-        const std::string_view _a_str,
-        const char*            _l_c_string_to_locate,
+        const std::u8string_view _a_str,
+        const std::u8string_view            _l_c_string_to_locate,
         std::size_t&           _a_current_pos_ref,
-        std::string&           _a_error_string
+        std::u8string&           _a_error_string
     ) noexcept
 {
     using namespace std;
@@ -178,12 +178,12 @@ constexpr void
     _a_current_pos_ref
         = _a_str.find_first_of(_l_c_string_to_locate, _a_current_pos_ref);
     _a_error_string
-        = (_a_current_pos_ref != string::npos)
-              ? ""
+        = (_a_current_pos_ref != u8string::npos)
+              ? u8""
               : fmt::format(
-                    "Expecting one of \"{0}\", but unable to find in string "
-                    "\"{1}\". "
-                    "Searching from position {2} (substring \"{3}\")",
+                    u8"Expecting one of \"{0}\", but unable to find in string "
+                    u8"\"{1}\". "
+                    u8"Searching from position {2} (substring \"{3}\")",
                     _l_c_string_to_locate,
                     _a_str,
                     _l_old_current_pos,
@@ -193,37 +193,37 @@ constexpr void
 
 __no_constexpr_imp void
     locate_relevant_characters_and_change_mode(
-        const std::string_view _a_str,
+        const std::u8string_view _a_str,
         std::size_t&           _a_current_pos_ref,
-        const std::initializer_list<std::pair<char, std::size_t>>&
+        const std::initializer_list<std::pair<char8_t, std::size_t>>&
                      _a_char_and_mode_list,
-        std::string& _a_error_string,
+        std::u8string& _a_error_string,
         std::size_t& _a_mode_ref
     ) noexcept
 {
     using namespace std;
     const size_t _l_old_current_pos{_a_current_pos_ref};
     map<char, size_t> _l_map;
-    string _l_strs_to_search;
-    for (const pair<char, size_t>& _a_char_and_mode : _a_char_and_mode_list)
+    u8string _l_strs_to_search;
+    for (const pair<char8_t, size_t>& _a_char_and_mode : _a_char_and_mode_list)
     {
         _l_map.insert(_a_char_and_mode);
         _l_strs_to_search.push_back(_a_char_and_mode.first);
     }
     const size_t _l_new_pos
         = _a_str.find_first_of(_l_strs_to_search, _a_current_pos_ref);
-    if (_l_new_pos != string::npos)
+    if (_l_new_pos != u8string::npos)
     {
-        char _l_char{ _a_str[_l_new_pos] };
+        char8_t _l_char{ _a_str[_l_new_pos] };
         _a_mode_ref = _l_map.at(_l_char);
         _a_current_pos_ref = _l_new_pos;
     }
     else
     {
         _a_error_string = fmt::format(
-            "Expecting one of \"{0}\", but unable to find in string "
-            "\"{1}\". "
-            "Searching from position {2} (substring \"{3}\")",
+            u8"Expecting one of \"{0}\", but unable to find in string "
+            u8"\"{1}\". "
+            u8"Searching from position {2} (substring \"{3}\")",
             _l_strs_to_search,
             _a_str,
             _l_old_current_pos,
@@ -233,28 +233,28 @@ __no_constexpr_imp void
 }
 __no_constexpr_imp void
 skip_chars_and_strings_until_found(
-    const std::string_view _a_str,
+    const std::u8string_view _a_str,
     std::size_t& _a_current_pos_ref,
-    const std::initializer_list<std::pair<char, char>>& _a_ignore_mode,
-    char _a_increment_counter,
-    char _a_decrement_counter,
+    const std::initializer_list<std::pair<char8_t, char8_t>>& _a_ignore_mode,
+    char8_t _a_increment_counter,
+    char8_t _a_decrement_counter,
     const std::size_t _a_new_mode,
     const std::size_t _a_init_depth,
-    std::string& _A_error_string,
+    std::u8string& _A_error_string,
     std::size_t& _a_mode_ref
 ) noexcept
 {
     using namespace std;
     size_t _l_depth{ _a_init_depth };
-    std::string _l_to_find = string(1, _a_increment_counter);
+    std::u8string _l_to_find = u8string(1, _a_increment_counter);
     _l_to_find.push_back(_a_decrement_counter);
-    map<char, char> _l_map;
-    for (const pair<char, char>& _l_pair_char : _a_ignore_mode)
+    map<char8_t, char8_t> _l_map;
+    for (const pair<char8_t, char8_t>& _l_pair_char : _a_ignore_mode)
     {
         _l_to_find.push_back(_l_pair_char.first);
         _l_map.insert(_l_pair_char);
     }
-    optional<char> _l_ignore_char;
+    optional<char8_t> _l_ignore_char;
     while (_l_depth > 0)
     {
         if (_l_ignore_char.has_value())
@@ -262,7 +262,7 @@ skip_chars_and_strings_until_found(
             size_t _l_next_relevant_char = _a_str.find(_l_ignore_char.value(), _a_current_pos_ref);
             if (_l_next_relevant_char == string::npos)
             {
-                _A_error_string = "coudln't find";
+                _A_error_string = u8"coudln't find";
                 return;
             }
             else
@@ -276,10 +276,10 @@ skip_chars_and_strings_until_found(
             size_t _l_next_relevant_char = _a_str.find_first_of(_l_to_find, _a_current_pos_ref);
             if (_l_next_relevant_char == string::npos)
             {
-                _A_error_string = "couldn't work";
+                _A_error_string = u8"couldn't work";
                 return;
             }
-            char _l_char{ _a_str[_l_next_relevant_char] };
+            char8_t _l_char{ _a_str[_l_next_relevant_char] };
 
             if (_l_char == _a_increment_counter)
             {
@@ -314,16 +314,16 @@ constexpr std::size_t
 
 constexpr void
     process_string(
-        const std::string_view _a_str,
+        const std::u8string_view _a_str,
         std::size_t&           _a_current_pos,
-        std::string&           _a_error_string,
+        std::u8string&           _a_error_string,
         std::size_t&           _a_mode,
         const std::size_t      _a_finish_string_mode
     ) noexcept
 {
     using namespace std;
     locate_relevant_character(
-        _a_str, _c_quote, _a_current_pos, _a_error_string
+        _a_str, u8"\"", _a_current_pos, _a_error_string
     );
     _a_mode = _a_current_pos == string::npos ? numeric_limits<size_t>::max()
               : (_a_str[_a_current_pos - 1] == _c_backslash)

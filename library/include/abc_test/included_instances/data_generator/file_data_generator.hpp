@@ -138,7 +138,7 @@ __constexpr_imp
     if (not exists(_m_path))
     {
         file_line_writer_t _l_flw(_m_path);
-        _l_flw.write_comment(string_view_to_u8string(typeid(T).name()));
+        _l_flw.write_comment(type_id<T>());
         for (auto&& _l_element : _a_elements)
         {
             _l_flw.write_line(

@@ -96,7 +96,7 @@ __no_constexpr_imp auto
         "}}",
         typeid(_a_rd).name(),
         "_m_additional_data",
-        abc::u8string_to_string(_a_rd.additional_data),
+        abc::convert_u8string_to_string(_a_rd.additional_data).value(),
         "_m_mode",
         _a_rd.mode
     )};

@@ -112,7 +112,7 @@ __constexpr matcher_result_t
         fmt::format(
             u8"{0} {1} {2}",
             _l_left_str,
-            abc::string_view_to_u8string(_l_result ? cmp_str<Cmp>() : not_cmp_str<Cmp>()),
+            _l_result ? cmp_str<Cmp>() : not_cmp_str<Cmp>(),
             _l_right_str
         )
     );

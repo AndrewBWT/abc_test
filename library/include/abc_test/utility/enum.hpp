@@ -125,7 +125,7 @@ struct enumerate_enum_helper_t
         return unexpected(fmt::format(
             u8"Could not parse string {0} to enum {1}.",
             _a_parse_input.sv(),
-            string_view_to_u8string(typeid(T).name())
+            type_id<T>()
         ));
     }
 private:

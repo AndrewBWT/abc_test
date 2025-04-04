@@ -144,9 +144,9 @@ __constexpr_imp
             throw errors::test_library_exception_t(fmt::format(
                 u8"Could not initialise tests for loop stack. For loop stack = "
                 u8"{0}",
-                string_view_to_u8string(
+                convert_string_to_u8string(
                     fmt::format("{}", _l_current_test.for_loop_stack_trie())
-                )
+                ).value()
             ));
         }
     }

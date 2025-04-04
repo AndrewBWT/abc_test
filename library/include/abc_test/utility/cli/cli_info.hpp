@@ -326,7 +326,7 @@ public:
                 u8"Could not parse std::string \"{0}\" to type {1}. "
                 u8"Reason:",
                 _a_args[0],
-                string_view_to_u8string(typeid(T).name())
+                type_id< T>()
             ));
             return true;
         }
@@ -407,7 +407,7 @@ public:
                     u8"Could not parse std::string \"{0}\" to type {1}. "
                     u8"Reason:",
                     _l_arg,
-                    string_view_to_u8string(typeid(T).name())
+                    type_id< T>()
                 ));
                 return true;
             }

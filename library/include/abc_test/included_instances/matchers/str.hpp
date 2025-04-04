@@ -36,8 +36,8 @@ __no_constexpr_imp matcher_t
         fmt::format(
             u8"An unexpected exception, of a type derived from {0} was thrown. "
             u8"The exception's what() function returned \"{1}\".",
-            string_view_to_u8string(typeid(std::exception).name()),
-            string_view_to_u8string(_a_exception.what())
+            type_id<std::exception>(),
+            unpack_string_to_u8string(_a_exception.what())
         )
     ));
 }
@@ -70,9 +70,9 @@ __no_constexpr_imp matcher_t
         _l_equal,
         fmt::format(
             u8"{0} {1} {2}",
-            string_view_to_u8string(_a_str1),
+            convert_string_to_u8string(_a_str1).value(),
             _l_equal ? u8"==" : u8"!=",
-            string_view_to_u8string(_a_str2)
+            convert_string_to_u8string(_a_str2).value()
         )
     ));
 }

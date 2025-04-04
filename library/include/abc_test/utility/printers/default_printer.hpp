@@ -72,7 +72,7 @@ struct default_printer_t<char> : public printer_base_t<char>
                               const char& _a_object
                           ) const
     {
-        return string_view_to_u8string("`" + std::string(1, _a_object) + "`");
+        return convert_string_to_u8string("`" + std::string(1, _a_object) + "`").value();
     }
 };
 
@@ -126,7 +126,7 @@ struct default_printer_t<T> : public printer_base_t<T>
                           ) const
     {
         using namespace std;
-        return string_view_to_u8string(to_string(_a_object));
+        return convert_string_to_u8string(to_string(_a_object)).value();
     }
 };
 
@@ -145,7 +145,7 @@ struct default_printer_t<T> : public printer_base_t<T>
         std::to_chars(_l_holder, _l_holder + 1'000, _a_object);
         std::string _l_rv(_l_holder);
         delete[] _l_holder;
-        return string_view_to_u8string(_l_rv);
+        return convert_string_to_u8string(_l_rv).value();
     }
 };
 
@@ -153,7 +153,7 @@ template <typename... Ts>
 __constexpr std::u8string
             object_printer_with_custom_printers(
                 const utility::object_printer_parser_t& _a_object_print_parser,
-                const std::u8string_view&                 _a_begin_str,
+                const std::u8string_view&               _a_begin_str,
                 std::tuple<printer_t<Ts>...>            _a_parsers,
                 Ts... _a_elements_to_print
             );
@@ -161,23 +161,23 @@ template <typename... Ts>
 __constexpr std::u8string
             object_printer(
                 const utility::object_printer_parser_t& _a_object_print_parser,
-                const std::u8string_view&                 _a_begin_str,
+                const std::u8string_view&               _a_begin_str,
                 Ts... _a_elements_to_print
             );
 template <typename... Ts>
 __constexpr std::u8string
             object_printer_with_field_names_and_custom_printers(
                 const utility::object_printer_parser_t& _a_object_print_parser,
-                const std::u8string_view&                 _a_begin_str,
+                const std::u8string_view&               _a_begin_str,
                 const std::array<std::u8string_view, sizeof...(Ts)>& _a_object_names,
-                std::tuple<printer_t<Ts>...>                       _a_parsers,
+                std::tuple<printer_t<Ts>...>                         _a_parsers,
                 Ts... _a_elements_to_print
             );
 template <typename... Ts>
 __constexpr std::u8string
             object_printer_with_field_names(
                 const utility::object_printer_parser_t& _a_object_print_parser,
-                const std::u8string_view&                 _a_begin_str,
+                const std::u8string_view&               _a_begin_str,
                 const std::array<std::u8string_view, sizeof...(Ts)>& _a_object_names,
                 Ts... _a_elements_to_print
             );
@@ -188,7 +188,7 @@ template <typename... Ts>
 __constexpr std::u8string
             object_printer_internal(
                 const utility::object_printer_parser_t& _a_object_print_parser,
-                const std::u8string_view&                 _a_begin_str,
+                const std::u8string_view&               _a_begin_str,
                 const std::optional<std::array<std::u8string_view, sizeof...(Ts)>>&
                                              _a_object_names,
                 std::tuple<printer_t<Ts>...> _a_parsers,
@@ -198,7 +198,7 @@ template <std::size_t I, typename... Ts>
 __constexpr void
     object_printer_internal(
         const utility::object_printer_parser_t& _a_object_print_parser,
-        std::u8string&                            _a_str,
+        std::u8string&                          _a_str,
         const std::optional<std::array<std::u8string_view, sizeof...(Ts)>>&
                                      _a_object_names,
         std::tuple<printer_t<Ts>...> _a_parsers,
@@ -240,7 +240,7 @@ template <typename... Ts>
 __constexpr std::u8string
             object_printer_with_custom_printers(
                 const utility::object_printer_parser_t& _a_object_print_parser,
-                const std::u8string_view&                 _a_begin_str,
+                const std::u8string_view&               _a_begin_str,
                 std::tuple<printer_t<Ts>...>            _a_printers,
                 Ts... _a_elements_to_print
             )
@@ -259,7 +259,7 @@ template <typename... Ts>
 __constexpr std::u8string
             object_printer(
                 const utility::object_printer_parser_t& _a_object_print_parser,
-                const std::u8string_view&                 _a_begin_str,
+                const std::u8string_view&               _a_begin_str,
                 Ts... _a_elements_to_print
             )
 {
@@ -279,9 +279,9 @@ template <typename... Ts>
 __constexpr_imp std::u8string
                 object_printer_with_field_names_and_custom_printers(
                     const utility::object_printer_parser_t& _a_object_print_parser,
-                    const std::u8string_view&                 _a_begin_str,
+                    const std::u8string_view&               _a_begin_str,
                     const std::array<std::u8string_view, sizeof...(Ts)>& _a_object_names,
-                    std::tuple<printer_t<Ts>...>                       _a_parsers,
+                    std::tuple<printer_t<Ts>...>                         _a_parsers,
                     Ts... _a_elements_to_print
                 )
 {
@@ -299,7 +299,7 @@ template <typename... Ts>
 __constexpr_imp std::u8string
                 object_printer_with_field_names(
                     const utility::object_printer_parser_t& _a_object_print_parser,
-                    const std::u8string_view&                 _a_begin_str,
+                    const std::u8string_view&               _a_begin_str,
                     const std::array<std::u8string_view, sizeof...(Ts)>& _a_object_names,
                     Ts... _a_elements_to_print
                 )
@@ -322,7 +322,7 @@ template <typename... Ts>
 __constexpr std::u8string
             object_printer_internal(
                 const utility::object_printer_parser_t& _a_object_print_parser,
-                const std::u8string_view&                 _a_begin_str,
+                const std::u8string_view&               _a_begin_str,
                 const std::optional<std::array<std::u8string_view, sizeof...(Ts)>>&
                                              _a_object_names,
                 std::tuple<printer_t<Ts>...> _a_parsers,
@@ -335,12 +335,16 @@ __constexpr std::u8string
     {
         _l_rv.append(u8" ");
     }
-    _l_rv.append(string_view_to_u8string(string(1,_a_object_print_parser.begin_char)));
+    _l_rv.append(
+        convert_string_to_u8string(string(1, _a_object_print_parser.begin_char)).value()
+    );
     tuple<Ts...> _l_tuple{tie(_a_elements_to_print...)};
     object_printer_internal<0>(
         _a_object_print_parser, _l_rv, _a_object_names, _a_parsers, _l_tuple
     );
-    _l_rv.append(string_view_to_u8string(string(1, _a_object_print_parser.end_char)));
+    _l_rv.append(
+        convert_string_to_u8string(string(1, _a_object_print_parser.end_char)).value()
+    );
     return _l_rv;
 }
 
@@ -348,7 +352,7 @@ template <std::size_t I, typename... Ts>
 __constexpr void
     object_printer_internal(
         const utility::object_printer_parser_t& _a_object_print_parser,
-        std::u8string&                            _a_str,
+        std::u8string&                          _a_str,
         const std::optional<std::array<std::u8string_view, sizeof...(Ts)>>&
                                      _a_object_names,
         std::tuple<printer_t<Ts>...> _a_parsers,
@@ -368,12 +372,14 @@ __constexpr void
         _a_str.append(get<I>(_a_object_names.value()));
         if (_a_object_print_parser.space_before_field_name_and_field_separator)
         {
-            _a_str.append(string_view_to_u8string(string(1, ' ')));
+            _a_str.append(convert_string_to_u8string(string(1, ' ')).value());
         }
-        _a_str.append(string_view_to_u8string(string(1, _a_object_print_parser.delimiter_between_field_name_and_field)));
+        _a_str.append(convert_string_to_u8string(string(
+            1, _a_object_print_parser.delimiter_between_field_name_and_field
+        )));
         if (_a_object_print_parser.space_after_field_name_and_field_separator)
         {
-            _a_str.append(string_view_to_u8string(string(1, ' ')));
+            _a_str.append(convert_string_to_u8string(string(1, ' ')));
         }
     }
     _a_str.append(
@@ -383,12 +389,14 @@ __constexpr void
     {
         if (_a_object_print_parser.space_before_field_delimiter)
         {
-            _a_str.append(string_view_to_u8string(string(1, ' ')));
+            _a_str.append(convert_string_to_u8string(string(1, ' ')).value());
         }
-        _a_str.append(string_view_to_u8string(string(1, _a_object_print_parser.delimiter_between_fields)));
+        _a_str.append(convert_string_to_u8string(
+            string(1, _a_object_print_parser.delimiter_between_fields)
+        ).value());
         if (_a_object_print_parser.space_after_field_delimieter)
         {
-            _a_str.append(string_view_to_u8string(string(1, ' ')));
+            _a_str.append(convert_string_to_u8string(string(1, ' ')).value());
         }
         object_printer_internal<I + 1>(
             _a_object_print_parser,
@@ -518,7 +526,7 @@ template <typename... Ts>
 template <std::size_t I>
 __constexpr_imp void
     default_printer_t<std::tuple<Ts...>>::run_internal_printer(
-        std::u8string&                                            _a_str,
+        std::u8string&                                          _a_str,
         const default_printer_t<std::tuple<Ts...>>::value_type& _a_object
     ) const
 {
@@ -562,7 +570,7 @@ struct default_printer_t<std::basic_string<T>>
         using namespace std;
         if constexpr (same_as<basic_string<T>, string>)
         {
-            return fmt::format(u8"\"{0}\"", string_view_to_u8string(_a_object));
+            return fmt::format(u8"\"{0}\"", convert_string_to_u8string(_a_object).value());
         }
         else
         {
@@ -599,6 +607,33 @@ public:
     requires (std::is_default_constructible_v<default_printer_t<T>> && std::is_default_constructible_v<default_printer_t<U>>)
         : _m_printers(std::make_pair(default_printer<T>(), default_printer<U>())
           )
+    {}
+
+    __constexpr virtual std::u8string
+        run_printer(const value_type& _a_object) const;
+};
+
+template <typename T, typename U>
+struct default_printer_t<std::map<T, U>> : public printer_base_t<std::map<T, U>>
+{
+private:
+    printer_t<T> _m_key_printer;
+    printer_t<U> _m_element_printer;
+public:
+    static constexpr bool is_specialized{true};
+    using value_type = std::map<T, U>;
+
+    __constexpr
+    default_printer_t(
+        const printer_t<T>& _a_printer_t,
+        const printer_t<U>& _a_printer_u
+    );
+
+    default_printer_t()
+    requires (std::is_default_constructible_v<default_printer_t<T>>
+              && std::is_default_constructible_v<default_printer_t<U>>)
+        : _m_key_printer(default_printer<T>())
+        , _m_element_printer(default_printer<U>())
     {}
 
     __constexpr virtual std::u8string
@@ -682,6 +717,33 @@ __constexpr_imp std::u8string
     _l_str.append(u8", ");
     _l_str.append(_m_printers.second->run_printer(_a_object.second));
     _l_str.append(u8")");
+    return _l_str;
+}
+
+template <typename T, typename U>
+__constexpr_imp
+    default_printer_t<std::map<T, U>>::default_printer_t(
+        const printer_t<T>& _a_printer_t,
+        const printer_t<U>& _a_printer_u
+    )
+    : _m_key_printer(_a_printer_t), _m_element_printer(_a_printer_t)
+{}
+
+template <typename T, typename U>
+__constexpr_imp std::u8string
+                default_printer_t<std::map<T, U>>::run_printer(
+        const default_printer_t<std::map<T, U>>::value_type& _a_object
+    ) const
+{
+    using namespace std;
+    u8string _l_str{u8"{"};
+    for (const pair<T, U>& _l_element : _a_object)
+    {
+        _l_str.append(_m_key_printer->run_printer(_l_element.first));
+        _l_str.append(u8":");
+        _l_str.append(_m_element_printer->run_printer(_l_element.second));
+    }
+    _l_str.append(u8"}");
     return _l_str;
 }
 

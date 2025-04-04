@@ -140,9 +140,9 @@ __constexpr_imp void
                 u8"{0}{1}",
                 prefix(_a_idx),
                 _a_pc.indent(_a_pc.source_representation(
-                    string_view_to_u8string(
+                    convert_string_to_u8string(
                         _a_element.source().source_code_representation()
-                    )
+                    ).value()
 
                 ))
             ));
@@ -178,11 +178,11 @@ __constexpr_imp void
                 u8"{0}{1}",
                 prefix(_a_idx),
                 _a_pc.indent(
-                    _a_pc.source_representation(abc::string_view_to_u8string(
+                    _a_pc.source_representation(abc::convert_string_to_u8string(
                         _a_element.source()
                             .begin_source()
                             .source_code_representation()
-                    )),
+                    ).value()),
                     2
                 )
             ));
@@ -217,9 +217,9 @@ __constexpr_imp void
                     prefix(_a_idx),
                     _a_pc.indent(
                         _a_pc.source_representation(
-                            abc::string_view_to_u8string(
+                            abc::convert_string_to_u8string(
                                 _l_end.source_code_representation()
-                            )
+                            ).value()
                         ),
                         2
                     )

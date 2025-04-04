@@ -42,9 +42,9 @@ stacktraces_equal(
         _l_equal,
         fmt::format(
             u8"{0} {1} {2}",
-            string_view_to_u8string(to_string(_a_st1)),
+            convert_string_to_u8string(to_string(_a_st1)).value(),
             _l_equal ? u8"==" : u8"!=",
-            string_view_to_u8string(to_string(_a_st2))
+            convert_string_to_u8string(to_string(_a_st2)).value()
         )
     ));
 }

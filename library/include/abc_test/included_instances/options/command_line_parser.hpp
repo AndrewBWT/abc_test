@@ -103,7 +103,7 @@ __no_constexpr_imp int
                     u8"function:\n{0}\nThe program will now terminate. "
                     u8"included_instances_test_options_t = {1}",
                     _l_st(),
-                    string_view_to_u8string(fmt::format("{}",_l_iito))
+                    convert_string_to_u8string(fmt::format("{}",_l_iito)).value()
                 ) };
                 std::cout << string(_l_rv.begin(),_l_rv.end()) << std::endl;
                 return -1;

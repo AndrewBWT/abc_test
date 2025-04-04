@@ -152,9 +152,9 @@ __no_constexpr_imp void
                            _a_element.annotation().has_value()
                                ?
 
-                               optional<u8string>(string_view_to_u8string(
+                               optional<u8string>(convert_string_to_u8string(
                                    _a_element.annotation().value()
-                               ))
+                               ).value())
                                : optional<u8string>{}
                        ),
                        _m_indent_offset + 1
@@ -173,9 +173,9 @@ __no_constexpr_imp void
                            _a_element.annotation().has_value()
                                ?
 
-                               optional<u8string>(string_view_to_u8string(
+                               optional<u8string>(convert_string_to_u8string(
                                    _a_element.annotation().value()
-                               ))
+                               ).value())
                                : optional<u8string>{}
                        ),
                        _m_indent_offset + 1
@@ -267,7 +267,7 @@ __no_constexpr_imp void
                     prefix(_a_idx + 1),
                     _a_pc.indent(
                         _a_pc.source_representation(
-                            string_view_to_u8string(_l_str)
+                            convert_string_to_u8string(_l_str).value()
                         ),
                         _m_indent_offset + 2
                     )
@@ -282,9 +282,9 @@ __no_constexpr_imp void
                    _a_pc.colon(_a_pc.source_code_str()), _m_indent_offset
                ),
                _a_pc.indent(
-                   _a_pc.source_representation(string_view_to_u8string(
+                   _a_pc.source_representation(convert_string_to_u8string(
                        _a_element.source().value().source_code_representation()
-                   )),
+                   ).value()),
                    _m_indent_offset + 1
                )};
         break;

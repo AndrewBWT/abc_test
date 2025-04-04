@@ -111,7 +111,7 @@ __no_constexpr_imp void
         for (const test_list_element_t& _l_test_element :
              _l_test_list_element.get())
         {
-            const string _l_id{
+            const u8string _l_id{
                 _l_test_element._m_user_data.make_uid(_m_options.path_delimiter)
             };
             const tdg_collection_stack_trie_t* _l_reps{
@@ -125,7 +125,7 @@ __no_constexpr_imp void
             };
             const test_path_hierarchy_t _l_test_path_hierarchy{
                 abc::utility::str::split_string<char8_t>(
-                    string_view_to_u8string(_l_test_element._m_user_data.path),
+                    convert_string_to_u8string(_l_test_element._m_user_data.path).value(),
                     _m_options.path_delimiter
                 )
             };

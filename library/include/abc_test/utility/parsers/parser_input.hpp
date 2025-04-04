@@ -99,7 +99,7 @@ __constexpr void
         const std::string_view _a_str_to_check_against
     )
 {
-    check_advance_and_throw(string_view_to_u8string(_a_str_to_check_against));
+    check_advance_and_throw(convert_string_to_u8string(_a_str_to_check_against).value());
 }
 
 __no_constexpr_imp void
@@ -152,7 +152,7 @@ __constexpr bool
         const std::string_view _a_str_to_check_against
     ) noexcept
 {
-    return check_and_advance(string_view_to_u8string(_a_str_to_check_against));
+    return check_and_advance(convert_string_to_u8string(_a_str_to_check_against).value());
 }
 
 __constexpr void

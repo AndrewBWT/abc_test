@@ -17,7 +17,7 @@ class cli_help_t : public cli_info_t<Option_Class>
 public:
     __constexpr
     cli_help_t(
-        const std::u8string_view     _a_flag      = u8"help",
+        const std::u8string_view      _a_flag      = u8"help",
         const std::optional<char8_t>& _a_char_flag = char8_t('h')
     )
         : cli_info_t<Option_Class>(
@@ -36,11 +36,11 @@ public:
 
     __constexpr virtual bool
         process_args_(
-            Option_Class&                        _a_option_class,
+            Option_Class&                          _a_option_class,
             const std::u8string_view               _a_flag,
             const std::vector<std::u8string_view>& _a_args,
-            const cli_t<Option_Class>&           _a_cli,
-            cli_results_t&                       _a_cli_results
+            const cli_t<Option_Class>&             _a_cli,
+            cli_results_t&                         _a_cli_results
         ) const noexcept
     {
         _a_cli_results.add_table_output(_a_cli.make_help_output());
@@ -54,13 +54,14 @@ class cli_config_t : public cli_info_t<Option_Class>
 public:
     __constexpr
     cli_config_t(
-        const std::u8string_view     _a_flag      = u8"config",
+        const std::u8string_view      _a_flag      = u8"config",
         const std::optional<char8_t>& _a_char_flag = char8_t('c')
     )
         : cli_info_t<Option_Class>(
               cli_option_config_t{
                   _a_flag,
-                  u8"Specifies a configuration file for the command line parser "
+                  u8"Specifies a configuration file for the command line "
+                  u8"parser "
                   u8"to read from.",
                   _a_char_flag
               },
@@ -72,70 +73,89 @@ public:
 
     __constexpr virtual bool
         process_args_(
-            Option_Class&                        _a_option_class,
+            Option_Class&                          _a_option_class,
             const std::u8string_view               _a_flag,
             const std::vector<std::u8string_view>& _a_args,
-            const cli_t<Option_Class>&           _a_cli,
-            cli_results_t&                       _a_cli_results
+            const cli_t<Option_Class>&             _a_cli,
+            cli_results_t&                         _a_cli_results
         ) const noexcept
     {
         using namespace std;
         // _a_cli.set_terminate_early(true);
         // Read the file.
         // Go thorugh the args and
-        fstream _l_config_file{u8string_to_string(_a_args[0])};
-        size_t  _l_line_idx{0};
-        if (_l_config_file.is_open())
+        const result_t<string> _l_file_name{
+            convert_u8string_to_string(_a_args[0])
+        };
+        if (_l_file_name.has_value())
         {
-            string _l_unprocessed_line;
-            while (getline(_l_config_file, _l_unprocessed_line))
+            fstream _l_config_file{_l_file_name.value()};
+            size_t  _l_line_idx{0};
+            if (_l_config_file.is_open())
             {
-                ++_l_line_idx;
-                u8string _l_line{ string_view_to_u8string(_l_unprocessed_line) };
-                // Split string into parts. Then process.
-                if (_l_line.size() == 0 || _l_line[0] == char8_t('#'))
+                string _l_unprocessed_line;
+                while (getline(_l_config_file, _l_unprocessed_line))
                 {
-                    continue;
-                }
-                const size_t _l_equals_pos{_l_line.find_first_of(u8"=")};
-                if (_l_equals_pos == string::npos)
-                {
-                    _l_config_file.close();
-                    _a_cli_results.add_error(fmt::format(u8"couldn't run file"));
-                    return true;
-                }
-                else
-                {
-                    const u8string _l_field_name{
-                        abc::utility::str::remove_whitespace(
-                            _l_line.substr(0, _l_equals_pos - 1)
-                        )
-                    };
-                    vector<u8string> _l_strs = abc::utility::str::split_string<char8_t>(
-                        _l_line.substr(_l_equals_pos + 1), u8" "
-                    );
-                    if (const bool _l_terminate{_a_cli.process_config_line(
-                            _a_option_class,
-                            _l_field_name,
-                            _l_strs,
-                            fmt::format(
-                                u8"config file \"{0}\", line {1}",
-                                _a_args[0],
-                                _l_line_idx
-                            ),
-                            _a_cli_results
-                        )};
-                        _l_terminate)
+                    ++_l_line_idx;
+                    u8string _l_line{unpack_string_to_u8string(_l_unprocessed_line
+                    )};
+                    // Split string into parts. Then process.
+                    if (_l_line.size() == 0 || _l_line[0] == char8_t('#'))
                     {
+                        continue;
+                    }
+                    const size_t _l_equals_pos{_l_line.find_first_of(u8"=")};
+                    if (_l_equals_pos == string::npos)
+                    {
+                        _l_config_file.close();
+                        _a_cli_results.add_error(
+                            fmt::format(u8"couldn't run file")
+                        );
                         return true;
                     }
+                    else
+                    {
+                        const u8string _l_field_name{
+                            abc::utility::str::remove_whitespace(
+                                _l_line.substr(0, _l_equals_pos - 1)
+                            )
+                        };
+                        vector<u8string> _l_strs
+                            = abc::utility::str::split_string<char8_t>(
+                                _l_line.substr(_l_equals_pos + 1), u8" "
+                            );
+                        if (const bool _l_terminate{_a_cli.process_config_line(
+                                _a_option_class,
+                                _l_field_name,
+                                _l_strs,
+                                fmt::format(
+                                    u8"config file \"{0}\", line {1}",
+                                    _a_args[0],
+                                    _l_line_idx
+                                ),
+                                _a_cli_results
+                            )};
+                            _l_terminate)
+                        {
+                            return true;
+                        }
+                    }
                 }
+                return false;
             }
-            return false;
+            else
+            {
+                _a_cli_results.add_error(fmt::format(u8"couldn't run file"));
+                return true;
+            }
         }
         else
         {
-            _a_cli_results.add_error(fmt::format(u8"couldn't run file"));
+            _a_cli_results.add_error(fmt::format(
+                u8"Could not convert file name from std::u8string to "
+                u8"std::string. Conversion error was \"{0}\".",
+                _l_file_name.error()
+            ));
             return true;
         }
     }
@@ -147,7 +167,7 @@ class cli_auto_config_t : public cli_info_t<Option_Class>
 public:
     __constexpr
     cli_auto_config_t(
-        const std::u8string_view     _a_flag      = u8"auto_configuration",
+        const std::u8string_view      _a_flag      = u8"auto_configuration",
         const std::optional<char8_t>& _a_char_flag = {}
     )
         : cli_info_t<Option_Class>(
@@ -160,29 +180,36 @@ public:
                   u8"is either a positive integer or the strings latest or "
                   u8"latest_if_failure. The third is any of the strings "
                   u8"always_write, "
-                  u8"write_if_different_or_new_run_that_failed or do_not_write. "
+                  u8"write_if_different_or_new_run_that_failed or "
+                  u8"do_not_write. "
                   u8"Using this "
                   u8"option will "
                   u8"read "
                   u8"memoized configurations from the folder given. These are "
-                  u8"configurations indexed by integer, with an additional bool "
-                  u8"denoting whether the test was a success or failure. If the "
+                  u8"configurations indexed by integer, with an additional "
+                  u8"bool "
+                  u8"denoting whether the test was a success or failure. If "
+                  u8"the "
                   u8"second "
                   u8"argument is an integer, that configuration is found and "
                   u8"loaded "
                   u8"(if "
-                  u8"it exists). If it is the string \"latest\", it will run the "
+                  u8"it exists). If it is the string \"latest\", it will run "
+                  u8"the "
                   u8"most "
                   u8"recent configuration. If it is the string "
                   u8"\"latest_if_failure\", it "
-                  u8"will only load the configuration if the previous test was a "
+                  u8"will only load the configuration if the previous test was "
+                  u8"a "
                   u8"failure. "
                   u8"Otherwise it will will not load any configuration. The "
                   u8"third "
                   u8"argument "
-                  u8"denotes whether to write data after the test is run to the "
+                  u8"denotes whether to write data after the test is run to "
+                  u8"the "
                   u8"folder. If "
-                  u8"the string is \"always_write\", the data is always written. "
+                  u8"the string is \"always_write\", the data is always "
+                  u8"written. "
                   u8"If "
                   u8"the "
                   u8"string is \"\", the data is only written if it was loaded "
@@ -190,9 +217,11 @@ public:
                   u8"overridden by the user, or no configuration was "
                   u8"automatically "
                   u8"loaded "
-                  u8"and instead a clean run was performd, which failed. If the "
+                  u8"and instead a clean run was performd, which failed. If "
+                  u8"the "
                   u8"string is "
-                  u8"\"do_not_write\", the configuration is never written to any "
+                  u8"\"do_not_write\", the configuration is never written to "
+                  u8"any "
                   u8"files. ",
                   _a_char_flag
               },
@@ -204,11 +233,11 @@ public:
 
     __constexpr virtual bool
         process_args_(
-            Option_Class&                        _a_option_class,
+            Option_Class&                          _a_option_class,
             const std::u8string_view               _a_flag,
             const std::vector<std::u8string_view>& _a_args,
-            const cli_t<Option_Class>&           _a_cli,
-            cli_results_t&                       _a_cli_results
+            const cli_t<Option_Class>&             _a_cli,
+            cli_results_t&                         _a_cli_results
         ) const noexcept
     {
         using namespace std;
@@ -220,9 +249,7 @@ public:
         get<0>(_l_rep_data) = _a_args[0];
         abc::result_t<auto_configuration_load_configuration_t> _l_rfli{
             abc::utility::parser::parse<
-                auto_configuration_load_configuration_t>(
-                _a_args[1]
-            )
+                auto_configuration_load_configuration_t>(_a_args[1])
         };
         abc::result_t<enum_auto_configuration_write_to_file_t> _l_rf{
             abc::utility::parser::parse<
@@ -240,9 +267,7 @@ public:
         {
             _a_cli_results.add_error(fmt::format(
                 u8"Error parsing {0}. Parser reported error: \"{1}\".",
-                string_view_to_u8string(
-                    typeid(auto_configuration_load_configuration_t).name()
-                ),
+                type_id< auto_configuration_load_configuration_t>(),
                 _l_rfli.error()
             ));
             return true;
@@ -251,9 +276,7 @@ public:
         {
             _a_cli_results.add_error(fmt::format(
                 u8"Error parsing {0}. Parser reported error: \"{1}\".",
-                string_view_to_u8string(
-                    typeid(enum_auto_configuration_write_to_file_t).name()
-                ),
+                type_id< enum_auto_configuration_write_to_file_t>(),
                 _l_rf.error()
             ));
             return true;

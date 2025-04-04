@@ -111,7 +111,7 @@ __constexpr_imp bool
         ++_m_current_line_idx;
         string _l_unprocessed_line;
         std::getline(_l_file_hander, _l_unprocessed_line);
-        _m_current_line = string_view_to_u8string(_l_unprocessed_line);
+        _m_current_line = unpack_string_to_u8string(_l_unprocessed_line);
         const bool _l_error_reading_file{
             _l_file_hander.fail() || _l_file_hander.bad()
         };

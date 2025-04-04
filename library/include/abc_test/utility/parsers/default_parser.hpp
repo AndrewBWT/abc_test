@@ -6,9 +6,8 @@
 #include "abc_test/utility/parsers/parser_base.hpp"
 
 #include <filesystem>
-#include <variant>
-
 #include <fmt/xchar.h>
+#include <variant>
 
 _BEGIN_ABC_UTILITY_PARSER_NS
 
@@ -123,15 +122,17 @@ struct default_parser_t<char> : public parser_base_t<char>
             else
             {
                 return unexpected(fmt::format(
-                    u8"Could not find expected character `{0}`.", string_view_to_u8string("`")
+                    u8"Could not find expected character `{0}`.",
+                    convert_string_to_u8string("`").value()
                 ));
             }
         }
         else
         {
-            return unexpected(
-                fmt::format(u8"Could not find expected character `{0}`.", string_view_to_u8string("`"))
-            );
+            return unexpected(fmt::format(
+                u8"Could not find expected character `{0}`.",
+                convert_string_to_u8string("`").value()
+            ));
         }
     }
 };
@@ -160,20 +161,38 @@ struct default_parser_t<T> : public parser_base_t<T>
                 ) const
     {
         using namespace std;
-        T                 result{};
-        const string _l_str{ u8string_to_string(_a_parse_input.sv())};
-        auto [ptr, ec]
-            = from_chars(_l_str.data(), _l_str.data() + _l_str.size(), result);
-
-        if (ec == std::errc())
+        T                      result{};
+        const result_t<string> _l_result_str{
+            convert_u8string_to_string(_a_parse_input.sv())
+        };
+        if (_l_result_str.has_value())
         {
-            _a_parse_input.advance((ptr - _l_str.data()) + 0);
-            return result_t<T>(result);
+            const string _l_str{_l_result_str.value()};
+            auto [ptr, ec] = from_chars(
+                _l_str.data(), _l_str.data() + _l_str.size(), result
+            );
+
+            if (ec == std::errc())
+            {
+                _a_parse_input.advance((ptr - _l_str.data()) + 0);
+                return result_t<T>(result);
+            }
+            else
+            {
+                return result_t<T>(unexpected(fmt::format(
+                    u8"Could not parse \"{0}\" using std::from_chars",
+                    _a_parse_input.sv()
+                ))
+
+                );
+            }
         }
         else
         {
             return result_t<T>(unexpected(fmt::format(
-                u8"Could not parse \"{0}\" using std::from_chars", _a_parse_input.sv()
+                u8"Could not convert std::u8string to std::string. Error was "
+                u8"\"{0}\".",
+                _l_result_str.error()
             ))
 
             );
@@ -926,7 +945,8 @@ __constexpr std::optional<std::u8string>
     else if constexpr (I + 1 == tuple_size<std::tuple<Ts...>>{})
     {
         return optional<u8string>(fmt::format(
-            u8"Could not parse std::variant element {0}. Tuple does not contain "
+            u8"Could not parse std::variant element {0}. Tuple does not "
+            u8"contain "
             u8"index",
             I
         ));

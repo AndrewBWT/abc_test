@@ -134,7 +134,7 @@ __constexpr_imp void
                         this->prefix(_a_idx + 1)
                         + _a_pc.indent(
                             _a_pc.source_representation(
-                                string_view_to_u8string(_l_str)
+                                convert_string_to_u8string(_l_str).value()
                             ),
                             2
                         )
@@ -171,9 +171,9 @@ __constexpr_imp void
                 this->prefix(_a_idx + 1)
                 + _a_pc.indent(
                     _a_element.matcher_info().annotation().has_value()
-                        ? _a_pc.message_str(string_view_to_u8string(
+                        ? _a_pc.message_str(convert_string_to_u8string(
                               _a_element.matcher_info().annotation().value()
-                          ))
+                          ).value())
                         : _a_pc.message_str(optional<u8string>())
                 )
             );

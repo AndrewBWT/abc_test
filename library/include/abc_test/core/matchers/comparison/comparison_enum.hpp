@@ -63,10 +63,10 @@ __constexpr bool
  * @return A const char* containing a string representation of the argument.
  */
 template <comparison_enum_t Comparison_Enum>
-__constexpr const char*
+__constexpr std::u8string_view
     cmp_str() noexcept;
 template<comparison_enum_t Comparison_Enum>
-__constexpr const char*
+__constexpr std::u8string_view
 not_cmp_str() noexcept;
 _END_ABC_MATCHER_NS
 
@@ -138,33 +138,33 @@ __constexpr_imp bool
 }
 
 template <comparison_enum_t Comparison_Enum>
-__constexpr_imp const char*
+__constexpr_imp std::u8string_view
     cmp_str() noexcept
 {
     using enum comparison_enum_t;
     if constexpr (Comparison_Enum == EQ)
     {
-        return "==";
+        return u8"==";
     }
     else if constexpr (Comparison_Enum == NEQ)
     {
-        return "!=";
+        return u8"!=";
     }
     else if constexpr (Comparison_Enum == LT)
     {
-        return "<";
+        return u8"<";
     }
     else if constexpr (Comparison_Enum == LEQ)
     {
-        return "<=";
+        return u8"<=";
     }
     else if constexpr (Comparison_Enum == GT)
     {
-        return ">";
+        return u8">";
     }
     else if constexpr (Comparison_Enum == GEQ)
     {
-        return ">=";
+        return u8">=";
     }
     else
     {
@@ -176,33 +176,33 @@ __constexpr_imp const char*
     }
 }
 template<comparison_enum_t Comparison_Enum>
-__constexpr_imp const char*
+__constexpr_imp std::u8string_view
 not_cmp_str() noexcept
 {
     using enum comparison_enum_t;
     if constexpr (Comparison_Enum == EQ)
     {
-        return "!=";
+        return u8"!=";
     }
     else if constexpr (Comparison_Enum == NEQ)
     {
-        return "==";
+        return u8"==";
     }
     else if constexpr (Comparison_Enum == LT)
     {
-        return ">=";
+        return u8">=";
     }
     else if constexpr (Comparison_Enum == LEQ)
     {
-        return ">";
+        return u8">";
     }
     else if constexpr (Comparison_Enum == GT)
     {
-        return "<=";
+        return u8"<=";
     }
     else if constexpr (Comparison_Enum == GEQ)
     {
-        return "<";
+        return u8"<";
     }
     else
     {

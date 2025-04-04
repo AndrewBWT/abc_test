@@ -237,7 +237,7 @@ __constexpr void
     {
         throw errors::test_library_exception_t(fmt::format(
             u8"Could not find function to format item of abstract class {0}. ",
-            string_view_to_u8string(typeid(_a_unexpected_report).name())
+            type_id<decltype(_a_unexpected_report)>()
         ));
     }
 }
@@ -418,10 +418,9 @@ __constexpr_imp void
     }
     else
     {
-        const std::string _l_i = typeid(*_a_gur).name();
         throw errors::test_library_exception_t(fmt::format(
             u8"Could not find function to format item of abstract class {0}. ",
-            string_view_to_u8string(typeid(*_a_gur).name())
+            type_id<decltype(*_a_gur)>()
         ));
     }
 }

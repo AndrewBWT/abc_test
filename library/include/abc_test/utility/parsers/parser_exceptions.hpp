@@ -43,7 +43,7 @@ __no_constexpr_imp
         const std::u8string_view _a_str,
         const std::size_t        _a_elements_read
     ) noexcept
-    : std::runtime_error(u8string_to_string(fmt::format(
+    : std::runtime_error(pack_u8string_into_string(fmt::format(
           u8"Parser at end of u8string \"{0}\". Parser read {1} characters",
           _a_str,
           _a_elements_read
@@ -56,7 +56,7 @@ __no_constexpr_imp
         const std::u8string_view _a_remaining_string,
         const std::u8string_view _a_str_failed_to_match
     ) noexcept
-    : std::runtime_error(u8string_to_string(fmt::format(
+    : std::runtime_error(pack_u8string_into_string(fmt::format(
           u8"Parser could not find string it expected to find. Remaining "
           u8"string = \"{0}\", string parser failed to match = \"{1}\", total "
           u8"string = \"{2}\".",

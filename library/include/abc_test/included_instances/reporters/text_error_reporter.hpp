@@ -88,11 +88,11 @@ __no_constexpr_imp
 			u8"      Line: {3}\n"
 			u8"   Stacktrace: {4}"
 			, _a_setup_test_error.error_msg()
-			, string_view_to_u8string(_a_setup_test_error.source_location().file_name())
-			, string_view_to_u8string(_a_setup_test_error.source_location().function_name())
+			, convert_string_to_u8string(_a_setup_test_error.source_location().file_name()).value()
+			, convert_string_to_u8string(_a_setup_test_error.source_location().function_name()).value()
 			, _a_setup_test_error.source_location().line()
 			, _a_setup_test_error.opt_stacktrace().has_value() ?
-			string_view_to_u8string(to_string(_a_setup_test_error.opt_stacktrace().value())) :
+			convert_string_to_u8string(to_string(_a_setup_test_error.opt_stacktrace().value())).value() :
 			u8"No stacktrace"
 			));
 	}
@@ -102,7 +102,7 @@ __no_constexpr_imp
 			const std::string_view _a_str
 		) const noexcept
 	{
-		write(u8"WARNING: " + string_view_to_u8string(_a_str));
+		write(u8"WARNING: " + convert_string_to_u8string(_a_str).value());
 	}
 __no_constexpr_imp
 		void

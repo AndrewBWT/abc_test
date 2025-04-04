@@ -172,7 +172,7 @@ __no_constexpr_imp errors::opt_setup_error_t
                 u8"post_setup_test_data_t = {2}",
                 _l_test.thread_resourses_required(),
                 _a_options.threads,
-                string_view_to_u8string(fmt::format("{0}", _l_test))
+                convert_string_to_u8string(fmt::format("{0}", _l_test)).value()
             ),
             false
         ));
@@ -200,7 +200,7 @@ __no_constexpr_imp errors::opt_setup_error_t
                     u8"post_setup_test_data_t = {2}",
                     _l_empty_indexes,
                     _l_test.test_path_hierarchy(),
-                    string_view_to_u8string(fmt::format("{0}", _l_test))
+                    convert_string_to_u8string(fmt::format("{0}", _l_test)).value()
                 ),
                 false
             ));
@@ -329,10 +329,10 @@ __no_constexpr_imp errors::opt_setup_error_t
                     u8"insert is {0}, "
                     u8"while the post_setup_test_data_t object blocking its "
                     u8"insertion is {1}. ",
-                    string_view_to_u8string(fmt::format("{0}", _a_test.get())),
-                    string_view_to_u8string(
+                    convert_string_to_u8string(fmt::format("{0}", _a_test.get())).value(),
+                    convert_string_to_u8string(
                         fmt::format("{0}", (_l_name_range_itts.begin()->get()))
-                    )
+                    ).value()
                 ),
                 false
             ));

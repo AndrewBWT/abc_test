@@ -432,8 +432,8 @@ __constexpr_imp std::u8string
                 print_config_t::line_break() const noexcept
 {
     using namespace std;
-    return string_view_to_u8string(string(_m_line_break_len, _m_line_break_char)
-    );
+    return convert_string_to_u8string(string(_m_line_break_len, _m_line_break_char)
+    ).value();
 }
 
 __constexpr_imp const std::u8string
@@ -1001,7 +1001,7 @@ __constexpr_imp std::u8string
     {
         return highlight(fmt::format(
             u8"{0}:{1}",
-            string_view_to_u8string(_a_sl.value().file_name()),
+            convert_string_to_u8string(_a_sl.value().file_name()).value(),
             _a_sl.value().line()
         ));
     }
@@ -1303,7 +1303,7 @@ __constexpr_imp std::u8string
     ) const noexcept
 {
     using namespace std;
-    return string_view_to_u8string(string(_a_n_indents * _m_indent_size, ' '))
+    return u8string(_a_n_indents * _m_indent_size, char8_t(' '))
         .append(_a_str);
 }
 

@@ -985,7 +985,7 @@ __constexpr_imp std::vector<std::u8string>
     vector<u8string> _l_strs(_a_argc > 1 ? (_a_argc - 1) : 0);
     for (size_t _l_idx{1}; _l_idx < _a_argc; ++_l_idx)
     {
-        _l_strs[_l_idx - 1] = string_view_to_u8string(_a_argv[_l_idx]);
+        _l_strs[_l_idx - 1] = convert_string_to_u8string(_a_argv[_l_idx]).value();
     }
     return _l_strs;
 }
@@ -1000,7 +1000,7 @@ __no_constexpr_imp std::optional<std::string>
     string _l_unprocessed_line;
     while (getline(_a_fstream, _l_unprocessed_line))
     {
-        u8string _l_line{abc::string_view_to_u8string(_l_unprocessed_line)};
+        u8string _l_line{abc::unpack_string_to_u8string(_l_unprocessed_line)};
         if (_l_line.starts_with(_a_str_to_find))
         {
             return _l_unprocessed_line;
@@ -1031,7 +1031,7 @@ __constexpr_imp std::optional<found_data_t>
                                                    ? _l_unprocessed_line.value()
                                                    : _l_line;
         const u8string _l_line_to_get{
-            abc::string_view_to_u8string(_l_line_to_get_as_str)
+            abc::unpack_string_to_u8string(_l_line_to_get_as_str)
         };
         if (_l_unprocessed_line.has_value())
         {

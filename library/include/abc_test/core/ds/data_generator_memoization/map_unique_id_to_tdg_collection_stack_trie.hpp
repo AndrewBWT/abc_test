@@ -10,7 +10,7 @@ _BEGIN_ABC_DS_NS
 struct map_unique_id_to_tdg_collection_stack_trie_t;
 using parse_map_unique_id_to_tdg_collection_stack_trie_result_t
     = result_t<map_unique_id_to_tdg_collection_stack_trie_t>;
-using key_t = std::string;
+using key_t = std::u8string;
 
 class map_unique_id_to_tdg_collection_stack_trie_t
 {
@@ -121,12 +121,11 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
     ) noexcept
 {
     using namespace std;
-    vector<pair<string_view, string_view>> _l_strs;
-    size_t                                 _l_idx{0};
-    string _a_str{u8string_to_string(_a_u8_str)};
-    while (_l_idx < _a_str.size())
+    vector<pair<u8string_view, u8string_view>> _l_strs;
+    size_t                                     _l_idx{0};
+    while (_l_idx < _a_u8_str.size())
     {
-        size_t _l_next_colon{_a_str.find(':', _l_idx)};
+        size_t _l_next_colon{_a_u8_str.find(char8_t(':'), _l_idx)};
         if (_l_next_colon == string::npos)
         {
             return unexpected(fmt::format(
@@ -139,24 +138,24 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
                 u8"subtring "
                 u8"\"{1}\".",
                 _l_idx,
-                string_view_to_u8string(_a_str.substr(_l_idx))
+                _a_u8_str.substr(_l_idx)
             ));
         }
         else
         {
-            const string_view _l_number{
-                _a_str.substr(_l_idx, _l_next_colon - _l_idx)
+            const u8string_view _l_number{
+                _a_u8_str.substr(_l_idx, _l_next_colon - _l_idx)
             };
             _l_idx = _l_next_colon + 1;
             // Finding the next colon. This one doesn't have to exist.
-            size_t            _l_next_colon{_a_str.find(':', _l_idx)};
-            const string_view _l_hex_numbers{_a_str.substr(
+            size_t _l_next_colon{_a_u8_str.find(char8_t(':'), _l_idx)};
+            const u8string_view _l_hex_numbers{_a_u8_str.substr(
                 _l_idx,
-                _l_next_colon == string::npos ? _a_str.size() - _l_idx
-                                              : _l_next_colon - _l_idx
+                _l_next_colon == u8string::npos ? _a_u8_str.size() - _l_idx
+                                                : _l_next_colon - _l_idx
             )};
             _l_strs.push_back({_l_number, _l_hex_numbers});
-            _l_idx = _l_next_colon == string::npos ? _a_str.size()
+            _l_idx = _l_next_colon == string::npos ? _a_u8_str.size()
                                                    : _l_next_colon + 1;
         }
     }
@@ -165,7 +164,8 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
     for (size_t _l_idx{0}; _l_idx < _l_strs.size(); ++_l_idx)
     {
         auto& [_l_str_hex, _l_compressed_str]{_l_strs[_l_idx]};
-        string _l_str = abc::utility::str::from_hex_with_exception(_l_str_hex);
+        u8string _l_str
+            = abc::utility::str::from_hex_with_exception(_l_str_hex);
         const parse_for_loop_stack_trie_result_t _l_compressed_scan_result{
             parse_compressed_repetition_tree_node(_l_compressed_str)
         };
@@ -184,7 +184,7 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
                     u8"because there is already an element with that unique ID "
                     u8"in the map. Unique ID = {1}",
                     (_l_idx + 1),
-                    string_view_to_u8string(_l_str)
+                    _l_str
                 ));
             }
         }
@@ -194,7 +194,7 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
                 u8"Could not parse compressed string \"{0}\", which is element "
                 u8"{1}. "
                 u8"internal parser returned error message \"{2}\".",
-                string_view_to_u8string(_l_compressed_str),
+                _l_compressed_str,
                 (_l_idx + 1),
                 _l_compressed_scan_result.error()
             ));
@@ -245,8 +245,10 @@ __no_constexpr_imp std::u8string
                 _a_parse_input
         ) const
 {
-    return fmt::format(u8"{}", string_view_to_u8string(
-        fmt::format("{0}",_a_parse_input.map())));
+    using namespace std;
+    using namespace ds;
+    return default_printer<map<key_t, tdg_collection_stack_trie_t>>()
+        ->run_printer(_a_parse_input.map());
 }
 
 _END_ABC_UTILITY_PRINTER_NS
@@ -274,11 +276,11 @@ __no_constexpr_imp auto
         ) const -> format_context::iterator
 {
     using namespace std;
-    const string _l_rv{fmt::format(
-        "{0}{{{1} = {2}}}",
-        typeid(_a_rtd).name(),
-        "_m_internal_map",
-        _a_rtd.map()
+    const string _l_rv{fmt::format(""
+    //    "{0}{{{1} = {2}}}",
+    //    typeid(_a_rtd).name(),
+    //    "_m_internal_map",
+    //    abc::u8string_to_string(fmt::format(u8"{}", _a_rtd.map()))
     )};
     return formatter<string_view>::format(_l_rv, _a_ctx);
 }

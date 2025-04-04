@@ -2,13 +2,16 @@
 #include "abc_test/core/ds/data_generator_memoization/data_generator_memoized_element.hpp"
 #include "abc_test/core/ds/type_synonyms.hpp"
 #include "abc_test/core/errors/test_library_exception.hpp"
+#include "abc_test/utility/parsers/default_parser.hpp"
 #include "abc_test/utility/str/parser_utility.hpp"
 #include "abc_test/utility/str/string_utility.hpp"
-#include <fmt/base.h>
-#include <fmt/ranges.h>
+
+#include "abc_test/utility/printers/default_printer.hpp"
 
 #include <charconv>
 #include <exception>
+#include <fmt/base.h>
+#include <fmt/ranges.h>
 #include <functional>
 #include <scn/scan.h>
 
@@ -20,8 +23,8 @@ class typeless_data_generator_collection_stack_trie_t;
  * for_loop_stack_trie_t object.
  */
 
-using parse_for_loop_stack_trie_result_t = result_t
-    <typeless_data_generator_collection_stack_trie_t>;
+using parse_for_loop_stack_trie_result_t
+    = result_t<typeless_data_generator_collection_stack_trie_t>;
 
 namespace
 {
@@ -74,8 +77,8 @@ using opt_itt_and_end_t = std::optional<std::pair<
  */
 __no_constexpr parse_for_loop_stack_trie_result_t
     parse_repetition_tree_node(
-        const std::string_view _a_str,
-        const bool             _a_head_node
+        const std::u8string_view _a_str,
+        const bool               _a_head_node
     ) noexcept;
 
 class typeless_data_generator_collection_stack_trie_t
@@ -87,10 +90,9 @@ public:
      * Only available public constructor.
      */
     __constexpr
-        typeless_data_generator_collection_stack_trie_t() noexcept
-    {
+    typeless_data_generator_collection_stack_trie_t() noexcept
+    {}
 
-    }
     /*!
      * @brief Returns a string representing the for_loop_stack_trie_t object in
      * a compressed format.
@@ -211,12 +213,12 @@ public:
      */
 
     friend __constexpr parse_for_loop_stack_trie_result_t
-        parse_compressed_repetition_tree_node(const std::string_view _a_str
+        parse_compressed_repetition_tree_node(const std::u8string_view _a_str
         ) noexcept;
     friend __no_constexpr parse_for_loop_stack_trie_result_t
         parse_repetition_tree_node(
-            const std::string_view _a_str,
-            const bool             _a_head_node
+            const std::u8string_view _a_str,
+            const bool               _a_head_node
         ) noexcept;
 private:
     /*!
@@ -277,6 +279,34 @@ private:
 using tdg_collection_stack_trie_t
     = typeless_data_generator_collection_stack_trie_t;
 _END_ABC_DS_NS
+_BEGIN_ABC_UTILITY_PRINTER_NS
+
+template <>
+struct default_printer_t<
+    abc::ds::typeless_data_generator_collection_stack_trie_t>
+    : public printer_base_t<
+          abc::ds::typeless_data_generator_collection_stack_trie_t>
+{
+    static constexpr bool is_specialized{true};
+
+    __no_constexpr_imp           std::u8string
+                          run_printer(
+                              const abc::ds::typeless_data_generator_collection_stack_trie_t&
+                                  _a_object
+                          ) const
+    {
+        return fmt::format(
+            u8"{0}"
+            u8"{{{1} = {2}"
+            u8"}}",
+            type_id<decltype(_a_object)>(),
+            u8"_m_children",
+            _a_object.print_for_loop_stack_trie()
+        );
+    }
+}
+;
+_END_ABC_UTILITY_PRINTER_NS
 
 template <>
 struct fmt::formatter<
@@ -540,7 +570,7 @@ __constexpr_imp opt_itt_and_end_t
             }
             else
             {
-                bool _l_found{ false };
+                bool _l_found{false};
                 _l_rv.second = _l_children.end();
                 for (for_loop_stack_trie_children_t::const_iterator _l_itt
                      = _l_equal_subrange.begin();
@@ -552,9 +582,9 @@ __constexpr_imp opt_itt_and_end_t
                         == _l_flcd.for_loop_iteration_data.flied
                                .additional_data)
                     {
-                        _l_rv.first = _l_itt;
+                        _l_rv.first    = _l_itt;
                         _l_current_ref = ref(*_l_element);
-                        _l_found = true;
+                        _l_found       = true;
                         break;
                     }
                 }
@@ -630,13 +660,13 @@ __no_constexpr_imp std::u8string
 
 __constexpr_imp parse_for_loop_stack_trie_result_t
     parse_compressed_repetition_tree_node(
-        const std::string_view _a_str
+        const std::u8string_view _a_str
     ) noexcept
 {
     using namespace utility::str;
     using namespace std;
     using enum utility::internal::internal_log_enum_t;
-    result_t<string> _l_hex_result{abc::utility::str::from_hex(_a_str)};
+    result_t<u8string> _l_hex_result{abc::utility::str::from_hex(_a_str)};
     if (_l_hex_result.has_value())
     {
         return parse_repetition_tree_node(_l_hex_result.value(), true);
@@ -649,15 +679,15 @@ __constexpr_imp parse_for_loop_stack_trie_result_t
 
 __no_constexpr_imp parse_for_loop_stack_trie_result_t
     parse_repetition_tree_node(
-        const std::string_view _a_str,
-        const bool             _a_head_node
+        const std::u8string_view _a_str,
+        const bool               _a_head_node
     ) noexcept
 {
     using namespace utility::str;
     using namespace std;
     using enum utility::internal::internal_log_enum_t;
 
-    string _l_str = string(_a_str);
+    u8string _l_str = u8string(_a_str);
     _LIBRARY_LOG(
         PARSING_SEED,
         fmt::format(
@@ -670,19 +700,19 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
     );
 
     // Separete the string into strings...
-    size_t                 _l_current_pos{0};
-    size_t                 _l_mode{_a_head_node ? size_t{6} : size_t{0}};
-    size_t                 _l_start{0};
-    vector<vector<string>> _l_strs;
-    size_t                 _l_depth;
-    size_t                 _l_found_pos;
-    bool                   _l_end;
-    char                   _l_char;
-    size_t                 _l_previous_mode;
-    string                 _l_error_string;
-    size_t                 _l_old_pos;
-    vector<string>         _l_current_strs;
-    tuple<string, string, u8string, string> _l_node;
+    size_t                   _l_current_pos{0};
+    size_t                   _l_mode{_a_head_node ? size_t{6} : size_t{0}};
+    size_t                   _l_start{0};
+    vector<vector<u8string>> _l_strs;
+    size_t                   _l_depth;
+    size_t                   _l_found_pos;
+    bool                     _l_end;
+    char                     _l_char;
+    size_t                   _l_previous_mode;
+    u8string                 _l_error_string;
+    size_t                   _l_old_pos;
+    vector<u8string>         _l_current_strs;
+    tuple<u8string, u8string, u8string, string> _l_node;
     std::size_t _l_mode_zero_next_mode = _a_head_node ? 1 : 0;
     while (_l_current_pos < _l_str.size())
     {
@@ -696,7 +726,7 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
                 _l_str,
                 _l_current_pos,
                 {
-                    {'(', 1}
+                    {char8_t('('), 1}
             },
                 _l_error_string,
                 _l_mode
@@ -708,7 +738,7 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
                 _l_str,
                 _l_current_pos,
                 {
-                    {',', 2}
+                    {char8_t(','), 2}
             },
                 _l_error_string,
                 _l_mode
@@ -724,7 +754,7 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
                 _l_str,
                 _l_current_pos,
                 {
-                    {',', 3}
+                    {char8_t(','), 3}
             },
                 _l_error_string,
                 _l_mode
@@ -740,7 +770,7 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
                 _l_str,
                 _l_current_pos,
                 {
-                    {'"', 4}
+                    {char8_t('"'), 4}
             },
                 _l_error_string,
                 _l_mode
@@ -756,7 +786,7 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
             if (_l_error_string.empty())
             {
                 get<2>(_l_node)
-                    = string_view_to_u8string(_l_str.substr(_l_old_pos, _l_current_pos - _l_old_pos));
+                    = _l_str.substr(_l_old_pos, _l_current_pos - _l_old_pos);
             }
             break;
         case 5:
@@ -764,7 +794,7 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
                 _l_str,
                 _l_current_pos,
                 {
-                    {',', 6}
+                    {char8_t(','), 6}
             },
                 _l_error_string,
                 _l_mode
@@ -775,7 +805,7 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
                 _l_str,
                 _l_current_pos,
                 {
-                    {'[', 7}
+                    {char8_t('['), 7}
             },
                 _l_error_string,
                 _l_mode
@@ -788,8 +818,8 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
                 _l_str,
                 _l_current_pos,
                 {
-                    {'[', 8 },
-                    {']', 12}
+                    {char8_t('['), 8 },
+                    {char8_t(']'), 12}
             },
                 _l_error_string,
                 _l_mode
@@ -801,7 +831,7 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
                 _l_str,
                 _l_current_pos,
                 {
-                    {'(', 9}
+                    {char8_t('('), 9}
             },
                 _l_error_string,
                 _l_mode
@@ -814,20 +844,20 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
                 _l_str,
                 _l_current_pos,
                 {
-                    {'"', '"'},
-                    {'[', ']'}
+                    {char8_t('"'), char8_t('"')},
+                    {char8_t('['), char8_t(']')}
             },
-                '(',
-                ')',
+                char8_t('('),
+                char8_t(')'),
                 10,
                 1,
                 _l_error_string,
                 _l_mode
             );
             // Add element to list
-            _l_current_strs.push_back(
-                string(_l_str.substr(_l_start, (_l_current_pos - _l_start + 1)))
-            );
+            _l_current_strs.push_back(u8string(
+                _l_str.substr(_l_start, (_l_current_pos - _l_start + 1))
+            ));
             break;
         case 10:
             // Looking for comma or end bracket.
@@ -835,9 +865,9 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
                 _l_str,
                 _l_current_pos,
                 {
-                    {']',11},
+                    {']', 11},
                     {',', 8 },
-                  //  {']', 11}
+                    // {']', 11}
             },
                 _l_error_string,
                 _l_mode
@@ -888,7 +918,7 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
         }
         if (not _l_error_string.empty())
         {
-            return unexpected(string_view_to_u8string(_l_error_string));
+            return unexpected(_l_error_string);
         }
         _l_current_pos++;
     }
@@ -897,33 +927,34 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
     tdg_collection_stack_trie_t _l_rv;
     if (not _a_head_node)
     {
-        auto _l_result_1{scn::scan<std::size_t>(get<0>(_l_node), "{0}")};
+        using namespace abc::utility::parser;
+        auto _l_result_1{parse<size_t>(get<0>(_l_node))};
         if (not _l_result_1.has_value())
         {
             return unexpected(fmt::format(
                 u8"Could not parse generation_collection_index using string "
                 u8"\"{0}\"",
-                string_view_to_u8string(get<0>(_l_node))
+                get<0>(_l_node)
             ));
         }
-        auto _l_result_2{scn::scan<std::size_t>(get<1>(_l_node), "{0}")};
+        auto _l_result_2{parse<size_t>(get<0>(_l_node))};
         if (not _l_result_2.has_value())
         {
             return unexpected(fmt::format(
                 u8"Could not parse generation_collection_index using string "
                 u8"\"{0}\"",
-                string_view_to_u8string(get<1>(_l_node))
+                get<1>(_l_node)
             ));
         }
         _l_rv._m_for_loop_data.generation_collection_index
-            = _l_result_1->value();
-        _l_rv._m_for_loop_data.flied.mode            = _l_result_2->value();
+            = _l_result_1.value();
+        _l_rv._m_for_loop_data.flied.mode            = _l_result_2.value();
         _l_rv._m_for_loop_data.flied.additional_data = get<2>(_l_node);
     }
-    for (const vector<string>& _l_str : _l_strs)
+    for (const vector<u8string>& _l_str : _l_strs)
     {
         vector<shared_ptr<tdg_collection_stack_trie_t>> _l_kids;
-        for (const string& _l_st : _l_str)
+        for (const u8string& _l_st : _l_str)
         {
             const result_t<tdg_collection_stack_trie_t> _l_op{
                 parse_repetition_tree_node(_l_st, false)
@@ -947,10 +978,12 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
 _END_ABC_DS_NS
 
 __no_constexpr_imp auto
-    fmt::formatter<_ABC_NS_DS::tdg_collection_stack_trie_t>::format(
-        _ABC_NS_DS::tdg_collection_stack_trie_t _a_rt,
-        format_context&                         _a_cxt
-    ) const -> format_context::iterator
+    fmt::formatter<
+        _ABC_NS_DS::tdg_collection_stack_trie_t>::
+        format(
+            _ABC_NS_DS::tdg_collection_stack_trie_t _a_rt,
+            format_context&                                             _a_cxt
+        ) const -> format_context::iterator
 {
     using namespace std;
     const string _l_rv{fmt::format(
@@ -959,7 +992,7 @@ __no_constexpr_imp auto
         "}}",
         typeid(_a_rt).name(),
         "_m_children",
-        abc::u8string_to_string(_a_rt.print_for_loop_stack_trie())
+        abc::convert_u8string_to_string(_a_rt.print_for_loop_stack_trie()).value()
     )};
     return formatter<string_view>::format(_l_rv, _a_cxt);
 }

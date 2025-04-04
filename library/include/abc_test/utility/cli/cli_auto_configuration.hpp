@@ -162,9 +162,9 @@ struct default_parser_t<cli::auto_configuration_load_configuration_t>
                 u8"Couldn't parse string {0} to either a {1} or a {2}, which the "
                 u8"constructor for {3} requires.",
                 _a_parse_input.sv(),
-                char_star_to_u8string(typeid(enum_auto_configuration_load_type_t).name()),
-                char_star_to_u8string(typeid(std::size_t).name()),
-                char_star_to_u8string(typeid(auto_configuration_load_configuration_t).name())
+                type_id< enum_auto_configuration_load_type_t>(),
+                type_id< size_t>(),
+                type_id< auto_configuration_load_configuration_t>()
             ));
         }
     }
