@@ -13,7 +13,7 @@
 
 _BEGIN_ABC_UTILITY_NS
 template <typename T>
-using enum_list_t = std::vector<std::pair<T, std::string_view>>;
+using enum_list_t = std::vector<std::pair<T, std::u32string_view>>;
 template <typename T>
 concept enum_has_list_c = std::is_enum_v<T> && requires () {
     { get_enum_list<T>() } -> std::same_as<enum_list_t<T>>;
@@ -96,7 +96,7 @@ struct enumerate_enum_helper_t
     {
         using namespace std;
         using enum enum_helper_string_case_t;
-        std::reference_wrapper<const std::map<std::string, T>>
+        std::reference_wrapper<const std::map<std::u32string, T>>
             _l_string_to_elements_ref(_m_lower_string_to_elements);
         switch (_a_enum_string_case)
         {
@@ -124,19 +124,19 @@ struct enumerate_enum_helper_t
         }
         return unexpected(fmt::format(
             u8"Could not parse string {0} to enum {1}.",
-            _a_parse_input.sv(),
+            _a_parse_input,
             type_id<T>()
         ));
     }
 private:
     std::map<std::size_t, T> _m_idx_to_elements;
     std::map<T, std::size_t> _m_elements_to_idx;
-    std::map<std::string, T> _m_string_to_elements;
-    std::map<std::string, T> _m_lower_string_to_elements;
-    std::map<std::string, T> _m_upper_string_to_elements;
-    std::map<T, std::string> _m_elements_to_string;
-    std::map<T, std::string> _m_elements_to_lower_string;
-    std::map<T, std::string> _m_elements_to_upper_string;
+    std::map<std::u32string, T> _m_string_to_elements;
+    std::map<std::u32string, T> _m_lower_string_to_elements;
+    std::map<std::u32string, T> _m_upper_string_to_elements;
+    std::map<T, std::u32string> _m_elements_to_string;
+    std::map<T, std::u32string> _m_elements_to_lower_string;
+    std::map<T, std::u32string> _m_elements_to_upper_string;
 };
 
 template <typename T>
@@ -145,7 +145,7 @@ __constexpr const enumerate_enum_helper_t<T>&
                   get_thread_local_enumerate_enum_helper() noexcept;
 _END_ABC_UTILITY_NS
 
-#define _ENUM_LIST_ENTRY(x) {x, #x}
+#define _ENUM_LIST_ENTRY(x) {x, U#x}
 
 _BEGIN_ABC_UTILITY_NS
 template <typename T>
@@ -161,16 +161,25 @@ __constexpr_imp
     {
         _m_idx_to_elements.insert({_m_idx_to_elements.size(), _l_element});
         _m_elements_to_idx.insert({_l_element, _m_elements_to_idx.size()});
-        string _l_cpy{ _l_str };
+        u32string _l_cpy{ _l_str };
         _m_string_to_elements.insert({ _l_cpy, _l_element});
         _m_elements_to_string.insert({_l_element, _l_cpy });
         transform(
             _l_cpy.begin(),
             _l_cpy.end(),
             _l_cpy.begin(),
-            [](unsigned char c)
+            [](char32_t _l_char)
             {
-                return tolower(c);
+                if (static_cast<uint32_t>(_l_char) <= 0x7F)
+                {
+                    char _l_c{ static_cast<char>(_l_char) };
+                    char _l_converted{ static_cast<char>(std::tolower(_l_c)) };
+                    return static_cast<char32_t>(_l_converted);
+                }
+                else
+                {
+                    return _l_char;
+                }
             }
         );
         _m_lower_string_to_elements.insert({_l_cpy, _l_element});
@@ -179,9 +188,18 @@ __constexpr_imp
             _l_cpy.begin(),
             _l_cpy.end(),
             _l_cpy.begin(),
-            [](unsigned char c)
+            [](char32_t _l_char)
             {
-                return toupper(c);
+                if (static_cast<uint32_t>(_l_char) <= 0x7F)
+                {
+                    char _l_c{ static_cast<char>(_l_char) };
+                    char _l_converted{ static_cast<char>(std::toupper(_l_c)) };
+                    return static_cast<char32_t>(_l_converted);
+                }
+                else
+                {
+                    return _l_char;
+                }
             }
         );
         _m_upper_string_to_elements.insert({_l_cpy, _l_element});

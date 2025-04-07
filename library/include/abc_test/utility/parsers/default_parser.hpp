@@ -7,6 +7,7 @@
 
 #include <filesystem>
 #include <fmt/xchar.h>
+#include <functional>
 #include <variant>
 
 _BEGIN_ABC_UTILITY_PARSER_NS
@@ -62,11 +63,11 @@ struct default_parser_t<bool> : public parser_base_t<bool>
                 ) const
     {
         using namespace std;
-        if (_a_parse_input.check_and_advance("true"))
+        if (_a_parse_input.check_and_advance(U"true"))
         {
             return result_t<bool>(true);
         }
-        else if (_a_parse_input.check_and_advance("false"))
+        else if (_a_parse_input.check_and_advance(U"false"))
         {
             return result_t<bool>(false);
         }
@@ -102,37 +103,238 @@ struct default_parser_t<T> : public parser_base_t<T>
     }
 };
 
-template <>
-struct default_parser_t<char> : public parser_base_t<char>
+template <typename T>
+struct character_parser_t : public parser_base_t<T>
 {
-    __constexpr result_t<char>
+    __constexpr
+    character_parser_t(
+        const std::u8string _a_surrounding_str = std::u8string{}
+    )
+        : _m_surrounding_str(_a_surrounding_str)
+    {}
+protected:
+    __constexpr result_t<std::monostate>
+                remove_surrounding_str(
+                    parser_input_t& _a_parse_input
+                ) const
+    {
+        using namespace std;
+        if (_a_parse_input.check_and_advance(_m_surrounding_str))
+        {
+            return monostate{};
+        }
+        else
+        {
+            return unexpected(fmt::format(
+                u8"Could not find expected surrounding string \"{0}\".",
+                _m_surrounding_str
+            ));
+        }
+    }
+private:
+    std::u8string _m_surrounding_str;
+};
+
+namespace detail
+{
+template <typename T>
+__constexpr result_t<T>
+            from_hex(
+                parser_input_t&   _a_parse_input,
+                const std::size_t _a_characters_to_take
+            ) noexcept
+{
+    using namespace std;
+    const u8string_view _l_sv{_a_parse_input.get_u32string(_a_characters_to_take
+    )};
+    const result_t<string> _l_sv_as_str{abc::convert_u32string_to_string(_l_sv)
+    };
+    if (_l_sv_as_str.has_value())
+    {
+        T _l_res;
+        auto [ptr, ec] = from_chars(
+            _l_sv_as_str.value().data(),
+            _l_sv_as_str.value().data() + _l_sv_as_str.value().size(),
+            _l_res,
+            16
+        );
+        return _l_res;
+    }
+    else
+    {
+        return unexpected(_l_sv_as_str.error());
+    }
+}
+} // namespace detail
+
+template <typename T>
+requires std::same_as<T, char> || std::same_as<T, char8_t>
+struct default_parser_t<T> : public character_parser_t<T>
+{
+public:
+    using character_parser_t<T>::character_parser_t;
+
+    __constexpr result_t<T>
                 run_parser(
                     parser_input_t& _a_parse_input
                 ) const
     {
         using namespace std;
-        if (_a_parse_input.check_and_advance("`"))
+        T _l_char;
+        if (const result_t<monostate> _l_result_1{
+                this->remove_surrounding_str(_a_parse_input)
+            };
+            _l_result_1.has_value())
         {
-            char _l_rv{*_a_parse_input};
-            _a_parse_input.advance(1);
-            if (_a_parse_input.check_and_advance("`"))
+            if (_a_parse_input.check_and_advance(u8"\\x"))
             {
-                return _l_rv;
+                if (const result_t<T> _l_char_result{
+                        detail::from_hex<T>(_a_parse_input, 2)
+                    };
+                    _l_char_result.has_value())
+                {
+                    _l_char = _l_char_result.value();
+                }
+                else
+                {
+                    return unexpected(_l_char_result.error());
+                }
             }
             else
             {
-                return unexpected(fmt::format(
-                    u8"Could not find expected character `{0}`.",
-                    convert_string_to_u8string("`").value()
-                ));
+                _l_char = static_cast<T>(*_a_parse_input);
+                _a_parse_input.advance(1);
+            }
+            if (const result_t<monostate> _l_result_2{
+                    this->remove_surrounding_str(_a_parse_input)
+                };
+                _l_result_2.has_value())
+            {
+                return _l_char;
+            }
+            else
+            {
+                return unexpected(_l_result_2.error());
             }
         }
         else
         {
-            return unexpected(fmt::format(
-                u8"Could not find expected character `{0}`.",
-                convert_string_to_u8string("`").value()
-            ));
+            return unexpected(_l_result_1.error());
+        }
+    }
+};
+
+template <typename T>
+    requires std::same_as<T, char16_t> || (sizeof(wchar_t) == 2 && std::same_as<T, wchar_t>)
+struct default_parser_t<T> : public character_parser_t<T>
+{
+public:
+    using character_parser_t<T>::character_parser_t;
+
+    __constexpr result_t<T>
+                run_parser(
+                    parser_input_t& _a_parse_input
+                ) const
+    {
+        using namespace std;
+        T _l_char;
+        if (const result_t<monostate> _l_result_1{
+                this->remove_surrounding_str(_a_parse_input)
+            };
+            _l_result_1.has_value())
+        {
+            if (_a_parse_input.check_and_advance(U"\\x"))
+            {
+                if (const result_t<T> _l_char_result{
+                        detail::from_hex<T>(_a_parse_input, 4)
+                    };
+                    _l_char_result.has_value())
+                {
+                    _l_char = _l_char_result.value();
+                }
+                else
+                {
+                    return unexpected(_l_char_result.error());
+                }
+            }
+            else
+            {
+                _l_char = abc::convert_u32string_to_u16string(
+                              _a_parse_input.process_characters(1)
+                )
+                              .at(0);
+            }
+            if (const result_t<monostate> _l_result_2{
+                    this->remove_surrounding_str(_a_parse_input)
+                };
+                _l_result_2.has_value())
+            {
+                return _l_char;
+            }
+            else
+            {
+                return unexpected(_l_result_2.error());
+            }
+        }
+        else
+        {
+            return unexpected(_l_result_1.error());
+        }
+    }
+};
+
+template <typename T>
+    requires std::same_as<T, char32_t> || (sizeof(wchar_t) == 4 && std::same_as<T, wchar_t>)
+struct default_parser_t<T> : public character_parser_t<T>
+{
+public:
+    using character_parser_t<T>::character_parser_t;
+
+    __constexpr result_t<T>
+                run_parser(
+                    parser_input_t& _a_parse_input
+                ) const
+    {
+        using namespace std;
+        T _l_char;
+        if (const result_t<monostate> _l_result_1{
+                this->remove_surrounding_str(_a_parse_input)
+            };
+            _l_result_1.has_value())
+        {
+            if (_a_parse_input.check_and_advance(U"\\x"))
+            {
+                if (const result_t<T> _l_char_result{
+                        detail::from_hex<T>(_a_parse_input, 4)
+                    };
+                    _l_char_result.has_value())
+                {
+                    _l_char = _l_char_result.value();
+                }
+                else
+                {
+                    return unexpected(_l_char_result.error());
+                }
+            }
+            else
+            {
+                _l_char = _a_parse_input.process_characters(1).at(0);
+            }
+            if (const result_t<monostate> _l_result_2{
+                    this->remove_surrounding_str(_a_parse_input)
+                };
+                _l_result_2.has_value())
+            {
+                return _l_char;
+            }
+            else
+            {
+                return unexpected(_l_result_2.error());
+            }
+        }
+        else
+        {
+            return unexpected(_l_result_1.error());
         }
     }
 };
@@ -162,12 +364,10 @@ struct default_parser_t<T> : public parser_base_t<T>
     {
         using namespace std;
         T                      result{};
-        const result_t<string> _l_result_str{
-            convert_u8string_to_string(_a_parse_input.sv())
-        };
+        const result_t<string> _l_result_str{_a_parse_input.ascii_string()};
         if (_l_result_str.has_value())
         {
-            const string _l_str{_l_result_str.value()};
+            const string& _l_str{_l_result_str.value()};
             auto [ptr, ec] = from_chars(
                 _l_str.data(), _l_str.data() + _l_str.size(), result
             );
@@ -181,7 +381,7 @@ struct default_parser_t<T> : public parser_base_t<T>
             {
                 return result_t<T>(unexpected(fmt::format(
                     u8"Could not parse \"{0}\" using std::from_chars",
-                    _a_parse_input.sv()
+                    convert_string_to_u8string(_l_result_str.value()).value()
                 ))
 
                 );
@@ -465,7 +665,7 @@ _END_ABC_UTILITY_PARSER_NS
 
 _BEGIN_ABC_UTILITY_PARSER_NS
 
-template <typename T>
+/*template <typename T>
 struct default_parser_t<std::basic_string<T>>
     : public parser_base_t<std::basic_string<T>>
 {
@@ -512,6 +712,103 @@ struct default_parser_t<std::basic_string<T>>
     }
 private:
     parser_t<T> _m_parser;
+};*/
+
+template <typename T>
+requires (std::same_as<std::basic_string<T>, std::string> || std::same_as<std::basic_string<T>, std::wstring> || std::same_as<std::basic_string<T>, std::u8string> || std::same_as<std::basic_string<T>, std::u16string> || std::same_as<std::basic_string<T>, std::u32string>)
+struct default_parser_t<std::basic_string<T>>
+    : public parser_base_t<std::basic_string<T>>
+{
+    static constexpr bool is_specialized{true};
+
+    __constexpr           result_t<std::basic_string<T>>
+                          run_parser(
+                              parser_input_t& _a_parse_input
+                          ) const
+    {
+        using namespace std;
+        using arg_type_t = basic_string<T>;
+        char32_t  _l_char{U'"'};
+        char32_t  _l_prev_char;
+        char32_t  _l_char2{U'\\'};
+        size_t    _l_idx{0};
+        u32string _l_str{};
+        if (_a_parse_input.check_and_advance(_l_char))
+        {
+            const u32string _l_str{
+                _a_parse_input.continue_until_char1_but_not_proceeded_by_char2(
+                    U'"', U'\\'
+                )
+            };
+            _a_parse_input.advance(1);
+            if constexpr (same_as<arg_type_t, string>)
+            {
+                const result_t<string> _l_rv{
+                    abc::convert_u32string_to_string(_l_str)
+                };
+                if (_l_rv.has_value())
+                {
+                    return _l_rv;
+                }
+                else
+                {
+                    return unexpected(fmt::format(u8"Could not convert"));
+                }
+            }
+            else if constexpr (same_as<arg_type_t, u8string>)
+            {
+                const result_t<u8string> _l_rv{
+                    abc::convert_u32string_to_u8string(_l_str)
+                };
+                if (_l_rv.has_value())
+                {
+                    return _l_rv;
+                }
+                else
+                {
+                    return unexpected(fmt::format("Could not convert"));
+                }
+            }
+            else if constexpr (same_as<arg_type_t, u16string>
+                               || (same_as<arg_type_t, wstring>
+                                   && (sizeof(wchar_t) == 2)))
+            {
+                const result_t<u16string> _l_rv{
+                    abc::convert_u32string_to_u16string(_l_str)
+                };
+                if (_l_rv.has_value())
+                {
+                    return _l_rv;
+                }
+                else
+                {
+                    return unexpected(fmt::format("Could not convert"));
+                }
+            }
+            else if constexpr (same_as<arg_type_t, u32string>
+                               || (same_as<arg_type_t, wstring>
+                                   && (sizeof(wchar_t) == 4)))
+            {
+                return _l_str;
+            }
+            else
+            {
+                __STATIC_ASSERT(
+                    T, "wchar_t of this specific size is not supported"
+                );
+            }
+        }
+        else
+        {
+            return unexpected(fmt::format(
+                u8"Expected {0} to have a prefix of the string \"{1}\". "
+                u8"Remaining string = {2}",
+                type_id<T>(),
+                convert_u32string_to_u8string(u32string(1, _l_char)),
+                _a_parse_input.get_u8string()
+            ));
+        }
+    }
 };
 
 template <typename T, typename U>
@@ -611,18 +908,18 @@ __constexpr_imp result_t<typename default_parser_t<std::pair<T, U>>::value_type>
 {
     using namespace std;
     value_type _l_rv;
-    _a_parse_input.check_advance_and_throw("(");
+    _a_parse_input.check_advance_and_throw(U"(");
     if (auto _l_first_result{_m_parsers.first->run_parser(_a_parse_input)};
         _l_first_result.has_value())
     {
         _l_rv.first = _l_first_result.value();
-        _a_parse_input.check_advance_and_throw(", ");
+        _a_parse_input.check_advance_and_throw(U", ");
         if (auto _l_second_result{_m_parsers.second->run_parser(_a_parse_input)
             };
             _l_second_result.has_value())
         {
             _l_rv.second = _l_second_result.value();
-            _a_parse_input.check_advance_and_throw(")");
+            _a_parse_input.check_advance_and_throw(U")");
             return result_t<value_type>(_l_rv);
         }
         else
@@ -653,10 +950,9 @@ __constexpr_imp result_t<std::vector<T>>
     using namespace std;
 
     vector<T> _l_rv;
-    _a_parse_input.check_advance_and_throw("{");
-    if (*_a_parse_input == '}')
+    _a_parse_input.check_advance_and_throw(U"{");
+    if (_a_parse_input.check_and_advance(U"}"))
     {
-        _a_parse_input.advance(1);
         return _l_rv;
     }
     else
@@ -670,14 +966,13 @@ __constexpr_imp result_t<std::vector<T>>
                 return unexpected(_l_result.error());
             }
             _l_rv.push_back(_l_result.value());
-            if (_a_parse_input.check_and_advance(","))
+            if (_a_parse_input.check_and_advance(U","))
             {
                 _a_parse_input.process_whitespace();
                 continue;
             }
-            else if (*_a_parse_input == '}')
+            else if (_a_parse_input.check_and_advance(U"}"))
             {
-                _a_parse_input.advance(1);
                 return _l_rv;
             }
             else
@@ -836,13 +1131,13 @@ __constexpr result_t<typename default_parser_t<std::tuple<Ts...>>::value_type>
 {
     using namespace std;
     value_type _l_rv;
-    _a_parse_input.check_advance_and_throw("(");
+    _a_parse_input.check_advance_and_throw(U"(");
     auto _l_res{run_parser_internal<0>(_l_rv, _a_parse_input)};
     if (_l_res.has_value())
     {
         return unexpected(_l_res.value());
     }
-    _a_parse_input.check_advance_and_throw(")");
+    _a_parse_input.check_advance_and_throw(U")");
     return result_t<value_type>(_l_rv);
 }
 
@@ -861,7 +1156,7 @@ __constexpr std::optional<std::u8string>
         std::get<I>(_a_object) = _l_result.value();
         if constexpr (I + 1 < tuple_size<value_type>{})
         {
-            _a_parse_input.check_advance_and_throw(",");
+            _a_parse_input.check_advance_and_throw(U",");
             _a_parse_input.process_whitespace();
             return run_parser_internal<I + 1>(_a_object, _a_parse_input);
         }
@@ -900,7 +1195,7 @@ __constexpr result_t<typename default_parser_t<std::variant<Ts...>>::value_type>
     default_parser_t<size_t> _l_size_t_parser;
     result_t<size_t> _l_size_t_result{_l_size_t_parser.run_parser(_a_parse_input
     )};
-    _a_parse_input.check_advance_and_throw(" ");
+    _a_parse_input.check_advance_and_throw(U" ");
     auto _l_res{
         run_parser_internal<0>(_l_rv, _l_size_t_result.value(), _a_parse_input)
     };
@@ -962,7 +1257,7 @@ __constexpr result_t<std::filesystem::path>
         parser_input_t& _a_parse_input
     ) const
 {
-    return std::filesystem::path(_a_parse_input.sv());
+    return std::filesystem::path(_a_parse_input.get_u32string());
 }
 
 _END_ABC_UTILITY_PARSER_NS

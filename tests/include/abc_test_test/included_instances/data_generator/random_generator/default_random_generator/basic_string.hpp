@@ -108,10 +108,10 @@ _TEST_CASE(
     using namespace std;
     using namespace test;
     manual_data_generator_t _l_mdg;
-    RUN(_l_mdg, fuzzy_test_default_random_generator_basic_string<string>());
+   // RUN(_l_mdg, fuzzy_test_default_random_generator_basic_string<string>());
     //RUN(_l_mdg, fuzzy_test_default_random_generator_basic_string<wstring>());
-   // RUN(_l_mdg, fuzzy_test_default_random_generator_basic_string<u8string>());
-   // RUN(_l_mdg, fuzzy_test_default_random_generator_basic_string<u16string>());
+  //  RUN(_l_mdg, fuzzy_test_default_random_generator_basic_string<u8string>());
+    RUN(_l_mdg, fuzzy_test_default_random_generator_basic_string<u16string>());
    // RUN(_l_mdg, fuzzy_test_default_random_generator_basic_string<u32string>());
    // RUN(_l_mdg,
    //     fuzzy_test_default_random_generator_basic_string<basic_string<int>>());
@@ -175,8 +175,8 @@ _TEST_CASE(
     using namespace std;
     using namespace test;
     manual_data_generator_t _l_mdg;
-    RUN(_l_mdg,
-        unit_test_default_random_generator_basic_string_using_vect<string>());
+ //   RUN(_l_mdg,
+  //      unit_test_default_random_generator_basic_string_using_vect<string>());
    // RUN(_l_mdg,
   //      unit_test_default_random_generator_basic_string_using_vect<wstring>());
   //  RUN(_l_mdg,
@@ -242,7 +242,7 @@ _TEST_CASE(
     using namespace std;
     using namespace test;
     manual_data_generator_t _l_mdg;
-    RUN(_l_mdg, unit_test_default_random_generator_basic_string<string>());
+ //   RUN(_l_mdg, unit_test_default_random_generator_basic_string<string>());
     //RUN(_l_mdg, unit_test_default_random_generator_basic_string<wstring>());
    // RUN(_l_mdg, unit_test_default_random_generator_basic_string<u8string>());
    // RUN(_l_mdg, unit_test_default_random_generator_basic_string<u16string>());

@@ -263,7 +263,7 @@ __no_constexpr_imp
 {
     using namespace abc::ds;
     return parse_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
-        _a_parse_input.sv()
+        _a_parse_input.get_u8string()
     );
 }
 

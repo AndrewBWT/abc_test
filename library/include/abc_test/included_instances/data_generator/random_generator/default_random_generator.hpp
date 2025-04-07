@@ -96,6 +96,32 @@ struct default_random_generator_t<bool> : public random_generator_base_t<bool>
         );
 };
 
+template <>
+struct default_random_generator_t<char8_t> : public random_generator_base_t<char8_t>
+{
+    __no_constexpr_imp virtual char8_t
+        operator()(
+            utility::rng_t& _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+            )
+    {
+        return char8_t();
+    }
+};
+
+template <>
+struct default_random_generator_t<char16_t> : public random_generator_base_t<char16_t>
+{
+    __no_constexpr_imp virtual char16_t
+        operator()(
+            utility::rng_t& _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+            )
+    {
+        return char16_t();
+    }
+};
+
 template <typename T>
 requires std::integral<T>
 struct default_random_generator_t<T> : public random_generator_base_t<T>
