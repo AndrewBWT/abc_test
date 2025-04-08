@@ -180,6 +180,7 @@ set(LIBRARY_FILES
   include/abc_test/utility/printers/printer_base.hpp
   include/abc_test/utility/printers/default_printer.hpp
   include/abc_test/utility/object_printer_parser.hpp
+  include/abc_test/utility/str.hpp
   include/abc_test/utility/str/parser_utility.hpp
   include/abc_test/utility/str/string_utility.hpp
   include/abc_test/utility/str/string_table.hpp

@@ -10,6 +10,8 @@
 
 #include <fmt/xchar.h>
 
+#include "abc_test/utility/str.hpp"
+
 _BEGIN_ABC_ERRORS_NS
 
 /*!

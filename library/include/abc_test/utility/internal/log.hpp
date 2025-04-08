@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/utility/internal/log/params.hpp"
 #include "abc_test/utility/io/threaded_ostream_output_reporter.hpp"
-#include "abc_test/utility/types.hpp"
+#include "abc_test/utility/str.hpp"
 
 #include <fmt/std.h>
 #include <iostream>
