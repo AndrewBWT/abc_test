@@ -1,11 +1,12 @@
 #pragma once
 #include "abc_test/core/errors/test_library_exception.hpp"
 #include "abc_test/core/global.hpp"
-#include "abc_test/core/matchers/static_matcher.hpp"
 #include "abc_test/core/matchers/logic_enum.hpp"
+#include "abc_test/core/matchers/static_matcher.hpp"
 #include "abc_test/utility/ranges.hpp"
 
 _BEGIN_ABC_MATCHER_NS
+
 /*!
  * @brief This class holds all the logic for matchers in abc_test.
  *
@@ -26,14 +27,16 @@ public:
     template <typename = typename std::enable_if_t<not Has_Annotation>>
     __no_constexpr
         matcher_wrapper_t() noexcept;
-    template<bool Arg_Has_Annotation>
-    __no_constexpr_imp void 
+
+    template <bool Arg_Has_Annotation>
+    __no_constexpr_imp void
         override_matcher(
-            const matcher_wrapper_t< Arg_Has_Annotation>& _a_matcher_result
+            const matcher_wrapper_t<Arg_Has_Annotation>& _a_matcher_result
         ) noexcept
     {
         this->_m_test_result = _a_matcher_result.matcher_result();
     }
+
     /*!
      * @brief Gets the sourses attached to this matcher.
      * @return Cref to the vector of single_source_t objects.
@@ -83,7 +86,7 @@ public:
      * @return A const std::string_view to the element's internal annotation.
      */
     template <typename = typename std::enable_if_t<Has_Annotation>>
-    __constexpr const std::string_view
+    __constexpr const std::u8string_view
                       annotation() const noexcept;
 
     /*!
@@ -198,7 +201,7 @@ public:
     __no_constexpr friend matcher_wrapper_t<true>
         mk_matcher_using_matcher_and_annotation(
             const matcher_wrapper_t<false>& _a_matcher,
-            const std::string_view          _a_annotation
+            const std::u8string_view        _a_annotation
         ) noexcept;
     /*!
      * @brief Creates a matcher_wrapper_t<false> entity representing a binary
@@ -224,7 +227,7 @@ public:
     __constexpr explicit
         operator bool();
 private:
-    std::conditional_t<Has_Annotation, std::string, std::monostate>
+    std::conditional_t<Has_Annotation, std::u8string, std::monostate>
                                        _m_annotation;
     matcher_result_t                   _m_test_result;
     std::vector<ds::single_source_t>   _m_sources;
@@ -235,13 +238,17 @@ private:
      */
     __constexpr
     matcher_wrapper_t(
-        const matcher_result_t&                   _a_matcher_result,
-        const std::vector<ds::single_source_t>& _a_matcher_sources = std::vector<ds::single_source_t>{},
-        const std::optional<ds::single_source_t>& _a_primary_source = std::optional<ds::single_source_t>{},
-        const std::optional<precedence_t>& _a_precedence = std::optional<precedence_t>{}
+        const matcher_result_t&                 _a_matcher_result,
+        const std::vector<ds::single_source_t>& _a_matcher_sources
+        = std::vector<ds::single_source_t>{},
+        const std::optional<ds::single_source_t>& _a_primary_source
+        = std::optional<ds::single_source_t>{},
+        const std::optional<precedence_t>& _a_precedence
+        = std::optional<precedence_t>{}
     ) noexcept;
     /*!
-     * @brief Constructor which includes bit-parts of macro which will be primary source.
+     * @brief Constructor which includes bit-parts of macro which will be
+     * primary source.
      */
     __no_constexpr_imp
         matcher_wrapper_t(
@@ -257,19 +264,20 @@ private:
     __constexpr
     matcher_wrapper_t(
         const matcher_wrapper_t<false>& _a_matcher,
-        const std::string_view          _a_annotation
+        const std::u8string_view        _a_annotation
     ) noexcept;
 };
+
 namespace
 {
-    std::pair<const char*, const char*> _c_normal_bracket_pair{ "(", ")" };
-    std::pair<const char*, const char*> _c_empty_bracket_pair{ "", "" };
-    __constexpr std::vector<ds::single_source_t>
-        make_matcher_vector(
-            const std::vector<ds::single_source_t>& _a_sources,
-            const std::optional<ds::single_source_t>& _a_primary_source
-        ) noexcept;
-}
+std::pair<const char*, const char*> _c_normal_bracket_pair{"(", ")"};
+std::pair<const char*, const char*> _c_empty_bracket_pair{"", ""};
+__constexpr                         std::vector<ds::single_source_t>
+                                    make_matcher_vector(
+                                        const std::vector<ds::single_source_t>&   _a_sources,
+                                        const std::optional<ds::single_source_t>& _a_primary_source
+                                    ) noexcept;
+} // namespace
 
 template <logic_enum_t Logic_Enum>
 __constexpr bool
@@ -287,12 +295,16 @@ _BEGIN_ABC_NS
 using matcher_t           = _ABC_NS_MATCHER::matcher_wrapper_t<false>;
 using annotated_matcher_t = _ABC_NS_MATCHER::matcher_wrapper_t<true>;
 __no_constexpr annotated_matcher_t
-    annotate(const matcher_t& _a_matcher, const std::string_view _a_annotation)
-        noexcept;
+    annotate(
+        const matcher_t&         _a_matcher,
+        const std::u8string_view _a_annotation
+    ) noexcept;
 
 __no_constexpr annotated_matcher_t
-    annotate(const std::string_view _a_annotation, const matcher_t& _a_matcher)
-        noexcept;
+    annotate(
+        const std::u8string_view _a_annotation,
+        const matcher_t&         _a_matcher
+    ) noexcept;
 _END_ABC_NS
 
 _BEGIN_ABC_MATCHER_NS
@@ -300,7 +312,7 @@ template <bool Has_Annotation>
 template <typename>
 __no_constexpr_imp
     matcher_wrapper_t<Has_Annotation>::matcher_wrapper_t() noexcept
-    : matcher_wrapper_t(mk_matcher_result< _ABC_NS_REPORTS::pass_t>())
+    : matcher_wrapper_t(mk_matcher_result<_ABC_NS_REPORTS::pass_t>())
 {}
 
 template <bool Has_Annotation>
@@ -355,7 +367,7 @@ __no_constexpr_imp void
 
 template <bool Has_Annotation>
 template <typename>
-__constexpr_imp const std::string_view
+__constexpr_imp const std::u8string_view
     matcher_wrapper_t<Has_Annotation>::annotation() const noexcept
 {
     return _m_annotation;
@@ -485,7 +497,7 @@ __constexpr_imp _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>
 __no_constexpr_imp matcher_wrapper_t<true>
                    mk_matcher_using_matcher_and_annotation(
                        const matcher_wrapper_t<false>& _a_matcher,
-                       const std::string_view          _a_annotation
+                       const std::u8string_view        _a_annotation
                    ) noexcept
 {
     return matcher_wrapper_t<true>(_a_matcher, _a_annotation);
@@ -569,9 +581,9 @@ __constexpr_imp matcher_wrapper_t<false>
         logic_precedence<Logic_Enum>()
     );
 }
+
 template <bool Has_Annotation>
-__constexpr
-matcher_wrapper_t<Has_Annotation>::operator bool()
+__constexpr matcher_wrapper_t<Has_Annotation>::operator bool()
 {
     return _m_test_result.passed();
 }
@@ -582,7 +594,7 @@ matcher_wrapper_t<Has_Annotation>::matcher_wrapper_t(
     const matcher_result_t&                   _a_matcher_result,
     const std::vector<ds::single_source_t>&   _a_matcher_sources,
     const std::optional<ds::single_source_t>& _a_primary_source,
-    const std::optional<precedence_t>&         _a_precedence
+    const std::optional<precedence_t>&        _a_precedence
 ) noexcept
     : _m_test_result(_a_matcher_result)
     , _m_sources(_a_matcher_sources)
@@ -610,41 +622,43 @@ __no_constexpr_imp
 template <bool Has_Annotation>
 template <typename>
 __constexpr_imp
-matcher_wrapper_t<Has_Annotation>::matcher_wrapper_t(
-    const matcher_wrapper_t<false>& _a_matcher,
-    const std::string_view          _a_annotation
-) noexcept
+    matcher_wrapper_t<Has_Annotation>::matcher_wrapper_t(
+        const matcher_wrapper_t<false>& _a_matcher,
+        const std::u8string_view        _a_annotation
+    ) noexcept
     : _m_test_result(_a_matcher._m_test_result)
     , _m_sources(_a_matcher._m_sources)
     , _m_primary_source(_a_matcher._m_primary_source)
     , _m_precedence(_a_matcher._m_precedence)
     , _m_annotation(_a_annotation)
 {}
+
 namespace
 {
-    __constexpr_imp std::vector<ds::single_source_t>
-        make_matcher_vector(
-            const std::vector<ds::single_source_t>& _a_sources,
-            const std::optional<ds::single_source_t>& _a_primary_source
-        ) noexcept
+__constexpr_imp std::vector<ds::single_source_t>
+                make_matcher_vector(
+                    const std::vector<ds::single_source_t>&   _a_sources,
+                    const std::optional<ds::single_source_t>& _a_primary_source
+                ) noexcept
+{
+    using namespace std;
+    using namespace ds;
+    vector<single_source_t> _l_rv{_a_sources};
+    if (_a_primary_source.has_value())
     {
-        using namespace std;
-        using namespace ds;
-        vector<single_source_t> _l_rv{ _a_sources };
-        if (_a_primary_source.has_value())
-        {
-            _l_rv.push_back(_a_primary_source.value());
-        }
-        return _l_rv;
+        _l_rv.push_back(_a_primary_source.value());
     }
+    return _l_rv;
 }
+} // namespace
+
 _END_ABC_MATCHER_NS
 
 _BEGIN_ABC_NS
 __no_constexpr_imp annotated_matcher_t
     annotate(
-        const matcher_t&       _a_matcher,
-        const std::string_view _a_annotation
+        const matcher_t&         _a_matcher,
+        const std::u8string_view _a_annotation
     ) noexcept
 {
     return mk_matcher_using_matcher_and_annotation(_a_matcher, _a_annotation);
@@ -652,8 +666,8 @@ __no_constexpr_imp annotated_matcher_t
 
 __no_constexpr_imp annotated_matcher_t
     annotate(
-        const std::string_view _a_annotation,
-        const matcher_t&       _a_matcher
+        const std::u8string_view _a_annotation,
+        const matcher_t&         _a_matcher
     ) noexcept
 {
     return mk_matcher_using_matcher_and_annotation(_a_matcher, _a_annotation);

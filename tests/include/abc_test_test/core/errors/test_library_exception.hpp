@@ -15,14 +15,14 @@ _TEST_CASE(
     using namespace _ABC_NS_ERRORS;
     using namespace abc;
     _CHECK(annotate(
-        "Checks test_library_exception_t is derived from std::runtime_error",
+        u8"Checks test_library_exception_t is derived from std::runtime_error",
         _EXPR(
             ( std::is_base_of_v<std::runtime_error, test_library_exception_t> )
             == true
         )
     ));
     _CHECK(annotate(
-        "Checks test_library_exception_t is not default constructable",
+        u8"Checks test_library_exception_t is not default constructable",
         _EXPR(not std::is_default_constructible_v<test_library_exception_t>)
             == true
     ));
@@ -46,11 +46,11 @@ _TEST_CASE(
         test_library_exception_t _l_tle
             = test_library_exception_t(convert_string_to_u8string(_l_str).value(), _l_st);
         _l_test_lib_bba += _BLOCK_CHECK(annotate(
-            "Checking test_library_exception_t what() function",
+            u8"Checking test_library_exception_t what() function",
             c_str_equal(_l_tle.what(), _l_str)
         ));
         _l_test_lib_bba += _BLOCK_CHECK(annotate(
-            "Checking test_library_exception_t source_location() function",
+            u8"Checking test_library_exception_t source_location() function",
             stacktraces_equal(_l_tle.stacktrace(), _l_st)
         ));
     }

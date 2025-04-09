@@ -11,6 +11,7 @@ set(TEST_FILES
   include/abc_test_test/utility.hpp
   include/abc_test_test/utility/cli.hpp
   include/abc_test_test/utility/bounds.hpp
+  include/abc_test_test/utility/str.hpp
   include/abc_test_test/included_instances.hpp
   include/abc_test_test/included_instances/data_generator/enumeration/default_enumeration.hpp
   include/abc_test_test/included_instances/data_generator/random_generator/default_random_generator.hpp

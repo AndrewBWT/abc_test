@@ -207,7 +207,7 @@ requires std::derived_from<T, _ABC_NS_REPORTS::static_status_t>
 __constexpr assertion_wp_t<T>
             make_entity_bba_compatable(
                 const bool                        _a_pass,
-                const std::optional<std::string>& _a_opt_str_msg,
+                const std::optional<std::u8string>& _a_opt_str_msg,
                 const std::string_view            _a_str_representation,
                 const std::source_location&       _a_source_location
             )
@@ -216,11 +216,13 @@ __constexpr assertion_wp_t<T>
     matcher_source_map_t _l_msm;
     global::get_this_threads_current_test().add_current_for_loop_stack_to_trie(
     );
+    auto ki = global::get_this_threads_test_runner_ref().get_log_infos(false);
     bba_inner_assertion_type_t _l_tuple(
         ( std::same_as<T, _ABC_NS_REPORTS::terminate_t>
           || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t> ),
         _a_pass,
         _a_opt_str_msg,
+        ki,
         ds::single_source_t(_a_str_representation, _a_source_location)
     );
     return assertion_wp_t<T>{_l_tuple};
@@ -249,7 +251,7 @@ __constexpr assertion_wp_t<T>
             _a_matcher.matcher_result(),
             ki,
             ds::single_source_t(_a_str_representation, _a_source_location),
-            std::optional<std::string>(_a_matcher.annotation()),
+            std::optional<std::u8string>(_a_matcher.annotation()),
             _l_msm
         );
         return assertion_wp_t<T>{_l_tuple};
@@ -262,7 +264,7 @@ __constexpr assertion_wp_t<T>
             _a_matcher.matcher_result(),
             ki,
             ds::single_source_t(_a_str_representation, _a_source_location),
-            std::optional<std::string>{},
+            std::optional<std::u8string>{},
             _l_msm
         );
         return assertion_wp_t<T>{_l_tuple};

@@ -274,7 +274,7 @@
 #define _BLOCK_FAIL_WITH_MSG(_a_msg)                \
     __GENERIC_STATIC_BBA_TRANSFORM(                 \
         false,                                      \
-        optional<std::string>{_a_msg},              \
+        std::optional<std::u8string>{_a_msg},              \
         _ABC_NS_REPORTS::fail_t,                    \
         _ABC_NS_UTILITY::str::create_string(        \
             {"_BLOCK_FAIL_WITH_MSG(", #_a_msg, ")"} \

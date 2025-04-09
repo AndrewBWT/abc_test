@@ -1,3 +1,4 @@
+#pragma once
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
 #include "abc_test/included_instances/data_generator/enumeration/default_enumeration.hpp"
@@ -202,7 +203,7 @@ inline void
 {
     using namespace abc;
     _a_bba += _BLOCK_CHECK(annotate(
-        fmt::format("Ensures bounds_c works with {0}", typeid(T)),
+        fmt::format(u8"Ensures bounds_c works with {0}", type_id<T>()),
         _EXPR(abc::utility::detail::bounds_c<T> == _a_result)
     ));
 }

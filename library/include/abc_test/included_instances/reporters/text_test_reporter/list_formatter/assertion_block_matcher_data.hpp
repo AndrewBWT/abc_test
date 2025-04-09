@@ -149,13 +149,7 @@ __no_constexpr_imp void
                    ),
                    _a_pc.indent(
                        _a_pc.message_str(
-                           _a_element.annotation().has_value()
-                               ?
-
-                               optional<u8string>(convert_string_to_u8string(
-                                   _a_element.annotation().value()
-                               ).value())
-                               : optional<u8string>{}
+                           _a_element.annotation()
                        ),
                        _m_indent_offset + 1
                    )};
@@ -170,13 +164,7 @@ __no_constexpr_imp void
                    ),
                    _a_pc.indent(
                        _a_pc.message_str(
-                           _a_element.annotation().has_value()
-                               ?
-
-                               optional<u8string>(convert_string_to_u8string(
-                                   _a_element.annotation().value()
-                               ).value())
-                               : optional<u8string>{}
+                           _a_element.annotation()
                        ),
                        _m_indent_offset + 1
                    )};

@@ -6,5 +6,6 @@ n_integers_used_for_rng_generation = 100
 force_run_all_tests = true
 write_data_to_files = true
 #auto_configuration = ../../tests/data/repetition_data_files auto auto
-test_paths_to_run = abc_test_test::included_instances::data_generator::random
+#test_paths_to_run = abc_test_test::included_instances::data_generator::random
+test_paths_to_run = abc_test_test::utility::str
 #automatic_repetition_data_folder = ../../tests/data/repetition_data_files 123|latest_if_failure always_write|write_if_different_or_new_run|do_not_write. 

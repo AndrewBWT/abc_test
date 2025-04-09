@@ -363,39 +363,26 @@ struct default_parser_t<T> : public parser_base_t<T>
                 ) const
     {
         using namespace std;
-        T                      result{};
-        const result_t<string> _l_result_str{_a_parse_input.ascii_string()};
-        if (_l_result_str.has_value())
+        T               result{};
+        const u32string _l_u32str{
+            _a_parse_input.take_string_containing(U"0123456789-")
+        };
+        const string _l_str{abc::unsafe_convert_u32string_to_string(_l_u32str)};
+        auto [ptr, ec]
+            = from_chars(_l_str.data(), _l_str.data() + _l_str.size(), result);
+
+        if (ec == std::errc())
         {
-            const string& _l_str{_l_result_str.value()};
-            auto [ptr, ec] = from_chars(
-                _l_str.data(), _l_str.data() + _l_str.size(), result
-            );
-
-            if (ec == std::errc())
-            {
-                _a_parse_input.advance((ptr - _l_str.data()) + 0);
-                return result_t<T>(result);
-            }
-            else
-            {
-                return result_t<T>(unexpected(fmt::format(
-                    u8"Could not parse \"{0}\" using std::from_chars",
-                    convert_string_to_u8string(_l_result_str.value()).value()
-                ))
-
-                );
-            }
+            return result_t<T>(result);
         }
         else
         {
             return result_t<T>(unexpected(fmt::format(
-                u8"Could not convert std::u8string to std::string. Error was "
-                u8"\"{0}\".",
-                _l_result_str.error()
-            ))
+                u8"Could not parse \"{0}\" using std::from_chars",
+                convert_u32string_to_u8string(_l_u32str)
+            )
 
-            );
+            ));
         }
     }
 };
@@ -740,7 +727,6 @@ struct default_parser_t<std::basic_string<T>>
                     U'"', U'\\'
                 )
             };
-            _a_parse_input.advance(1);
             if constexpr (same_as<arg_type_t, string>)
             {
                 const result_t<string> _l_rv{
@@ -766,7 +752,7 @@ struct default_parser_t<std::basic_string<T>>
                 }
                 else
                 {
-                    return unexpected(fmt::format("Could not convert"));
+                    return unexpected(fmt::format(u8"Could not convert"));
                 }
             }
             else if constexpr (same_as<arg_type_t, u16string>
@@ -1193,12 +1179,15 @@ __constexpr result_t<typename default_parser_t<std::variant<Ts...>>::value_type>
     using namespace std;
     value_type               _l_rv;
     default_parser_t<size_t> _l_size_t_parser;
+    _a_parse_input.check_advance_and_throw(U"(");
     result_t<size_t> _l_size_t_result{_l_size_t_parser.run_parser(_a_parse_input
     )};
-    _a_parse_input.check_advance_and_throw(U" ");
+    _a_parse_input.check_advance_and_throw(U",");
+    _a_parse_input.process_whitespace();
     auto _l_res{
         run_parser_internal<0>(_l_rv, _l_size_t_result.value(), _a_parse_input)
     };
+    _a_parse_input.check_advance_and_throw(U")");
     if (_l_res.has_value())
     {
         return unexpected(_l_res.value());
@@ -1224,7 +1213,7 @@ __constexpr std::optional<std::u8string>
         if (auto _l_result{get<I>(_m_parsers)->run_parser(_a_parse_input)};
             _l_result.has_value())
         {
-            std::get<I>(_a_object) = _l_result.value();
+            _a_object = _l_result.value();
             return nullopt;
         }
         else

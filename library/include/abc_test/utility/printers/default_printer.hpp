@@ -633,6 +633,67 @@ private:
             const;
 };
 
+template <typename... Ts>
+struct default_printer_t<std::variant<Ts...>>
+    : public printer_base_t<std::variant<Ts...>>
+{
+    using value_type = std::variant<Ts...>;
+    static constexpr bool is_specialized{true};
+    __constexpr
+    default_printer_t(printer_t<Ts>... _a_printers);
+
+    __constexpr
+    default_printer_t()
+    requires (std::is_default_constructible_v<default_printer_t<Ts>> && ...)
+        : _m_printers(std::make_tuple(mk_printer(default_printer_t<Ts>())...))
+    {}
+
+    __constexpr virtual std::u8string
+        run_printer(
+            const value_type& _a_object
+        ) const
+    {
+        using namespace std;
+        u8string     _l_str{u8"("};
+        const size_t _l_idx{_a_object.index()};
+        _l_str.append(default_printer_t<size_t>{}.run_printer(_l_idx));
+        _l_str.append(u8" ");
+        _l_str.append(run_internal_printer<0>(_a_object, _l_idx));
+        _l_str.append(u8")");
+        return _l_str;
+    }
+
+    __constexpr std::tuple<printer_t<Ts>...>&
+                get_printers_ref() noexcept
+    {
+        return _m_printers;
+    }
+private:
+    std::tuple<printer_t<Ts>...> _m_printers;
+
+    template <std::size_t I>
+    __constexpr std::u8string
+                run_internal_printer(
+                    const value_type& _a_object,
+                    const std::size_t _a_idx
+                ) const
+    {
+        using namespace std;
+        if (I == _a_idx)
+        {
+            return get<I>(_m_printers)->run_printer(get<I>(_a_object));
+        }
+        else if constexpr (I + 1 < tuple_size<decltype(_m_printers)>{})
+        {
+            return run_internal_printer<I + 1>(_a_object, _a_idx);
+        }
+        else
+        {
+            throw std::runtime_error("Couldn't work it out");
+        }
+    }
+};
+
 template <>
 struct default_printer_t<std::filesystem::path>
     : public printer_base_t<std::filesystem::path>
@@ -740,27 +801,39 @@ struct default_printer_t<std::basic_string<T>>
 {
     static constexpr bool is_specialized{true};
 
-    __constexpr           std::u8string
-                          run_printer(
-                              const std::basic_string<T>& _a_object
-                          ) const
+    __constexpr
+    default_printer_t()
+        : default_printer_t(u8"\"")
+    {}
+
+    __constexpr
+    default_printer_t(
+        const std::u8string_view _a_surrounding_str
+    )
+        : _m_surrounding_str(_a_surrounding_str)
+    {}
+
+    __constexpr std::u8string
+                run_printer(
+                    const std::basic_string<T>& _a_object
+                ) const
     {
         using namespace std;
         using arg_type_t = basic_string<T>;
         if constexpr (same_as<arg_type_t, string>)
         {
-            u8string                _l_rv{u8"\""};
+            u8string                _l_rv{_m_surrounding_str};
             default_printer_t<char> _l_printer;
             for (const char _l_char : _a_object)
             {
                 _l_rv.append(_l_printer.run_printer(_l_char));
             }
-            _l_rv.append(u8"\"");
+            _l_rv.append(_m_surrounding_str);
             return _l_rv;
         }
         else if constexpr (same_as<arg_type_t, u8string>)
         {
-            return fmt::format(u8"\"{0}\"", _a_object);
+            return fmt::format(u8"{0}{1}{0}", _m_surrounding_str, _a_object);
         }
         else if constexpr (same_as<arg_type_t, u16string>)
         {
@@ -770,7 +843,9 @@ struct default_printer_t<std::basic_string<T>>
                 _a_object.end(),
                 std::back_inserter(_l_object_as_u8str)
             );
-            return fmt::format(u8"\"{0}\"", _l_object_as_u8str);
+            return fmt::format(
+                u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
+            );
         }
         else if constexpr (same_as<arg_type_t, u32string>)
         {
@@ -780,7 +855,9 @@ struct default_printer_t<std::basic_string<T>>
                 _a_object.end(),
                 std::back_inserter(_l_object_as_u8str)
             );
-            return fmt::format(u8"\"{0}\"", _l_object_as_u8str);
+            return fmt::format(
+                u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
+            );
         }
         else if constexpr (same_as<arg_type_t, wstring>)
         {
@@ -792,7 +869,9 @@ struct default_printer_t<std::basic_string<T>>
                     _a_object.end(),
                     std::back_inserter(_l_object_as_u8str)
                 );
-                return fmt::format(u8"\"{0}\"", _l_object_as_u8str);
+                return fmt::format(
+                    u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
+                );
             }
             else if constexpr (sizeof(wchar_t) == 4)
             {
@@ -802,11 +881,15 @@ struct default_printer_t<std::basic_string<T>>
                     _a_object.end(),
                     std::back_inserter(_l_object_as_u8str)
                 );
-                return fmt::format(u8"\"{0}\"", _l_object_as_u8str);
+                return fmt::format(
+                    u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
+                );
             }
             else
             {
-                __STATIC_ASSERT(T, "wchar_t of this specific size is not supported");
+                __STATIC_ASSERT(
+                    T, "wchar_t of this specific size is not supported"
+                );
             }
         }
         else
@@ -818,6 +901,8 @@ struct default_printer_t<std::basic_string<T>>
             );
         }
     }
+private:
+    std::u8string _m_surrounding_str;
 };
 
 template <typename T>

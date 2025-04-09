@@ -136,7 +136,7 @@ __constexpr_imp void
                     enum_bba_inner_assertion_type_t,
                     optional<ds::single_source_t>,
                     matcher_source_map_t>,
-                vector<tuple<size_t, matcher_result_t, optional<string>, _ABC_NS_DS::log_infos_t>>>>
+                vector<tuple<size_t, matcher_result_t, optional<u8string>, _ABC_NS_DS::log_infos_t>>>>
                    _l_info;
             size_t _l_idx{1};
             for (const bba_inner_assertion_type_t& _l_matcher :
@@ -153,7 +153,7 @@ __constexpr_imp void
                         _l_matcher.source(),
                         _l_matcher.source_map()
                     );
-                tuple<size_t, matcher_result_t, optional<string>, _ABC_NS_DS::log_infos_t>
+                tuple<size_t, matcher_result_t, optional<u8string>, _ABC_NS_DS::log_infos_t>
                     _l_single_element = make_tuple(
                         _l_idx++,
                         _l_matcher.matcher_result(),
@@ -165,7 +165,7 @@ __constexpr_imp void
                     _l_info.push_back(make_pair(
                         _l_first,
                         vector<
-                            tuple<size_t, matcher_result_t, optional<string>,_ABC_NS_DS::log_infos_t>>(
+                            tuple<size_t, matcher_result_t, optional<u8string>,_ABC_NS_DS::log_infos_t>>(
                             1, _l_single_element
                         )
                     ));
@@ -181,7 +181,7 @@ __constexpr_imp void
                          enum_bba_inner_assertion_type_t,
                          optional<ds::single_source_t>,
                          matcher_source_map_t>,
-                     vector<tuple<size_t, matcher_result_t, optional<string>,_ABC_NS_DS::log_infos_t>>>&
+                     vector<tuple<size_t, matcher_result_t, optional<u8string>,_ABC_NS_DS::log_infos_t>>>&
                      _l_element : _l_info)
             {
                 if (_l_element.second.size() == 1)
@@ -189,7 +189,7 @@ __constexpr_imp void
                     str::string_table_t _l_st({0});
                     std::tuple<
                         matcher_result_t,
-                        std::optional<std::string>,
+                        std::optional<std::u8string>,
                         matcher_source_map_t>;
                     bba_inner_assertion_type_t _l_matcher(
                         get<3>(_l_element.second[0]),

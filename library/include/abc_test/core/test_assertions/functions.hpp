@@ -259,12 +259,12 @@ create_assertion(
     using namespace std;
     assertion_ptr_t<true, T> _l_gur;
     bool                     _l_passed{true};
-    optional<string>         _l_matcher_annotation{};
+    optional<u8string>         _l_matcher_annotation{};
     ds::single_source_t      _l_source
         = _a_matcher.add_source_info(_a_macro_str, _a_matcher_str, _a_sl);
     if constexpr (Has_Annotation)
     {
-        _l_matcher_annotation = optional<string>(_a_matcher.annotation());
+        _l_matcher_annotation = optional<u8string>(_a_matcher.annotation());
     }
     matcher_result_t     _l_mr{_a_matcher.matcher_result()};
     matcher_source_map_t _l_msm;

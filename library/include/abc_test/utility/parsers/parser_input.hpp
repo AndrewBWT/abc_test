@@ -20,26 +20,30 @@ public:
             const std::u32string_view _a_str_to_check_against
         );
     __no_constexpr void
-        process_whitespace() noexcept;
-    __no_constexpr std::u32string process_characters(const std::size_t _a_max_size) noexcept;
-    __no_constexpr std::u32string continue_until_char1_but_not_proceeded_by_char2(
-        const char32_t _a_char1,
-        const char32_t _a_char2
-    ) noexcept;
+                   process_whitespace() noexcept;
+    __no_constexpr std::u32string
+                   process_characters(const std::size_t _a_max_size) noexcept;
+    __no_constexpr std::u32string
+                   continue_until_char1_but_not_proceeded_by_char2(
+                       const char32_t _a_char1,
+                       const char32_t _a_char2
+                   ) noexcept;
     __constexpr void
-                      advance(const std::size_t _a_new_itereator) noexcept;
-    __constexpr const std::u8string_view
-                      get_u8string() const noexcept;
-    __constexpr const std::u8string_view
-                      get_u8string(const std::size_t _a_size) const noexcept;
+                         advance(const std::size_t _a_new_itereator) noexcept;
+    __constexpr const    std::u8string_view
+                         get_u8string() const noexcept;
+    __constexpr const    std::u8string_view
+                         get_u8string(const std::size_t _a_size) const noexcept;
     __no_constexpr const std::u32string
-                      get_u32string() const noexcept;
+                         get_u32string() const noexcept;
     __no_constexpr const std::u32string
                       get_u32string(const std::size_t _a_size) const noexcept;
     __constexpr const result_t<std::string>
                       ascii_string() const noexcept;
-    __constexpr       std::size_t
-                      size() const noexcept;
+    __no_constexpr const std::u32string
+        take_string_containing(const std::u32string_view _a_str) noexcept;
+    __constexpr std::size_t
+                size() const noexcept;
     __no_constexpr char32_t
         operator*() const noexcept;
     __constexpr parser_input_t&
@@ -111,11 +115,15 @@ __no_constexpr_imp void
         ++_m_cur_itt;
     }
 }
-__no_constexpr_imp std::u32string parser_input_t::process_characters(const std::size_t _a_max_size) noexcept
+
+__no_constexpr_imp std::u32string
+                   parser_input_t::process_characters(
+        const std::size_t _a_max_size
+    ) noexcept
 {
     using namespace std;
     u32string _l_str;
-    size_t _l_idx{ 0 };
+    size_t    _l_idx{0};
     while (_m_cur_itt < _m_end_itt && _l_idx < _a_max_size)
     {
         _l_str.push_back(utf8::next(_m_cur_itt, _m_end_itt));
@@ -123,23 +131,25 @@ __no_constexpr_imp std::u32string parser_input_t::process_characters(const std::
     }
     return _l_str;
 }
-__no_constexpr_imp std::u32string parser_input_t::continue_until_char1_but_not_proceeded_by_char2(
-    const char32_t _a_char1,
-    const char32_t _a_char2
-) noexcept
+
+__no_constexpr_imp std::u32string
+    parser_input_t::continue_until_char1_but_not_proceeded_by_char2(
+        const char32_t _a_char1,
+        const char32_t _a_char2
+    ) noexcept
 {
     using namespace std;
     u32string _l_str;
-    size_t _l_idx{ 0 };
-    char32_t _l_prev_char;
+    size_t    _l_idx{0};
     while (_m_cur_itt < _m_end_itt)
     {
-        char32_t _l_char{ utf8::next(_m_cur_itt, _m_end_itt) };
+        char32_t _l_char{utf8::next(_m_cur_itt, _m_end_itt)};
         if (_l_char == _a_char1)
         {
-            if (_l_idx > 0 && _l_prev_char == _a_char2)
+            if (_l_idx > 0 && _l_str.back() == _a_char2)
             {
-                _l_str.push_back(_l_char);
+                // Replace the last character, as it is currently the escape sequence
+                _l_str.back() = _l_char;
             }
             else
             {
@@ -151,10 +161,10 @@ __no_constexpr_imp std::u32string parser_input_t::continue_until_char1_but_not_p
             _l_str.push_back(_l_char);
         }
         ++_l_idx;
-        _l_prev_char = _l_char;
     }
     return _l_str;
 }
+
 __constexpr bool
     parser_input_t::check_and_advance(
         const char32_t _a_char_to_check_against
@@ -177,13 +187,14 @@ __constexpr bool
     ) noexcept
 {
     using namespace std;
-    u32string_view::const_iterator _l_itt{ _a_str_to_check_against.begin() };
-    const u32string_view::const_iterator _l_end{ _a_str_to_check_against.end() };
+    u32string_view::const_iterator _l_itt{_a_str_to_check_against.begin()};
+    const u32string_view::const_iterator _l_end{_a_str_to_check_against.end()};
+    u8string_view::const_iterator        _l_curr_itt_cpy{_m_cur_itt};
     while (_l_itt < _l_end)
     {
         if (_m_cur_itt < _m_end_itt)
         {
-            char32_t _l_char{ utf8::next(_m_cur_itt,_m_end_itt) };
+            char32_t _l_char{utf8::next(_l_curr_itt_cpy, _m_end_itt)};
             if (_l_char != *_l_itt)
             {
                 return false;
@@ -195,6 +206,7 @@ __constexpr bool
         }
         ++_l_itt;
     }
+    _m_cur_itt = _l_curr_itt_cpy;
     return true;
 }
 
@@ -203,7 +215,7 @@ __constexpr void
         const std::size_t _a_new_itereator
     ) noexcept
 {
-    size_t _l_idx{ 0 };
+    size_t _l_idx{0};
     while (_m_cur_itt < _m_end_itt && _l_idx < _a_new_itereator)
     {
         utf8::next(_m_cur_itt, _m_end_itt);
@@ -228,14 +240,14 @@ __constexpr const std::u8string_view
 }
 
 __no_constexpr_imp const std::u32string
-                  parser_input_t::get_u32string() const noexcept
+                         parser_input_t::get_u32string() const noexcept
 {
     using namespace std;
     return convert_u8string_to_u32string(u8string_view(_m_cur_itt, _m_end_itt));
 }
 
 __no_constexpr_imp const std::u32string
-                  parser_input_t::get_u32string(
+                         parser_input_t::get_u32string(
         const std::size_t _a_size
     ) const noexcept
 {
@@ -250,6 +262,30 @@ __constexpr const result_t<std::string>
 {
     using namespace std;
     return convert_u8string_to_string(u8string_view(_m_cur_itt, _m_end_itt));
+}
+
+__no_constexpr_imp const std::u32string
+                     parser_input_t::take_string_containing(
+        const std::u32string_view _a_str
+    ) noexcept
+{
+    using namespace std;
+    u32string _l_rv;
+
+    while (_m_cur_itt < _m_end_itt)
+    {
+        char32_t _l_char{ utf8::peek_next(_m_cur_itt, _m_end_itt) };
+        if (_a_str.contains(_l_char))
+        {
+            _l_rv.push_back(_l_char);
+            utf8::next(_m_cur_itt, _m_end_itt);
+        }
+        else
+        {
+            break;
+        }
+    }
+    return _l_rv;
 }
 
 __constexpr std::size_t

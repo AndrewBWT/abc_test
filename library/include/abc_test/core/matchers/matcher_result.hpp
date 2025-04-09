@@ -89,7 +89,7 @@ public:
               matcher_result_t(),
               _ABC_NS_DS::log_infos_t{},
               std::optional<ds::single_source_t>(),
-              std::optional<std::string>(),
+              std::optional<std::u8string>(),
               matcher_source_map_t()
           )
     {}
@@ -98,7 +98,7 @@ public:
         bba_inner_assertion_type_t(
             const bool                                _a_terminate,
             const bool                                _a_pass_or_failure,
-            const std::optional<std::string>&         _a_opt_msg,
+            const std::optional<std::u8string>&         _a_opt_msg,
             const _ABC_NS_DS::log_infos_t&            _a_log_infos,
             const std::optional<ds::single_source_t>& _a_source
             = std::optional<ds::single_source_t>{}
@@ -121,8 +121,8 @@ public:
             const _ABC_NS_DS::log_infos_t&            _a_log_infos,
             const std::optional<ds::single_source_t>& _a_source
             = std::optional<ds::single_source_t>{},
-            const std::optional<std::string>& _a_annotation
-            = std::optional<std::string>{},
+            const std::optional<std::u8string>& _a_annotation
+            = std::optional<std::u8string>{},
             const matcher_source_map_t& _a_matcher_source_map
             = matcher_source_map_t()
         ) noexcept
@@ -143,7 +143,7 @@ public:
             const bool                                _a_terminate,
             const matcher_result_t&                   _a_matcher_result,
             const std::optional<ds::single_source_t>& _a_source,
-            const std::optional<std::string>&         _a_annotation,
+            const std::optional<std::u8string>&         _a_annotation,
             const matcher_source_map_t&               _a_matcher_source_map,
             const enum_bba_inner_assertion_type_t
                 _a_enum_bba_inner_assertion_type
@@ -163,7 +163,7 @@ public:
         return _m_matcher_result;
     }
 
-    __constexpr_imp const std::optional<std::string>&
+    __constexpr_imp const std::optional<std::u8string>&
                           annotation() const noexcept
     {
         return _m_annotation;
@@ -201,7 +201,7 @@ public:
 private:
     _ABC_NS_DS::log_infos_t            _m_log_infos;
     matcher_result_t                   _m_matcher_result;
-    std::optional<std::string>         _m_annotation;
+    std::optional<std::u8string>         _m_annotation;
     matcher_source_map_t               _m_source_map;
     std::optional<ds::single_source_t> _m_source;
     enum_bba_inner_assertion_type_t    _m_enum_bba_inner_assertion_type;
