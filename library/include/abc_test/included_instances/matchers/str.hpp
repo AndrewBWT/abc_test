@@ -18,16 +18,18 @@ __constexpr_imp matcher_t
     using namespace std;
     using namespace _ABC_NS_MATCHER;
     using namespace abc::utility::printer;
-    using T       = ranges::range_value_t<R1>;
-    using R1_Type = remove_cvref_t<R1>;
-    using R2_Type = remove_cvref_t<R2>;
-    typename R1_Type::const_iterator _l_itt_1{std::begin(_a_range_1)};
-    typename R1_Type::const_iterator _l_itt_1_end{std::end(_a_range_1)};
-    typename R2_Type::const_iterator _l_itt_2{std::begin(_a_range_2)};
-    typename R2_Type::const_iterator _l_itt_2_end{std::end(_a_range_2)};
-    optional<size_t>                 _l_unequal_index;
-    size_t                           _l_idx{1};
-    u8string                         _l_explanation_str;
+    using T            = ranges::range_value_t<R1>;
+    using R1_Type      = remove_cvref_t<R1>;
+    using R2_Type      = remove_cvref_t<R2>;
+    using R1_const_itt = R1_Type::const_iterator;
+    using R2_const_itt = R1_Type::const_iterator;
+    R1_const_itt     _l_itt_1{std::begin(_a_range_1)};
+    R1_const_itt     _l_itt_1_end{std::end(_a_range_1)};
+    R2_const_itt     _l_itt_2{std::begin(_a_range_2)};
+    R2_const_itt     _l_itt_2_end{std::end(_a_range_2)};
+    optional<size_t> _l_unequal_index;
+    size_t           _l_idx{1};
+    u8string         _l_explanation_str;
     while (_l_itt_1 != _l_itt_1_end && _l_itt_2 != _l_itt_2_end)
     {
         const T& _l_element_1{*_l_itt_1};

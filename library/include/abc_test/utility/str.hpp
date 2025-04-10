@@ -30,6 +30,54 @@ __no_constexpr std::u16string
     convert_u32string_to_u16string(const std::u32string_view _a_str) noexcept;
 __no_constexpr std::u8string
                positive_integer_to_placement(const std::size_t _a_number);
+template <typename T>
+concept is_wchar_and_32_bit_c
+    = std::same_as<T, wchar_t> && sizeof(wchar_t) == 4;
+template <typename T>
+concept is_wchar_and_16_bit_c
+    = std::same_as<T, wchar_t> && sizeof(wchar_t) == 2;
+template <typename T>
+concept char_type_is_unicode_c
+    = std::same_as<T, char8_t> || std::same_as<T, char16_t>
+      || std::same_as<T, char32_t> || is_wchar_and_32_bit_c<T>
+      || is_wchar_and_16_bit_c<T>;
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__no_constexpr_imp std::basic_string<T>
+                   convert_char_to_string(
+                       const char32_t _a_char
+                   ) noexcept
+{
+    using namespace std;
+    if constexpr (is_wchar_and_32_bit_c<T>)
+    {
+        return wstring(1, static_cast<wchar_t>(_a_char));
+    }
+    else if constexpr (same_as<char32_t, T>)
+    {
+        return u32string(1, _a_char);
+    }
+    else if constexpr (is_wchar_and_16_bit_c<T>)
+    {
+        u16string _l_u16str{convert_u32string_to_u16string(u32string(1, _a_char)
+        )};
+        return wstring(_l_u16str.begin(), _l_u16str.end());
+    }
+    else if constexpr (same_as<char16_t, T>)
+    {
+        return convert_u32string_to_u16string(u32string(1, _a_char));
+    }
+    else if constexpr (same_as<char8_t, T>)
+    {
+        return convert_u32string_to_u8string(u32string(1, _a_char));
+    }
+    else
+    {
+        __STATIC_ASSERT(T, "convert_char_to_string not defined for type.");
+    }
+}
+
 _END_ABC_NS
 
 
@@ -51,7 +99,7 @@ __constexpr_imp result_t<std::string>
 
     try
     {
-        for (size_t _l_idx{ 1 }; it != end; ++_l_idx)
+        for (size_t _l_idx{1}; it != end; ++_l_idx)
         {
             char32_t _l_char = utf8::next(it, end);
             if (not (_l_char <= 0x7F))
@@ -62,10 +110,13 @@ __constexpr_imp result_t<std::string>
                     std::back_inserter(_l_char_str)
                 );
                 return unexpected(fmt::format(
-                    u8"The function convert_u8string_to_string could not encode "
-                    u8"the character '{0}' into basic ASCII, which is the encoding "
+                    u8"The function convert_u8string_to_string could not "
+                    u8"encode "
+                    u8"the character '{0}' into basic ASCII, which is the "
+                    u8"encoding "
                     u8"used for the std::string type in abc_test. This error "
-                    u8"occoured when converting the {1} character in the string "
+                    u8"occoured when converting the {1} character in the "
+                    u8"string "
                     u8"\"{2}\".",
                     convert_u32string_to_u8string(u32string(1, _l_char)),
                     positive_integer_to_placement(_l_idx),

@@ -5,6 +5,7 @@
 #include "abc_test/utility/enum.hpp"
 #include "abc_test/utility/limits/max_value_concept.hpp"
 #include "abc_test/utility/limits/min_value_concept.hpp"
+#include "abc_test/utility/str.hpp"
 #include "concepts"
 
 #include <memory>
@@ -58,12 +59,13 @@ __constexpr T
         };
         return
             // If denominator is max, then difference must be max. And lower==0.
-            (_l_denominator == numeric_limits< std::uintmax_t>::max()) ?
-            _a_rng() :
-            // If denominator is 0, no point in calling rng
-            _l_denominator == 0
+            (_l_denominator == numeric_limits<std::uintmax_t>::max())
+                ? _a_rng()
+                :
+                // If denominator is 0, no point in calling rng
+                _l_denominator == 0
                 ? _a_bounds.lower()
-            // Otherwise, pick the value we want.
+                // Otherwise, pick the value we want.
                 : _a_bounds.lower()
                       + static_cast<T>(_a_rng() % (_l_denominator + 1));
     }
@@ -84,7 +86,235 @@ __constexpr T
                       + static_cast<T>(_a_rng() % (_l_denominator + 1));
     }
 }
+
+template <typename T>
+__constexpr std::size_t
+            biggest_character_size()
+{
+    using namespace std;
+    if constexpr (same_as<T, char>
+                  || (same_as<T, wchar_t> && sizeof(wchar_t) == 4)
+                  || same_as<T, char32_t>)
+    {
+        return 1;
+    }
+    else if constexpr (same_as<T, char16_t>
+                       || (same_as<T, wchar_t> && sizeof(wchar_t) == 2))
+    {
+        return 2;
+    }
+    else if constexpr (same_as<T, char8_t>)
+    {
+        return 4;
+    }
+    else if constexpr (same_as<wchar_t>)
+    {
+        __STATIC_ASSERT(
+            T,
+            "biggest_character is not defined for the wchar_t type of this size"
+        );
+    }
+    else
+    {
+        __STATIC_ASSERT(
+            T, "biggest_character_size is not defined for this type"
+        );
+    }
+}
+
+__constexpr char32_t
+    generate_valid_unicode_char32_t(
+        utility::rng_t& _a_rng,
+        const char32_t  _a_limit = 0x1'0FFF
+    )
+{
+    using namespace std;
+    constexpr char32_t _l_low_surrogate{0xD800};
+    constexpr char32_t _l_high_surrogate{0xDFFF};
+    char32_t           _l_rv;
+    if (_a_limit < _l_low_surrogate)
+    {
+        // Don't have to worry about surrogates.
+        _l_rv = _a_rng() % (_a_limit + 1);
+    }
+    else if (_a_limit < _l_high_surrogate)
+    {
+        // Should never happen.
+        std::unreachable();
+    }
+    else
+    {
+        constexpr char32_t _l_surrogate_diff{
+            _l_high_surrogate - _l_low_surrogate
+        };
+        const char32_t _l_limit{
+            _a_limit - _l_surrogate_diff
+            // Total range of char32_t = 1114111
+            // Surrogate range between 55296 and 57343. Cannot be these numbers.
+        };
+        char32_t _l_rnd{_a_rng() % (_l_limit + 1)};
+        _l_rv = (_l_rnd >= _l_low_surrogate && _l_rnd <= _l_high_surrogate)
+                    ? (_l_rnd + _l_surrogate_diff)
+                    : _l_rnd;
+    }
+    return _l_rv;
+}
+
+template <typename T>
+__constexpr std::optional<std::basic_string<T>>
+            generate_valid_character(
+                utility::rng_t&   _a_rng,
+                const std::size_t _a_biggest_string
+            ) noexcept
+{
+    using namespace std;
+    if (_a_biggest_string == 0)
+    {
+        // Should always be 1. This should be optimised away.
+        std::unreachable();
+        return basic_string<T>{};
+    }
+    if constexpr (same_as<T, char>)
+    {
+        // Chars are in the ascii range, and are easy to create.
+        return basic_string<T>(1, (_a_rng() % 128));
+    }
+    else if constexpr (same_as<T, char32_t>
+                       || (same_as<T, wchar_t> && sizeof(wchar_t) == 4))
+    {
+        // Biggest string type, no variable lengths.
+        return basic_string<T>(
+            1, static_cast<T>(generate_valid_unicode_char32_t(_a_rng))
+        );
+    }
+    else
+    {
+        // Ths is the largest amount of space that a char32_t will take in this
+        // encoding (assuming not plain ASCII chars).
+        const size_t _l_biggest_char{biggest_character_size<T>()};
+        if (_l_biggest_char <= _a_biggest_string)
+        {
+            return convert_char_to_string<T>(
+                generate_valid_unicode_char32_t(_a_rng)
+            );
+        }
+        else
+        {
+            // Else there is a limit on how high the char32_ts can be. This
+            // value is encoded in limit by the following code.
+            char32_t _l_limit;
+            if constexpr (same_as<T, char16_t>
+                          || (same_as<T, wchar_t> && sizeof(wchar_t) == 2))
+            {
+                switch (_a_biggest_string)
+                {
+                case 1:
+                    _l_limit = 0xFFFF;
+                    break;
+                default:
+                    std::unreachable();
+                }
+            }
+            else if constexpr (same_as<T, char8_t>)
+            {
+                switch (_a_biggest_string)
+                {
+                case 1:
+                    _l_limit = 0x7F;
+                    break;
+                case 2:
+                    _l_limit = 0x7FF;
+                    break;
+                case 3:
+                    _l_limit = 0xFFFF;
+                    break;
+                default:
+                    std::unreachable();
+                }
+            }
+            else
+            {
+                __STATIC_ASSERT(
+                    T, "generate_valid_character not defined for this type"
+                );
+            }
+            // Now we know the limit, we can create a string from it.
+            return convert_char_to_string<T>(
+                generate_valid_unicode_char32_t(_a_rng, _l_limit)
+            );
+        }
+    }
+}
 } // namespace detail
+
+enum class enum_character_random_generator_mode_t
+{
+    ONLY_VALID_CHARS,
+    ALL_VALID_INTEGERS
+};
+
+/*template <typename T>
+struct character_random_generator_t : public random_generator_base_t<T>
+{
+public:
+    __constexpr
+    character_random_generator_t()
+        = default;
+
+    __constexpr
+    character_random_generator_t(
+        const utility::bounds_t<T>& _a_bounds
+    )
+        : _m_mode(enum_character_random_generator_mode_t::ALL_VALID_INTEGERS)
+        , _m_bounds(_a_bounds)
+    {}
+
+    __no_constexpr virtual T
+        operator()(
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        )
+    {
+        using enum enum_character_random_generator_mode_t;
+        using namespace std;
+        constexpr char32_t _l_max_char32_t{0x10'FFFF};
+        constexpr char32_t _l_low_surrogate{0xD800};
+        constexpr char32_t _l_high_surrogate{0xDFFF};
+        constexpr char32_t _l_surrogate_diff{
+            _l_high_surrogate - _l_low_surrogate
+        };
+        const char32_t _l_limit{
+            _l_max_char32_t - _l_surrogate_diff
+            // Total range of char32_t = 1114111
+            // Surrogate range between 55296 and 57343. Cannot be these numbers.
+        };
+        switch (_m_mode)
+        {
+        case ONLY_VALID_CHARS:
+        {
+            char32_t  _l_rnd{_a_rnd_generator() % (_l_limit + 1)};
+            u32string _l_char{
+                (_l_rnd >= _l_low_surrogate && _l_rnd <= _l_high_surrogate)
+                    ? (_l_rnd + _l_surrogate_diff)
+                    : _l_rnd
+            };
+            const T _l_str{ abc::convert_string<u32string, T>() };
+            return _l_str.at(0);
+            return abc::convert_u32string_to_u8string(_l_char).at(0);
+        }
+        case ALL_VALID_INTEGERS:
+            return detail::generate_rng_value_between_bounds(
+                _m_bounds, _a_index, _a_rnd_generator
+            );
+        default:
+            throw errors::unaccounted_for_enum_exception(_m_mode);
+        }
+    }
+private:
+    enum_character_random_generator_mode_t _m_mode
+        = enum_character_random_generator_mode_t::ONLY_VALID_CHARS;
+    utility::bounds_t<T> _m_bounds;
+};*/
 
 template <>
 struct default_random_generator_t<bool> : public random_generator_base_t<bool>
@@ -96,31 +326,26 @@ struct default_random_generator_t<bool> : public random_generator_base_t<bool>
         );
 };
 
-template <>
-struct default_random_generator_t<char8_t> : public random_generator_base_t<char8_t>
+/*template <>
+struct default_random_generator_t<char8_t>
+    : public character_random_generator_t<char8_t>
 {
-    __no_constexpr_imp virtual char8_t
-        operator()(
-            utility::rng_t& _a_rnd_generator,
-            const utility::rng_counter_t& _a_index
-            )
-    {
-        return char8_t();
-    }
+    using character_random_generator_t<char8_t>::character_random_generator_t;
 };
 
 template <>
-struct default_random_generator_t<char16_t> : public random_generator_base_t<char16_t>
+struct default_random_generator_t<char16_t>
+    : public random_generator_base_t<char16_t>
 {
     __no_constexpr_imp virtual char16_t
         operator()(
-            utility::rng_t& _a_rnd_generator,
+            utility::rng_t&               _a_rnd_generator,
             const utility::rng_counter_t& _a_index
-            )
+        )
     {
         return char16_t();
     }
-};
+};*/
 
 template <typename T>
 requires std::integral<T>
@@ -227,7 +452,7 @@ private:
     random_generator_t<T> _m_gen;
 };
 
-template <typename T>
+/*template <typename T>
 requires (std::convertible_to<T, std::string_view>)
 struct default_random_generator_t<T> : public random_generator_base_t<T>
 {
@@ -246,7 +471,7 @@ struct default_random_generator_t<T> : public random_generator_base_t<T>
         }
         return _l_rv;
     }
-};
+};*/
 
 template <typename... Ts>
 struct default_random_generator_t<std::tuple<Ts...>>
@@ -394,32 +619,153 @@ _END_ABC_DG_NS
 _BEGIN_ABC_DG_NS
 
 template <typename T>
+struct default_random_generator_t<std::basic_string<T>>
+    : public random_generator_base_t<std::basic_string<T>>
+{
+    __constexpr
+    default_random_generator_t(
+        const utility::bounds_t<typename std::basic_string<T>::size_type>&
+            _a_bounds
+        = utility::bounds_t<typename std::basic_string<T>::size_type>(
+            0,
+            std::basic_string<T>{}.max_size()
+        )
+    )
+        : _m_rng(std::nullopt), _m_bounds(_a_bounds)
+    {}
+
+    __constexpr
+    default_random_generator_t(
+        const random_generator_t<typename std::basic_string<T>::value_type>&
+            _a_rng,
+        const utility::bounds_t<typename std::basic_string<T>::size_type>&
+            _a_bounds
+        = utility::bounds_t<typename std::basic_string<T>::size_type>(
+            0,
+            std::basic_string<T>{}.max_size()
+        )
+    ) noexcept
+        : _m_rng(_a_rng), _m_bounds(_a_bounds)
+    {}
+
+    __no_constexpr_imp virtual std::basic_string<T>
+        operator()(
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        )
+    {
+        using namespace std;
+        const basic_string<T>::size_type _l_size{
+            detail::generate_rng_value_between_bounds<
+                basic_string<T>::size_type>(
+                _m_bounds, _a_index, _a_rnd_generator
+            )
+        };
+        basic_string<T> _l_rv(_l_size, T{});
+        if (_m_rng.has_value())
+        {
+            random_generator_t<typename std::basic_string<T>::value_type>&
+                _l_rng{_m_rng.value()};
+            for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
+            {
+                _l_rv[_l_idx] = _l_rng->operator()(_a_rnd_generator, _a_index);
+            }
+        }
+        else
+        {
+            size_t _l_remaining{_l_size};
+            size_t _l_idx{0};
+            while (_l_remaining > 0)
+            {
+                const optional<basic_string<T>> _l_opt_generated{
+                    detail::generate_valid_character<T>(
+                        _a_rnd_generator, _l_remaining
+                    )
+                };
+                if (_l_opt_generated.has_value())
+                {
+                    const basic_string<T>& _l_generated{_l_opt_generated.value()
+                    };
+                    for (const T _l_char : _l_generated)
+                    {
+                        _l_rv[_l_idx++] = _l_char;
+                        _l_remaining--;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if (_l_remaining > 0)
+            {
+                _l_rv.resize(_l_idx);
+            }
+        }
+        return _l_rv;
+    }
+private:
+    std::optional<random_generator_t<typename std::basic_string<T>::value_type>>
+                                                                _m_rng;
+    utility::bounds_t<typename std::basic_string<T>::size_type> _m_bounds;
+};
+
+/*template <typename T>
 requires _ABC_NS_UTILITY::min_value_c<T> && _ABC_NS_UTILITY::max_value_c<T>
 struct default_random_generator_t<std::basic_string<T>>
     : public random_generator_base_t<std::basic_string<T>>
 {
 public:
-    __constexpr_imp
-        default_random_generator_t() noexcept;
     __constexpr
     default_random_generator_t(
-        const random_generator_t<T>& _a_rnd_gen,
         const utility::bounds_t<typename std::basic_string<T>::size_type>&
             _a_size_bounds
         = utility::bounds_t<typename std::basic_string<T>::size_type>(
             0,
             std::basic_string<T>{}.max_size()
         )
-    ) noexcept;
-    __no_constexpr virtual std::basic_string<T>
-        operator()(
-            utility::rng_t&               _a_rnd_generator,
-            const utility::rng_counter_t& _a_index
-        );
+    )
+        : _m_mode(enum_character_random_generator_mode_t::ONLY_VALID_CHARS)
+        , _m_rng(std::variant(
+              std::in_place_index<0>,
+              default_random_generator<all_valid_chars_t>()
+          ))
+    {*/
+/*
+        const utility::bounds_t<typename
+std::basic_string<T>::size_type>& _a_size_bounds =
+utility::bounds_t<typename std::basic_string<T>::size_type>( 0,
+    std::basic_string<T>{}.max_size()
+)
+: _m_mode(enum_character_random_generator_mode_t::ONLY_VALID_CHARS)
+, _m_bounds(_a_size_bounds)
+, _m_rng(default_random_generator_t<char32_t>{})
+*/
+/*}
+
+__constexpr
+default_random_generator_t(
+    const random_generator_t<T>& _a_rnd_gen,
+    const utility::bounds_t<typename std::basic_string<T>::size_type>&
+        _a_size_bounds
+    = utility::bounds_t<typename std::basic_string<T>::size_type>(
+        0,
+        std::basic_string<T>{}.max_size()
+    )
+) noexcept;
+__no_constexpr virtual std::basic_string<T>
+    operator()(
+        utility::rng_t&               _a_rnd_generator,
+        const utility::rng_counter_t& _a_index
+    );
 private:
-    random_generator_t<T>                                       _m_rng;
-    utility::bounds_t<typename std::basic_string<T>::size_type> _m_bounds;
-};
+using all_valid_chars_t
+    = std::conditional_t<std::same_as<T, char>, char, char32_t>;
+enum_character_random_generator_mode_t _m_mode;
+std::variant<random_generator_t<all_valid_chars_t>, random_generator_t<T>>
+                                                            _m_rng;
+utility::bounds_t<typename std::basic_string<T>::size_type> _m_bounds;
+};*/
 
 template <typename T>
 struct default_random_generator_t<std::vector<T>>
@@ -440,17 +786,8 @@ private:
 _END_ABC_DG_NS
 
 _BEGIN_ABC_DG_NS
-template <typename T>
-requires _ABC_NS_UTILITY::min_value_c<T> && _ABC_NS_UTILITY::max_value_c<T>
-__constexpr_imp
-    default_random_generator_t<
-        std::basic_string<T>>::default_random_generator_t() noexcept
-    : default_random_generator_t<std::basic_string<T>>(
-          default_random_generator<T>()
-      )
-{}
 
-template <typename T>
+/*template <typename T>
 requires _ABC_NS_UTILITY::min_value_c<T> && _ABC_NS_UTILITY::max_value_c<T>
 __constexpr_imp
     default_random_generator_t<std::basic_string<T>>::
@@ -471,19 +808,52 @@ __no_constexpr_imp std::basic_string<T>
     )
 {
     using namespace std;
+    using enum enum_character_random_generator_mode_t;
     const basic_string<T>::size_type _l_size{
         detail::generate_rng_value_between_bounds<basic_string<T>::size_type>(
             _m_bounds, _a_index, _a_rnd_generator
         )
     };
-    auto            ki = std::basic_string<T>{}.max_size();
     basic_string<T> _l_rv(_l_size, T{});
-    for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
+    switch (_m_mode)
     {
-        _l_rv[_l_idx] = _m_rng->operator()(_a_rnd_generator, _a_index);
+    case ONLY_VALID_CHARS:
+        for (size_t _l_idx{0}; _l_idx < _l_size;)
+        {
+            if constexpr (same_as<basic_string<T>, u8string>)
+            {
+                char32_t _l_char{
+                    get<0>(_m_rng)->operator()(_a_rnd_generator, _a_index)
+                };
+                basic_string<T> _l_auxillery_str{
+                    abc::convert_u32string_to_u8string(u32string(1, _l_char))
+                };
+                if (_l_idx + _l_auxillery_str.size() < _l_size)
+                {
+                    for (const T& _l_char : _l_auxillery_str)
+                    {
+                        _l_rv[_l_idx++] = _l_char;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        break;
+    case ALL_VALID_INTEGERS:
+        for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
+        {
+            _l_rv[_l_idx]
+                = get<1>(_m_rng)->operator()(_a_rnd_generator, _a_index);
+        }
+        break;
+    default:
+        throw errors::unaccounted_for_enum_exception(_m_mode);
     }
     return _l_rv;
-}
+}*/
 
 /*template <typename T>
 requires std::integral<T>

@@ -5,6 +5,35 @@
 
 _TEST_CASE(
     abc::test_case_t(
+        { .name = "Fuzzy tests for convert_u8string_to_string",
+         .path = "abc_test_test::utility::str",
+         .threads_required = 1 }
+    )
+)
+{
+    using namespace abc;
+    using namespace abc::data_gen;
+    using namespace std;
+    _BEGIN_MULTI_ELEMENT_BBA(
+        _l_fuzzy_tests, "Fuzzy tests for convert_u8string_to_string"
+    );
+    // Third index is either 0 or 1; 0 if valid result, non-zero if not
+    using test_data
+        = std::tuple<u8string>;
+    for (const auto& [_l_input_str] : generate_data_randomly<test_data>())
+    {
+        _TVLOG(_l_input_str);
+        _BEGIN_NO_THROW_MATCHER(_l_matcher);
+        do_not_optimise(convert_u8string_to_string(_l_input_str));
+        // End the checks for an exception being thrown.
+        _END_NO_THROW_MATCHER(_l_matcher);
+        _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
+    }
+    _END_BBA_CHECK(_l_fuzzy_tests);
+}
+
+_TEST_CASE(
+    abc::test_case_t(
         {.name             = "Unit tests for convert_u8string_to_string",
          .path             = "abc_test_test::utility::str",
          .threads_required = 1}
