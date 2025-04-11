@@ -140,10 +140,9 @@ __constexpr_imp void
                 u8"{0}{1}",
                 prefix(_a_idx),
                 _a_pc.indent(_a_pc.source_representation(
-                    convert_string_to_u8string(
+                    abc::checkless_convert_ascii_to_unicode_string<u8string>(
                         _a_element.source().source_code_representation()
-                    ).value()
-
+                    )
                 ))
             ));
         }
@@ -178,11 +177,12 @@ __constexpr_imp void
                 u8"{0}{1}",
                 prefix(_a_idx),
                 _a_pc.indent(
-                    _a_pc.source_representation(abc::convert_string_to_u8string(
-                        _a_element.source()
-                            .begin_source()
-                            .source_code_representation()
-                    ).value()),
+                    _a_pc.source_representation(
+                        abc::checkless_convert_ascii_to_unicode_string<
+                            u8string>(_a_element.source()
+                                          .begin_source()
+                                          .source_code_representation())
+                    ),
                     2
                 )
             ));
@@ -217,9 +217,8 @@ __constexpr_imp void
                     prefix(_a_idx),
                     _a_pc.indent(
                         _a_pc.source_representation(
-                            abc::convert_string_to_u8string(
-                                _l_end.source_code_representation()
-                            ).value()
+                            abc::checkless_convert_ascii_to_unicode_string<
+                                u8string>(_l_end.source_code_representation())
                         ),
                         2
                     )
@@ -235,10 +234,7 @@ __constexpr_imp void
         for (const u8string_view& _l_str : _a_element.log_infos())
         {
             _a_ttor.write(fmt::format(
-                u8"{0}{1}",
-                prefix(_a_idx),
-                _a_pc.indent(_a_pc.log_info(_l_str
-                ))
+                u8"{0}{1}", prefix(_a_idx), _a_pc.indent(_a_pc.log_info(_l_str))
             ));
         }
     }

@@ -84,7 +84,7 @@ __constexpr void
         throw parser_could_not_match_string_t(
             _m_complete_string,
             u8string_view(_m_cur_itt, _m_end_itt),
-            convert_u32string_to_u8string(
+            unicode_conversion<u8string>(
                 std::u32string(1, _a_char_to_check_against)
             )
         );
@@ -102,7 +102,7 @@ __constexpr void
         throw parser_could_not_match_string_t(
             _m_complete_string,
             u8string_view(_m_cur_itt, _m_end_itt),
-            abc::convert_u32string_to_u8string(_a_str_to_check_against)
+            unicode_conversion<u8string>(_a_str_to_check_against)
         );
     }
 }
@@ -243,7 +243,7 @@ __no_constexpr_imp const std::u32string
                          parser_input_t::get_u32string() const noexcept
 {
     using namespace std;
-    return convert_u8string_to_u32string(u8string_view(_m_cur_itt, _m_end_itt));
+    return unicode_conversion<u32string>(u8string_view(_m_cur_itt, _m_end_itt));
 }
 
 __no_constexpr_imp const std::u32string
@@ -252,7 +252,7 @@ __no_constexpr_imp const std::u32string
     ) const noexcept
 {
     using namespace std;
-    return convert_u8string_to_u32string(
+    return unicode_conversion<u32string>(
         u8string_view(_m_cur_itt, _m_cur_itt + _a_size)
     );
 }
@@ -261,7 +261,7 @@ __constexpr const result_t<std::string>
                   parser_input_t::ascii_string() const noexcept
 {
     using namespace std;
-    return convert_u8string_to_string(u8string_view(_m_cur_itt, _m_end_itt));
+    return convert_unicode_string_to_ascii_string(u8string_view(_m_cur_itt, _m_end_itt));
 }
 
 __no_constexpr_imp const std::u32string

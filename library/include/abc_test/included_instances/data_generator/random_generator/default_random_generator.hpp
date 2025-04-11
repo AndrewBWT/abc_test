@@ -5,7 +5,7 @@
 #include "abc_test/utility/enum.hpp"
 #include "abc_test/utility/limits/max_value_concept.hpp"
 #include "abc_test/utility/limits/min_value_concept.hpp"
-#include "abc_test/utility/str.hpp"
+#include "abc_test/utility/str/conversion.hpp"
 #include "concepts"
 
 #include <memory>
@@ -194,7 +194,7 @@ __constexpr std::optional<std::basic_string<T>>
         const size_t _l_biggest_char{biggest_character_size<T>()};
         if (_l_biggest_char <= _a_biggest_string)
         {
-            return convert_char_to_string<T>(
+            return abc::detail::convert_char_to_string<T>(
                 generate_valid_unicode_char32_t(_a_rng)
             );
         }
@@ -239,7 +239,7 @@ __constexpr std::optional<std::basic_string<T>>
                 );
             }
             // Now we know the limit, we can create a string from it.
-            return convert_char_to_string<T>(
+            return abc::detail::convert_char_to_string<T>(
                 generate_valid_unicode_char32_t(_a_rng, _l_limit)
             );
         }

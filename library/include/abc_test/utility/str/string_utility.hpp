@@ -198,7 +198,7 @@ __constexpr_imp result_t<std::u8string>
     else
     {
         const result_t<string> _l_str_result{
-            abc::convert_u8string_to_string(_a_str)
+            abc::convert_unicode_string_to_ascii_string(_a_str)
         };
         if (_l_str_result.has_value())
         {

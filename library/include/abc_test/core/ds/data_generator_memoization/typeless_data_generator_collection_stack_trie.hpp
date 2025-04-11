@@ -992,7 +992,7 @@ __no_constexpr_imp auto
         "}}",
         typeid(_a_rt).name(),
         "_m_children",
-        abc::convert_u8string_to_string(_a_rt.print_for_loop_stack_trie()).value()
+        abc::checkless_convert_unicode_string_to_ascii_string(_a_rt.print_for_loop_stack_trie())
     )};
     return formatter<string_view>::format(_l_rv, _a_cxt);
 }

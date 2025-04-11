@@ -432,8 +432,8 @@ __constexpr_imp std::u8string
                 print_config_t::line_break() const noexcept
 {
     using namespace std;
-    return convert_string_to_u8string(string(_m_line_break_len, _m_line_break_char)
-    ).value();
+    return checkless_convert_ascii_to_unicode_string<u8string>(string(_m_line_break_len, _m_line_break_char)
+    );
 }
 
 __constexpr_imp const std::u8string
@@ -997,11 +997,12 @@ __constexpr_imp std::u8string
         const std::optional<std::source_location>& _a_sl
     ) const noexcept
 {
+    using namespace std;
     if (_a_sl.has_value())
     {
         return highlight(fmt::format(
             u8"{0}:{1}",
-            convert_string_to_u8string(_a_sl.value().file_name()).value(),
+            checkless_convert_ascii_to_unicode_string<u8string>(_a_sl.value().file_name()),
             _a_sl.value().line()
         ));
     }

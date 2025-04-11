@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/utility/internal/log/params.hpp"
 #include "abc_test/utility/io/threaded_ostream_output_reporter.hpp"
-#include "abc_test/utility/str.hpp"
+#include "abc_test/utility/str/conversion.hpp"
 
 #include <fmt/std.h>
 #include <iostream>
@@ -134,7 +134,7 @@ __constexpr_imp void
             u8"LOG: {0}: {1} - {2}",
             get_thread_id(),
             to_str(_a_internal_logger_enum),
-            convert_string_to_u8string(_a_str).value()
+            checkless_convert_ascii_to_unicode_string<u8string>(_a_str)
         ));
     }
 }

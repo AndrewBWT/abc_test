@@ -192,7 +192,7 @@ __constexpr result_t<complete_global_seed_t>
         char8_t                _l_mode{_a_str[0]};
         const u8string_view    _l_rest_of_str{_a_str.substr(1)};
         const result_t<string> _l_str_result{
-            abc::convert_u8string_to_string(_l_rest_of_str)
+            abc::checkless_convert_unicode_string_to_ascii_string(_l_rest_of_str)
         };
         if (_l_str_result.has_value())
         {
@@ -256,7 +256,7 @@ __constexpr result_t<complete_global_seed_t>
                         {
                             return unexpected(fmt::format(
                                 u8"Couldn't parse substring {0} in string {1}.",
-                                convert_string_to_u8string(_l_integer_str).value(),
+                                checkless_convert_ascii_to_unicode_string<u8string>(_l_integer_str),
                                 _a_str
                             ));
                         }

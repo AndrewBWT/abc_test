@@ -124,6 +124,7 @@ __constexpr_imp
     , _m_this_iterators_index{0}
     , _m_test_runner(_a_test_runner)
 {
+    using namespace std;
     using namespace ds;
     using namespace errors;
     invoked_test_data_t& _l_current_test{_m_test_runner->current_test()};
@@ -144,9 +145,9 @@ __constexpr_imp
             throw errors::test_library_exception_t(fmt::format(
                 u8"Could not initialise tests for loop stack. For loop stack = "
                 u8"{0}",
-                convert_string_to_u8string(
+                checkless_convert_ascii_to_unicode_string<u8string>(
                     fmt::format("{}", _l_current_test.for_loop_stack_trie())
-                ).value()
+                )
             ));
         }
     }

@@ -4,6 +4,7 @@
 #include "abc_test/utility/internal/macros.hpp"
 #include "abc_test/utility/parsers/default_parser.hpp"
 #include "abc_test/utility/printers/default_printer.hpp"
+#include "abc_test/utility/str/conversion.hpp"
 
 #include <filesystem>
 #include <fstream>

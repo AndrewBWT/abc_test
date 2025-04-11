@@ -125,7 +125,7 @@ __no_constexpr_imp void
             };
             const test_path_hierarchy_t _l_test_path_hierarchy{
                 abc::utility::str::split_string<char8_t>(
-                    convert_string_to_u8string(_l_test_element._m_user_data.path).value(),
+                    checkless_convert_ascii_to_unicode_string<u8string>(_l_test_element._m_user_data.path),
                     _m_options.path_delimiter
                 )
             };

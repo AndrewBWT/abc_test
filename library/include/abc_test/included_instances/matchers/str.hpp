@@ -172,9 +172,9 @@ __no_constexpr_imp matcher_t
         _l_equal,
         fmt::format(
             u8"{0} {1} {2}",
-            convert_string_to_u8string(_a_str1).value(),
+            checkless_convert_ascii_to_unicode_string<u8string>(_a_str1),
             _l_equal ? u8"==" : u8"!=",
-            convert_string_to_u8string(_a_str2).value()
+            checkless_convert_ascii_to_unicode_string<u8string>(_a_str2)
         )
     ));
 }

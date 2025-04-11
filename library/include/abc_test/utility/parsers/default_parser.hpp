@@ -147,7 +147,7 @@ __constexpr result_t<T>
     using namespace std;
     const u8string_view _l_sv{_a_parse_input.get_u32string(_a_characters_to_take
     )};
-    const result_t<string> _l_sv_as_str{abc::convert_u32string_to_string(_l_sv)
+    const result_t<string> _l_sv_as_str{abc::convert_unicode_string_to_ascii_string<u32string>(_l_sv)
     };
     if (_l_sv_as_str.has_value())
     {
@@ -259,7 +259,7 @@ public:
             }
             else
             {
-                _l_char = abc::convert_u32string_to_u16string(
+                _l_char = abc::unicode_conversion<u16string>(
                               _a_parse_input.process_characters(1)
                 )
                               .at(0);
@@ -367,7 +367,7 @@ struct default_parser_t<T> : public parser_base_t<T>
         const u32string _l_u32str{
             _a_parse_input.take_string_containing(U"0123456789-")
         };
-        const string _l_str{abc::unsafe_convert_u32string_to_string(_l_u32str)};
+        const string _l_str{checkless_convert_unicode_string_to_ascii_string(_l_u32str)};
         auto [ptr, ec]
             = from_chars(_l_str.data(), _l_str.data() + _l_str.size(), result);
 
@@ -379,7 +379,7 @@ struct default_parser_t<T> : public parser_base_t<T>
         {
             return result_t<T>(unexpected(fmt::format(
                 u8"Could not parse \"{0}\" using std::from_chars",
-                convert_u32string_to_u8string(_l_u32str)
+                unicode_conversion<u8string>(_l_u32str)
             )
 
             ));
@@ -730,7 +730,7 @@ struct default_parser_t<std::basic_string<T>>
             if constexpr (same_as<arg_type_t, string>)
             {
                 const result_t<string> _l_rv{
-                    abc::convert_u32string_to_string(_l_str)
+                    abc::convert_unicode_string_to_ascii_string(_l_str)
                 };
                 if (_l_rv.has_value())
                 {
@@ -744,7 +744,7 @@ struct default_parser_t<std::basic_string<T>>
             else if constexpr (same_as<arg_type_t, u8string>)
             {
                 const result_t<u8string> _l_rv{
-                    abc::convert_u32string_to_u8string(_l_str)
+                    abc::unicode_conversion<u8string>(_l_str)
                 };
                 if (_l_rv.has_value())
                 {
@@ -760,7 +760,7 @@ struct default_parser_t<std::basic_string<T>>
                                    && (sizeof(wchar_t) == 2)))
             {
                 const result_t<u16string> _l_rv{
-                    abc::convert_u32string_to_u16string(_l_str)
+                    abc::unicode_conversion<u16string>(_l_str)
                 };
                 if (_l_rv.has_value())
                 {
@@ -790,7 +790,7 @@ struct default_parser_t<std::basic_string<T>>
                 u8"Expected {0} to have a prefix of the string \"{1}\". "
                 u8"Remaining string = {2}",
                 type_id<T>(),
-                convert_u32string_to_u8string(u32string(1, _l_char)),
+                unicode_conversion<u8string>(u32string(1, _l_char)),
                 _a_parse_input.get_u8string()
             ));
         }
@@ -1213,7 +1213,7 @@ __constexpr std::optional<std::u8string>
         if (auto _l_result{get<I>(_m_parsers)->run_parser(_a_parse_input)};
             _l_result.has_value())
         {
-            _a_object = _l_result.value();
+            _a_object = value_type(in_place_index<I>,_l_result.value());
             return nullopt;
         }
         else

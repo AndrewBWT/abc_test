@@ -85,7 +85,7 @@ public:
         // Read the file.
         // Go thorugh the args and
         const result_t<string> _l_file_name{
-            convert_u8string_to_string(_a_args[0])
+            abc::checkless_convert_unicode_string_to_ascii_string(_a_args[0])
         };
         if (_l_file_name.has_value())
         {

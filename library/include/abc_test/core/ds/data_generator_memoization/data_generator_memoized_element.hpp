@@ -96,7 +96,7 @@ __no_constexpr_imp auto
         "}}",
         typeid(_a_rd).name(),
         "_m_additional_data",
-        abc::convert_u8string_to_string(_a_rd.additional_data).value(),
+        abc::checkless_convert_unicode_string_to_ascii_string(_a_rd.additional_data),
         "_m_mode",
         _a_rd.mode
     )};

@@ -310,7 +310,7 @@ struct default_printer_t<T> : public printer_base_t<T>
                           ) const
     {
         using namespace std;
-        return convert_string_to_u8string(to_string(_a_object)).value();
+        return abc::checkless_convert_ascii_to_unicode_string<u8string>(to_string(_a_object));
     }
 };
 
@@ -325,11 +325,12 @@ struct default_printer_t<T> : public printer_base_t<T>
                               const T& _a_object
                           ) const
     {
+        using namespace std;
         char* _l_holder = new char[1'000](0);
-        std::to_chars(_l_holder, _l_holder + 1'000, _a_object);
-        std::string _l_rv(_l_holder);
+        to_chars(_l_holder, _l_holder + 1'000, _a_object);
+        string _l_rv(_l_holder);
         delete[] _l_holder;
-        return convert_string_to_u8string(_l_rv).value();
+        return abc::checkless_convert_ascii_to_unicode_string<u8string>(_l_rv);
     }
 };
 
@@ -519,18 +520,16 @@ __constexpr std::u8string
     {
         _l_rv.append(u8" ");
     }
-    _l_rv.append(
-        convert_string_to_u8string(string(1, _a_object_print_parser.begin_char))
-            .value()
-    );
+    _l_rv.append(checkless_convert_ascii_to_unicode_string<u8string>(
+        string(1, _a_object_print_parser.begin_char)
+    ));
     tuple<Ts...> _l_tuple{tie(_a_elements_to_print...)};
     object_printer_internal<0>(
         _a_object_print_parser, _l_rv, _a_object_names, _a_parsers, _l_tuple
     );
-    _l_rv.append(
-        convert_string_to_u8string(string(1, _a_object_print_parser.end_char))
-            .value()
-    );
+    _l_rv.append(checkless_convert_ascii_to_unicode_string<u8string>(
+        string(1, _a_object_print_parser.end_char)
+    ));
     return _l_rv;
 }
 
@@ -558,14 +557,19 @@ __constexpr void
         _a_str.append(get<I>(_a_object_names.value()));
         if (_a_object_print_parser.space_before_field_name_and_field_separator)
         {
-            _a_str.append(convert_string_to_u8string(string(1, ' ')).value());
+            _a_str.append(checkless_convert_ascii_to_unicode_string<u8string>(
+                              string(1, ' ')
+            )
+                              .value());
         }
-        _a_str.append(convert_string_to_u8string(string(
-            1, _a_object_print_parser.delimiter_between_field_name_and_field
-        )));
+        _a_str.append(
+            checkless_convert_ascii_to_unicode_string<u8string>(string(
+                1, _a_object_print_parser.delimiter_between_field_name_and_field
+            ))
+        );
         if (_a_object_print_parser.space_after_field_name_and_field_separator)
         {
-            _a_str.append(convert_string_to_u8string(string(1, ' ')));
+            _a_str.append(checkless_convert_ascii_to_unicode_string<u8string>(string(1, ' ')));
         }
     }
     _a_str.append(
@@ -575,17 +579,17 @@ __constexpr void
     {
         if (_a_object_print_parser.space_before_field_delimiter)
         {
-            _a_str.append(convert_string_to_u8string(string(1, ' ')).value());
+            _a_str.append(checkless_convert_ascii_to_unicode_string<u8string>(string(1, ' ')).value());
         }
         _a_str.append(
-            convert_string_to_u8string(
+            checkless_convert_ascii_to_unicode_string<u8string>(
                 string(1, _a_object_print_parser.delimiter_between_fields)
             )
                 .value()
         );
         if (_a_object_print_parser.space_after_field_delimieter)
         {
-            _a_str.append(convert_string_to_u8string(string(1, ' ')).value());
+            _a_str.append(checkless_convert_ascii_to_unicode_string<u8string>(string(1, ' ')).value());
         }
         object_printer_internal<I + 1>(
             _a_object_print_parser,
