@@ -215,6 +215,7 @@ __constexpr assertion_wp_t<T>
     using namespace _ABC_NS_MATCHER;
     matcher_source_map_t _l_msm;
     global::get_this_threads_current_test().add_current_for_loop_stack_to_trie(
+        not _a_pass
     );
     auto ki = global::get_this_threads_test_runner_ref().get_log_infos(false);
     bba_inner_assertion_type_t _l_tuple(
@@ -240,7 +241,7 @@ __constexpr assertion_wp_t<T>
     using namespace _ABC_NS_MATCHER;
     matcher_source_map_t _l_msm;
     global::get_this_threads_current_test().add_current_for_loop_stack_to_trie(
-    );
+        not _a_matcher.matcher_result().passed());
     auto ki = global::get_this_threads_test_runner_ref().get_log_infos(false);
     _a_matcher.gather_map_source(_l_msm);
     if constexpr (Annotated)

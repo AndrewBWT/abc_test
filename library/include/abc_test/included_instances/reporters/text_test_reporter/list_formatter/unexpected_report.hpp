@@ -25,7 +25,7 @@ public:
             const reports::unexpected_report_t<Terminating>&    _a_element,
             const print_config_t&                               _a_pc,
             const utility::io::threated_text_output_reporter_t& _a_ttor,
-            const std::size_t _a_idx
+            const std::size_t                                   _a_idx
         ) const;
 protected:
     __constexpr virtual std::string
@@ -60,12 +60,12 @@ __constexpr_imp bool
 
 template <bool Terminating>
 __constexpr_imp void
-                unexpected_report_list_formatter_t<Terminating>::get_data(
+    unexpected_report_list_formatter_t<Terminating>::get_data(
         const enum_unexpected_report_fields_t&              _a_fid,
         const reports::unexpected_report_t<Terminating>&    _a_element,
         const print_config_t&                               _a_pc,
         const utility::io::threated_text_output_reporter_t& _a_ttor,
-                    const std::size_t _a_idx
+        const std::size_t                                   _a_idx
     ) const
 {
     /**/ using namespace std;
@@ -73,39 +73,43 @@ __constexpr_imp void
     using enum enum_unexpected_report_fields_t;
     switch (_a_fid)
     {
-    /*case SOURCE:
-        return {
-            _a_pc.indent(_a_pc.colon(
-                _a_pc.potential_source_str(_a_element.exact_source())
-            )),
-            _a_pc.indent(
-                _a_pc.source_location(
-                    _a_element.source().has_value()
-                        ? optional<source_location>{_a_element.source()
-                                                        .value()
-                                                        .source_location()}
-                        : optional<source_location>{}
-                ),
-                2
-            ),
-            _a_pc.indent(
-                _a_pc.colon(_a_pc.potential_code_str(_a_element.exact_source()))
-            ),
-            _a_pc.indent(
-                _a_pc.source_representation(
-                    _a_element.source().has_value()
-                        ? optional<string_view>{_a_element.source()
+    case SOURCE:
+        _a_ttor.write(_a_pc.indent(
+            _a_pc.colon(_a_pc.potential_source_str(_a_element.exact_source()))
+        ));
+        _a_ttor.write(_a_pc.indent(
+            _a_pc.source_location(
+                _a_element.source().has_value()
+                    ? optional<source_location>{_a_element.source()
                                                     .value()
-                                                    .source_code_representation(
-                                                    )}
-                        : optional<string_view>{}
-                ),
-                2
-            )
-        };
+                                                    .source_location()}
+                    : optional<source_location>{}
+            ),
+            2
+        ));
+        _a_ttor.write(_a_pc.indent(
+            _a_pc.colon(_a_pc.potential_code_str(_a_element.exact_source()))
+        ));
+        _a_ttor.write(_a_pc.indent(
+            _a_pc.source_representation(
+                _a_element.source().has_value()
+                    ? optional<
+                          u8string>{checkless_convert_ascii_to_unicode_string<
+                          u8string>(_a_element.source()
+                                        .value()
+                                        .source_code_representation())}
+                    : optional<u8string>{}
+            ),
+            2
+        ));
+        break;
     case STR_REPRESENTATION:
-        return {_a_pc.highlight_fail(get_str_representation(_a_element, _a_pc))
-        };*/
+        _a_ttor.write(_a_pc.highlight_fail(
+            checkless_convert_ascii_to_unicode_string<u8string>(
+                get_str_representation(_a_element, _a_pc)
+            )
+        ));
+        break;
     default:
         throw unaccounted_for_enum_exception(_a_fid);
     }

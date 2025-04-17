@@ -142,13 +142,14 @@ __constexpr_imp
         }
         else
         {
-            throw errors::test_library_exception_t(fmt::format(
-                u8"Could not initialise tests for loop stack. For loop stack = "
-                u8"{0}",
-                checkless_convert_ascii_to_unicode_string<u8string>(
-                    fmt::format("{}", _l_current_test.for_loop_stack_trie())
-                )
-            ));
+            this->_m_generation_collection_index = _m_iterator_length;
+            //throw errors::test_library_exception_t(fmt::format(
+          //      u8"Could not initialise tests for loop stack. For loop stack = "
+          //      u8"{0}",
+          //      checkless_convert_ascii_to_unicode_string<u8string>(
+           //         fmt::format("{}", _l_current_test.for_loop_stack_trie())
+          //      )
+         //   ));
         }
     }
     // If not at the end, increment the current test's CURRENT for loop stack

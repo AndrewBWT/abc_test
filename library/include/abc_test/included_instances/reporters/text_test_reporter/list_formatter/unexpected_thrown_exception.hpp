@@ -22,7 +22,7 @@ public:
             const reports::unexpected_thrown_exception_t&       _a_element,
             const print_config_t&                               _a_pc,
             const utility::io::threated_text_output_reporter_t& _a_ttor,
-            const std::size_t _a_idx
+            const std::size_t                                   _a_idx
         ) const;
 protected:
     __constexpr virtual std::string
@@ -68,12 +68,12 @@ __constexpr_imp bool
 }
 
 __constexpr_imp void
-                unexpected_thrown_exception_list_formatter_t::get_data(
-        const combined_enum_unexpected_exception_fields_t&       _a_fid,
-        const reports::unexpected_thrown_exception_t&            _a_element,
-        const print_config_t&                                    _a_pc,
+    unexpected_thrown_exception_list_formatter_t::get_data(
+        const combined_enum_unexpected_exception_fields_t&  _a_fid,
+        const reports::unexpected_thrown_exception_t&       _a_element,
+        const print_config_t&                               _a_pc,
         const utility::io::threated_text_output_reporter_t& _a_ttor,
-                    const std::size_t _a_idx
+        const std::size_t                                   _a_idx
     ) const
 {
     using namespace std;
@@ -93,20 +93,28 @@ __constexpr_imp void
         using enum enum_unexpected_exception_fields_t;
         switch (*_l_ptr)
         {
-        /*case EXCEPTION_TYPE:
-            return {
-                _a_pc.indent(_a_pc.exception_type_str()),
-                _a_pc.indent(
-                    _a_pc.exception_type(_a_element.exception_type()), 2
-                )
-            };
+        case EXCEPTION_TYPE:
+            _a_ttor.write(_a_pc.indent(_a_pc.exception_type_str()));
+            _a_ttor.write(_a_pc.indent(
+                _a_pc.exception_type(
+                    checkless_convert_ascii_to_unicode_string<u8string>(
+                        _a_element.exception_type()
+                    )
+                ),
+                2
+            ));
+            break;
         case EXCEPTION_MESSAGE:
-            return {
-                _a_pc.indent(_a_pc.exception_message_str()),
-                _a_pc.indent(
-                    _a_pc.exception_message(_a_element.exception_message()), 2
-                )
-            };*/
+            _a_ttor.write(_a_pc.indent(_a_pc.exception_message_str()));
+            _a_ttor.write(_a_pc.indent(
+                _a_pc.exception_message(
+                    checkless_convert_ascii_to_unicode_string<u8string>(
+                        _a_element.exception_message()
+                    )
+                ),
+                2
+            ));
+            break;
         default:
             throw errors::unaccounted_for_enum_exception(*_l_ptr);
         }

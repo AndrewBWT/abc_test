@@ -3,10 +3,9 @@
 #include "abc_test/core/ds/type_synonyms.hpp"
 #include "abc_test/core/errors/test_library_exception.hpp"
 #include "abc_test/utility/parsers/default_parser.hpp"
+#include "abc_test/utility/printers/default_printer.hpp"
 #include "abc_test/utility/str/parser_utility.hpp"
 #include "abc_test/utility/str/string_utility.hpp"
-
-#include "abc_test/utility/printers/default_printer.hpp"
 
 #include <charconv>
 #include <exception>
@@ -197,6 +196,7 @@ public:
      */
     __constexpr opt_idgc_memoized_element_t
         find_first_child_of_sequence_in_trie(
+            const std::size_t _a_current_for_loop_index,
             const idgc_memoized_element_sequence_t& _a_rds
         ) const noexcept;
     friend class itdg_collection_stack_trie_t;
@@ -289,7 +289,7 @@ struct default_printer_t<
 {
     static constexpr bool is_specialized{true};
 
-    __no_constexpr_imp           std::u8string
+    __no_constexpr_imp    std::u8string
                           run_printer(
                               const abc::ds::typeless_data_generator_collection_stack_trie_t&
                                   _a_object
@@ -304,8 +304,8 @@ struct default_printer_t<
             _a_object.print_for_loop_stack_trie()
         );
     }
-}
-;
+};
+
 _END_ABC_UTILITY_PRINTER_NS
 
 template <>
@@ -423,55 +423,28 @@ __constexpr_imp void
         {
             _l_current_ref = ref(*_l_children.back());
         }
-
-        // Find the equal element; or the subragne around them.
-        /*ranges::subrange<for_loop_stack_trie_children_t::iterator>
-            _l_equal_subrange{ranges::equal_range(
-                _l_children,
-                _l_flcd.for_loop_iteration_data,
-                ranges::less{},
-                [](const for_loop_stack_trie_child_t& _a_flstc)
-                {
-                    return _a_flstc->_m_for_loop_data;
-                }
-            )};
-        // If they are equal (both greater than the element - no element in the
-        // list).
-        if (_l_equal_subrange.begin() == _l_equal_subrange.end())
-        {
-            // So time to insert.
-            for_loop_stack_trie_children_t::iterator _l_inserted_itt{
-                _l_children.insert(
-                    _l_equal_subrange.end(),
-                    make_unique<tdg_collection_stack_trie_t>(
-                        tdg_collection_stack_trie_t(
-                            _l_flcd.for_loop_iteration_data
-                        )
-                    )
-                )
-            };
-            // Set the new current ref to the inserted element.
-            _l_current_ref = ref(*((*_l_inserted_itt).get()));
-        }
-        else
-        {
-            // Element already in, just navigate to it.
-            _l_current_ref = ref(*((*_l_equal_subrange.begin()).get()));
-        }*/
     }
 }
 
 __constexpr_imp opt_idgc_memoized_element_t
     typeless_data_generator_collection_stack_trie_t::
         find_first_child_of_sequence_in_trie(
+            const std::size_t _a_current_for_loop_index,
             const idgc_memoized_element_sequence_t& _a_rds
         ) const noexcept
 {
     if (_a_rds.size() == 0)
     {
-        return opt_idgc_memoized_element_t{
-            idgc_memoized_element_t{0, _m_children[0][0]->_m_for_loop_data}
-        };
+        if (_m_children.size() == 0 || _m_children[_a_current_for_loop_index].size() == 0)
+        {
+            return opt_idgc_memoized_element_t{};
+        }
+        else
+        {
+            return opt_idgc_memoized_element_t{
+                idgc_memoized_element_t{_a_current_for_loop_index, _m_children[_a_current_for_loop_index][0]->_m_for_loop_data}
+            };
+        }
     }
     if (const opt_itt_t _l_opt_itt{find_iterator(_a_rds)};
         _l_opt_itt.has_value())
@@ -712,12 +685,253 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
     u8string                 _l_error_string;
     size_t                   _l_old_pos;
     vector<u8string>         _l_current_strs;
-    tuple<u8string, u8string, u8string, string> _l_node;
+    tuple<u8string, u8string, u8string> _l_node;
     std::size_t _l_mode_zero_next_mode = _a_head_node ? 1 : 0;
-    while (_l_current_pos < _l_str.size())
+    std::cout << string(_a_str.begin(), _a_str.end()) << std::endl;
+    auto                                 kipwe = _a_str.size();
+    abc::utility::parser::parser_input_t _l_pt(_a_str);
+    size_t                               _l_min_index{0};
+    if (not _a_head_node)
+    {
+        if (auto _l_pos{_a_str.find(u8'(', _l_min_index)};
+            _l_pos == u8string::npos || _l_pos > 0)
+        {
+            return unexpected(u8"error");
+        }
+        else
+        {
+            _l_min_index = _l_pos + 1;
+        }
+        const size_t _l_first_comma{_a_str.find(u8',', _l_min_index)};
+        if (_l_first_comma == u8string::npos)
+        {
+            return unexpected(u8"error");
+        }
+        else
+        {
+            get<0>(_l_node)
+                = _a_str.substr(_l_min_index, _l_first_comma - _l_min_index);
+        }
+        _l_min_index = _l_first_comma + 1;
+        const size_t _l_second_comma{_a_str.find(u8',', _l_min_index)};
+        if (_l_second_comma == u8string::npos)
+        {
+            return unexpected(u8"error");
+        }
+        else
+        {
+            get<1>(_l_node)
+                = _a_str.substr(_l_min_index, _l_second_comma - _l_min_index);
+        }
+        _l_min_index = _l_first_comma + 1;
+        const size_t _l_first_quote{_a_str.find(u8'"', _l_min_index)};
+        if (_l_first_quote == u8string::npos)
+        {
+            return unexpected(u8"error");
+        }
+        else
+        {
+            _l_min_index = _l_first_quote + 1;
+            while (true)
+            {
+                const size_t _l_second_quote{_a_str.find(u8'"', _l_min_index)};
+                if (_l_second_quote != u8string::npos)
+                {
+                    if (_a_str.at(_l_second_quote - 1) != u8'\\')
+                    {
+                        get<2>(_l_node) = _a_str.substr(
+                            _l_first_quote+1, (_l_second_quote-1) - _l_first_quote
+                        );
+                        break;
+                    }
+                    else
+                    {
+                        _l_min_index = _l_second_quote + 1;
+                    }
+                }
+                else
+                {
+                    return unexpected(u8"error");
+                }
+            }
+            if (auto _l_pos{_a_str.find(u8',', _l_min_index)};
+                _l_pos == u8string::npos)
+            {
+                return unexpected(u8"error");
+            }
+            else
+            {
+                _l_min_index = _l_pos + 1;
+            }
+        }
+    }
+    if (auto _l_pos{_a_str.find(u8"[", _l_min_index)}; _l_pos == u8string::npos)
+    {
+        return unexpected(u8"error");
+    }
+    else
+    {
+        _l_min_index = _l_pos + 1;
+    }
+    if (_a_str[_l_min_index] == ']')
+    {
+    }
+    else
+    {
+        size_t _l_mode = 0;
+        while (true)
+        {
+            char8_t _l_char{_a_str[_l_min_index]};
+            if (_l_char == ']')
+            {
+                break;
+            }
+            if (_l_char == ',')
+            {
+                _l_min_index++;
+                // _l_strs.push_back(_l_current_strs);
+                // _l_current_strs.clear();
+                // _l_min_index++;
+                continue;
+            }
+            if (_l_char == '[')
+            {
+                _l_min_index++;
+                _l_mode = 1;
+                while (true)
+                {
+                    if (_a_str[_l_min_index] == ']')
+                    {
+                        _l_min_index++;
+                        _l_strs.push_back(_l_current_strs);
+                        _l_current_strs.clear();
+                        break;
+                    }
+                    if (_a_str[_l_min_index] != '(')
+                    {
+                        return unexpected(u8"");
+                    }
+                    size_t _l_start = _l_min_index;
+                    _l_min_index++;
+                    const size_t _l_first_quote{
+                        _a_str.find(u8"\"", _l_min_index)
+                    };
+                    if (_l_first_quote == string::npos)
+                    {
+                        return unexpected(u8"");
+                    }
+                    _l_min_index = _l_first_quote + 1;
+                    while (true)
+                    {
+                        const size_t _l_escape_char{
+                            _a_str.find(u8"\\", _l_min_index)
+                        };
+                        const size_t _l_second_quote{
+                            _a_str.find(u8"\"", _l_min_index)
+                        };
+                        if (_l_second_quote == string::npos)
+                        {
+                            return unexpected(u8"");
+                        }
+                        else if (_l_escape_char != string::npos
+                                 && (_l_escape_char + 1) == _l_second_quote)
+                        {
+                            _l_min_index = _l_second_quote + 1;
+                            continue;
+                        }
+                        else
+                        {
+                            _l_min_index = _l_second_quote + 1;
+                            break;
+                        }
+                    }
+                    if (_a_str[_l_min_index] != ',')
+                    {
+                        return unexpected(u8"");
+                    }
+                    _l_min_index++;
+                    if (_a_str[_l_min_index] != '[')
+                    {
+                        return unexpected(u8"");
+                    }
+                    ++_l_min_index;
+                    size_t _l_depth = 1;
+                    while (_l_depth > 0)
+                    {
+                        const size_t _l_next_relevant{
+                            _a_str.find_first_of(u8"[]\"", _l_min_index)
+                        };
+                        if (_l_next_relevant == string::npos)
+                        {
+                            return unexpected(u8"");
+                        }
+                        _l_min_index = _l_next_relevant;
+                        char8_t _l_char{_a_str[_l_min_index]};
+                        switch (_l_char)
+                        {
+                        case u8'[':
+                            _l_depth++;
+                            break;
+                        case u8']':
+                            _l_depth--;
+                            break;
+                        case u8'"':
+                        {
+                            _l_min_index++;
+                            while (true)
+                            {
+                                const size_t _l_escape_char{
+                                    _a_str.find(u8"\\", _l_min_index)
+                                };
+                                const size_t _l_closing_brace{
+                                    _a_str.find(u8"\"", _l_min_index)
+                                };
+                                if (_l_closing_brace == string::npos)
+                                {
+                                    return unexpected(u8"");
+                                }
+                                if (_l_escape_char == string::npos)
+                                {
+                                    _l_min_index = _l_closing_brace + 1;
+                                    break;
+                                }
+                                else if ((_l_escape_char + 1)
+                                         == _l_closing_brace)
+                                {
+                                    _l_min_index = _l_closing_brace + 1;
+                                    continue;
+                                }
+                            }
+                        }
+                        }
+                        _l_min_index++;
+                    }
+                    _l_current_strs.push_back(u8string(
+                        _a_str.substr(_l_start, (_l_min_index - _l_start + 1))
+                    ));
+                    _l_min_index++;
+                    if (_a_str[_l_min_index] == ',')
+                    {
+                        _l_min_index++;
+                        continue;
+                    }
+                    else if (_a_str[_l_min_index] == ']')
+                    {
+                        _l_min_index++;
+                        _l_strs.push_back(_l_current_strs);
+                        _l_current_strs.clear();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    /*while (_l_current_pos < _l_str.size())
     {
         _l_previous_mode = _l_mode;
         _l_old_pos       = _l_current_pos;
+        u8string xii(_a_str.begin() + _l_current_pos, _a_str.end());
         switch (_l_mode)
         {
         case 0:
@@ -812,8 +1026,8 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
             );
             break;
         case 7:
-            // Mini loop. Search for either a [ (signifying new set) or ]
-            // (ending set)
+            // Mini loop. Search for either a [ (signifying new set) or
+            // ] (ending set)
             locate_relevant_characters_and_change_mode(
                 _l_str,
                 _l_current_pos,
@@ -838,14 +1052,14 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
             );
             break;
         case 9:
-            // Skip everything until a round bracket is found, signifying
-            // the ending of this element.
+            // Skip everything until a round bracket is found,
+            // signifying the ending of this element.
             skip_chars_and_strings_until_found(
                 _l_str,
                 _l_current_pos,
                 {
                     {char8_t('"'), char8_t('"')},
-                    {char8_t('['), char8_t(']')}
+                    // {char8_t('['), char8_t(']')}
             },
                 char8_t('('),
                 char8_t(')'),
@@ -865,14 +1079,14 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
                 _l_str,
                 _l_current_pos,
                 {
-                    {']', 11},
-                    {',', 8 },
+                    {char8_t(']'), 11},
+                    {char8_t(','), 8 },
                     // {']', 11}
             },
                 _l_error_string,
                 _l_mode
             );
-            if (_a_str[_l_current_pos] == ']')
+            if (_a_str[_l_current_pos] == char8_t(']'))
             {
                 _l_strs.push_back(_l_current_strs);
                 _l_current_strs.clear();
@@ -889,8 +1103,8 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
                 _l_str,
                 _l_current_pos,
                 {
-                    {',', 7                     },
-                    {']', _a_head_node ? 13 : 12}
+                    {char8_t(','), 7                     },
+                    {char8_t(']'), _a_head_node ? 13 : 12}
             },
                 _l_error_string,
                 _l_mode
@@ -901,13 +1115,14 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
                 _l_str,
                 _l_current_pos,
                 {
-                    {')', 13},
+                    {char8_t(')'), 13},
             },
                 _l_error_string,
                 _l_mode
             );
             break;
         case 13:
+            std::cout << std::string(_a_str.begin(), _a_str.end()) << std::endl;
             if (_l_current_pos != _a_str.size())
             {
                 return unexpected(u8"Should have been at end. Not");
@@ -921,7 +1136,7 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
             return unexpected(_l_error_string);
         }
         _l_current_pos++;
-    }
+    }*/
 
     // Put it all together
     tdg_collection_stack_trie_t _l_rv;
@@ -932,7 +1147,8 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
         if (not _l_result_1.has_value())
         {
             return unexpected(fmt::format(
-                u8"Could not parse generation_collection_index using string "
+                u8"Could not parse generation_collection_index using "
+                u8"string "
                 u8"\"{0}\"",
                 get<0>(_l_node)
             ));
@@ -941,7 +1157,8 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
         if (not _l_result_2.has_value())
         {
             return unexpected(fmt::format(
-                u8"Could not parse generation_collection_index using string "
+                u8"Could not parse generation_collection_index using "
+                u8"string "
                 u8"\"{0}\"",
                 get<1>(_l_node)
             ));
@@ -978,12 +1195,10 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
 _END_ABC_DS_NS
 
 __no_constexpr_imp auto
-    fmt::formatter<
-        _ABC_NS_DS::tdg_collection_stack_trie_t>::
-        format(
-            _ABC_NS_DS::tdg_collection_stack_trie_t _a_rt,
-            format_context&                                             _a_cxt
-        ) const -> format_context::iterator
+    fmt::formatter<_ABC_NS_DS::tdg_collection_stack_trie_t>::format(
+        _ABC_NS_DS::tdg_collection_stack_trie_t _a_rt,
+        format_context&                         _a_cxt
+    ) const -> format_context::iterator
 {
     using namespace std;
     const string _l_rv{fmt::format(
@@ -992,7 +1207,9 @@ __no_constexpr_imp auto
         "}}",
         typeid(_a_rt).name(),
         "_m_children",
-        abc::checkless_convert_unicode_string_to_ascii_string(_a_rt.print_for_loop_stack_trie())
+        abc::checkless_convert_unicode_string_to_ascii_string(
+            _a_rt.print_for_loop_stack_trie()
+        )
     )};
     return formatter<string_view>::format(_l_rv, _a_cxt);
 }

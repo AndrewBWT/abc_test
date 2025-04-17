@@ -44,9 +44,9 @@ public:
         ) const noexcept;
     __no_constexpr void
         parse_arguments(
-            Option_Class&                          _a_option_class,
+            Option_Class&                     _a_option_class,
             const std::vector<std::u8string>& _a_args,
-            cli_results_t&                         _a_cli_results
+            cli_results_t&                    _a_cli_results
         ) const noexcept;
     template <typename T, typename U = T>
     __no_constexpr void
@@ -95,10 +95,10 @@ public:
                       auto_configuration() const noexcept;
     __no_constexpr void
         setup_next_file(
-            const std::string_view _a_autofile_name,
-            const std::size_t      _a_autofile_size,
-            const Option_Class&    _a_option_class,
-            const bool             _a_test_success
+            const std::u8string_view _a_autofile_name,
+            const std::size_t        _a_autofile_size,
+            const Option_Class&      _a_option_class,
+            const bool               _a_test_success
         ) const noexcept;
 private:
     __no_constexpr bool
@@ -129,7 +129,7 @@ private:
             Option_Class&                            _a_option_class,
             const std::u8string_view                 _a_flag,
             const cli_info_t<Option_Class>&          _a_cli_info,
-            const std::vector<std::u8string>&   _a_strs,
+            const std::vector<std::u8string>&        _a_strs,
             const std::size_t                        _a_strs_size,
             std::size_t&                             _a_current_index,
             const std::optional<std::u8string_view>& _a_source,
@@ -142,10 +142,10 @@ private:
         ) noexcept;
     __no_constexpr void
         write_file(
-            const std::string_view _a_autofile_name,
-            const std::size_t      _a_autofile_size,
-            const Option_Class&    _a_option_class,
-            const bool             _a_test_success
+            const std::u8string_view _a_autofile_name,
+            const std::size_t        _a_autofile_size,
+            const Option_Class&      _a_option_class,
+            const bool               _a_test_success
         ) const noexcept;
     __constexpr std::vector<std::pair<std::u8string, std::u8string>>
                 get_config_file_data(const Option_Class& _a_option_class
@@ -224,9 +224,9 @@ __no_constexpr_imp void
 template <typename Option_Class>
 __no_constexpr_imp void
     cli_t<Option_Class>::parse_arguments(
-        Option_Class&                          _a_option_class,
+        Option_Class&                     _a_option_class,
         const std::vector<std::u8string>& _a_args,
-        cli_results_t&                         _a_cli_results
+        cli_results_t&                    _a_cli_results
     ) const noexcept
 {
     using namespace std;
@@ -383,7 +383,7 @@ __constexpr_imp bool
                 _l_clp_info{find_clp_info(_l_opt_normalised_str.value())};
             _l_clp_info.has_value())
         {
-            size_t                _l_idx{0};
+            size_t           _l_idx{0};
             vector<u8string> _l_strs;
             for (auto& _l_arg : _a_args)
             {
@@ -623,10 +623,10 @@ __constexpr_imp const std::optional<cli_auto_configuration_t>&
 template <typename Option_Class>
 __no_constexpr void
     cli_t<Option_Class>::setup_next_file(
-        const std::string_view _a_autofile_name,
-        const std::size_t      _a_autofile_size,
-        const Option_Class&    _a_option_class,
-        const bool             _a_test_success
+        const std::u8string_view _a_autofile_name,
+        const std::size_t        _a_autofile_size,
+        const Option_Class&      _a_option_class,
+        const bool               _a_test_success
     ) const noexcept
 {
     if (_m_rep_data.has_value())
@@ -818,7 +818,7 @@ __constexpr_imp bool
         Option_Class&                            _a_option_class,
         const std::u8string_view                 _a_flag,
         const cli_info_t<Option_Class>&          _a_cli_info,
-        const std::vector<std::u8string>&   _a_strs,
+        const std::vector<std::u8string>&        _a_strs,
         const std::size_t                        _a_strs_size,
         std::size_t&                             _a_current_index,
         const std::optional<std::u8string_view>& _a_source,
@@ -889,10 +889,10 @@ __no_constexpr_imp void
 template <typename Option_Class>
 __no_constexpr_imp void
     cli_t<Option_Class>::write_file(
-        const std::string_view _a_autofile_name,
-        const std::size_t      _a_autofile_size,
-        const Option_Class&    _a_option_class,
-        const bool             _a_test_success
+        const std::u8string_view _a_autofile_name,
+        const std::size_t        _a_autofile_size,
+        const Option_Class&      _a_option_class,
+        const bool               _a_test_success
     ) const noexcept
 {
     using namespace std;
@@ -907,7 +907,7 @@ __no_constexpr_imp void
             const filesystem::path _l_new_path{
                 filesystem::path(_l_rep_data._m_repetition_folder)
                     .append(fmt::format(
-                        "{0}_{1}_{2}",
+                        u8"{0}_{1}_{2}",
                         _a_autofile_name,
                         _l_rep_data._m_last_config_info.value().max_index + 1,
                         _l_rep_data._m_last_config_info.value().max_index
@@ -930,7 +930,7 @@ __no_constexpr_imp void
         const filesystem::path _l_new_path{
             filesystem::path(_l_rep_data._m_repetition_folder)
                 .append(fmt::format(
-                    "{0}_{1}_{2}", _a_autofile_name, 1, +_a_autofile_size
+                    u8"{0}_{1}_{2}", _a_autofile_name, 1, +_a_autofile_size
                 ))
         };
         _l_output.open(_l_new_path, ios::app);
@@ -939,13 +939,14 @@ __no_constexpr_imp void
         abc::utility::printer::default_printer_t<pair<bool, size_t>>{}
             .run_printer(make_pair(_a_test_success, _l_next_index))
     };
-    _l_output << _a_option_class.autofile_metadata_string << "_"
-              << string(_l_printed_str.begin(), _l_printed_str.end())
+    _l_output << abc::pack_u8string_into_string(
+        _a_option_class.autofile_metadata_string
+    ) << "_" << string(_l_printed_str.begin(), _l_printed_str.end())
               << std::endl;
     for (const auto& [_l_field, _l_data] :
          get_config_file_data(_a_option_class))
     {
-        const u8string _l_str{ fmt::format(u8"{0} = {1}", _l_field, _l_data) };
+        const u8string _l_str{fmt::format(u8"{0} = {1}", _l_field, _l_data)};
         _l_output << string(_l_str.begin(), _l_str.end()) << endl;
     }
     _l_output.close();
@@ -985,7 +986,10 @@ __constexpr_imp std::vector<std::u8string>
     vector<u8string> _l_strs(_a_argc > 1 ? (_a_argc - 1) : 0);
     for (size_t _l_idx{1}; _l_idx < _a_argc; ++_l_idx)
     {
-        _l_strs[_l_idx - 1] = checkless_convert_ascii_to_unicode_string<u8string>(_a_argv[_l_idx]);
+        _l_strs[_l_idx - 1]
+            = checkless_convert_ascii_to_unicode_string<u8string>(
+                _a_argv[_l_idx]
+            );
     }
     return _l_strs;
 }

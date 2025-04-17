@@ -191,7 +191,8 @@ public:
      *
      */
     __constexpr void
-        add_current_for_loop_stack_to_trie() noexcept;
+        add_current_for_loop_stack_to_trie(const bool _a_is_stack_to_be_added
+        ) noexcept;
     /*!
      * @brief Gets the current order ran ID.
      *
@@ -410,6 +411,7 @@ __constexpr_imp opt_idgc_memoized_element_t
             ? opt_idgc_memoized_element_t{}
             : _m_post_setup_test_data.for_loop_stack_trie()
                   .find_first_child_of_sequence_in_trie(
+                      _m_for_loop_data_collection.current_for_loop_index(),
                       _m_for_loop_data_collection.create_data_sequence(
                           false, true
                       )
@@ -453,11 +455,16 @@ __constexpr_imp const ds::tdg_collection_stack_trie_t&
 }
 
 __constexpr_imp void
-    invoked_test_data_t::add_current_for_loop_stack_to_trie() noexcept
+    invoked_test_data_t::add_current_for_loop_stack_to_trie(
+        const bool _a_is_stack_to_be_added
+    ) noexcept
 {
-    _m_tests_for_loop_stack_trie.add_for_loop_creation_data_sequence(
-        _m_for_loop_data_collection.create_data_sequence(true, false)
-    );
+    if (_a_is_stack_to_be_added)
+    {
+        _m_tests_for_loop_stack_trie.add_for_loop_creation_data_sequence(
+            _m_for_loop_data_collection.create_data_sequence(true, false)
+        );
+    }
 }
 
 __constexpr_imp std::size_t
@@ -481,7 +488,9 @@ __constexpr_imp void
         throw errors::test_library_exception_t(fmt::format(
             u8"add_assertions function has been entered, however should have "
             u8"already termianted. _m_test_status = {0}",
-            abc::checkless_convert_ascii_to_unicode_string<std::u8string>(fmt::format("{}",_m_test_status))
+            abc::checkless_convert_ascii_to_unicode_string<std::u8string>(
+                fmt::format("{}", _m_test_status)
+            )
         ));
     }
     else if (_a_ptr == nullptr)
@@ -541,7 +550,9 @@ __constexpr_imp void
         throw errors::test_library_exception_t(fmt::format(
             u8"set_unexpected_termination function has been entered, however "
             u8"should have already termianted. _m_test_status = {0}",
-            abc::checkless_convert_ascii_to_unicode_string<std::u8string>(fmt::format("{}", _m_test_status))
+            abc::checkless_convert_ascii_to_unicode_string<std::u8string>(
+                fmt::format("{}", _m_test_status)
+            )
         ));
     }
     else if (_m_termination_report != nullptr)
@@ -690,9 +701,11 @@ __no_constexpr_imp std::filesystem::path
     {
         _l_path /= normalise_for_file_use(_a_test_path_component);
     }
-    _l_path /= normalise_for_file_use(abc::checkless_convert_ascii_to_unicode_string<std::u8string>(
-        _a_test_info.registered_test_data()._m_user_data.name
-    ));
+    _l_path /= normalise_for_file_use(
+        abc::checkless_convert_ascii_to_unicode_string<std::u8string>(
+            _a_test_info.registered_test_data()._m_user_data.name
+        )
+    );
     if (not exists(_l_path))
     {
         create_directories(_l_path);

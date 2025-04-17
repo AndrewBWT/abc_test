@@ -73,6 +73,8 @@ __no_constexpr_imp
 {
     using namespace global;
     using namespace ds;
+    this->_m_flid = data_generator_memoized_element_t{ 0, abc::utility::printer::print(_m_idx) };
+    this->_m_repeat_flid = this->_m_flid;
     invoked_test_data_t& _l_current_test{get_this_threads_current_test()};
     _l_current_test.increment_for_loop_stack(*this);
     _m_should_idx_be_ran = _l_current_test.is_current_for_loop_stack_in_true();
@@ -99,7 +101,10 @@ __no_constexpr_imp manual_data_generator_t&
     using namespace std;
     using namespace global;
     using namespace ds;
+    typeless_data_generator_collection_iterator_t::reset();
     _m_idx++;
+    this->_m_flid = data_generator_memoized_element_t{ 0, abc::utility::printer::print(_m_idx) };
+    this->_m_repeat_flid = this->_m_flid;
     invoked_test_data_t& _l_current_test{get_this_threads_current_test()};
     _l_current_test.update_for_loop_stack(*this);
     _m_should_idx_be_ran = _l_current_test.is_current_for_loop_stack_in_true();

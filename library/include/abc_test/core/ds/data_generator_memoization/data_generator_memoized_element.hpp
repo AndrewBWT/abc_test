@@ -42,7 +42,7 @@ public:
     /*!
      * @brief The mode the gen_data_t element was in when the iteration data was
      * created. Classes derived from gen_data_t can have different modes -
-     * integers which change th behaviour of the class. This variable holds that
+     * integers which change the behaviour of the class. This variable holds that
      * data.
      */
     std::size_t mode = 0;

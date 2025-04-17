@@ -28,8 +28,8 @@ __constexpr std::function<std::optional<T>(const std::u8string_view)>
     using namespace abc::utility::parser;
     return [](const u8string_view _a_str)
     {
-        if constexpr (std::same_as<T, std::u8string>
-                      || std::same_as<T, std::filesystem::path>)
+        if constexpr (same_as<T, u8string>
+                      || same_as<T, filesystem::path>)
         {
             return make_optional(T(_a_str));
         }
@@ -195,11 +195,11 @@ public:
 
     __no_constexpr_imp virtual bool
         process_args_(
-            Option_Class&                        _a_option_class,
+            Option_Class&                          _a_option_class,
             const std::u8string_view               _a_flag,
             const std::vector<std::u8string_view>& _a_args,
-            const cli_t<Option_Class>&           _a_cli,
-            cli_results_t&                       _a_cli_results
+            const cli_t<Option_Class>&             _a_cli,
+            cli_results_t&                         _a_cli_results
         ) const noexcept
         = 0;
 
@@ -326,7 +326,7 @@ public:
                 u8"Could not parse std::string \"{0}\" to type {1}. "
                 u8"Reason:",
                 _a_args[0],
-                type_id< T>()
+                type_id<T>()
             ));
             return true;
         }
@@ -377,9 +377,7 @@ public:
         for (const u8string_view _l_arg : _a_args)
         {
             if (const optional<U> _l_parse_result{
-                    _m_processing_info.parser_func(
-                        _l_arg
-                    )
+                    _m_processing_info.parser_func(_l_arg)
                 };
                 _l_parse_result.has_value())
             {
@@ -407,7 +405,7 @@ public:
                     u8"Could not parse std::string \"{0}\" to type {1}. "
                     u8"Reason:",
                     _l_arg,
-                    type_id< T>()
+                    type_id<T>()
                 ));
                 return true;
             }

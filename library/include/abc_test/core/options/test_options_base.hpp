@@ -42,7 +42,7 @@ public:
         test_options_base_t() noexcept
         = default;
     std::size_t autofile_size                      = 1'000;
-    std::string autofile_name                      = "autofile";
+    std::u8string autofile_name                      = u8"autofile";
     /*!
      * @brief Path delimiter used to separate tests into their components.
      *
@@ -78,7 +78,7 @@ public:
      * writer uses fmt::format and scn::scan.
      */
     std::u8string general_data_extension                       = u8"gd";
-    std::string tertiary_data_file_extension                 = "td";
+    std::u8string tertiary_data_file_extension                 = u8"td";
     /*!
      * @brief The comment line string.
      *
@@ -149,9 +149,9 @@ public:
      * Test paths to run
      */
     std::vector<std::u8string> test_paths_to_run;
-    std::string              autofile_metadata_string = "metadata";
+    std::u8string              autofile_metadata_string = u8"metadata";
     std::size_t maximum_individual_alloctable_memory = 2'147;// 483'648;
-    bool retain_passed_assertions = false;
+    bool retain_passed_assertions = true;
     /*!
      * @brief Function to validate the input.
      *

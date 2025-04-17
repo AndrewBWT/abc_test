@@ -147,7 +147,8 @@ __constexpr result_t<T>
     using namespace std;
     const u8string_view _l_sv{_a_parse_input.get_u32string(_a_characters_to_take
     )};
-    const result_t<string> _l_sv_as_str{abc::convert_unicode_string_to_ascii_string<u32string>(_l_sv)
+    const result_t<string> _l_sv_as_str{
+        abc::convert_unicode_string_to_ascii_string<u32string>(_l_sv)
     };
     if (_l_sv_as_str.has_value())
     {
@@ -367,7 +368,9 @@ struct default_parser_t<T> : public parser_base_t<T>
         const u32string _l_u32str{
             _a_parse_input.take_string_containing(U"0123456789-")
         };
-        const string _l_str{checkless_convert_unicode_string_to_ascii_string(_l_u32str)};
+        const string _l_str{
+            checkless_convert_unicode_string_to_ascii_string(_l_u32str)
+        };
         auto [ptr, ec]
             = from_chars(_l_str.data(), _l_str.data() + _l_str.size(), result);
 
@@ -743,33 +746,13 @@ struct default_parser_t<std::basic_string<T>>
             }
             else if constexpr (same_as<arg_type_t, u8string>)
             {
-                const result_t<u8string> _l_rv{
-                    abc::unicode_conversion<u8string>(_l_str)
-                };
-                if (_l_rv.has_value())
-                {
-                    return _l_rv;
-                }
-                else
-                {
-                    return unexpected(fmt::format(u8"Could not convert"));
-                }
+                return abc::unicode_conversion<u8string>(_l_str);
             }
             else if constexpr (same_as<arg_type_t, u16string>
                                || (same_as<arg_type_t, wstring>
                                    && (sizeof(wchar_t) == 2)))
             {
-                const result_t<u16string> _l_rv{
-                    abc::unicode_conversion<u16string>(_l_str)
-                };
-                if (_l_rv.has_value())
-                {
-                    return _l_rv;
-                }
-                else
-                {
-                    return unexpected(fmt::format("Could not convert"));
-                }
+                return abc::unicode_conversion<arg_type_t>(_l_str);
             }
             else if constexpr (same_as<arg_type_t, u32string>
                                || (same_as<arg_type_t, wstring>
@@ -1213,7 +1196,7 @@ __constexpr std::optional<std::u8string>
         if (auto _l_result{get<I>(_m_parsers)->run_parser(_a_parse_input)};
             _l_result.has_value())
         {
-            _a_object = value_type(in_place_index<I>,_l_result.value());
+            _a_object = value_type(in_place_index<I>, _l_result.value());
             return nullopt;
         }
         else

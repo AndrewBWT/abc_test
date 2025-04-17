@@ -654,6 +654,8 @@ struct default_random_generator_t<std::basic_string<T>>
             const utility::rng_counter_t& _a_index
         )
     {
+        std::cout << "Begin RNG basic string. rng_counter = " <<
+            _a_index << std::endl;
         using namespace std;
         const basic_string<T>::size_type _l_size{
             detail::generate_rng_value_between_bounds<
@@ -661,6 +663,11 @@ struct default_random_generator_t<std::basic_string<T>>
                 _m_bounds, _a_index, _a_rnd_generator
             )
         };
+        std::cout << fmt::format("Size {1}",_a_index, _l_size) << std::endl;
+        if (_a_index == 0)
+        {
+            int i = 5;
+        }
         basic_string<T> _l_rv(_l_size, T{});
         if (_m_rng.has_value())
         {
@@ -669,6 +676,10 @@ struct default_random_generator_t<std::basic_string<T>>
             for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
             {
                 _l_rv[_l_idx] = _l_rng->operator()(_a_rnd_generator, _a_index);
+               // auto kbd = fmt::format(
+               //     u8"[{0}] = {1}", _l_idx, basic_string<T>(1, _l_rv[_l_idx])
+              //  );
+              //  std::cout << string(kbd.begin(), kbd.end()) << std::endl;
             }
         }
         else
@@ -686,11 +697,16 @@ struct default_random_generator_t<std::basic_string<T>>
                 {
                     const basic_string<T>& _l_generated{_l_opt_generated.value()
                     };
+                    auto ki = _l_idx;
                     for (const T _l_char : _l_generated)
                     {
                         _l_rv[_l_idx++] = _l_char;
                         _l_remaining--;
                     }
+                //    auto kbd = fmt::format(
+                //        u8"[{0} - {1}] = {2}", ki, _l_idx, _l_generated
+                //    );
+                //    std::cout << std::string(kbd.begin(), kbd.end()) << std::endl;
                 }
                 else
                 {
@@ -702,6 +718,8 @@ struct default_random_generator_t<std::basic_string<T>>
                 _l_rv.resize(_l_idx);
             }
         }
+        std::cout << "End RNG basic string. rng_counter = " <<
+            _a_index << std::endl;
         return _l_rv;
     }
 private:

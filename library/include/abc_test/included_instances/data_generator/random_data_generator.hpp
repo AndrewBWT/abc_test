@@ -83,6 +83,12 @@ __constexpr void
     )
 {
     _m_random_calls_before_after = _a_tertiary_data;
+    utility::rng_t& _l_rng{
+        global::get_this_threads_current_test().get_random_generator()
+    };
+    _l_rng.progress(get<0>(_m_random_calls_before_after));
+    _m_elements_generated = get<2>(_m_random_calls_before_after);
+    _m_element = (*_m_random_generator)(_l_rng, _m_elements_generated);
 }
 
 template <typename T>

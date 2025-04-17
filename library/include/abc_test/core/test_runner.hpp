@@ -338,7 +338,7 @@ __constexpr_imp void
             _a_optional_warning.value(), _a_ptr->last_source()
         );
     }
-    _m_current_test->add_current_for_loop_stack_to_trie();
+    _m_current_test->add_current_for_loop_stack_to_trie(not _a_ptr->get_pass_status());
     _m_current_test->add_assertion(_a_ptr);
 }
 

@@ -310,7 +310,9 @@ struct default_printer_t<T> : public printer_base_t<T>
                           ) const
     {
         using namespace std;
-        return abc::checkless_convert_ascii_to_unicode_string<u8string>(to_string(_a_object));
+        return abc::checkless_convert_ascii_to_unicode_string<u8string>(
+            to_string(_a_object)
+        );
     }
 };
 
@@ -569,7 +571,9 @@ __constexpr void
         );
         if (_a_object_print_parser.space_after_field_name_and_field_separator)
         {
-            _a_str.append(checkless_convert_ascii_to_unicode_string<u8string>(string(1, ' ')));
+            _a_str.append(checkless_convert_ascii_to_unicode_string<u8string>(
+                string(1, ' ')
+            ));
         }
     }
     _a_str.append(
@@ -579,7 +583,10 @@ __constexpr void
     {
         if (_a_object_print_parser.space_before_field_delimiter)
         {
-            _a_str.append(checkless_convert_ascii_to_unicode_string<u8string>(string(1, ' ')).value());
+            _a_str.append(checkless_convert_ascii_to_unicode_string<u8string>(
+                              string(1, ' ')
+            )
+                              .value());
         }
         _a_str.append(
             checkless_convert_ascii_to_unicode_string<u8string>(
@@ -589,7 +596,10 @@ __constexpr void
         );
         if (_a_object_print_parser.space_after_field_delimieter)
         {
-            _a_str.append(checkless_convert_ascii_to_unicode_string<u8string>(string(1, ' ')).value());
+            _a_str.append(checkless_convert_ascii_to_unicode_string<u8string>(
+                              string(1, ' ')
+            )
+                              .value());
         }
         object_printer_internal<I + 1>(
             _a_object_print_parser,
@@ -854,11 +864,30 @@ struct default_printer_t<std::basic_string<T>>
         else if constexpr (same_as<arg_type_t, u32string>)
         {
             u8string _l_object_as_u8str;
-            utf8::utf32to8(
-                _a_object.begin(),
-                _a_object.end(),
-                std::back_inserter(_l_object_as_u8str)
-            );
+            for (auto _l_itt{_a_object.begin()}; _l_itt != _a_object.end();
+                 ++_l_itt)
+            {
+                char32_t _l_char{*_l_itt};
+                if (not utf8::internal::is_code_point_valid(_l_char))
+                {
+                    u8string _l_char_as_hex{
+                        abc::make_hex_from_char<char8_t>(_l_char)
+                    };
+                    _l_object_as_u8str.append(_l_char_as_hex);
+                }
+                else
+                {
+                    utf8::internal::append(
+                        _l_char, std::back_inserter(_l_object_as_u8str)
+                    );
+                }
+            }
+
+            // utf8::utf32to8(
+            // _a_object.begin(),
+            // _a_object.end(),
+            // std::back_inserter(_l_object_as_u8str)
+            // );
             return fmt::format(
                 u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
             );
@@ -868,11 +897,58 @@ struct default_printer_t<std::basic_string<T>>
             if constexpr (sizeof(wchar_t) == 2)
             {
                 u8string _l_object_as_u8str;
-                utf8::utf16to8(
-                    _a_object.begin(),
-                    _a_object.end(),
-                    std::back_inserter(_l_object_as_u8str)
-                );
+                auto     _l_itt{_a_object.begin()};
+                auto     _l_end{_a_object.end()};
+                auto     result = std::back_inserter(_l_object_as_u8str);
+                while (_l_itt != _l_end)
+                {
+                    char32_t _l_char = utf8::internal::mask16(*_l_itt++);
+                    // Take care of surrogate pairs first
+                    if (utf8::internal::is_lead_surrogate(_l_char))
+                    {
+                        if (_l_itt != _l_end)
+                        {
+                            const char32_t trail_surrogate
+                                = utf8::internal::mask16(*_l_itt++);
+                            if (utf8::internal::is_trail_surrogate(
+                                    trail_surrogate
+                                ))
+                            {
+                                _l_char = (_l_char << 10) + trail_surrogate
+                                          + utf8::internal::SURROGATE_OFFSET;
+                            }
+                            else
+                            {
+                                _l_object_as_u8str.append(
+                                    abc::make_hex_from_char<uint16_t>(
+                                        trail_surrogate
+                                    )
+                                );
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            _l_object_as_u8str.append(
+                                abc::make_hex_from_char<uint16_t>(
+                                    _l_char
+                                )
+                            );
+                            continue;
+                        }
+                    }
+                    // Lone trail surrogate
+                    else if (utf8::internal::is_trail_surrogate(_l_char))
+                    {
+                        _l_object_as_u8str.append(
+                            abc::make_hex_from_char<uint16_t>(
+                                _l_char
+                            )
+                        );
+                    }
+
+                    result = utf8::append(_l_char, result);
+                }
                 return fmt::format(
                     u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
                 );

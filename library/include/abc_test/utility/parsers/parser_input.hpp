@@ -28,6 +28,10 @@ public:
                        const char32_t _a_char1,
                        const char32_t _a_char2
                    ) noexcept;
+    __no_constexpr std::u32string
+        continue_until_char(
+            const char32_t _a_char1
+        ) noexcept;
     __constexpr void
                          advance(const std::size_t _a_new_itereator) noexcept;
     __constexpr const    std::u8string_view

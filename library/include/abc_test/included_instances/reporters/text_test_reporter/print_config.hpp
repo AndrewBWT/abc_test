@@ -497,7 +497,7 @@ __no_constexpr_imp std::u8string
     ) const noexcept
 {
     return quote(
-        print_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(_a_map)
+        print_map_of_unique_ids_to_tdg_collection_stack_tries(_a_map)
     );
 }
 

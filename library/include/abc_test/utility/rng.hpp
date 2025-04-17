@@ -22,11 +22,13 @@ public:
     __no_constexpr rng_t
         make_rng(const std::size_t _a_n_elements_to_take);
 
-    __constexpr void
+    __no_constexpr void
         progress(const size_t _a_expected_calls) noexcept;
-    template<typename T>
-    __constexpr T in_range_inclusive(const T& _a_lower, const T& _a_higher) const noexcept;
-    __constexpr result_type
+    template <typename T>
+    __constexpr T
+        in_range_inclusive(const T& _a_lower, const T& _a_higher)
+            const noexcept;
+    __no_constexpr result_type
         operator()();
 
     template <typename Rng>
@@ -52,10 +54,10 @@ private:
     size_t          _m_calls;
 
     __no_constexpr
-    rng_t(
-        const std::shared_ptr<inner_rng_t>& _a_rng,
-        const utility::seed_t&              _a_seed
-    );
+        rng_t(
+            const std::shared_ptr<inner_rng_t>& _a_rng,
+            const utility::seed_t&              _a_seed
+        );
 };
 
 _END_ABC_UTILITY_NS
@@ -89,32 +91,54 @@ __no_constexpr_imp rng_t
     return utility::rng_t(_l_rng_cpy, _l_seed);
 }
 
-__constexpr_imp void
+__no_constexpr_imp void
     rng_t::progress(
         const size_t _a_expected_calls
     ) noexcept
 {
+    std::cout << fmt::format(
+        "Setting calls from {0} to {1}", _m_calls, _a_expected_calls
+    ) << std::endl;
     if (_m_calls > _a_expected_calls)
     {
         _m_rng->set_seed(_m_seed);
         _m_calls  = 0;
-        _m_calls += _a_expected_calls;
+        _m_calls = _a_expected_calls;
         _m_rng.get()->progress(_a_expected_calls);
     }
-    _m_calls += _a_expected_calls;
-    _m_rng.get()->progress(_a_expected_calls);
+    else if (_m_calls < _a_expected_calls)
+    {
+        _m_calls = _a_expected_calls;
+        _m_rng.get()->progress(_a_expected_calls);
+    }
 }
-template<typename T>
-__constexpr T rng_t::in_range_inclusive(const T& _a_lower, const T& _a_higher) const noexcept
-{
-    const result_type _l_rv{ operator() };
 
+template <typename T>
+__constexpr T
+    rng_t::in_range_inclusive(
+        const T& _a_lower,
+        const T& _a_higher
+    ) const noexcept
+{
+    const result_type _l_rv{operator()};
 }
-__constexpr_imp rng_t::result_type
-                rng_t::operator()()
+
+__no_constexpr_imp rng_t::result_type
+                   rng_t::operator()()
 {
     ++_m_calls;
-    return _m_rng.get()->operator()();
+    const rng_t::result_type _l_rv{_m_rng.get()->operator()()};
+    if (9'943'563'833'514'170'357 == _l_rv)
+    {
+        int i = 4;
+    }
+    std::cout << fmt::format(
+        "Calls before = {0}, calls after = {1}, random value = {2}",
+        (_m_calls - 1),
+        _m_calls,
+        _l_rv
+    ) << std::endl;
+    return _l_rv;
 }
 
 template <typename Rng>

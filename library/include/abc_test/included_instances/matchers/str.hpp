@@ -45,11 +45,22 @@ __constexpr_imp matcher_t
     }
     if (not _l_unequal_index.has_value())
     {
-        const bool _l_left_smaller{_l_itt_1 != _l_itt_1_end};
-        if (_l_left_smaller || _l_itt_2 != _l_itt_2_end)
+        const bool _l_left_smaller{_l_itt_1 == _l_itt_1_end};
+        if (not _l_left_smaller && (_l_itt_2 == _l_itt_2_end))
+        {
+            return mk_matcher_using_result(matcher_result_t(
+                true,
+                fmt::format(
+                    u8"{0} == {1}",
+                    default_printer_t<R1_Type>{}.run_printer(_a_range_1),
+                    default_printer_t<R2_Type>{}.run_printer(_a_range_2)
+                )
+            ));
+        }
+        if (not (_l_left_smaller || _l_itt_2 == _l_itt_2_end))
         {
             _l_explanation_str = fmt::format(
-                u8"{0} argument (size {1} smaller than {2} argument ({3})",
+                u8"{0} argument (size {1}) smaller than {2} argument ({3})",
                 _l_left_smaller ? u8"left" : u8"right",
                 _l_idx - 1,
                 _l_left_smaller ? u8"right" : u8"left",
@@ -77,17 +88,6 @@ __constexpr_imp matcher_t
     }
     else
     {
-        size_t  _l_limit = 10;
-        R1_Type _l_left_surrounding_str{
-            _l_idx < _l_limit
-                ? _a_range_1.substr(_l_idx + _l_limit)
-                : _a_range_1.substr(_l_idx - _l_limit, _l_limit * 2)
-        };
-        R2_Type _l_right_surrounding_str{
-            _l_idx < _l_limit
-                ? _a_range_2.substr(_l_idx + _l_limit)
-                : _a_range_2.substr(_l_idx - _l_limit, _l_limit * 2)
-        };
         _l_explanation_str = fmt::format(
             u8"Strings diverge at index {0}. Left argument's index {0} = {1}, "
             u8"and "
@@ -96,10 +96,11 @@ __constexpr_imp matcher_t
             _l_idx,
             default_printer_t<T>{}.run_printer(*_l_itt_1),
             default_printer_t<T>{}.run_printer(*_l_itt_2),
-            default_printer_t<R1_Type>{u8""}.run_printer(_l_left_surrounding_str
+            default_printer_t<R1_Type>{u8""}.run_printer(
+                make_focused_string(_a_range_1, _l_idx)
             ),
             default_printer_t<R2_Type>{u8""}.run_printer(
-                _l_right_surrounding_str
+                make_focused_string(_a_range_2, _l_idx)
             )
 
         );

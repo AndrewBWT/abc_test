@@ -29,6 +29,10 @@ public:
             const std::u8string_view _a_str
         ) noexcept;
     friend __no_constexpr std::u8string
+        print_map_of_unique_ids_to_tdg_collection_stack_tries(
+            const map_unique_id_to_tdg_collection_stack_trie_t& _a_map
+        ) noexcept;
+    friend __no_constexpr std::u8string
         print_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
             const map_unique_id_to_tdg_collection_stack_trie_t& _a_map
         ) noexcept;
@@ -201,6 +205,38 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
         }
     }
     return _l_map;
+}
+
+__no_constexpr_imp std::u8string
+print_map_of_unique_ids_to_tdg_collection_stack_tries(
+    const map_unique_id_to_tdg_collection_stack_trie_t& _a_map
+) noexcept
+{
+    using namespace std;
+    u8string _l_rv;
+    for (const pair<key_t, tdg_collection_stack_trie_t>& _l_element :
+        _a_map.map())
+    {
+        u8string _l_key_compressed, _l_key_compressed_2;
+        for (char _l_char : _l_element.first)
+        {
+            _l_key_compressed.push_back(static_cast<unsigned char>(_l_char));
+        }
+        for (unsigned char _l_char : _l_key_compressed)
+        {
+            _l_key_compressed_2.append(fmt::format(u8"{:x}", _l_char));
+        }
+        _l_rv.append(fmt::format(
+            u8"{0}:{1}:",
+            _l_key_compressed,
+            _l_element.second.print_for_loop_stack_trie()
+        ));
+    }
+    if (_l_rv.size() > 0)
+    {
+        _l_rv.erase(_l_rv.end() - 1);
+    }
+    return _l_rv;
 }
 
 __no_constexpr_imp std::u8string
