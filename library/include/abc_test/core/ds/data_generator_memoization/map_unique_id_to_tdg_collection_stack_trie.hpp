@@ -170,7 +170,7 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
         auto& [_l_str_hex, _l_compressed_str]{_l_strs[_l_idx]};
         u8string _l_str
             = abc::utility::str::from_hex_with_exception(_l_str_hex);
-        const parse_for_loop_stack_trie_result_t _l_compressed_scan_result{
+        const result_t<typeless_data_generator_collection_stack_trie_t> _l_compressed_scan_result{
             parse_compressed_repetition_tree_node(_l_compressed_str)
         };
         if (_l_compressed_scan_result.has_value())

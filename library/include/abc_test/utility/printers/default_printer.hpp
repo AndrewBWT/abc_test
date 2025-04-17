@@ -1,6 +1,7 @@
 #pragma once
 
 #include "abc_test/utility/concepts.hpp"
+#include "abc_test/utility/enum.hpp"
 #include "abc_test/utility/object_printer_parser.hpp"
 #include "abc_test/utility/printers/printer_base.hpp"
 
@@ -562,7 +563,7 @@ __constexpr void
             _a_str.append(checkless_convert_ascii_to_unicode_string<u8string>(
                               string(1, ' ')
             )
-                              .value());
+                              );
         }
         _a_str.append(
             checkless_convert_ascii_to_unicode_string<u8string>(string(
@@ -586,20 +587,19 @@ __constexpr void
             _a_str.append(checkless_convert_ascii_to_unicode_string<u8string>(
                               string(1, ' ')
             )
-                              .value());
+                              );
         }
         _a_str.append(
             checkless_convert_ascii_to_unicode_string<u8string>(
                 string(1, _a_object_print_parser.delimiter_between_fields)
             )
-                .value()
         );
         if (_a_object_print_parser.space_after_field_delimieter)
         {
             _a_str.append(checkless_convert_ascii_to_unicode_string<u8string>(
                               string(1, ' ')
             )
-                              .value());
+                              );
         }
         object_printer_internal<I + 1>(
             _a_object_print_parser,
@@ -930,9 +930,7 @@ struct default_printer_t<std::basic_string<T>>
                         else
                         {
                             _l_object_as_u8str.append(
-                                abc::make_hex_from_char<uint16_t>(
-                                    _l_char
-                                )
+                                abc::make_hex_from_char<uint16_t>(_l_char)
                             );
                             continue;
                         }
@@ -941,9 +939,7 @@ struct default_printer_t<std::basic_string<T>>
                     else if (utf8::internal::is_trail_surrogate(_l_char))
                     {
                         _l_object_as_u8str.append(
-                            abc::make_hex_from_char<uint16_t>(
-                                _l_char
-                            )
+                            abc::make_hex_from_char<uint16_t>(_l_char)
                         );
                     }
 
@@ -1060,8 +1056,8 @@ public:
     __constexpr
     default_printer_t(const printer_t<T>& _a_printer);
 
-    default_printer_t()
-    requires (std::is_default_constructible_v<default_printer_t<T>>)
+    __constexpr default_printer_t()
+  //  requires (std::is_default_constructible_v<default_printer_t<T>>)
         : _m_printer(mk_printer(default_printer_t<T>()))
     {}
 
@@ -1069,6 +1065,58 @@ public:
         run_printer(const value_type& _a_object) const;
 };
 
+template<typename T>
+struct default_printer_t<T*> : public printer_base_t<T*>
+{
+    using value_type = T*;
+
+    __constexpr default_printer_t()
+        //  requires (std::is_default_constructible_v<default_printer_t<T>>)
+
+    {
+    }
+
+    __constexpr virtual std::u8string
+        run_printer(const value_type& _a_object) const
+    {
+        const uintptr_t _l_address{ reinterpret_cast<uintptr_t>(static_cast<void*>(_a_object)) };
+        return default_printer<uintptr_t>()->run_printer(_l_address);
+    }
+};
+
+template <typename T>
+struct default_printer_t<std::shared_ptr<T>> : public printer_base_t<std::shared_ptr<T>>
+{
+private:
+    printer_t<T> _m_printer;
+public:
+    static constexpr bool is_specialized{ true };
+    using value_type = std::shared_ptr<T>;
+
+    __constexpr
+        default_printer_t(const printer_t<T>& _a_printer)
+        : _m_printer(_a_printer)
+    { }
+
+    __constexpr default_printer_t()
+        //  requires (std::is_default_constructible_v<default_printer_t<T>>)
+        : _m_printer(mk_printer(default_printer_t<T>()))
+    {
+    }
+
+    __constexpr virtual std::u8string
+        run_printer(const value_type& _a_object) const
+    {
+        return object_printer_with_field_names_and_custom_printers(
+            object_printer_parser_t{},
+            type_id<decltype(_a_object)>(),
+            { u8"address",u8"data" },
+            make_tuple(default_printer<T*>(), _m_printer),
+            _a_object.get(),
+            *(_a_object.get())
+        );
+    }
+};
 _END_ABC_UTILITY_PRINTER_NS
 _BEGIN_ABC_UTILITY_PRINTER_NS
 

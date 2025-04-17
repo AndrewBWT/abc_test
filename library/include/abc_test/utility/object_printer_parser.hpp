@@ -9,10 +9,10 @@ _BEGIN_ABC_UTILITY_NS
 
 struct object_printer_parser_t
 {
-    char begin_char                             = '{';
-    char end_char                               = '}';
-    char delimiter_between_field_name_and_field = '=';
-    char delimiter_between_fields               = ',';
+    char8_t begin_char                             = u8'{';
+    char8_t end_char                               = u8'}';
+    char8_t delimiter_between_field_name_and_field = u8'=';
+    char8_t delimiter_between_fields               = u8',';
     bool space_after_object_name = true;
     bool space_before_field_name_and_field_separator = true;
     bool space_after_field_name_and_field_separator = true;

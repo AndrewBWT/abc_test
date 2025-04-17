@@ -4,6 +4,7 @@
 #include "abc_test/core/errors/test_library_exception.hpp"
 #include "abc_test/utility/parsers/default_parser.hpp"
 #include "abc_test/utility/printers/default_printer.hpp"
+#include "abc_test/utility/printers/function_printer.hpp"
 #include "abc_test/utility/str/parser_utility.hpp"
 #include "abc_test/utility/str/string_utility.hpp"
 
@@ -17,13 +18,6 @@
 _BEGIN_ABC_DS_NS
 // Forward declare
 class typeless_data_generator_collection_stack_trie_t;
-/*!
- * @brief Type synonym representing the result from parsing a string to a
- * for_loop_stack_trie_t object.
- */
-
-using parse_for_loop_stack_trie_result_t
-    = result_t<typeless_data_generator_collection_stack_trie_t>;
 
 namespace
 {
@@ -74,11 +68,11 @@ using opt_itt_and_end_t = std::optional<std::pair<
  * loop index. We use a 2D vector as the outer contains all the data indexed by
  * the for loop index.
  */
-__no_constexpr parse_for_loop_stack_trie_result_t
-    parse_repetition_tree_node(
-        const std::u8string_view _a_str,
-        const bool               _a_head_node
-    ) noexcept;
+__no_constexpr result_t<typeless_data_generator_collection_stack_trie_t>
+               parse_repetition_tree_node(
+                   const std::u8string_view _a_str,
+                   const bool               _a_head_node
+               ) noexcept;
 
 class typeless_data_generator_collection_stack_trie_t
 {
@@ -90,8 +84,7 @@ public:
      */
     __constexpr
     typeless_data_generator_collection_stack_trie_t() noexcept
-    {}
-
+        = default;
     /*!
      * @brief Returns a string representing the for_loop_stack_trie_t object in
      * a compressed format.
@@ -196,7 +189,7 @@ public:
      */
     __constexpr opt_idgc_memoized_element_t
         find_first_child_of_sequence_in_trie(
-            const std::size_t _a_current_for_loop_index,
+            const std::size_t                       _a_current_for_loop_index,
             const idgc_memoized_element_sequence_t& _a_rds
         ) const noexcept;
     friend class itdg_collection_stack_trie_t;
@@ -212,14 +205,27 @@ public:
      * nullopt.
      */
 
-    friend __constexpr parse_for_loop_stack_trie_result_t
+    friend __constexpr result_t<typeless_data_generator_collection_stack_trie_t>
         parse_compressed_repetition_tree_node(const std::u8string_view _a_str
         ) noexcept;
-    friend __no_constexpr parse_for_loop_stack_trie_result_t
+    friend __no_constexpr
+        result_t<typeless_data_generator_collection_stack_trie_t>
         parse_repetition_tree_node(
             const std::u8string_view _a_str,
             const bool               _a_head_node
         ) noexcept;
+
+    __constexpr const dgc_memoized_element_t&
+        for_loop_data() const noexcept
+    {
+        return _m_for_loop_data;
+    }
+
+    __constexpr const for_loop_stack_trie_indexed_children_t&
+        children() const noexcept
+    {
+        return _m_children;
+    }
 private:
     /*!
      * @brief Conditional variable used to hold node data.
@@ -295,34 +301,18 @@ struct default_printer_t<
                                   _a_object
                           ) const
     {
-        return fmt::format(
-            u8"{0}"
-            u8"{{{1} = {2}"
-            u8"}}",
+        using namespace std;
+        return object_printer_with_field_names(
+            object_printer_parser_t{},
             type_id<decltype(_a_object)>(),
-            u8"_m_children",
-            _a_object.print_for_loop_stack_trie()
+            {u8"for_loop_data", u8"children"},
+            _a_object.for_loop_data(),
+            _a_object.children()
         );
     }
 };
 
 _END_ABC_UTILITY_PRINTER_NS
-
-template <>
-struct fmt::formatter<
-    _ABC_NS_DS::typeless_data_generator_collection_stack_trie_t>
-    : formatter<string_view>
-{
-    /*!
-     * Provides a formatter for a poset_setup_test_data_t object
-     */
-    // Can't be constexpr due to use of fmt
-    __no_constexpr auto
-        format(
-            _ABC_NS_DS::typeless_data_generator_collection_stack_trie_t _a_rt,
-            format_context&                                             _a_cxt
-        ) const -> format_context::iterator;
-};
 
 _BEGIN_ABC_DS_NS
 
@@ -429,20 +419,23 @@ __constexpr_imp void
 __constexpr_imp opt_idgc_memoized_element_t
     typeless_data_generator_collection_stack_trie_t::
         find_first_child_of_sequence_in_trie(
-            const std::size_t _a_current_for_loop_index,
+            const std::size_t                       _a_current_for_loop_index,
             const idgc_memoized_element_sequence_t& _a_rds
         ) const noexcept
 {
     if (_a_rds.size() == 0)
     {
-        if (_m_children.size() == 0 || _m_children[_a_current_for_loop_index].size() == 0)
+        if (_m_children.size() == 0
+            || _m_children[_a_current_for_loop_index].size() == 0)
         {
             return opt_idgc_memoized_element_t{};
         }
         else
         {
             return opt_idgc_memoized_element_t{
-                idgc_memoized_element_t{_a_current_for_loop_index, _m_children[_a_current_for_loop_index][0]->_m_for_loop_data}
+                idgc_memoized_element_t{
+                                        _a_current_for_loop_index, _m_children[_a_current_for_loop_index][0]->_m_for_loop_data
+                }
             };
         }
     }
@@ -631,10 +624,10 @@ __no_constexpr_imp std::u8string
     }
 }
 
-__constexpr_imp parse_for_loop_stack_trie_result_t
-    parse_compressed_repetition_tree_node(
-        const std::u8string_view _a_str
-    ) noexcept
+__constexpr_imp result_t<typeless_data_generator_collection_stack_trie_t>
+                parse_compressed_repetition_tree_node(
+                    const std::u8string_view _a_str
+                ) noexcept
 {
     using namespace utility::str;
     using namespace std;
@@ -650,11 +643,11 @@ __constexpr_imp parse_for_loop_stack_trie_result_t
     }
 }
 
-__no_constexpr_imp parse_for_loop_stack_trie_result_t
-    parse_repetition_tree_node(
-        const std::u8string_view _a_str,
-        const bool               _a_head_node
-    ) noexcept
+__no_constexpr_imp result_t<typeless_data_generator_collection_stack_trie_t>
+                   parse_repetition_tree_node(
+                       const std::u8string_view _a_str,
+                       const bool               _a_head_node
+                   ) noexcept
 {
     using namespace utility::str;
     using namespace std;
@@ -740,7 +733,8 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
                     if (_a_str.at(_l_second_quote - 1) != u8'\\')
                     {
                         get<2>(_l_node) = _a_str.substr(
-                            _l_first_quote+1, (_l_second_quote-1) - _l_first_quote
+                            _l_first_quote + 1,
+                            (_l_second_quote - 1) - _l_first_quote
                         );
                         break;
                     }
@@ -927,217 +921,6 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
         }
     }
 
-    /*while (_l_current_pos < _l_str.size())
-    {
-        _l_previous_mode = _l_mode;
-        _l_old_pos       = _l_current_pos;
-        u8string xii(_a_str.begin() + _l_current_pos, _a_str.end());
-        switch (_l_mode)
-        {
-        case 0:
-            // Searching for opening curly bracket
-            locate_relevant_characters_and_change_mode(
-                _l_str,
-                _l_current_pos,
-                {
-                    {char8_t('('), 1}
-            },
-                _l_error_string,
-                _l_mode
-            );
-            break;
-        case 1:
-            // Up to first comma
-            locate_relevant_characters_and_change_mode(
-                _l_str,
-                _l_current_pos,
-                {
-                    {char8_t(','), 2}
-            },
-                _l_error_string,
-                _l_mode
-            );
-            if (_l_error_string.empty())
-            {
-                get<0>(_l_node)
-                    = _l_str.substr(_l_old_pos, _l_current_pos - _l_old_pos);
-            }
-            break;
-        case 2:
-            locate_relevant_characters_and_change_mode(
-                _l_str,
-                _l_current_pos,
-                {
-                    {char8_t(','), 3}
-            },
-                _l_error_string,
-                _l_mode
-            );
-            if (_l_error_string.empty())
-            {
-                get<1>(_l_node)
-                    = _l_str.substr(_l_old_pos, _l_current_pos - _l_old_pos);
-            }
-            break;
-        case 3:
-            locate_relevant_characters_and_change_mode(
-                _l_str,
-                _l_current_pos,
-                {
-                    {char8_t('"'), 4}
-            },
-                _l_error_string,
-                _l_mode
-            );
-            if (_l_error_string.empty())
-            {
-                _l_start = _l_current_pos;
-            }
-            break;
-        case 4:
-            // Escaping quotes
-            process_string(_l_str, _l_current_pos, _l_error_string, _l_mode, 5);
-            if (_l_error_string.empty())
-            {
-                get<2>(_l_node)
-                    = _l_str.substr(_l_old_pos, _l_current_pos - _l_old_pos);
-            }
-            break;
-        case 5:
-            locate_relevant_characters_and_change_mode(
-                _l_str,
-                _l_current_pos,
-                {
-                    {char8_t(','), 6}
-            },
-                _l_error_string,
-                _l_mode
-            );
-            break;
-        case 6:
-            locate_relevant_characters_and_change_mode(
-                _l_str,
-                _l_current_pos,
-                {
-                    {char8_t('['), 7}
-            },
-                _l_error_string,
-                _l_mode
-            );
-            break;
-        case 7:
-            // Mini loop. Search for either a [ (signifying new set) or
-            // ] (ending set)
-            locate_relevant_characters_and_change_mode(
-                _l_str,
-                _l_current_pos,
-                {
-                    {char8_t('['), 8 },
-                    {char8_t(']'), 12}
-            },
-                _l_error_string,
-                _l_mode
-            );
-            _l_start = _l_current_pos + 1;
-            break;
-        case 8:
-            locate_relevant_characters_and_change_mode(
-                _l_str,
-                _l_current_pos,
-                {
-                    {char8_t('('), 9}
-            },
-                _l_error_string,
-                _l_mode
-            );
-            break;
-        case 9:
-            // Skip everything until a round bracket is found,
-            // signifying the ending of this element.
-            skip_chars_and_strings_until_found(
-                _l_str,
-                _l_current_pos,
-                {
-                    {char8_t('"'), char8_t('"')},
-                    // {char8_t('['), char8_t(']')}
-            },
-                char8_t('('),
-                char8_t(')'),
-                10,
-                1,
-                _l_error_string,
-                _l_mode
-            );
-            // Add element to list
-            _l_current_strs.push_back(u8string(
-                _l_str.substr(_l_start, (_l_current_pos - _l_start + 1))
-            ));
-            break;
-        case 10:
-            // Looking for comma or end bracket.
-            locate_relevant_characters_and_change_mode(
-                _l_str,
-                _l_current_pos,
-                {
-                    {char8_t(']'), 11},
-                    {char8_t(','), 8 },
-                    // {']', 11}
-            },
-                _l_error_string,
-                _l_mode
-            );
-            if (_a_str[_l_current_pos] == char8_t(']'))
-            {
-                _l_strs.push_back(_l_current_strs);
-                _l_current_strs.clear();
-            }
-            if (_l_mode == 8)
-            {
-                _l_start = _l_current_pos + 1;
-            }
-            break;
-        case 11:
-            // Looking for comma on upper level of 2d vector, or ending
-            // bracket
-            locate_relevant_characters_and_change_mode(
-                _l_str,
-                _l_current_pos,
-                {
-                    {char8_t(','), 7                     },
-                    {char8_t(']'), _a_head_node ? 13 : 12}
-            },
-                _l_error_string,
-                _l_mode
-            );
-            break;
-        case 12:
-            locate_relevant_characters_and_change_mode(
-                _l_str,
-                _l_current_pos,
-                {
-                    {char8_t(')'), 13},
-            },
-                _l_error_string,
-                _l_mode
-            );
-            break;
-        case 13:
-            std::cout << std::string(_a_str.begin(), _a_str.end()) << std::endl;
-            if (_l_current_pos != _a_str.size())
-            {
-                return unexpected(u8"Should have been at end. Not");
-            }
-            break;
-        default:
-            return unexpected(u8"default case");
-        }
-        if (not _l_error_string.empty())
-        {
-            return unexpected(_l_error_string);
-        }
-        _l_current_pos++;
-    }*/
-
     // Put it all together
     tdg_collection_stack_trie_t _l_rv;
     if (not _a_head_node)
@@ -1193,23 +976,3 @@ __no_constexpr_imp parse_for_loop_stack_trie_result_t
 }
 
 _END_ABC_DS_NS
-
-__no_constexpr_imp auto
-    fmt::formatter<_ABC_NS_DS::tdg_collection_stack_trie_t>::format(
-        _ABC_NS_DS::tdg_collection_stack_trie_t _a_rt,
-        format_context&                         _a_cxt
-    ) const -> format_context::iterator
-{
-    using namespace std;
-    const string _l_rv{fmt::format(
-        "{0}"
-        "{{{1} = {2}"
-        "}}",
-        typeid(_a_rt).name(),
-        "_m_children",
-        abc::checkless_convert_unicode_string_to_ascii_string(
-            _a_rt.print_for_loop_stack_trie()
-        )
-    )};
-    return formatter<string_view>::format(_l_rv, _a_cxt);
-}

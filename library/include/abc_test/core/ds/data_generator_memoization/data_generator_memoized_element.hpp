@@ -2,10 +2,12 @@
 #include "abc_test/utility/internal/log.hpp"
 #include "abc_test/utility/internal/macros.hpp"
 #include <fmt/format.h>
+#include "abc_test/utility/printers/default_printer.hpp"
 
 #include <tuple>
 #include <vector>
 #include "abc_test/utility/types.hpp"
+#include <array>
 
 _BEGIN_ABC_DS_NS
 
@@ -63,42 +65,30 @@ using dg_memoized_element_t = data_generator_memoized_element_t;
 using opt_dg_memoized_element_t = std::optional<dg_memoized_element_t>;
 
 _END_ABC_DS_NS
-
+_BEGIN_ABC_UTILITY_PRINTER_NS
 template <>
-struct fmt::formatter<_ABC_NS_DS::data_generator_memoized_element_t>
-    : formatter<string_view>
+struct default_printer_t<
+    abc::ds::data_generator_memoized_element_t>
+    : public printer_base_t<
+    abc::ds::data_generator_memoized_element_t>
 {
-    /*!
-     * Provides a formatter for a gen_data_creation_data_t object
-     */
-    // Cannot be constexpr due to use of fmt::format.
-    __no_constexpr auto
-        format(
-            _ABC_NS_DS::data_generator_memoized_element_t _a_rd,
-            format_context&                            _a_cxt
-        ) const -> format_context::iterator;
-};
+    static constexpr bool is_specialized{ true };
 
+    __no_constexpr_imp    std::u8string
+        run_printer(
+            const abc::ds::data_generator_memoized_element_t&
+            _a_object
+        ) const
+    {
+        return object_printer_with_field_names(
+            object_printer_parser_t{},
+            type_id<decltype(_a_object)>(),
+            { u8"mode",u8"additional_data" },
+            _a_object.mode,
+            _a_object.additional_data
+        );
+    }
+};
+_END_ABC_UTILITY_PRINTER_NS
 _BEGIN_ABC_DS_NS
 _END_ABC_DS_NS
-
-__no_constexpr_imp auto
-    fmt::formatter<_ABC_NS_DS::data_generator_memoized_element_t>::format(
-        _ABC_NS_DS::data_generator_memoized_element_t _a_rd,
-        format_context&                            _a_ctx
-    ) const -> format_context::iterator
-{
-    using namespace std;
-    const string _l_rv{fmt::format(
-        "{0}"
-        "{{{1} = {2}"
-        ", {3} = {4}"
-        "}}",
-        typeid(_a_rd).name(),
-        "_m_additional_data",
-        abc::checkless_convert_unicode_string_to_ascii_string(_a_rd.additional_data),
-        "_m_mode",
-        _a_rd.mode
-    )};
-    return formatter<string_view>::format(_l_rv, _a_ctx);
-}
