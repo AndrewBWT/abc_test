@@ -23,7 +23,9 @@ public:
      * @return True if equal, false if not.
      */
     __constexpr bool
-        operator==(const indexed_data_generator_collection_memoized_element_t& _a_rhs) const noexcept
+        operator==(
+            const indexed_data_generator_collection_memoized_element_t& _a_rhs
+        ) const noexcept
         = default;
     /*!
      * @brief Spaceship operator for for_loop_creation_data_t elements.
@@ -31,7 +33,9 @@ public:
      * @return Dependant on context.
      */
     __constexpr auto
-        operator<=>(const indexed_data_generator_collection_memoized_element_t& _a_rhs) const noexcept
+        operator<=>(
+            const indexed_data_generator_collection_memoized_element_t& _a_rhs
+        ) const noexcept
         = default;
     /*!
      * @brief The index of the for loop this data point refers to.
@@ -43,19 +47,24 @@ public:
      */
     dgc_memoized_element_t for_loop_iteration_data;
 };
-using idgc_memoized_element_t = indexed_data_generator_collection_memoized_element_t;
+
+using idgc_memoized_element_t
+    = indexed_data_generator_collection_memoized_element_t;
 /*!
  * @brief A synonym for sequence of for_loop_creation_data_t elements.
  */
-using idgc_memoized_element_sequence_t = std::vector<indexed_data_generator_collection_memoized_element_t>;
+using idgc_memoized_element_sequence_t
+    = std::vector<indexed_data_generator_collection_memoized_element_t>;
 /*!
  * @brief A synonym for an optional for_loop_creation_data_t element.
  */
-using opt_idgc_memoized_element_t = std::optional<indexed_data_generator_collection_memoized_element_t>;
+using opt_idgc_memoized_element_t
+    = std::optional<indexed_data_generator_collection_memoized_element_t>;
 _END_ABC_DS_NS
 
 template <>
-struct fmt::formatter<_ABC_NS_DS::indexed_data_generator_collection_memoized_element_t>
+struct fmt::formatter<
+    _ABC_NS_DS::indexed_data_generator_collection_memoized_element_t>
     : formatter<string_view>
 {
     /*!
@@ -63,18 +72,24 @@ struct fmt::formatter<_ABC_NS_DS::indexed_data_generator_collection_memoized_ele
      */
     // Cannot be constexpr due to use of fmt::format.
     __no_constexpr auto
-        format(_ABC_NS_DS::indexed_data_generator_collection_memoized_element_t _a_rd, format_context& _a_cxt)
-            const -> format_context::iterator;
+        format(
+            _ABC_NS_DS::indexed_data_generator_collection_memoized_element_t
+                            _a_rd,
+            format_context& _a_cxt
+        ) const -> format_context::iterator;
 };
 
 _BEGIN_ABC_DS_NS
 _END_ABC_DS_NS
 
 __no_constexpr_imp auto
-    fmt::formatter<_ABC_NS_DS::indexed_data_generator_collection_memoized_element_t>::format(
-        _ABC_NS_DS::indexed_data_generator_collection_memoized_element_t _a_rd,
-        format_context&                   _a_ctx
-    ) const -> format_context::iterator
+    fmt::formatter<
+        _ABC_NS_DS::indexed_data_generator_collection_memoized_element_t>::
+        format(
+            _ABC_NS_DS::indexed_data_generator_collection_memoized_element_t
+                            _a_rd,
+            format_context& _a_ctx
+        ) const -> format_context::iterator
 {
     using namespace std;
     const string _l_rv{fmt::format(
@@ -85,7 +100,11 @@ __no_constexpr_imp auto
         "_m_for_loop_index",
         _a_rd.for_loop_index,
         "_m_flid",
-        _a_rd.for_loop_iteration_data
+        abc::checkless_convert_unicode_string_to_ascii_string(
+            abc::utility::printer::default_printer<
+                decltype(_a_rd.for_loop_iteration_data)>()
+                ->run_printer(_a_rd.for_loop_iteration_data)
+        )
     )};
     return formatter<string_view>::format(_l_rv, _a_ctx);
 }

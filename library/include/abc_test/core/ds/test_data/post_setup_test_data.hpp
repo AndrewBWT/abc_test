@@ -47,12 +47,12 @@ public:
     __constexpr
     post_setup_test_data_t(
         const registered_test_data_t&          _a_registered_test_data,
-        const test_path_hierarchy_t&                 _a_test_path_hierarchy,
+        const test_path_hierarchy_t&           _a_test_path_hierarchy,
         const unique_id_t                      _a_discovery_id,
         const bool                             _a_is_test_to_be_ran,
         const ds::tdg_collection_stack_trie_t* _a_for_loop_stack_trie,
         const size_t                           _a_maximum_threads_allowed,
-        const std::u8string_view _a_unique_id
+        const std::u8string_view               _a_unique_id
     ) noexcept;
     /*!
      * @brief Returns a cref to the registered_test_data_t member variable.
@@ -108,10 +108,10 @@ public:
      *
      * @return The thread resourses required by this test.
      */
-    __constexpr std::size_t
-                thread_resourses_required() const noexcept;
+    __constexpr       std::size_t
+                      thread_resourses_required() const noexcept;
     __constexpr const std::u8string_view
-        unique_id() const noexcept;
+                      unique_id() const noexcept;
     /*!
      * @brief Equality operator for post_setup_test_data_t objects.
      * @param _a_rhs The post_setup_test_data_t object to compare this object
@@ -138,10 +138,11 @@ private:
     std::u8string _m_unique_id;
 };
 
-__constexpr bool check_if_element_in_path_set(
-    const test_path_hierarchy_t& _a_test_path_hierarchy,
-    const std::vector<test_path_hierarchy_t>& _a_test_path_set
-) noexcept;
+__constexpr bool
+    check_if_element_in_path_set(
+        const test_path_hierarchy_t&              _a_test_path_hierarchy,
+        const std::vector<test_path_hierarchy_t>& _a_test_path_set
+    ) noexcept;
 _END_ABC_DS_NS
 
 /*!
@@ -165,12 +166,12 @@ _BEGIN_ABC_DS_NS
 __constexpr_imp
     post_setup_test_data_t::post_setup_test_data_t(
         const registered_test_data_t&          _a_registered_test_data,
-        const test_path_hierarchy_t& _a_test_path_hierarchy,
+        const test_path_hierarchy_t&           _a_test_path_hierarchy,
         const unique_id_t                      _a_discovery_id,
         const bool                             _a_is_test_to_be_ran,
         const ds::tdg_collection_stack_trie_t* _a_repetition_data,
         const size_t                           _a_maximum_threads_allowed,
-        const std::u8string_view _a_unique_id
+        const std::u8string_view               _a_unique_id
     ) noexcept
     : _m_registered_test_data(_a_registered_test_data)
     , _m_test_path_hierarchy(_a_test_path_hierarchy)
@@ -240,22 +241,25 @@ __constexpr_imp std::size_t
 {
     return _m_thread_resourses_required;
 }
+
 __constexpr_imp const std::u8string_view
-post_setup_test_data_t::unique_id() const noexcept
+                      post_setup_test_data_t::unique_id() const noexcept
 {
     return _m_unique_id;
 }
-__constexpr_imp bool check_if_element_in_path_set(
-    const test_path_hierarchy_t& _a_test_path_hierarchy,
-    const std::vector<test_path_hierarchy_t>& _a_test_path_set
-) noexcept
+
+__constexpr_imp bool
+    check_if_element_in_path_set(
+        const test_path_hierarchy_t&              _a_test_path_hierarchy,
+        const std::vector<test_path_hierarchy_t>& _a_test_path_set
+    ) noexcept
 {
     using namespace std;
-    const size_t _l_test_path_hierarchy_size{ _a_test_path_hierarchy.size() };
+    const size_t _l_test_path_hierarchy_size{_a_test_path_hierarchy.size()};
     for (const test_path_hierarchy_t& _l_path_set_element : _a_test_path_set)
     {
-        bool _l_prefix_matches{ true };
-        for (size_t _l_idx{ 0 }; const u8string_view _l_str : _l_path_set_element)
+        bool _l_prefix_matches{true};
+        for (size_t _l_idx{0}; const u8string_view _l_str : _l_path_set_element)
         {
             if (_l_idx >= _l_test_path_hierarchy_size)
             {
@@ -276,6 +280,7 @@ __constexpr_imp bool check_if_element_in_path_set(
     }
     return false;
 }
+
 _END_ABC_DS_NS
 
 __no_constexpr_imp auto
@@ -309,8 +314,13 @@ __no_constexpr_imp auto
         _a_pstd.thread_resourses_required(),
         "_m_for_loop_stack_trie",
         _a_pstd.has_for_loop_stack_trie()
-            ? fmt::format("{0}", _a_pstd.for_loop_stack_trie())
-            : "nullptr"
-    )};
+        ? fmt::format("{0}", "not written")
+
+        // abc::checkless_convert_unicode_string_to_ascii_string(
+        //     abc::utility::printer::default_printer<
+        //         decltype(_a_pstd.for_loop_stack_trie())>()
+        //         ->run_printer(_a_pstd.for_loop_stack_trie())
+        // )
+         : "nullptr")};
     return formatter<string_view>::format(_l_rv, _a_ctx);
 }
