@@ -86,29 +86,6 @@ public:
     typeless_data_generator_collection_stack_trie_t() noexcept
         = default;
     /*!
-     * @brief Returns a string representing the for_loop_stack_trie_t object in
-     * a compressed format.
-     *
-     * Currently the compressed format is created by taking the output from
-     * print_for_loop_stack_trie and turning it into hex.
-     *
-     * @return Compressed string representing the for_loop_stack_trie_t object.
-     */
-    __no_constexpr std::u8string
-                   print_for_loop_stack_trie_compressed() const noexcept;
-    /*!
-     * @brief Returns a string representing the for_loop_stack_trie_t object.
-     *
-     * It prints a ndoe's generation_collection_index, mode and
-     * additional data, as well as its children.
-     *
-     * Note for a root note, it will only print the children.
-     *
-     * @return String representing the for_loop_stack_trie_t object.
-     */
-    __no_constexpr std::u8string
-                   print_for_loop_stack_trie() const noexcept;
-    /*!
      * @brief This function firstly finds the trie node representing the
      * for_loop_creation_data_sequence_t argument. It then finds that node's
      * first successor sibling s, and returns the for_loop_creation_data_t which
@@ -270,16 +247,6 @@ private:
     __constexpr opt_itt_t
         find_iterator(const idgc_memoized_element_sequence_t& _a_flcds
         ) const noexcept;
-    /*!
-     * @brief Core printing function.
-     *
-     * @param _a_is_root Denotes whether the printing functions is being called
-     * on the root.
-     * @return std::string representing the for_loop_stack_trie.
-     */
-    __no_constexpr std::u8string
-        inner_print_for_loop_stack_trie(const bool _a_is_root = false)
-            const noexcept;
 };
 
 using tdg_collection_stack_trie_t
@@ -312,25 +279,62 @@ struct default_printer_t<
     }
 };
 
+template <bool Head_Node = true>
+struct compressed_typless_data_generator_collection_stack_trie_printer_t
+    : public printer_base_t<
+          abc::ds::typeless_data_generator_collection_stack_trie_t>
+{
+    __no_constexpr_imp std::u8string
+                       run_printer(
+                           const abc::ds::typeless_data_generator_collection_stack_trie_t&
+                               _a_object
+                       ) const
+    {
+        using namespace std;
+        using namespace abc::ds;
+        const auto _l_child_printer{default_printer<
+            vector<for_loop_stack_trie_children_t>>(
+            default_printer<vector<for_loop_stack_trie_child_t>>(
+                default_printer<shared_ptr<
+                    typeless_data_generator_collection_stack_trie_t>>(
+                    mk_printer(
+                        compressed_typless_data_generator_collection_stack_trie_printer_t<
+                            false>{}
+                    ),
+                        enum_pointer_print_type_t::JUST_DATA
+                )
+            )
+        )};
+        if constexpr (Head_Node == false)
+        {
+            auto& _l_fld{_a_object.for_loop_data()};
+            auto& _l_flied{_l_fld.flied};
+            tuple<
+                size_t,
+                size_t,
+                u8string,
+                for_loop_stack_trie_indexed_children_t>
+                _l_node_data{
+                    _l_fld.generation_collection_index,
+                    _l_flied.mode,
+                    _l_flied.additional_data,
+                    _a_object.children()
+                };
+            auto _l_printer{default_printer_t<decltype(_l_node_data)>()};
+            get<3>(_l_printer.get_printers_ref()) = _l_child_printer;
+            return _l_printer.run_printer(_l_node_data);
+        }
+        else
+        {
+            return _l_child_printer->run_printer(_a_object.children());
+        }
+    }
+};
+
 _END_ABC_UTILITY_PRINTER_NS
 
 _BEGIN_ABC_DS_NS
 
-__no_constexpr_imp std::u8string
-                   typeless_data_generator_collection_stack_trie_t::
-        print_for_loop_stack_trie_compressed() const noexcept
-{
-    using namespace std;
-    u8string _l_rv{print_for_loop_stack_trie()};
-    return abc::utility::str::to_hex(_l_rv);
-}
-
-__no_constexpr_imp std::u8string
-    typeless_data_generator_collection_stack_trie_t::print_for_loop_stack_trie(
-    ) const noexcept
-{
-    return inner_print_for_loop_stack_trie(true);
-}
 
 __constexpr_imp opt_idgc_memoized_element_t
     typeless_data_generator_collection_stack_trie_t::increment_last_index(
@@ -577,50 +581,6 @@ __constexpr_imp opt_itt_t
     else
     {
         return opt_itt_t{};
-    }
-}
-
-__no_constexpr_imp std::u8string
-                   typeless_data_generator_collection_stack_trie_t::
-        inner_print_for_loop_stack_trie(
-            const bool _a_is_root
-        ) const noexcept
-{
-    using namespace std;
-    using namespace utility::str;
-    u8string _l_children_str{u8"["};
-    for (size_t                                _l_idx{0};
-         const for_loop_stack_trie_children_t& _l_for_loop_at_idx : _m_children)
-    {
-        _l_children_str.append(u8"[");
-        for (size_t                             _l_jdx{0};
-             const for_loop_stack_trie_child_t& _l_child : _l_for_loop_at_idx)
-        {
-            _l_children_str.append(_l_child->inner_print_for_loop_stack_trie());
-            _l_children_str.append(return_str_if_next_index_in_bound(
-                _l_jdx++, _l_for_loop_at_idx.size(), u8","
-            ));
-        }
-        _l_children_str.append(u8"]");
-        _l_children_str.append(return_str_if_next_index_in_bound(
-            _l_idx++, _m_children.size(), u8","
-        ));
-    }
-
-    _l_children_str.append(u8"]");
-    if (_a_is_root)
-    {
-        return _l_children_str;
-    }
-    else
-    {
-        return fmt::format(
-            u8"({0},{1},\"{2}\",{3})",
-            _m_for_loop_data.generation_collection_index,
-            _m_for_loop_data.flied.mode,
-            _m_for_loop_data.flied.additional_data,
-            _l_children_str
-        );
     }
 }
 

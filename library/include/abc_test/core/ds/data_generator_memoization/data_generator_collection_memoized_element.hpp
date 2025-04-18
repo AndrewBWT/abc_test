@@ -35,7 +35,8 @@ public:
      * @return True if equal, false if not.
      */
     __constexpr bool
-        operator==(const data_generator_collection_memoized_element_t& _a_rhs) const noexcept
+        operator==(const data_generator_collection_memoized_element_t& _a_rhs
+        ) const noexcept
         = default;
     /*!
      * @brief Spaceship operator for gen_collection_creation_data_t elements.
@@ -43,7 +44,8 @@ public:
      * @return Dependant on context.
      */
     __constexpr auto
-        operator<=>(const data_generator_collection_memoized_element_t& _a_rhs) const noexcept
+        operator<=>(const data_generator_collection_memoized_element_t& _a_rhs
+        ) const noexcept
         = default;
     /*!
      * @brief The index in the gen_data_collection_t collection where the
@@ -55,33 +57,44 @@ public:
      */
     dg_memoized_element_t flied;
 };
+
 using dgc_memoized_element_t = data_generator_collection_memoized_element_t;
 
 _END_ABC_DS_NS
 _BEGIN_ABC_UTILITY_PRINTER_NS
-template <>
-struct default_printer_t<
-    abc::ds::data_generator_collection_memoized_element_t>
-    : public printer_base_t<
-    abc::ds::data_generator_collection_memoized_element_t>
-{
-    static constexpr bool is_specialized{ true };
 
-    __no_constexpr_imp    std::u8string
-        run_printer(
-            const abc::ds::data_generator_collection_memoized_element_t&
-            _a_object
-        ) const
-    {
-        return object_printer_with_field_names(
-            object_printer_parser_t{},
-            type_id<decltype(_a_object)>(),
-            { u8"generation_collection_index",u8"dg_memoized_element_t" },
-            _a_object.generation_collection_index,
-            _a_object.flied
-        );
-    }
+template <>
+struct default_printer_t<abc::ds::data_generator_collection_memoized_element_t>
+    : public printer_base_t<
+          abc::ds::data_generator_collection_memoized_element_t>
+{
+    static constexpr bool is_specialized{true};
+
+    __no_constexpr        std::u8string
+        run_printer(const abc::ds::data_generator_collection_memoized_element_t&
+                        _a_object) const;
 };
+
 _END_ABC_UTILITY_PRINTER_NS
 _BEGIN_ABC_DS_NS
 _END_ABC_DS_NS
+
+_BEGIN_ABC_UTILITY_PRINTER_NS
+
+__no_constexpr_imp std::u8string
+    default_printer_t<abc::ds::data_generator_collection_memoized_element_t>::
+        run_printer(
+            const abc::ds::data_generator_collection_memoized_element_t&
+                _a_object
+        ) const
+{
+    return object_printer_with_field_names(
+        object_printer_parser_t{},
+        type_id<decltype(_a_object)>(),
+        {u8"generation_collection_index", u8"flied"},
+        _a_object.generation_collection_index,
+        _a_object.flied
+    );
+}
+
+_END_ABC_UTILITY_PRINTER_NS

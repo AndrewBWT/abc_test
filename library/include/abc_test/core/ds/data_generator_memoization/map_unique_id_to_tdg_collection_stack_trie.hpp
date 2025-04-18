@@ -29,9 +29,9 @@ public:
             const std::u8string_view _a_str
         ) noexcept;
     friend __no_constexpr std::u8string
-        print_map_of_unique_ids_to_tdg_collection_stack_tries(
-            const map_unique_id_to_tdg_collection_stack_trie_t& _a_map
-        ) noexcept;
+                          print_map_of_unique_ids_to_tdg_collection_stack_tries(
+                              const map_unique_id_to_tdg_collection_stack_trie_t& _a_map
+                          ) noexcept;
     friend __no_constexpr std::u8string
         print_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
             const map_unique_id_to_tdg_collection_stack_trie_t& _a_map
@@ -170,9 +170,10 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
         auto& [_l_str_hex, _l_compressed_str]{_l_strs[_l_idx]};
         u8string _l_str
             = abc::utility::str::from_hex_with_exception(_l_str_hex);
-        const result_t<typeless_data_generator_collection_stack_trie_t> _l_compressed_scan_result{
-            parse_compressed_repetition_tree_node(_l_compressed_str)
-        };
+        const result_t<typeless_data_generator_collection_stack_trie_t>
+            _l_compressed_scan_result{
+                parse_compressed_repetition_tree_node(_l_compressed_str)
+            };
         if (_l_compressed_scan_result.has_value())
         {
             const typeless_data_generator_collection_stack_trie_t& _l_it{
@@ -208,41 +209,9 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
 }
 
 __no_constexpr_imp std::u8string
-print_map_of_unique_ids_to_tdg_collection_stack_tries(
-    const map_unique_id_to_tdg_collection_stack_trie_t& _a_map
-) noexcept
-{
-    using namespace std;
-    u8string _l_rv;
-    for (const pair<key_t, tdg_collection_stack_trie_t>& _l_element :
-        _a_map.map())
-    {
-        u8string _l_key_compressed, _l_key_compressed_2;
-        for (char _l_char : _l_element.first)
-        {
-            _l_key_compressed.push_back(static_cast<unsigned char>(_l_char));
-        }
-        for (unsigned char _l_char : _l_key_compressed)
-        {
-            _l_key_compressed_2.append(fmt::format(u8"{:x}", _l_char));
-        }
-        _l_rv.append(fmt::format(
-            u8"{0}:{1}:",
-            _l_key_compressed,
-            _l_element.second.print_for_loop_stack_trie()
-        ));
-    }
-    if (_l_rv.size() > 0)
-    {
-        _l_rv.erase(_l_rv.end() - 1);
-    }
-    return _l_rv;
-}
-
-__no_constexpr_imp std::u8string
-    print_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
-        const map_unique_id_to_tdg_collection_stack_trie_t& _a_map
-    ) noexcept
+                   print_map_of_unique_ids_to_tdg_collection_stack_tries(
+                       const map_unique_id_to_tdg_collection_stack_trie_t& _a_map
+                   ) noexcept
 {
     using namespace std;
     u8string _l_rv;
@@ -260,8 +229,51 @@ __no_constexpr_imp std::u8string
         }
         _l_rv.append(fmt::format(
             u8"{0}:{1}:",
+            _l_key_compressed,
+            abc::utility::printer::
+                compressed_typless_data_generator_collection_stack_trie_printer_t{
+                }
+                    .run_printer(_l_element.second)
+        ));
+    }
+    if (_l_rv.size() > 0)
+    {
+        _l_rv.erase(_l_rv.end() - 1);
+    }
+    return _l_rv;
+}
+
+__no_constexpr_imp std::u8string
+    print_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
+        const map_unique_id_to_tdg_collection_stack_trie_t& _a_map
+    ) noexcept
+{
+    using namespace std;
+    using namespace abc::utility::printer;
+    u8string _l_rv;
+    for (const pair<key_t, tdg_collection_stack_trie_t>& _l_element :
+         _a_map.map())
+    {
+        u8string _l_key_compressed, _l_key_compressed_2;
+        for (char _l_char : _l_element.first)
+        {
+            _l_key_compressed.push_back(static_cast<unsigned char>(_l_char));
+        }
+        for (unsigned char _l_char : _l_key_compressed)
+        {
+            _l_key_compressed_2.append(fmt::format(u8"{:x}", _l_char));
+        }
+        _l_rv.append(fmt::format(
+            u8"{0}:{1}:",
             _l_key_compressed_2,
-            _l_element.second.print_for_loop_stack_trie_compressed()
+            abc::utility::printer::hex_printer<ds::tdg_collection_stack_trie_t>(
+                mk_printer(
+                    abc::utility::printer::
+                        compressed_typless_data_generator_collection_stack_trie_printer_t{
+                        }
+                )
+            )
+                .run_printer(_l_element.second)
         ));
     }
     if (_l_rv.size() > 0)
@@ -312,11 +324,12 @@ __no_constexpr_imp auto
         ) const -> format_context::iterator
 {
     using namespace std;
-    const string _l_rv{fmt::format(""
-    //    "{0}{{{1} = {2}}}",
-    //    typeid(_a_rtd).name(),
-    //    "_m_internal_map",
-    //    abc::u8string_to_string(fmt::format(u8"{}", _a_rtd.map()))
+    const string _l_rv{fmt::format(
+        ""
+        // "{0}{{{1} = {2}}}",
+        // typeid(_a_rtd).name(),
+        // "_m_internal_map",
+        // abc::u8string_to_string(fmt::format(u8"{}", _a_rtd.map()))
     )};
     return formatter<string_view>::format(_l_rv, _a_ctx);
 }

@@ -86,16 +86,17 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
     case DESCRIPTION:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.test_description_str())),
-            {_a_pc.slight_highlight(
-                _a_pc.message_str(
-                    _a_element.post_setup_test_data()
-                                      .registered_test_data()
-                                      ._m_user_data.description.has_value() ?
-                    optional<u8string>{} : 
-                    checkless_convert_ascii_to_unicode_string<u8string>(_a_element.post_setup_test_data()
-                                      .registered_test_data()
-                                      ._m_user_data.description.value()))
-            )}
+            {_a_pc.slight_highlight(_a_pc.message_str(
+                _a_element.post_setup_test_data()
+                        .registered_test_data()
+                        ._m_user_data.description.has_value()
+                    ? optional<u8string>{}
+                    : checkless_convert_ascii_to_unicode_string<u8string>(
+                          _a_element.post_setup_test_data()
+                              .registered_test_data()
+                              ._m_user_data.description.value()
+                      )
+            ))}
         };
     case STR_STATUS:
         return {
@@ -110,10 +111,11 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
     case NAME:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.name_str())),
-            {_a_pc.name(checkless_convert_ascii_to_unicode_string<u8string>(_a_element
-                                                    .post_setup_test_data()
-                                                    .registered_test_data()
-                                                    ._m_user_data.name))}
+            {_a_pc.name(checkless_convert_ascii_to_unicode_string<u8string>(
+                _a_element.post_setup_test_data()
+                    .registered_test_data()
+                    ._m_user_data.name
+            ))}
         };
     case SOURCE_LOCATION:
     {
@@ -139,9 +141,10 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
             _a_pc.space(_a_pc.colon(_a_pc.source_code_str())),
             {_a_pc.source_representation(
                 _l_opt.has_value()
-                    ? optional<u8string>{checkless_convert_ascii_to_unicode_string<u8string>(
-                          _l_opt.value().source_code_representation()
-                      )}
+                    ? optional<
+                          u8string>{checkless_convert_ascii_to_unicode_string<
+                          u8string>(_l_opt.value().source_code_representation())
+                      }
                     : optional<u8string>{}
             )}
         };
@@ -150,18 +153,27 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
     case TEST_PATH:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.test_path_str())),
-            {_a_pc.test_path(checkless_convert_ascii_to_unicode_string<u8string>(_a_element.post_setup_test_data()
-                                 .registered_test_data()
-                                 ._m_user_data.path))}
+            {_a_pc.test_path(
+                checkless_convert_ascii_to_unicode_string<u8string>(
+                    _a_element.post_setup_test_data()
+                        .registered_test_data()
+                        ._m_user_data.path
+                )
+            )}
         };
     case SEED_USED:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.seed_used_str())),
             {_a_pc.seed_used(
                 _a_element.post_setup_test_data().has_for_loop_stack_trie()
-                    ? optional<u8string>(_a_element.post_setup_test_data()
-                                           .for_loop_stack_trie()
-                                           .print_for_loop_stack_trie())
+                    ? optional<u8string>(
+
+                          abc::utility::printer::
+                              compressed_typless_data_generator_collection_stack_trie_printer_t{
+                              }
+                                  .run_printer(_a_element.post_setup_test_data()
+                                                   .for_loop_stack_trie())
+                      )
                     : optional<u8string>()
             )}
         };
@@ -171,9 +183,19 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
             {_a_pc.seed_used_in_hex(
                 _a_element.post_setup_test_data().has_for_loop_stack_trie()
                     ? optional<u8string>(
-                          _a_element.post_setup_test_data()
-                              .for_loop_stack_trie()
-                              .print_for_loop_stack_trie_compressed()
+                          abc::utility::printer::hex_printer<
+                              ds::tdg_collection_stack_trie_t>(
+                              mk_printer(
+                                  abc::utility::printer::
+                                      compressed_typless_data_generator_collection_stack_trie_printer_t{
+                                      }
+                              )
+                          )
+                              .run_printer(_a_element.post_setup_test_data()
+                                               .for_loop_stack_trie())
+                          // _a_element.post_setup_test_data()
+                          //    .for_loop_stack_trie()
+                          ////           .print_for_loop_stack_trie_compressed()
                       )
                     : optional<u8string>()
             )}
@@ -182,7 +204,10 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
         return {
             _a_pc.space(_a_pc.colon(_a_pc.seed_to_use_to_re_run_test_str())),
             {_a_pc.seed_to_use_to_re_run_test(
-                _a_element.for_loop_stack_trie().print_for_loop_stack_trie()
+                abc::utility::printer::
+                    compressed_typless_data_generator_collection_stack_trie_printer_t{
+                    }
+                        .run_printer(_a_element.for_loop_stack_trie())
             )}
         };
     case SEED_TO_USE_TO_RE_RUN_TEST_IN_HEX:
@@ -190,8 +215,15 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
             _a_pc.space(_a_pc.colon(_a_pc.seed_to_use_to_re_run_test_in_hex_str(
             ))),
             {_a_pc.seed_to_use_to_re_run_test_in_hex(
-                _a_element.for_loop_stack_trie()
-                    .print_for_loop_stack_trie_compressed()
+                abc::utility::printer::hex_printer<
+                    ds::tdg_collection_stack_trie_t>(
+                    mk_printer(
+                        abc::utility::printer::
+                            compressed_typless_data_generator_collection_stack_trie_printer_t{
+                            }
+                    )
+                )
+                    .run_printer(_a_element.for_loop_stack_trie())
             )}
         };
     case TEST_WARNINGS_RECIEVED:
