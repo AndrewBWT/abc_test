@@ -18,6 +18,8 @@
 _BEGIN_ABC_DS_NS
 // Forward declare
 class typeless_data_generator_collection_stack_trie_t;
+template <bool From_Hex, bool Head_Node>
+struct compressed_typless_data_generator_collection_stack_trie_parser_t;
 
 namespace
 {
@@ -68,11 +70,6 @@ using opt_itt_and_end_t = std::optional<std::pair<
  * loop index. We use a 2D vector as the outer contains all the data indexed by
  * the for loop index.
  */
-__no_constexpr result_t<typeless_data_generator_collection_stack_trie_t>
-               parse_repetition_tree_node(
-                   const std::u8string_view _a_str,
-                   const bool               _a_head_node
-               ) noexcept;
 
 class typeless_data_generator_collection_stack_trie_t
 {
@@ -170,27 +167,9 @@ public:
             const idgc_memoized_element_sequence_t& _a_rds
         ) const noexcept;
     friend class itdg_collection_stack_trie_t;
-    /*!
-     * @brief Parses a string into a for_loop_stack_trie_t element.
-     *
-     * This function assumes the string has been written using
-     * print_for_loop_stack_trie_compressed.
-     *
-     * @param _a_str The string to parse.
-     * @return An parse_for_loop_stack_trie_result_t. If the string could be
-     * parsed, it is a for_loop_stack_trie_t element. Otherwise it returns
-     * nullopt.
-     */
-
-    friend __constexpr result_t<typeless_data_generator_collection_stack_trie_t>
-        parse_compressed_repetition_tree_node(const std::u8string_view _a_str
-        ) noexcept;
-    friend __no_constexpr
-        result_t<typeless_data_generator_collection_stack_trie_t>
-        parse_repetition_tree_node(
-            const std::u8string_view _a_str,
-            const bool               _a_head_node
-        ) noexcept;
+    template <bool Is_Hex, bool Is_Head>
+    friend class
+        compressed_typless_data_generator_collection_stack_trie_parser_t;
 
     __constexpr const dgc_memoized_element_t&
         for_loop_data() const noexcept
@@ -279,9 +258,12 @@ struct default_printer_t<
     }
 };
 
-template <bool Head_Node = true>
+_END_ABC_UTILITY_PRINTER_NS
+_BEGIN_ABC_DS_NS
+
+template <bool To_Hex, bool Head_Node = true>
 struct compressed_typless_data_generator_collection_stack_trie_printer_t
-    : public printer_base_t<
+    : public abc::utility::printer::printer_base_t<
           abc::ds::typeless_data_generator_collection_stack_trie_t>
 {
     __no_constexpr_imp std::u8string
@@ -292,49 +274,159 @@ struct compressed_typless_data_generator_collection_stack_trie_printer_t
     {
         using namespace std;
         using namespace abc::ds;
-        const auto _l_child_printer{default_printer<
-            vector<for_loop_stack_trie_children_t>>(
+        using namespace abc::utility::printer;
+        using namespace abc::utility;
+        const auto  _l_child_printer{default_printer<
+             vector<for_loop_stack_trie_children_t>>(
             default_printer<vector<for_loop_stack_trie_child_t>>(
                 default_printer<shared_ptr<
-                    typeless_data_generator_collection_stack_trie_t>>(
+                     typeless_data_generator_collection_stack_trie_t>>(
                     mk_printer(
                         compressed_typless_data_generator_collection_stack_trie_printer_t<
+                             To_Hex,
+                             false>{}
+                    ),
+                    enum_pointer_print_parse_type_t::JUST_DATA
+                )
+            )
+        )};
+        const auto& _l_children{_a_object.children()};
+        if constexpr (Head_Node == false)
+        {
+            auto& _l_fld{_a_object.for_loop_data()};
+            auto& _l_flied{_l_fld.flied};
+            using node_type_t = tuple<
+                size_t,
+                size_t,
+                u8string,
+                for_loop_stack_trie_indexed_children_t>;
+            node_type_t _l_node_data{
+                _l_fld.generation_collection_index,
+                _l_flied.mode,
+                _l_flied.additional_data,
+                _l_children
+            };
+            auto _l_printer{default_printer_t<node_type_t>()};
+            get<3>(_l_printer.get_printers_ref()) = _l_child_printer;
+            if constexpr (To_Hex)
+            {
+                return hex_printer<node_type_t>{mk_printer(_l_printer)}
+                    .run_printer(_l_node_data);
+            }
+            else
+            {
+                return _l_printer.run_printer(_l_node_data);
+            }
+        }
+        else
+        {
+            if constexpr (To_Hex)
+            {
+                return hex_printer<vector<for_loop_stack_trie_children_t>>{
+                    _l_child_printer
+                }
+                    .run_printer(_l_children);
+            }
+            else
+            {
+                return _l_child_printer->run_printer(_l_children);
+            }
+        }
+    }
+};
+
+template <bool From_Hex, bool Head_Node = true>
+struct compressed_typless_data_generator_collection_stack_trie_parser_t
+    : public abc::utility::parser::parser_base_t<
+          abc::ds::typeless_data_generator_collection_stack_trie_t>
+{
+    __no_constexpr_imp
+        result_t<abc::ds::typeless_data_generator_collection_stack_trie_t>
+        run_parser(
+            abc::utility::parser::parser_input_t& _a_parse_input
+        ) const
+
+    {
+        using namespace std;
+        using namespace abc::ds;
+        using namespace abc::utility::parser;
+        using namespace abc::utility;
+        auto _l_child_parser{default_parser<
+            vector<for_loop_stack_trie_children_t>>(
+            default_parser<vector<for_loop_stack_trie_child_t>>(
+                default_parser<shared_ptr<
+                    typeless_data_generator_collection_stack_trie_t>>(
+                    mk_parser(
+                        compressed_typless_data_generator_collection_stack_trie_parser_t<
+                            false,
                             false>{}
                     ),
-                        enum_pointer_print_type_t::JUST_DATA
+                    enum_pointer_print_parse_type_t::JUST_DATA
                 )
             )
         )};
         if constexpr (Head_Node == false)
         {
-            auto& _l_fld{_a_object.for_loop_data()};
-            auto& _l_flied{_l_fld.flied};
-            tuple<
+            using tuple_type_t = tuple<
                 size_t,
                 size_t,
                 u8string,
-                for_loop_stack_trie_indexed_children_t>
-                _l_node_data{
-                    _l_fld.generation_collection_index,
-                    _l_flied.mode,
-                    _l_flied.additional_data,
-                    _a_object.children()
-                };
-            auto _l_printer{default_printer_t<decltype(_l_node_data)>()};
-            get<3>(_l_printer.get_printers_ref()) = _l_child_printer;
-            return _l_printer.run_printer(_l_node_data);
+                for_loop_stack_trie_indexed_children_t>;
+            parser_t<tuple_type_t> _l_node_parser{default_parser<tuple_type_t>(
+                default_parser<size_t>(),
+                default_parser<size_t>(),
+                default_parser<u8string>(),
+                _l_child_parser
+            )};
+            if constexpr (From_Hex)
+            {
+                _l_node_parser
+                    = mk_parser(hex_parser_t<tuple_type_t>{_l_node_parser});
+            }
+            return _l_node_parser->run_parser(_a_parse_input)
+                .transform(
+                    [](const tuple_type_t& _l_node)
+                    {
+                        const auto& [_l_generation_collection_index, _l_mode, _l_additional_data, _l_children]{
+                            _l_node
+                        };
+                        dgc_memoized_element_t _l_dgc{
+                            _l_generation_collection_index,
+                            dg_memoized_element_t{_l_mode, _l_additional_data}
+                        };
+                        typeless_data_generator_collection_stack_trie_t _l_rv;
+                        _l_rv._m_for_loop_data = _l_dgc;
+                        _l_rv._m_children      = _l_children;
+                        return _l_rv;
+                    }
+                );
         }
         else
         {
-            return _l_child_printer->run_printer(_a_object.children());
+            if constexpr (From_Hex)
+            {
+                _l_child_parser = mk_parser(
+                    hex_parser_t<vector<for_loop_stack_trie_children_t>>(
+                        _l_child_parser
+                    )
+                );
+            }
+            return _l_child_parser->run_parser(_a_parse_input)
+                .transform(
+                    [](const auto& _l_children)
+                    {
+                        typeless_data_generator_collection_stack_trie_t _l_rv;
+                        _l_rv._m_children = _l_children;
+                        return _l_rv;
+                    }
+                );
         }
     }
 };
 
-_END_ABC_UTILITY_PRINTER_NS
+_END_ABC_DS_NS
 
 _BEGIN_ABC_DS_NS
-
 
 __constexpr_imp opt_idgc_memoized_element_t
     typeless_data_generator_collection_stack_trie_t::increment_last_index(
@@ -582,357 +674,6 @@ __constexpr_imp opt_itt_t
     {
         return opt_itt_t{};
     }
-}
-
-__constexpr_imp result_t<typeless_data_generator_collection_stack_trie_t>
-                parse_compressed_repetition_tree_node(
-                    const std::u8string_view _a_str
-                ) noexcept
-{
-    using namespace utility::str;
-    using namespace std;
-    using enum utility::internal::internal_log_enum_t;
-    result_t<u8string> _l_hex_result{abc::utility::str::from_hex(_a_str)};
-    if (_l_hex_result.has_value())
-    {
-        return parse_repetition_tree_node(_l_hex_result.value(), true);
-    }
-    else
-    {
-        return unexpected(_l_hex_result.error());
-    }
-}
-
-__no_constexpr_imp result_t<typeless_data_generator_collection_stack_trie_t>
-                   parse_repetition_tree_node(
-                       const std::u8string_view _a_str,
-                       const bool               _a_head_node
-                   ) noexcept
-{
-    using namespace utility::str;
-    using namespace std;
-    using enum utility::internal::internal_log_enum_t;
-
-    u8string _l_str = u8string(_a_str);
-    _LIBRARY_LOG(
-        PARSING_SEED,
-        fmt::format(
-            "Depth {0}. Repetition tree after conversion from hex is "
-            "in "
-            "form \"{1}\"",
-            _a_depth,
-            _l_str
-        )
-    );
-
-    // Separete the string into strings...
-    size_t                   _l_current_pos{0};
-    size_t                   _l_mode{_a_head_node ? size_t{6} : size_t{0}};
-    size_t                   _l_start{0};
-    vector<vector<u8string>> _l_strs;
-    size_t                   _l_depth;
-    size_t                   _l_found_pos;
-    bool                     _l_end;
-    char                     _l_char;
-    size_t                   _l_previous_mode;
-    u8string                 _l_error_string;
-    size_t                   _l_old_pos;
-    vector<u8string>         _l_current_strs;
-    tuple<u8string, u8string, u8string> _l_node;
-    std::size_t _l_mode_zero_next_mode = _a_head_node ? 1 : 0;
-    std::cout << string(_a_str.begin(), _a_str.end()) << std::endl;
-    auto                                 kipwe = _a_str.size();
-    abc::utility::parser::parser_input_t _l_pt(_a_str);
-    size_t                               _l_min_index{0};
-    if (not _a_head_node)
-    {
-        if (auto _l_pos{_a_str.find(u8'(', _l_min_index)};
-            _l_pos == u8string::npos || _l_pos > 0)
-        {
-            return unexpected(u8"error");
-        }
-        else
-        {
-            _l_min_index = _l_pos + 1;
-        }
-        const size_t _l_first_comma{_a_str.find(u8',', _l_min_index)};
-        if (_l_first_comma == u8string::npos)
-        {
-            return unexpected(u8"error");
-        }
-        else
-        {
-            get<0>(_l_node)
-                = _a_str.substr(_l_min_index, _l_first_comma - _l_min_index);
-        }
-        _l_min_index = _l_first_comma + 1;
-        const size_t _l_second_comma{_a_str.find(u8',', _l_min_index)};
-        if (_l_second_comma == u8string::npos)
-        {
-            return unexpected(u8"error");
-        }
-        else
-        {
-            get<1>(_l_node)
-                = _a_str.substr(_l_min_index, _l_second_comma - _l_min_index);
-        }
-        _l_min_index = _l_first_comma + 1;
-        const size_t _l_first_quote{_a_str.find(u8'"', _l_min_index)};
-        if (_l_first_quote == u8string::npos)
-        {
-            return unexpected(u8"error");
-        }
-        else
-        {
-            _l_min_index = _l_first_quote + 1;
-            while (true)
-            {
-                const size_t _l_second_quote{_a_str.find(u8'"', _l_min_index)};
-                if (_l_second_quote != u8string::npos)
-                {
-                    if (_a_str.at(_l_second_quote - 1) != u8'\\')
-                    {
-                        get<2>(_l_node) = _a_str.substr(
-                            _l_first_quote + 1,
-                            (_l_second_quote - 1) - _l_first_quote
-                        );
-                        break;
-                    }
-                    else
-                    {
-                        _l_min_index = _l_second_quote + 1;
-                    }
-                }
-                else
-                {
-                    return unexpected(u8"error");
-                }
-            }
-            if (auto _l_pos{_a_str.find(u8',', _l_min_index)};
-                _l_pos == u8string::npos)
-            {
-                return unexpected(u8"error");
-            }
-            else
-            {
-                _l_min_index = _l_pos + 1;
-            }
-        }
-    }
-    if (auto _l_pos{_a_str.find(u8"[", _l_min_index)}; _l_pos == u8string::npos)
-    {
-        return unexpected(u8"error");
-    }
-    else
-    {
-        _l_min_index = _l_pos + 1;
-    }
-    if (_a_str[_l_min_index] == ']')
-    {
-    }
-    else
-    {
-        size_t _l_mode = 0;
-        while (true)
-        {
-            char8_t _l_char{_a_str[_l_min_index]};
-            if (_l_char == ']')
-            {
-                break;
-            }
-            if (_l_char == ',')
-            {
-                _l_min_index++;
-                // _l_strs.push_back(_l_current_strs);
-                // _l_current_strs.clear();
-                // _l_min_index++;
-                continue;
-            }
-            if (_l_char == '[')
-            {
-                _l_min_index++;
-                _l_mode = 1;
-                while (true)
-                {
-                    if (_a_str[_l_min_index] == ']')
-                    {
-                        _l_min_index++;
-                        _l_strs.push_back(_l_current_strs);
-                        _l_current_strs.clear();
-                        break;
-                    }
-                    if (_a_str[_l_min_index] != '(')
-                    {
-                        return unexpected(u8"");
-                    }
-                    size_t _l_start = _l_min_index;
-                    _l_min_index++;
-                    const size_t _l_first_quote{
-                        _a_str.find(u8"\"", _l_min_index)
-                    };
-                    if (_l_first_quote == string::npos)
-                    {
-                        return unexpected(u8"");
-                    }
-                    _l_min_index = _l_first_quote + 1;
-                    while (true)
-                    {
-                        const size_t _l_escape_char{
-                            _a_str.find(u8"\\", _l_min_index)
-                        };
-                        const size_t _l_second_quote{
-                            _a_str.find(u8"\"", _l_min_index)
-                        };
-                        if (_l_second_quote == string::npos)
-                        {
-                            return unexpected(u8"");
-                        }
-                        else if (_l_escape_char != string::npos
-                                 && (_l_escape_char + 1) == _l_second_quote)
-                        {
-                            _l_min_index = _l_second_quote + 1;
-                            continue;
-                        }
-                        else
-                        {
-                            _l_min_index = _l_second_quote + 1;
-                            break;
-                        }
-                    }
-                    if (_a_str[_l_min_index] != ',')
-                    {
-                        return unexpected(u8"");
-                    }
-                    _l_min_index++;
-                    if (_a_str[_l_min_index] != '[')
-                    {
-                        return unexpected(u8"");
-                    }
-                    ++_l_min_index;
-                    size_t _l_depth = 1;
-                    while (_l_depth > 0)
-                    {
-                        const size_t _l_next_relevant{
-                            _a_str.find_first_of(u8"[]\"", _l_min_index)
-                        };
-                        if (_l_next_relevant == string::npos)
-                        {
-                            return unexpected(u8"");
-                        }
-                        _l_min_index = _l_next_relevant;
-                        char8_t _l_char{_a_str[_l_min_index]};
-                        switch (_l_char)
-                        {
-                        case u8'[':
-                            _l_depth++;
-                            break;
-                        case u8']':
-                            _l_depth--;
-                            break;
-                        case u8'"':
-                        {
-                            _l_min_index++;
-                            while (true)
-                            {
-                                const size_t _l_escape_char{
-                                    _a_str.find(u8"\\", _l_min_index)
-                                };
-                                const size_t _l_closing_brace{
-                                    _a_str.find(u8"\"", _l_min_index)
-                                };
-                                if (_l_closing_brace == string::npos)
-                                {
-                                    return unexpected(u8"");
-                                }
-                                if (_l_escape_char == string::npos)
-                                {
-                                    _l_min_index = _l_closing_brace + 1;
-                                    break;
-                                }
-                                else if ((_l_escape_char + 1)
-                                         == _l_closing_brace)
-                                {
-                                    _l_min_index = _l_closing_brace + 1;
-                                    continue;
-                                }
-                            }
-                        }
-                        }
-                        _l_min_index++;
-                    }
-                    _l_current_strs.push_back(u8string(
-                        _a_str.substr(_l_start, (_l_min_index - _l_start + 1))
-                    ));
-                    _l_min_index++;
-                    if (_a_str[_l_min_index] == ',')
-                    {
-                        _l_min_index++;
-                        continue;
-                    }
-                    else if (_a_str[_l_min_index] == ']')
-                    {
-                        _l_min_index++;
-                        _l_strs.push_back(_l_current_strs);
-                        _l_current_strs.clear();
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    // Put it all together
-    tdg_collection_stack_trie_t _l_rv;
-    if (not _a_head_node)
-    {
-        using namespace abc::utility::parser;
-        auto _l_result_1{parse<size_t>(get<0>(_l_node))};
-        if (not _l_result_1.has_value())
-        {
-            return unexpected(fmt::format(
-                u8"Could not parse generation_collection_index using "
-                u8"string "
-                u8"\"{0}\"",
-                get<0>(_l_node)
-            ));
-        }
-        auto _l_result_2{parse<size_t>(get<0>(_l_node))};
-        if (not _l_result_2.has_value())
-        {
-            return unexpected(fmt::format(
-                u8"Could not parse generation_collection_index using "
-                u8"string "
-                u8"\"{0}\"",
-                get<1>(_l_node)
-            ));
-        }
-        _l_rv._m_for_loop_data.generation_collection_index
-            = _l_result_1.value();
-        _l_rv._m_for_loop_data.flied.mode            = _l_result_2.value();
-        _l_rv._m_for_loop_data.flied.additional_data = get<2>(_l_node);
-    }
-    for (const vector<u8string>& _l_str : _l_strs)
-    {
-        vector<shared_ptr<tdg_collection_stack_trie_t>> _l_kids;
-        for (const u8string& _l_st : _l_str)
-        {
-            const result_t<tdg_collection_stack_trie_t> _l_op{
-                parse_repetition_tree_node(_l_st, false)
-            };
-            if (_l_op.has_value())
-            {
-                _l_kids.push_back(shared_ptr<tdg_collection_stack_trie_t>(
-                    new tdg_collection_stack_trie_t(_l_op.value())
-                ));
-            }
-            else
-            {
-                return unexpected(_l_op.error());
-            }
-        }
-        _l_rv._m_children.push_back(_l_kids);
-    }
-    return _l_rv;
 }
 
 _END_ABC_DS_NS

@@ -56,11 +56,16 @@ public:
         operator++(int);
     __constexpr bool
         at_end() const noexcept;
+    __constexpr void advance_to_end(
+    ) noexcept
+    {
+        _m_cur_itt = _m_end_itt;
+    }
 private:
-    std::u8string_view                 _m_complete_string;
+    std::u8string                 _m_complete_string;
     std::size_t                        _m_elements_processed{0};
-    std::u8string_view::const_iterator _m_cur_itt;
-    std::u8string_view::const_iterator _m_end_itt;
+    std::u8string::const_iterator _m_cur_itt;
+    std::u8string::const_iterator _m_end_itt;
 };
 
 __no_constexpr auto
@@ -72,10 +77,13 @@ __constexpr
 parser_input_t::parser_input_t(
     const std::u8string_view _a_str
 ) noexcept
-    : _m_cur_itt(_a_str.begin())
-    , _m_end_itt(_a_str.end())
-    , _m_complete_string(_a_str)
-{}
+   // : _m_cur_itt(_a_str.begin())
+   // , _m_end_itt(_a_str.end())
+    : _m_complete_string(_a_str)
+{
+    _m_cur_itt = _m_complete_string.begin();
+    _m_end_itt = _m_complete_string.end();
+}
 
 __constexpr void
     parser_input_t::check_advance_and_throw(
@@ -193,7 +201,7 @@ __constexpr bool
     using namespace std;
     u32string_view::const_iterator _l_itt{_a_str_to_check_against.begin()};
     const u32string_view::const_iterator _l_end{_a_str_to_check_against.end()};
-    u8string_view::const_iterator        _l_curr_itt_cpy{_m_cur_itt};
+    u8string::const_iterator        _l_curr_itt_cpy{_m_cur_itt};
     while (_l_itt < _l_end)
     {
         if (_m_cur_itt < _m_end_itt)

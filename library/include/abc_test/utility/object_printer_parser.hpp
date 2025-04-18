@@ -20,6 +20,12 @@ struct object_printer_parser_t
     bool space_before_field_delimiter = false;
 };
 
+enum enum_pointer_print_parse_type_t
+{
+    JUST_DATA,
+    AS_OBJECT
+};
+
 _END_ABC_UTILITY_NS
 
 _BEGIN_ABC_UTILITY_NS

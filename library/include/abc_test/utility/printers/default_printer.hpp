@@ -1085,11 +1085,6 @@ struct default_printer_t<T*> : public printer_base_t<T*>
     }
 };
 
-enum enum_pointer_print_type_t
-{
-    JUST_DATA,
-    AS_OBJECT
-};
 
 template <typename T>
 struct default_printer_t<std::shared_ptr<T>>
@@ -1100,13 +1095,13 @@ private:
 public:
     static constexpr bool is_specialized{true};
     using value_type                  = std::shared_ptr<T>;
-    enum_pointer_print_type_t _m_enum = enum_pointer_print_type_t::AS_OBJECT;
+    enum_pointer_print_parse_type_t _m_enum = enum_pointer_print_parse_type_t::AS_OBJECT;
 
     __constexpr
     default_printer_t(
         const printer_t<T>&             _a_printer,
-        const enum_pointer_print_type_t _a_enum
-        = enum_pointer_print_type_t::AS_OBJECT
+        const enum_pointer_print_parse_type_t _a_enum
+        = enum_pointer_print_parse_type_t::AS_OBJECT
     )
         : _m_printer(_a_printer), _m_enum(_a_enum)
     {}
@@ -1122,7 +1117,7 @@ public:
             const value_type& _a_object
         ) const
     {
-        using enum enum_pointer_print_type_t;
+        using enum enum_pointer_print_parse_type_t;
         switch (_m_enum)
         {
         case AS_OBJECT:

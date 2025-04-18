@@ -4,6 +4,7 @@
 #include "abc_test/utility/enum.hpp"
 #include "abc_test/utility/object_printer_parser.hpp"
 #include "abc_test/utility/parsers/parser_base.hpp"
+#include "abc_test/utility/str/string_utility.hpp"
 
 #include <filesystem>
 #include <fmt/xchar.h>
@@ -919,8 +920,8 @@ __constexpr_imp result_t<std::vector<T>>
     using namespace std;
 
     vector<T> _l_rv;
-    _a_parse_input.check_advance_and_throw(U"{");
-    if (_a_parse_input.check_and_advance(U"}"))
+    _a_parse_input.check_advance_and_throw(U"[");
+    if (_a_parse_input.check_and_advance(U"]"))
     {
         return _l_rv;
     }
@@ -940,7 +941,7 @@ __constexpr_imp result_t<std::vector<T>>
                 _a_parse_input.process_whitespace();
                 continue;
             }
-            else if (_a_parse_input.check_and_advance(U"}"))
+            else if (_a_parse_input.check_and_advance(U"]"))
             {
                 return _l_rv;
             }
@@ -968,7 +969,8 @@ struct default_parser_t<std::tuple<Ts...>>
 
     __constexpr
     default_parser_t()
-    requires (std::is_default_constructible_v<default_parser_t<Ts>> && ...)
+        // requires (std::is_default_constructible_v<default_parser_t<Ts>> &&
+        // ...)
         : _m_parsers(std::make_tuple(mk_parser(default_parser_t<Ts>())...))
     {}
 
@@ -1067,6 +1069,53 @@ struct default_parser_t<std::optional<T>>
             {
                 return unexpected("error");
             }
+        }
+    }
+private:
+    parser_t<T> _m_parser;
+};
+
+template <typename T>
+struct default_parser_t<std::shared_ptr<T>>
+    : public parser_base_t<std::shared_ptr<T>>
+{
+    using value_type = std::shared_ptr<T>;
+    enum_pointer_print_parse_type_t _m_enum
+        = enum_pointer_print_parse_type_t::AS_OBJECT;
+
+    __constexpr
+    default_parser_t(
+        parser_t<T>                           _a_parser,
+        const enum_pointer_print_parse_type_t _a_enum
+        = enum_pointer_print_parse_type_t::AS_OBJECT
+    )
+        : _m_parser(_a_parser), _m_enum(_a_enum)
+    {}
+
+    __constexpr
+    default_parser_t()
+        // requires (std::is_default_constructible_v<default_parser_t<T>>)
+        : _m_parser(mk_parser(default_parser_t<T>()))
+    {}
+
+    __constexpr virtual result_t<value_type>
+        run_parser(
+            parser_input_t& _a_parse_input
+        ) const
+    {
+        using enum enum_pointer_print_parse_type_t;
+        switch (_m_enum)
+        {
+        case JUST_DATA:
+            return _m_parser->run_parser(_a_parse_input)
+                .transform(
+                    [](const T& _l_value)
+                    {
+                        return std::make_shared<T>(_l_value);
+                    }
+                );
+        default:
+            throw errors::unaccounted_for_enum_exception(_m_enum);
         }
     }
 private:
@@ -1231,5 +1280,41 @@ __constexpr result_t<std::filesystem::path>
 {
     return std::filesystem::path(_a_parse_input.get_u32string());
 }
+
+template <typename T>
+struct hex_parser_t : public parser_base_t<T>
+{
+    parser_t<T> _m_parser;
+
+    __constexpr
+    hex_parser_t(
+        const parser_t<T>& _a_parser
+    )
+        : _m_parser(_a_parser)
+    {}
+
+    __no_constexpr_imp result_t<T>
+                       run_parser(
+                           parser_input_t& _a_parse_input
+                       ) const
+    {
+        using namespace std;
+        using namespace abc::utility::str;
+        const u8string _l_str{_a_parse_input.get_u8string()};
+        _a_parse_input.advance_to_end();
+        result_t<parser_input_t> _l_intermediary{from_hex(_l_str).transform(
+            [](const u8string& _a_str)
+            {
+                return parser_input_t(_a_str);
+            }
+        )};
+        return _l_intermediary.and_then(
+            [&](parser_input_t& _l_arg) -> result_t<T>
+            {
+                return _m_parser->run_parser(_l_arg);
+            }
+        );
+    }
+};
 
 _END_ABC_UTILITY_PARSER_NS

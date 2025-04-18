@@ -72,6 +72,7 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
 {
     using namespace std;
     using namespace _ABC_NS_DS;
+    using namespace abc::utility::printer;
     using enum enum_after_execution_test_report_fields_t;
     pair<string, string> _l_pair;
     switch (_a_fid)
@@ -167,12 +168,10 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
             {_a_pc.seed_used(
                 _a_element.post_setup_test_data().has_for_loop_stack_trie()
                     ? optional<u8string>(
-
-                          abc::utility::printer::
-                              compressed_typless_data_generator_collection_stack_trie_printer_t{
-                              }
-                                  .run_printer(_a_element.post_setup_test_data()
-                                                   .for_loop_stack_trie())
+                          compressed_typless_data_generator_collection_stack_trie_printer_t<
+                              false>{}
+                              .run_printer(_a_element.post_setup_test_data()
+                                               .for_loop_stack_trie())
                       )
                     : optional<u8string>()
             )}
@@ -183,19 +182,10 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
             {_a_pc.seed_used_in_hex(
                 _a_element.post_setup_test_data().has_for_loop_stack_trie()
                     ? optional<u8string>(
-                          abc::utility::printer::hex_printer<
-                              ds::tdg_collection_stack_trie_t>(
-                              mk_printer(
-                                  abc::utility::printer::
-                                      compressed_typless_data_generator_collection_stack_trie_printer_t{
-                                      }
-                              )
-                          )
+                          compressed_typless_data_generator_collection_stack_trie_printer_t<
+                              true>{}
                               .run_printer(_a_element.post_setup_test_data()
                                                .for_loop_stack_trie())
-                          // _a_element.post_setup_test_data()
-                          //    .for_loop_stack_trie()
-                          ////           .print_for_loop_stack_trie_compressed()
                       )
                     : optional<u8string>()
             )}
@@ -204,10 +194,9 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
         return {
             _a_pc.space(_a_pc.colon(_a_pc.seed_to_use_to_re_run_test_str())),
             {_a_pc.seed_to_use_to_re_run_test(
-                abc::utility::printer::
-                    compressed_typless_data_generator_collection_stack_trie_printer_t{
-                    }
-                        .run_printer(_a_element.for_loop_stack_trie())
+                compressed_typless_data_generator_collection_stack_trie_printer_t<
+                    false>{}
+                    .run_printer(_a_element.for_loop_stack_trie())
             )}
         };
     case SEED_TO_USE_TO_RE_RUN_TEST_IN_HEX:
@@ -215,14 +204,8 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
             _a_pc.space(_a_pc.colon(_a_pc.seed_to_use_to_re_run_test_in_hex_str(
             ))),
             {_a_pc.seed_to_use_to_re_run_test_in_hex(
-                abc::utility::printer::hex_printer<
-                    ds::tdg_collection_stack_trie_t>(
-                    mk_printer(
-                        abc::utility::printer::
-                            compressed_typless_data_generator_collection_stack_trie_printer_t{
-                            }
-                    )
-                )
+                compressed_typless_data_generator_collection_stack_trie_printer_t<
+                    true>{}
                     .run_printer(_a_element.for_loop_stack_trie())
             )}
         };

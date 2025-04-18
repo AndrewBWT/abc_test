@@ -167,13 +167,19 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
     map_unique_id_to_tdg_collection_stack_trie_t _l_map;
     for (size_t _l_idx{0}; _l_idx < _l_strs.size(); ++_l_idx)
     {
+        using namespace abc::utility::parser;
+        using namespace abc::ds;
         auto& [_l_str_hex, _l_compressed_str]{_l_strs[_l_idx]};
+        const result_t<typeless_data_generator_collection_stack_trie_t>
+                 _l_compressed_scan_result{parse(
+                _l_compressed_str,
+                mk_parser(
+                    compressed_typless_data_generator_collection_stack_trie_parser_t<
+                             true>{}
+                )
+            )};
         u8string _l_str
             = abc::utility::str::from_hex_with_exception(_l_str_hex);
-        const result_t<typeless_data_generator_collection_stack_trie_t>
-            _l_compressed_scan_result{
-                parse_compressed_repetition_tree_node(_l_compressed_str)
-            };
         if (_l_compressed_scan_result.has_value())
         {
             const typeless_data_generator_collection_stack_trie_t& _l_it{
@@ -230,10 +236,9 @@ __no_constexpr_imp std::u8string
         _l_rv.append(fmt::format(
             u8"{0}:{1}:",
             _l_key_compressed,
-            abc::utility::printer::
-                compressed_typless_data_generator_collection_stack_trie_printer_t{
-                }
-                    .run_printer(_l_element.second)
+            compressed_typless_data_generator_collection_stack_trie_printer_t<
+                false>{}
+                .run_printer(_l_element.second)
         ));
     }
     if (_l_rv.size() > 0)
@@ -266,13 +271,8 @@ __no_constexpr_imp std::u8string
         _l_rv.append(fmt::format(
             u8"{0}:{1}:",
             _l_key_compressed_2,
-            abc::utility::printer::hex_printer<ds::tdg_collection_stack_trie_t>(
-                mk_printer(
-                    abc::utility::printer::
-                        compressed_typless_data_generator_collection_stack_trie_printer_t{
-                        }
-                )
-            )
+            compressed_typless_data_generator_collection_stack_trie_printer_t<
+                true>{}
                 .run_printer(_l_element.second)
         ));
     }

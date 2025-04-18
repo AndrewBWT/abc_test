@@ -183,7 +183,6 @@ set(LIBRARY_FILES
   include/abc_test/utility/str/printing_utilities.hpp
   include/abc_test/utility/str/concepts.hpp
   include/abc_test/utility/str/conversion.hpp
-  include/abc_test/utility/str/parser_utility.hpp
   include/abc_test/utility/str/string_utility.hpp
   include/abc_test/utility/str/string_table.hpp
   include/abc_test/utility/ranges.hpp
