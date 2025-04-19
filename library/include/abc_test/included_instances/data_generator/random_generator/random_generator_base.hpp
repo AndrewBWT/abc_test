@@ -1,7 +1,6 @@
 #pragma once
 
 #include "abc_test/utility/rng.hpp"
-#include "abc_test/utility/rng/rng_counter.hpp"
 
 #include <memory>
 

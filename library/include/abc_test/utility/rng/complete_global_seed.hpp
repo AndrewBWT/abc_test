@@ -3,7 +3,7 @@
 #include "abc_test/core/errors/test_library_exception.hpp"
 #include "abc_test/utility/parsers/default_parser.hpp"
 #include "abc_test/utility/printers/default_printer.hpp"
-#include "abc_test/utility/rng/seed.hpp"
+#include "abc_test/utility/rng/types.hpp"
 
 #include <optional>
 #include <scn/scan.h>

@@ -144,8 +144,7 @@ set(LIBRARY_FILES
   include/abc_test/utility/rng/global_seed.hpp
   include/abc_test/utility/rng/inner_rng.hpp
   include/abc_test/utility/rng/inner_rng_mt19937_64.hpp
-  include/abc_test/utility/rng/rng_counter.hpp
-  include/abc_test/utility/rng/seed.hpp
+  include/abc_test/utility/rng/types.hpp
   include/abc_test/utility/rng.hpp
   include/abc_test/utility/types.hpp
   # BigInteger files. Currently we do not use these. We should determine whether we will

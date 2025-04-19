@@ -1052,23 +1052,21 @@ struct default_parser_t<std::optional<T>>
     {
         using namespace std;
         value_type _l_rv;
-        _a_parse_input.check_advance_and_throw("{");
-        if (_a_parse_input.check_and_advance("}"))
+        _a_parse_input.check_advance_and_throw(U"{");
+        if (_a_parse_input.check_and_advance(U"}"))
         {
             return result_t<value_type>(nullopt);
         }
         else
         {
-            const result_t<T> _l_result{_m_parser->run_parser(_a_parse_input)};
-            if (_l_result.has_value())
-            {
-                _a_parse_input.check_advance_and_throw("}");
-                return result_t<value_type>(_l_result.value());
-            }
-            else
-            {
-                return unexpected("error");
-            }
+            return _m_parser->run_parser(_a_parse_input)
+                .transform(
+                    [&](const T& _a_object)
+                    {
+                        _a_parse_input.check_advance_and_throw(U"}");
+                        return make_optional(_a_object);
+                    }
+                );
         }
     }
 private:

@@ -518,8 +518,8 @@ __no_constexpr_imp std::u8string
     using namespace utility::printer;
     using namespace utility;
     using namespace std;
-    const optional<reference_wrapper<const complete_global_seed_t>>
-        _l_complete_global_seed{_a_seed.get_complete_global_seed_if_used()};
+    const optional<complete_global_seed_t>&
+        _l_complete_global_seed{_a_seed.inner_seed()};
     if (not _l_complete_global_seed.has_value())
     {
         if (const unsigned int* _l_ptr{
@@ -548,7 +548,7 @@ __no_constexpr_imp std::u8string
         return fmt::format(
             u8"{0}",
             default_printer_t<variant<unsigned int, seed_t>>().run_printer(
-                _l_complete_global_seed.value().get().inner_seed
+                _l_complete_global_seed.value().inner_seed
             )
         );
     }
@@ -1483,9 +1483,9 @@ __no_constexpr_imp std::u8string
 {
     using namespace utility;
     using namespace std;
-    const optional<reference_wrapper<const complete_global_seed_t>>
+    const optional<complete_global_seed_t>&
         _l_opt_complete_global_seed{
-            _a_global_seed.get_complete_global_seed_if_used()
+            _a_global_seed.inner_seed()
         };
     if (not _l_opt_complete_global_seed.has_value())
     {
@@ -1496,7 +1496,7 @@ __no_constexpr_imp std::u8string
     {
         using namespace abc::utility::printer;
         const variant<unsigned int, seed_t>& _l_complete_global_seed{
-            _l_opt_complete_global_seed.value().get().inner_seed
+            _l_opt_complete_global_seed.value().inner_seed
         };
         return fmt::format(
             u8"The global seed is set using the {0} {1}",

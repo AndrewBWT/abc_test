@@ -238,9 +238,9 @@ __no_constexpr_imp void
             {
                 using namespace utility;
                 using namespace abc::utility::printer;
-                const optional<reference_wrapper<const complete_global_seed_t>>
+                const optional<complete_global_seed_t>&
                     _l_opt_complete_global_seed{
-                        _a_global_seed.get_complete_global_seed_if_used()
+                        _a_global_seed.inner_seed()
                     };
                 return _l_opt_complete_global_seed.has_value()
                            ? fmt::format(
@@ -249,7 +249,6 @@ __no_constexpr_imp void
                                      variant<unsigned int, seed_t>>{}
                                      .run_printer(_l_opt_complete_global_seed
                                                       .value()
-                                                      .get()
                                                       .inner_seed)
                              )
                            : fmt::format(

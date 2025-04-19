@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/utility/rng/seed.hpp"
+#include "abc_test/utility/rng/types.hpp"
 #include <random>
 
 _BEGIN_ABC_UTILITY_NS

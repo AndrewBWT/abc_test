@@ -411,6 +411,8 @@ __no_constexpr_imp std::string
                    ) noexcept
 {
     using namespace std;
+    using namespace utility;
+    using namespace utility::printer;
     const string _l_rv{fmt::format(
         "{0} = {1}"
         ", {2} = {3}"
@@ -427,7 +429,7 @@ __no_constexpr_imp std::string
         "root_path",
         _a_opts.root_path,
         "global_seed",
-        _a_opts.global_seed,
+        checkless_convert_unicode_string_to_ascii_string(default_printer_t<global_seed_t>{}.run_printer(_a_opts.global_seed)),
         "number_of_integers_used_to_seed_random_generators",
         _a_opts.number_of_integers_used_to_seed_random_generators,
         "general_data_extension",
