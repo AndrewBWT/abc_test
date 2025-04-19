@@ -5,7 +5,6 @@
 #include "abc_test/utility/parsers/default_parser.hpp"
 #include "abc_test/utility/printers/default_printer.hpp"
 #include "abc_test/utility/printers/function_printer.hpp"
-#include "abc_test/utility/str/parser_utility.hpp"
 #include "abc_test/utility/str/string_utility.hpp"
 
 #include <charconv>

@@ -432,7 +432,8 @@ __constexpr_imp std::u8string
                 print_config_t::line_break() const noexcept
 {
     using namespace std;
-    return checkless_convert_ascii_to_unicode_string<u8string>(string(_m_line_break_len, _m_line_break_char)
+    return checkless_convert_ascii_to_unicode_string<u8string>(
+        string(_m_line_break_len, _m_line_break_char)
     );
 }
 
@@ -496,9 +497,7 @@ __no_constexpr_imp std::u8string
         const ds::map_unique_id_to_tdg_collection_stack_trie_t& _a_map
     ) const noexcept
 {
-    return quote(
-        print_map_of_unique_ids_to_tdg_collection_stack_tries(_a_map)
-    );
+    return quote(print_map_of_unique_ids_to_tdg_collection_stack_tries(_a_map));
 }
 
 __no_constexpr_imp std::u8string
@@ -506,7 +505,8 @@ __no_constexpr_imp std::u8string
         const utility::complete_global_seed_t& _a_seed
     ) const
 {
-    return quote(_a_seed.print_in_hex());
+    using namespace abc::utility::printer;
+    return quote(print(_a_seed));
 }
 
 __no_constexpr_imp std::u8string
@@ -518,30 +518,39 @@ __no_constexpr_imp std::u8string
     using namespace utility::printer;
     using namespace utility;
     using namespace std;
-    if (_a_seed.is_not_set())
+    const optional<reference_wrapper<const complete_global_seed_t>>
+        _l_complete_global_seed{_a_seed.get_complete_global_seed_if_used()};
+    if (not _l_complete_global_seed.has_value())
     {
-        return fmt::format(
-            u8"Not set by user. Global seed has been set randomly by system to "
-            u8"{0}",
-            _a_seed_global.integer().value()
-        );
-    }
-    else
-    {
-        const complete_global_seed_t _l_complete_seed{
-            _a_seed.complete_global_seed().value()
-        };
-        if (const optional<unsigned int> _l_opt_integer{
-                _l_complete_seed.integer()
+        if (const unsigned int* _l_ptr{
+                get_if<unsigned int>(&_a_seed_global.inner_seed)
             };
-            _l_opt_integer.has_value())
+            _l_ptr != nullptr)
         {
-            return fmt::format(u8"{0}", _l_opt_integer.value());
+            return fmt::format(
+                u8"Not set by user. Global seed has been set randomly by "
+                u8"system to "
+                u8"the integer {0}",
+                *_l_ptr
+            );
         }
         else
         {
-            return fmt::format(u8"{0}", _l_complete_seed.vector_of_integers());
+            return fmt::format(
+                u8"Not set by user. Global seed should have been set randomly "
+                u8"to an integer, however this was not performed. "
+            );
         }
+    }
+    else
+    {
+        using namespace abc::utility::printer;
+        return fmt::format(
+            u8"{0}",
+            default_printer_t<variant<unsigned int, seed_t>>().run_printer(
+                _l_complete_global_seed.value().get().inner_seed
+            )
+        );
     }
 }
 
@@ -1002,7 +1011,9 @@ __constexpr_imp std::u8string
     {
         return highlight(fmt::format(
             u8"{0}:{1}",
-            checkless_convert_ascii_to_unicode_string<u8string>(_a_sl.value().file_name()),
+            checkless_convert_ascii_to_unicode_string<u8string>(
+                _a_sl.value().file_name()
+            ),
             _a_sl.value().line()
         ));
     }
@@ -1304,8 +1315,7 @@ __constexpr_imp std::u8string
     ) const noexcept
 {
     using namespace std;
-    return u8string(_a_n_indents * _m_indent_size, char8_t(' '))
-        .append(_a_str);
+    return u8string(_a_n_indents * _m_indent_size, char8_t(' ')).append(_a_str);
 }
 
 __constexpr_imp std::u8string
@@ -1473,32 +1483,30 @@ __no_constexpr_imp std::u8string
 {
     using namespace utility;
     using namespace std;
-    if (_a_global_seed.is_not_set())
+    const optional<reference_wrapper<const complete_global_seed_t>>
+        _l_opt_complete_global_seed{
+            _a_global_seed.get_complete_global_seed_if_used()
+        };
+    if (not _l_opt_complete_global_seed.has_value())
     {
         return u8"The global seed has not been set by the user, and will "
                u8"therefore be set using the current time.";
     }
     else
     {
-        const complete_global_seed_t _l_complete_global_seed{
-            _a_global_seed.complete_global_seed().value()
+        using namespace abc::utility::printer;
+        const variant<unsigned int, seed_t>& _l_complete_global_seed{
+            _l_opt_complete_global_seed.value().get().inner_seed
         };
-        if (const optional<unsigned int> _l_opt_integer{
-                _l_complete_global_seed.integer()
-            };
-            _l_opt_integer.has_value())
-        {
-            return fmt::format(
-                u8"The global seed is set using the single integer {0}",
-                _l_opt_integer.value()
-            );
-        }
-        else
-        {
-            return fmt::format(
-                u8"The global seed is set using the vector of integers above."
-            );
-        }
+        return fmt::format(
+            u8"The global seed is set using the {0} {1}",
+            holds_alternative<unsigned int>(_l_complete_global_seed)
+                ? u8"single integer"
+                : u8"vector of integers",
+            default_printer_t<variant<unsigned int, seed_t>>{}.run_printer(
+                _l_complete_global_seed
+            )
+        );
     }
 }
 

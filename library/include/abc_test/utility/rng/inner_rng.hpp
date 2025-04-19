@@ -15,5 +15,6 @@ public:
     virtual std::mt19937_64::result_type
         operator()() noexcept
         = 0;
+    virtual std::shared_ptr<inner_rng_t> deep_copy() const noexcept = 0;
 };
 _END_ABC_UTILITY_NS

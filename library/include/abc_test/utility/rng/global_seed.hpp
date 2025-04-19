@@ -15,10 +15,13 @@ public:
     global_seed_t(const complete_global_seed_t& _a_seed) noexcept;
     __constexpr void
         set_complete_seed(complete_global_seed_t& _a_seed) const;
-    __constexpr bool
+    __constexpr const
+        std::optional<std::reference_wrapper<const complete_global_seed_t>>
+        get_complete_global_seed_if_used() const noexcept;
+    /*__constexpr bool
                 is_not_set() const noexcept;
     __constexpr std::optional<complete_global_seed_t>
-                complete_global_seed() const noexcept;
+                complete_global_seed() const noexcept;*/
 private:
     std::variant<std::monostate, complete_global_seed_t> _m_inner_seed
         = std::monostate{};
@@ -51,14 +54,14 @@ _END_ABC_UTILITY_PARSER_NS
 /*!
  * formatter for registered_test_data_t
  */
-    template <>
+template <>
 struct fmt::formatter<abc::utility::global_seed_t> : formatter<string_view>
 {
     // parse is inherited from formatter<string_view>.
     // Can't be constexpr due to use of fmt::format.
     __no_constexpr auto
         format(abc::utility::global_seed_t _a_rtd, format_context& _a_ctx) const
-        ->format_context::iterator;
+        -> format_context::iterator;
 };
 
 _BEGIN_ABC_UTILITY_NS
@@ -77,7 +80,8 @@ __constexpr void
     using namespace std;
     if (auto _l_ptr{get_if<monostate>(&_m_inner_seed)}; _l_ptr != nullptr)
     {
-        _a_seed = static_cast<unsigned int>(std::time(0));
+        _a_seed
+            = complete_global_seed_t(static_cast<unsigned int>(std::time(0)));
     }
     else if (auto _l_ptr{get_if<complete_global_seed_t>(&_m_inner_seed)};
              _l_ptr != nullptr)
@@ -90,7 +94,23 @@ __constexpr void
     }
 }
 
-__constexpr bool
+__constexpr const std::optional<std::reference_wrapper<const complete_global_seed_t>>
+    global_seed_t::get_complete_global_seed_if_used() const noexcept
+{
+    using namespace std;
+    if (const complete_global_seed_t
+            * _l_ptr{get_if<complete_global_seed_t>(&_m_inner_seed)};
+        _l_ptr != nullptr)
+    {
+        return reference_wrapper(*_l_ptr);
+    }
+    else
+    {
+        return nullopt;
+    }
+}
+
+/*__constexpr bool
     global_seed_t::is_not_set() const noexcept
 {
     using namespace std;
@@ -109,7 +129,7 @@ __constexpr std::optional<complete_global_seed_t>
     {
         return nullopt;
     }
-}
+}*/
 
 _END_ABC_UTILITY_NS
 
@@ -154,13 +174,13 @@ __constexpr result_t<global_seed_t>
 _END_ABC_UTILITY_PARSER_NS
 
 __no_constexpr_imp auto
-fmt::formatter<abc::utility::global_seed_t>::format(
-    abc::utility::global_seed_t _a_rtd,
-    format_context& _a_ctx
-) const -> format_context::iterator
+    fmt::formatter<abc::utility::global_seed_t>::format(
+        abc::utility::global_seed_t _a_rtd,
+        format_context&             _a_ctx
+    ) const -> format_context::iterator
 {
     using namespace std;
-    string _l_rv{ fmt::format(
+    string _l_rv{fmt::format(
         "{0}"
         "{{{1} = {2}"
         "}}",
@@ -168,6 +188,6 @@ fmt::formatter<abc::utility::global_seed_t>::format(
         "_l_inner_seed",
         "placeholder"
         // _a_rtd._l_inner_seed
-    ) };
+    )};
     return formatter<string_view>::format(_l_rv, _a_ctx);
 }

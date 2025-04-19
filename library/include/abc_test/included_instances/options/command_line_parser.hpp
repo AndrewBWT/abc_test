@@ -49,7 +49,7 @@ __no_constexpr_imp int
                 << "Errors encountered when parsing command line parameters. "
                    "These are as follows:"
                 << std::endl;
-            const u8string _l_errors{ _l_cli_results.errors() };
+            const u8string _l_errors{_l_cli_results.errors()};
             std::cout << "\t" << string(_l_errors.begin(), _l_errors.end());
             return -1;
         }
@@ -65,7 +65,7 @@ __no_constexpr_imp int
         {
             for (auto& k : _l_cli_results.text_output())
             {
-                string _l_str{ k.begin(), k.end()};
+                string _l_str{k.begin(), k.end()};
                 std::cout << _l_str << std::endl;
             }
             return -1;
@@ -91,21 +91,23 @@ __no_constexpr_imp int
             {
                 str::string_table_t _l_st({1});
                 for (size_t _l_idx{0};
-                    u8string& _l_error : _l_validated_test_options.error())
+                     u8string & _l_error : _l_validated_test_options.error())
                 {
                     _l_st.push_back(fmt::format(u8" {0})  ", ++_l_idx));
                     _l_st.push_back(_l_error);
                     _l_st.new_line();
                 }
-                const u8string _l_rv{ fmt::format(
+                const u8string _l_rv{fmt::format(
                     u8"Error(s) encountered when validating test_options_t. "
                     u8"The following errors were returned from the validation "
                     u8"function:\n{0}\nThe program will now terminate. "
                     u8"included_instances_test_options_t = {1}",
                     _l_st(),
-                    checkless_convert_ascii_to_unicode_string<u8string>(fmt::format("{}",_l_iito))
-                ) };
-                std::cout << string(_l_rv.begin(),_l_rv.end()) << std::endl;
+                    checkless_convert_ascii_to_unicode_string<u8string>(
+                        fmt::format("{}", _l_iito)
+                    )
+                )};
+                std::cout << string(_l_rv.begin(), _l_rv.end()) << std::endl;
                 return -1;
             }
         }
@@ -234,23 +236,24 @@ __no_constexpr_imp void
             .print_func =
                 [](const utility::global_seed_t& _a_global_seed)
             {
-                return _a_global_seed.complete_global_seed()
-                               .value()
-                               .integer()
-                               .has_value()
+                using namespace utility;
+                using namespace abc::utility::printer;
+                const optional<reference_wrapper<const complete_global_seed_t>>
+                    _l_opt_complete_global_seed{
+                        _a_global_seed.get_complete_global_seed_if_used()
+                    };
+                return _l_opt_complete_global_seed.has_value()
                            ? fmt::format(
-                                 u8"{0}",
-                                 _a_global_seed.complete_global_seed()
-                                     .value()
-                                     .integer()
-                                     .value()
+                                 u8"{}",
+                                 default_printer_t<
+                                     variant<unsigned int, seed_t>>{}
+                                     .run_printer(_l_opt_complete_global_seed
+                                                      .value()
+                                                      .get()
+                                                      .inner_seed)
                              )
                            : fmt::format(
-                                 u8"{0}",
-                                 _a_global_seed.complete_global_seed()
-                                     .value()
-                                     .vector_of_integers()
-                                     .value()
+                                 u8"Global seed not set to appropriate value"
                              );
             }
         }
@@ -289,7 +292,7 @@ __no_constexpr_imp void
             .print_func =
                 [](const vector<u8string>& _a_strs)
             {
-                    u8string _l_rv;
+                u8string _l_rv;
                 for (size_t _l_idx{0}; const u8string_view _l_str : _a_strs)
                 {
                     if (_l_str.empty())

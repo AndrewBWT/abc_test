@@ -13,6 +13,13 @@ public:
     {
 
     }
+    inline simple_rng_t(
+        const std::size_t _a_rng
+    )
+        : _m_rng(_a_rng)
+    {
+
+    }
     inline void
         set_seed(
             const abc::utility::seed_t& _a_seed
@@ -32,6 +39,13 @@ public:
         };
         ++_m_rng;
         return _l_rv;
+    }
+    inline std::shared_ptr<inner_rng_t>
+
+        deep_copy() const noexcept
+    {
+        using namespace std;
+        return make_shared<simple_rng_t>(_m_rng);
     }
 private:
     std::size_t _m_rng{0};
