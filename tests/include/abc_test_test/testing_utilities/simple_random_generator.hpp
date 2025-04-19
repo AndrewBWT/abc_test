@@ -40,12 +40,12 @@ public:
         ++_m_rng;
         return _l_rv;
     }
-    inline std::shared_ptr<inner_rng_t>
+    inline std::unique_ptr<inner_rng_t>
 
         deep_copy() const noexcept
     {
         using namespace std;
-        return make_shared<simple_rng_t>(_m_rng);
+        return make_unique<simple_rng_t>(_m_rng);
     }
 private:
     std::size_t _m_rng{0};

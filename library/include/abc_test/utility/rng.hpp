@@ -99,8 +99,15 @@ public:
      */
     __constexpr size_t
         calls() const noexcept;
+    __constexpr rng_t(const rng_t& _a_rng)
+        : _m_rng(_a_rng._m_rng->deep_copy())
+        , _m_calls(_a_rng._m_calls)
+    {
+
+    }
 private:
-    std::shared_ptr<inner_rng_t> _m_rng;
+    using inner_rng_ptr_t = std::unique_ptr<inner_rng_t>;
+    inner_rng_ptr_t _m_rng;
     seed_t                       _m_seed;
     size_t                       _m_calls{0};
     /*
@@ -108,8 +115,13 @@ private:
      */
     __no_constexpr
         rng_t(
-            const std::shared_ptr<inner_rng_t>& _a_rng,
+            inner_rng_ptr_t& _a_rng,
             const utility::seed_t&              _a_seed
+        );
+    __constexpr
+        rng_t(
+            inner_rng_ptr_t&& _a_rng,
+            const utility::seed_t& _a_seed
         );
 };
 
@@ -123,15 +135,32 @@ __no_constexpr_imp rng_t
     ) noexcept
 {
     using namespace std;
-    shared_ptr<inner_rng_t> _l_rng_cpy{_m_rng->deep_copy()};
-    seed_t                  _l_seed(_a_n_elements_to_take);
-    seed_t::iterator        _l_end{end(_l_seed)};
-    for (seed_t::iterator _l_itt{begin(_l_seed)}; _l_itt != _l_end; ++_l_itt)
+    if (_m_rng == nullptr)
     {
-        *_l_itt = _m_rng->operator()();
+        std::unreachable();
     }
-    _l_rng_cpy->set_seed(_l_seed);
-    return rng_t(_l_rng_cpy, _l_seed);
+    else
+    {
+        inner_rng_t&            _l_rng{*_m_rng};
+        inner_rng_ptr_t _l_rng_cpy{_l_rng.deep_copy()};
+        if (_l_rng_cpy == nullptr)
+        {
+            std::unreachable();
+        }
+        else
+        {
+            inner_rng_t&     _l_rng_copy_ref{*_l_rng_cpy};
+            seed_t           _l_seed(_a_n_elements_to_take);
+            seed_t::iterator _l_end{end(_l_seed)};
+            for (seed_t::iterator _l_itt{begin(_l_seed)}; _l_itt != _l_end;
+                 ++_l_itt)
+            {
+                *_l_itt = _l_rng();
+            }
+            _l_rng_copy_ref.set_seed(_l_seed);
+            return rng_t(_l_rng_cpy, _l_seed);
+        }
+    }
 }
 
 template <typename Rng>
@@ -155,7 +184,7 @@ __constexpr_imp rng_t
     ) noexcept
 {
     using namespace std;
-    return rng_t(make_shared<Rng>(_a_seed), _a_seed);
+    return rng_t(std::make_unique<Rng>(_a_seed), _a_seed);
 }
 
 __constexpr_imp void
@@ -165,12 +194,27 @@ __constexpr_imp void
 {
     if (_m_calls != _a_expected_calls)
     {
-        _m_calls = _a_expected_calls;
-        if (_m_calls > _a_expected_calls)
+        if (_m_rng == nullptr)
         {
-            _m_rng->set_seed(_m_seed);
+            std::unreachable();
         }
-        _m_rng.get()->progress(_a_expected_calls);
+        else
+        {
+            inner_rng_t& _l_rng{*_m_rng};
+            if (_m_calls > _a_expected_calls)
+            {
+                // Basically been reset to zero.
+                _l_rng.set_seed(_m_seed);
+                _l_rng.progress(_m_calls - _a_expected_calls);
+            }
+            else
+            {
+                // _a_expected_calls <= _m_calls. _m_alls - _a_expected_calls >
+                // 0.
+                _l_rng.progress(_a_expected_calls);
+            }
+            _m_calls = _a_expected_calls;
+        }
     }
 }
 
@@ -178,7 +222,15 @@ __constexpr_imp rng_t::result_type_t
                 rng_t::operator()()
 {
     ++_m_calls;
-    return _m_rng.get()->operator()();
+    if (_m_rng == nullptr)
+    {
+        std::unreachable();
+    }
+    else
+    {
+        inner_rng_t& _l_rng{*_m_rng};
+        return _l_rng();
+    }
 }
 
 __constexpr_imp size_t
@@ -189,10 +241,19 @@ __constexpr_imp size_t
 
 __no_constexpr_imp
     rng_t::rng_t(
-        const std::shared_ptr<inner_rng_t>& _a_rng,
+        inner_rng_ptr_t& _a_rng,
         const seed_t&                       _a_seed
     )
-    : _m_rng(_a_rng), _m_seed(_a_seed)
+    : _m_rng(std::move(_a_rng)), _m_seed(_a_seed)
 {}
+__constexpr
+rng_t::rng_t(
+    inner_rng_ptr_t&& _a_rng,
+    const utility::seed_t& _a_seed
+)
+    : _m_rng(std::move(_a_rng)), _m_seed(_a_seed)
+{
+
+}
 
 _END_ABC_UTILITY_NS

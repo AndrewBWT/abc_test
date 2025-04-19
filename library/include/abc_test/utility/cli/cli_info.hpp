@@ -21,29 +21,20 @@ class cli_output_t;
 namespace detail
 {
 template <typename T>
-__constexpr std::function<std::optional<T>(const std::u8string_view)>
+__constexpr std::function<result_t<T>(abc::utility::parser::parser_input_t&)>
             make_parser_func()
 {
     using namespace std;
     using namespace abc::utility::parser;
-    return [](const u8string_view _a_str)
+    return [](parser_input_t& _a_str)
     {
-        if constexpr (same_as<T, u8string>
-                      || same_as<T, filesystem::path>)
+        if constexpr (same_as<T, u8string> || same_as<T, filesystem::path>)
         {
-            return make_optional(T(_a_str));
+            return T(_a_str.get_u8string());
         }
         else
         {
-            const result_t<T> _l_pr{parse(_a_str, default_parser<T>())};
-            if (_l_pr.has_value())
-            {
-                return make_optional(_l_pr.value());
-            }
-            else
-            {
-                return optional<T>{};
-            }
+            return default_parser<T>()->run_parser(_a_str);
         }
     };
 }
@@ -94,8 +85,8 @@ __constexpr std::function<std::optional<std::u8string>(T&, const U&)>
 template <typename T, typename U>
 struct cli_argument_processing_info_t
 {
-    std::function<std::optional<U>(const std::u8string_view)> parser_func
-        = detail::make_parser_func<U>();
+    std::function<result_t<U>(abc::utility::parser::parser_input_t&)>
+        parser_func = detail::make_parser_func<U>();
     std::function<std::optional<std::u8string>(T&, const U&)>
         process_parsed_value_func = detail::process_value<T, U>();
     std::function<std::u8string(const T&)> print_func
@@ -298,8 +289,9 @@ public:
         ) const noexcept
     {
         using namespace std;
-        if (const optional<U> _l_parse_result{
-                _m_processing_info.parser_func(_a_args[0])
+        abc::utility::parser::parser_input_t _l_pi(_a_args[0]);
+        if (const result_t<U> _l_parse_result{
+                _m_processing_info.parser_func(_l_pi)
             };
             _l_parse_result.has_value())
         {
@@ -324,9 +316,10 @@ public:
         {
             _a_cli_results.add_error(fmt::format(
                 u8"Could not parse std::string \"{0}\" to type {1}. "
-                u8"Reason:",
+                u8"Reason: {2}",
                 _a_args[0],
-                type_id<T>()
+                type_id<T>(),
+                _l_parse_result.error()
             ));
             return true;
         }
@@ -376,8 +369,9 @@ public:
         using namespace std;
         for (const u8string_view _l_arg : _a_args)
         {
-            if (const optional<U> _l_parse_result{
-                    _m_processing_info.parser_func(_l_arg)
+            abc::utility::parser::parser_input_t _l_pi(_l_arg);
+            if (const result_t<U> _l_parse_result{
+                    _m_processing_info.parser_func(_l_pi)
                 };
                 _l_parse_result.has_value())
             {
@@ -403,9 +397,10 @@ public:
             {
                 _a_cli_results.add_error(fmt::format(
                     u8"Could not parse std::string \"{0}\" to type {1}. "
-                    u8"Reason:",
+                    u8"Reason: {2}",
                     _l_arg,
-                    type_id<T>()
+                    type_id<T>(),
+                    _l_parse_result.error()
                 ));
                 return true;
             }

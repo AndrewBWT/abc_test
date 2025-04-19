@@ -997,9 +997,25 @@ struct default_parser_t<std::variant<Ts...>>
     : public parser_base_t<std::variant<Ts...>>
 {
     using value_type = std::variant<Ts...>;
+    variant_print_parse_e _m_enum_variant_print_parse
+        = variant_print_parse_e::use_indexes;
 
     __constexpr
-    default_parser_t(parser_t<Ts>... _a_parsers);
+    default_parser_t(
+        const variant_print_parse_e _a_enum_variant_print_parse
+    )
+        : _m_parsers(std::make_tuple(mk_parser(default_parser_t<Ts>())...))
+        , _m_enum_variant_print_parse(_a_enum_variant_print_parse)
+    {}
+
+    __constexpr
+    default_parser_t(
+        const variant_print_parse_e _a_enum_variant_print_parse,
+        parser_t<Ts>... _a_parsers
+    )
+        : _m_parsers(_a_parsers)
+        , _m_enum_variant_print_parse(_a_enum_variant_print_parse)
+    {}
 
     __constexpr
     default_parser_t()
@@ -1017,6 +1033,12 @@ struct default_parser_t<std::variant<Ts...>>
     }
 private:
     std::tuple<parser_t<Ts>...> _m_parsers;
+    template<std::size_t I>
+    __constexpr                 std::optional<std::u8string>
+                                run_parser_internal(
+                                    value_type&     _a_object,
+                                    parser_input_t& _a_parse_input
+                                ) const;
     template <std::size_t I>
     __constexpr std::optional<std::u8string>
                 run_parser_internal(
@@ -1193,38 +1215,80 @@ __constexpr std::optional<std::u8string>
 }
 
 template <typename... Ts>
-__constexpr
-default_parser_t<std::variant<Ts...>>::default_parser_t(
-    parser_t<Ts>... _a_parsers
-)
-    : _m_parsers{std::move(_a_parsers)...}
-{}
-
-template <typename... Ts>
 __constexpr result_t<typename default_parser_t<std::variant<Ts...>>::value_type>
             default_parser_t<std::variant<Ts...>>::run_parser(
         parser_input_t& _a_parse_input
     ) const
 {
     using namespace std;
-    value_type               _l_rv;
-    default_parser_t<size_t> _l_size_t_parser;
-    _a_parse_input.check_advance_and_throw(U"(");
-    result_t<size_t> _l_size_t_result{_l_size_t_parser.run_parser(_a_parse_input
-    )};
-    _a_parse_input.check_advance_and_throw(U",");
-    _a_parse_input.process_whitespace();
-    auto _l_res{
-        run_parser_internal<0>(_l_rv, _l_size_t_result.value(), _a_parse_input)
-    };
-    _a_parse_input.check_advance_and_throw(U")");
-    if (_l_res.has_value())
+    using enum variant_print_parse_e;
+    switch (_m_enum_variant_print_parse)
     {
-        return unexpected(_l_res.value());
+    case no_indexes:
+    {
+        value_type               _l_rv;
+        const optional<u8string> _l_res{
+            run_parser_internal<0>(_l_rv, _a_parse_input)
+        };
+        return (_l_res.has_value()) ? unexpected(_l_res.value())
+                                    : result_t<value_type>(_l_rv);
+    }
+    case use_indexes:
+    {
+        _a_parse_input.check_advance_and_throw(U"(");
+        return default_parser_t<size_t>{}
+            .run_parser(_a_parse_input)
+            .and_then(
+                [&](const size_t _a_size)
+                {
+                    _a_parse_input.check_advance_and_throw(U",");
+                    _a_parse_input.process_whitespace();
+                    value_type               _l_rv;
+                    const optional<u8string> _l_res{
+                        run_parser_internal<0>(_l_rv, _a_size, _a_parse_input)
+                    };
+                    _a_parse_input.check_advance_and_throw(U")");
+                    return (_l_res.has_value()) ? unexpected(_l_res.value())
+                                                : result_t<value_type>(_l_rv);
+                }
+            );
+    }
+    default:
+        throw errors::unaccounted_for_enum_exception(_m_enum_variant_print_parse
+        );
+    }
+}
+
+template <typename... Ts>
+template<std::size_t I>
+__constexpr std::optional<std::u8string>
+            default_parser_t<std::variant<Ts...>>::run_parser_internal(
+        value_type&     _a_object,
+        parser_input_t& _a_parse_input
+    ) const
+{
+    using namespace std;
+    if constexpr (I + 1 == tuple_size<std::tuple<Ts...>>{})
+    {
+        return optional<u8string>(fmt::format(
+            u8"Could not parse std::variant element {0}. Tuple does not "
+            u8"contain "
+            u8"index",
+            I
+        ));
     }
     else
     {
-        return result_t<value_type>(_l_rv);
+        if (auto _l_result{ get<I>(_m_parsers)->run_parser(_a_parse_input) };
+            _l_result.has_value())
+        {
+            _a_object = value_type(in_place_index<I>, _l_result.value());
+            return nullopt;
+        }
+        else
+        {
+            return run_parser_internal<I + 1>(_a_object, _a_parse_input);
+        }
     }
 }
 

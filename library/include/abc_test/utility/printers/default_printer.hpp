@@ -4,9 +4,9 @@
 #include "abc_test/utility/enum.hpp"
 #include "abc_test/utility/object_printer_parser.hpp"
 #include "abc_test/utility/printers/printer_base.hpp"
+#include "abc_test/utility/str/string_utility.hpp"
 
 #include <filesystem>
-#include "abc_test/utility/str/string_utility.hpp"
 
 _BEGIN_ABC_UTILITY_PRINTER_NS
 
@@ -648,9 +648,26 @@ struct default_printer_t<std::variant<Ts...>>
     : public printer_base_t<std::variant<Ts...>>
 {
     using value_type = std::variant<Ts...>;
+    variant_print_parse_e _m_enum_variant_print_parse
+        = variant_print_parse_e::use_indexes;
     static constexpr bool is_specialized{true};
+
     __constexpr
-    default_printer_t(printer_t<Ts>... _a_printers);
+    default_printer_t(
+        const variant_print_parse_e _a_enum_variant_print_parse,
+        printer_t<Ts>... _a_printers
+    )
+        : _m_printers(_a_printers)
+        , _m_enum_variant_print_parse(_a_enum_variant_print_parse)
+    {}
+
+    __constexpr
+    default_printer_t(
+        const variant_print_parse_e _a_enum_variant_print_parse
+    )
+        : _m_printers(std::make_tuple(mk_printer(default_printer_t<Ts>())...))
+        , _m_enum_variant_print_parse(_a_enum_variant_print_parse)
+    {}
 
     __constexpr
     default_printer_t()
@@ -664,13 +681,21 @@ struct default_printer_t<std::variant<Ts...>>
         ) const
     {
         using namespace std;
-        u8string     _l_str{u8"("};
-        const size_t _l_idx{_a_object.index()};
-        _l_str.append(default_printer_t<size_t>{}.run_printer(_l_idx));
-        _l_str.append(u8" ");
-        _l_str.append(run_internal_printer<0>(_a_object, _l_idx));
-        _l_str.append(u8")");
-        return _l_str;
+        using enum variant_print_parse_e;
+        const size_t   _l_idx{_a_object.index()};
+        const u8string _l_element_str{run_internal_printer<0>(_a_object, _l_idx)
+        };
+        switch (_m_enum_variant_print_parse)
+        {
+        case no_indexes:
+            return _l_element_str;
+        case use_indexes:
+            return fmt::format(u8"({0}, {1})", _l_idx, _l_element_str);
+        default:
+            throw errors::unaccounted_for_enum_exception(
+                _m_enum_variant_print_parse
+            );
+        }
     }
 
     __constexpr std::tuple<printer_t<Ts>...>&
@@ -1085,7 +1110,6 @@ struct default_printer_t<T*> : public printer_base_t<T*>
     }
 };
 
-
 template <typename T>
 struct default_printer_t<std::shared_ptr<T>>
     : public printer_base_t<std::shared_ptr<T>>
@@ -1094,12 +1118,13 @@ private:
     printer_t<T> _m_printer;
 public:
     static constexpr bool is_specialized{true};
-    using value_type                  = std::shared_ptr<T>;
-    enum_pointer_print_parse_type_t _m_enum = enum_pointer_print_parse_type_t::AS_OBJECT;
+    using value_type = std::shared_ptr<T>;
+    enum_pointer_print_parse_type_t _m_enum
+        = enum_pointer_print_parse_type_t::AS_OBJECT;
 
     __constexpr
     default_printer_t(
-        const printer_t<T>&             _a_printer,
+        const printer_t<T>&                   _a_printer,
         const enum_pointer_print_parse_type_t _a_enum
         = enum_pointer_print_parse_type_t::AS_OBJECT
     )

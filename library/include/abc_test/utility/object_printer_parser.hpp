@@ -26,6 +26,12 @@ enum enum_pointer_print_parse_type_t
     AS_OBJECT
 };
 
+enum variant_print_parse_e
+{
+    no_indexes,
+    use_indexes
+};
+
 _END_ABC_UTILITY_NS
 
 _BEGIN_ABC_UTILITY_NS
