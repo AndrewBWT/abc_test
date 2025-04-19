@@ -8,7 +8,7 @@ _TEST_CASE(
          .description
          = "Checks that each of the functions for user_defined_test_data_t are "
            "able to process randomised data",
-         .path = "abc_test::internal::ds::test_data::user_defined_test_data",
+         .path = "abc_test_test::core::ds::test_data::user_defined_test_data",
          .threads_required = 1}
     )
 )

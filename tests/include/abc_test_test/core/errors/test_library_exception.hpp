@@ -7,7 +7,7 @@
 _TEST_CASE(
     abc::test_case_t(
         {.name             = "Testing traits of of test_library_exception_t",
-         .path             = "abc_test::core::errors",
+         .path             = "abc_test_test::core::errors::test_library_exception",
          .threads_required = 1}
     )
 )

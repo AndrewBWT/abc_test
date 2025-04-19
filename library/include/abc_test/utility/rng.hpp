@@ -205,13 +205,11 @@ __constexpr_imp void
             {
                 // Basically been reset to zero.
                 _l_rng.set_seed(_m_seed);
-                _l_rng.progress(_m_calls - _a_expected_calls);
+                _l_rng.progress(_a_expected_calls);
             }
             else
             {
-                // _a_expected_calls <= _m_calls. _m_alls - _a_expected_calls >
-                // 0.
-                _l_rng.progress(_a_expected_calls);
+                _l_rng.progress(_a_expected_calls - _m_calls);
             }
             _m_calls = _a_expected_calls;
         }

@@ -90,7 +90,7 @@ _TEST_CASE(
          .description
          = "Checks default_enumerator_t functions for floating point numbers",
          .path
-         = "abc_test_test::included_instances::data_generator::enumeration",
+         = "abc_test_test::included_instances::data_generator::enumeration::default_enumeration",
          .threads_required = 1}
     )
 )
@@ -108,7 +108,7 @@ _TEST_CASE(
          .description
          = "Checks default_enumerator_t functions for std::vector objects",
          .path
-         = "abc_test_test::included_instances::data_generator::enumeration",
+         = "abc_test_test::included_instances::data_generator::enumeration::default_enumeration",
          .threads_required = 1}
     )
 )

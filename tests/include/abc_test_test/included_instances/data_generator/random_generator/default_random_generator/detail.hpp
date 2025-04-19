@@ -76,8 +76,8 @@ _TEST_CASE(
     abc::test_case_t(
         {.name = "Fuzzy testing detail::generate_rng_value_between_bounds for "
                  "various types and values",
-         .path
-         = "abc_test_test::included_instances::data_generator::random::detail",
+         .path = "abc_test_test::included_instances::data_generator::random_"
+                 "generator::default_random_generator::detail",
          .threads_required = 1}
     )
 )
@@ -145,8 +145,8 @@ inline void
 _TEST_CASE(
     abc::test_case_t(
         {.name = "Unit tests for detail::generate_rng_value_between_bounds",
-         .path
-         = "abc_test_test::included_instances::data_generator::random::detail",
+         .path = "abc_test_test::included_instances::data_generator::random_"
+                 "generator::default_random_generator::detail",
          .threads_required = 1}
     )
 )

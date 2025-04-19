@@ -99,7 +99,8 @@ _TEST_CASE(
     abc::test_case_t(
         {.name = "Fuzzy test for random_data_generator_t for the "
                  "std::basic_string type using various RNG",
-         .path = "abc_test_test::included_instances::data_generator::random",
+         .path = "abc_test_test::included_instances::data_generator::random_"
+                 "generator::default_random_generator::basic_string",
          .threads_required = 1}
     )
 )
@@ -108,13 +109,15 @@ _TEST_CASE(
     using namespace std;
     using namespace test;
     manual_data_generator_t _l_mdg;
-   // RUN(_l_mdg, fuzzy_test_default_random_generator_basic_string<string>());
-    //RUN(_l_mdg, fuzzy_test_default_random_generator_basic_string<wstring>());
-  //  RUN(_l_mdg, fuzzy_test_default_random_generator_basic_string<u8string>());
+    // RUN(_l_mdg, fuzzy_test_default_random_generator_basic_string<string>());
+    // RUN(_l_mdg, fuzzy_test_default_random_generator_basic_string<wstring>());
+    // RUN(_l_mdg,
+    // fuzzy_test_default_random_generator_basic_string<u8string>());
     RUN(_l_mdg, fuzzy_test_default_random_generator_basic_string<u16string>());
-   // RUN(_l_mdg, fuzzy_test_default_random_generator_basic_string<u32string>());
-   // RUN(_l_mdg,
-   //     fuzzy_test_default_random_generator_basic_string<basic_string<int>>());
+    // RUN(_l_mdg,
+    // fuzzy_test_default_random_generator_basic_string<u32string>());
+    // RUN(_l_mdg,
+    //     fuzzy_test_default_random_generator_basic_string<basic_string<int>>());
 }
 
 namespace test
@@ -145,8 +148,7 @@ inline void
             _l_tuple
         };
         // Convert signed char vector to a string
-        T _l_str_result
-            = convert_type<T>(_l_result_as_signed_chars);
+        T _l_str_result = convert_type<T>(_l_result_as_signed_chars);
         // Seed the random generator function with the given seed value.
         _l_rng.progress(_l_rng_seed_value);
         // Generate the string.
@@ -166,7 +168,8 @@ _TEST_CASE(
     abc::test_case_t(
         {.name = "Unit testing random_data_generator_t for std::basic_string "
                  "type, using user-supplied vectors of signed integers",
-         .path = "abc_test_test::included_instances::data_generator::random",
+         .path = "abc_test_test::included_instances::data_generator::random_"
+                 "generator::default_random_generator::basic_string",
          .threads_required = 1}
     )
 )
@@ -175,21 +178,21 @@ _TEST_CASE(
     using namespace std;
     using namespace test;
     manual_data_generator_t _l_mdg;
- //   RUN(_l_mdg,
-  //      unit_test_default_random_generator_basic_string_using_vect<string>());
-   // RUN(_l_mdg,
-  //      unit_test_default_random_generator_basic_string_using_vect<wstring>());
-  //  RUN(_l_mdg,
-  //      unit_test_default_random_generator_basic_string_using_vect<u8string>());
- //   RUN(_l_mdg,
-  //      unit_test_default_random_generator_basic_string_using_vect<u16string>()
-  //  );
-  //  RUN(_l_mdg,
- //       unit_test_default_random_generator_basic_string_using_vect<u32string>()
-  //  );
-  //  RUN(_l_mdg,
-  //      unit_test_default_random_generator_basic_string_using_vect<
-  //          basic_string<int>>());
+    // RUN(_l_mdg,
+    //    unit_test_default_random_generator_basic_string_using_vect<string>());
+    // RUN(_l_mdg,
+    // unit_test_default_random_generator_basic_string_using_vect<wstring>());
+    // RUN(_l_mdg,
+    // unit_test_default_random_generator_basic_string_using_vect<u8string>());
+    // RUN(_l_mdg,
+    //    unit_test_default_random_generator_basic_string_using_vect<u16string>()
+    // );
+    // RUN(_l_mdg,
+    // unit_test_default_random_generator_basic_string_using_vect<u32string>()
+    // );
+    // RUN(_l_mdg,
+    // unit_test_default_random_generator_basic_string_using_vect<
+    //    basic_string<int>>());
 }
 
 namespace test
@@ -233,7 +236,8 @@ _TEST_CASE(
     abc::test_case_t(
         {.name = "Unit testing random_data_generator_t for std::basic_string "
                  "type, using user-supplied ASCII strings",
-         .path = "abc_test_test::included_instances::data_generator::random",
+         .path = "abc_test_test::included_instances::data_generator::random_"
+                 "generator::default_random_generator::basic_string",
          .threads_required = 1}
     )
 )
@@ -242,11 +246,13 @@ _TEST_CASE(
     using namespace std;
     using namespace test;
     manual_data_generator_t _l_mdg;
- //   RUN(_l_mdg, unit_test_default_random_generator_basic_string<string>());
-    //RUN(_l_mdg, unit_test_default_random_generator_basic_string<wstring>());
-   // RUN(_l_mdg, unit_test_default_random_generator_basic_string<u8string>());
-   // RUN(_l_mdg, unit_test_default_random_generator_basic_string<u16string>());
-    //RUN(_l_mdg, unit_test_default_random_generator_basic_string<u32string>());
-   // RUN(_l_mdg,
-   //     unit_test_default_random_generator_basic_string<basic_string<int>>());
+    // RUN(_l_mdg, unit_test_default_random_generator_basic_string<string>());
+    // RUN(_l_mdg, unit_test_default_random_generator_basic_string<wstring>());
+    // RUN(_l_mdg, unit_test_default_random_generator_basic_string<u8string>());
+    // RUN(_l_mdg,
+    // unit_test_default_random_generator_basic_string<u16string>());
+    // RUN(_l_mdg,
+    // unit_test_default_random_generator_basic_string<u32string>());
+    // RUN(_l_mdg,
+    //     unit_test_default_random_generator_basic_string<basic_string<int>>());
 }
