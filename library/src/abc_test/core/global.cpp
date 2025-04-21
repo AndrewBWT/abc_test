@@ -140,9 +140,7 @@ __no_constexpr_or_inline_imp void
     using namespace std;
     using namespace utility;
     complete_global_seed_t& _l_complete_global_seed{get_inner_global_seed()};
-    global::get_global_test_options().global_seed.set_complete_seed(
-        _l_complete_global_seed
-    );
+    get_inner_global_seed() = set_complete_global_seed(global::get_global_test_options().global_seed);
 }
 
 __no_constexpr_or_inline_imp const utility::complete_global_seed_t&

@@ -18,7 +18,6 @@
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_thrown_non_descript_entity.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter.hpp"
 #include "abc_test/utility/rng.hpp"
-#include "abc_test/utility/rng/global_seed.hpp"
 
 #include <fmt/color.h>
 _BEGIN_ABC_REPORTERS_NS
@@ -506,7 +505,14 @@ __no_constexpr_imp std::u8string
     ) const
 {
     using namespace abc::utility::printer;
-    return quote(print(_a_seed));
+    using namespace utility;
+    using namespace std;
+    return quote(print(
+        _a_seed,
+        default_printer<variant<unsigned int, seed_t>>(
+            variant_print_parse_e::no_indexes
+        )
+    ));
 }
 
 __no_constexpr_imp std::u8string
@@ -518,13 +524,9 @@ __no_constexpr_imp std::u8string
     using namespace utility::printer;
     using namespace utility;
     using namespace std;
-    const optional<complete_global_seed_t>&
-        _l_complete_global_seed{_a_seed.inner_seed()};
-    if (not _l_complete_global_seed.has_value())
+    if (not _a_seed.has_value())
     {
-        if (const unsigned int* _l_ptr{
-                get_if<unsigned int>(&_a_seed_global.inner_seed)
-            };
+        if (const unsigned int* _l_ptr{get_if<unsigned int>(&_a_seed_global)};
             _l_ptr != nullptr)
         {
             return fmt::format(
@@ -548,7 +550,7 @@ __no_constexpr_imp std::u8string
         return fmt::format(
             u8"{0}",
             default_printer_t<variant<unsigned int, seed_t>>().run_printer(
-                _l_complete_global_seed.value().inner_seed
+                _a_seed.value()
             )
         );
     }
@@ -1483,11 +1485,7 @@ __no_constexpr_imp std::u8string
 {
     using namespace utility;
     using namespace std;
-    const optional<complete_global_seed_t>&
-        _l_opt_complete_global_seed{
-            _a_global_seed.inner_seed()
-        };
-    if (not _l_opt_complete_global_seed.has_value())
+    if (not _a_global_seed.has_value())
     {
         return u8"The global seed has not been set by the user, and will "
                u8"therefore be set using the current time.";
@@ -1496,7 +1494,7 @@ __no_constexpr_imp std::u8string
     {
         using namespace abc::utility::printer;
         const variant<unsigned int, seed_t>& _l_complete_global_seed{
-            _l_opt_complete_global_seed.value().inner_seed
+            _a_global_seed.value()
         };
         return fmt::format(
             u8"The global seed is set using the {0} {1}",

@@ -234,8 +234,8 @@ __no_constexpr_imp void
         cli_argument_processing_info_t<
             utility::global_seed_t,
             utility::global_seed_t>{
-            .parser_func =
-                [](utility::parser::parser_input_t& _a_input) -> result_t<global_seed_t>
+            .parser_func = [](utility::parser::parser_input_t& _a_input
+                           ) -> result_t<global_seed_t>
             {
                 using namespace utility;
                 using namespace abc::utility::parser;
@@ -246,9 +246,7 @@ __no_constexpr_imp void
                     .transform(
                         [](const variant<unsigned int, seed_t>& _a_varint)
                         {
-                            return global_seed_t(
-                                complete_global_seed_t{_a_varint}
-                            );
+                            return global_seed_t(_a_varint);
                         }
                     );
             },
@@ -257,18 +255,13 @@ __no_constexpr_imp void
             {
                 using namespace utility;
                 using namespace abc::utility::printer;
-                const optional<complete_global_seed_t>&
-                    _l_opt_complete_global_seed{_a_global_seed.inner_seed()};
-                return _l_opt_complete_global_seed.has_value()
+                return _a_global_seed.has_value()
                            ? fmt::format(
                                  u8"{}",
-                                 default_printer_t<
-                                     variant<unsigned int, seed_t>>{
+                                 default_printer_t<complete_global_seed_t>{
                                      variant_print_parse_e::no_indexes
                                  }
-                                     .run_printer(_l_opt_complete_global_seed
-                                                      .value()
-                                                      .inner_seed)
+                                     .run_printer(_a_global_seed.value())
                              )
                            : fmt::format(
                                  u8"Global seed not set to appropriate value"

@@ -7,31 +7,32 @@
 #include "abc_test/utility/str/conversion.hpp"
 
 #include <filesystem>
+#include <fmt/xchar.h>
 #include <fstream>
 #include <variant>
 
-#include <fmt/xchar.h>
-
-
 
 _BEGIN_ABC_UTILITY_CLI_NS
-enum class enum_auto_configuration_load_type_t
+enum class auto_configuration_load_type_e
 {
-    LATEST,
-    LATEST_IF_FAILURE,
-    AUTO
+    latest,
+    latest_if_failure,
+    automatic
 };
 _END_ABC_UTILITY_CLI_NS
 
 _BEGIN_ABC_NS
 template <>
 auto
-    utility::get_enum_list(
-    ) -> utility::enum_list_t<utility::cli::enum_auto_configuration_load_type_t>
+    utility::get_enum_list()
+        -> utility::enum_list_t<utility::cli::auto_configuration_load_type_e>
 {
-    using enum utility::cli::enum_auto_configuration_load_type_t;
-    return {_ENUM_LIST_ENTRY(LATEST), _ENUM_LIST_ENTRY(LATEST_IF_FAILURE),
-    _ENUM_LIST_ENTRY(AUTO) };
+    using enum utility::cli::auto_configuration_load_type_e;
+    return {
+        _ENUM_LIST_ENTRY(latest),
+        _ENUM_LIST_ENTRY(latest_if_failure),
+        _ENUM_LIST_ENTRY(automatic)
+    };
 }
 
 _END_ABC_NS
@@ -55,7 +56,7 @@ public:
 
     __constexpr
     auto_configuration_load_configuration_t(
-        const enum_auto_configuration_load_type_t _a_data
+        const auto_configuration_load_type_e _a_data
     )
         : _m_data(_a_data)
     {}
@@ -69,7 +70,7 @@ public:
                    : nullopt;
     }
 private:
-    std::variant<std::size_t, enum_auto_configuration_load_type_t> _m_data;
+    std::variant<std::size_t, auto_configuration_load_type_e> _m_data;
 };
 enum class enum_auto_configuration_write_to_file_t
 {
@@ -140,8 +141,8 @@ struct default_parser_t<cli::auto_configuration_load_configuration_t>
     {
         using namespace std;
         using namespace _ABC_NS_CLI;
-        if (const result_t<enum_auto_configuration_load_type_t> _l_result{
-                default_parser_t<enum_auto_configuration_load_type_t>(
+        if (const result_t<auto_configuration_load_type_e> _l_result{
+                default_parser_t<auto_configuration_load_type_e>(
                     enum_helper_string_case_t::lower
                 )
                     .run_parser(_a_parse_input)
@@ -160,12 +161,13 @@ struct default_parser_t<cli::auto_configuration_load_configuration_t>
         else
         {
             return unexpected(fmt::format(
-                u8"Couldn't parse string {0} to either a {1} or a {2}, which the "
+                u8"Couldn't parse string {0} to either a {1} or a {2}, which "
+                u8"the "
                 u8"constructor for {3} requires.",
                 _a_parse_input.get_u8string(),
-                type_id< enum_auto_configuration_load_type_t>(),
-                type_id< size_t>(),
-                type_id< auto_configuration_load_configuration_t>()
+                type_id<auto_configuration_load_type_e>(),
+                type_id<size_t>(),
+                type_id<auto_configuration_load_configuration_t>()
             ));
         }
     }

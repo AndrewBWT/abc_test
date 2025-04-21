@@ -1,6 +1,5 @@
 #pragma once
 
-#include "abc_test/utility/rng/complete_global_seed.hpp"
 #include "abc_test/utility/rng/inner_rng.hpp"
 
 #include <memory>
@@ -42,7 +41,7 @@ public:
      * Cannot be constexpr due to calling private rng_t constructor, which is
      * not constexpr.
      */
-    __no_constexpr rng_t
+    __constexpr rng_t
         make_rng(const std::size_t _a_n_elements_to_take) noexcept;
     /*!
      * @brief Factory function for creating rng_t objects. One of only two ways
@@ -66,11 +65,16 @@ public:
      * @brief Factory function for creating rng_t objects. One of only two ways
      * of creating an rng_t value without any previous rng_t value.
      * @tparam Rng The type of the internal inner_rng_t object.
-     * @param _a_seed seed_t object representing the seed of the created object.
+     * @param _a_seed seed_t An rvalue object representing the seed of the
+     * created object.
      * @return The rng_t object created from the parameters.
      */
     template <typename Rng>
     requires std::derived_from<Rng, inner_rng_t>
+    __constexpr static rng_t
+        make_rng(seed_t&& _a_seed) noexcept;
+    template <typename Rng>
+        requires std::derived_from<Rng, inner_rng_t>
     __constexpr static rng_t
         make_rng(const seed_t& _a_seed) noexcept;
     /*!
@@ -91,7 +95,7 @@ public:
      * @return The randomly generated result_type_t type.
      */
     __constexpr result_type_t
-        operator()();
+        operator()() noexcept;
     /*!
      * @brief Tells the caller the number of times the internal RNG has been
      * called.
@@ -99,37 +103,35 @@ public:
      */
     __constexpr size_t
         calls() const noexcept;
-    __constexpr rng_t(const rng_t& _a_rng)
-        : _m_rng(_a_rng._m_rng->deep_copy())
-        , _m_calls(_a_rng._m_calls)
-    {
-
-    }
+    /*!
+     * @brief Constructor which takes an rvalue argument.
+     * @param _a_rng The rvalue _a_rng argument.
+     */
+    __constexpr
+    rng_t(rng_t&& _a_rng) noexcept;
+    /*!
+     * @brief A constructor which takes a lvalue argument.
+     * @param _a_rng The lvalue in question.
+     * @return
+     */
+    __constexpr
+    rng_t(const rng_t& _a_rng) noexcept;
 private:
     using inner_rng_ptr_t = std::unique_ptr<inner_rng_t>;
     inner_rng_ptr_t _m_rng;
-    seed_t                       _m_seed;
-    size_t                       _m_calls{0};
-    /*
-     * Cannot be constexpr due to use of shared_ptr copy constructor.
-     */
-    __no_constexpr
-        rng_t(
-            inner_rng_ptr_t& _a_rng,
-            const utility::seed_t&              _a_seed
-        );
+    seed_t          _m_seed;
+    size_t          _m_calls{0};
     __constexpr
-        rng_t(
-            inner_rng_ptr_t&& _a_rng,
-            const utility::seed_t& _a_seed
-        );
+    rng_t(inner_rng_ptr_t&& _a_rng, seed_t&& _a_seed);
+    __constexpr
+        rng_t(inner_rng_ptr_t&& _a_rng, const seed_t& _a_seed);
 };
 
 _END_ABC_UTILITY_NS
 
 _BEGIN_ABC_UTILITY_NS
 
-__no_constexpr_imp rng_t
+__constexpr_imp rng_t
     rng_t::make_rng(
         const std::size_t _a_n_elements_to_take
     ) noexcept
@@ -141,7 +143,7 @@ __no_constexpr_imp rng_t
     }
     else
     {
-        inner_rng_t&            _l_rng{*_m_rng};
+        inner_rng_t&    _l_rng{*_m_rng};
         inner_rng_ptr_t _l_rng_cpy{_l_rng.deep_copy()};
         if (_l_rng_cpy == nullptr)
         {
@@ -158,7 +160,7 @@ __no_constexpr_imp rng_t
                 *_l_itt = _l_rng();
             }
             _l_rng_copy_ref.set_seed(_l_seed);
-            return rng_t(_l_rng_cpy, _l_seed);
+            return rng_t(move(_l_rng_cpy), move(_l_seed));
         }
     }
 }
@@ -171,22 +173,50 @@ __constexpr_imp rng_t
         const std::size_t             _a_seed_size
     ) noexcept
 {
-    return make_rng<Rng>(
-        seed_t(_a_global_seed.create_seed_from_global_seed(_a_seed_size))
-    );
+    using namespace std;
+    if (const unsigned int* _l_ptr{ get_if<unsigned int>(&_a_global_seed) };
+        _l_ptr != nullptr)
+    {
+        seed_t           _l_seed(_a_seed_size);
+        seed_t::iterator _l_end{ end(_l_seed) };
+        srand(*_l_ptr);
+        for (seed_t::iterator _l_itt{ begin(_l_seed) }; _l_itt != _l_end; ++_l_itt)
+        {
+            *_l_itt = rand();
+        }
+        return make_rng<Rng>(move(_l_seed));
+    }
+    else if (const seed_t* _l_ptr{ get_if<seed_t>(&_a_global_seed) };
+        _l_ptr != nullptr)
+    {
+        return make_rng<Rng>(*_l_ptr);
+    }
+    else
+    {
+        std::unreachable();
+    }
 }
 
 template <typename Rng>
 requires std::derived_from<Rng, inner_rng_t>
 __constexpr_imp rng_t
     rng_t::make_rng(
-        const seed_t& _a_seed
+        seed_t&& _a_seed
     ) noexcept
 {
     using namespace std;
-    return rng_t(std::make_unique<Rng>(_a_seed), _a_seed);
+    return rng_t(make_unique<Rng>(_a_seed), move(_a_seed));
 }
-
+template <typename Rng>
+    requires std::derived_from<Rng, inner_rng_t>
+__constexpr_imp rng_t
+rng_t::make_rng(
+    const seed_t& _a_seed
+) noexcept
+{
+    using namespace std;
+    return rng_t(make_unique<Rng>(_a_seed), _a_seed);
+}
 __constexpr_imp void
     rng_t::progress(
         const size_t _a_expected_calls
@@ -217,15 +247,15 @@ __constexpr_imp void
 }
 
 __constexpr_imp rng_t::result_type_t
-                rng_t::operator()()
+                rng_t::operator()() noexcept
 {
-    ++_m_calls;
     if (_m_rng == nullptr)
     {
         std::unreachable();
     }
     else
     {
+        ++_m_calls;
         inner_rng_t& _l_rng{*_m_rng};
         return _l_rng();
     }
@@ -237,21 +267,38 @@ __constexpr_imp size_t
     return _m_calls;
 }
 
-__no_constexpr_imp
+__constexpr_imp
     rng_t::rng_t(
-        inner_rng_ptr_t& _a_rng,
-        const seed_t&                       _a_seed
-    )
-    : _m_rng(std::move(_a_rng)), _m_seed(_a_seed)
+        rng_t&& _a_rng
+    ) noexcept
+    : _m_rng(std::move(_a_rng._m_rng)), _m_calls(_a_rng._m_calls)
+{}
+
+__constexpr_imp
+    rng_t::rng_t(
+        const rng_t& _a_rng
+    ) noexcept
+    : _m_rng(
+          _a_rng._m_rng == nullptr ? inner_rng_ptr_t{}
+                                   : _a_rng._m_rng->deep_copy()
+      )
+    , _m_calls(_a_rng._m_calls)
+{}
+
+__constexpr
+rng_t::rng_t(
+    inner_rng_ptr_t&& _a_rng,
+    seed_t&&          _a_seed
+)
+    : _m_rng(std::move(_a_rng)), _m_seed(std::move(_a_seed))
 {}
 __constexpr
 rng_t::rng_t(
     inner_rng_ptr_t&& _a_rng,
-    const utility::seed_t& _a_seed
+    const seed_t& _a_seed
 )
     : _m_rng(std::move(_a_rng)), _m_seed(_a_seed)
 {
 
 }
-
 _END_ABC_UTILITY_NS

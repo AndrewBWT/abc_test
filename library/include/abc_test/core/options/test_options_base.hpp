@@ -8,7 +8,6 @@
 #include "abc_test/utility/internal/log.hpp"
 #include "abc_test/utility/parsers/default_parser.hpp"
 #include "abc_test/utility/rng.hpp"
-#include "abc_test/utility/rng/global_seed.hpp"
 #include "abc_test/utility/rng/inner_rng_mt19937_64.hpp"
 
 #include <filesystem>

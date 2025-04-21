@@ -760,7 +760,7 @@ struct default_printer_t<std::optional<T>>
 
     __constexpr
     default_printer_t()
-    requires (std::is_default_constructible_v<default_printer_t<T>>)
+   // requires (std::is_default_constructible_v<default_printer_t<T>>)
         : _m_printer(mk_printer(default_printer_t<T>()))
     {}
 

@@ -61,7 +61,6 @@ __no_constexpr_imp
         const utility::seed_t& _a_seed
     ) noexcept
     : inner_rng_mt19937_64_t(std::seed_seq(_a_seed.begin(), _a_seed.end()))
-// : _m_rng(std::seed_seq(_a_seed.begin(), _a_seed.end());)
 {}
 
 __no_constexpr_imp

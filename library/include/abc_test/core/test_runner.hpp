@@ -43,7 +43,7 @@ public:
         test_runner_t(
             _ABC_NS_REPORTERS::test_reporter_controller_t& _a_trc,
             const test_options_base_t&                     _a_test_options,
-            const utility::rng_t& _a_rng
+            utility::rng_t&& _a_rng
         ) noexcept;
     /*!
      * @brief Adds a log message to the current set of log messages.
@@ -209,11 +209,11 @@ __no_constexpr_imp
     test_runner_t::test_runner_t(
         _ABC_NS_REPORTERS::test_reporter_controller_t& _a_trc,
         const test_options_base_t&                     _a_test_options,
-        const utility::rng_t& _a_rng
+        utility::rng_t&& _a_rng
     ) noexcept
     : _m_trc(_a_trc)
     , _m_current_test(nullptr)
-    , _m_random_generator(_a_rng)
+    , _m_random_generator(std::move(_a_rng))
     , _m_tests_most_recent_source(_ABC_NS_DS::single_source_t())
 {}
 

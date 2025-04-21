@@ -41,7 +41,7 @@ public:
      */
     __no_constexpr
         invoked_test_data_t(
-            const utility::rng_t&         _a_rng,
+            utility::rng_t&&              _a_rng,
             const post_setup_test_data_t& _a_test_info,
             const size_t                  _a_order_ran_id,
             const std::filesystem::path&  _a_root_path
@@ -341,7 +341,7 @@ struct fmt::formatter<_ABC_NS_DS::invoked_test_data_t> : formatter<string_view>
 _BEGIN_ABC_DS_NS
 __no_constexpr_imp
     invoked_test_data_t::invoked_test_data_t(
-        const utility::rng_t&         _a_rng,
+        utility::rng_t&&              _a_rng,
         const post_setup_test_data_t& _a_post_setup_test_data,
         const size_t                  _a_order_ran_id,
         const std::filesystem::path&  _a_root_path
@@ -349,7 +349,7 @@ __no_constexpr_imp
     : _m_post_setup_test_data(_a_post_setup_test_data)
     , _m_for_loop_data_collection(ds::tdg_collection_stack_t())
     , _m_order_ran_id(_a_order_ran_id)
-    , _m_this_tests_random_generator(_a_rng)
+    , _m_this_tests_random_generator(std::move(_a_rng))
     , _m_path(create_test_path(_a_post_setup_test_data, _a_root_path))
     , _m_test_status(enum_test_status_t::NO_TERMINATION_TEST_PASSED)
 {}
@@ -745,7 +745,7 @@ __no_constexpr_imp auto
         _a_iti.post_setup_test_data(),
         "_m_repetition_tree",
         _l_unwritten_str,
-//        _a_iti.for_loop_stack_trie(),
+        // _a_iti.for_loop_stack_trie(),
         "_m_for_loop_data_collection",
         _a_iti.for_loop_data_collection(),
         "_m_order_ran_id",
