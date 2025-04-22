@@ -783,6 +783,24 @@ private:
     printer_t<T> _m_printer;
 };
 
+template <>
+struct default_printer_t<std::monostate>
+    : public printer_base_t<std::monostate>
+{
+    using value_type = std::monostate;
+    static constexpr bool is_specialized{ true };
+    __constexpr virtual std::u8string
+        run_printer(
+            const value_type& _a_object
+        ) const
+    {
+        using namespace std;
+        u8string _l_rv;
+        _l_rv.append(u8"std::monostate");
+        return _l_rv;
+    }
+};
+
 _END_ABC_UTILITY_PRINTER_NS
 
 _BEGIN_ABC_UTILITY_PRINTER_NS template <typename... Ts>

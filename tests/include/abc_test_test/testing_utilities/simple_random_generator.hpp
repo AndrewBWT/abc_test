@@ -10,8 +10,12 @@ public:
     inline simple_rng_t(
         const seed_t& _a_seed
     )
+        : _m_rng{ size_t{0} }
     {
-
+        for (auto& _l_element : _a_seed)
+        {
+            _m_rng += _l_element;
+        }
     }
     inline simple_rng_t(
         const std::size_t _a_rng
@@ -26,10 +30,14 @@ public:
         ) noexcept
     {
         _m_rng = 0;
+        for (auto& _l_element : _a_seed)
+        {
+            _m_rng += _l_element;
+        }
     }
     inline virtual void progress(const std::size_t _a_n_to_progress) noexcept
     {
-        _m_rng = _a_n_to_progress;
+        _m_rng += _a_n_to_progress;
     }
     inline std::mt19937_64::result_type
         operator()() noexcept

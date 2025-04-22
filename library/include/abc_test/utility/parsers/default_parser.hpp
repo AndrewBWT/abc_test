@@ -379,11 +379,36 @@ struct default_parser_t<T> : public parser_base_t<T>
         {
             return result_t<T>(result);
         }
+        else if (ec == errc::invalid_argument)
+        {
+            return result_t<T>(unexpected(fmt::format(
+                u8"Could not parse \"{0}\" using std::from_chars, as the "
+                u8"std::string argument is invalid",
+                unicode_conversion<u8string>(_l_u32str)
+            )));
+        }
+        else if (ec == errc::result_out_of_range)
+        {
+            return result_t<T>(unexpected(fmt::format(
+                u8"Could not parse \"{0}\" using std::from_chars as, after "
+                u8"conversion, number is out of range. Min and max value of "
+                u8"{1} are {2} and {3}",
+                unicode_conversion<u8string>(_l_u32str),
+                type_id<T>(),
+                numeric_limits<T>::min(),
+                numeric_limits<T>::max()
+            )
+
+            ));
+        }
         else
         {
             return result_t<T>(unexpected(fmt::format(
-                u8"Could not parse \"{0}\" using std::from_chars",
-                unicode_conversion<u8string>(_l_u32str)
+                u8"Could not parse \"{0}\" using std::from_chars for some "
+                u8"unknown reason. The error code returned was unexpected. Its "
+                u8"integer represention is {1}",
+                unicode_conversion<u8string>(_l_u32str),
+                std::to_underlying(ec)
             )
 
             ));
@@ -883,7 +908,8 @@ __constexpr_imp result_t<typename default_parser_t<std::pair<T, U>>::value_type>
         _l_first_result.has_value())
     {
         _l_rv.first = _l_first_result.value();
-        _a_parse_input.check_advance_and_throw(U", ");
+        _a_parse_input.check_advance_and_throw(U",");
+        _a_parse_input.process_whitespace();
         if (auto _l_second_result{_m_parsers.second->run_parser(_a_parse_input)
             };
             _l_second_result.has_value())
@@ -1033,12 +1059,12 @@ struct default_parser_t<std::variant<Ts...>>
     }
 private:
     std::tuple<parser_t<Ts>...> _m_parsers;
-    template<std::size_t I>
-    __constexpr                 std::optional<std::u8string>
-                                run_parser_internal(
-                                    value_type&     _a_object,
-                                    parser_input_t& _a_parse_input
-                                ) const;
+    template <std::size_t I>
+    __constexpr std::optional<std::u8string>
+                run_parser_internal(
+                    value_type&     _a_object,
+                    parser_input_t& _a_parse_input
+                ) const;
     template <std::size_t I>
     __constexpr std::optional<std::u8string>
                 run_parser_internal(
@@ -1063,7 +1089,7 @@ struct default_parser_t<std::optional<T>>
 
     __constexpr
     default_parser_t()
-  //  requires (std::is_default_constructible_v<default_parser_t<T>>)
+        // requires (std::is_default_constructible_v<default_parser_t<T>>)
         : _m_parser(mk_parser(default_parser_t<T>()))
     {}
 
@@ -1207,7 +1233,7 @@ __constexpr std::optional<std::u8string>
     {
         return optional<u8string>(fmt::format(
             u8"Could not parse std::tuple element {0}. Failed with error "
-            u8"message: {1}",
+            u8"message: \"{1}\".",
             I,
             _l_result.error()
         ));
@@ -1260,7 +1286,7 @@ __constexpr result_t<typename default_parser_t<std::variant<Ts...>>::value_type>
 }
 
 template <typename... Ts>
-template<std::size_t I>
+template <std::size_t I>
 __constexpr std::optional<std::u8string>
             default_parser_t<std::variant<Ts...>>::run_parser_internal(
         value_type&     _a_object,
@@ -1279,7 +1305,7 @@ __constexpr std::optional<std::u8string>
     }
     else
     {
-        if (auto _l_result{ get<I>(_m_parsers)->run_parser(_a_parse_input) };
+        if (auto _l_result{get<I>(_m_parsers)->run_parser(_a_parse_input)};
             _l_result.has_value())
         {
             _a_object = value_type(in_place_index<I>, _l_result.value());

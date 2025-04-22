@@ -39,7 +39,7 @@ __constexpr precedence_t
  * @return A char* representative of the enum template.
  */
 template <logic_enum_t Logic_Enum>
-__constexpr const char*
+__constexpr const std::u8string_view
     logic_str() noexcept;
 /*!
  * @brief Function which takes two booealn values and runs the given logical
@@ -89,21 +89,21 @@ __constexpr_imp precedence_t
 }
 
 template <logic_enum_t Logic_Enum>
-__constexpr_imp const char*
+__constexpr_imp const std::u8string_view
     logic_str() noexcept
 {
     using enum logic_enum_t;
     if constexpr (Logic_Enum == NOT)
     {
-        return "!";
+        return u8"!";
     }
     else if constexpr (Logic_Enum == OR)
     {
-        return "||";
+        return u8"||";
     }
     else if constexpr (Logic_Enum == AND)
     {
-        return "&&";
+        return u8"&&";
     }
     else
     {
@@ -111,7 +111,7 @@ __constexpr_imp const char*
             Logic_Enum,
             "precedence function does not have value for given template type."
         );
-        return "";
+        return u8"";
     }
 }
 

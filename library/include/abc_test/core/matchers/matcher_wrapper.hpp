@@ -222,7 +222,7 @@ public:
         mk_matcher_representing_binary_logical_expr(
             const std::optional<matcher_wrapper_t<false>>& _a_matcher_l,
             const std::optional<matcher_wrapper_t<false>>& _a_matcher_r,
-            const std::string_view _a_str_representing_nullopt
+            const std::u8string_view _a_str_representing_nullopt
         ) noexcept;
     __constexpr explicit
         operator bool();
@@ -436,7 +436,7 @@ __no_constexpr_imp matcher_wrapper_t<Has_Annotation>
     ) const noexcept
 {
     return mk_matcher_representing_binary_logical_expr<logic_enum_t::AND>(
-        *this, _a_matcher, ""
+        *this, _a_matcher, u8""
     );
 }
 
@@ -448,7 +448,7 @@ __no_constexpr_imp matcher_wrapper_t<Has_Annotation>
     ) const noexcept
 {
     return mk_matcher_representing_binary_logical_expr<logic_enum_t::OR>(
-        *this, _a_matcher, ""
+        *this, _a_matcher, u8""
     );
 }
 
@@ -508,16 +508,16 @@ __constexpr_imp matcher_wrapper_t<false>
                 mk_matcher_representing_binary_logical_expr(
                     const std::optional<matcher_wrapper_t<false>>& _a_matcher_l,
                     const std::optional<matcher_wrapper_t<false>>& _a_matcher_r,
-                    const std::string_view                         _a_default_str
+                    const std::u8string_view                       _a_default_str
                 ) noexcept
 {
     using namespace std;
     using namespace abc::ds;
-    string _l_left_str{
+    u8string _l_left_str{
         _a_matcher_l.has_value() ? _a_matcher_l.value().matcher_result().str()
                                  : _a_default_str
     };
-    string _l_right_str{
+    u8string _l_right_str{
         _a_matcher_r.has_value() ? _a_matcher_r.value().matcher_result().str()
                                  : _a_default_str
     };
@@ -550,14 +550,22 @@ __constexpr_imp matcher_wrapper_t<false>
     matcher_result_t _l_mr(
         compute_logic_result<Logic_Enum>(_l_left_passed, _l_right_passed),
         fmt::format(
-            "{0}{1}{2} {3} {4}{5}{6}",
-            _l_str_pair_l.first,
+            u8"{0}{1}{2} {3} {4}{5}{6}",
+            checkless_convert_ascii_to_unicode_string<u8string>(
+                _l_str_pair_l.first
+            ),
             _l_left_str,
-            _l_str_pair_l.second,
+            checkless_convert_ascii_to_unicode_string<u8string>(
+                _l_str_pair_l.second
+            ),
             logic_str<Logic_Enum>(),
-            _l_str_pair_r.first,
+            checkless_convert_ascii_to_unicode_string<u8string>(
+                _l_str_pair_r.first
+            ),
             _l_right_str,
-            _l_str_pair_r.second
+            checkless_convert_ascii_to_unicode_string<u8string>(
+                _l_str_pair_r.second
+            )
         )
     );
     vector<single_source_t> _l_sources_l

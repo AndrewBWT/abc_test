@@ -204,7 +204,7 @@ __constexpr bool
     u8string::const_iterator        _l_curr_itt_cpy{_m_cur_itt};
     while (_l_itt < _l_end)
     {
-        if (_m_cur_itt < _m_end_itt)
+        if (_l_curr_itt_cpy < _m_end_itt)
         {
             char32_t _l_char{utf8::next(_l_curr_itt_cpy, _m_end_itt)};
             if (_l_char != *_l_itt)

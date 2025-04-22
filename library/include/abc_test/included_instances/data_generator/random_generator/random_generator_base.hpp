@@ -22,14 +22,14 @@ _END_ABC_DG_NS
 _BEGIN_ABC_NS
 template <typename T>
 __constexpr data_gen::random_generator_t<typename T::value_type_t>
-            mk_random_generator(T&& _a_random_generator_base) noexcept;
+            mk_random_generator(const T& _a_random_generator_base) noexcept;
 _END_ABC_NS
 
 _BEGIN_ABC_NS
 template <typename T>
 __constexpr_imp data_gen::random_generator_t<typename T::value_type_t>
                 mk_random_generator(
-                    T&& _a_random_generator_base
+                    const T& _a_random_generator_base
                 ) noexcept
 {
     using namespace std;

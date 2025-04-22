@@ -695,7 +695,11 @@ __no_constexpr_imp std::filesystem::path
 {
     using namespace std::filesystem;
     using namespace utility;
-    path_t _l_path{_a_root_path};
+    using namespace std;
+    path_t _l_path{ R"(\\?\)" };
+    path_t _l_absolute_path{ std::filesystem::absolute(_a_root_path).string() };
+    wstring _l_wstr{ _l_absolute_path.native() };
+    _l_path = path_t(L"\\\\?\\" + _l_wstr);
     for (const test_path_element_ref_t& _a_test_path_component :
          _a_test_info.test_path_hierarchy())
     {
@@ -706,9 +710,19 @@ __no_constexpr_imp std::filesystem::path
             _a_test_info.registered_test_data()._m_user_data.name
         )
     );
+    std::cout << _l_path << std::endl;
     if (not exists(_l_path))
     {
-        create_directories(_l_path);
+        std::cout << _l_path.u8string().size() << std::endl;
+        try
+        {
+            create_directories(_l_path);
+        }
+        catch (const std::filesystem::filesystem_error& _a_exception)
+        {
+            std::cout << _a_exception.what() << std::endl;
+            int x = 4;
+        }
     }
     return _l_path;
 }

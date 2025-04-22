@@ -13,6 +13,11 @@
 
 _BEGIN_ABC_DG_NS
 
+/*!
+ * @brief Abstract class for the default random generator. There has to be some
+ * specialization of this class for it to actuall be used.
+ * @tparam T
+ */
 template <typename T>
 struct default_random_generator_t : public random_generator_base_t<T>
 {
@@ -33,6 +38,14 @@ public:
 
 _END_ABC_DG_NS
 _BEGIN_ABC_NS
+/*!
+ * @brief Factory function for creating a default_random_generator_t wrapped in
+ * a random_generaotr_t object.
+ * @tparam T The template type of the created random generator.
+ * @tparam ...Ts The argument types for the default_random_generator_t.
+ * @param ...elements The arguments for the default_random_generator_t.
+ * @return The created random_generator_t object.
+ */
 template <typename T, typename... Ts>
 __constexpr data_gen::random_generator_t<T>
             default_random_generator(Ts... elements) noexcept;
@@ -353,11 +366,18 @@ struct default_random_generator_t<T> : public random_generator_base_t<T>
 {
 public:
     __constexpr
+        default_random_generator_t(
+            const T& _a_arg1,
+            const T& _a_arg2
+        ) noexcept
+        : _m_bounds(utility::bounds_t<T>(_a_arg1,_a_arg2))
+    {
+    }
+    __constexpr
     default_random_generator_t(
-        const T& _a_min = std::numeric_limits<T>::min(),
-        const T& _a_max = std::numeric_limits<T>::max()
+        const utility::bounds_t<T> _a_bounds = utility::bounds_t<T>()
     ) noexcept
-        : _m_min(_a_min), _m_max(_a_max), _m_range(_m_max - _m_min)
+        : _m_bounds(_a_bounds)
     {}
 
     __constexpr_imp virtual T
@@ -367,13 +387,14 @@ public:
         )
     {
         using namespace std;
-        T _l_val{static_cast<T>(_a_rnd_generator() % _m_range)};
-        return _m_min + _l_val;
+        return _m_bounds.lower() + (_m_bounds.difference() == 0)
+                   ? 0
+                   : static_cast<T>(
+                         _a_rnd_generator() % _m_bounds.difference()
+                     );
     }
 private:
-    T _m_min;
-    T _m_max;
-    T _m_range;
+    utility::bounds_t<T> _m_bounds;
 };
 
 template <typename T>
@@ -482,10 +503,7 @@ struct default_random_generator_t<std::tuple<Ts...>>
     __constexpr
     default_random_generator_t(random_generator_t<Ts>... _a_rngs);
     __constexpr
-    default_random_generator_t()
-    requires (
-        std::is_default_constructible_v<default_random_generator_t<Ts>> && ...
-    );
+    default_random_generator_t();
     template <std::size_t I>
     __constexpr void
         run_rng_internal(
@@ -506,6 +524,118 @@ struct default_random_generator_t<std::tuple<Ts...>>
     }
 private:
     std::tuple<random_generator_t<Ts>...> _m_rngs;
+};
+
+template <typename T1, typename T2>
+struct default_random_generator_t<std::pair<T1, T2>>
+    : public random_generator_base_t<std::pair<T1, T2>>
+{
+    using value_type = std::pair<T1, T2>;
+
+    __constexpr
+    default_random_generator_t(
+        const random_generator_t<T1>& _a_arg1,
+        const random_generator_t<T2>& _a_arg2
+    )
+        : _m_rngs(std::make_pair(_a_arg1, _a_arg2))
+    {}
+
+    __constexpr
+    default_random_generator_t()
+        : _m_rngs(std::make_pair(
+              default_random_generator<T1>(),
+              default_random_generator<T2>()
+          ))
+    {}
+
+    template <std::size_t I>
+    __constexpr void
+        run_rng_internal(
+            value_type&                   _a_object,
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        ) const
+    {
+        using namespace std;
+        get<I>(_a_object)
+            = get<I>(_m_rngs)->operator()(_a_rnd_generator, _a_index);
+        if constexpr (I + 1 < tuple_size<value_type>{})
+        {
+            run_rng_internal<I + 1>(_a_object, _a_rnd_generator, _a_index);
+        }
+    }
+
+    __no_constexpr virtual value_type
+        operator()(
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        )
+    {
+        value_type _l_rv;
+        run_rng_internal<0>(_l_rv, _a_rnd_generator, _a_index);
+        return _l_rv;
+    }
+
+    __constexpr std::pair<random_generator_t<T1>, random_generator_t<T2>>&
+                get_ref_to_inner_rngs() noexcept
+    {
+        return _m_rngs;
+    }
+private:
+    std::pair<random_generator_t<T1>, random_generator_t<T2>> _m_rngs;
+};
+
+template <typename... Ts>
+struct default_random_generator_t<std::variant<Ts...>>
+    : public random_generator_base_t<std::variant<Ts...>>
+{
+    using value_type = std::variant<Ts...>;
+
+    __constexpr
+    default_random_generator_t(random_generator_t<Ts>... _a_rngs);
+    __constexpr
+    default_random_generator_t();
+    template <std::size_t I>
+    __constexpr void
+        run_rng_internal(
+            value_type&                   _a_object,
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index,
+            const std::size_t             _a_generate_index
+        ) const;
+    __no_constexpr virtual value_type
+        operator()(
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        );
+
+    __constexpr std::tuple<random_generator_t<Ts>...>&
+                get_ref_to_inner_rngs() noexcept
+    {
+        return _m_rngs;
+    }
+private:
+    std::tuple<random_generator_t<Ts>...> _m_rngs;
+};
+
+template <>
+struct default_random_generator_t<std::monostate>
+    : public random_generator_base_t<std::monostate>
+{
+    using value_type = std::monostate;
+
+    __constexpr
+    default_random_generator_t()
+    {}
+
+    __no_constexpr virtual value_type
+        operator()(
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        )
+    {
+        return std::monostate{};
+    }
 };
 
 _END_ABC_DG_NS
@@ -654,8 +784,8 @@ struct default_random_generator_t<std::basic_string<T>>
             const utility::rng_counter_t& _a_index
         )
     {
-        std::cout << "Begin RNG basic string. rng_counter = " <<
-            _a_index << std::endl;
+        std::cout << "Begin RNG basic string. rng_counter = " << _a_index
+                  << std::endl;
         using namespace std;
         const basic_string<T>::size_type _l_size{
             detail::generate_rng_value_between_bounds<
@@ -663,7 +793,7 @@ struct default_random_generator_t<std::basic_string<T>>
                 _m_bounds, _a_index, _a_rnd_generator
             )
         };
-        std::cout << fmt::format("Size {1}",_a_index, _l_size) << std::endl;
+        std::cout << fmt::format("Size {1}", _a_index, _l_size) << std::endl;
         if (_a_index == 0)
         {
             int i = 5;
@@ -676,10 +806,11 @@ struct default_random_generator_t<std::basic_string<T>>
             for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
             {
                 _l_rv[_l_idx] = _l_rng->operator()(_a_rnd_generator, _a_index);
-               // auto kbd = fmt::format(
-               //     u8"[{0}] = {1}", _l_idx, basic_string<T>(1, _l_rv[_l_idx])
-              //  );
-              //  std::cout << string(kbd.begin(), kbd.end()) << std::endl;
+                // auto kbd = fmt::format(
+                //     u8"[{0}] = {1}", _l_idx, basic_string<T>(1,
+                //     _l_rv[_l_idx])
+                // );
+                // std::cout << string(kbd.begin(), kbd.end()) << std::endl;
             }
         }
         else
@@ -697,16 +828,17 @@ struct default_random_generator_t<std::basic_string<T>>
                 {
                     const basic_string<T>& _l_generated{_l_opt_generated.value()
                     };
-                    auto ki = _l_idx;
+                    auto                   ki = _l_idx;
                     for (const T _l_char : _l_generated)
                     {
                         _l_rv[_l_idx++] = _l_char;
                         _l_remaining--;
                     }
-                //    auto kbd = fmt::format(
-                //        u8"[{0} - {1}] = {2}", ki, _l_idx, _l_generated
-                //    );
-                //    std::cout << std::string(kbd.begin(), kbd.end()) << std::endl;
+                    // auto kbd = fmt::format(
+                    //     u8"[{0} - {1}] = {2}", ki, _l_idx, _l_generated
+                    // );
+                    // std::cout << std::string(kbd.begin(), kbd.end()) <<
+                    // std::endl;
                 }
                 else
                 {
@@ -718,8 +850,8 @@ struct default_random_generator_t<std::basic_string<T>>
                 _l_rv.resize(_l_idx);
             }
         }
-        std::cout << "End RNG basic string. rng_counter = " <<
-            _a_index << std::endl;
+        std::cout << "End RNG basic string. rng_counter = " << _a_index
+                  << std::endl;
         return _l_rv;
     }
 private:
@@ -790,6 +922,11 @@ struct default_random_generator_t<std::vector<T>>
     : public random_generator_base_t<std::vector<T>>
 {
 public:
+    __constexpr
+    default_random_generator_t() noexcept
+        : _m_gen(default_random_generator<T>())
+    {}
+
     __constexpr
     default_random_generator_t(const random_generator_t<T>& _a_gen) noexcept;
     __no_constexpr virtual std::vector<T>
@@ -913,11 +1050,18 @@ __no_constexpr_imp std::vector<T>
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY;
-    const size_t _l_size{_a_rnd_generator() % _a_index};
-    vector<T>    _l_rv(_l_size);
-    for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
+    using namespace utility;
+    using value_type_t = std::vector<T>;
+    using size_type    = value_type_t::size_type;
+    const size_type _l_size{detail::generate_rng_value_between_bounds(
+        bounds_t<size_type>(), _a_index, _a_rnd_generator
+    )};
+    value_type_t    _l_rv(_l_size);
+    const typename value_type_t::iterator _l_end{end(_l_rv)};
+    for (typename value_type_t::iterator _l_itt{begin(_l_rv)}; _l_itt != _l_end;
+         ++_l_itt)
     {
-        _l_rv[_l_idx] = _m_gen(_a_rnd_generator, _a_index);
+        *_l_itt = _m_gen->operator()(_a_rnd_generator, _a_index);
     }
     return _l_rv;
 }
@@ -1073,12 +1217,7 @@ __constexpr_imp
 template <typename... Ts>
 __constexpr_imp
     default_random_generator_t<std::tuple<Ts...>>::default_random_generator_t()
-requires (
-    std::is_default_constructible_v<default_random_generator_t<Ts>> && ...
-)
-    : _m_rngs(std::make_tuple(
-          mk_random_generator(default_random_generator_t<Ts>())...
-      ))
+    : _m_rngs(std::make_tuple(default_random_generator<Ts>()...))
 {}
 
 template <typename... Ts>
@@ -1107,6 +1246,66 @@ __no_constexpr_imp default_random_generator_t<std::tuple<Ts...>>::value_type
 {
     value_type _l_rv;
     run_rng_internal<0>(_l_rv, _a_rnd_generator, _a_index);
+    return _l_rv;
+}
+
+template <typename... Ts>
+__constexpr_imp
+    default_random_generator_t<std::variant<Ts...>>::default_random_generator_t(
+        random_generator_t<Ts>... _a_rngs
+    )
+    : _m_rngs(_a_rngs...)
+{}
+
+template <typename... Ts>
+__constexpr_imp
+    default_random_generator_t<std::variant<Ts...>>::default_random_generator_t(
+    )
+    : _m_rngs(std::make_tuple(
+          mk_random_generator(default_random_generator_t<Ts>())...
+      ))
+{}
+
+template <typename... Ts>
+template <std::size_t I>
+__constexpr void
+    default_random_generator_t<std::variant<Ts...>>::run_rng_internal(
+        value_type&                   _a_object,
+        utility::rng_t&               _a_rnd_generator,
+        const utility::rng_counter_t& _a_index,
+        const std::size_t             _a_generate_index
+    ) const
+{
+    using namespace std;
+    if (I == _a_generate_index)
+    {
+        _a_object = get<I>(_m_rngs)->operator()(_a_rnd_generator, _a_index);
+    }
+    else if constexpr (I + 1 < tuple_size<std::tuple<Ts...>>{})
+    {
+        run_rng_internal<I + 1>(
+            _a_object, _a_rnd_generator, _a_index, _a_generate_index
+        );
+    }
+    else
+    {
+    }
+}
+
+template <typename... Ts>
+__no_constexpr_imp default_random_generator_t<std::variant<Ts...>>::value_type
+                   default_random_generator_t<std::variant<Ts...>>::operator()(
+        utility::rng_t&               _a_rnd_generator,
+        const utility::rng_counter_t& _a_index
+    )
+{
+    value_type _l_rv;
+    size_t     _l_index{detail::generate_rng_value_between_bounds(
+        utility::bounds_t<size_t>(0, std::tuple_size<std::tuple<Ts...>>{}),
+        _a_index,
+        _a_rnd_generator
+    )};
+    run_rng_internal<0>(_l_rv, _a_rnd_generator, _a_index, _l_index);
     return _l_rv;
 }
 
