@@ -150,14 +150,14 @@ __constexpr_imp rng_t
     else
     {
         inner_rng_t&    _l_rng{*_m_rng};
-        inner_rng_ptr_t _l_rng_cpy{_l_rng.deep_copy()};
-        if (_l_rng_cpy == nullptr)
+       // inner_rng_ptr_t _l_rng_cpy{_l_rng.deep_copy()};
+     //   if (_l_rng_cpy == nullptr)
+      //  {
+     //       std::unreachable();
+    //    }
+   //     else
         {
-            std::unreachable();
-        }
-        else
-        {
-            inner_rng_t&     _l_rng_copy_ref{*_l_rng_cpy};
+        //    inner_rng_t&     _l_rng_copy_ref{*_l_rng_cpy};
             seed_t           _l_seed(_a_n_elements_to_take);
             seed_t::iterator _l_end{end(_l_seed)};
             for (seed_t::iterator _l_itt{begin(_l_seed)}; _l_itt != _l_end;
@@ -165,8 +165,8 @@ __constexpr_imp rng_t
             {
                 *_l_itt = (*this)();
             }
-            _l_rng_copy_ref.set_seed(_l_seed);
-            return rng_t(move(_l_rng_cpy), move(_l_seed));
+          //  inner_rng_ptr_t _l_rng_cpy(_l_rng.make_rng(_l_seed));
+            return rng_t(move(_l_rng.make_rng(_l_seed)), move(_l_seed));
         }
     }
 }

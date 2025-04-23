@@ -35,6 +35,12 @@ public:
             _m_rng += _l_element;
         }
     }
+
+    inline std::unique_ptr<inner_rng_t>
+        make_rng(const seed_t& _a_seed) const noexcept
+    {
+        return make_unique<simple_rng_t>(_a_seed);
+    }
     inline virtual void progress(const std::size_t _a_n_to_progress) noexcept
     {
         _m_rng += _a_n_to_progress;

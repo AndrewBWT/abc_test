@@ -366,13 +366,13 @@ struct default_random_generator_t<T> : public random_generator_base_t<T>
 {
 public:
     __constexpr
-        default_random_generator_t(
-            const T& _a_arg1,
-            const T& _a_arg2
-        ) noexcept
-        : _m_bounds(utility::bounds_t<T>(_a_arg1,_a_arg2))
-    {
-    }
+    default_random_generator_t(
+        const T& _a_arg1,
+        const T& _a_arg2
+    ) noexcept
+        : _m_bounds(utility::bounds_t<T>(_a_arg1, _a_arg2))
+    {}
+
     __constexpr
     default_random_generator_t(
         const utility::bounds_t<T> _a_bounds = utility::bounds_t<T>()
@@ -635,6 +635,31 @@ struct default_random_generator_t<std::monostate>
         )
     {
         return std::monostate{};
+    }
+};
+
+template <>
+struct default_random_generator_t<std::mt19937_64>
+    : public random_generator_base_t<std::mt19937_64>
+{
+    using value_type = std::mt19937_64;
+
+    __constexpr
+    default_random_generator_t()
+    {}
+
+    __no_constexpr virtual value_type
+        operator()(
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        )
+    {
+        using namespace std;
+        auto             _l_rnd{default_random_generator<vector<uint32_t>>()};
+        vector<uint32_t> _l_seeds
+            = _l_rnd->operator()(_a_rnd_generator, _a_index);
+        seed_seq _l_seed(_l_seeds.begin(), _l_seeds.end());
+        return std::mt19937_64(_l_seed);
     }
 };
 
@@ -934,6 +959,10 @@ public:
             utility::rng_t&               _a_rnd_generator,
             const utility::rng_counter_t& _a_index
         );
+    __constexpr random_generator_t<T>& get_rng_ref() noexcept
+    {
+        return _m_gen;
+    }
 private:
     random_generator_t<T> _m_gen;
 };
@@ -1279,7 +1308,8 @@ __constexpr void
     using namespace std;
     if (I == _a_generate_index)
     {
-        _a_object = get<I>(_m_rngs)->operator()(_a_rnd_generator, _a_index);
+        auto ki   = get<I>(_m_rngs)->operator()(_a_rnd_generator, _a_index);
+        _a_object = value_type(in_place_index<I>, ki);
     }
     else if constexpr (I + 1 < tuple_size<std::tuple<Ts...>>{})
     {

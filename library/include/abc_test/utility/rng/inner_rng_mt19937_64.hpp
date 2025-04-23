@@ -43,6 +43,8 @@ public:
      */
     __no_constexpr virtual std::unique_ptr<inner_rng_t>
         deep_copy() const noexcept override;
+    __no_constexpr virtual std::unique_ptr<inner_rng_t>
+        make_rng(const seed_t& _a_seed) const noexcept override;
 private:
     std::mt19937_64 _m_rng;
     /*
@@ -98,6 +100,14 @@ __no_constexpr_imp std::unique_ptr<inner_rng_t>
                    inner_rng_mt19937_64_t::deep_copy() const noexcept
 {
     return make_unique<inner_rng_mt19937_64_t>(_m_rng);
+}
+
+__no_constexpr_imp std::unique_ptr<inner_rng_t>
+                   inner_rng_mt19937_64_t::make_rng(
+        const seed_t& _a_seed
+    ) const noexcept
+{
+    return make_unique<inner_rng_mt19937_64_t>(_a_seed);
 }
 
 __no_constexpr_imp

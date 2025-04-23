@@ -45,6 +45,8 @@ public:
      */
     virtual std::unique_ptr<inner_rng_t>
         deep_copy() const noexcept = 0;
+    virtual std::unique_ptr<inner_rng_t>
+        make_rng(const seed_t& _a_seed) const noexcept = 0;
 };
 
 _END_ABC_UTILITY_NS

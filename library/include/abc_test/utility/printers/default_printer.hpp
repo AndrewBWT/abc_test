@@ -6,6 +6,8 @@
 #include "abc_test/utility/printers/printer_base.hpp"
 #include "abc_test/utility/str/string_utility.hpp"
 
+#include <random>
+
 #include <filesystem>
 
 _BEGIN_ABC_UTILITY_PRINTER_NS
@@ -671,7 +673,7 @@ struct default_printer_t<std::variant<Ts...>>
 
     __constexpr
     default_printer_t()
-    requires (std::is_default_constructible_v<default_printer_t<Ts>> && ...)
+   // requires (std::is_default_constructible_v<default_printer_t<Ts>> && ...)
         : _m_printers(std::make_tuple(mk_printer(default_printer_t<Ts>())...))
     {}
 
@@ -797,6 +799,24 @@ struct default_printer_t<std::monostate>
         using namespace std;
         u8string _l_rv;
         _l_rv.append(u8"std::monostate");
+        return _l_rv;
+    }
+};
+
+template <>
+struct default_printer_t<std::mt19937_64>
+    : public printer_base_t<std::mt19937_64>
+{
+    using value_type = std::mt19937_64;
+    static constexpr bool is_specialized{ true };
+    __constexpr virtual std::u8string
+        run_printer(
+            const value_type& _a_object
+        ) const
+    {
+        using namespace std;
+        u8string _l_rv;
+        _l_rv.append(u8"std::mt19937_64");
         return _l_rv;
     }
 };
@@ -1047,7 +1067,7 @@ public:
     );
 
     default_printer_t()
-    requires (std::is_default_constructible_v<default_printer_t<T>> && std::is_default_constructible_v<default_printer_t<U>>)
+        //    requires (std::is_default_constructible_v<default_printer_t<T>> && std::is_default_constructible_v<default_printer_t<U>>)
         : _m_printers(std::make_pair(default_printer<T>(), default_printer<U>())
           )
     {}
