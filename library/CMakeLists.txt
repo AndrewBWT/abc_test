@@ -138,18 +138,12 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_move_k_elements.hpp
   # utility subfolder. Contains axillary helper classes and functions not necessary
   # related to the core testing framework.
-  include/abc_test/utility/ptr_utility.hpp
   include/abc_test/utility/do_not_optimise.hpp
   include/abc_test/utility/rng/inner_rng.hpp
   include/abc_test/utility/rng/inner_rng_mt19937_64.hpp
   include/abc_test/utility/rng/rng_utilities.hpp
   include/abc_test/utility/rng.hpp
   include/abc_test/utility/types.hpp
-  # BigInteger files. Currently we do not use these. We should determine whether we will
-  # need these and, if not, remove them from the library.
-  # Combinatorics files. Currently these are unused, however we plan to re-engineer them
-  # and make them compatible with gen_data.
-  include/abc_test/utility/combinatorics.hpp
   # Internal subfolder. Contains functions used for either internal debugging or
   # internal macros. These shouldn't really be used by the user, used for development.
   include/abc_test/utility/internal/log/enum.hpp

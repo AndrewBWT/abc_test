@@ -19,7 +19,7 @@ concept is_to_string_convertable_c
 {
     { std::to_string(_a_element) } -> std::same_as<std::string>;
 };
-
+#if 0
 template <typename>
 struct is_tuple : std::false_type
 {};
@@ -35,4 +35,5 @@ struct is_pair : std::false_type
 template <typename T, typename U>
 struct is_pair<std::pair<T, U>> : std::true_type
 {};
+#endif
 _END_ABC_UTILITY_NS

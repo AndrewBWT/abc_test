@@ -1,6 +1,5 @@
 #pragma once
 #include "abc_test/utility/internal/macros.hpp"
-
 #include <vector>
 
 _BEGIN_ABC_UTILITY_NS

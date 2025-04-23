@@ -34,16 +34,16 @@ private:
     T _m_min;
     T _m_max;
     T _m_difference;
-    enum class bounds_ordering_enum_t
+    enum class bounds_ordering_e
     {
         first_less_than_second,
         second_less_than_first,
     };
     __constexpr
     bounds_t(
-        const T&                     _a_first,
-        const T&                     _a_second,
-        const bounds_ordering_enum_t _a_ordering_enum
+        const T&                _a_first,
+        const T&                _a_second,
+        const bounds_ordering_e _a_ordering_enum
     ) noexcept;
 };
 
@@ -91,7 +91,7 @@ __constexpr_imp
     : bounds_t(
           _a_first_and_second,
           _a_first_and_second,
-          bounds_ordering_enum_t::first_less_than_second
+          bounds_ordering_e::first_less_than_second
       )
 {}
 
@@ -105,8 +105,8 @@ __constexpr_imp
     : bounds_t(
           _a_first,
           _a_second,
-          _a_first < _a_second ? bounds_ordering_enum_t::first_less_than_second
-                               : bounds_ordering_enum_t::second_less_than_first
+          _a_first < _a_second ? bounds_ordering_e::first_less_than_second
+                               : bounds_ordering_e::second_less_than_first
       )
 {}
 
@@ -139,22 +139,22 @@ template <typename T>
 requires detail::bounds_c<T>
 __constexpr_imp
     bounds_t<T>::bounds_t(
-        const T&                     _a_first,
-        const T&                     _a_second,
-        const bounds_ordering_enum_t _a_ordering_enum
+        const T&                _a_first,
+        const T&                _a_second,
+        const bounds_ordering_e _a_ordering_enum
     ) noexcept
     : _m_min(
-          _a_ordering_enum == bounds_ordering_enum_t::first_less_than_second
+          _a_ordering_enum == bounds_ordering_e::first_less_than_second
               ? _a_first
               : _a_second
       )
     , _m_max(
-          _a_ordering_enum == bounds_ordering_enum_t::first_less_than_second
+          _a_ordering_enum == bounds_ordering_e::first_less_than_second
               ? _a_second
               : _a_first
       )
     , _m_difference(
-          _a_ordering_enum == bounds_ordering_enum_t::first_less_than_second
+          _a_ordering_enum == bounds_ordering_e::first_less_than_second
               ? _a_second - _a_first
               : _a_first - _a_second
       )

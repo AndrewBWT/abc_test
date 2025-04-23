@@ -1,6 +1,5 @@
 #pragma once
 #include "abc_test/core/reporters/error_reporter.hpp"
-#include "abc_test/utility/ptr_utility.hpp"
 
 _BEGIN_ABC_REPORTERS_NS
 /*!

@@ -2,7 +2,6 @@
 
 #include "abc_test/core/ds/data_generator_memoization/indexed_data_generator_collection_memoized_element.hpp"
 #include "abc_test/utility/internal/macros.hpp"
-#include "abc_test/utility/ptr_utility.hpp"
 
 #include <concepts>
 #include <functional>
