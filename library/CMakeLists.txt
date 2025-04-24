@@ -161,6 +161,7 @@ set(LIBRARY_FILES
   include/abc_test/utility/io/file/general_data.hpp
   include/abc_test/utility/io/file/tertiary_data.hpp
   include/abc_test/utility/io/file/file_line_writer_with_optional_rw_info.hpp
+  include/abc_test/utility/io/file/file_based_map.hpp
   # Utility functions and objects for strings including parsing and printing.
   include/abc_test/utility/parsers/parser_input.hpp
   include/abc_test/utility/parsers/parser_exceptions.hpp

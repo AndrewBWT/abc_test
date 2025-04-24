@@ -17,3 +17,4 @@
 #include "abc_test/utility/parsers/function_parser.hpp"
 #include "abc_test/utility/printers/function_printer.hpp"
 #include "abc_test/utility/printers/default_printer.hpp"
+#include "abc_test/utility/io/file/file_based_map.hpp"

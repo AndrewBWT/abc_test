@@ -148,14 +148,14 @@ inline void
             _l_tuple
         };
         // Convert signed char vector to a string
-        T _l_str_result = convert_type<T>(_l_result_as_signed_chars);
+        T _l_str_result = static_cast_range<T>(_l_result_as_signed_chars);
         // Seed the random generator function with the given seed value.
         _l_rng.progress(_l_rng_seed_value);
         // Generate the string.
         T _l_rv{_l_rdg.operator()(_l_rng, utility::rng_counter_t(_l_size_index))
         };
         // Convert the gotten string to a vector of signed chars.
-        auto _l_str_gotten{convert_type<vector<typename T::value_type>>(_l_rv)};
+        auto _l_str_gotten{static_cast_range<vector<typename T::value_type>>(_l_rv)};
         _TVLOG_(_l_str_gotten);
         // Run the test.
         _l_string_tests += _BLOCK_CHECK(_EXPR(_l_str_result == _l_rv));

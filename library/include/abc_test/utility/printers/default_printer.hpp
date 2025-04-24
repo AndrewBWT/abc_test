@@ -6,9 +6,8 @@
 #include "abc_test/utility/printers/printer_base.hpp"
 #include "abc_test/utility/str/string_utility.hpp"
 
-#include <random>
-
 #include <filesystem>
+#include <random>
 
 _BEGIN_ABC_UTILITY_PRINTER_NS
 
@@ -303,8 +302,10 @@ struct default_printer_t<T> : public printer_base_t<T>
 };
 
 template <typename T>
-    requires (std::is_same_v<std::remove_cvref_t<T>, T>&& is_to_string_convertable_c<T> && (not std::same_as<T, bool>) && (not std::same_as<char, T>)) && (not std::floating_point<T>)
-struct default_printer_t<T> : public printer_base_t<T>
+    requires (std::is_same_v<std::remove_cvref_t<T>, T>&&
+is_to_string_convertable_c<T> && (not std::same_as<T, bool>) && (not
+std::same_as<char, T>)) && (not std::floating_point<T>) struct
+default_printer_t<T> : public printer_base_t<T>
 {
     static constexpr bool is_specialized{true};
 
@@ -673,7 +674,8 @@ struct default_printer_t<std::variant<Ts...>>
 
     __constexpr
     default_printer_t()
-   // requires (std::is_default_constructible_v<default_printer_t<Ts>> && ...)
+        // requires (std::is_default_constructible_v<default_printer_t<Ts>> &&
+        // ...)
         : _m_printers(std::make_tuple(mk_printer(default_printer_t<Ts>())...))
     {}
 
@@ -762,7 +764,7 @@ struct default_printer_t<std::optional<T>>
 
     __constexpr
     default_printer_t()
-   // requires (std::is_default_constructible_v<default_printer_t<T>>)
+        // requires (std::is_default_constructible_v<default_printer_t<T>>)
         : _m_printer(mk_printer(default_printer_t<T>()))
     {}
 
@@ -786,11 +788,11 @@ private:
 };
 
 template <>
-struct default_printer_t<std::monostate>
-    : public printer_base_t<std::monostate>
+struct default_printer_t<std::monostate> : public printer_base_t<std::monostate>
 {
     using value_type = std::monostate;
-    static constexpr bool is_specialized{ true };
+    static constexpr bool is_specialized{true};
+
     __constexpr virtual std::u8string
         run_printer(
             const value_type& _a_object
@@ -808,7 +810,8 @@ struct default_printer_t<std::mt19937_64>
     : public printer_base_t<std::mt19937_64>
 {
     using value_type = std::mt19937_64;
-    static constexpr bool is_specialized{ true };
+    static constexpr bool is_specialized{true};
+
     __constexpr virtual std::u8string
         run_printer(
             const value_type& _a_object
@@ -1067,7 +1070,8 @@ public:
     );
 
     default_printer_t()
-        //    requires (std::is_default_constructible_v<default_printer_t<T>> && std::is_default_constructible_v<default_printer_t<U>>)
+        // requires (std::is_default_constructible_v<default_printer_t<T>> &&
+        // std::is_default_constructible_v<default_printer_t<U>>)
         : _m_printers(std::make_pair(default_printer<T>(), default_printer<U>())
           )
     {}
@@ -1131,26 +1135,34 @@ struct default_printer_t<T*> : public printer_base_t<T*>
     using value_type = T*;
 
     __constexpr
-    default_printer_t()
-    // requires (std::is_default_constructible_v<default_printer_t<T>>)
+        default_printer_t()
+        // requires (std::is_default_constructible_v<default_printer_t<T>>)
 
-    {}
+    {
+    }
 
     __constexpr virtual std::u8string
         run_printer(
             const value_type& _a_object
         ) const
     {
-        const uintptr_t _l_address{
-            reinterpret_cast<uintptr_t>(static_cast<void*>(_a_object))
+#ifdef UINTPTR_MAX
+        // uintptr_t is available.
+        using ptr_t = uintptr_t;
+#else
+        using ptr_t = size_t;
+#endif
+        const ptr_t _l_address{
+            reinterpret_cast<ptr_t>(static_cast<void*>(_a_object))
         };
-        return default_printer<uintptr_t>()->run_printer(_l_address);
+        return default_printer<ptr_t>()->run_printer(_l_address);
     }
 };
 
 template <typename T>
 struct default_printer_t<std::shared_ptr<T>>
     : public printer_base_t<std::shared_ptr<T>>
+
 {
 private:
     printer_t<T> _m_printer;
