@@ -1,9 +1,9 @@
 #
 ("class std::array<int,3>", {false})
 ("class std::vector<int,class std::allocator<int> >", {true})
-("class std::deque<int,class std::allocator<int> >", {true})
+("class std::deque<int,class std::allocator<int> >", {false})
 ("class std::forward_list<int,class std::allocator<int> >", {false})
-("class std::list<int,class std::allocator<int> >", {true})
+("class std::list<int,class std::allocator<int> >", {false})
 ("class std::set<int,struct std::less<int>,class std::allocator<int> >", {false})
 ("class std::map<int,int,struct std::less<int>,class std::allocator<struct std::pair<int const ,int> > >", {false})
 ("class std::multiset<int,struct std::less<int>,class std::allocator<int> >", {false})

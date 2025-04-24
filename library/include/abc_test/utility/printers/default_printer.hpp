@@ -301,36 +301,13 @@ struct default_printer_t<T> : public printer_base_t<T>
     }
 };
 
-template <typename T>
-    requires (std::is_same_v<std::remove_cvref_t<T>, T>&&
-is_to_string_convertable_c<T> && (not std::same_as<T, bool>) && (not
-std::same_as<char, T>)) && (not std::floating_point<T>) struct
-default_printer_t<T> : public printer_base_t<T>
-{
-    static constexpr bool is_specialized{true};
-
-    __constexpr           std::u8string
-                          run_printer(
-                              const T& _a_object
-                          ) const
-    {
-        using namespace std;
-        return abc::checkless_convert_ascii_to_unicode_string<u8string>(
-            to_string(_a_object)
-        );
-    }
-};
-
-template <typename T>
-requires std::floating_point<T>
+template<typename T>
+    requires to_chars_convertable_c<T> && (not std::same_as<T, char>)
 struct default_printer_t<T> : public printer_base_t<T>
 {
-    static constexpr bool is_specialized{true};
+    static constexpr bool is_specialized{ true };
 
-    __constexpr           std::u8string
-                          run_printer(
-                              const T& _a_object
-                          ) const
+    __constexpr std::u8string run_printer(const T& _a_object) const
     {
         using namespace std;
         char* _l_holder = new char[1'000](0);
@@ -1135,11 +1112,10 @@ struct default_printer_t<T*> : public printer_base_t<T*>
     using value_type = T*;
 
     __constexpr
-        default_printer_t()
-        // requires (std::is_default_constructible_v<default_printer_t<T>>)
+    default_printer_t()
+    // requires (std::is_default_constructible_v<default_printer_t<T>>)
 
-    {
-    }
+    {}
 
     __constexpr virtual std::u8string
         run_printer(

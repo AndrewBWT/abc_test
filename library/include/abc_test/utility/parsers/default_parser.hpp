@@ -356,7 +356,7 @@ struct default_parser_t<wchar_t> : public parser_base_t<wchar_t>
 };*/
 
 template <typename T>
-    requires is_from_chars_convertable_c<T> && (not std::same_as<T, char>)
+    requires from_chars_convertable_c<T> && (not std::same_as<T, char>)
 struct default_parser_t<T> : public parser_base_t<T>
 {
     __constexpr result_t<T>

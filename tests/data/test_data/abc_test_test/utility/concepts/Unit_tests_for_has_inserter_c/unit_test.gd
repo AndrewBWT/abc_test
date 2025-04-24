@@ -12,3 +12,4 @@
 ("class std::unordered_map<int,int,struct std::hash<int>,struct std::equal_to<int>,class std::allocator<struct std::pair<int const ,int> > >", {true})
 ("class std::unordered_multiset<int,struct std::hash<int>,struct std::equal_to<int>,class std::allocator<int> >", {true})
 ("class std::unordered_multimap<int,int,struct std::hash<int>,struct std::equal_to<int>,class std::allocator<struct std::pair<int const ,int> > >", {true})
+("class std::basic_string<int,struct std::char_traits<int>,class std::allocator<int> >", {true})
