@@ -8,6 +8,10 @@
 
 #include <filesystem>
 #include <random>
+#include <deque>
+
+#include <unordered_set>
+#include <set>
 
 _BEGIN_ABC_UTILITY_PRINTER_NS
 
@@ -228,7 +232,7 @@ private:
 public:
     __constexpr
     range_based_printer_t(
-        const printer_t<value_t>&         _a_inner_printer,
+        const printer_t<value_t>& _a_inner_printer = default_printer<value_t>(),
         const range_based_printer_opts_t& _a_opts
         = default_range_based_printer_opts<T>()
     ) noexcept
@@ -305,9 +309,12 @@ template<typename T>
     requires to_chars_convertable_c<T> && (not std::same_as<T, char>)
 struct default_printer_t<T> : public printer_base_t<T>
 {
-    static constexpr bool is_specialized{ true };
+    static constexpr bool is_specialized{true};
 
-    __constexpr std::u8string run_printer(const T& _a_object) const
+    __constexpr           std::u8string
+                          run_printer(
+                              const T& _a_object
+                          ) const
     {
         using namespace std;
         char* _l_holder = new char[1'000](0);
@@ -1058,6 +1065,126 @@ public:
 };
 
 template <typename T, typename U>
+struct default_printer_t<std::unordered_multimap<T, U>>
+    : public printer_base_t<std::unordered_multimap<T, U>>
+{
+private:
+    printer_t<T> _m_key_printer;
+    printer_t<U> _m_element_printer;
+public:
+    static constexpr bool is_specialized{true};
+    using value_type = std::unordered_multimap<T, U>;
+
+    __constexpr
+    default_printer_t(
+        const printer_t<T>& _a_printer_t,
+        const printer_t<U>& _a_printer_u
+    );
+
+    default_printer_t()
+        : _m_key_printer(default_printer<T>())
+        , _m_element_printer(default_printer<U>())
+    {}
+
+    __constexpr virtual std::u8string
+        run_printer(
+            const value_type& _a_object
+        ) const
+    {
+        using namespace std;
+        u8string _l_str{u8"{"};
+        for (const pair<T, U>& _l_element : _a_object)
+        {
+            _l_str.append(_m_key_printer->run_printer(_l_element.first));
+            _l_str.append(u8":");
+            _l_str.append(_m_element_printer->run_printer(_l_element.second));
+        }
+        _l_str.append(u8"}");
+        return _l_str;
+    }
+};
+
+template <typename T, typename U>
+struct default_printer_t<std::multimap<T, U>>
+    : public printer_base_t<std::multimap<T, U>>
+{
+private:
+    printer_t<T> _m_key_printer;
+    printer_t<U> _m_element_printer;
+public:
+    static constexpr bool is_specialized{true};
+    using value_type = std::multimap<T, U>;
+
+    __constexpr
+    default_printer_t(
+        const printer_t<T>& _a_printer_t,
+        const printer_t<U>& _a_printer_u
+    );
+
+    default_printer_t()
+        : _m_key_printer(default_printer<T>())
+        , _m_element_printer(default_printer<U>())
+    {}
+
+    __constexpr virtual std::u8string
+        run_printer(
+            const value_type& _a_object
+        ) const
+    {
+        using namespace std;
+        u8string _l_str{u8"{"};
+        for (const pair<T, U>& _l_element : _a_object)
+        {
+            _l_str.append(_m_key_printer->run_printer(_l_element.first));
+            _l_str.append(u8":");
+            _l_str.append(_m_element_printer->run_printer(_l_element.second));
+        }
+        _l_str.append(u8"}");
+        return _l_str;
+    }
+};
+
+template <typename T, typename U>
+struct default_printer_t<std::unordered_map<T, U>>
+    : public printer_base_t<std::unordered_map<T, U>>
+{
+private:
+    printer_t<T> _m_key_printer;
+    printer_t<U> _m_element_printer;
+public:
+    static constexpr bool is_specialized{true};
+    using value_type = std::unordered_map<T, U>;
+
+    __constexpr
+    default_printer_t(
+        const printer_t<T>& _a_printer_t,
+        const printer_t<U>& _a_printer_u
+    );
+
+    default_printer_t()
+        : _m_key_printer(default_printer<T>())
+        , _m_element_printer(default_printer<U>())
+    {}
+
+    __constexpr virtual std::u8string
+        run_printer(
+            const value_type& _a_object
+        ) const
+    {
+        using namespace std;
+        u8string _l_str{u8"{"};
+        for (const pair<T, U>& _l_element : _a_object)
+        {
+            _l_str.append(_m_key_printer->run_printer(_l_element.first));
+            _l_str.append(u8":");
+            _l_str.append(_m_element_printer->run_printer(_l_element.second));
+        }
+        _l_str.append(u8"}");
+        return _l_str;
+    }
+};
+
+template <typename T, typename U>
 struct default_printer_t<std::map<T, U>> : public printer_base_t<std::map<T, U>>
 {
 private:
@@ -1104,6 +1231,313 @@ public:
 
     __constexpr virtual std::u8string
         run_printer(const value_type& _a_object) const;
+};
+
+template <typename T>
+struct default_printer_t<std::forward_list<T>>
+    : public printer_base_t<std::forward_list<T>>
+{
+private:
+    printer_t<T> _m_printer;
+public:
+    static constexpr bool is_specialized{true};
+    using value_type = std::forward_list<T>;
+
+    __constexpr
+    default_printer_t(const printer_t<T>& _a_printer);
+
+    __constexpr
+    default_printer_t()
+        // requires (std::is_default_constructible_v<default_printer_t<T>>)
+        : _m_printer(mk_printer(default_printer_t<T>()))
+    {}
+
+    __constexpr virtual std::u8string
+        run_printer(
+            const value_type& _a_object
+        ) const
+    {
+        using namespace std;
+        u8string _l_str{u8"["};
+        using Itt = typename value_type::const_iterator;
+        const Itt _l_end{ end(_a_object) };
+
+        for (Itt _l_itt{ begin(_a_object) }; _l_itt != _l_end;)
+        {
+            _l_str.append(_m_printer->run_printer(*_l_itt));
+            ++_l_itt;
+            if (_l_itt != _l_end)
+            {
+                _l_str.append(u8",");
+            }
+        }
+        _l_str.append(u8"]");
+        return _l_str;
+    }
+};
+
+template <typename T>
+struct default_printer_t<std::deque<T>>
+    : public printer_base_t<std::deque<T>>
+{
+private:
+    printer_t<T> _m_printer;
+public:
+    static constexpr bool is_specialized{ true };
+    using value_type = std::deque<T>;
+
+    __constexpr
+        default_printer_t(const printer_t<T>& _a_printer);
+
+    __constexpr
+        default_printer_t()
+        // requires (std::is_default_constructible_v<default_printer_t<T>>)
+        : _m_printer(mk_printer(default_printer_t<T>()))
+    {
+    }
+
+    __constexpr virtual std::u8string
+        run_printer(
+            const value_type& _a_object
+        ) const
+    {
+        using namespace std;
+        u8string _l_str{ u8"[" };
+        using Itt = typename value_type::const_iterator;
+        const Itt _l_end{ end(_a_object) };
+
+        for (Itt _l_itt{ begin(_a_object) }; _l_itt != _l_end;)
+        {
+            _l_str.append(_m_printer->run_printer(*_l_itt));
+            ++_l_itt;
+            if (_l_itt != _l_end)
+            {
+                _l_str.append(u8",");
+            }
+        }
+        _l_str.append(u8"]");
+        return _l_str;
+    }
+};
+
+template <typename T>
+struct default_printer_t<std::list<T>>
+    : public printer_base_t<std::list<T>>
+{
+private:
+    printer_t<T> _m_printer;
+public:
+    static constexpr bool is_specialized{ true };
+    using value_type = std::list<T>;
+
+    __constexpr
+        default_printer_t(const printer_t<T>& _a_printer);
+
+    __constexpr
+        default_printer_t()
+        // requires (std::is_default_constructible_v<default_printer_t<T>>)
+        : _m_printer(mk_printer(default_printer_t<T>()))
+    {
+    }
+
+    __constexpr virtual std::u8string
+        run_printer(
+            const value_type& _a_object
+        ) const
+    {
+        using namespace std;
+        u8string _l_str{ u8"[" };
+        using Itt = typename value_type::const_iterator;
+        const Itt _l_end{ end(_a_object) };
+
+        for (Itt _l_itt{ begin(_a_object) }; _l_itt != _l_end;)
+        {
+            _l_str.append(_m_printer->run_printer(*_l_itt));
+            ++_l_itt;
+            if (_l_itt != _l_end)
+            {
+                _l_str.append(u8",");
+            }
+        }
+        _l_str.append(u8"]");
+        return _l_str;
+    }
+};
+
+template <typename T>
+struct default_printer_t<std::unordered_multiset<T>>
+    : public printer_base_t<std::unordered_multiset<T>>
+{
+private:
+    printer_t<T> _m_printer;
+public:
+    static constexpr bool is_specialized{ true };
+    using value_type = std::unordered_multiset<T>;
+
+    __constexpr
+        default_printer_t(const printer_t<T>& _a_printer);
+
+    __constexpr
+        default_printer_t()
+        // requires (std::is_default_constructible_v<default_printer_t<T>>)
+        : _m_printer(mk_printer(default_printer_t<T>()))
+    {
+    }
+
+    __constexpr virtual std::u8string
+        run_printer(
+            const value_type& _a_object
+        ) const
+    {
+        using namespace std;
+        u8string _l_str{ u8"[" };
+        using Itt = typename value_type::const_iterator;
+        const Itt _l_end{ end(_a_object) };
+
+        for (Itt _l_itt{ begin(_a_object) }; _l_itt != _l_end;)
+        {
+            _l_str.append(_m_printer->run_printer(*_l_itt));
+            ++_l_itt;
+            if (_l_itt != _l_end)
+            {
+                _l_str.append(u8",");
+            }
+        }
+        _l_str.append(u8"]");
+        return _l_str;
+    }
+};
+
+template <typename T>
+struct default_printer_t<std::set<T>>
+    : public printer_base_t<std::set<T>>
+{
+private:
+    printer_t<T> _m_printer;
+public:
+    static constexpr bool is_specialized{ true };
+    using value_type = std::set<T>;
+
+    __constexpr
+        default_printer_t(const printer_t<T>& _a_printer);
+
+    __constexpr
+        default_printer_t()
+        // requires (std::is_default_constructible_v<default_printer_t<T>>)
+        : _m_printer(mk_printer(default_printer_t<T>()))
+    {
+    }
+
+    __constexpr virtual std::u8string
+        run_printer(
+            const value_type& _a_object
+        ) const
+    {
+        using namespace std;
+        u8string _l_str{ u8"[" };
+        using Itt = typename value_type::const_iterator;
+        const Itt _l_end{ end(_a_object) };
+
+        for (Itt _l_itt{ begin(_a_object) }; _l_itt != _l_end;)
+        {
+            _l_str.append(_m_printer->run_printer(*_l_itt));
+            ++_l_itt;
+            if (_l_itt != _l_end)
+            {
+                _l_str.append(u8",");
+            }
+        }
+        _l_str.append(u8"]");
+        return _l_str;
+    }
+};
+
+template <typename T>
+struct default_printer_t<std::multiset<T>>
+    : public printer_base_t<std::multiset<T>>
+{
+private:
+    printer_t<T> _m_printer;
+public:
+    static constexpr bool is_specialized{ true };
+    using value_type = std::multiset<T>;
+
+    __constexpr
+        default_printer_t(const printer_t<T>& _a_printer);
+
+    __constexpr
+        default_printer_t()
+        // requires (std::is_default_constructible_v<default_printer_t<T>>)
+        : _m_printer(mk_printer(default_printer_t<T>()))
+    {
+    }
+
+    __constexpr virtual std::u8string
+        run_printer(
+            const value_type& _a_object
+        ) const
+    {
+        using namespace std;
+        u8string _l_str{ u8"[" };
+        using Itt = typename value_type::const_iterator;
+        const Itt _l_end{ end(_a_object) };
+
+        for (Itt _l_itt{ begin(_a_object) }; _l_itt != _l_end;)
+        {
+            _l_str.append(_m_printer->run_printer(*_l_itt));
+            ++_l_itt;
+            if (_l_itt != _l_end)
+            {
+                _l_str.append(u8",");
+            }
+        }
+        _l_str.append(u8"]");
+        return _l_str;
+    }
+};
+
+template <typename T>
+struct default_printer_t<std::unordered_set<T>>
+    : public printer_base_t<std::unordered_set<T>>
+{
+private:
+    printer_t<T> _m_printer;
+public:
+    static constexpr bool is_specialized{ true };
+    using value_type = std::unordered_set<T>;
+
+    __constexpr
+        default_printer_t(const printer_t<T>& _a_printer);
+
+    __constexpr
+        default_printer_t()
+        // requires (std::is_default_constructible_v<default_printer_t<T>>)
+        : _m_printer(mk_printer(default_printer_t<T>()))
+    {
+    }
+
+    __constexpr virtual std::u8string
+        run_printer(
+            const value_type& _a_object
+        ) const
+    {
+        using namespace std;
+        u8string _l_str{ u8"[" };
+        using Itt = typename value_type::const_iterator;
+        const Itt _l_end{ end(_a_object) };
+
+        for (Itt _l_itt{ begin(_a_object) }; _l_itt != _l_end;)
+        {
+            _l_str.append(_m_printer->run_printer(*_l_itt));
+            ++_l_itt;
+            if (_l_itt != _l_end)
+            {
+                _l_str.append(u8",");
+            }
+        }
+        _l_str.append(u8"]");
+        return _l_str;
+    }
 };
 
 template <typename T>

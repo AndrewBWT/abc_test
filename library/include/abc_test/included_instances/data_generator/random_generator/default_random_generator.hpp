@@ -786,8 +786,19 @@ struct default_random_generator_t<std::basic_string<T>>
             std::basic_string<T>{}.max_size()
         )
     )
-        : _m_rng(std::nullopt), _m_bounds(_a_bounds)
-    {}
+        : _m_bounds(_a_bounds)
+    {
+        if constexpr (is_char_type_c<T>)
+        {
+            _m_rng = std::optional<
+                random_generator_t<typename std::basic_string<T>::value_type>>{
+            };
+        }
+        else
+        {
+            _m_rng = default_random_generator<T>();
+        }
+    }
 
     __constexpr
     default_random_generator_t(
@@ -809,8 +820,6 @@ struct default_random_generator_t<std::basic_string<T>>
             const utility::rng_counter_t& _a_index
         )
     {
-        std::cout << "Begin RNG basic string. rng_counter = " << _a_index
-                  << std::endl;
         using namespace std;
         const basic_string<T>::size_type _l_size{
             detail::generate_rng_value_between_bounds<
@@ -818,70 +827,88 @@ struct default_random_generator_t<std::basic_string<T>>
                 _m_bounds, _a_index, _a_rnd_generator
             )
         };
-        std::cout << fmt::format("Size {1}", _a_index, _l_size) << std::endl;
-        if (_a_index == 0)
-        {
-            int i = 5;
-        }
         basic_string<T> _l_rv(_l_size, T{});
-        if (_m_rng.has_value())
+        if constexpr (is_char_type_c<T>)
         {
-            random_generator_t<typename std::basic_string<T>::value_type>&
-                _l_rng{_m_rng.value()};
-            for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
+            if (_m_rng.has_value())
             {
-                _l_rv[_l_idx] = _l_rng->operator()(_a_rnd_generator, _a_index);
-                // auto kbd = fmt::format(
-                //     u8"[{0}] = {1}", _l_idx, basic_string<T>(1,
-                //     _l_rv[_l_idx])
-                // );
-                // std::cout << string(kbd.begin(), kbd.end()) << std::endl;
+                generate_string(
+                    _l_rv, _m_rng.value(), _a_rnd_generator, _a_index
+                );
+            }
+            else
+            {
+                size_t _l_remaining{_l_size};
+                size_t _l_idx{0};
+                while (_l_remaining > 0)
+                {
+                    const optional<basic_string<T>> _l_opt_generated{
+                        detail::generate_valid_character<T>(
+                            _a_rnd_generator, _l_remaining
+                        )
+                    };
+                    if (_l_opt_generated.has_value())
+                    {
+                        const basic_string<T>& _l_generated{
+                            _l_opt_generated.value()
+                        };
+                        auto ki = _l_idx;
+                        for (const T _l_char : _l_generated)
+                        {
+                            _l_rv[_l_idx++] = _l_char;
+                            _l_remaining--;
+                        }
+                        // auto kbd = fmt::format(
+                        //     u8"[{0} - {1}] = {2}", ki, _l_idx, _l_generated
+                        // );
+                        // std::cout << std::string(kbd.begin(), kbd.end()) <<
+                        // std::endl;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                if (_l_remaining > 0)
+                {
+                    _l_rv.resize(_l_idx);
+                }
             }
         }
         else
         {
-            size_t _l_remaining{_l_size};
-            size_t _l_idx{0};
-            while (_l_remaining > 0)
-            {
-                const optional<basic_string<T>> _l_opt_generated{
-                    detail::generate_valid_character<T>(
-                        _a_rnd_generator, _l_remaining
-                    )
-                };
-                if (_l_opt_generated.has_value())
-                {
-                    const basic_string<T>& _l_generated{_l_opt_generated.value()
-                    };
-                    auto                   ki = _l_idx;
-                    for (const T _l_char : _l_generated)
-                    {
-                        _l_rv[_l_idx++] = _l_char;
-                        _l_remaining--;
-                    }
-                    // auto kbd = fmt::format(
-                    //     u8"[{0} - {1}] = {2}", ki, _l_idx, _l_generated
-                    // );
-                    // std::cout << std::string(kbd.begin(), kbd.end()) <<
-                    // std::endl;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            if (_l_remaining > 0)
-            {
-                _l_rv.resize(_l_idx);
-            }
+            generate_string(_l_rv, _m_rng, _a_rnd_generator, _a_index);
         }
-        std::cout << "End RNG basic string. rng_counter = " << _a_index
-                  << std::endl;
         return _l_rv;
     }
 private:
-    std::optional<random_generator_t<typename std::basic_string<T>::value_type>>
-                                                                _m_rng;
+    std::conditional_t<
+        is_char_type_c<T>,
+        std::optional<
+            random_generator_t<typename std::basic_string<T>::value_type>>,
+        random_generator_t<typename std::basic_string<T>::value_type>>
+        _m_rng;
+
+    __constexpr_imp void
+        generate_string(
+            std::basic_string<T>& _a_rv,
+            random_generator_t<typename std::basic_string<T>::value_type>&
+                                          _a_rng,
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        )
+    {
+        using namespace std;
+        typename basic_string<T>::iterator _l_end{end(_a_rv)};
+        typename basic_string<T>::iterator _l_itt{begin(_a_rv)};
+        for (typename basic_string<T>::iterator _l_itt{begin(_a_rv)};
+             _l_itt != _l_end;
+             ++_l_itt)
+        {
+            *_l_itt = _a_rng->operator()(_a_rnd_generator, _a_index);
+        }
+    }
+
     utility::bounds_t<typename std::basic_string<T>::size_type> _m_bounds;
 };
 
@@ -959,12 +986,550 @@ public:
             utility::rng_t&               _a_rnd_generator,
             const utility::rng_counter_t& _a_index
         );
-    __constexpr random_generator_t<T>& get_rng_ref() noexcept
+
+    __constexpr random_generator_t<T>&
+                get_rng_ref() noexcept
     {
         return _m_gen;
     }
 private:
     random_generator_t<T> _m_gen;
+};
+
+template <typename T>
+struct default_random_generator_t<std::forward_list<T>>
+    : public random_generator_base_t<std::forward_list<T>>
+{
+public:
+    using value_type_t = std::forward_list<T>;
+
+    __constexpr
+    default_random_generator_t() noexcept
+        : _m_gen(default_random_generator<T>())
+    {}
+
+    __constexpr
+    default_random_generator_t(const random_generator_t<T>& _a_gen) noexcept;
+
+    __no_constexpr virtual value_type_t
+        operator()(
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        )
+    {
+        using namespace std;
+        using namespace _ABC_NS_UTILITY;
+        using namespace utility;
+        using size_type = value_type_t::size_type;
+        const size_type _l_size{detail::generate_rng_value_between_bounds(
+            bounds_t<size_type>(), _a_index, _a_rnd_generator
+        )};
+        value_type_t    _l_rv;
+        typename value_type_t::iterator _l_end{end(_l_rv)};
+        for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
+        {
+            _l_rv.push_front(_m_gen->operator()(_a_rnd_generator, _a_index)
+            );
+        }
+        return _l_rv;
+    }
+
+    __constexpr random_generator_t<T>&
+                get_rng_ref() noexcept
+    {
+        return _m_gen;
+    }
+private:
+    random_generator_t<T> _m_gen;
+};
+
+template <typename T>
+struct default_random_generator_t<std::deque<T>>
+    : public random_generator_base_t<std::deque<T>>
+{
+public:
+    using value_type_t = std::deque<T>;
+
+    __constexpr
+    default_random_generator_t() noexcept
+        : _m_gen(default_random_generator<T>())
+    {}
+
+    __constexpr
+    default_random_generator_t(const random_generator_t<T>& _a_gen) noexcept;
+
+    __no_constexpr virtual value_type_t
+        operator()(
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        )
+    {
+        using namespace std;
+        using namespace _ABC_NS_UTILITY;
+        using namespace utility;
+        using size_type = value_type_t::size_type;
+        const size_type _l_size{detail::generate_rng_value_between_bounds(
+            bounds_t<size_type>(), _a_index, _a_rnd_generator
+        )};
+        value_type_t    _l_rv(_l_size);
+        typename value_type_t::iterator       _l_itt{begin(_l_rv)};
+        const typename value_type_t::iterator _l_end{end(_l_rv)};
+        for (typename value_type_t::iterator _l_itt{begin(_l_rv)};
+             _l_itt != _l_end;
+             ++_l_itt)
+        {
+            *_l_itt = _m_gen->operator()(_a_rnd_generator, _a_index);
+        }
+        return _l_rv;
+    }
+
+    __constexpr random_generator_t<T>&
+                get_rng_ref() noexcept
+    {
+        return _m_gen;
+    }
+private:
+    random_generator_t<T> _m_gen;
+};
+
+template <typename T>
+struct default_random_generator_t<std::list<T>>
+    : public random_generator_base_t<std::list<T>>
+{
+public:
+    using value_type_t = std::list<T>;
+
+    __constexpr
+    default_random_generator_t() noexcept
+        : _m_gen(default_random_generator<T>())
+    {}
+
+    __constexpr
+    default_random_generator_t(const random_generator_t<T>& _a_gen) noexcept;
+
+    __no_constexpr virtual value_type_t
+        operator()(
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        )
+    {
+        using namespace std;
+        using namespace _ABC_NS_UTILITY;
+        using namespace utility;
+        using size_type = value_type_t::size_type;
+        const size_type _l_size{detail::generate_rng_value_between_bounds(
+            bounds_t<size_type>(), _a_index, _a_rnd_generator
+        )};
+        value_type_t    _l_rv;
+        typename value_type_t::iterator _l_end{end(_l_rv)};
+        for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
+        {
+            _l_end = _l_rv.insert(
+                _l_end, _m_gen->operator()(_a_rnd_generator, _a_index)
+            );
+        }
+        return _l_rv;
+    }
+
+    __constexpr random_generator_t<T>&
+                get_rng_ref() noexcept
+    {
+        return _m_gen;
+    }
+private:
+    random_generator_t<T> _m_gen;
+};
+
+template <typename T>
+struct default_random_generator_t<std::unordered_multiset<T>>
+    : public random_generator_base_t<std::unordered_multiset<T>>
+{
+public:
+    using value_type_t = std::unordered_multiset<T>;
+
+    __constexpr
+    default_random_generator_t() noexcept
+        : _m_gen(default_random_generator<T>())
+    {}
+
+    __constexpr
+    default_random_generator_t(const random_generator_t<T>& _a_gen) noexcept;
+
+    __no_constexpr virtual value_type_t
+        operator()(
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        )
+    {
+        using namespace std;
+        using namespace _ABC_NS_UTILITY;
+        using namespace utility;
+        using size_type = value_type_t::size_type;
+        const size_type _l_size{detail::generate_rng_value_between_bounds(
+            bounds_t<size_type>(), _a_index, _a_rnd_generator
+        )};
+        value_type_t    _l_rv;
+        typename value_type_t::iterator _l_end{end(_l_rv)};
+        for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
+        {
+            _l_end = _l_rv.insert(
+                _l_end, _m_gen->operator()(_a_rnd_generator, _a_index)
+            );
+        }
+        return _l_rv;
+    }
+
+    __constexpr random_generator_t<T>&
+                get_rng_ref() noexcept
+    {
+        return _m_gen;
+    }
+private:
+    random_generator_t<T> _m_gen;
+};
+
+template <typename T>
+struct default_random_generator_t<std::multiset<T>>
+    : public random_generator_base_t<std::multiset<T>>
+{
+public:
+    using value_type_t = std::multiset<T>;
+
+    __constexpr
+    default_random_generator_t() noexcept
+        : _m_gen(default_random_generator<T>())
+    {}
+
+    __constexpr
+    default_random_generator_t(const random_generator_t<T>& _a_gen) noexcept;
+
+    __no_constexpr virtual value_type_t
+        operator()(
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        )
+    {
+        using namespace std;
+        using namespace _ABC_NS_UTILITY;
+        using namespace utility;
+        using size_type = value_type_t::size_type;
+        const size_type _l_size{detail::generate_rng_value_between_bounds(
+            bounds_t<size_type>(), _a_index, _a_rnd_generator
+        )};
+        value_type_t    _l_rv;
+        typename value_type_t::iterator _l_end{end(_l_rv)};
+        for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
+        {
+            _l_end = _l_rv.insert(
+                _l_end, _m_gen->operator()(_a_rnd_generator, _a_index)
+            );
+        }
+        return _l_rv;
+    }
+
+    __constexpr random_generator_t<T>&
+                get_rng_ref() noexcept
+    {
+        return _m_gen;
+    }
+private:
+    random_generator_t<T> _m_gen;
+};
+
+template <typename T>
+struct default_random_generator_t<std::set<T>>
+    : public random_generator_base_t<std::set<T>>
+{
+public:
+    using value_type_t = std::set<T>;
+
+    __constexpr
+    default_random_generator_t() noexcept
+        : _m_gen(default_random_generator<T>())
+    {}
+
+    __constexpr
+    default_random_generator_t(const random_generator_t<T>& _a_gen) noexcept;
+
+    __no_constexpr virtual value_type_t
+        operator()(
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        )
+    {
+        using namespace std;
+        using namespace _ABC_NS_UTILITY;
+        using namespace utility;
+        using size_type = value_type_t::size_type;
+        const size_type _l_size{detail::generate_rng_value_between_bounds(
+            bounds_t<size_type>(), _a_index, _a_rnd_generator
+        )};
+        value_type_t    _l_rv;
+        typename value_type_t::iterator _l_end{end(_l_rv)};
+        for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
+        {
+            _l_end = _l_rv.insert(
+                _l_end, _m_gen->operator()(_a_rnd_generator, _a_index)
+            );
+        }
+        return _l_rv;
+    }
+
+    __constexpr random_generator_t<T>&
+                get_rng_ref() noexcept
+    {
+        return _m_gen;
+    }
+private:
+    random_generator_t<T> _m_gen;
+};
+
+template <typename T>
+struct default_random_generator_t<std::unordered_set<T>>
+    : public random_generator_base_t<std::unordered_set<T>>
+{
+public:
+    using value_type_t = std::unordered_set<T>;
+
+    __constexpr
+    default_random_generator_t() noexcept
+        : _m_gen(default_random_generator<T>())
+    {}
+
+    __constexpr
+    default_random_generator_t(const random_generator_t<T>& _a_gen) noexcept;
+
+    __no_constexpr virtual value_type_t
+        operator()(
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        )
+    {
+        using namespace std;
+        using namespace _ABC_NS_UTILITY;
+        using namespace utility;
+        using size_type = value_type_t::size_type;
+        const size_type _l_size{detail::generate_rng_value_between_bounds(
+            bounds_t<size_type>(), _a_index, _a_rnd_generator
+        )};
+        value_type_t    _l_rv;
+        typename value_type_t::iterator _l_end{end(_l_rv)};
+        for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
+        {
+            _l_end = _l_rv.insert(
+                _l_end, _m_gen->operator()(_a_rnd_generator, _a_index)
+            );
+        }
+        return _l_rv;
+    }
+
+    __constexpr random_generator_t<T>&
+                get_rng_ref() noexcept
+    {
+        return _m_gen;
+    }
+private:
+    random_generator_t<T> _m_gen;
+};
+
+template <typename T1, typename T2>
+struct default_random_generator_t<std::map<T1, T2>>
+    : public random_generator_base_t<std::map<T1, T2>>
+{
+public:
+    using value_type_t = std::map<T1, T2>;
+
+    __constexpr
+    default_random_generator_t() noexcept
+        : _m_gen1(default_random_generator<T1>())
+        , _m_gen2(default_random_generator<T2>())
+    {}
+
+    __constexpr
+    default_random_generator_t(const random_generator_t<T1>& _a_gen) noexcept;
+
+    __no_constexpr virtual value_type_t
+        operator()(
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        )
+    {
+        using namespace std;
+        using namespace _ABC_NS_UTILITY;
+        using namespace utility;
+        using size_type = value_type_t::size_type;
+        const size_type _l_size{detail::generate_rng_value_between_bounds(
+            bounds_t<size_type>(), _a_index, _a_rnd_generator
+        )};
+        value_type_t    _l_rv;
+        for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
+        {
+            _l_rv.insert(make_pair(
+                _m_gen1->operator()(_a_rnd_generator, _a_index),
+                _m_gen2->operator()(_a_rnd_generator, _a_index)
+            ));
+        }
+        return _l_rv;
+    }
+
+    __constexpr random_generator_t<T1>&
+                get_rng_ref() noexcept
+    {
+        return _m_gen1;
+    }
+private:
+    random_generator_t<T1> _m_gen1;
+    random_generator_t<T2> _m_gen2;
+};
+
+template <typename T1, typename T2>
+struct default_random_generator_t<std::unordered_map<T1, T2>>
+    : public random_generator_base_t<std::unordered_map<T1, T2>>
+{
+public:
+    using value_type_t = std::unordered_map<T1, T2>;
+
+    __constexpr
+    default_random_generator_t() noexcept
+        : _m_gen1(default_random_generator<T1>())
+        , _m_gen2(default_random_generator<T2>())
+    {}
+
+    __constexpr
+    default_random_generator_t(const random_generator_t<T1>& _a_gen) noexcept;
+
+    __no_constexpr virtual value_type_t
+        operator()(
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        )
+    {
+        using namespace std;
+        using namespace _ABC_NS_UTILITY;
+        using namespace utility;
+        using size_type = value_type_t::size_type;
+        const size_type _l_size{detail::generate_rng_value_between_bounds(
+            bounds_t<size_type>(), _a_index, _a_rnd_generator
+        )};
+        value_type_t    _l_rv;
+        for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
+        {
+            _l_rv.insert(make_pair(
+                _m_gen1->operator()(_a_rnd_generator, _a_index),
+                _m_gen2->operator()(_a_rnd_generator, _a_index)
+            ));
+        }
+        return _l_rv;
+    }
+
+    __constexpr random_generator_t<T1>&
+                get_rng_ref() noexcept
+    {
+        return _m_gen1;
+    }
+private:
+    random_generator_t<T1> _m_gen1;
+    random_generator_t<T2> _m_gen2;
+};
+
+template <typename T1, typename T2>
+struct default_random_generator_t<std::multimap<T1, T2>>
+    : public random_generator_base_t<std::multimap<T1, T2>>
+{
+public:
+    using value_type_t = std::multimap<T1, T2>;
+
+    __constexpr
+    default_random_generator_t() noexcept
+        : _m_gen1(default_random_generator<T1>())
+        , _m_gen2(default_random_generator<T2>())
+    {}
+
+    __constexpr
+    default_random_generator_t(const random_generator_t<T1>& _a_gen) noexcept;
+
+    __no_constexpr virtual value_type_t
+        operator()(
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        )
+    {
+        using namespace std;
+        using namespace _ABC_NS_UTILITY;
+        using namespace utility;
+        using size_type = value_type_t::size_type;
+        const size_type _l_size{detail::generate_rng_value_between_bounds(
+            bounds_t<size_type>(), _a_index, _a_rnd_generator
+        )};
+        value_type_t    _l_rv;
+        for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
+        {
+            _l_rv.insert(make_pair(
+                _m_gen1->operator()(_a_rnd_generator, _a_index),
+                _m_gen2->operator()(_a_rnd_generator, _a_index)
+            ));
+        }
+        return _l_rv;
+    }
+
+    __constexpr random_generator_t<T1>&
+                get_rng_ref() noexcept
+    {
+        return _m_gen1;
+    }
+private:
+    random_generator_t<T1> _m_gen1;
+    random_generator_t<T2> _m_gen2;
+};
+
+template <typename T1, typename T2>
+struct default_random_generator_t<std::unordered_multimap<T1, T2>>
+    : public random_generator_base_t<std::unordered_multimap<T1, T2>>
+{
+public:
+    using value_type_t = std::unordered_multimap<T1, T2>;
+
+    __constexpr
+    default_random_generator_t() noexcept
+        : _m_gen1(default_random_generator<T1>())
+        , _m_gen2(default_random_generator<T2>())
+    {}
+
+    __constexpr
+    default_random_generator_t(const random_generator_t<T1>& _a_gen) noexcept;
+
+    __no_constexpr virtual value_type_t
+        operator()(
+            utility::rng_t&               _a_rnd_generator,
+            const utility::rng_counter_t& _a_index
+        )
+    {
+        using namespace std;
+        using namespace _ABC_NS_UTILITY;
+        using namespace utility;
+        using size_type = value_type_t::size_type;
+        const size_type _l_size{detail::generate_rng_value_between_bounds(
+            bounds_t<size_type>(), _a_index, _a_rnd_generator
+        )};
+        value_type_t    _l_rv;
+        for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
+        {
+            _l_rv.insert(make_pair(
+                _m_gen1->operator()(_a_rnd_generator, _a_index),
+                _m_gen2->operator()(_a_rnd_generator, _a_index)
+            ));
+        }
+        return _l_rv;
+    }
+
+    __constexpr random_generator_t<T1>&
+                get_rng_ref() noexcept
+    {
+        return _m_gen1;
+    }
+private:
+    random_generator_t<T1> _m_gen1;
+    random_generator_t<T2> _m_gen2;
 };
 
 _END_ABC_DG_NS

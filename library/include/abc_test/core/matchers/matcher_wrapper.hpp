@@ -581,7 +581,9 @@ __constexpr_imp matcher_wrapper_t<false>
                                      )
                                    : vector<single_source_t>{};
     vector<single_source_t> _l_sources
-        = abc::utility::join(_l_sources_l, _l_sources_r);
+        = abc::utility::join<vector<single_source_t>>(
+            _l_sources_l, _l_sources_r
+        );
     return matcher_wrapper_t<false>(
         _l_mr,
         _l_sources,

@@ -15,4 +15,6 @@ concept char_type_is_unicode_c
     = std::same_as<T, char8_t> || std::same_as<T, char16_t>
       || std::same_as<T, char32_t> || is_wchar_and_32_bit_c<T>
       || is_wchar_and_16_bit_c<T>;
+template <typename T>
+concept is_char_type_c = char_type_is_unicode_c<T> || std::same_as<T, char>;
 _END_ABC_NS

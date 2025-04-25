@@ -30,12 +30,20 @@ concept has_front_inserter_c
  * maintain its own ordering on objects.
  */
 template <typename T>
-concept has_inserter_c = requires (
+concept has_unordered_inserter_c = requires (
     T&                            _a_range,
     std::ranges::range_value_t<T> _a_element,
     std::ranges::iterator_t<T>    _a_range_itt
 ) {
     { _a_range.insert(_a_range_itt, _a_element) };
+};
+template <typename R>
+concept has_inserter_c
+    = (has_back_inserter_c<R> || has_unordered_inserter_c<R> || has_front_inserter_c<R>);
+template<typename R1, typename R2>
+concept has_append_range_c = std::ranges::range<R1> && std::ranges::range<R2> && requires (R1 & _a_range1, R2 && _a_range2)
+{
+    { _a_range1.append_range(_a_range2) };
 };
 /*!
  * @brief Concept for a container which has three functions; reserve, capacity

@@ -115,7 +115,7 @@ namespace
 {
 template <typename T>
 inline void
-    test_inserter(
+    test_unordered_inserter(
         abc::utility::io::file_based_map_t<std::u8string, bool>& _a_bfr
     )
 {
@@ -126,7 +126,7 @@ inline void
         type_id<T>(),
         [&](const bool& _a_expected_result)
         {
-            return _EXPR(abc::utility::has_inserter_c<T> == _a_expected_result);
+            return _EXPR(abc::utility::has_unordered_inserter_c<T> == _a_expected_result);
         }
     ));
 }
@@ -134,7 +134,7 @@ inline void
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name             = "Unit tests for has_inserter_c",
+        {.name             = "Unit tests for has_unordered_inserter_c",
          .path             = "abc_test_test::utility::concepts",
          .threads_required = 1}
     )
@@ -147,20 +147,20 @@ _TEST_CASE(
     using namespace abc::utility::io;
     file_based_map_t<u8string, bool> _l_data("unit_test");
     manual_data_generator_t          _l_mdg;
-    RUN(_l_mdg, (test_inserter<array<int, 3>>(_l_data)));
-    RUN(_l_mdg, (test_inserter<vector<int>>(_l_data)));
-    RUN(_l_mdg, (test_inserter<deque<int>>(_l_data)));
-    RUN(_l_mdg, (test_inserter<forward_list<int>>(_l_data)));
-    RUN(_l_mdg, (test_inserter<list<int>>(_l_data)));
-    RUN(_l_mdg, (test_inserter<set<int>>(_l_data)));
-    RUN(_l_mdg, (test_inserter<map<int, int>>(_l_data)));
-    RUN(_l_mdg, (test_inserter<multiset<int>>(_l_data)));
-    RUN(_l_mdg, (test_inserter<multimap<int, int>>(_l_data)));
-    RUN(_l_mdg, (test_inserter<unordered_set<int>>(_l_data)));
-    RUN(_l_mdg, (test_inserter<unordered_map<int, int>>(_l_data)));
-    RUN(_l_mdg, (test_inserter<unordered_multiset<int>>(_l_data)));
-    RUN(_l_mdg, (test_inserter<unordered_multimap<int, int>>(_l_data)));
-    RUN(_l_mdg, (test_inserter<basic_string<int>>(_l_data)));
+    RUN(_l_mdg, (test_unordered_inserter<array<int, 3>>(_l_data)));
+    RUN(_l_mdg, (test_unordered_inserter<vector<int>>(_l_data)));
+    RUN(_l_mdg, (test_unordered_inserter<deque<int>>(_l_data)));
+    RUN(_l_mdg, (test_unordered_inserter<forward_list<int>>(_l_data)));
+    RUN(_l_mdg, (test_unordered_inserter<list<int>>(_l_data)));
+    RUN(_l_mdg, (test_unordered_inserter<set<int>>(_l_data)));
+    RUN(_l_mdg, (test_unordered_inserter<map<int, int>>(_l_data)));
+    RUN(_l_mdg, (test_unordered_inserter<multiset<int>>(_l_data)));
+    RUN(_l_mdg, (test_unordered_inserter<multimap<int, int>>(_l_data)));
+    RUN(_l_mdg, (test_unordered_inserter<unordered_set<int>>(_l_data)));
+    RUN(_l_mdg, (test_unordered_inserter<unordered_map<int, int>>(_l_data)));
+    RUN(_l_mdg, (test_unordered_inserter<unordered_multiset<int>>(_l_data)));
+    RUN(_l_mdg, (test_unordered_inserter<unordered_multimap<int, int>>(_l_data)));
+    RUN(_l_mdg, (test_unordered_inserter<basic_string<int>>(_l_data)));
 }
 
 namespace
