@@ -7,23 +7,7 @@ _BEGIN_ABC_UTILITY_NS
 
 namespace detail
 {
-/*!
- * @brief A concept for describing ranges which can be used with the
- * static_cast_range function.
- */
-/*template <typename New_Type, typename Original_Type>
-concept static_cast_range_c
-    // Check both are ranges
-    = std::ranges::range<New_Type>
-      && std::ranges::range<Original_Type>
-      // Check the New_Type has an inserter
-      && has_inserter_c<New_Type>
-      // Check static cast works
-      && requires (std::ranges::range_value_t<Original_Type> _a_object) {
-             {
-                 static_cast<std::ranges::range_value_t<New_Type>>(_a_object)
-             } -> std::same_as<std::ranges::range_value_t<New_Type>>;
-         };*/
+
 /*!
  * @brief Returns either a std::inserter, std::back_inserter or
  * std::front_inserter. If the template cannot issue any of these objects, the
@@ -33,6 +17,9 @@ template <typename T>
 requires has_inserter_c<T>
 __constexpr auto
     get_inserter(T& _a_range) noexcept;
+/*!
+ * @brief Function which appends the second argument to the first. 
+ */
 template <typename R1, typename R2>
 requires std::ranges::range<R1> && std::ranges::range<R2>
          && std::convertible_to<
@@ -42,6 +29,15 @@ __constexpr void
     append_range(R1& _a_range1, R2&& _a_range2) noexcept;
 } // namespace detail
 
+/*!
+ * @brief Function which joins two ranges into a third range.
+ * @tparam R The return type.
+ * @tparam R1 The type of the first range.
+ * @tparam R2 The type of the second range.
+ * @param _a_vect1 The first range.
+ * @param _a_vect_2 The second range.
+ * @return The first and second range combined.
+ */
 template <typename R, typename R1, typename R2>
 requires std::ranges::range<R> && std::ranges::range<R1>
          && std::ranges::range<R2>
