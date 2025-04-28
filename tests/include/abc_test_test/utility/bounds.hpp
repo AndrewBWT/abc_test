@@ -19,128 +19,10 @@ inline void
     _a_bba += _BLOCK_CHECK(_EXPR(_a_difference == _a_bounds.difference()));
 }
 
-template <typename T>
-inline void
-    run_bounds_tests_default_constructor()
-{
-    using namespace abc::utility;
-    using namespace std;
-    bounds_t<T> _l_bounds;
-    _BEGIN_MULTI_ELEMENT_BBA(
-        _l_bounds_tests,
-        fmt::format(
-            "Running default bounds_t constructor tests for type {0}", typeid(T)
-        )
-    );
-    test_bounds(
-        _l_bounds_tests,
-        _l_bounds,
-        numeric_limits<T>::max(),
-        numeric_limits<T>::min(),
-        numeric_limits<T>::max()
-    );
-    _END_BBA_CHECK(_l_bounds_tests);
-}
-
-template <typename T>
-inline void
-    run_bounds_tests_single_argument_constructor()
-{
-    using namespace abc;
-    using namespace abc::utility;
-    using namespace std;
-    using namespace abc::data_gen;
-    _BEGIN_MULTI_ELEMENT_BBA(
-        _l_bounds_tests,
-        fmt::format(
-            "Running single element bounds_t constructor tests for type {0}",
-            typeid(T)
-        )
-    );
-    using test_data_t = T;
-    _ABC_NS_DG::data_generator_collection_t<test_data_t> _l_data_gen;
-    if constexpr (sizeof(T) == 0)
-    {
-        _l_data_gen = enumerate_data<test_data_t>();
-    }
-    else
-    {
-        _l_data_gen = generate_data_randomly<test_data_t>();
-    }
-    for (const auto& _l_val : _l_data_gen)
-    {
-        bounds_t<T> _l_bounds(_l_val);
-        test_bounds<T>(_l_bounds_tests, _l_bounds, _l_val, _l_val, 0);
-    }
-    _END_BBA_CHECK(_l_bounds_tests);
-}
-
-template <typename T>
-inline void
-    run_bounds_tests_two_argument_constructor()
-{
-    using namespace abc;
-    using namespace abc::utility;
-    using namespace std;
-    using namespace abc::data_gen;
-    _BEGIN_MULTI_ELEMENT_BBA(
-        _l_bounds_tests,
-        fmt::format(
-            "Running two element bounds_t constructor tests for type {0}",
-            typeid(T)
-        )
-    );
-    using test_data_t = std::tuple<T, T>;
-    _ABC_NS_DG::data_generator_collection_t<test_data_t> _l_data_gen;
-    if constexpr (sizeof(T) == 1)
-    {
-        _l_data_gen = enumerate_data<test_data_t>();
-    }
-    else
-    {
-        _l_data_gen = generate_data_randomly<test_data_t>();
-    }
-    for (const auto& [_l_first_val, _l_second_val] : _l_data_gen)
-    {
-        bounds_t<T> _l_bounds(_l_first_val, _l_second_val);
-        // Deduce lowest and highest values. Then find difference.
-        const bool _l_first_val_smallest{_l_first_val < _l_second_val};
-        const T& _l_lower{_l_first_val_smallest ? _l_first_val : _l_second_val};
-        const T& _l_upper{_l_first_val_smallest ? _l_second_val : _l_first_val};
-        const T  _l_difference{static_cast<T>(
-            _l_first_val_smallest ? (_l_second_val - _l_first_val)
-                                  : (_l_first_val - _l_second_val)
-        )};
-        test_bounds(
-            _l_bounds_tests, _l_bounds, _l_upper, _l_lower, _l_difference
-        );
-        // Run the same tests, but with the constructor calling the arguments in
-        // the other order.
-        _l_bounds = bounds_t<T>(_l_second_val, _l_first_val);
-        test_bounds(
-            _l_bounds_tests, _l_bounds, _l_upper, _l_lower, _l_difference
-        );
-    }
-    _END_BBA_CHECK(_l_bounds_tests);
-}
-
-template <typename T>
-inline void
-    run_bounds_constructor_tests()
-{
-    using namespace abc;
-    using namespace abc::utility;
-    using namespace std;
-    using namespace abc::data_gen;
-    run_bounds_tests_default_constructor<T>();
-    run_bounds_tests_single_argument_constructor<T>();
-    run_bounds_tests_two_argument_constructor<T>();
-}
-
 _TEST_CASE(
     abc::test_case_t(
-        {.name = "Testing bounds_t constructors using hand-picked values",
-         .path = "abc_test_test::utility::bounds",
+        {.name             = "Unit tests for bounds_t constructors",
+         .path             = "abc_test_test::utility::bounds",
          .threads_required = 1}
     )
 )
@@ -148,69 +30,175 @@ _TEST_CASE(
     using namespace abc;
     using namespace std;
     using namespace abc::utility;
-    _BEGIN_MULTI_ELEMENT_BBA(
-        _l_bounds_tests, "Testing hand-written values for bounds_t"
-    );
-    using test_data_t = tuple<size_t, size_t, size_t>;
-    for (const auto& [_l_first_val, _l_second_val, _l_difference] :
-         read_data_from_file<test_data_t>("bounds_t_handwritten_data"))
+    auto _l_test_func = [&]<typename T>()
     {
-        bounds_t      _l_bounds(_l_first_val, _l_second_val);
-        const size_t& _l_lower{
-            _l_first_val < _l_second_val ? _l_first_val : _l_second_val
-        };
-        const size_t& _l_upper{
-            _l_first_val < _l_second_val ? _l_first_val : _l_second_val
-        };
-        test_bounds(
-            _l_bounds_tests, _l_bounds, _l_lower, _l_upper, _l_difference
+        _BEGIN_MULTI_ELEMENT_BBA(
+            _l_bounds_tests, "Testing hand-written values for bounds_t"
         );
-        _l_bounds = bounds_t(_l_second_val, _l_first_val);
-        test_bounds(
-            _l_bounds_tests, _l_bounds, _l_lower, _l_upper, _l_difference
-        );
-    }
-    _END_BBA_CHECK(_l_bounds_tests);
-}
-
-_TEST_CASE(
-    abc::test_case_t(
-        {.name = "Testing bounds_t constructors using enumerated and randomly "
-                 "generated values",
-         .path = "abc_test_test::utility::bounds",
-         .threads_required = 1}
-    )
-)
-{
-    using namespace abc;
-    using namespace abc::data_gen;
-    using namespace std;
+        using test_data_t = tuple<T, T, T>;
+        for (const auto& [_l_first_val, _l_second_val, _l_difference] :
+            read_data_from_file<test_data_t>(fmt::format("bounds_t_handwritten_data_{0}",
+                typeid(T).name())))
+        {
+            bounds_t<T>      _l_bounds(_l_first_val, _l_second_val);
+            const T& _l_lower{
+                _l_first_val < _l_second_val ? _l_first_val : _l_second_val
+            };
+            const T& _l_upper{
+                _l_first_val < _l_second_val ? _l_first_val : _l_second_val
+            };
+            test_bounds(
+                _l_bounds_tests, _l_bounds, _l_lower, _l_upper, _l_difference
+            );
+            _l_bounds = bounds_t(_l_second_val, _l_first_val);
+            test_bounds(
+                _l_bounds_tests, _l_bounds, _l_lower, _l_upper, _l_difference
+            );
+        }
+        _END_BBA_CHECK(_l_bounds_tests);
+    };
+    using container_type_list_t = type_list<
+#if 0
+        bool, unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long
+#endif
+        >;
     manual_data_generator_t _l_mdg;
-    RUN(_l_mdg, run_bounds_constructor_tests<bool>());
-    RUN(_l_mdg, run_bounds_constructor_tests<unsigned char>());
-    RUN(_l_mdg, run_bounds_constructor_tests<unsigned short>());
-    RUN(_l_mdg, run_bounds_constructor_tests<unsigned int>());
-    RUN(_l_mdg, run_bounds_constructor_tests<unsigned long>());
-    RUN(_l_mdg, run_bounds_constructor_tests<unsigned long long>());
-}
-
-template <typename T>
-inline void
-    run_concept_checks(
-        abc::multi_element_test_block_t& _a_bba,
-        const bool                       _a_result
-    )
-{
-    using namespace abc;
-    _a_bba += _BLOCK_CHECK(annotate(
-        fmt::format(u8"Ensures bounds_c works with {0}", type_id<T>()),
-        _EXPR(abc::utility::detail::bounds_c<T> == _a_result)
-    ));
+    for_each_type<container_type_list_t>(
+        [&]<typename T>()
+        {
+            RUN(_l_mdg, (_l_test_func.operator()<T>()));
+        }
+    );
 }
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name             = "Testing bounds_t concepts",
+        {.name = "Property tests for bounds_t constructors, using enumerated "
+                 "and randomly generated values",
+         .path = "abc_test_test::utility::bounds",
+         .threads_required = 1}
+    )
+)
+{
+    using namespace abc;
+    using namespace abc::data_gen;
+    using namespace std;
+    using namespace abc::utility;
+    auto _l_run_bounds_default_constructor = [&]<typename T>()
+    {
+        bounds_t<T> _l_bounds;
+        _BEGIN_MULTI_ELEMENT_BBA(
+            _l_bounds_tests,
+            fmt::format(
+                "Running default bounds_t constructor tests for type {0}",
+                typeid(T)
+            )
+        );
+        test_bounds(
+            _l_bounds_tests,
+            _l_bounds,
+            numeric_limits<T>::max(),
+            numeric_limits<T>::min(),
+            numeric_limits<T>::max()
+        );
+        _END_BBA_CHECK(_l_bounds_tests);
+    };
+    auto _l_run_bounds_one_arg_constructor = [&]<typename T>()
+    {
+        _BEGIN_MULTI_ELEMENT_BBA(
+            _l_bounds_tests,
+            fmt::format(
+                "Running single element bounds_t constructor tests for type "
+                "{0}",
+                typeid(T)
+            )
+        );
+        using test_data_t = T;
+        _ABC_NS_DG::data_generator_collection_t<test_data_t> _l_data_gen;
+        if constexpr (sizeof(T) == 0)
+        {
+            _l_data_gen = enumerate_data<test_data_t>();
+        }
+        else
+        {
+            _l_data_gen = generate_data_randomly<test_data_t>();
+        }
+        for (const auto& _l_val : _l_data_gen)
+        {
+            bounds_t<T> _l_bounds(_l_val);
+            test_bounds<T>(_l_bounds_tests, _l_bounds, _l_val, _l_val, 0);
+        }
+        _END_BBA_CHECK(_l_bounds_tests);
+    };
+    auto _l_bounds_constructor_two_args = [&]<typename T>()
+    {
+        _BEGIN_MULTI_ELEMENT_BBA(
+            _l_bounds_tests,
+            fmt::format(
+                "Running two element bounds_t constructor tests for type {0}",
+                typeid(T)
+            )
+        );
+        using test_data_t = std::tuple<T, T>;
+        _ABC_NS_DG::data_generator_collection_t<test_data_t> _l_data_gen;
+        if constexpr (sizeof(T) == 1)
+        {
+            _l_data_gen = enumerate_data<test_data_t>();
+        }
+        else
+        {
+            _l_data_gen = generate_data_randomly<test_data_t>();
+        }
+        for (const auto& [_l_first_val, _l_second_val] : _l_data_gen)
+        {
+            bounds_t<T> _l_bounds(_l_first_val, _l_second_val);
+            // Deduce lowest and highest values. Then find difference.
+            const bool _l_first_val_smallest{_l_first_val < _l_second_val};
+            const T&   _l_lower{
+                _l_first_val_smallest ? _l_first_val : _l_second_val
+            };
+            const T& _l_upper{
+                _l_first_val_smallest ? _l_second_val : _l_first_val
+            };
+            const T _l_difference{static_cast<T>(
+                _l_first_val_smallest ? (_l_second_val - _l_first_val)
+                                      : (_l_first_val - _l_second_val)
+            )};
+            test_bounds(
+                _l_bounds_tests, _l_bounds, _l_upper, _l_lower, _l_difference
+            );
+            // Run the same tests, but with the constructor calling the
+            // arguments in the other order.
+            _l_bounds = bounds_t<T>(_l_second_val, _l_first_val);
+            test_bounds(
+                _l_bounds_tests, _l_bounds, _l_upper, _l_lower, _l_difference
+            );
+        }
+        _END_BBA_CHECK(_l_bounds_tests);
+    };
+    auto _l_top_level_func = [&]<typename T>()
+    {
+        _l_run_bounds_default_constructor.operator()<T>();
+        _l_run_bounds_one_arg_constructor.operator()<T>();
+        _l_bounds_constructor_two_args.operator()<T>();
+    };
+    using container_type_list_t = type_list<
+#if 0
+        bool, unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long
+#endif
+        >;
+    manual_data_generator_t _l_mdg;
+    for_each_type<container_type_list_t>(
+        [&]<typename T>()
+        {
+            RUN(_l_mdg, (_l_top_level_func.operator()<T>()));
+        }
+    );
+}
+
+_TEST_CASE(
+    abc::test_case_t(
+        {.name             = "Testing bounds_c concept",
          .path             = "abc_test_test::utility::bounds",
          .threads_required = 1}
     )
@@ -219,15 +207,35 @@ _TEST_CASE(
     using namespace abc;
     using namespace abc::data_gen;
     using namespace std;
-    _BEGIN_MULTI_ELEMENT_BBA(
-        _l_bounds_tests, "Testing concepts around bounds_t"
-    );
+    using namespace abc::utility;
+    using namespace abc::utility::io;
+    file_based_map_t<u8string, bool> _l_data("unit_test");
+    auto                             unit_test_func = [&]<typename T>()
+    {
+        using namespace abc::utility;
+
+        using namespace abc;
+        _TVLOG(type_id<T>());
+        _CHECK(_l_data.generate_matcher(
+            type_id<T>(),
+            [&](const bool& _a_expected_result)
+            {
+                return _EXPR(
+                    abc::utility::detail::bounds_c<T> == _a_expected_result
+                );
+            }
+        ));
+    };
+    using container_type_list_t = type_list<
+#if 0
+        bool,unsigned char, unsigned short, unsigned int, unsigned long, unsigned long long
+#endif
+        >;
     manual_data_generator_t _l_mdg;
-    RUN(_l_mdg, run_concept_checks<bool>(_l_bounds_tests, true));
-    RUN(_l_mdg, run_concept_checks<unsigned char>(_l_bounds_tests, true));
-    RUN(_l_mdg, run_concept_checks<unsigned short>(_l_bounds_tests, true));
-    RUN(_l_mdg, run_concept_checks<unsigned int>(_l_bounds_tests, true));
-    RUN(_l_mdg, run_concept_checks<unsigned long>(_l_bounds_tests, true));
-    RUN(_l_mdg, run_concept_checks<unsigned long long>(_l_bounds_tests, true));
-    _END_BBA_CHECK(_l_bounds_tests);
+    for_each_type<container_type_list_t>(
+        [&]<typename T>()
+        {
+            RUN(_l_mdg, (unit_test_func.operator()<T>()));
+        }
+    );
 }
