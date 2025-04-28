@@ -1,7 +1,7 @@
 #pragma once
 
-#include "abc_test/utility/str/rw_info.hpp"
 #include "abc_test/utility/io/file/general_data.hpp"
+#include "abc_test/utility/str/rw_info.hpp"
 
 _BEGIN_ABC_UTILITY_IO_NS
 
@@ -42,9 +42,12 @@ public:
         if (not std::filesystem::exists(_m_file_name))
         {
             file_line_writer_t _l_flw(_m_file_name);
-            _l_flw.write_comment(fmt::format(u8""));
+            _l_flw.write_comment(
+                fmt::format(u8"{0}", type_id<decltype(_m_inner_map)>())
+            );
         }
         {
+            size_t             _l_line_idx{0};
             file_line_reader_t _l_flr(_m_file_name);
             while (_l_flr.has_current_line())
             {
@@ -63,14 +66,35 @@ public:
                     }
                     else
                     {
-                        throw abc::errors::test_library_exception_t(u8"whoah");
+                        throw abc::errors::test_library_exception_t(fmt::format(
+                            u8"{0} was able to successfully parse the {1} line of file {2}"
+                            u8"\"{3}\" to the the entity {4} of type {5}. "
+                            u8"However, it was found that the internal map "
+                            u8"already contains an element with this key. The "
+                            u8"current element is {6}.",
+                            type_id<decltype(*this)>(),
+                            positive_integer_to_placement(_l_line_idx),
+                            _m_file_name.u8string(),
+                            _l_flr.current_line(),
+                            _m_element_printer->run_printer(_l_parsed_element),
+                            type_id<map_type_t>(),
+                            _m_element_printer->run_printer(*_l_finder)
+                        ));
                     }
                 }
                 else
                 {
-                    throw abc::errors::test_library_exception_t(u8"whoah");
+                    throw abc::errors::test_library_exception_t(fmt::format(
+                        u8"{0} could not parse line \"{1}\" of file {2}, which should "
+                        u8"contain a parsable entity of type {3}.",
+                        type_id<decltype(*this)>(),
+                        _l_flr.current_line(),
+                        _m_file_name.u8string(),
+                        type_id<map_type_t>()
+                    ));
                 }
                 _l_flr.get_next_line();
+                ++_l_line_idx;
             }
         }
         _m_flw = file_line_writer_t(_m_file_name);
@@ -121,9 +145,11 @@ public:
             using namespace abc::matcher;
             using namespace std;
             using namespace abc::utility::printer;
+            auto _l_new_map_element{make_pair(_a_key, nullopt)};
             _m_flw.write_line(abc::utility::printer::print<map_type_t>(
-                make_pair(_a_key, nullopt), _m_element_printer
+                _l_new_map_element, _m_element_printer
             ));
+            _m_inner_map.insert(_l_new_map_element);
             return mk_matcher_using_result(matcher_result_t(
                 false,
                 fmt::format(

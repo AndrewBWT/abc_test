@@ -29,6 +29,7 @@ set(TEST_FILES
   include/abc_test_test/core/errors/test_library_exception.hpp
   # Contains simple random generator for testing randomly generated data.
   include/abc_test_test/testing_utilities/simple_random_generator.hpp
+  include/abc_test_test/testing_utilities/functions.hpp
 )
 
 # These are the libs required for the testing suite.

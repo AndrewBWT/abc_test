@@ -5,6 +5,7 @@
 
 namespace
 {
+    struct X {};
 template <typename T>
 inline void
     test_back_inserter(
@@ -12,6 +13,7 @@ inline void
     )
 {
     using namespace abc::utility;
+
     using namespace abc;
     _TVLOG(type_id<T>());
     _CHECK(_a_bfr.generate_matcher(

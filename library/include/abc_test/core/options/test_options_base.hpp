@@ -150,7 +150,7 @@ public:
     std::vector<std::u8string> test_paths_to_run;
     std::u8string              autofile_metadata_string = u8"metadata";
     std::size_t maximum_individual_alloctable_memory = 2'147;// 483'648;
-    bool retain_passed_assertions = true;
+    bool retain_passed_assertions = false;
     /*!
      * @brief Function to validate the input.
      *

@@ -144,6 +144,7 @@ set(LIBRARY_FILES
   include/abc_test/utility/rng/rng_utilities.hpp
   include/abc_test/utility/rng.hpp
   include/abc_test/utility/types.hpp
+  include/abc_test/utility/type_level.hpp
   # Internal subfolder. Contains functions used for either internal debugging or
   # internal macros. These shouldn't really be used by the user, used for development.
   include/abc_test/utility/internal/log/enum.hpp
