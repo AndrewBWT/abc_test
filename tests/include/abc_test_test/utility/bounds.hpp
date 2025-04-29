@@ -4,6 +4,8 @@
 #include "abc_test/included_instances/data_generator/enumeration/default_enumeration.hpp"
 #include "abc_test/utility/bounds.hpp"
 
+namespace
+{
 template <typename T>
 inline void
     test_bounds(
@@ -18,6 +20,7 @@ inline void
     _a_bba += _BLOCK_CHECK(_EXPR(_a_upper == _a_bounds.higher()));
     _a_bba += _BLOCK_CHECK(_EXPR(_a_difference == _a_bounds.difference()));
 }
+} // namespace
 
 _TEST_CASE(
     abc::test_case_t(
@@ -37,11 +40,12 @@ _TEST_CASE(
         );
         using test_data_t = tuple<T, T, T>;
         for (const auto& [_l_first_val, _l_second_val, _l_difference] :
-            read_data_from_file<test_data_t>(fmt::format("bounds_t_handwritten_data_{0}",
-                typeid(T).name())))
+             read_data_from_file<test_data_t>(
+                 fmt::format("bounds_t_handwritten_data_{0}", typeid(T).name())
+             ))
         {
-            bounds_t<T>      _l_bounds(_l_first_val, _l_second_val);
-            const T& _l_lower{
+            bounds_t<T> _l_bounds(_l_first_val, _l_second_val);
+            const T&    _l_lower{
                 _l_first_val < _l_second_val ? _l_first_val : _l_second_val
             };
             const T& _l_upper{

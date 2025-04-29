@@ -5,26 +5,84 @@
 
 namespace
 {
-    struct X {};
-template <typename T>
+struct X
+{};
+
+template <typename F>
 inline void
-    test_back_inserter(
-        abc::utility::io::file_based_map_t<std::u8string, bool>& _a_bfr
+    unit_test_inserter_helper(
+        F _a_function
     )
 {
-    using namespace abc::utility;
-
     using namespace abc;
-    _TVLOG(type_id<T>());
-    _CHECK(_a_bfr.generate_matcher(
-        type_id<T>(),
-        [&](const bool& _a_expected_result)
+    using namespace abc::data_gen;
+    using namespace std;
+    using namespace utility;
+    using namespace abc::utility::io;
+    using container_type_list_t = type_list<
+        short int,
+        unsigned short int,
+        int,
+        unsigned int,
+        long int,
+        unsigned long int,
+        long long int,
+        unsigned long long int,
+        bool,
+        signed char,
+        unsigned char,
+        char,
+        wchar_t,
+        char8_t,
+        char16_t,
+        char32_t,
+        float,
+        double,
+        long double,
+        X,
+        vector<int>
+#if 0
+
+#endif
+        >;
+    auto _l_test_l1 = [&]<typename Value_Type>()
+    {
+        using container_type_list_vect_t = type_list<vector<Value_Type>
+#if 0
+
+#endif
+                                                     >;
+        manual_data_generator_t _l_mdg;
+        for_each_type<container_type_list_vect_t>(
+            [&]<typename T>()
+            {
+                RUN(_l_mdg, (_a_function.operator()<T>()));
+            }
+        );
+    };
+    manual_data_generator_t _l_mdg;
+    for_each_type<container_type_list_t>(
+        [&]<typename T>()
         {
-            return _EXPR(
-                abc::utility::has_back_inserter_c<T> == _a_expected_result
-            );
+            RUN(_l_mdg, (_l_test_l1.operator()<T>()));
         }
-    ));
+    );
+    auto _l_test_pair_l1 = [&]<typename T1>()
+    {
+        manual_data_generator_t _l_mdg;
+        for_each_type<container_type_list_t>(
+            [&]<typename T2>()
+            {
+                RUN(_l_mdg, (_a_function.operator()<std::pair<T1, T2>>()));
+            }
+        );
+    };
+    for_each_type<container_type_list_t>(
+        [&]<typename T>()
+        {
+            RUN(_l_mdg, (_l_test_pair_l1.operator()<T>()));
+        }
+    );
 }
 } // namespace
 
@@ -42,45 +100,21 @@ _TEST_CASE(
     using namespace utility;
     using namespace abc::utility::io;
     file_based_map_t<u8string, bool> _l_data("unit_test");
-    manual_data_generator_t          _l_mdg;
-    RUN(_l_mdg, (test_back_inserter<array<int, 3>>(_l_data)));
-    RUN(_l_mdg, (test_back_inserter<vector<int>>(_l_data)));
-    RUN(_l_mdg, (test_back_inserter<deque<int>>(_l_data)));
-    RUN(_l_mdg, (test_back_inserter<forward_list<int>>(_l_data)));
-    RUN(_l_mdg, (test_back_inserter<list<int>>(_l_data)));
-    RUN(_l_mdg, (test_back_inserter<set<int>>(_l_data)));
-    RUN(_l_mdg, (test_back_inserter<map<int, int>>(_l_data)));
-    RUN(_l_mdg, (test_back_inserter<multiset<int>>(_l_data)));
-    RUN(_l_mdg, (test_back_inserter<multimap<int, int>>(_l_data)));
-    RUN(_l_mdg, (test_back_inserter<unordered_set<int>>(_l_data)));
-    RUN(_l_mdg, (test_back_inserter<unordered_map<int, int>>(_l_data)));
-    RUN(_l_mdg, (test_back_inserter<unordered_multiset<int>>(_l_data)));
-    RUN(_l_mdg, (test_back_inserter<unordered_multimap<int, int>>(_l_data)));
-    RUN(_l_mdg, (test_back_inserter<basic_string<int>>(_l_data)));
+    auto                             _l_test_l2 = [&]<typename T>()
+    {
+        _TVLOG(type_id<T>());
+        _CHECK(_l_data.generate_matcher(
+            type_id<T>(),
+            [&](const bool& _a_expected_result)
+            {
+                return _EXPR(
+                    abc::utility::has_back_inserter_c<T> == _a_expected_result
+                );
+            }
+        ));
+    };
+    unit_test_inserter_helper(_l_test_l2);
 }
-
-namespace
-{
-template <typename T>
-inline void
-    test_front_inserter(
-        abc::utility::io::file_based_map_t<std::u8string, bool>& _a_bfr
-    )
-{
-    using namespace abc::utility;
-    using namespace abc;
-    _TVLOG(type_id<T>());
-    _CHECK(_a_bfr.generate_matcher(
-        type_id<T>(),
-        [&](const bool& _a_expected_result)
-        {
-            return _EXPR(
-                abc::utility::has_front_inserter_c<T> == _a_expected_result
-            );
-        }
-    ));
-}
-} // namespace
 
 _TEST_CASE(
     abc::test_case_t(
@@ -95,44 +129,22 @@ _TEST_CASE(
     using namespace std;
     using namespace utility;
     using namespace abc::utility::io;
-    file_based_map_t<std::u8string, bool> _l_data("unit_test");
-    manual_data_generator_t               _l_mdg;
-    RUN(_l_mdg, (test_front_inserter<array<int, 3>>(_l_data)));
-    RUN(_l_mdg, (test_front_inserter<vector<int>>(_l_data)));
-    RUN(_l_mdg, (test_front_inserter<deque<int>>(_l_data)));
-    RUN(_l_mdg, (test_front_inserter<forward_list<int>>(_l_data)));
-    RUN(_l_mdg, (test_front_inserter<list<int>>(_l_data)));
-    RUN(_l_mdg, (test_front_inserter<set<int>>(_l_data)));
-    RUN(_l_mdg, (test_front_inserter<map<int, int>>(_l_data)));
-    RUN(_l_mdg, (test_front_inserter<multiset<int>>(_l_data)));
-    RUN(_l_mdg, (test_front_inserter<multimap<int, int>>(_l_data)));
-    RUN(_l_mdg, (test_front_inserter<unordered_set<int>>(_l_data)));
-    RUN(_l_mdg, (test_front_inserter<unordered_map<int, int>>(_l_data)));
-    RUN(_l_mdg, (test_front_inserter<unordered_multiset<int>>(_l_data)));
-    RUN(_l_mdg, (test_front_inserter<unordered_multimap<int, int>>(_l_data)));
-    RUN(_l_mdg, (test_front_inserter<basic_string<int>>(_l_data)));
+    file_based_map_t<u8string, bool> _l_data("unit_test");
+    auto                             _l_test_l2 = [&]<typename T>()
+    {
+        _TVLOG(type_id<T>());
+        _CHECK(_l_data.generate_matcher(
+            type_id<T>(),
+            [&](const bool& _a_expected_result)
+            {
+                return _EXPR(
+                    abc::utility::has_front_inserter_c<T> == _a_expected_result
+                );
+            }
+        ));
+    };
+    unit_test_inserter_helper(_l_test_l2);
 }
-
-namespace
-{
-template <typename T>
-inline void
-    test_unordered_inserter(
-        abc::utility::io::file_based_map_t<std::u8string, bool>& _a_bfr
-    )
-{
-    using namespace abc::utility;
-    using namespace abc;
-    _TVLOG(type_id<T>());
-    _CHECK(_a_bfr.generate_matcher(
-        type_id<T>(),
-        [&](const bool& _a_expected_result)
-        {
-            return _EXPR(abc::utility::has_unordered_inserter_c<T> == _a_expected_result);
-        }
-    ));
-}
-} // namespace
 
 _TEST_CASE(
     abc::test_case_t(
@@ -148,50 +160,26 @@ _TEST_CASE(
     using namespace utility;
     using namespace abc::utility::io;
     file_based_map_t<u8string, bool> _l_data("unit_test");
-    manual_data_generator_t          _l_mdg;
-    RUN(_l_mdg, (test_unordered_inserter<array<int, 3>>(_l_data)));
-    RUN(_l_mdg, (test_unordered_inserter<vector<int>>(_l_data)));
-    RUN(_l_mdg, (test_unordered_inserter<deque<int>>(_l_data)));
-    RUN(_l_mdg, (test_unordered_inserter<forward_list<int>>(_l_data)));
-    RUN(_l_mdg, (test_unordered_inserter<list<int>>(_l_data)));
-    RUN(_l_mdg, (test_unordered_inserter<set<int>>(_l_data)));
-    RUN(_l_mdg, (test_unordered_inserter<map<int, int>>(_l_data)));
-    RUN(_l_mdg, (test_unordered_inserter<multiset<int>>(_l_data)));
-    RUN(_l_mdg, (test_unordered_inserter<multimap<int, int>>(_l_data)));
-    RUN(_l_mdg, (test_unordered_inserter<unordered_set<int>>(_l_data)));
-    RUN(_l_mdg, (test_unordered_inserter<unordered_map<int, int>>(_l_data)));
-    RUN(_l_mdg, (test_unordered_inserter<unordered_multiset<int>>(_l_data)));
-    RUN(_l_mdg, (test_unordered_inserter<unordered_multimap<int, int>>(_l_data)));
-    RUN(_l_mdg, (test_unordered_inserter<basic_string<int>>(_l_data)));
+    auto                             _l_test_l2 = [&]<typename T>()
+    {
+        _TVLOG(type_id<T>());
+        _CHECK(_l_data.generate_matcher(
+            type_id<T>(),
+            [&](const bool& _a_expected_result)
+            {
+                return _EXPR(
+                    abc::utility::has_unordered_inserter_c<T>
+                    == _a_expected_result
+                );
+            }
+        ));
+    };
+    unit_test_inserter_helper(_l_test_l2);
 }
-
-namespace
-{
-template <typename T>
-inline void
-    test_sized_and_resizable_range(
-        abc::utility::io::file_based_map_t<std::u8string, bool>& _a_bfr
-    )
-{
-    using namespace abc::utility;
-    using namespace abc;
-    _TVLOG(type_id<T>());
-    _CHECK(_a_bfr.generate_matcher(
-        type_id<T>(),
-        [&](const bool& _a_expected_result)
-        {
-            return _EXPR(
-                abc::utility::sized_and_reservable_range_c<T>
-                == _a_expected_result
-            );
-        }
-    ));
-}
-} // namespace
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name             = "Unit tests for sized_and_reservable_range_c",
+        {.name             = "Unit tests for has_inserter_c",
          .path             = "abc_test_test::utility::concepts",
          .threads_required = 1}
     )
@@ -203,39 +191,100 @@ _TEST_CASE(
     using namespace utility;
     using namespace abc::utility::io;
     file_based_map_t<u8string, bool> _l_data("unit_test");
-    manual_data_generator_t          _l_mdg;
-    RUN(_l_mdg, (test_sized_and_resizable_range<array<int, 3>>(_l_data)));
-    RUN(_l_mdg, (test_sized_and_resizable_range<vector<int>>(_l_data)));
-    RUN(_l_mdg, (test_sized_and_resizable_range<deque<int>>(_l_data)));
-    RUN(_l_mdg, (test_sized_and_resizable_range<forward_list<int>>(_l_data)));
-    RUN(_l_mdg, (test_sized_and_resizable_range<list<int>>(_l_data)));
-    RUN(_l_mdg, (test_sized_and_resizable_range<set<int>>(_l_data)));
-    RUN(_l_mdg, (test_sized_and_resizable_range<map<int, int>>(_l_data)));
-    RUN(_l_mdg, (test_sized_and_resizable_range<multiset<int>>(_l_data)));
-    RUN(_l_mdg, (test_sized_and_resizable_range<multimap<int, int>>(_l_data)));
-    RUN(_l_mdg, (test_sized_and_resizable_range<unordered_set<int>>(_l_data)));
-    RUN(_l_mdg,
-        (test_sized_and_resizable_range<unordered_map<int, int>>(_l_data)));
-    RUN(_l_mdg,
-        (test_sized_and_resizable_range<unordered_multiset<int>>(_l_data)));
-    RUN(_l_mdg,
-        (test_sized_and_resizable_range<unordered_multimap<int, int>>(_l_data))
-    );
-    RUN(_l_mdg, (test_sized_and_resizable_range<basic_string<int>>(_l_data)));
+    auto                             _l_test_l2 = [&]<typename T>()
+    {
+        _TVLOG(type_id<T>());
+        _CHECK(_l_data.generate_matcher(
+            type_id<T>(),
+            [&](const bool& _a_expected_result)
+            {
+                return _EXPR(
+                    abc::utility::has_inserter_c<T> == _a_expected_result
+                );
+            }
+        ));
+    };
+    unit_test_inserter_helper(_l_test_l2);
 }
 
-namespace
+_TEST_CASE(
+    abc::test_case_t(
+        {.name             = "Unit tests for has_append_range_c",
+         .path             = "abc_test_test::utility::concepts",
+         .threads_required = 1}
+    )
+)
 {
-    template <typename T>
-    inline void
-        test_from_chars_convertable(
-            abc::utility::io::file_based_map_t<std::u8string, bool>& _a_bfr
-        )
+    using namespace abc;
+    using namespace abc::data_gen;
+    using namespace std;
+    using namespace utility;
+    using namespace abc::utility::io;
+    file_based_map_t<pair<u8string, u8string>, bool> _l_data("unit_test");
+    auto _l_append_range_test = [&]<typename T1, typename T2>()
     {
-        using namespace abc::utility;
-        using namespace abc;
+        auto _l_type_pair{make_pair(type_id<T1>(), type_id<T2>())};
+        _TVLOG(_l_type_pair);
+        _CHECK(_l_data.generate_matcher(
+            _l_type_pair,
+            [&](const bool& _a_expected_result)
+            {
+                return _EXPR(
+                    ( abc::utility::has_append_range_c<T1, T2> )
+                    == _a_expected_result
+                );
+            }
+        ));
+    };
+    using container_type_list_t = type_list<short int>;
+    auto _l_func1               = [&]<typename Value_Type>()
+    {
+        using container_type_list2 = type_list<vector<Value_Type>>;
+        auto _l_func2              = [&]<typename R1>()
+        {
+            manual_data_generator_t _l_mdg;
+            for_each_type<container_type_list2>(
+                [&]<typename R2>()
+                {
+                    RUN(_l_mdg, (_l_append_range_test.operator()<R1, R2>()));
+                }
+            );
+        };
+        manual_data_generator_t _l_mdg;
+        for_each_type<container_type_list2>(
+            [&]<typename R1>()
+            {
+                RUN(_l_mdg, (_l_func2.operator()<R1>()));
+            }
+        );
+    };
+    manual_data_generator_t _l_mdg;
+    for_each_type<container_type_list_t>(
+        [&]<typename T>()
+        {
+            RUN(_l_mdg, (_l_func1.operator()<T>()));
+        }
+    );
+}
+
+_TEST_CASE(
+    abc::test_case_t(
+        {.name             = "Unit tests for from_chars_convertable_c",
+         .path             = "abc_test_test::utility::concepts",
+         .threads_required = 1}
+    )
+)
+{
+    using namespace abc;
+    using namespace abc::data_gen;
+    using namespace std;
+    using namespace utility;
+    using namespace abc::utility::io;
+    file_based_map_t<u8string, bool> _l_data("unit_test");
+    auto test_from_chars_convertable = [&]<typename T>()
+    {
         _TVLOG(type_id<T>());
-        _CHECK(_a_bfr.generate_matcher(
+        _CHECK(_l_data.generate_matcher(
             type_id<T>(),
             [&](const bool& _a_expected_result)
             {
@@ -245,12 +294,45 @@ namespace
                 );
             }
         ));
-    }
-} // namespace
+    };
+    using container_type_list_t = type_list<
+        short int,
+        unsigned short int,
+        int,
+        unsigned int,
+        long int,
+        unsigned long int,
+        long long int,
+        unsigned long long int,
+        bool,
+        signed char,
+        unsigned char,
+        char,
+        wchar_t,
+        char8_t,
+        char16_t,
+        char32_t,
+        float,
+        double,
+        long double,
+        X,
+        vector<int>
+#if 0
+
+#endif
+        >;
+    manual_data_generator_t _l_mdg;
+    for_each_type<container_type_list_t>(
+        [&]<typename T>()
+        {
+            RUN(_l_mdg, (test_from_chars_convertable.operator()<T>()));
+        }
+    );
+}
 
 _TEST_CASE(
     abc::test_case_t(
-        { .name = "Unit tests for from_chars_convertable_c",
+        { .name = "Unit tests for to_chars_convertable_c",
          .path = "abc_test_test::utility::concepts",
          .threads_required = 1 }
     )
@@ -262,28 +344,51 @@ _TEST_CASE(
     using namespace utility;
     using namespace abc::utility::io;
     file_based_map_t<u8string, bool> _l_data("unit_test");
-    manual_data_generator_t          _l_mdg;
-    RUN(_l_mdg, (test_from_chars_convertable<short int>(_l_data)));
-    RUN(_l_mdg, (test_from_chars_convertable<unsigned short int>(_l_data)));
-    RUN(_l_mdg, (test_from_chars_convertable<int>(_l_data)));
-    RUN(_l_mdg, (test_from_chars_convertable<unsigned int>(_l_data)));
-    RUN(_l_mdg, (test_from_chars_convertable<long int>(_l_data)));
-    RUN(_l_mdg, (test_from_chars_convertable<unsigned long int>(_l_data)));
-    RUN(_l_mdg, (test_from_chars_convertable<long long int>(_l_data)));
-    RUN(_l_mdg, (test_from_chars_convertable<unsigned long long int>(_l_data)));
+    auto test_to_chars_convertable = [&]<typename T>()
+    {
+        _TVLOG(type_id<T>());
+        _CHECK(_l_data.generate_matcher(
+            type_id<T>(),
+            [&](const bool& _a_expected_result)
+            {
+                return _EXPR(
+                    abc::utility::to_chars_convertable_c<T>
+                    == _a_expected_result
+                );
+            }
+        ));
+    };
+    using container_type_list_t = type_list<
+        short int,
+        unsigned short int,
+        int,
+        unsigned int,
+        long int,
+        unsigned long int,
+        long long int,
+        unsigned long long int,
+        bool,
+        signed char,
+        unsigned char,
+        char,
+        wchar_t,
+        char8_t,
+        char16_t,
+        char32_t,
+        float,
+        double,
+        long double,
+        X,
+        vector<int>
+#if 0
 
-    RUN(_l_mdg, (test_from_chars_convertable<bool>(_l_data)));
-    RUN(_l_mdg, (test_from_chars_convertable<signed char>(_l_data)));
-    RUN(_l_mdg, (test_from_chars_convertable<unsigned char>(_l_data)));
-    RUN(_l_mdg, (test_from_chars_convertable<char>(_l_data)));
-    RUN(_l_mdg, (test_from_chars_convertable<wchar_t>(_l_data)));
-    RUN(_l_mdg, (test_from_chars_convertable<char16_t>(_l_data)));
-    RUN(_l_mdg, (test_from_chars_convertable<char32_t>(_l_data)));
-    RUN(_l_mdg, (test_from_chars_convertable<char8_t>(_l_data)));
-
-    RUN(_l_mdg, (test_from_chars_convertable<float>(_l_data)));
-    RUN(_l_mdg, (test_from_chars_convertable<double>(_l_data)));
-    RUN(_l_mdg, (test_from_chars_convertable<long double>(_l_data)));
-    RUN(_l_mdg, (test_from_chars_convertable<X>(_l_data)));
-    RUN(_l_mdg, (test_from_chars_convertable<vector<int>>(_l_data)));
+#endif
+    > ;
+    manual_data_generator_t _l_mdg;
+    for_each_type<container_type_list_t>(
+        [&]<typename T>()
+    {
+        RUN(_l_mdg, (test_to_chars_convertable.operator() < T > ()));
+    }
+    );
 }

@@ -46,23 +46,6 @@ concept has_append_range_c = std::ranges::range<R1> && std::ranges::range<R2> &&
     { _a_range1.append_range(_a_range2) };
 };
 /*!
- * @brief Concept for a container which has three functions; reserve, capacity
- * and max_size. In essence, it describes a reiszable vector-like object. In the
- * STD, this concept is met by std::basic_string and std::vector.
- */
-template <typename T>
-concept sized_and_reservable_range_c
-    = std::ranges::sized_range<T>
-      && requires (T& _a_range, const std::ranges::range_size_t<T> _a_size) {
-             { _a_range.reserve(_a_size) };
-             {
-                 _a_range.capacity()
-             } -> std::same_as<std::ranges::range_size_t<T>>;
-             {
-                 _a_range.max_size()
-             } -> std::same_as<std::ranges::range_size_t<T>>;
-         };
-/*!
  * @brief Concept for an entity that can be built from the std::from_chars
  * function.
  *
