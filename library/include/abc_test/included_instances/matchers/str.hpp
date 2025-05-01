@@ -127,6 +127,27 @@ __no_constexpr_imp matcher_t
     ));
 }
 
+template<typename T>
+__no_constexpr_imp matcher_t
+unexpected_exception_thrown(
+    const std::exception& _a_exception
+)
+{
+    using namespace std;
+    using namespace _ABC_NS_MATCHER;
+    return mk_matcher_using_result(matcher_result_t(
+        false,
+        fmt::format(
+            u8"It was expected that an exception of type {0} was to be thrown. "
+            u8"Instead an exception, of a type derived from {1} was thrown. "
+            u8"The exception's what() function returned \"{2}\".",
+            type_id<T>(),
+            type_id<std::exception>(),
+            unpack_string_to_u8string(_a_exception.what())
+        )
+    ));
+}
+
 __no_constexpr_imp matcher_t
     unexpected_exception_thrown(
         const std::exception& _a_exception
@@ -145,6 +166,21 @@ __no_constexpr_imp matcher_t
     ));
 }
 
+template<typename T>
+__no_constexpr_imp matcher_t
+unexpected_exception_thrown() noexcept
+{
+    using namespace std;
+    using namespace _ABC_NS_MATCHER;
+    return mk_matcher_using_result(matcher_result_t(
+        false,
+        fmt::format(
+            u8"It was expected that an exception of type {0} was to be thrown. "
+            u8"Instead, an unexpected exception of an unknown type was thrown.",
+            type_id<T>())
+    ));
+}
+
 __no_constexpr_imp matcher_t
     unexpected_exception_of_unknown_type_thrown() noexcept
 {
@@ -153,6 +189,118 @@ __no_constexpr_imp matcher_t
     return mk_matcher_using_result(matcher_result_t(
         false,
         fmt::format(u8"An unexpected exception of an unknown type was thrown.")
+    ));
+}
+
+template <typename R1, typename R2>
+__constexpr_imp matcher_t
+    check_exception_string(
+        R1&& _a_range_1,
+        R2&& _a_range_2
+    ) noexcept
+{
+    using namespace std;
+    using namespace _ABC_NS_MATCHER;
+    using namespace abc::utility::printer;
+    using T            = ranges::range_value_t<R1>;
+    using R1_Type      = remove_cvref_t<R1>;
+    using R2_Type      = remove_cvref_t<R2>;
+    using R1_const_itt = R1_Type::const_iterator;
+    using R2_const_itt = R1_Type::const_iterator;
+    R1_const_itt     _l_itt_1{std::begin(_a_range_1)};
+    R1_const_itt     _l_itt_1_end{std::end(_a_range_1)};
+    R2_const_itt     _l_itt_2{std::begin(_a_range_2)};
+    R2_const_itt     _l_itt_2_end{std::end(_a_range_2)};
+    optional<size_t> _l_unequal_index;
+    size_t           _l_idx{1};
+    u8string         _l_explanation_str;
+    while (_l_itt_1 != _l_itt_1_end && _l_itt_2 != _l_itt_2_end)
+    {
+        const T& _l_element_1{*_l_itt_1};
+        const T& _l_element_2{*_l_itt_2};
+        if (_l_element_1 != _l_element_2)
+        {
+            _l_unequal_index = _l_idx;
+            break;
+        }
+        ++_l_itt_1;
+        ++_l_itt_2;
+        ++_l_idx;
+    }
+    if (not _l_unequal_index.has_value())
+    {
+        const bool _l_left_smaller{_l_itt_1 == _l_itt_1_end};
+        if (not _l_left_smaller && (_l_itt_2 == _l_itt_2_end))
+        {
+            return mk_matcher_using_result(matcher_result_t(
+                true,
+                fmt::format(
+                    u8"Exception's what() message returned the expected "
+                    u8"string. {0} == {1}",
+                    default_printer_t<R1_Type>{}.run_printer(_a_range_1),
+                    default_printer_t<R2_Type>{}.run_printer(_a_range_2)
+                )
+            ));
+        }
+        if (not (_l_left_smaller || _l_itt_2 == _l_itt_2_end))
+        {
+            _l_explanation_str = fmt::format(
+                u8"{0} argument (size {1}) smaller than {2} argument ({3})",
+                _l_left_smaller ? u8"left" : u8"right",
+                _l_idx - 1,
+                _l_left_smaller ? u8"right" : u8"left",
+                (ranges::sized_range<R2>
+                     ? fmt::format(
+                           u8"{}",
+                           ranges::size(
+                               _l_left_smaller ? _a_range_2 : _a_range_1
+                           )
+                       )
+                     : u8"unknown size")
+            );
+        }
+        else
+        {
+            return mk_matcher_using_result(matcher_result_t(
+                true,
+                fmt::format(
+                    u8"Exception's what() message returned the expected "
+                    u8"string. {0} == {1}",
+                    default_printer_t<R1_Type>{}.run_printer(_a_range_1),
+                    default_printer_t<R2_Type>{}.run_printer(_a_range_2)
+                )
+            ));
+        }
+    }
+    else
+    {
+        _l_explanation_str = fmt::format(
+            u8"Strings diverge at index {0}. Left argument's index {0} = {1}, "
+            u8"and "
+            u8"right argument's index {0} = {2}. The surrounding string of the "
+            u8"left and right arguments are \"...{3}...\" and \"...{4}...\"",
+            _l_idx,
+            default_printer_t<T>{}.run_printer(*_l_itt_1),
+            default_printer_t<T>{}.run_printer(*_l_itt_2),
+            default_printer_t<R1_Type>{u8""}.run_printer(
+                make_focused_string(_a_range_1, _l_idx)
+            ),
+            default_printer_t<R2_Type>{u8""}.run_printer(
+                make_focused_string(_a_range_2, _l_idx)
+            )
+
+        );
+    }
+    return mk_matcher_using_result(matcher_result_t(
+        false,
+        fmt::format(
+            u8"Exception's what() message did not return the expected string. "
+            u8"The exception's what() message ({0}) != the expected message "
+            u8"({1}). {2}.",
+            default_printer_t<R1_Type>{}.run_printer(_a_range_1),
+            default_printer_t<R2_Type>{}.run_printer(_a_range_2),
+            _l_explanation_str
+        )
     ));
 }
 

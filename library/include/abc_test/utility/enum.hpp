@@ -2,6 +2,7 @@
 #include "abc_test/core/errors/test_library_exception.hpp"
 #include "abc_test/utility/internal/macros.hpp"
 #include "abc_test/utility/parsers/parser_input.hpp"
+#include "abc_test/utility/str/conversion.hpp"
 #include "abc_test/utility/types.hpp"
 
 #include <algorithm>
@@ -12,6 +13,11 @@
 
 
 _BEGIN_ABC_UTILITY_NS
+/*!
+ * @brief A type synonym for the list of enums together with a u32string_view
+ * which denotes the string entity representing each enum.
+ * @tparam T
+ */
 template <typename T>
 using enum_list_t = std::vector<std::pair<T, std::u32string_view>>;
 template <typename T>
@@ -66,25 +72,31 @@ struct enumerate_enum_helper_t
     __constexpr std::size_t
                 difference(const T& _a_arg1, const T& _a_arg2) const noexcept;
 
-    __constexpr std::string
+    __constexpr std::u8string
                 print(
                     const T&                        _a_element,
                     const enum_helper_string_case_t _a_enum_string_case
                     = enum_helper_string_case_t::unchanged
                 ) const
     {
+        using namespace std;
         using enum enum_helper_string_case_t;
+        u32string _l_rv;
         switch (_a_enum_string_case)
         {
         case lower:
-            return _m_elements_to_lower_string.at(_a_element);
+            _l_rv = _m_elements_to_lower_string.at(_a_element);
+            break;
         case upper:
-            return _m_elements_to_upper_string.at(_a_element);
+            _l_rv = _m_elements_to_upper_string.at(_a_element);
+            break;
         case unchanged:
-            return _m_elements_to_string.at(_a_element);
+            _l_rv = _m_elements_to_string.at(_a_element);
+            break;
         default:
             throw errors::unaccounted_for_enum_exception(_a_enum_string_case);
         }
+        return abc::unicode_conversion<u8string>(_l_rv);
     }
 
     __constexpr result_t<T>
@@ -129,8 +141,8 @@ struct enumerate_enum_helper_t
         ));
     }
 private:
-    std::map<std::size_t, T> _m_idx_to_elements;
-    std::map<T, std::size_t> _m_elements_to_idx;
+    std::map<std::size_t, T>    _m_idx_to_elements;
+    std::map<T, std::size_t>    _m_elements_to_idx;
     std::map<std::u32string, T> _m_string_to_elements;
     std::map<std::u32string, T> _m_lower_string_to_elements;
     std::map<std::u32string, T> _m_upper_string_to_elements;
@@ -161,9 +173,9 @@ __constexpr_imp
     {
         _m_idx_to_elements.insert({_m_idx_to_elements.size(), _l_element});
         _m_elements_to_idx.insert({_l_element, _m_elements_to_idx.size()});
-        u32string _l_cpy{ _l_str };
-        _m_string_to_elements.insert({ _l_cpy, _l_element});
-        _m_elements_to_string.insert({_l_element, _l_cpy });
+        u32string _l_cpy{_l_str};
+        _m_string_to_elements.insert({_l_cpy, _l_element});
+        _m_elements_to_string.insert({_l_element, _l_cpy});
         transform(
             _l_cpy.begin(),
             _l_cpy.end(),
@@ -172,8 +184,8 @@ __constexpr_imp
             {
                 if (static_cast<uint32_t>(_l_char) <= 0x7F)
                 {
-                    char _l_c{ static_cast<char>(_l_char) };
-                    char _l_converted{ static_cast<char>(std::tolower(_l_c)) };
+                    char _l_c{static_cast<char>(_l_char)};
+                    char _l_converted{static_cast<char>(std::tolower(_l_c))};
                     return static_cast<char32_t>(_l_converted);
                 }
                 else
@@ -192,8 +204,8 @@ __constexpr_imp
             {
                 if (static_cast<uint32_t>(_l_char) <= 0x7F)
                 {
-                    char _l_c{ static_cast<char>(_l_char) };
-                    char _l_converted{ static_cast<char>(std::toupper(_l_c)) };
+                    char _l_c{static_cast<char>(_l_char)};
+                    char _l_converted{static_cast<char>(std::toupper(_l_c))};
                     return static_cast<char32_t>(_l_converted);
                 }
                 else
@@ -207,9 +219,10 @@ __constexpr_imp
     }
     if (_a_enum_list.size() == 0)
     {
-        throw test_library_exception_t(fmt::format(
-            u8"Could not create enumerate_enum_helper_t using enum_list of size 0"
-        ));
+        throw test_library_exception_t(
+            fmt::format(u8"Could not create enumerate_enum_helper_t using "
+                        u8"enum_list of size 0")
+        );
     }
 }
 

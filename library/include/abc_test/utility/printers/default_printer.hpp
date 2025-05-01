@@ -288,7 +288,8 @@ requires enum_has_list_c<T>
 struct default_printer_t<T> : public printer_base_t<T>
 {
     default_printer_t<T>(
-        const enum_helper_string_case_t _a_enum_helper_string_case
+        const enum_helper_string_case_t _a_enum_helper_string_case =
+        enum_helper_string_case_t::lower
     )
         : _m_enum_helper_string_case(_a_enum_helper_string_case)
     {}

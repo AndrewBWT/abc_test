@@ -1,5 +1,6 @@
 #pragma once
 
+#include "abc_test/utility/internal/unreachable.hpp"
 #include "abc_test/utility/rng/inner_rng.hpp"
 
 #include <memory>
@@ -38,7 +39,8 @@ public:
      * is created using the virtual function deep_copy.
      */
     __constexpr rng_t
-        make_rng(const std::size_t _a_n_elements_to_take) noexcept;
+        make_rng(const std::size_t _a_n_elements_to_take)
+            noexcept(unreachable_does_not_throw_exception);
     /*!
      * @brief Factory function for creating rng_t objects. One of only two ways
      * of creating an rng_t value without any previous rng_t value.
@@ -56,7 +58,7 @@ public:
         make_rng(
             const complete_global_seed_t& _a_global_seed,
             const std::size_t             _a_seed_size
-        ) noexcept;
+        ) noexcept(unreachable_does_not_throw_exception);
     /*!
      * @brief Factory function for creating rng_t objects. One of only two ways
      * of creating an rng_t value without any previous rng_t value.
@@ -85,13 +87,14 @@ public:
      * computationally expensive.
      */
     __constexpr void
-        progress(const std::size_t _a_expected_calls) noexcept;
+        progress(const std::size_t _a_expected_calls)
+            noexcept(unreachable_does_not_throw_exception);
     /*!
      * @brief Returns a randomly generated result_type_t type.
      * @return The randomly generated result_type_t type.
      */
     __constexpr result_type_t
-        operator()() noexcept;
+        operator()() noexcept(unreachable_does_not_throw_exception);
     /*!
      * @brief Tells the caller the number of times the internal RNG has been
      * called.
@@ -111,17 +114,34 @@ public:
      * @return
      */
     __constexpr
-    rng_t(const rng_t& _a_rng) noexcept;
-    __constexpr
-        rng_t operator=(const rng_t& _a_arg) noexcept
+    rng_t(const rng_t& _a_rng) noexcept(unreachable_does_not_throw_exception);
+
+    __constexpr rng_t&
+        operator=(
+            const rng_t& _a_arg
+        )
     {
+        if (this != &_a_arg)
+        {
+            _m_rng   = _a_arg.get_inner_rng().deep_copy();
+            _m_seed  = _a_arg._m_seed;
+            _m_calls = _a_arg._m_calls;
+        }
         return *this;
     }
-    __constexpr
-        rng_t operator=(rng_t&& _a_arg) noexcept
-    {
-        return *this;
-    }
+
+    __constexpr rng_t&
+        operator=(rng_t&& _a_arg) noexcept
+        = default;
+#if _TESTING_BUILD
+    /*! Constructor for testing when inner_rng_t is a nullptr. It shouldn't be
+     * able to happen, but we want to check that if it does, then the code will
+     * throw a breakpoint.
+     */
+    template <typename Rng>
+        requires std::derived_from<Rng, inner_rng_t>
+    __constexpr static rng_t make_default_rng() noexcept;
+#endif
 private:
     using inner_rng_ptr_t = std::unique_ptr<inner_rng_t>;
     inner_rng_ptr_t _m_rng;
@@ -131,6 +151,8 @@ private:
     rng_t(inner_rng_ptr_t&& _a_rng, seed_t&& _a_seed);
     __constexpr
     rng_t(inner_rng_ptr_t&& _a_rng, const seed_t& _a_seed);
+    __constexpr inner_rng_t&
+        get_inner_rng() const noexcept(unreachable_does_not_throw_exception);
 };
 
 _END_ABC_UTILITY_NS
@@ -140,35 +162,20 @@ _BEGIN_ABC_UTILITY_NS
 __constexpr_imp rng_t
     rng_t::make_rng(
         const std::size_t _a_n_elements_to_take
-    ) noexcept
+    )
+        noexcept(
+            unreachable_does_not_throw_exception
+        )
 {
     using namespace std;
-    if (_m_rng == nullptr)
+    inner_rng_t&     _l_rng{get_inner_rng()};
+    seed_t           _l_seed(_a_n_elements_to_take);
+    seed_t::iterator _l_end{end(_l_seed)};
+    for (seed_t::iterator _l_itt{begin(_l_seed)}; _l_itt != _l_end; ++_l_itt)
     {
-        std::unreachable();
+        *_l_itt = (*this)();
     }
-    else
-    {
-        inner_rng_t&    _l_rng{*_m_rng};
-       // inner_rng_ptr_t _l_rng_cpy{_l_rng.deep_copy()};
-     //   if (_l_rng_cpy == nullptr)
-      //  {
-     //       std::unreachable();
-    //    }
-   //     else
-        {
-        //    inner_rng_t&     _l_rng_copy_ref{*_l_rng_cpy};
-            seed_t           _l_seed(_a_n_elements_to_take);
-            seed_t::iterator _l_end{end(_l_seed)};
-            for (seed_t::iterator _l_itt{begin(_l_seed)}; _l_itt != _l_end;
-                 ++_l_itt)
-            {
-                *_l_itt = (*this)();
-            }
-          //  inner_rng_ptr_t _l_rng_cpy(_l_rng.make_rng(_l_seed));
-            return rng_t(move(_l_rng.make_rng(_l_seed)), move(_l_seed));
-        }
-    }
+    return rng_t(move(_l_rng.make_rng(_l_seed)), move(_l_seed));
 }
 
 template <typename Rng>
@@ -177,15 +184,20 @@ __constexpr_imp rng_t
     rng_t::make_rng(
         const complete_global_seed_t& _a_global_seed,
         const std::size_t             _a_seed_size
-    ) noexcept
+    )
+        noexcept(
+            unreachable_does_not_throw_exception
+        )
 {
     using namespace std;
-    if (const unsigned int* _l_ptr{get_if<unsigned int>(&_a_global_seed)};
-        _l_ptr != nullptr)
+    const auto _l_index{_a_global_seed.index()};
+    switch (_l_index)
+    {
+    case 0:
     {
         seed_t           _l_seed(_a_seed_size);
         seed_t::iterator _l_end{end(_l_seed)};
-        srand(*_l_ptr);
+        srand(get<0>(_a_global_seed));
         for (seed_t::iterator _l_itt{begin(_l_seed)}; _l_itt != _l_end;
              ++_l_itt)
         {
@@ -193,14 +205,12 @@ __constexpr_imp rng_t
         }
         return make_rng<Rng>(move(_l_seed));
     }
-    else if (const seed_t * _l_ptr{get_if<seed_t>(&_a_global_seed)};
-             _l_ptr != nullptr)
-    {
-        return make_rng<Rng>(*_l_ptr);
-    }
-    else
-    {
-        std::unreachable();
+    case 1:
+        return make_rng<Rng>(get<1>(_a_global_seed));
+    default:
+        _ABC_UNREACHABLE(fmt::format(
+            u8"_a_global_seed is invalid variant type. Index = {0}", _l_index
+        ));
     }
 }
 
@@ -229,45 +239,36 @@ __constexpr_imp rng_t
 __constexpr_imp void
     rng_t::progress(
         const size_t _a_expected_calls
-    ) noexcept
+    )
+        noexcept(
+            unreachable_does_not_throw_exception
+        )
 {
     if (_m_calls != _a_expected_calls)
     {
-        if (_m_rng == nullptr)
+        inner_rng_t& _l_rng{get_inner_rng()};
+        if (_m_calls > _a_expected_calls)
         {
-            std::unreachable();
+            // Basically been reset to zero.
+            _l_rng.set_seed(_m_seed);
+            _l_rng.progress(_a_expected_calls);
         }
         else
         {
-            inner_rng_t& _l_rng{*_m_rng};
-            if (_m_calls > _a_expected_calls)
-            {
-                // Basically been reset to zero.
-                _l_rng.set_seed(_m_seed);
-                _l_rng.progress(_a_expected_calls);
-            }
-            else
-            {
-                _l_rng.progress(_a_expected_calls - _m_calls);
-            }
-            _m_calls = _a_expected_calls;
+            _l_rng.progress(_a_expected_calls - _m_calls);
         }
+        _m_calls = _a_expected_calls;
     }
 }
 
 __constexpr_imp rng_t::result_type_t
-                rng_t::operator()() noexcept
+                rng_t::operator()() noexcept(
+        unreachable_does_not_throw_exception
+    )
 {
-    if (_m_rng == nullptr)
-    {
-        std::unreachable();
-    }
-    else
-    {
-        ++_m_calls;
-        inner_rng_t& _l_rng{*_m_rng};
-        return _l_rng();
-    }
+    inner_rng_t& _l_rng{get_inner_rng()};
+    ++_m_calls;
+    return _l_rng();
 }
 
 __constexpr_imp size_t
@@ -286,14 +287,31 @@ __constexpr_imp
 __constexpr_imp
     rng_t::rng_t(
         const rng_t& _a_rng
-    ) noexcept
+    )
+        noexcept(
+            unreachable_does_not_throw_exception
+        )
     : _m_rng(
-          _a_rng._m_rng == nullptr ? inner_rng_ptr_t{}
+          _a_rng._m_rng == nullptr ?
+#if _TESTING_BUILD
+                                   throw abc::unreachable_exception_t(
+                                       fmt::format(u8"_m_rng == nullptr")
+                                   )
+#else
+                                   inner_rng_ptr_t{}
+#endif
                                    : _a_rng._m_rng->deep_copy()
       )
     , _m_calls(_a_rng._m_calls)
 {}
-
+#if _TESTING_BUILD
+template <typename Rng>
+    requires std::derived_from<Rng, inner_rng_t>
+__constexpr rng_t rng_t::make_default_rng() noexcept
+{
+    return rng_t(inner_rng_ptr_t{}, seed_t{});
+}
+#endif
 __constexpr
 rng_t::rng_t(
     inner_rng_ptr_t&& _a_rng,
@@ -309,5 +327,20 @@ rng_t::rng_t(
 )
     : _m_rng(std::move(_a_rng)), _m_seed(_a_seed)
 {}
+
+__constexpr inner_rng_t&
+    rng_t::get_inner_rng() const noexcept(
+        unreachable_does_not_throw_exception
+    )
+{
+    if (_m_rng == nullptr)
+    {
+        _ABC_UNREACHABLE(fmt::format(u8"_m_rng == nullptr"));
+    }
+    else
+    {
+        return *_m_rng;
+    }
+}
 
 _END_ABC_UTILITY_NS

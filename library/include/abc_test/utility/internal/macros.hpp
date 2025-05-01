@@ -231,3 +231,10 @@ constexpr bool dependent_false = false; // workaround before CWG2518/P2593R1
 
 #define __STATIC_ASSERT(_a_type, _a_msg) \
     static_assert(abc::internal::dependent_false<_a_type>, _a_msg);
+
+#if 0
+// Testing off
+#define _TESTING_BUILD 0
+#else
+#define _TESTING_BUILD 1
+#endif

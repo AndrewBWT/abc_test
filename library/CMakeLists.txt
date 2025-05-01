@@ -151,6 +151,7 @@ set(LIBRARY_FILES
   include/abc_test/utility/internal/log/params.hpp
   include/abc_test/utility/internal/log.hpp
   include/abc_test/utility/internal/macros.hpp
+  include/abc_test/utility/internal/unreachable.hpp
   # Utility io functions and objects.
   include/abc_test/utility/io/threaded_text_output_reporter.hpp
   include/abc_test/utility/io/threaded_ostream_output_reporter.hpp

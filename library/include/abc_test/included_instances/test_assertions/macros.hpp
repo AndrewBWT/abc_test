@@ -224,6 +224,33 @@
         )                                                               \
     )
 
+#define __BEGIN_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_a_matcher_name) \
+    try                                                                       \
+    {
+#define __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(                  \
+    _a_matcher_name, _a_exception_type, _a_expected_string                   \
+)                                                                            \
+    _a_matcher_name                                                          \
+        = abc::matcher::mk_matcher_using_result(matcher::matcher_result_t(   \
+            false,                                                           \
+            fmt::format(                                                     \
+                u8"Expected an exception of type {0}, however no exception " \
+                u8"was "                                                     \
+                u8"thrown",                                                  \
+                abc::type_id<_a_exception_type>()                            \
+            )                                                                \
+        ));                                                                  \
+    }                                                                        \
+    catch (const _a_exception_type& _a_error)                                \
+    {                                                                        \
+        u8string _l_rv{                                                      \
+            abc::checkless_convert_ascii_to_unicode_string<u8string>(        \
+                _a_error.what()                                              \
+            )                                                                \
+        };                                                                   \
+        _a_matcher_name                                                      \
+            = abc::check_exception_string(_l_rv, _a_expected_string);        \
+    }
 #define _BEGIN_EXCEPTION_TYPE_AND_MSG(_a_name)                            \
     _BEGIN_SINGLE_ELEMENT_BBA_CUSTOM_SOURCE(                              \
         _a_name,                                                          \
@@ -238,21 +265,32 @@
     ));                                                                   \
     try                                                                   \
     {
-#define __INTERNAL_END_EXCEPTION_TYPE_AND_MSG(_a_name, _a_type, _a_msg) \
-    }                                                                   \
-    catch (const _a_type& _l_et)                                        \
-    {                                                                   \
-        _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(                 \
-            "Code block threw the required entity.",                    \
-            abc::eq<std::string, std::string>(_a_msg, _l_et.what())     \
-        ));                                                             \
-    }                                                                   \
-    catch (...)                                                         \
-    {                                                                   \
-        _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(                 \
-            "Code throws an exception not derived from std::exception", \
-            abc::false_matcher()                                        \
-        ));                                                             \
+#define __INTERNAL_END_EXCEPTION_TYPE_AND_MSG(_a_name, _a_type, _a_msg)        \
+    }                                                                          \
+    catch (const _a_type& _l_et)                                               \
+    {                                                                          \
+        _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(                        \
+            "Code block threw the required entity.",                           \
+            abc::eq<std::string, std::string>(_a_msg, _l_et.what())            \
+        ));                                                                    \
+    }                                                                          \
+    catch (...)                                                                \
+    {                                                                          \
+        _a_name = _BLOCK_CHECK_NO_SOURCE(abc::annotate(                        \
+            "Code throws an exception not derived from std::exception",        \
+            abc::false_matcher()                                               \
+        ));                                                                    \
+    }                                                                          \
+    catch (const std::exception& _a_exception)                                 \
+    {                                                                          \
+        _a_matcher_name                                                        \
+            = abc::unexpected_exception_thrown<_a_exception_type>(_a_exception \
+            );                                                                 \
+    }                                                                          \
+    catch (...)                                                                \
+    {                                                                          \
+        _a_matcher_name                                                        \
+            = abc::unexpected_exception_thrown<_a_exception_type>();           \
     }
 
 #define _END_CHECK_EXCEPTION_TYPE_AND_MSG(_a_name, _a_type, _a_msg) \
