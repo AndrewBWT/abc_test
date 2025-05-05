@@ -40,6 +40,7 @@ _TEST_CASE(
     {
         _TVLOG_(_l_data);
         const auto& [_l_constructor, _l_instrs]{_l_data};
+        matcher_t _l_matcher;
         _BEGIN_NO_THROW_MATCHER(_l_matcher);
         inner_rng_mt19937_64_t _l_rng = inner_rng_mt19937_64_t(seed_t());
         switch (_l_constructor.index())

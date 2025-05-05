@@ -2,7 +2,7 @@
 #include "abc_test/core/test_assertions/macros.hpp"
 
 #define _BEGIN_NO_THROW_MATCHER(_a_matcher_name)                  \
-    abc::matcher_t _a_matcher_name{abc::expected_no_exception()}; \
+    _a_matcher_name = abc::expected_no_exception(); \
     _a_matcher_name.add_source_info(                              \
         "_BEGIN_NO_THROW_MATCHER",                                \
         #_a_matcher_name,                                         \
@@ -248,8 +248,9 @@
                 _a_error.what()                                              \
             )                                                                \
         };                                                                   \
-        _a_matcher_name                                                      \
-            = abc::check_exception_string(_l_rv, _a_expected_string);        \
+        _a_matcher_name = abc::check_exception_string(                       \
+            _l_rv, std::u8string(_a_expected_string)                    \
+        );                                                                   \
     }
 #define _BEGIN_EXCEPTION_TYPE_AND_MSG(_a_name)                            \
     _BEGIN_SINGLE_ELEMENT_BBA_CUSTOM_SOURCE(                              \

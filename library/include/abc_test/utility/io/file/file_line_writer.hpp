@@ -39,7 +39,7 @@ __no_constexpr_imp
     )
     : _m_file_handler(std::shared_ptr<std::ofstream>())
     , _m_current_line_idx(0)
-    , _m_file_name(_a_file_name)
+    , _m_file_name(normalise_for_file_use(_a_file_name.u8string()))
 //	, _m_test_options(_a_test_options)
 {
     using namespace std;
@@ -50,6 +50,7 @@ __no_constexpr_imp
     {
         _m_file_handler
             = make_shared<ofstream>(_m_file_name, std::ios_base::app);
+        std::cout << _m_file_name << std::endl;
         if (not _m_file_handler.get()->is_open())
         {
             throw test_library_exception_t(fmt::format(

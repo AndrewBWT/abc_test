@@ -1,6 +1,7 @@
 #pragma once
 #include "abc_test/core/errors/test_library_exception.hpp"
 #include "abc_test/utility/internal/macros.hpp"
+#include "abc_test/utility/internal/unreachable.hpp"
 #include "abc_test/utility/parsers/parser_input.hpp"
 #include "abc_test/utility/str/conversion.hpp"
 #include "abc_test/utility/types.hpp"
@@ -27,7 +28,7 @@ concept enum_has_list_c = std::is_enum_v<T> && requires () {
 template <typename T>
 __constexpr enum_list_t<T>
             get_enum_list() noexcept = delete;
-enum class enum_helper_string_case_t
+enum class enum_helper_string_type_e
 {
     lower,
     upper,
@@ -41,15 +42,19 @@ struct enumerate_enum_helper_t
     __constexpr
     enumerate_enum_helper_t(enum_list_t<T>&& _a_enum_list);
     __constexpr_imp bool
-        less_than(const T& _a_l, const T& _a_r) const noexcept;
+        less_than(const T& _a_l, const T& _a_r) const
+        noexcept(unreachable_does_not_throw_exception);
 
     __constexpr_imp bool
         equal(
             const T& _a_l,
             const T& _a_r
-        ) const noexcept
+        ) const
+        noexcept(
+            unreachable_does_not_throw_exception
+        )
     {
-        return _m_elements_to_idx.at(_a_l) == _m_elements_to_idx.at(_a_r);
+        return enums_idx(_a_l) == enums_idx(_a_r);
     }
 
     __constexpr T
@@ -61,26 +66,27 @@ struct enumerate_enum_helper_t
             T&                      _a_element,
             std::size_t&            _a_times_called,
             const std::optional<T>& _a_max_value
-        ) const noexcept;
+        ) const noexcept(unreachable_does_not_throw_exception);
     ;
     __constexpr bool
         decrement(
             T&                      _a_element,
             std::size_t&            _a_times_called,
             const std::optional<T>& _a_max_value
-        ) const noexcept;
+        ) const noexcept(unreachable_does_not_throw_exception);
     __constexpr std::size_t
-                difference(const T& _a_arg1, const T& _a_arg2) const noexcept;
+                difference(const T& _a_arg1, const T& _a_arg2) const
+        noexcept(unreachable_does_not_throw_exception);
 
     __constexpr std::u8string
                 print(
                     const T&                        _a_element,
-                    const enum_helper_string_case_t _a_enum_string_case
-                    = enum_helper_string_case_t::unchanged
+                    const enum_helper_string_type_e _a_enum_string_case
+                    = enum_helper_string_type_e::unchanged
                 ) const
     {
         using namespace std;
-        using enum enum_helper_string_case_t;
+        using enum enum_helper_string_type_e;
         u32string _l_rv;
         switch (_a_enum_string_case)
         {
@@ -102,12 +108,12 @@ struct enumerate_enum_helper_t
     __constexpr result_t<T>
                 parse_enum(
                     parser::parser_input_t&         _a_parse_input,
-                    const enum_helper_string_case_t _a_enum_string_case
-                    = enum_helper_string_case_t::unchanged
+                    const enum_helper_string_type_e _a_enum_string_case
+                    = enum_helper_string_type_e::unchanged
                 ) const
     {
         using namespace std;
-        using enum enum_helper_string_case_t;
+        using enum enum_helper_string_type_e;
         std::reference_wrapper<const std::map<std::u32string, T>>
             _l_string_to_elements_ref(_m_lower_string_to_elements);
         switch (_a_enum_string_case)
@@ -139,6 +145,35 @@ struct enumerate_enum_helper_t
             _a_parse_input,
             type_id<T>()
         ));
+    }
+
+    __constexpr std::size_t
+                size() const noexcept
+    {
+        return _m_idx_to_elements.size();
+    }
+    __constexpr                 std::size_t
+        enums_idx(const T& _a_enum) const
+        noexcept(unreachable_does_not_throw_exception);
+
+    __constexpr T
+        idxs_enum(
+            const std::size_t _a_idx
+        ) const
+        noexcept(
+            unreachable_does_not_throw_exception
+            )
+    {
+        if (_m_idx_to_elements.contains(_a_idx))
+        {
+            return _m_idx_to_elements.at(_a_idx);
+        }
+        else
+        {
+            _ABC_UNREACHABLE(
+                fmt::format(u8"_m_idx_to_elements does not contain index")
+            );
+        }
     }
 private:
     std::map<std::size_t, T>    _m_idx_to_elements;
@@ -232,9 +267,12 @@ __constexpr_imp bool
     enumerate_enum_helper_t<T>::less_than(
         const T& _a_l,
         const T& _a_r
-    ) const noexcept
+    ) const
+    noexcept(
+        unreachable_does_not_throw_exception
+    )
 {
-    return _m_elements_to_idx.at(_a_l) < _m_elements_to_idx.at(_a_r);
+    return enums_idx(_a_l) < enums_idx(_a_r);
 }
 
 template <typename T>
@@ -260,31 +298,37 @@ __constexpr_imp bool
         T&                      _a_element,
         std::size_t&            _a_times_called,
         const std::optional<T>& _a_max_value
-    ) const noexcept
+    ) const
+    noexcept(
+        unreachable_does_not_throw_exception
+    )
 {
     using namespace std;
-    const size_t _l_current_idx{_m_elements_to_idx.at(_a_element)};
-    const size_t _l_max_times_called{
-        _m_elements_to_idx.size() - _l_current_idx - 1
+    const size_t _l_current_idx{enums_idx(_a_element)};
+    const size_t _l_max_value{
+        _a_max_value.has_value() ? enums_idx(_a_max_value.value())
+                                 : (_m_elements_to_idx.size() - 1)
     };
-    if (_a_times_called > _l_max_times_called)
+    if (_l_max_value < _l_current_idx)
     {
-        if (_l_max_times_called == 0)
+        _ABC_UNREACHABLE(u8"could not");
+    }
+    else
+    {
+        const size_t _l_max_times_called{_l_max_value - _l_current_idx};
+        if (_a_times_called > _l_max_times_called)
         {
+            _a_times_called -= _l_max_times_called;
+            _a_element       = _m_idx_to_elements.at(_l_max_value);
             return false;
         }
         else
         {
-            _a_element = _m_idx_to_elements.at(_m_elements_to_idx.size() - 1);
-            _a_times_called -= _l_max_times_called;
+            _a_element
+                = _m_idx_to_elements.at(_l_current_idx + _a_times_called);
+            _a_times_called = 0;
             return true;
         }
-    }
-    else
-    {
-        _a_element = _m_idx_to_elements.at(_l_current_idx + _a_times_called);
-        _a_times_called = 0;
-        return true;
     }
 }
 
@@ -294,30 +338,37 @@ __constexpr_imp bool
     enumerate_enum_helper_t<T>::decrement(
         T&                      _a_element,
         std::size_t&            _a_times_called,
-        const std::optional<T>& _a_max_value
-    ) const noexcept
+        const std::optional<T>& _a_min_value
+    ) const
+    noexcept(
+        unreachable_does_not_throw_exception
+    )
 {
     using namespace std;
-    const size_t _l_current_idx{_m_elements_to_idx.at(_a_element)};
-    const size_t _l_max_times_called{_l_current_idx};
-    if (_a_times_called > _l_max_times_called)
+    const size_t _l_current_idx{ enums_idx(_a_element)};
+    const size_t _l_min_value{
+        _a_min_value.has_value() ? enums_idx(_a_min_value.value()) : 0
+    };
+    if (_l_min_value > _l_current_idx)
     {
-        if (_l_max_times_called == 0)
+        _ABC_UNREACHABLE(u8"could not");
+    }
+    else
+    {
+        const size_t _l_max_times_called{_l_current_idx - _l_min_value};
+        if (_a_times_called > _l_max_times_called)
         {
+            _a_times_called -= _l_max_times_called;
+            _a_element       = _m_idx_to_elements.at(_l_min_value);
             return false;
         }
         else
         {
-            _a_element       = _m_idx_to_elements.at(0);
-            _a_times_called -= _l_max_times_called;
+            _a_element
+                = _m_idx_to_elements.at(_l_current_idx - _a_times_called);
+            _a_times_called = 0;
             return true;
         }
-    }
-    else
-    {
-        _a_element = _m_idx_to_elements.at(_l_current_idx - _a_times_called);
-        _a_times_called = 0;
-        return true;
     }
 }
 
@@ -327,12 +378,37 @@ __constexpr_imp std::size_t
                 enumerate_enum_helper_t<T>::difference(
         const T& _a_arg1,
         const T& _a_arg2
-    ) const noexcept
+    ) const
+    noexcept(
+        unreachable_does_not_throw_exception
+    )
 {
-    const size_t _l_arg1_idx{_m_elements_to_idx.at(_a_arg1)};
-    const size_t _l_arg2_idx{_m_elements_to_idx.at(_a_arg2)};
+    const size_t _l_arg1_idx{ enums_idx(_a_arg1)};
+    const size_t _l_arg2_idx{ enums_idx(_a_arg2)};
     return (_l_arg1_idx < _l_arg2_idx) ? (_l_arg2_idx - _l_arg1_idx)
                                        : (_l_arg1_idx - _l_arg2_idx);
+}
+
+template <typename T>
+requires enum_has_list_c<T>
+__constexpr std::size_t
+            enumerate_enum_helper_t<T>::enums_idx(
+        const T& _a_enum
+    ) const
+    noexcept(
+        unreachable_does_not_throw_exception
+    )
+{
+    if (_m_elements_to_idx.contains(_a_enum))
+    {
+        return _m_elements_to_idx.at(_a_enum);
+    }
+    else
+    {
+        _ABC_UNREACHABLE(
+            fmt::format(u8"_m_elements_to_idx does not contain enum")
+        );
+    }
 }
 
 template <typename T>
@@ -347,3 +423,18 @@ __constexpr_imp const enumerate_enum_helper_t<T>&
 }
 
 _END_ABC_UTILITY_NS
+
+namespace abc
+{
+template <>
+inline auto
+    utility::get_enum_list() -> utility::enum_list_t<enum_helper_string_type_e>
+{
+    using enum enum_helper_string_type_e;
+    return {
+        _ENUM_LIST_ENTRY(lower),
+        _ENUM_LIST_ENTRY(upper),
+        _ENUM_LIST_ENTRY(unchanged)
+    };
+}
+} // namespace abc

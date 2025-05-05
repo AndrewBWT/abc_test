@@ -258,7 +258,7 @@ public:
                 abc::utility::parser::mk_parser(
                     utility::parser::default_parser_t<
                         enum_auto_configuration_write_to_file_t>(
-                        enum_helper_string_case_t::lower
+                        enum_helper_string_type_e::lower
                     )
                 )
             )

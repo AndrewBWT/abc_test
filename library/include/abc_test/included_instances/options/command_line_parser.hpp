@@ -180,6 +180,11 @@ __no_constexpr_imp void
         _a_cli_results
     );
     _a_cli.add_option(
+        _s_retain_passed_assertions,
+        &included_instances_test_options_t::retain_passed_assertions,
+        _a_cli_results
+    );
+    _a_cli.add_option(
         _s_integers_used_for_rng_generation,
         &included_instances_test_options_t::
             number_of_integers_used_to_seed_random_generators,

@@ -35,6 +35,7 @@ inline void
              ))
     {
         _TVLOG(_l_input_str);
+        matcher_t _l_matcher;
         _BEGIN_NO_THROW_MATCHER(_l_matcher);
         do_not_optimise(abc::convert_unicode_string_to_ascii_string(_l_input_str
         ));
@@ -178,6 +179,7 @@ inline void
     for (const auto& [_l_input_str] : generate_data_randomly<test_data>())
     {
         _TVLOG(_l_input_str);
+        matcher_t _l_matcher;
         _BEGIN_NO_THROW_MATCHER(_l_matcher);
         do_not_optimise(
             abc::checkless_convert_unicode_string_to_ascii_string(_l_input_str)
@@ -289,6 +291,7 @@ inline void
     for (const auto& [_l_input_str] : generate_data_randomly<test_data>())
     {
         _TVLOG(_l_input_str);
+        matcher_t _l_matcher;
         _BEGIN_NO_THROW_MATCHER(_l_matcher);
         do_not_optimise(abc::convert_ascii_to_unicode_string<T>(_l_input_str));
         // End the checks for an exception being thrown.
@@ -426,6 +429,7 @@ inline void
     for (const auto& [_l_input_str] : generate_data_randomly<test_data>())
     {
         _TVLOG(_l_input_str);
+        matcher_t _l_matcher;
         _BEGIN_NO_THROW_MATCHER(_l_matcher);
         do_not_optimise(
             abc::checkless_convert_ascii_to_unicode_string<T>(_l_input_str)

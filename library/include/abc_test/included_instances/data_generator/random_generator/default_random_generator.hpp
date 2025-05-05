@@ -408,8 +408,10 @@ public:
         const T& _a_min = _ABC_NS_UTILITY::min_value_t<T>().min_value(),
         const T& _a_max = _ABC_NS_UTILITY::max_value_t<T>().max_value()
     ) noexcept
-        : _m_min(_a_min)
-        , _m_max(_a_max)
+        : _m_min(_ABC_NS_UTILITY::get_thread_local_enumerate_enum_helper<T>()
+                     .enums_idx(_a_min))
+        , _m_max(_ABC_NS_UTILITY::get_thread_local_enumerate_enum_helper<T>()
+                     .enums_idx(_a_max))
         , _m_range(_ABC_NS_UTILITY::get_thread_local_enumerate_enum_helper<T>()
                        .difference(_a_min, _a_max))
     {}
@@ -422,15 +424,15 @@ public:
     {
         using namespace std;
         using namespace _ABC_NS_UTILITY;
-        const size_t _l_val{static_cast<size_t>(_a_rnd_generator() % _m_range)};
-        T            _l_rv{_m_min};
-        get_thread_local_enumerate_enum_helper<T>().increment(_l_rv, _l_val);
-        return _l_rv;
+        const size_t _l_val{
+            _m_min + (static_cast<size_t>(_a_rnd_generator()) % _m_range)
+        };
+        return get_thread_local_enumerate_enum_helper<T>().idxs_enum(_l_val);
     }
 private:
-    T _m_min;
-    T _m_max;
-    T _m_range;
+    std::size_t _m_min;
+    std::size_t _m_max;
+    std::size_t _m_range;
 };
 
 template <typename T, typename... Ts>
@@ -1028,8 +1030,7 @@ public:
         typename value_type_t::iterator _l_end{end(_l_rv)};
         for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
         {
-            _l_rv.push_front(_m_gen->operator()(_a_rnd_generator, _a_index)
-            );
+            _l_rv.push_front(_m_gen->operator()(_a_rnd_generator, _a_index));
         }
         return _l_rv;
     }

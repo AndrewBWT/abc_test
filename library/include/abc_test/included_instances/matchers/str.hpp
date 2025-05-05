@@ -205,8 +205,8 @@ __constexpr_imp matcher_t
     using T            = ranges::range_value_t<R1>;
     using R1_Type      = remove_cvref_t<R1>;
     using R2_Type      = remove_cvref_t<R2>;
-    using R1_const_itt = R1_Type::const_iterator;
-    using R2_const_itt = R1_Type::const_iterator;
+    using R1_const_itt = decltype(std::begin(_a_range_1));
+    using R2_const_itt = decltype(std::begin(_a_range_2));
     R1_const_itt     _l_itt_1{std::begin(_a_range_1)};
     R1_const_itt     _l_itt_1_end{std::end(_a_range_1)};
     R2_const_itt     _l_itt_2{std::begin(_a_range_2)};

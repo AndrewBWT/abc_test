@@ -143,7 +143,7 @@ struct default_parser_t<cli::auto_configuration_load_configuration_t>
         using namespace _ABC_NS_CLI;
         if (const result_t<auto_configuration_load_type_e> _l_result{
                 default_parser_t<auto_configuration_load_type_e>(
-                    enum_helper_string_case_t::lower
+                    enum_helper_string_type_e::lower
                 )
                     .run_parser(_a_parse_input)
             };

@@ -102,8 +102,8 @@ __constexpr matcher_result_t
     ) noexcept
 {
     using namespace std;
-    u8string     _l_left_str{format_str<T1>(forward<T1>(_a_t1))};
-    u8string     _l_right_str{format_str<T2>(forward<T2>(_a_t2))};
+    u8string   _l_left_str{format_str<T1>(forward<T1>(_a_t1))};
+    u8string   _l_right_str{format_str<T2>(forward<T2>(_a_t2))};
     const bool _l_result{
         cmp<T1, T2, Cmp>(forward<T1>(_a_t1), forward<T2>(_a_t2))
     };
@@ -126,11 +126,10 @@ __constexpr_imp std::u8string
 {
     using namespace std;
     u8string _l_rv{u8"[?]"};
-    if constexpr (abc::utility::printer::default_printable<
-                      typename std::remove_cvref<T>::type>)
+    using Stripped_Type = typename std::remove_cvref<T>::type;
+    if constexpr (abc::utility::printer::default_printable<Stripped_Type>)
     {
-        _l_rv = abc::utility::printer::default_printer<
-                    typename std::remove_cvref<T>::type>()
+        _l_rv = abc::utility::printer::default_printer<Stripped_Type>()
                     ->run_printer(_a_element);
     }
     else if constexpr (fmt::formattable<T>)

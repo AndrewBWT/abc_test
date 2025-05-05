@@ -287,14 +287,15 @@ template <typename T>
 requires enum_has_list_c<T>
 struct default_printer_t<T> : public printer_base_t<T>
 {
+    static constexpr bool is_specialized{ true };
     default_printer_t<T>(
-        const enum_helper_string_case_t _a_enum_helper_string_case =
-        enum_helper_string_case_t::lower
+        const enum_helper_string_type_e _a_enum_helper_string_case =
+        enum_helper_string_type_e::lower
     )
         : _m_enum_helper_string_case(_a_enum_helper_string_case)
     {}
 
-    enum_helper_string_case_t _m_enum_helper_string_case;
+    enum_helper_string_type_e _m_enum_helper_string_case;
 
     __constexpr               std::u8string
                               run_printer(
@@ -611,7 +612,7 @@ struct default_printer_t<std::tuple<Ts...>>
 
     __constexpr
     default_printer_t()
-    requires (std::is_default_constructible_v<default_printer_t<Ts>> && ...)
+    //requires (std::is_default_constructible_v<default_printer_t<Ts>> && ...)
         : _m_printers(std::make_tuple(mk_printer(default_printer_t<Ts>())...))
     {}
 
@@ -1063,6 +1064,60 @@ public:
 
     __constexpr virtual std::u8string
         run_printer(const value_type& _a_object) const;
+};
+
+template <typename T, typename U>
+struct default_printer_t<std::expected<T, U>>
+    : public printer_base_t<std::expected<T, U>>
+{
+private:
+    std::pair<printer_t<T>, printer_t<U>> _m_printers;
+public:
+    static constexpr bool is_specialized{ true };
+    using value_type = std::expected<T, U>;
+    variant_print_parse_e _m_enum_variant_print_parse;
+    __constexpr
+        default_printer_t(
+            const printer_t<T>& _a_printer_t,
+            const printer_t<U>& _a_printer_u
+        );
+
+    default_printer_t()
+        // requires (std::is_default_constructible_v<default_printer_t<T>> &&
+        // std::is_default_constructible_v<default_printer_t<U>>)
+        : _m_printers(std::make_pair(default_printer<T>(), default_printer<U>())
+        )
+    {
+    }
+
+    __constexpr virtual std::u8string
+        run_printer(const value_type& _a_object) const
+    {
+        using namespace std;
+        using enum variant_print_parse_e;
+        const size_t   _l_idx{ _a_object.has_value() ? size_t(0) : size_t(1)};
+        const u8string _l_element_str;
+        switch (_l_idx)
+        {
+        case 0:
+            _m_printers.first->run_printer(_a_object.value());
+            break;
+        case 1:
+            _m_printers.second->run_printer(_a_object.error());
+            break;
+        }
+        switch (_m_enum_variant_print_parse)
+        {
+        case no_indexes:
+            return _l_element_str;
+        case use_indexes:
+            return fmt::format(u8"({0}, {1})", _l_idx, _l_element_str);
+        default:
+            throw errors::unaccounted_for_enum_exception(
+                _m_enum_variant_print_parse
+            );
+        }
+    }
 };
 
 template <typename T, typename U>

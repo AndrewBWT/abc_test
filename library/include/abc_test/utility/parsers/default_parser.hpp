@@ -86,13 +86,13 @@ struct default_parser_t<T> : public parser_base_t<T>
     using value_type_t = T;
 
     default_parser_t(
-        const enum_helper_string_case_t _a_enum_helper_string_case
-        = enum_helper_string_case_t::unchanged
+        const enum_helper_string_type_e _a_enum_helper_string_case
+        = enum_helper_string_type_e::unchanged
     )
         : _m_enum_helper_string_case(_a_enum_helper_string_case)
     {}
 
-    enum_helper_string_case_t _m_enum_helper_string_case;
+    enum_helper_string_type_e _m_enum_helper_string_case;
 
     __constexpr               result_t<T>
                               run_parser(
@@ -829,8 +829,94 @@ public:
         run_parser(parser_input_t& _a_parse_input) const;
 };
 
+template <typename T, typename U>
+struct default_parser_t<std::expected<T, U>>
+    : public parser_base_t<std::expected<T, U>>
+{
+private:
+    std::pair<parser_t<T>, parser_t<U>> _m_parsers;
+public:
+    using value_type = std::expected<T, U>;
+
+    __constexpr
+        default_parser_t(
+            const parser_t<T>& _a_parser_t,
+            const parser_t<U>& _a_parser_u
+        );
+
+    default_parser_t()
+        // requires (std::is_default_constructible_v<default_parser_t<T>>&&
+        // std::is_default_constructible_v<default_parser_t<U>>)
+        : _m_parsers(std::make_pair(default_parser<T>(), default_parser<U>()))
+    {
+    }
+
+    __constexpr virtual result_t<value_type>
+        run_parser(
+            parser_input_t& _a_parse_input
+        ) const
+    {
+        using namespace std;
+        value_type _l_rv;
+        _a_parse_input.check_advance_and_throw(U"(");
+        if (auto _l_first_result{
+                default_parser_t<size_t>().run_parser(_a_parse_input)
+            };
+            _l_first_result.has_value())
+        {
+            _a_parse_input.check_advance_and_throw(U",");
+            _a_parse_input.process_whitespace();
+            switch (_l_first_result.value())
+            {
+            case 0:
+                if (auto _l_result{ _m_parsers.first->run_parser(_a_parse_input)
+                    };
+                    _l_result.has_value())
+                {
+                    return value_type(_l_result.value());
+                }
+                else
+                {
+                    return unexpected(
+                        fmt::format(u8"Could not parse std::tuple element 2. "
+                            u8"Failed with error "
+                            u8"message:")
+                    );
+                }
+                break;
+            case 1:
+                if (auto _l_result{ _m_parsers.first->run_parser(_a_parse_input)
+                    };
+                    _l_result.has_value())
+                {
+                    return value_type(_l_result.value());
+                }
+                else
+                {
+                    return unexpected(
+                        fmt::format(u8"Could not parse std::tuple element 2. "
+                            u8"Failed with error "
+                            u8"message:")
+                    );
+                }
+                break;
+            }
+            return unexpected(u8"error");
+        }
+        else
+        {
+            return unexpected(fmt::format(
+                u8"Could not parse std::tuple element 1. Failed with error "
+                u8"message: {0}",
+                _l_first_result.error()
+            ));
+        }
+    }
+};
+
 template <typename T>
 struct default_parser_t<std::vector<T>> : public parser_base_t<std::vector<T>>
+
 {
 private:
     parser_t<T> _m_parser;
@@ -995,7 +1081,8 @@ struct default_parser_t<std::tuple<Ts...>>
 
     __constexpr
     default_parser_t()
-        // requires (std::is_default_constructible_v<default_parser_t<Ts>> &&
+        // requires (std::is_default_constructible_v<default_parser_t<Ts>>
+        // &&
         // ...)
         : _m_parsers(std::make_tuple(mk_parser(default_parser_t<Ts>())...))
     {}
@@ -1339,7 +1426,8 @@ __constexpr std::optional<std::u8string>
         else
         {
             return optional<u8string>(fmt::format(
-                u8"Could not parse std::variant element {0}. Failed with error "
+                u8"Could not parse std::variant element {0}. Failed with "
+                u8"error "
                 u8"message: {1}",
                 I,
                 _l_result.error()

@@ -1,6 +1,7 @@
 #pragma once
 #include "abc_test/utility/limits/max_value_object.hpp"
 #include "abc_test/utility/limits/min_value_object.hpp"
+#include <optional>
 
 _BEGIN_ABC_UTILITY_NS
 
@@ -10,6 +11,16 @@ struct min_value_t<std::array<T, N>>
 {
     __constexpr_imp std::array<T, N>
                     min_value() const noexcept;
+};
+
+template <typename T>
+struct min_value_t<std::optional<T>>
+{
+    __constexpr_imp std::optional<T>
+        min_value() const noexcept
+    {
+        return std::nullopt;
+    }
 };
 
 template <typename... Ts>
@@ -30,6 +41,16 @@ struct max_value_t<std::array<T, N>>
 {
     __constexpr_imp std::array<T, N>
                     max_value() const noexcept;
+};
+template <typename T>
+    requires max_value_c<T>
+struct max_value_t<std::optional<T>>
+{
+    __constexpr_imp std::optional<T>
+        max_value() const noexcept
+    {
+        return std::make_optional(max_value_t<T>{}.max_value());
+    }
 };
 template <typename... Ts>
     requires (max_value_c<Ts> && ...)

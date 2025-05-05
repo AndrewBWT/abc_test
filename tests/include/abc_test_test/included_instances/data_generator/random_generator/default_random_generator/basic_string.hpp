@@ -57,6 +57,7 @@ inline void
                  {0, 0                                 }
     }))
     {
+        matcher_t _l_matcher;
         _BEGIN_NO_THROW_MATCHER(_l_matcher);
         auto& [_l_rng_seed_value, _l_size_index]{_l_tuple};
         // Seed the random generator function with the given seed value.

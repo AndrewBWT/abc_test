@@ -42,7 +42,7 @@ file_line_reader_t::file_line_reader_t(
     : _m_current_line_idx(0)
     , _m_current_line(u8"")
     , _m_file_handler(std::shared_ptr<std::ifstream>())
-    , _m_file_name(_a_file_name)
+    , _m_file_name(normalise_for_file_use(_a_file_name.u8string()))
     , _m_finished_reading(false)
 {
     using namespace std;

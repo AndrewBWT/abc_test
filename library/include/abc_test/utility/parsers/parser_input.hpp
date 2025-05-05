@@ -61,6 +61,10 @@ public:
     {
         _m_cur_itt = _m_end_itt;
     }
+    __constexpr std::size_t elements_left() const noexcept
+    {
+        return std::distance(_m_cur_itt, _m_end_itt);
+    }
 private:
     std::u8string                 _m_complete_string;
     std::size_t                        _m_elements_processed{0};

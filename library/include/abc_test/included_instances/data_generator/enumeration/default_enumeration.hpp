@@ -851,6 +851,170 @@ public:
 };
 
 template <typename T>
+struct default_enumeration_t<std::optional<T>>
+    : public enumeration_base_t<std::optional<T>>
+{
+private:
+    enumeration_schema_t<T> _m_enumerate;
+    std::size_t             _m_n_jumps;
+public:
+    __constexpr_imp
+        default_enumeration_t(
+            const std::size_t              _a_n_jumps = std::size_t{ 1 },
+            const enumeration_schema_t<T>& _a_enumerate = all_values<T>()
+        )
+        : _m_n_jumps(_a_n_jumps), _m_enumerate(_a_enumerate)
+    {
+    }
+
+    __constexpr_imp virtual bool
+        less_than(
+            const std::optional<T>& _a_l,
+            const std::optional<T>& _a_r
+        ) const noexcept
+    {
+        if (_a_l.has_value() && _a_r.has_value())
+        {
+            return _m_enumerate->less_than(_a_l.value(), _a_r.value());
+        }
+        else
+        {
+            if (_a_l.has_value())
+            {
+                return false;
+            }
+            else if (_a_r.has_value())
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    __constexpr_imp virtual bool
+        equal(
+            const std::optional<T>& _a_l,
+            const std::optional<T>& _a_r
+        ) const noexcept
+    {
+        if (_a_l.has_value() && _a_r.has_value())
+        {
+            return _m_enumerate->equal(_a_l.value(), _a_r.value());
+        }
+        else
+        {
+            if (_a_l.has_value() || _a_r.has_value())
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+    }
+
+    __constexpr_imp bool
+        increment(
+            std::optional<T>&                      _a_opt,
+            enumerate_index_t&                     _a_n_times_to_increment,
+            const std::optional<std::optional<T>>& _a_max_value
+        )
+    {
+        using namespace std;
+        const optional<T> _l_max_value{
+            _a_max_value.has_value() ? _a_max_value.value()
+                                     : make_optional(_m_enumerate->end_value())
+        };
+        if (less_than(_l_max_value, _a_opt))
+        {
+            _ABC_UNREACHABLE(u8"couldn't reach");
+        }
+        else
+        {
+            if (equal(_l_max_value, _a_opt) || _a_n_times_to_increment == 0)
+            {
+                return _a_n_times_to_increment == 0;
+            }
+            if (not _a_opt.has_value())
+            {
+                _a_opt = make_optional(_m_enumerate->start_value());
+                --_a_n_times_to_increment;
+            }
+            return _m_enumerate->increment(
+                _a_opt.value(), _a_n_times_to_increment, _l_max_value.value()
+            );
+        }
+    }
+
+    __constexpr_imp bool
+        decrement(
+            std::optional<T>&                      _a_opt,
+            enumerate_index_t&                     _a_n_times_to_increment,
+            const std::optional<std::optional<T>>& _a_min_value
+        )
+    {
+        using namespace std;
+        const optional<T> _l_min_value{
+            _a_min_value.has_value() ? _a_min_value.value() : std::nullopt
+        };
+        if (less_than(_a_opt, _l_min_value))
+        {
+            _ABC_UNREACHABLE(u8"couldn't reach");
+        }
+        else
+        {
+            if (equal(_l_min_value, _a_opt) || _a_n_times_to_increment == 0)
+            {
+                return _a_n_times_to_increment == 0;
+            }
+            if (_a_opt.has_value())
+            {
+                bool _l_opt_result;
+                if (_l_min_value.has_value())
+                {
+                    _l_opt_result = _m_enumerate->decrement(
+                        _a_opt.value(),
+                        _a_n_times_to_increment,
+                        _l_min_value.value()
+                    );
+                }
+                else
+                {
+                    _l_opt_result = _m_enumerate->decrement(
+                        _a_opt.value(),
+                        _a_n_times_to_increment,
+                        _m_enumerate->start_value()
+                    );
+                }
+                if (_a_n_times_to_increment == 0)
+                {
+                    return true;
+                }
+            }
+            if (_a_n_times_to_increment > 0 && _l_min_value == std::nullopt)
+            {
+                --_a_n_times_to_increment;
+                _a_opt = std::nullopt;
+            }
+            return _a_n_times_to_increment == 0;
+        }
+    }
+
+    __constexpr virtual enumeration_diff_t
+        difference(
+            const std::optional<T>& _a_arg1,
+            const std::optional<T>& _a_arg2
+        ) noexcept
+    {
+        return {0, 0};
+    }
+};
+
+template <typename T>
 struct default_enumeration_t<std::vector<T>>
     : public enumeration_base_t<std::vector<T>>
 {
@@ -1782,6 +1946,12 @@ private:
             enumerate_index_t& _a_n_times_to_increment
         );
     template <std::size_t I>
+    __constexpr bool
+        decrement_(
+            value_type_t& _a_element,
+            enumerate_index_t& _a_n_times_to_increment
+        );
+    template <std::size_t I>
     __constexpr void
         difference_(
             const value_type_t& _a_lesser,
@@ -1879,9 +2049,23 @@ __constexpr bool
     default_enumeration_t<std::tuple<Ts...>>::decrement(
         value_type_t&                      _a_element,
         enumerate_index_t&                 _a_n_times_to_increment,
-        const std::optional<value_type_t>& _a_max_value
+        const std::optional<value_type_t>& _a_min_value
     )
 {
+    using namespace std;
+    while (_a_n_times_to_increment > 0)
+    {
+        if (not decrement_ < tuple_size<value_type_t>{} - 1 > (
+            _a_element, _a_n_times_to_increment
+        ))
+        {
+            return false;
+        }
+    }
+    if (_a_n_times_to_increment == 0)
+    {
+        return _a_element >= _a_min_value;
+    }
     return true;
 }
 
@@ -1998,6 +2182,40 @@ __constexpr bool
         }
     }
 }
+
+template <typename... Ts>
+template <std::size_t I>
+__constexpr bool
+default_enumeration_t<std::tuple<Ts...>>::decrement_(
+    value_type_t& _a_element,
+    enumerate_index_t& _a_n_times_to_increment
+)
+{
+    using namespace std;
+    const auto& _l_enum{ get<I>(_m_enumeration_schemas) };
+    auto& _l_elem{ get<I>(_a_element) };
+    size_t      _l_n_times_to_increment{ 1 };
+    if (_l_enum->decrement(
+        _l_elem, _l_n_times_to_increment, _l_enum->start_value()
+    ))
+    {
+        --_a_n_times_to_increment;
+        return true;
+    }
+    else
+    {
+        _l_elem = _l_enum->end_value();
+        if constexpr (I == 0)
+        {
+            return false;
+        }
+        else
+        {
+            return decrement_<I - 1>(_a_element, _a_n_times_to_increment);
+        }
+    }
+}
+
 
 template <typename... Ts>
 template <std::size_t I>

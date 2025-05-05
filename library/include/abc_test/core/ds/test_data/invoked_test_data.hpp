@@ -696,10 +696,9 @@ __no_constexpr_imp std::filesystem::path
     using namespace std::filesystem;
     using namespace utility;
     using namespace std;
-    path_t _l_path{ R"(\\?\)" };
     path_t _l_absolute_path{ std::filesystem::absolute(_a_root_path).string() };
     wstring _l_wstr{ _l_absolute_path.native() };
-    _l_path = path_t(L"\\\\?\\" + _l_wstr);
+    path_t _l_path = path_t(L"\\\\?\\" + _l_wstr);
     for (const test_path_element_ref_t& _a_test_path_component :
          _a_test_info.test_path_hierarchy())
     {
