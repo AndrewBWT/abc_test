@@ -440,6 +440,10 @@ create_assertion_block(
             _l_passed = false;
         }
     }
+    if (_a_test_block.get_matcher().size() == 0)
+    {
+        _l_passed = false;
+    }
     matcher_res_infos_t _l_mtr{_a_test_block.get_matcher()};
     _l_gur = make_unique<multi_element_assertion_block_t<T>>(
         _l_passed,
