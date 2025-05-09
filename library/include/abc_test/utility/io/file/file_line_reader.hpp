@@ -24,6 +24,10 @@ public:
         has_current_line() const noexcept;
     __constexpr bool
         get_next_line();
+    __constexpr std::size_t line_number() const noexcept
+    {
+        return _m_current_line_idx+1;
+    }
 private:
     size_t                         _m_current_line_idx;
     std::u8string                    _m_current_line;

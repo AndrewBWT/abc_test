@@ -1,0 +1,2 @@
+#class std::tuple<unsigned __int64,class std::basic_string<char8_t,struct std::char_traits<char8_t>,class std::allocator<char8_t> > >
+(10,"enumerate_enum_helper_t<enum `anonymous namespace'::enum_with_enum_list_3> does not contain an enum which corresponds with the index 10.")

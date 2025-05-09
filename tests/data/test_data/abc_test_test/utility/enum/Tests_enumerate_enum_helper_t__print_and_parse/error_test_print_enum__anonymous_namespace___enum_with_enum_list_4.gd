@@ -1,0 +1,4 @@
+#class std::tuple<int,int,class std::basic_string<char8_t,struct std::char_traits<char8_t>,class std::allocator<char8_t> > >
+(10, 0, "enumerate_enum_helper_t<enum `anonymous namespace'::enum_with_enum_list_4> does not contain the given enum. The enum's value has no known text representation. The enum, represented in its underlying type \"int\", has a value of 10")
+(1,10,"No code for enum of type \"enum abc::utility::enum_helper_string_type_e\" encountered in function \"enumerate_enum_helper_t::print\". The enum's value has no known text representation. The enum, represented in its underlying type \"int\", has a value of 10.")
+(0, 10, "enumerate_enum_helper_t<enum `anonymous namespace'::enum_with_enum_list_4> does not contain the given enum. The enum's value has no known text representation. The enum, represented in its underlying type \"int\", has a value of 0")

@@ -117,10 +117,10 @@ __no_constexpr_imp void
         const unexpected_report_t<true>& _l_unexpected_termination{
             *_a_itd.unexpected_termination()
         };
-        process_termination(_l_unexpected_termination);
         write(fmt::format(
             u8"{1}{0}{0}", _l_line_break, u8"UNEXPECTED TERMINATION INFORMATION\n"
         ));
+        process_termination(_l_unexpected_termination);
     }
     if (_a_itd.warnings_recieved() > 0)
     {

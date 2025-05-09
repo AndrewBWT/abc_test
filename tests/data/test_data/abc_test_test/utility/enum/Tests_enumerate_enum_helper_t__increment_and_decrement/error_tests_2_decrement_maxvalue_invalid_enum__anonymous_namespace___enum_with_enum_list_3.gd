@@ -1,0 +1,2 @@
+#class std::tuple<enum `anonymous namespace'::enum_with_enum_list_3,enum A0xe1c13721::enum_with_enum_list_3,class std::basic_string<char8_t,struct std::char_traits<char8_t>,class std::allocator<char8_t> > >
+(Two, Three,"enumerate_enum_helper_t::decrement has a minimum enum value greater than the enum argument. The enum \"enum `anonymous namespace'::enum_with_enum_list_3\" argument has a text representation of \"Two\", while the minimum enum value has a text representation of \"Three\".")

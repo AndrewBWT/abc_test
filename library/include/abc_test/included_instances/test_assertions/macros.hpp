@@ -1,14 +1,14 @@
 #pragma once
 #include "abc_test/core/test_assertions/macros.hpp"
 
-#define _BEGIN_NO_THROW_MATCHER(_a_matcher_name)                  \
+#define _BEGIN_NO_THROW_MATCHER(_a_matcher_name)    \
     _a_matcher_name = abc::expected_no_exception(); \
-    _a_matcher_name.add_source_info(                              \
-        "_BEGIN_NO_THROW_MATCHER",                                \
-        #_a_matcher_name,                                         \
-        std::source_location::current()                           \
-    );                                                            \
-    try                                                           \
+    _a_matcher_name.add_source_info(                \
+        "_BEGIN_NO_THROW_MATCHER",                  \
+        #_a_matcher_name,                           \
+        std::source_location::current()             \
+    );                                              \
+    try                                             \
     {
 #define _END_NO_THROW_MATCHER(_a_matcher_name)            \
     _a_matcher_name.add_source_info(                      \
@@ -249,8 +249,18 @@
             )                                                                \
         };                                                                   \
         _a_matcher_name = abc::check_exception_string(                       \
-            _l_rv, std::u8string(_a_expected_string)                    \
+            _l_rv, std::u8string(_a_expected_string)                         \
         );                                                                   \
+    }                                                                        \
+    catch (const std::exception& _a_error)                                   \
+    {                                                                        \
+        _a_matcher_name                                                      \
+            = abc::unexpected_exception_thrown<_a_exception_type>(_a_error); \
+    }                                                                        \
+    catch (...)                                                              \
+    {                                                                        \
+        _a_matcher_name                                                      \
+            = abc::unexpected_exception_thrown<_a_exception_type>();         \
     }
 #define _BEGIN_EXCEPTION_TYPE_AND_MSG(_a_name)                            \
     _BEGIN_SINGLE_ELEMENT_BBA_CUSTOM_SOURCE(                              \

@@ -709,17 +709,14 @@ __no_constexpr_imp std::filesystem::path
             _a_test_info.registered_test_data()._m_user_data.name
         )
     );
-    std::cout << _l_path << std::endl;
     if (not exists(_l_path))
     {
-        std::cout << _l_path.u8string().size() << std::endl;
         try
         {
             create_directories(_l_path);
         }
         catch (const std::filesystem::filesystem_error& _a_exception)
         {
-            std::cout << _a_exception.what() << std::endl;
             int x = 4;
         }
     }

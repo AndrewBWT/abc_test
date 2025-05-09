@@ -1,0 +1,1 @@
+#class std::tuple<enum `anonymous namespace'::enum_with_enum_list_2,enum A0xe1c13721::enum_with_enum_list_2,class std::basic_string<char8_t,struct std::char_traits<char8_t>,class std::allocator<char8_t> > >

@@ -131,11 +131,13 @@ __constexpr_imp
         const utility::io::general_data_t& _a_gdf,
         R&&                                _a_elements
     )
-    : _m_path(_a_gdf.path())
+    : _m_path(abc::utility::io::normalise_for_file_use(_a_gdf.path().u8string())
+      )
 {
     using namespace abc::utility::io;
     using namespace std::filesystem;
-    if (not exists(_m_path))
+    std::error_code ec;
+    if (not std::filesystem::exists(_m_path, ec))
     {
         file_line_writer_t _l_flw(_m_path);
         _l_flw.write_comment(type_id<T>());
@@ -192,9 +194,25 @@ __constexpr_imp void
     if (_m_line_reader.has_current_line())
     {
         ++_m_elements_read;
-        _m_element = abc::utility::parser::parse_with_exception(
+        const result_t<T> _l_parsed_result{abc::utility::parser::parse(
             _m_line_reader.current_line(), _m_element_rw_info.internal_parser
-        );
+        )};
+        if (_l_parsed_result.has_value())
+        {
+            _m_element = _l_parsed_result.value();
+        }
+        else
+        {
+            throw errors::test_library_exception_t(fmt::format(
+                u8"Error encountered in file_data_generator_t<{0}> "
+                u8"when reading file \"{1}\" at line {2}. Parser reported "
+                u8"error \"{3}\".",
+                type_id<T>(),
+                _m_path.u8string(),
+                _m_line_reader.line_number(),
+                _l_parsed_result.error()
+            ));
+        }
     }
 }
 
@@ -225,10 +243,25 @@ __constexpr_imp bool
     if (_m_line_reader.get_next_line())
     {
         ++_m_elements_read;
-        _m_element = abc::utility::parser::parse_with_exception(
-            _m_line_reader.current_line(),
-            _m_element_rw_info.internal_parser
-        );
+        const result_t<T> _l_parsed_result{abc::utility::parser::parse(
+            _m_line_reader.current_line(), _m_element_rw_info.internal_parser
+        )};
+        if (_l_parsed_result.has_value())
+        {
+            _m_element = _l_parsed_result.value();
+        }
+        else
+        {
+            throw errors::test_library_exception_t(fmt::format(
+                u8"Error encountered in file_data_generator_t<{0}> "
+                u8"when reading file \"{1}\" at line {2}. Parser reported "
+                u8"error \"{3}\".",
+                type_id<T>(),
+                _m_path.u8string(),
+                _m_line_reader.line_number(),
+                _l_parsed_result.error()
+            ));
+        }
         return true;
     }
     else

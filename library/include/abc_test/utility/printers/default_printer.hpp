@@ -6,12 +6,11 @@
 #include "abc_test/utility/printers/printer_base.hpp"
 #include "abc_test/utility/str/string_utility.hpp"
 
+#include <deque>
 #include <filesystem>
 #include <random>
-#include <deque>
-
-#include <unordered_set>
 #include <set>
+#include <unordered_set>
 
 _BEGIN_ABC_UTILITY_PRINTER_NS
 
@@ -287,10 +286,11 @@ template <typename T>
 requires enum_has_list_c<T>
 struct default_printer_t<T> : public printer_base_t<T>
 {
-    static constexpr bool is_specialized{ true };
+    static constexpr bool is_specialized{true};
+
     default_printer_t<T>(
-        const enum_helper_string_type_e _a_enum_helper_string_case =
-        enum_helper_string_type_e::lower
+        const enum_helper_string_type_e _a_enum_helper_string_case
+        = enum_helper_string_type_e::lower
     )
         : _m_enum_helper_string_case(_a_enum_helper_string_case)
     {}
@@ -612,7 +612,8 @@ struct default_printer_t<std::tuple<Ts...>>
 
     __constexpr
     default_printer_t()
-    //requires (std::is_default_constructible_v<default_printer_t<Ts>> && ...)
+        // requires (std::is_default_constructible_v<default_printer_t<Ts>> &&
+        // ...)
         : _m_printers(std::make_tuple(mk_printer(default_printer_t<Ts>())...))
     {}
 
@@ -1030,6 +1031,181 @@ private:
 };
 
 template <typename T>
+    requires (std::same_as<std::basic_string_view<T>, std::string_view> || std::same_as<std::basic_string_view<T>, std::wstring_view> || std::same_as<std::basic_string_view<T>, std::u8string_view> || std::same_as<std::basic_string_view<T>, std::u16string_view> || std::same_as<std::basic_string_view<T>, std::u32string_view>)
+struct default_printer_t<std::basic_string_view<T>>
+    : public printer_base_t<std::basic_string_view<T>>
+{
+    static constexpr bool is_specialized{ true };
+
+    __constexpr
+        default_printer_t()
+        : default_printer_t(u8"\"")
+    {
+    }
+
+    __constexpr
+        default_printer_t(
+            const std::u8string_view _a_surrounding_str
+        )
+        : _m_surrounding_str(_a_surrounding_str)
+    {
+    }
+
+    __constexpr std::u8string
+        run_printer(
+            const std::basic_string_view<T>& _a_object
+        ) const
+    {
+        using namespace std;
+        using arg_type_t = basic_string_view<T>;
+        if constexpr (same_as<arg_type_t, string_view>)
+        {
+            u8string                _l_rv{ _m_surrounding_str };
+            default_printer_t<char> _l_printer;
+            for (const char _l_char : _a_object)
+            {
+                _l_rv.append(_l_printer.run_printer(_l_char));
+            }
+            _l_rv.append(_m_surrounding_str);
+            return _l_rv;
+        }
+        else if constexpr (same_as<arg_type_t, u8string_view>)
+        {
+            return fmt::format(u8"{0}{1}{0}", _m_surrounding_str, _a_object);
+        }
+        else if constexpr (same_as<arg_type_t, u16string_view>)
+        {
+            u8string _l_object_as_u8str;
+            utf8::utf16to8(
+                _a_object.begin(),
+                _a_object.end(),
+                std::back_inserter(_l_object_as_u8str)
+            );
+            return fmt::format(
+                u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
+            );
+        }
+        else if constexpr (same_as<arg_type_t, u32string_view>)
+        {
+            u8string _l_object_as_u8str;
+            for (auto _l_itt{ _a_object.begin() }; _l_itt != _a_object.end();
+                ++_l_itt)
+            {
+                char32_t _l_char{ *_l_itt };
+                if (not utf8::internal::is_code_point_valid(_l_char))
+                {
+                    u8string _l_char_as_hex{
+                        abc::make_hex_from_char<char8_t>(_l_char)
+                    };
+                    _l_object_as_u8str.append(_l_char_as_hex);
+                }
+                else
+                {
+                    utf8::internal::append(
+                        _l_char, std::back_inserter(_l_object_as_u8str)
+                    );
+                }
+            }
+
+            // utf8::utf32to8(
+            // _a_object.begin(),
+            // _a_object.end(),
+            // std::back_inserter(_l_object_as_u8str)
+            // );
+            return fmt::format(
+                u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
+            );
+        }
+        else if constexpr (same_as<arg_type_t, wstring_view>)
+        {
+            if constexpr (sizeof(wchar_t) == 2)
+            {
+                u8string _l_object_as_u8str;
+                auto     _l_itt{ _a_object.begin() };
+                auto     _l_end{ _a_object.end() };
+                auto     result = std::back_inserter(_l_object_as_u8str);
+                while (_l_itt != _l_end)
+                {
+                    char32_t _l_char = utf8::internal::mask16(*_l_itt++);
+                    // Take care of surrogate pairs first
+                    if (utf8::internal::is_lead_surrogate(_l_char))
+                    {
+                        if (_l_itt != _l_end)
+                        {
+                            const char32_t trail_surrogate
+                                = utf8::internal::mask16(*_l_itt++);
+                            if (utf8::internal::is_trail_surrogate(
+                                trail_surrogate
+                            ))
+                            {
+                                _l_char = (_l_char << 10) + trail_surrogate
+                                    + utf8::internal::SURROGATE_OFFSET;
+                            }
+                            else
+                            {
+                                _l_object_as_u8str.append(
+                                    abc::make_hex_from_char<uint16_t>(
+                                        trail_surrogate
+                                    )
+                                );
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            _l_object_as_u8str.append(
+                                abc::make_hex_from_char<uint16_t>(_l_char)
+                            );
+                            continue;
+                        }
+                    }
+                    // Lone trail surrogate
+                    else if (utf8::internal::is_trail_surrogate(_l_char))
+                    {
+                        _l_object_as_u8str.append(
+                            abc::make_hex_from_char<uint16_t>(_l_char)
+                        );
+                    }
+
+                    result = utf8::append(_l_char, result);
+                }
+                return fmt::format(
+                    u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
+                );
+            }
+            else if constexpr (sizeof(wchar_t) == 4)
+            {
+                u8string _l_object_as_u8str;
+                utf8::utf32to8(
+                    _a_object.begin(),
+                    _a_object.end(),
+                    std::back_inserter(_l_object_as_u8str)
+                );
+                return fmt::format(
+                    u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
+                );
+            }
+            else
+            {
+                __STATIC_ASSERT(
+                    T, "wchar_t of this specific size is not supported"
+                );
+            }
+        }
+        else
+        {
+            __STATIC_ASSERT(
+                T,
+                "default_printer_t for basic_string type only allows certain "
+                "types"
+            );
+        }
+    }
+private:
+    std::u8string _m_surrounding_str;
+};
+
+template <typename T>
 requires (not (std::same_as<std::basic_string<T>, std::string> || std::same_as<std::basic_string<T>, std::wstring> || std::same_as<std::basic_string<T>, std::u8string> || std::same_as<std::basic_string<T>, std::u16string> || std::same_as<std::basic_string<T>, std::u32string>)
 )
 struct default_printer_t<std::basic_string<T>>
@@ -1073,37 +1249,39 @@ struct default_printer_t<std::expected<T, U>>
 private:
     std::pair<printer_t<T>, printer_t<U>> _m_printers;
 public:
-    static constexpr bool is_specialized{ true };
+    static constexpr bool is_specialized{true};
     using value_type = std::expected<T, U>;
     variant_print_parse_e _m_enum_variant_print_parse;
     __constexpr
-        default_printer_t(
-            const printer_t<T>& _a_printer_t,
-            const printer_t<U>& _a_printer_u
-        );
+    default_printer_t(
+        const printer_t<T>& _a_printer_t,
+        const printer_t<U>& _a_printer_u
+    );
 
     default_printer_t()
         // requires (std::is_default_constructible_v<default_printer_t<T>> &&
         // std::is_default_constructible_v<default_printer_t<U>>)
         : _m_printers(std::make_pair(default_printer<T>(), default_printer<U>())
-        )
-    {
-    }
+          )
+        , _m_enum_variant_print_parse(variant_print_parse_e::use_indexes)
+    {}
 
     __constexpr virtual std::u8string
-        run_printer(const value_type& _a_object) const
+        run_printer(
+            const value_type& _a_object
+        ) const
     {
         using namespace std;
         using enum variant_print_parse_e;
-        const size_t   _l_idx{ _a_object.has_value() ? size_t(0) : size_t(1)};
-        const u8string _l_element_str;
+        const size_t   _l_idx{_a_object.has_value() ? size_t(0) : size_t(1)};
+        u8string _l_element_str;
         switch (_l_idx)
         {
         case 0:
-            _m_printers.first->run_printer(_a_object.value());
+            _l_element_str = _m_printers.first->run_printer(_a_object.value());
             break;
         case 1:
-            _m_printers.second->run_printer(_a_object.error());
+            _l_element_str = _m_printers.second->run_printer(_a_object.error());
             break;
         }
         switch (_m_enum_variant_print_parse)
@@ -1316,9 +1494,9 @@ public:
         using namespace std;
         u8string _l_str{u8"["};
         using Itt = typename value_type::const_iterator;
-        const Itt _l_end{ end(_a_object) };
+        const Itt _l_end{end(_a_object)};
 
-        for (Itt _l_itt{ begin(_a_object) }; _l_itt != _l_end;)
+        for (Itt _l_itt{begin(_a_object)}; _l_itt != _l_end;)
         {
             _l_str.append(_m_printer->run_printer(*_l_itt));
             ++_l_itt;
@@ -1333,24 +1511,22 @@ public:
 };
 
 template <typename T>
-struct default_printer_t<std::deque<T>>
-    : public printer_base_t<std::deque<T>>
+struct default_printer_t<std::deque<T>> : public printer_base_t<std::deque<T>>
 {
 private:
     printer_t<T> _m_printer;
 public:
-    static constexpr bool is_specialized{ true };
+    static constexpr bool is_specialized{true};
     using value_type = std::deque<T>;
 
     __constexpr
-        default_printer_t(const printer_t<T>& _a_printer);
+    default_printer_t(const printer_t<T>& _a_printer);
 
     __constexpr
-        default_printer_t()
+    default_printer_t()
         // requires (std::is_default_constructible_v<default_printer_t<T>>)
         : _m_printer(mk_printer(default_printer_t<T>()))
-    {
-    }
+    {}
 
     __constexpr virtual std::u8string
         run_printer(
@@ -1358,11 +1534,11 @@ public:
         ) const
     {
         using namespace std;
-        u8string _l_str{ u8"[" };
+        u8string _l_str{u8"["};
         using Itt = typename value_type::const_iterator;
-        const Itt _l_end{ end(_a_object) };
+        const Itt _l_end{end(_a_object)};
 
-        for (Itt _l_itt{ begin(_a_object) }; _l_itt != _l_end;)
+        for (Itt _l_itt{begin(_a_object)}; _l_itt != _l_end;)
         {
             _l_str.append(_m_printer->run_printer(*_l_itt));
             ++_l_itt;
@@ -1377,24 +1553,22 @@ public:
 };
 
 template <typename T>
-struct default_printer_t<std::list<T>>
-    : public printer_base_t<std::list<T>>
+struct default_printer_t<std::list<T>> : public printer_base_t<std::list<T>>
 {
 private:
     printer_t<T> _m_printer;
 public:
-    static constexpr bool is_specialized{ true };
+    static constexpr bool is_specialized{true};
     using value_type = std::list<T>;
 
     __constexpr
-        default_printer_t(const printer_t<T>& _a_printer);
+    default_printer_t(const printer_t<T>& _a_printer);
 
     __constexpr
-        default_printer_t()
+    default_printer_t()
         // requires (std::is_default_constructible_v<default_printer_t<T>>)
         : _m_printer(mk_printer(default_printer_t<T>()))
-    {
-    }
+    {}
 
     __constexpr virtual std::u8string
         run_printer(
@@ -1402,11 +1576,11 @@ public:
         ) const
     {
         using namespace std;
-        u8string _l_str{ u8"[" };
+        u8string _l_str{u8"["};
         using Itt = typename value_type::const_iterator;
-        const Itt _l_end{ end(_a_object) };
+        const Itt _l_end{end(_a_object)};
 
-        for (Itt _l_itt{ begin(_a_object) }; _l_itt != _l_end;)
+        for (Itt _l_itt{begin(_a_object)}; _l_itt != _l_end;)
         {
             _l_str.append(_m_printer->run_printer(*_l_itt));
             ++_l_itt;
@@ -1427,18 +1601,17 @@ struct default_printer_t<std::unordered_multiset<T>>
 private:
     printer_t<T> _m_printer;
 public:
-    static constexpr bool is_specialized{ true };
+    static constexpr bool is_specialized{true};
     using value_type = std::unordered_multiset<T>;
 
     __constexpr
-        default_printer_t(const printer_t<T>& _a_printer);
+    default_printer_t(const printer_t<T>& _a_printer);
 
     __constexpr
-        default_printer_t()
+    default_printer_t()
         // requires (std::is_default_constructible_v<default_printer_t<T>>)
         : _m_printer(mk_printer(default_printer_t<T>()))
-    {
-    }
+    {}
 
     __constexpr virtual std::u8string
         run_printer(
@@ -1446,11 +1619,11 @@ public:
         ) const
     {
         using namespace std;
-        u8string _l_str{ u8"[" };
+        u8string _l_str{u8"["};
         using Itt = typename value_type::const_iterator;
-        const Itt _l_end{ end(_a_object) };
+        const Itt _l_end{end(_a_object)};
 
-        for (Itt _l_itt{ begin(_a_object) }; _l_itt != _l_end;)
+        for (Itt _l_itt{begin(_a_object)}; _l_itt != _l_end;)
         {
             _l_str.append(_m_printer->run_printer(*_l_itt));
             ++_l_itt;
@@ -1465,24 +1638,22 @@ public:
 };
 
 template <typename T>
-struct default_printer_t<std::set<T>>
-    : public printer_base_t<std::set<T>>
+struct default_printer_t<std::set<T>> : public printer_base_t<std::set<T>>
 {
 private:
     printer_t<T> _m_printer;
 public:
-    static constexpr bool is_specialized{ true };
+    static constexpr bool is_specialized{true};
     using value_type = std::set<T>;
 
     __constexpr
-        default_printer_t(const printer_t<T>& _a_printer);
+    default_printer_t(const printer_t<T>& _a_printer);
 
     __constexpr
-        default_printer_t()
+    default_printer_t()
         // requires (std::is_default_constructible_v<default_printer_t<T>>)
         : _m_printer(mk_printer(default_printer_t<T>()))
-    {
-    }
+    {}
 
     __constexpr virtual std::u8string
         run_printer(
@@ -1490,11 +1661,11 @@ public:
         ) const
     {
         using namespace std;
-        u8string _l_str{ u8"[" };
+        u8string _l_str{u8"["};
         using Itt = typename value_type::const_iterator;
-        const Itt _l_end{ end(_a_object) };
+        const Itt _l_end{end(_a_object)};
 
-        for (Itt _l_itt{ begin(_a_object) }; _l_itt != _l_end;)
+        for (Itt _l_itt{begin(_a_object)}; _l_itt != _l_end;)
         {
             _l_str.append(_m_printer->run_printer(*_l_itt));
             ++_l_itt;
@@ -1515,18 +1686,17 @@ struct default_printer_t<std::multiset<T>>
 private:
     printer_t<T> _m_printer;
 public:
-    static constexpr bool is_specialized{ true };
+    static constexpr bool is_specialized{true};
     using value_type = std::multiset<T>;
 
     __constexpr
-        default_printer_t(const printer_t<T>& _a_printer);
+    default_printer_t(const printer_t<T>& _a_printer);
 
     __constexpr
-        default_printer_t()
+    default_printer_t()
         // requires (std::is_default_constructible_v<default_printer_t<T>>)
         : _m_printer(mk_printer(default_printer_t<T>()))
-    {
-    }
+    {}
 
     __constexpr virtual std::u8string
         run_printer(
@@ -1534,11 +1704,11 @@ public:
         ) const
     {
         using namespace std;
-        u8string _l_str{ u8"[" };
+        u8string _l_str{u8"["};
         using Itt = typename value_type::const_iterator;
-        const Itt _l_end{ end(_a_object) };
+        const Itt _l_end{end(_a_object)};
 
-        for (Itt _l_itt{ begin(_a_object) }; _l_itt != _l_end;)
+        for (Itt _l_itt{begin(_a_object)}; _l_itt != _l_end;)
         {
             _l_str.append(_m_printer->run_printer(*_l_itt));
             ++_l_itt;
@@ -1559,18 +1729,17 @@ struct default_printer_t<std::unordered_set<T>>
 private:
     printer_t<T> _m_printer;
 public:
-    static constexpr bool is_specialized{ true };
+    static constexpr bool is_specialized{true};
     using value_type = std::unordered_set<T>;
 
     __constexpr
-        default_printer_t(const printer_t<T>& _a_printer);
+    default_printer_t(const printer_t<T>& _a_printer);
 
     __constexpr
-        default_printer_t()
+    default_printer_t()
         // requires (std::is_default_constructible_v<default_printer_t<T>>)
         : _m_printer(mk_printer(default_printer_t<T>()))
-    {
-    }
+    {}
 
     __constexpr virtual std::u8string
         run_printer(
@@ -1578,11 +1747,11 @@ public:
         ) const
     {
         using namespace std;
-        u8string _l_str{ u8"[" };
+        u8string _l_str{u8"["};
         using Itt = typename value_type::const_iterator;
-        const Itt _l_end{ end(_a_object) };
+        const Itt _l_end{end(_a_object)};
 
-        for (Itt _l_itt{ begin(_a_object) }; _l_itt != _l_end;)
+        for (Itt _l_itt{begin(_a_object)}; _l_itt != _l_end;)
         {
             _l_str.append(_m_printer->run_printer(*_l_itt));
             ++_l_itt;
@@ -1785,7 +1954,7 @@ __constexpr_imp std::u8string
         _l_str.append(_m_printer->run_printer(_a_object[_l_idx]));
         if (_l_idx + 1 < _a_object.size())
         {
-            _l_str.append(u8",");
+            _l_str.append(u8", ");
         }
     }
     _l_str.append(u8"]");

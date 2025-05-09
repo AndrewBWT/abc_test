@@ -1,0 +1,2 @@
+#class std::tuple<class std::basic_string<char8_t,struct std::char_traits<char8_t>,class std::allocator<char8_t> >,class std::optional<enum abc::utility::enum_helper_string_type_e>,class std::basic_string<char8_t,struct std::char_traits<char8_t>,class std::allocator<char8_t> > >
+("one",4,"No code for enum of type \"enum abc::utility::enum_helper_string_type_e\" encountered in function \"enumerate_enum_helper_t::parse\". The enum's value has no known text representation. The enum, represented in its underlying type \"int\", has a value of 4.")

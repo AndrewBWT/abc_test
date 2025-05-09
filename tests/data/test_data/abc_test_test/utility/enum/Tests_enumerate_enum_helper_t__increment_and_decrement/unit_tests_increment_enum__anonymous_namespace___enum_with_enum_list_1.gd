@@ -1,10 +1,35 @@
 #class std::tuple<enum `anonymous namespace'::enum_with_enum_list_1,unsigned __int64,class std::optional<enum `anonymous namespace'::enum_with_enum_list_1>,bool,enum A0xe1c13721::enum_with_enum_list_1,unsigned __int64>
-#class std::tuple<enum `anonymous namespace'::enum_with_enum_list_1,unsigned __int64,class std::optional<enum `anonymous namespace'::enum_with_enum_list_1>,bool,enum A0xe1c13721::enum_with_enum_list_1,unsigned __int64>
-#class std::tuple<enum `anonymous namespace'::enum_with_enum_list_1,unsigned __int64,class std::optional<enum `anonymous namespace'::enum_with_enum_list_1>,bool,enum A0xe1c13721::enum_with_enum_list_1,unsigned __int64>
-#class std::tuple<enum `anonymous namespace'::enum_with_enum_list_1,unsigned __int64,class std::optional<enum `anonymous namespace'::enum_with_enum_list_1>,bool,enum A0xe1c13721::enum_with_enum_list_1,unsigned __int64>
-#class std::tuple<enum `anonymous namespace'::enum_with_enum_list_1,unsigned __int64,class std::optional<enum `anonymous namespace'::enum_with_enum_list_1>,bool,enum A0xe1c13721::enum_with_enum_list_1,unsigned __int64>
-#class std::tuple<enum `anonymous namespace'::enum_with_enum_list_1,unsigned __int64,class std::optional<enum `anonymous namespace'::enum_with_enum_list_1>,bool,enum A0xe1c13721::enum_with_enum_list_1,unsigned __int64>
-#class std::tuple<enum `anonymous namespace'::enum_with_enum_list_1,unsigned __int64,class std::optional<enum `anonymous namespace'::enum_with_enum_list_1>,bool,enum A0xe1c13721::enum_with_enum_list_1,unsigned __int64>
-#class std::tuple<enum `anonymous namespace'::enum_with_enum_list_1,unsigned __int64,class std::optional<enum `anonymous namespace'::enum_with_enum_list_1>,bool,enum A0xe1c13721::enum_with_enum_list_1,unsigned __int64>
-#class std::tuple<enum `anonymous namespace'::enum_with_enum_list_1,unsigned __int64,class std::optional<enum `anonymous namespace'::enum_with_enum_list_1>,bool,enum A0xe1c13721::enum_with_enum_list_1,unsigned __int64>
-#class std::tuple<enum `anonymous namespace'::enum_with_enum_list_1,unsigned __int64,class std::optional<enum `anonymous namespace'::enum_with_enum_list_1>,bool,enum A0xe1c13721::enum_with_enum_list_1,unsigned __int64>
+(one,0,{},true,one,0)
+(one,1,{},true,two,0)
+(one,2,{},true,three,0)
+(one,3,{},false,three,1)
+(one,18446744073709551615,{},false,three,18446744073709551613)
+(two,0,{},true,two,0)
+(two,1,{},true,three,0)
+(two,2,{},false,three,1)
+(two,18446744073709551615,{},false,three,18446744073709551614)
+(three,0,{},true,three,0)
+(three,1,{},false,three,1)
+(three,18446744073709551615,{},false,three,18446744073709551615)
+(one,0,{three},true,one,0)
+(one,1,{three},true,two,0)
+(one,2,{three},true,three,0)
+(one,3,{three},false,three,1)
+(one,18446744073709551615,{three},false,three,18446744073709551613)
+(two,0,{three},true,two,0)
+(two,1,{three},true,three,0)
+(two,2,{three},false,three,1)
+(two,18446744073709551615,{three},false,three,18446744073709551614)
+(three,0,{three},true,three,0)
+(three,1,{three},false,three,1)
+(three,18446744073709551615,{three},false,three,18446744073709551615)
+(one,0,{two},true,one,0)
+(one,1,{two},true,two,0)
+(one,2,{two},false,two,1)
+(one,18446744073709551615,{two},false,two,18446744073709551614)
+(two,0,{two},true,two,0)
+(two,1,{two},false,two,1)
+(two,18446744073709551615,{two},false,two,18446744073709551615)
+(one,0,{one},true,one,0)
+(one,1,{one},false,one,1)
+(one,18446744073709551615,{one},false,one,18446744073709551615)

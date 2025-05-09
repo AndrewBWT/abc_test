@@ -360,9 +360,9 @@ _TEST_CASE(
         using unit_test_1 = tuple<
             variant<pair<unsigned int, size_t>, seed_t>,
             vector<variant<size_t, monostate>>>;
-        auto _l_rnd_generator{default_random_generator<unit_test_1>(
+        auto      _l_rnd_generator{default_random_generator<unit_test_1>(
             default_random_generator<
-                variant<pair<unsigned int, size_t>, seed_t>>(
+                     variant<pair<unsigned int, size_t>, seed_t>>(
                 default_random_generator<pair<unsigned int, size_t>>(
                     default_random_generator<unsigned int>(),
                     // Limit constructor to take first 100k values to create
@@ -442,32 +442,42 @@ _TEST_CASE(
             _l_unit_tests, "Unit tests checking unreachable behaviour"
         );
         matcher_t _l_matcher;
-        rng_t _l_bad_rng{ rng_t::make_default_rng<T>() };
+        rng_t     _l_bad_rng{rng_t::make_default_rng<T>()};
         __BEGIN_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher);
         do_not_optimise(_l_bad_rng.make_rng(10));
-        __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher, abc::unreachable_exception_t, u8"nullptr not correct");
+        __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(
+            _l_matcher, abc::unreachable_exception_t, u8"nullptr not correct"
+        );
         _l_unit_tests += _BLOCK_CHECK(_l_matcher);
 
         __BEGIN_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher);
         _l_bad_rng.progress(10);
-        __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher, abc::unreachable_exception_t, u8"nullptr not correct");
+        __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(
+            _l_matcher, abc::unreachable_exception_t, u8"nullptr not correct"
+        );
         _l_unit_tests += _BLOCK_CHECK(_l_matcher);
 
         __BEGIN_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher);
         do_not_optimise(_l_bad_rng.operator()());
-        __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher, abc::unreachable_exception_t, u8"nullptr not correct");
+        __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(
+            _l_matcher, abc::unreachable_exception_t, u8"nullptr not correct"
+        );
         _l_unit_tests += _BLOCK_CHECK(_l_matcher);
 
         __BEGIN_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher);
         do_not_optimise(rng_t(_l_bad_rng));
-        __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher, abc::unreachable_exception_t, u8"nullptr not correct");
+        __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(
+            _l_matcher, abc::unreachable_exception_t, u8"nullptr not correct"
+        );
         _l_unit_tests += _BLOCK_CHECK(_l_matcher);
 
         __BEGIN_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher);
         rng_t _l_new_rng = _l_bad_rng;
-        __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher, abc::unreachable_exception_t, u8"nullptr not correct");
+        __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(
+            _l_matcher, abc::unreachable_exception_t, u8"nullptr not correct"
+        );
         _l_unit_tests += _BLOCK_CHECK(_l_matcher);
-        
+
         _END_BBA_CHECK(_l_unit_tests);
     };
     manual_data_generator_t _l_mdg;

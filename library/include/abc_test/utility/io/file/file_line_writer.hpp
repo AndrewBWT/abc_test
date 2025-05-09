@@ -50,7 +50,6 @@ __no_constexpr_imp
     {
         _m_file_handler
             = make_shared<ofstream>(_m_file_name, std::ios_base::app);
-        std::cout << _m_file_name << std::endl;
         if (not _m_file_handler.get()->is_open())
         {
             throw test_library_exception_t(fmt::format(

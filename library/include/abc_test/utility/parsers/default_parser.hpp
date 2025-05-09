@@ -109,7 +109,7 @@ struct character_parser_t : public parser_base_t<T>
 {
     __constexpr
     character_parser_t(
-        const std::u8string _a_surrounding_str = std::u8string{}
+        const std::u32string _a_surrounding_str = std::u32string{}
     )
         : _m_surrounding_str(_a_surrounding_str)
     {}
@@ -133,7 +133,7 @@ protected:
         }
     }
 private:
-    std::u8string _m_surrounding_str;
+    std::u32string _m_surrounding_str;
 };
 
 namespace detail
@@ -146,7 +146,7 @@ __constexpr result_t<T>
             ) noexcept
 {
     using namespace std;
-    const u8string_view _l_sv{_a_parse_input.get_u32string(_a_characters_to_take
+    const u32string _l_sv{_a_parse_input.get_u32string(_a_characters_to_take
     )};
     const result_t<string> _l_sv_as_str{
         abc::convert_unicode_string_to_ascii_string<u32string>(_l_sv)
@@ -188,7 +188,7 @@ public:
             };
             _l_result_1.has_value())
         {
-            if (_a_parse_input.check_and_advance(u8"\\x"))
+            if (_a_parse_input.check_and_advance(U"\\x"))
             {
                 if (const result_t<T> _l_char_result{
                         detail::from_hex<T>(_a_parse_input, 2)
@@ -839,17 +839,16 @@ public:
     using value_type = std::expected<T, U>;
 
     __constexpr
-        default_parser_t(
-            const parser_t<T>& _a_parser_t,
-            const parser_t<U>& _a_parser_u
-        );
+    default_parser_t(
+        const parser_t<T>& _a_parser_t,
+        const parser_t<U>& _a_parser_u
+    );
 
     default_parser_t()
         // requires (std::is_default_constructible_v<default_parser_t<T>>&&
         // std::is_default_constructible_v<default_parser_t<U>>)
         : _m_parsers(std::make_pair(default_parser<T>(), default_parser<U>()))
-    {
-    }
+    {}
 
     __constexpr virtual result_t<value_type>
         run_parser(
@@ -869,44 +868,46 @@ public:
             switch (_l_first_result.value())
             {
             case 0:
-                if (auto _l_result{ _m_parsers.first->run_parser(_a_parse_input)
+                if (result_t<T> _l_result{_m_parsers.first->run_parser(_a_parse_input)
                     };
                     _l_result.has_value())
                 {
-                    return value_type(_l_result.value());
+                    _l_rv = _l_result.value();
                 }
                 else
                 {
-                    return unexpected(
-                        fmt::format(u8"Could not parse std::tuple element 2. "
-                            u8"Failed with error "
-                            u8"message:")
-                    );
+                    return unexpected(fmt::format(
+                        u8"Could not parse std::expected element 1. "
+                        u8"Failed with error "
+                        u8"message:"
+                    ));
                 }
                 break;
             case 1:
-                if (auto _l_result{ _m_parsers.first->run_parser(_a_parse_input)
+                if (const result_t<U> _l_result{_m_parsers.second->run_parser(_a_parse_input)
                     };
                     _l_result.has_value())
                 {
-                    return value_type(_l_result.value());
+                    _l_rv = unexpected(_l_result.value());
                 }
                 else
                 {
-                    return unexpected(
-                        fmt::format(u8"Could not parse std::tuple element 2. "
-                            u8"Failed with error "
-                            u8"message:")
-                    );
+                    return unexpected(fmt::format(
+                        u8"Could not parse std::expected element 2. "
+                        u8"Failed with error "
+                        u8"message: \"{0}\".",
+                        _l_result.error()
+                    ));
                 }
                 break;
             }
-            return unexpected(u8"error");
+            _a_parse_input.check_advance_and_throw(U")");
+            return _l_rv;
         }
         else
         {
             return unexpected(fmt::format(
-                u8"Could not parse std::tuple element 1. Failed with error "
+                u8"Could not parse std::expected element 1. Failed with error "
                 u8"message: {0}",
                 _l_first_result.error()
             ));
