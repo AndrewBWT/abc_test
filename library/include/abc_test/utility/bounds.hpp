@@ -1,7 +1,9 @@
 #pragma once
 
 #include "abc_test/utility/internal/macros.hpp"
+#include "abc_test/utility/limits/max_value_concept.hpp"
 #include "abc_test/utility/limits/max_value_object.hpp"
+#include "abc_test/utility/limits/min_value_concept.hpp"
 #include "abc_test/utility/limits/min_value_object.hpp"
 #include "abc_test/utility/printers/default_printer.hpp"
 
@@ -9,31 +11,73 @@ _BEGIN_ABC_UTILITY_NS
 
 namespace detail
 {
+/*!
+ * @brief This concept denotes the requirements ont he tamplte type for the
+ * bounds_t object.
+ */
 template <typename T>
-concept bounds_c = std::integral<T>; // && (not std::same_as<T, bool>);
+concept bounds_c = std::integral<T>;
 } // namespace detail
 
+/*!
+ * @brief An object used to describe the bounds on some templated type. It works
+ * out automatically which is the minimum and maximum value, and calculates the
+ * difference between the two values.
+ * @tparam T
+ */
 template <typename T>
 requires detail::bounds_c<T>
 class bounds_t
 {
 public:
+    /*!
+     * @brief Default constructor for bounds. Will set the lower value at
+     * minvalue_t<T>.min_value() and the max value at
+     * max_value_t<T>.max_value().
+     */
     __constexpr
-    bounds_t();
+    bounds_t() noexcept
+    requires min_value_c<T> && max_value_c<T>;
+    /*!
+     * @brief Creates a bounds_t object where the min and max value are set at
+     * the same element.
+     * @param _a_first_and_second The element to set the min and max values at.
+     */
     __constexpr
     bounds_t(const T& _a_first_and_second) noexcept;
+    /*!
+     * @brief The most commonly used bounds_t constructor.
+     *
+     * The minimum, maximum and difference values are worked out by comparing
+     * the two elements
+     *
+     * @param _a_first One of the elements to set.
+     * @param _a_second The other element to set.
+     */
     __constexpr
     bounds_t(const T& _a_first, const T& _a_second) noexcept;
+    /*!
+     * @brief Gets the minimum of the contained values.
+     * @return The minimum of the contained values.
+     */
     __constexpr const T&
         lower() const noexcept;
+    /*!
+     * @brief Gets the maximum of the contained values.
+     * @return The maximum of the contained values.
+     */
     __constexpr const T&
         higher() const noexcept;
-    __constexpr const T&
+    /*!
+     * @brief Gets the differnece between the contained values.
+     * @return The difference between the contained values.
+     */
+    __constexpr const std::size_t&
         difference() const noexcept;
 private:
     T _m_min;
     T _m_max;
-    T _m_difference;
+    std::size_t _m_difference;
     enum class bounds_ordering_e
     {
         first_less_than_second,
@@ -78,7 +122,8 @@ _BEGIN_ABC_UTILITY_NS
 template <typename T>
 requires detail::bounds_c<T>
 __constexpr_imp
-    bounds_t<T>::bounds_t()
+    bounds_t<T>::bounds_t() noexcept
+requires min_value_c<T> && max_value_c<T>
     : bounds_t(min_value_t<T>{}.min_value(), max_value_t<T>{}.max_value())
 {}
 
@@ -88,11 +133,7 @@ __constexpr_imp
     bounds_t<T>::bounds_t(
         const T& _a_first_and_second
     ) noexcept
-    : bounds_t(
-          _a_first_and_second,
-          _a_first_and_second,
-          bounds_ordering_e::first_less_than_second
-      )
+    : _m_min(_a_first_and_second), _m_max(_a_first_and_second), _m_difference(0)
 {}
 
 template <typename T>
@@ -128,7 +169,7 @@ __constexpr_imp const T&
 
 template <typename T>
 requires detail::bounds_c<T>
-__constexpr_imp const T&
+__constexpr_imp const std::size_t&
     bounds_t<T>::difference() const noexcept
 
 {
@@ -155,8 +196,8 @@ __constexpr_imp
       )
     , _m_difference(
           _a_ordering_enum == bounds_ordering_e::first_less_than_second
-              ? _a_second - _a_first
-              : _a_first - _a_second
+              ? static_cast<size_t>(_a_second) - static_cast<size_t>(_a_first)
+              : static_cast<size_t>(_a_first) - static_cast<size_t>(_a_second)
       )
 {}
 

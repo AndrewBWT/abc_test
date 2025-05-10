@@ -266,7 +266,7 @@ __constexpr_imp void
                             get<1>(_l_element.first)
                         );
                         assertion_block_matcher_data_list_formatter_t(
-                            get<0>(_l_ki), _l_info.size(), this->_m_max_str_size, true
+                            get<0>(_l_ki), _l_element.second.size(), this->_m_max_str_size, true
                         )
                             .process_all_data(
                                 _l_individual_data,

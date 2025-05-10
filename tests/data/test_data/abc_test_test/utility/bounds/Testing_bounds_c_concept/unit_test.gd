@@ -1,0 +1,12 @@
+#class std::map<class std::basic_string<char8_t,struct std::char_traits<char8_t>,class std::allocator<char8_t> >,class std::optional<bool>,struct std::less<class std::basic_string<char8_t,struct std::char_traits<char8_t>,class std::allocator<char8_t> > >,class std::allocator<struct std::pair<class std::basic_string<char8_t,struct std::char_traits<char8_t>,class std::allocator<char8_t> > const ,class std::optional<bool> > > >
+("bool", {true})
+("unsigned char", {true})
+("unsigned short", {true})
+("unsigned int", {true})
+("unsigned long", {true})
+("unsigned __int64", {true})
+("signed char", {true})
+("short", {true})
+("int", {true})
+("long", {true})
+("__int64", {true})

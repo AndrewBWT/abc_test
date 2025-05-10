@@ -18,10 +18,11 @@ _TEST_CASE(
         _l_fuzzy_tests, fmt::format("Fuzzy tests for inner_rng_mtd19937_64")
     );
     using test_1 = pair<
+        // How to construct the object.
         variant<seed_t, std::mt19937_64>,
+        // The various functions that can be called on the object.
         vector<
             variant<size_t, seed_t, std::monostate, std::monostate, seed_t>>>;
-    // for make_rng using a seed_t
     auto _l_rnd_gen{default_random_generator<test_1>(
         default_random_generator<variant<seed_t, mt19937_64>>(),
         default_random_generator<
@@ -82,7 +83,7 @@ _TEST_CASE(
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name = "Fuzzy tests for set_seed",
+        {.name = "Testing inner_rng_mtd19937_64::set_seed",
          .path = "abc_test_test::utility::rng::inner_rng_mt19937_64",
          .threads_required = 1}
     )
@@ -136,7 +137,7 @@ _TEST_CASE(
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name = "Property tests for progress and operator()",
+        {.name = "Testing inner_rng_mtd19937_64::progress and operator()",
          .path = "abc_test_test::utility::rng::inner_rng_mt19937_64",
          .threads_required = 1}
     )
@@ -174,7 +175,7 @@ _TEST_CASE(
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name = "Property tests for deep_copy",
+        {.name = "Testing inner_rng_mtd19937_64::deep_copy",
          .path = "abc_test_test::utility::rng::inner_rng_mt19937_64",
          .threads_required = 1}
     )
@@ -203,9 +204,9 @@ _TEST_CASE(
 
 _TEST_CASE(
     abc::test_case_t(
-        { .name = "Property tests for deep_copy",
+        {.name = "Testing inner_rng_mtd19937_64::make_rng",
          .path = "abc_test_test::utility::rng::inner_rng_mt19937_64",
-         .threads_required = 1 }
+         .threads_required = 1}
     )
 )
 {
@@ -216,15 +217,15 @@ _TEST_CASE(
     _BEGIN_MULTI_ELEMENT_BBA(
         _l_property_tests, fmt::format("Property test for make_rng")
     );
-    using test_1 = tuple<seed_t,seed_t>;
+    using test_1    = tuple<seed_t, seed_t>;
     auto _l_rnd_gen = default_random_generator<test_1>();
     for (const auto& _l_data : generate_data_randomly<test_1>(_l_rnd_gen))
     {
         _TVLOG_(_l_data);
-        const auto& [_l_seed1, _l_seed2] {_l_data};
+        const auto& [_l_seed1, _l_seed2]{_l_data};
         inner_rng_mt19937_64_t _l_rnd_1(_l_seed1);
         inner_rng_mt19937_64_t _l_rnd_2(_l_seed2);
-        auto                   _l_cpy{ _l_rnd_2.make_rng(_l_seed1)};
+        auto                   _l_cpy{_l_rnd_2.make_rng(_l_seed1)};
         _l_property_tests
             += _BLOCK_CHECK(_EXPR(_l_rnd_1() == _l_cpy->operator()()));
     }
