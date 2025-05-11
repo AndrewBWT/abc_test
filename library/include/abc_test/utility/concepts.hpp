@@ -53,7 +53,7 @@ concept has_append_range_c = std::ranges::range<R1> && std::ranges::range<R2> &&
  * char16_t and char32_t.
  */
 template <typename T>
-concept from_chars_convertable_c = requires (const char* _a_char, T _a_object) {
+concept from_chars_convertable_c = requires (const char* _a_char, T& _a_object) {
     {
         std::from_chars(_a_char, _a_char, _a_object)
     } -> std::same_as<std::from_chars_result>;
