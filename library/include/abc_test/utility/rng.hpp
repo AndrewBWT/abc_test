@@ -117,19 +117,7 @@ public:
     rng_t(const rng_t& _a_rng) noexcept(unreachable_does_not_throw_exception);
 
     __constexpr rng_t&
-        operator=(
-            const rng_t& _a_arg
-        )
-    {
-        if (this != &_a_arg)
-        {
-            _m_rng   = _a_arg.get_inner_rng().deep_copy();
-            _m_seed  = _a_arg._m_seed;
-            _m_calls = _a_arg._m_calls;
-        }
-        return *this;
-    }
-
+        operator=(const rng_t& _a_arg);
     __constexpr rng_t&
         operator=(rng_t&& _a_arg) noexcept
         = default;
@@ -139,8 +127,9 @@ public:
      * throw a breakpoint.
      */
     template <typename Rng>
-        requires std::derived_from<Rng, inner_rng_t>
-    __constexpr static rng_t make_default_rng() noexcept;
+    requires std::derived_from<Rng, inner_rng_t>
+    __constexpr static rng_t
+        make_default_rng() noexcept;
 #endif
 private:
     using inner_rng_ptr_t = std::unique_ptr<inner_rng_t>;
@@ -153,6 +142,9 @@ private:
     rng_t(inner_rng_ptr_t&& _a_rng, const seed_t& _a_seed);
     __constexpr inner_rng_t&
         get_inner_rng() const noexcept(unreachable_does_not_throw_exception);
+    static constexpr std::u8string_view _s_error_msg
+        = u8"rng_t's inner random generator contains a nullptr. This is an "
+          u8"invalid state for the rng_t object, and is undefined behaviour.";
 };
 
 _END_ABC_UTILITY_NS
@@ -208,9 +200,7 @@ __constexpr_imp rng_t
     case 1:
         return make_rng<Rng>(get<1>(_a_global_seed));
     default:
-        _ABC_UNREACHABLE(fmt::format(
-            u8"_a_global_seed is invalid variant type. Index = {0}", _l_index
-        ));
+        abc::unreachable_variant<decltype(_a_global_seed)>(u8"make_rng");
     }
 }
 
@@ -292,22 +282,38 @@ __constexpr_imp
             unreachable_does_not_throw_exception
         )
     : _m_rng(
-          _a_rng._m_rng == nullptr ?
+          _a_rng._m_rng == nullptr
+              ?
 #if _TESTING_BUILD
-                                   throw abc::unreachable_exception_t(
-                                       fmt::format(u8"_m_rng == nullptr")
-                                   )
+              throw abc::unreachable_exception_t(rng_t::_s_error_msg)
 #else
-                                   inner_rng_ptr_t{}
+              inner_rng_ptr_t{}
 #endif
-                                   : _a_rng._m_rng->deep_copy()
+              : _a_rng._m_rng->deep_copy()
       )
     , _m_calls(_a_rng._m_calls)
 {}
+
+__constexpr_imp rng_t&
+    rng_t::operator=(
+        const rng_t& _a_arg
+    )
+{
+    if (this != &_a_arg)
+    {
+        _m_rng   = _a_arg.get_inner_rng().deep_copy();
+        _m_seed  = _a_arg._m_seed;
+        _m_calls = _a_arg._m_calls;
+    }
+    return *this;
+}
+
+
 #if _TESTING_BUILD
 template <typename Rng>
-    requires std::derived_from<Rng, inner_rng_t>
-__constexpr rng_t rng_t::make_default_rng() noexcept
+requires std::derived_from<Rng, inner_rng_t>
+__constexpr rng_t
+    rng_t::make_default_rng() noexcept
 {
     return rng_t(inner_rng_ptr_t{}, seed_t{});
 }
@@ -335,7 +341,7 @@ __constexpr inner_rng_t&
 {
     if (_m_rng == nullptr)
     {
-        _ABC_UNREACHABLE(fmt::format(u8"_m_rng == nullptr"));
+        _ABC_UNREACHABLE(rng_t::_s_error_msg);
     }
     else
     {

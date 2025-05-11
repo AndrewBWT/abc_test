@@ -10,7 +10,7 @@
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name             = "Property tests for get_inserter",
+        {.name             = "Tests for get_inserter",
          .path             = "abc_test_test::utility::ranges",
          .threads_required = 1}
     )
@@ -58,21 +58,15 @@ _TEST_CASE(
         // unordered_set and unordered_multiset need a std::hash for pairs,
         // these do not exist in the std.
         using container_type_list_t = type_list<
-#if 0
-            map<Value_Type1, Value_Type2>,
-            unordered_map<Value_Type1, Value_Type2>,
-            multimap<Value_Type1, Value_Type2>,
-            unordered_multimap<Value_Type1, Value_Type2>,
-            vector<pair<Value_Type1, Value_Type2>>,
-            set<pair<Value_Type1, Value_Type2>>,
-            // unordered_set<pair<Value_Type1, Value_Type2>>,
-            multiset<pair<Value_Type1, Value_Type2>>,
-            // unordered_multiset<pair<Value_Type1, Value_Type2>>,
-            list<pair<Value_Type1, Value_Type2>>,
-            deque<pair<Value_Type1, Value_Type2>>,
-            forward_list<pair<Value_Type1, Value_Type2>>
-#endif
-            >;
+            vector<T>,
+            deque<T>,
+            forward_list<T>,
+            list<T>,
+            set<T>,
+            multiset<T>,
+            unordered_set<T>,
+            unordered_multiset<T>,
+            basic_string<T>>;
         manual_data_generator_t _l_mdg;
         for_each_type<container_type_list_t>(
             [&]<typename T1>()
@@ -87,7 +81,6 @@ _TEST_CASE(
         // unordered_set and unordered_multiset need a std::hash for pairs,
         // these do not exist in the std.
         using container_type_list_t = type_list<
-#if 0
             map<Value_Type1, Value_Type2>,
             unordered_map<Value_Type1, Value_Type2>,
             multimap<Value_Type1, Value_Type2>,
@@ -99,9 +92,7 @@ _TEST_CASE(
             // unordered_multiset<pair<Value_Type1, Value_Type2>>,
             list<pair<Value_Type1, Value_Type2>>,
             deque<pair<Value_Type1, Value_Type2>>,
-            forward_list<pair<Value_Type1, Value_Type2>>
-#endif
-            >;
+            forward_list<pair<Value_Type1, Value_Type2>>>;
         manual_data_generator_t _l_mdg;
         for_each_type<container_type_list_t>(
             [&]<typename T1>()
@@ -122,7 +113,7 @@ _TEST_CASE(
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name             = "Property tests for append_range",
+        {.name             = "Tests for append_range",
          .path             = "abc_test_test::utility::ranges",
          .threads_required = 1}
     )
@@ -150,7 +141,7 @@ _TEST_CASE(
         {
             _TVLOG_(_l_data);
             const auto& [_l_range_1, _l_range_2]{_l_data};
-            auto _l_range1_cpy{ _l_range_1 };
+            auto _l_range1_cpy{_l_range_1};
             abc::utility::detail::append_range(_l_range1_cpy, _l_range_2);
             vector<W> _l_hand_made_results_intermediary;
             for (const auto& _l_element :
@@ -174,7 +165,6 @@ _TEST_CASE(
     auto property_append_range_tests_top_level = [&]<typename Value_Type>()
     {
         using container_type_list_t = type_list<
-#if 0
             vector<Value_Type>,
             set<Value_Type>,
             unordered_set<Value_Type>,
@@ -183,9 +173,7 @@ _TEST_CASE(
             list<Value_Type>,
             deque<Value_Type>,
             forward_list<Value_Type>,
-            basic_string<Value_Type>
-#endif
-            >;
+            basic_string<Value_Type>>;
         auto function_l1 = [&]<typename T2>()
         {
             manual_data_generator_t _l_mdg;
@@ -212,7 +200,6 @@ _TEST_CASE(
         // unordered_set and unordered_multiset need a std::hash for pairs,
         // these do not exist in the std.
         using container_type_list_t = type_list<
-#if 0
             map<Value_Type1, Value_Type2>,
             unordered_map<Value_Type1, Value_Type2>,
             multimap<Value_Type1, Value_Type2>,
@@ -224,9 +211,7 @@ _TEST_CASE(
             // unordered_multiset<pair<Value_Type1, Value_Type2>>,
             list<pair<Value_Type1, Value_Type2>>,
             deque<pair<Value_Type1, Value_Type2>>,
-            forward_list<pair<Value_Type1, Value_Type2>>
-#endif
-            >;
+            forward_list<pair<Value_Type1, Value_Type2>>>;
         auto function_l1 = [&]<typename T2>()
         {
             manual_data_generator_t _l_mdg;
@@ -256,7 +241,7 @@ _TEST_CASE(
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name             = "Property tests for join",
+        {.name             = "Tests for join",
          .path             = "abc_test_test::utility::ranges",
          .threads_required = 1}
     )
@@ -283,7 +268,7 @@ _TEST_CASE(
         auto _l_rnd_gen{default_random_generator<test_1>()};
         for (const auto& _l_data : generate_data_randomly<test_1>(_l_rnd_gen))
         {
-            _TVLOG_(_l_data);
+            _TVLOG_(_l_data); 
             const auto& [_l_range_1, _l_range_2]{_l_data};
             T         _l_result{abc::utility::join<T>(_l_range_1, _l_range_2)};
             vector<W> _l_hand_made_results_intermediary;
@@ -308,7 +293,6 @@ _TEST_CASE(
     auto property_join_tests_top_level = [&]<typename Value_Type>()
     {
         using container_type_list_t = type_list<
-#if 0
             vector<Value_Type>,
             set<Value_Type>,
             unordered_set<Value_Type>,
@@ -316,16 +300,22 @@ _TEST_CASE(
             unordered_multiset<Value_Type>,
             list<Value_Type>,
             deque<Value_Type>,
-            forward_list<Value_Type>,
-            basic_string<Value_Type>
-#endif
-            >;
+            forward_list<Value_Type>>;
+        using container_type_list2_t= type_list<
+            vector<Value_Type>,
+            set<Value_Type>,
+            unordered_set<Value_Type>,
+            multiset<Value_Type>,
+            unordered_multiset<Value_Type>,
+            list<Value_Type>,
+            deque<Value_Type>,
+            forward_list<Value_Type>>;
         auto function_l1 = [&]<typename T3>()
         {
             auto function_l2 = [&]<typename T2>()
             {
                 manual_data_generator_t _l_mdg;
-                for_each_type<container_type_list_t>(
+                for_each_type<container_type_list2_t>(
                     [&]<typename T1>()
                     {
                         RUN(_l_mdg,
@@ -357,7 +347,6 @@ _TEST_CASE(
         // unordered_set and unordered_multiset need a std::hash for pairs,
         // these do not exist in the std.
         using container_type_list_t = type_list<
-#if 0
             map<Value_Type1, Value_Type2>,
             unordered_map<Value_Type1, Value_Type2>,
             multimap<Value_Type1, Value_Type2>,
@@ -369,15 +358,26 @@ _TEST_CASE(
             // unordered_multiset<pair<Value_Type1, Value_Type2>>,
             list<pair<Value_Type1, Value_Type2>>,
             deque<pair<Value_Type1, Value_Type2>>,
-            forward_list<pair<Value_Type1, Value_Type2>>
-#endif
-            >;
+            forward_list<pair<Value_Type1, Value_Type2>>>;
+        using container_type_list_2t = type_list<
+            map<Value_Type1, Value_Type2>,
+            unordered_map<Value_Type1, Value_Type2>,
+            multimap<Value_Type1, Value_Type2>,
+            unordered_multimap<Value_Type1, Value_Type2>,
+            vector<pair<Value_Type1, Value_Type2>>,
+            set<pair<Value_Type1, Value_Type2>>,
+            // unordered_set<pair<Value_Type1, Value_Type2>>,
+            multiset<pair<Value_Type1, Value_Type2>>,
+            // unordered_multiset<pair<Value_Type1, Value_Type2>>,
+            list<pair<Value_Type1, Value_Type2>>,
+            deque<pair<Value_Type1, Value_Type2>>,
+            forward_list<pair<Value_Type1, Value_Type2>>>;
         auto function_l1 = [&]<typename T3>()
         {
             auto funtion_l2 = [&]<typename T2>()
             {
                 manual_data_generator_t _l_mdg;
-                for_each_type<container_type_list_t>(
+                for_each_type<container_type_list_2t>(
                     [&]<typename T1>()
                     {
                         RUN(_l_mdg,
