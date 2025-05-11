@@ -201,6 +201,8 @@ __constexpr_imp rng_t
         return make_rng<Rng>(get<1>(_a_global_seed));
     default:
         abc::unreachable_variant<decltype(_a_global_seed)>(u8"make_rng");
+        // This code will never be reached.
+        return make_rng<Rng>(get<1>(_a_global_seed));
     }
 }
 

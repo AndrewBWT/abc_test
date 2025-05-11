@@ -38,15 +38,15 @@ constexpr bool unreachable_does_not_throw_exception = true;
 #endif
 
 template <typename T>
-    requires std::is_enum_v<T>
+requires std::is_enum_v<T>
 __constexpr std::u8string
-unreachable_enum(
-    const T                  _a_enum,
-    const std::u8string_view _a_function_name
-)
-noexcept(
-    unreachable_does_not_throw_exception
-    )
+            unreachable_enum(
+                const T                  _a_enum,
+                const std::u8string_view _a_function_name
+            )
+        noexcept(
+            unreachable_does_not_throw_exception
+        )
 {
 #if _TESTING_BUILD
     using namespace std;
@@ -68,32 +68,26 @@ noexcept(
 }
 
 template <typename T>
-    requires std::is_enum_v<T>
 __constexpr std::u8string
-unreachable_variant(
-    const T                  _a_variant,
-    const std::u8string_view _a_function_name
-)
-noexcept(
-    unreachable_does_not_throw_exception
-    )
+            unreachable_variant(
+                const std::u8string_view _a_function_name
+            )
+        noexcept(
+            unreachable_does_not_throw_exception
+        )
 {
 #if _TESTING_BUILD
     using namespace std;
     throw abc::unreachable_exception_t(fmt::format(
-        u8"No code for enum of type "
-        u8"\"{0}\" encountered in function "
-        u8"\"{1}\". The enum's value has no known text "
-        u8"representation. The enum, represented in its underlying type "
-        u8"\"{2}\", has a value of {3}.",
+        u8"No code for {0}. This may be due to a missed case, or a "
+        u8"std::variant that is corrupted. Error occoured in function \"{0}\".",
         type_id<T>(),
-        _a_function_name,
-        type_id<underlying_type_t<T>>(),
-        to_underlying(_a_enum)
+        _a_function_name
 
     ));
 #else
     std::unreachable();
 #endif
 }
+
 _END_ABC_NS
