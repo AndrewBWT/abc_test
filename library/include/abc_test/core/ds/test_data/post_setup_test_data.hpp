@@ -316,7 +316,7 @@ __no_constexpr_imp auto
         _a_pstd.has_for_loop_stack_trie()
         ? fmt::format("{0}", "not written")
 
-        // abc::checkless_convert_unicode_string_to_ascii_string(
+        // abc::checkless_convert_unicode_to_ascii(
         //     abc::utility::printer::default_printer<
         //         decltype(_a_pstd.for_loop_stack_trie())>()
         //         ->run_printer(_a_pstd.for_loop_stack_trie())

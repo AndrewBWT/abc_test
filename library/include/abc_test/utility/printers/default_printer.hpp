@@ -113,7 +113,7 @@ public:
                           ) const
     {
         using namespace std;
-        if (_a_object <= 0x7F)
+        if (_a_object >= 0 && _a_object <= 0x7F)
         {
             return surround_str(fmt::format(u8"{0}", u8string(1, _a_object)));
         }
@@ -323,7 +323,7 @@ struct default_printer_t<T> : public printer_base_t<T>
         to_chars(_l_holder, _l_holder + 1'000, _a_object);
         string _l_rv(_l_holder);
         delete[] _l_holder;
-        return abc::checkless_convert_ascii_to_unicode_string<u8string>(_l_rv);
+        return unpack_string_to_u8string(_l_rv);
     }
 };
 
@@ -513,14 +513,14 @@ __constexpr std::u8string
     {
         _l_rv.append(u8" ");
     }
-    _l_rv.append(checkless_convert_ascii_to_unicode_string<u8string>(
+    _l_rv.append(unpack_string_to_u8string(
         string(1, _a_object_print_parser.begin_char)
     ));
     tuple<Ts...> _l_tuple{tie(_a_elements_to_print...)};
     object_printer_internal<0>(
         _a_object_print_parser, _l_rv, _a_object_names, _a_parsers, _l_tuple
     );
-    _l_rv.append(checkless_convert_ascii_to_unicode_string<u8string>(
+    _l_rv.append(unpack_string_to_u8string(
         string(1, _a_object_print_parser.end_char)
     ));
     return _l_rv;
@@ -550,20 +550,18 @@ __constexpr void
         _a_str.append(get<I>(_a_object_names.value()));
         if (_a_object_print_parser.space_before_field_name_and_field_separator)
         {
-            _a_str.append(checkless_convert_ascii_to_unicode_string<u8string>(
-                string(1, ' ')
-            ));
+            _a_str.append(
+                unpack_string_to_u8string(string(1, ' '))
+            );
         }
-        _a_str.append(
-            checkless_convert_ascii_to_unicode_string<u8string>(string(
-                1, _a_object_print_parser.delimiter_between_field_name_and_field
-            ))
-        );
+        _a_str.append(unpack_string_to_u8string(string(
+            1, _a_object_print_parser.delimiter_between_field_name_and_field
+        )));
         if (_a_object_print_parser.space_after_field_name_and_field_separator)
         {
-            _a_str.append(checkless_convert_ascii_to_unicode_string<u8string>(
-                string(1, ' ')
-            ));
+            _a_str.append(
+                unpack_string_to_u8string(string(1, ' '))
+            );
         }
     }
     _a_str.append(
@@ -573,16 +571,16 @@ __constexpr void
     {
         if (_a_object_print_parser.space_before_field_delimiter)
         {
-            _a_str.append(checkless_convert_ascii_to_unicode_string<u8string>(
+            _a_str.append(unpack_string_to_u8string(
                 string(1, ' ')
             ));
         }
-        _a_str.append(checkless_convert_ascii_to_unicode_string<u8string>(
+        _a_str.append(unpack_string_to_u8string(
             string(1, _a_object_print_parser.delimiter_between_fields)
         ));
         if (_a_object_print_parser.space_after_field_delimieter)
         {
-            _a_str.append(checkless_convert_ascii_to_unicode_string<u8string>(
+            _a_str.append(unpack_string_to_u8string(
                 string(1, ' ')
             ));
         }
@@ -894,11 +892,72 @@ struct default_printer_t<std::basic_string<T>>
             _l_rv.append(_m_surrounding_str);
             return _l_rv;
         }
-        else if constexpr (same_as<arg_type_t, u8string>)
+        else if constexpr (same_as<arg_type_t, u8string>
+                           || same_as<arg_type_t, u16string>
+                           || same_as<arg_type_t, u32string>
+                           || same_as<arg_type_t, wstring>)
+        {
+            return fmt::format(
+                u8"{0}{1}{0}",
+                _m_surrounding_str,
+                unicode_string_to_u8string(_a_object)
+            );
+        }
+        else
+        {
+            __STATIC_ASSERT(
+                T,
+                "default_printer_t for basic_string type only allows certain "
+                "types"
+            );
+        }
+    }
+private:
+    std::u8string _m_surrounding_str;
+};
+
+template <typename T>
+requires (std::same_as<std::basic_string_view<T>, std::string_view> || std::same_as<std::basic_string_view<T>, std::wstring_view> || std::same_as<std::basic_string_view<T>, std::u8string_view> || std::same_as<std::basic_string_view<T>, std::u16string_view> || std::same_as<std::basic_string_view<T>, std::u32string_view>)
+struct default_printer_t<std::basic_string_view<T>>
+    : public printer_base_t<std::basic_string_view<T>>
+{
+    static constexpr bool is_specialized{true};
+
+    __constexpr
+    default_printer_t()
+        : default_printer_t(u8"\"")
+    {}
+
+    __constexpr
+    default_printer_t(
+        const std::u8string_view _a_surrounding_str
+    )
+        : _m_surrounding_str(_a_surrounding_str)
+    {}
+
+    __constexpr std::u8string
+                run_printer(
+                    const std::basic_string_view<T>& _a_object
+                ) const
+    {
+        using namespace std;
+        using arg_type_t = basic_string_view<T>;
+        if constexpr (same_as<arg_type_t, string_view>)
+        {
+            u8string                _l_rv{_m_surrounding_str};
+            default_printer_t<char> _l_printer;
+            for (const char _l_char : _a_object)
+            {
+                _l_rv.append(_l_printer.run_printer(_l_char));
+            }
+            _l_rv.append(_m_surrounding_str);
+            return _l_rv;
+        }
+        else if constexpr (same_as<arg_type_t, u8string_view>)
         {
             return fmt::format(u8"{0}{1}{0}", _m_surrounding_str, _a_object);
         }
-        else if constexpr (same_as<arg_type_t, u16string>)
+        else if constexpr (same_as<arg_type_t, u16string_view>)
         {
             u8string _l_object_as_u8str;
             utf8::utf16to8(
@@ -910,7 +969,7 @@ struct default_printer_t<std::basic_string<T>>
                 u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
             );
         }
-        else if constexpr (same_as<arg_type_t, u32string>)
+        else if constexpr (same_as<arg_type_t, u32string_view>)
         {
             u8string _l_object_as_u8str;
             for (auto _l_itt{_a_object.begin()}; _l_itt != _a_object.end();
@@ -941,7 +1000,7 @@ struct default_printer_t<std::basic_string<T>>
                 u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
             );
         }
-        else if constexpr (same_as<arg_type_t, wstring>)
+        else if constexpr (same_as<arg_type_t, wstring_view>)
         {
             if constexpr (sizeof(wchar_t) == 2)
             {
@@ -965,181 +1024,6 @@ struct default_printer_t<std::basic_string<T>>
                             {
                                 _l_char = (_l_char << 10) + trail_surrogate
                                           + utf8::internal::SURROGATE_OFFSET;
-                            }
-                            else
-                            {
-                                _l_object_as_u8str.append(
-                                    abc::make_hex_from_char<uint16_t>(
-                                        trail_surrogate
-                                    )
-                                );
-                                continue;
-                            }
-                        }
-                        else
-                        {
-                            _l_object_as_u8str.append(
-                                abc::make_hex_from_char<uint16_t>(_l_char)
-                            );
-                            continue;
-                        }
-                    }
-                    // Lone trail surrogate
-                    else if (utf8::internal::is_trail_surrogate(_l_char))
-                    {
-                        _l_object_as_u8str.append(
-                            abc::make_hex_from_char<uint16_t>(_l_char)
-                        );
-                    }
-
-                    result = utf8::append(_l_char, result);
-                }
-                return fmt::format(
-                    u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
-                );
-            }
-            else if constexpr (sizeof(wchar_t) == 4)
-            {
-                u8string _l_object_as_u8str;
-                utf8::utf32to8(
-                    _a_object.begin(),
-                    _a_object.end(),
-                    std::back_inserter(_l_object_as_u8str)
-                );
-                return fmt::format(
-                    u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
-                );
-            }
-            else
-            {
-                __STATIC_ASSERT(
-                    T, "wchar_t of this specific size is not supported"
-                );
-            }
-        }
-        else
-        {
-            __STATIC_ASSERT(
-                T,
-                "default_printer_t for basic_string type only allows certain "
-                "types"
-            );
-        }
-    }
-private:
-    std::u8string _m_surrounding_str;
-};
-
-template <typename T>
-    requires (std::same_as<std::basic_string_view<T>, std::string_view> || std::same_as<std::basic_string_view<T>, std::wstring_view> || std::same_as<std::basic_string_view<T>, std::u8string_view> || std::same_as<std::basic_string_view<T>, std::u16string_view> || std::same_as<std::basic_string_view<T>, std::u32string_view>)
-struct default_printer_t<std::basic_string_view<T>>
-    : public printer_base_t<std::basic_string_view<T>>
-{
-    static constexpr bool is_specialized{ true };
-
-    __constexpr
-        default_printer_t()
-        : default_printer_t(u8"\"")
-    {
-    }
-
-    __constexpr
-        default_printer_t(
-            const std::u8string_view _a_surrounding_str
-        )
-        : _m_surrounding_str(_a_surrounding_str)
-    {
-    }
-
-    __constexpr std::u8string
-        run_printer(
-            const std::basic_string_view<T>& _a_object
-        ) const
-    {
-        using namespace std;
-        using arg_type_t = basic_string_view<T>;
-        if constexpr (same_as<arg_type_t, string_view>)
-        {
-            u8string                _l_rv{ _m_surrounding_str };
-            default_printer_t<char> _l_printer;
-            for (const char _l_char : _a_object)
-            {
-                _l_rv.append(_l_printer.run_printer(_l_char));
-            }
-            _l_rv.append(_m_surrounding_str);
-            return _l_rv;
-        }
-        else if constexpr (same_as<arg_type_t, u8string_view>)
-        {
-            return fmt::format(u8"{0}{1}{0}", _m_surrounding_str, _a_object);
-        }
-        else if constexpr (same_as<arg_type_t, u16string_view>)
-        {
-            u8string _l_object_as_u8str;
-            utf8::utf16to8(
-                _a_object.begin(),
-                _a_object.end(),
-                std::back_inserter(_l_object_as_u8str)
-            );
-            return fmt::format(
-                u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
-            );
-        }
-        else if constexpr (same_as<arg_type_t, u32string_view>)
-        {
-            u8string _l_object_as_u8str;
-            for (auto _l_itt{ _a_object.begin() }; _l_itt != _a_object.end();
-                ++_l_itt)
-            {
-                char32_t _l_char{ *_l_itt };
-                if (not utf8::internal::is_code_point_valid(_l_char))
-                {
-                    u8string _l_char_as_hex{
-                        abc::make_hex_from_char<char8_t>(_l_char)
-                    };
-                    _l_object_as_u8str.append(_l_char_as_hex);
-                }
-                else
-                {
-                    utf8::internal::append(
-                        _l_char, std::back_inserter(_l_object_as_u8str)
-                    );
-                }
-            }
-
-            // utf8::utf32to8(
-            // _a_object.begin(),
-            // _a_object.end(),
-            // std::back_inserter(_l_object_as_u8str)
-            // );
-            return fmt::format(
-                u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
-            );
-        }
-        else if constexpr (same_as<arg_type_t, wstring_view>)
-        {
-            if constexpr (sizeof(wchar_t) == 2)
-            {
-                u8string _l_object_as_u8str;
-                auto     _l_itt{ _a_object.begin() };
-                auto     _l_end{ _a_object.end() };
-                auto     result = std::back_inserter(_l_object_as_u8str);
-                while (_l_itt != _l_end)
-                {
-                    char32_t _l_char = utf8::internal::mask16(*_l_itt++);
-                    // Take care of surrogate pairs first
-                    if (utf8::internal::is_lead_surrogate(_l_char))
-                    {
-                        if (_l_itt != _l_end)
-                        {
-                            const char32_t trail_surrogate
-                                = utf8::internal::mask16(*_l_itt++);
-                            if (utf8::internal::is_trail_surrogate(
-                                trail_surrogate
-                            ))
-                            {
-                                _l_char = (_l_char << 10) + trail_surrogate
-                                    + utf8::internal::SURROGATE_OFFSET;
                             }
                             else
                             {
@@ -1273,8 +1157,8 @@ public:
     {
         using namespace std;
         using enum variant_print_parse_e;
-        const size_t   _l_idx{_a_object.has_value() ? size_t(0) : size_t(1)};
-        u8string _l_element_str;
+        const size_t _l_idx{_a_object.has_value() ? size_t(0) : size_t(1)};
+        u8string     _l_element_str;
         switch (_l_idx)
         {
         case 0:

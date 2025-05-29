@@ -321,9 +321,9 @@ __no_constexpr_imp matcher_t
         _l_equal,
         fmt::format(
             u8"{0} {1} {2}",
-            checkless_convert_ascii_to_unicode_string<u8string>(_a_str1),
+            unpack_string_to_u8string(_a_str1),
             _l_equal ? u8"==" : u8"!=",
-            checkless_convert_ascii_to_unicode_string<u8string>(_a_str2)
+            unpack_string_to_u8string(_a_str2)
         )
     ));
 }

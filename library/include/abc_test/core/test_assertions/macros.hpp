@@ -172,7 +172,7 @@
                 #_a_matcher,                               \
                 std::source_location::current()            \
             );                                             \
-        not _a_logic_matcher_name.passed())
+        not _a_matcher.matcher_result().passed())
 
 
 /*!

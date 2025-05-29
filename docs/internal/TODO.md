@@ -32,6 +32,10 @@
 - Check that same pairs of test paths and test names are dealt with properly. Update DECLARING_TESTS.md when this is addressed.
 - We're using a function from Google Benchmark, who use an apache licence. Need to look into whether we need to include the original licence when providing our library.
 - We should have a way to "turn off" computationally expensive tests.
+- Investigate whether its possible to write random generators in a similar manner to how fmt::format is used. Specifically, write code such as abc::random_generator("({0},_)",default_random_generator<int>(0,100)). This would create a tuple generator, with the first default generator replaced by the argument above. This would be very clear syntax compared to what we currently have.
+- Add a way of automatically adding generated data to the current log stack. Make it able to be turned off.
+- Have some "type-map" available to log data, which would turn complicated types into simpler ones. e.g. "std::vector<int,std::allocator..." could become "vector<int>". This would have to be user-defined, and loaded at runtime.
+- Make it so that _EXPR(a==b) code runs some user-specified code for a==b. Currently it defaults to the default equals operator in C++. But for code such as when comparing strings, it would be better to use something which provides more information about where an error is. This should be investigated further.
 
 ## Information
 

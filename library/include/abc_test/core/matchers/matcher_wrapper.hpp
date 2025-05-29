@@ -551,19 +551,19 @@ __constexpr_imp matcher_wrapper_t<false>
         compute_logic_result<Logic_Enum>(_l_left_passed, _l_right_passed),
         fmt::format(
             u8"{0}{1}{2} {3} {4}{5}{6}",
-            checkless_convert_ascii_to_unicode_string<u8string>(
+            unpack_string_to_u8string(
                 _l_str_pair_l.first
             ),
             _l_left_str,
-            checkless_convert_ascii_to_unicode_string<u8string>(
+            unpack_string_to_u8string(
                 _l_str_pair_l.second
             ),
             logic_str<Logic_Enum>(),
-            checkless_convert_ascii_to_unicode_string<u8string>(
+            unpack_string_to_u8string(
                 _l_str_pair_r.first
             ),
             _l_right_str,
-            checkless_convert_ascii_to_unicode_string<u8string>(
+            unpack_string_to_u8string(
                 _l_str_pair_r.second
             )
         )

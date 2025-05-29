@@ -7,70 +7,6 @@ namespace
 {
 struct X
 {};
-
-template <typename F>
-inline void
-    unit_test_inserter_helper(
-        F _a_function
-    )
-{
-    using namespace abc;
-    using namespace abc::data_gen;
-    using namespace std;
-    using namespace utility;
-    using namespace abc::utility::io;
-    using container_type_list_t = type_list<short int>;
-    auto _l_test_l1             = [&]<typename Value_Type>()
-    {
-        using container_type_list_vect_t = type_list<
-            vector<Value_Type>,
-#if 1
-            array<Value_Type, 3>,
-            deque<Value_Type>,
-            list<Value_Type>,
-            forward_list<Value_Type>,
-            set<Value_Type>,
-            map<Value_Type, Value_Type>,
-            multiset<Value_Type, Value_Type>,
-            multimap<Value_Type, Value_Type>,
-            unordered_set<Value_Type>,
-            unordered_map<Value_Type, Value_Type>,
-            unordered_multiset<Value_Type, Value_Type>,
-            unordered_multimap<Value_Type, Value_Type>
-#endif
-            >;
-        manual_data_generator_t _l_mdg;
-        for_each_type<container_type_list_vect_t>(
-            [&]<typename T>()
-            {
-                RUN(_l_mdg, (_a_function.operator()<T>()));
-            }
-        );
-    };
-    manual_data_generator_t _l_mdg;
-    for_each_type<container_type_list_t>(
-        [&]<typename T>()
-        {
-            RUN(_l_mdg, (_l_test_l1.operator()<T>()));
-        }
-    );
-    auto _l_test_pair_l1 = [&]<typename T1>()
-    {
-        manual_data_generator_t _l_mdg;
-        for_each_type<container_type_list_t>(
-            [&]<typename T2>()
-            {
-                RUN(_l_mdg, (_a_function.operator()<std::pair<T1, T2>>()));
-            }
-        );
-    };
-    for_each_type<container_type_list_t>(
-        [&]<typename T>()
-        {
-            RUN(_l_mdg, (_l_test_pair_l1.operator()<T>()));
-        }
-    );
-}
 } // namespace
 
 _TEST_CASE(
@@ -168,22 +104,31 @@ _TEST_CASE(
     auto _l_func1               = [&]<typename Value_Type>()
     {
         using container_type_list2 = type_list<
-            array<Value_Type,3>,vector<Value_Type>,deque<Value_Type>,list<Value_Type>,
-        forward_list<Value_Type>,set<Value_Type>>;
-        auto _l_func2              = [&]<typename R1>()
+            array<Value_Type, 3>,
+            vector<Value_Type>,
+            deque<Value_Type>,
+            list<Value_Type>,
+            forward_list<Value_Type>,
+            set<Value_Type>>;
+        auto _l_func2 = [&]<typename R1>()
         {
             auto _l_func3 = [&]<typename Value_Type2>()
             {
                 using container_type_list3 = type_list<
-                    array<Value_Type2, 3>, vector<Value_Type2>, deque<Value_Type2>, list<Value_Type2>,
-                    forward_list<Value_Type2>, set<Value_Type2>>;
+                    array<Value_Type2, 3>,
+                    vector<Value_Type2>,
+                    deque<Value_Type2>,
+                    list<Value_Type2>,
+                    forward_list<Value_Type2>,
+                    set<Value_Type2>>;
                 manual_data_generator_t _l_mdg;
                 // Fourth level for loop.
                 for_each_type<container_type_list3>(
                     [&]<typename R2>()
-                {
-                    RUN(_l_mdg, (_l_append_range_test.operator() < R1, R2 > ()));
-                }
+                    {
+                        RUN(_l_mdg,
+                            (_l_append_range_test.operator()<R1, R2>()));
+                    }
                 );
             };
             // Third level for loop
@@ -209,7 +154,7 @@ _TEST_CASE(
     for_each_type<container_type_list_t>(
         [&]<typename VT1>()
         {
-            RUN(_l_mdg, (_l_func1.operator()< VT1 >()));
+            RUN(_l_mdg, (_l_func1.operator()<VT1>()));
         }
     );
 }
@@ -234,11 +179,15 @@ _TEST_CASE(
         _TVLOG(type_id<T>());
         _CHECK(_l_data.generate_matcher(
             type_id<T>(),
-            [&](const pair<bool,bool>& _a_expected_result)
+            [&](const pair<bool, bool>& _a_expected_result)
             {
-                return _EXPR(from_chars_convertable_c<T> == _a_expected_result.first)
+                return _EXPR(
+                           from_chars_convertable_c<T>
+                           == _a_expected_result.first
+                       )
                        && _EXPR(
-                           to_chars_convertable_c<T> == _a_expected_result.second
+                           to_chars_convertable_c<T>
+                           == _a_expected_result.second
                        );
             }
         ));
@@ -264,8 +213,7 @@ _TEST_CASE(
         double,
         long double,
         X,
-        vector<int>
-        >;
+        vector<int>>;
     manual_data_generator_t _l_mdg;
     for_each_type<container_type_list_t>(
         [&]<typename T>()

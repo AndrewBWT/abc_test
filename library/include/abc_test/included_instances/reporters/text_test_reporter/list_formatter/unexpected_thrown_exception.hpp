@@ -97,7 +97,7 @@ __constexpr_imp void
             _a_ttor.write(_a_pc.indent(_a_pc.exception_type_str()));
             _a_ttor.write(_a_pc.indent(
                 _a_pc.exception_type(
-                    checkless_convert_ascii_to_unicode_string<u8string>(
+                    unpack_string_to_u8string(
                         _a_element.exception_type()
                     )
                 ),
@@ -108,7 +108,7 @@ __constexpr_imp void
             _a_ttor.write(_a_pc.indent(_a_pc.exception_message_str()));
             _a_ttor.write(_a_pc.indent(
                 _a_pc.exception_message(
-                    checkless_convert_ascii_to_unicode_string<u8string>(
+                    unpack_string_to_u8string(
                         _a_element.exception_message()
                     )
                 ),

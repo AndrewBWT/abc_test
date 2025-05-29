@@ -1,10 +1,11 @@
 #pragma once
 
 #include "abc_test/utility/internal/macros.hpp"
-#include "abc_test/utility/str/conversion.hpp"
+#include "abc_test/utility/str/packing.hpp"
 
 #include <source_location>
 #include <stdexcept>
+#include <fmt/xchar.h>
 
 _BEGIN_ABC_NS
 

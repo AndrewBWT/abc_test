@@ -172,7 +172,7 @@ __no_constexpr_imp errors::opt_setup_error_t
                 u8"post_setup_test_data_t = {2}",
                 _l_test.thread_resourses_required(),
                 _a_options.threads,
-                checkless_convert_ascii_to_unicode_string<u8string>(fmt::format("{0}", _l_test))
+                unpack_string_to_u8string(fmt::format("{0}", _l_test))
             ),
             false
         ));
@@ -200,7 +200,7 @@ __no_constexpr_imp errors::opt_setup_error_t
                     u8"post_setup_test_data_t = {2}",
                     _l_empty_indexes,
                     _l_test.test_path_hierarchy(),
-                    checkless_convert_ascii_to_unicode_string<u8string>(fmt::format("{0}", _l_test))
+                    unpack_string_to_u8string(fmt::format("{0}", _l_test))
                 ),
                 false
             ));
@@ -329,8 +329,8 @@ __no_constexpr_imp errors::opt_setup_error_t
                     u8"insert is {0}, "
                     u8"while the post_setup_test_data_t object blocking its "
                     u8"insertion is {1}. ",
-                    checkless_convert_ascii_to_unicode_string<u8string>(fmt::format("{0}", _a_test.get())),
-                    checkless_convert_ascii_to_unicode_string<u8string>(
+                    unpack_string_to_u8string(fmt::format("{0}", _a_test.get())),
+                    unpack_string_to_u8string(
                         fmt::format("{0}", (_l_name_range_itts.begin()->get()))
                     )
                 ),

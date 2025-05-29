@@ -94,8 +94,7 @@ __constexpr_imp void
             _a_pc.source_representation(
                 _a_element.source().has_value()
                     ? optional<
-                          u8string>{checkless_convert_ascii_to_unicode_string<
-                          u8string>(_a_element.source()
+                          u8string>{unpack_string_to_u8string(_a_element.source()
                                         .value()
                                         .source_code_representation())}
                     : optional<u8string>{}
@@ -105,7 +104,7 @@ __constexpr_imp void
         break;
     case STR_REPRESENTATION:
         _a_ttor.write(_a_pc.highlight_fail(
-            checkless_convert_ascii_to_unicode_string<u8string>(
+            unpack_string_to_u8string(
                 get_str_representation(_a_element, _a_pc)
             )
         ));

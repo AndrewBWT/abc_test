@@ -76,15 +76,15 @@ __no_constexpr_imp void
         u8"      Line: {3}\n"
         u8"   Stacktrace: {4}",
         _a_setup_test_error.error_msg(),
-        checkless_convert_ascii_to_unicode_string<u8string>(
+        unpack_string_to_u8string(
             _a_setup_test_error.source_location().file_name()
         ),
-        checkless_convert_ascii_to_unicode_string<u8string>(
+        unpack_string_to_u8string(
             _a_setup_test_error.source_location().function_name()
         ),
         _a_setup_test_error.source_location().line(),
         _a_setup_test_error.opt_stacktrace().has_value()
-            ? checkless_convert_ascii_to_unicode_string<u8string>(
+            ? unpack_string_to_u8string(
                   to_string(_a_setup_test_error.opt_stacktrace().value())
               )
             : u8"No stacktrace"
@@ -97,10 +97,7 @@ __no_constexpr_imp void
     ) const noexcept
 {
     using namespace std;
-    write(
-        u8"WARNING: "
-        + checkless_convert_ascii_to_unicode_string<u8string>(_a_str)
-    );
+    write(u8"WARNING: " + unpack_string_to_u8string(_a_str));
 }
 
 __no_constexpr_imp void

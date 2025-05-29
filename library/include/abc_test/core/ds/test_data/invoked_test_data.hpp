@@ -6,6 +6,7 @@
 #include "abc_test/core/global.hpp"
 #include "abc_test/core/test_reports/assertion.hpp"
 #include "abc_test/core/test_reports/unexpected_report.hpp"
+#include "abc_test/utility/io/io_utilities.hpp"
 #include "abc_test/utility/rng.hpp"
 
 #include <fmt/ranges.h>
@@ -488,7 +489,7 @@ __constexpr_imp void
         throw errors::test_library_exception_t(fmt::format(
             u8"add_assertions function has been entered, however should have "
             u8"already termianted. _m_test_status = {0}",
-            abc::checkless_convert_ascii_to_unicode_string<std::u8string>(
+            unpack_string_to_u8string(
                 fmt::format("{}", _m_test_status)
             )
         ));
@@ -550,7 +551,7 @@ __constexpr_imp void
         throw errors::test_library_exception_t(fmt::format(
             u8"set_unexpected_termination function has been entered, however "
             u8"should have already termianted. _m_test_status = {0}",
-            abc::checkless_convert_ascii_to_unicode_string<std::u8string>(
+            unpack_string_to_u8string(
                 fmt::format("{}", _m_test_status)
             )
         ));
@@ -655,37 +656,6 @@ __constexpr const std::chrono::time_point<std::chrono::high_resolution_clock>&
 
 namespace
 {
-__constexpr std::u8string
-            normalise_for_file_use(
-                const std::u8string_view _a_str
-            ) noexcept
-{
-    using namespace std;
-    vector<pair<u8string, u8string>> _l_strs_to_replace = {
-        {u8":",  u8"_"},
-        {u8" ",  u8"_"},
-        {u8"\"", u8"" },
-    };
-    u8string _l_rv(_a_str);
-    for (auto& [_l_to_find, _l_to_replace_with] : _l_strs_to_replace)
-    {
-        bool _l_replaced{false};
-        do
-        {
-            _l_replaced = false;
-            if (auto _l_str_pos{_l_rv.find(_l_to_find)};
-                _l_str_pos != u8string::npos)
-            {
-                _l_replaced = true;
-                _l_rv.replace(
-                    _l_str_pos, _l_to_find.size(), _l_to_replace_with
-                );
-            }
-        }
-        while (_l_replaced);
-    }
-    return _l_rv;
-}
 
 __no_constexpr_imp std::filesystem::path
                    create_test_path(
@@ -696,16 +666,17 @@ __no_constexpr_imp std::filesystem::path
     using namespace std::filesystem;
     using namespace utility;
     using namespace std;
-    path_t _l_absolute_path{ std::filesystem::absolute(_a_root_path).string() };
-    wstring _l_wstr{ _l_absolute_path.native() };
-    path_t _l_path = path_t(L"\\\\?\\" + _l_wstr);
+    path_t  _l_absolute_path{std::filesystem::absolute(_a_root_path).string()};
+    wstring _l_wstr{_l_absolute_path.native()};
+    path_t  _l_path = path_t(L"\\\\?\\" + _l_wstr);
     for (const test_path_element_ref_t& _a_test_path_component :
          _a_test_info.test_path_hierarchy())
     {
-        _l_path /= normalise_for_file_use(_a_test_path_component);
+        _l_path
+            /= abc::utility::io::normalise_for_file_use(_a_test_path_component);
     }
-    _l_path /= normalise_for_file_use(
-        abc::checkless_convert_ascii_to_unicode_string<std::u8string>(
+    _l_path /= abc::utility::io::normalise_for_file_use(
+        unpack_string_to_u8string(
             _a_test_info.registered_test_data()._m_user_data.name
         )
     );

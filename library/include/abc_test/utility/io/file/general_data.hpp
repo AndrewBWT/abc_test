@@ -4,6 +4,7 @@
 #include "abc_test/core/options/test_options_base.hpp"
 #include "abc_test/utility/internal/macros.hpp"
 #include "abc_test/utility/str/rw_info.hpp"
+#include "abc_test/utility/io/io_utilities.hpp"
 
 #include <filesystem>
 
@@ -81,7 +82,9 @@ __no_constexpr_imp abc::utility::io::general_data_t
                    ) noexcept
 {
     using namespace abc::utility::io;
-    return general_data_t(_a_path);
+    return general_data_t(
+        abc::utility::io::normalise_for_file_use(
+        _a_path.u8string()));
 }
 
 _END_ABC_NS

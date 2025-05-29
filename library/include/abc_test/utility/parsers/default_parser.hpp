@@ -146,11 +146,8 @@ __constexpr result_t<T>
             ) noexcept
 {
     using namespace std;
-    const u32string _l_sv{_a_parse_input.get_u32string(_a_characters_to_take
-    )};
-    const result_t<string> _l_sv_as_str{
-        abc::convert_unicode_string_to_ascii_string<u32string>(_l_sv)
-    };
+    const u32string _l_sv{_a_parse_input.get_u32string(_a_characters_to_take)};
+    const result_t<string> _l_sv_as_str{abc::convert_unicode_to_ascii(_l_sv)};
     if (_l_sv_as_str.has_value())
     {
         T _l_res;
@@ -261,7 +258,7 @@ public:
             }
             else
             {
-                _l_char = abc::unicode_conversion<u16string>(
+                _l_char = abc::checkless_unicode_conversion<char16_t>(
                               _a_parse_input.process_characters(1)
                 )
                               .at(0);
@@ -369,49 +366,58 @@ struct default_parser_t<T> : public parser_base_t<T>
         const u32string _l_u32str{
             _a_parse_input.take_string_containing(U"0123456789-")
         };
-        const string _l_str{
-            checkless_convert_unicode_string_to_ascii_string(_l_u32str)
-        };
-        auto [ptr, ec]
-            = from_chars(_l_str.data(), _l_str.data() + _l_str.size(), result);
+        const result_t<string> _l_str_opt{convert_unicode_to_ascii(_l_u32str)};
+        if (_l_str_opt.has_value())
+        {
+            auto& _l_str{_l_str_opt.value()};
+            auto [ptr, ec] = from_chars(
+                _l_str.data(), _l_str.data() + _l_str.size(), result
+            );
 
-        if (ec == std::errc())
-        {
-            return result_t<T>(result);
-        }
-        else if (ec == errc::invalid_argument)
-        {
-            return result_t<T>(unexpected(fmt::format(
-                u8"Could not parse \"{0}\" using std::from_chars, as the "
-                u8"std::string argument is invalid",
-                unicode_conversion<u8string>(_l_u32str)
-            )));
-        }
-        else if (ec == errc::result_out_of_range)
-        {
-            return result_t<T>(unexpected(fmt::format(
-                u8"Could not parse \"{0}\" using std::from_chars as, after "
-                u8"conversion, number is out of range. Min and max value of "
-                u8"{1} are {2} and {3}",
-                unicode_conversion<u8string>(_l_u32str),
-                type_id<T>(),
-                numeric_limits<T>::min(),
-                numeric_limits<T>::max()
-            )
+            if (ec == std::errc())
+            {
+                return result_t<T>(result);
+            }
+            else if (ec == errc::invalid_argument)
+            {
+                return result_t<T>(unexpected(fmt::format(
+                    u8"Could not parse \"{0}\" using std::from_chars, as the "
+                    u8"std::string argument is invalid",
+                    checkless_unicode_conversion<char8_t>(_l_u32str)
+                )));
+            }
+            else if (ec == errc::result_out_of_range)
+            {
+                return result_t<T>(unexpected(fmt::format(
+                    u8"Could not parse \"{0}\" using std::from_chars as, after "
+                    u8"conversion, number is out of range. Min and max value "
+                    u8"of "
+                    u8"{1} are {2} and {3}",
+                    checkless_unicode_conversion<char8_t, char32_t>(_l_u32str),
+                    type_id<T>(),
+                    numeric_limits<T>::min(),
+                    numeric_limits<T>::max()
+                )
 
-            ));
+                ));
+            }
+            else
+            {
+                return result_t<T>(unexpected(fmt::format(
+                    u8"Could not parse \"{0}\" using std::from_chars for some "
+                    u8"unknown reason. The error code returned was unexpected. "
+                    u8"Its "
+                    u8"integer represention is {1}",
+                    checkless_unicode_conversion<char8_t, char32_t>(_l_u32str),
+                    std::to_underlying(ec)
+                )
+
+                ));
+            }
         }
         else
         {
-            return result_t<T>(unexpected(fmt::format(
-                u8"Could not parse \"{0}\" using std::from_chars for some "
-                u8"unknown reason. The error code returned was unexpected. Its "
-                u8"integer represention is {1}",
-                unicode_conversion<u8string>(_l_u32str),
-                std::to_underlying(ec)
-            )
-
-            ));
+            return unexpected(u8"unknown");
         }
     }
 };
@@ -744,65 +750,164 @@ struct default_parser_t<std::basic_string<T>>
     {
         using namespace std;
         using arg_type_t = basic_string<T>;
-        char32_t  _l_char{U'"'};
-        char32_t  _l_prev_char;
-        char32_t  _l_char2{U'\\'};
-        size_t    _l_idx{0};
-        u32string _l_str{};
-        if (_a_parse_input.check_and_advance(_l_char))
+        char32_t   _l_char{U'"'};
+        char32_t   _l_prev_char;
+        char32_t   _l_char2{U'\\'};
+        size_t     _l_idx{0};
+        u32string  _l_str{};
+        arg_type_t _l_rv_str;
+        auto       _l_add_str_func = [&](const u32string_view _a_str)
         {
-            const u32string _l_str{
-                _a_parse_input.continue_until_char1_but_not_proceeded_by_char2(
-                    U'"', U'\\'
-                )
-            };
             if constexpr (same_as<arg_type_t, string>)
             {
-                const result_t<string> _l_rv{
-                    abc::convert_unicode_string_to_ascii_string(_l_str)
+                const result_t<arg_type_t> _l_rv{
+                    abc::convert_unicode_to_ascii(_a_str)
                 };
                 if (_l_rv.has_value())
                 {
-                    return _l_rv;
+                    _l_rv_str.append(_l_rv.value());
                 }
                 else
                 {
-                    return unexpected(fmt::format(u8"Could not convert"));
+                    // return unexpected(fmt::format(u8"Could not convert"));
                 }
-            }
-            else if constexpr (same_as<arg_type_t, u8string>)
-            {
-                return abc::unicode_conversion<u8string>(_l_str);
-            }
-            else if constexpr (same_as<arg_type_t, u16string>
-                               || (same_as<arg_type_t, wstring>
-                                   && (sizeof(wchar_t) == 2)))
-            {
-                return abc::unicode_conversion<arg_type_t>(_l_str);
-            }
-            else if constexpr (same_as<arg_type_t, u32string>
-                               || (same_as<arg_type_t, wstring>
-                                   && (sizeof(wchar_t) == 4)))
-            {
-                return _l_str;
             }
             else
             {
-                __STATIC_ASSERT(
-                    T, "wchar_t of this specific size is not supported"
-                );
+                _l_rv_str.append(abc::unicode_conversion<T>(_a_str).value());
             }
+        };
+        // Function for reading hex digits into a T value.
+        auto read_hex_digits = [&]() -> result_t<T>
+        {
+            const size_t hex_size  = sizeof(T);
+            T            _l_result = 0;
+            string       _l_previously_processed_chars;
+            for (size_t _l_idx{0}; _l_idx < hex_size; ++_l_idx)
+            {
+                const u32string _l_str{_a_parse_input.process_characters(2)};
+                const result_t<string> _l_str_as_ascii_opt{
+                    abc::convert_unicode_to_ascii(_l_str)
+                };
+                if (_l_str_as_ascii_opt.has_value())
+                {
+                    const char* _l_str_as_ascii{
+                        _l_str_as_ascii_opt.value().data()
+                    };
+                    uint8_t _l_char;
+                    auto [_l_ptr, _l_ec] = from_chars(
+                        _l_str_as_ascii, _l_str_as_ascii + 2, _l_char, 16
+                    );
+                    if (_l_ec == errc())
+                    {
+                        _l_result |= static_cast<T>(_l_char)
+                                     << ((hex_size - _l_idx - 1) * 8);
+                        _l_previously_processed_chars.append(
+                            string_view(_l_str_as_ascii, _l_str_as_ascii + 2)
+                        );
+                    }
+                    else
+                    {
+                        auto _l_prev_str_info{
+                            (_l_idx == 0)
+                                ? u8""
+                                : fmt::format(
+                                      u8" Previously the characters \"{0}\""
+                                      u8" had been parsed correctly.",
+                                      unpack_string_to_u8string(
+                                          _l_previously_processed_chars
+                                      )
+                                  )
+                        };
+                        // Else return failure
+                        return unexpected{fmt::format(
+                            u8"Failure occoured "
+                            u8"when attempting to parse {0} characters "
+                            u8"into hex, to represent the type {1}. "
+                            u8"The failure occoured when parsing the {2} hex "
+                            u8"pair \"{3}\".{4}",
+                            hex_size * 2,
+                            type_id<T>(),
+                            positive_integer_to_placement(_l_idx + 1),
+                            unpack_string_to_u8string(string_view(
+                                _l_str_as_ascii, _l_str_as_ascii + 2
+                            )),
+                            _l_prev_str_info
+                        )};
+                    }
+                }
+                else
+                {
+                    return std::unexpected(u8"whoah");
+                }
+            }
+            return _l_result;
+        };
+        bool _l_finished{false};
+        if (_a_parse_input.check_and_advance(_l_char))
+        {
+            do
+            {
+                const u32string _l_str2{
+                    _a_parse_input.continue_until_char(U"\\\"")
+                };
+                _l_add_str_func(_l_str2);
+                switch (_a_parse_input.peek_char())
+                {
+                case U'"':
+                    _l_finished = true;
+                    _a_parse_input.advance(1);
+                    break;
+                case U'\\':
+                    switch (_a_parse_input.peek_char(1))
+                    {
+                    case U'x':
+                        // Reading a hex stream now.
+                        _a_parse_input.advance(2);
+                        {
+                            const result_t<T> _l_hex_char{read_hex_digits()};
+                            if (_l_hex_char.has_value())
+                            {
+                                _l_rv_str.push_back(_l_hex_char.value());
+                            }
+                            else
+                            {
+                                return unexpected(_l_hex_char.error());
+                            }
+                        }
+                        break;
+                    case U'"':
+                    case U'\\':
+                    {
+                        _a_parse_input.advance(1);
+                        const u32string _l_str(
+                            _a_parse_input.process_characters(1)
+                        );
+                        _l_add_str_func(_l_str);
+                    }
+                    break;
+                    default:
+                        return std::unexpected(u8"hello");
+                        break;
+                    }
+                    break;
+                }
+            }
+            while (not _l_finished);
         }
+
         else
         {
             return unexpected(fmt::format(
                 u8"Expected {0} to have a prefix of the string \"{1}\". "
                 u8"Remaining string = {2}",
                 type_id<T>(),
-                unicode_conversion<u8string>(u32string(1, _l_char)),
+                checkless_unicode_conversion<char8_t, char32_t>(u32string(1, _l_char)),
                 _a_parse_input.get_u8string()
             ));
         }
+
+        return _l_rv_str;
     }
 };
 
@@ -868,7 +973,8 @@ public:
             switch (_l_first_result.value())
             {
             case 0:
-                if (result_t<T> _l_result{_m_parsers.first->run_parser(_a_parse_input)
+                if (result_t<T> _l_result{
+                        _m_parsers.first->run_parser(_a_parse_input)
                     };
                     _l_result.has_value())
                 {
@@ -884,7 +990,8 @@ public:
                 }
                 break;
             case 1:
-                if (const result_t<U> _l_result{_m_parsers.second->run_parser(_a_parse_input)
+                if (const result_t<U> _l_result{
+                        _m_parsers.second->run_parser(_a_parse_input)
                     };
                     _l_result.has_value())
                 {
@@ -907,7 +1014,8 @@ public:
         else
         {
             return unexpected(fmt::format(
-                u8"Could not parse std::expected element 1. Failed with error "
+                u8"Could not parse std::expected element 1. Failed with "
+                u8"error "
                 u8"message: {0}",
                 _l_first_result.error()
             ));

@@ -225,7 +225,7 @@
 
 namespace abc::internal
 {
-template <class>
+template <typename>
 constexpr bool dependent_false = false; // workaround before CWG2518/P2593R1
 } // namespace abc::internal
 

@@ -2,6 +2,7 @@
 
 #include "abc_test/core/errors/test_library_exception.hpp"
 #include "abc_test/utility/internal/macros.hpp"
+#include "abc_test/utility/str/unicode.hpp"
 #include "abc_test/utility/types.hpp"
 
 #include <charconv>
@@ -51,6 +52,7 @@ __constexpr    std::u8string
                from_hex_with_exception(const std::u8string_view _a_str);
 __no_constexpr std::string
                remove_whitespace(const std::string_view _a_str) noexcept;
+
 _END_ABC_UTILITY_STR_NS
 
 _BEGIN_ABC_UTILITY_STR_NS
@@ -198,7 +200,7 @@ __constexpr_imp result_t<std::u8string>
     else
     {
         const result_t<string> _l_str_result{
-            abc::convert_unicode_string_to_ascii_string(_a_str)
+            abc::convert_unicode_to_ascii(_a_str)
         };
         if (_l_str_result.has_value())
         {

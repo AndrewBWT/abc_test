@@ -103,7 +103,7 @@ __no_constexpr_imp int
                     u8"function:\n{0}\nThe program will now terminate. "
                     u8"included_instances_test_options_t = {1}",
                     _l_st(),
-                    checkless_convert_ascii_to_unicode_string<u8string>(
+                    unpack_string_to_u8string(
                         fmt::format("{}", _l_iito)
                     )
                 )};

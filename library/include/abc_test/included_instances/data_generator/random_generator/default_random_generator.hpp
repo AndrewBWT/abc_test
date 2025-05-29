@@ -5,7 +5,7 @@
 #include "abc_test/utility/enum.hpp"
 #include "abc_test/utility/limits/max_value_concept.hpp"
 #include "abc_test/utility/limits/min_value_concept.hpp"
-#include "abc_test/utility/str/conversion.hpp"
+#include "abc_test/utility/str/unicode.hpp"
 #include "concepts"
 
 #include <memory>
@@ -50,6 +50,17 @@ template <typename T, typename... Ts>
 __constexpr data_gen::random_generator_t<T>
             default_random_generator(Ts... elements) noexcept;
 
+template <typename T, typename Ts>
+__constexpr data_gen::random_generator_t<T>
+            default_random_generatorx2(
+                Ts elements
+            ) noexcept
+{
+    using namespace std;
+    using namespace data_gen;
+    return make_shared<default_random_generator_t<T>>(elements);
+}
+
 template <typename T, typename... Ts>
 __constexpr T
     run_default_random_generator(
@@ -58,9 +69,8 @@ __constexpr T
         Ts... elements
     ) noexcept
 {
-    return default_random_generator<T>(elements...)->operator()(
-        _a_rnd_generator, _a_index
-    );
+    return default_random_generator<T>(elements...)
+        ->operator()(_a_rnd_generator, _a_index);
 }
 
 _END_ABC_NS
@@ -197,7 +207,7 @@ __constexpr std::optional<std::basic_string<T>>
     using namespace std;
     if (_a_biggest_string == 0)
     {
-        // Should always be 1. This should be optimised away.
+        // Should always be > 0. This should be optimised away.
         std::unreachable();
         return basic_string<T>{};
     }
@@ -216,12 +226,16 @@ __constexpr std::optional<std::basic_string<T>>
     }
     else
     {
+        auto _l_conversion_func = [](const char32_t _l_char)
+        {
+            return checkless_unicode_conversion<T>(u32string(1, _l_char));
+        };
         // Ths is the largest amount of space that a char32_t will take in this
         // encoding (assuming not plain ASCII chars).
         const size_t _l_biggest_char{biggest_character_size<T>()};
         if (_l_biggest_char <= _a_biggest_string)
         {
-            return abc::detail::convert_char_to_string<T>(
+            return _l_conversion_func(
                 generate_valid_unicode_char32_t(_a_rng)
             );
         }
@@ -266,7 +280,7 @@ __constexpr std::optional<std::basic_string<T>>
                 );
             }
             // Now we know the limit, we can create a string from it.
-            return abc::detail::convert_char_to_string<T>(
+            return _l_conversion_func(
                 generate_valid_unicode_char32_t(_a_rng, _l_limit)
             );
         }
@@ -1923,7 +1937,7 @@ __no_constexpr_imp default_random_generator_t<std::variant<Ts...>>::value_type_t
 {
     value_type_t _l_rv;
     size_t       _l_index{detail::generate_rng_value_between_bounds(
-        utility::bounds_t<size_t>(0, std::tuple_size<std::tuple<Ts...>>{}-1),
+        utility::bounds_t<size_t>(0, std::tuple_size<std::tuple<Ts...>>{} - 1),
         _a_index,
         _a_rnd_generator
     )};

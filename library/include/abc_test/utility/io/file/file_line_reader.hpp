@@ -29,7 +29,7 @@ public:
         return _m_current_line_idx+1;
     }
 private:
-    size_t                         _m_current_line_idx;
+    size_t                         _m_current_line_idx{ 0 };
     std::u8string                    _m_current_line;
     std::shared_ptr<std::ifstream> _m_file_handler;
     std::filesystem::path          _m_file_name;

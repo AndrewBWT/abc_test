@@ -1,13 +1,12 @@
 #pragma once
 #include "abc_test/utility/internal/log/params.hpp"
 #include "abc_test/utility/io/threaded_ostream_output_reporter.hpp"
-#include "abc_test/utility/str/conversion.hpp"
+#include "abc_test/utility/str/unicode.hpp"
 
 #include <fmt/std.h>
+#include <fmt/xchar.h>
 #include <iostream>
 #include <map>
-
-#include <fmt/xchar.h>
 
 
 #ifndef __LOGGING_ON
@@ -134,7 +133,7 @@ __constexpr_imp void
             u8"LOG: {0}: {1} - {2}",
             get_thread_id(),
             to_str(_a_internal_logger_enum),
-            checkless_convert_ascii_to_unicode_string<u8string>(_a_str)
+            unpack_string_to_u8string(_a_str)
         ));
     }
 }

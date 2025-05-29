@@ -987,7 +987,7 @@ __constexpr_imp std::vector<std::u8string>
     for (size_t _l_idx{1}; _l_idx < _a_argc; ++_l_idx)
     {
         _l_strs[_l_idx - 1]
-            = checkless_convert_ascii_to_unicode_string<u8string>(
+            = unpack_string_to_u8string(
                 _a_argv[_l_idx]
             );
     }

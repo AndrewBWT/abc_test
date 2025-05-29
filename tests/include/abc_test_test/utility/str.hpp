@@ -1,14 +1,16 @@
 #pragma once
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
-#include "abc_test/utility/str/conversion.hpp"
+#include "abc_test/utility/str/unicode.hpp"
+#include "abc_test_test/utility/str/concepts.hpp"
+#include "abc_test_test/utility/str/unicode.hpp"
 
 // Tests for convert_u8string_to_string.
-namespace
+/*namespace
 {
 template <typename T>
 inline void
-    fuzzy_convert_unicode_string_to_ascii_string()
+    fuzzy_convert_unicode_to_ascii()
 {
     using namespace abc;
     using namespace abc::data_gen;
@@ -16,7 +18,7 @@ inline void
     _BEGIN_MULTI_ELEMENT_BBA(
         _l_fuzzy_tests,
         fmt::format(
-            "Fuzzy tests for convert_unicode_string_to_ascii_string "
+            "Fuzzy tests for convert_unicode_to_ascii "
             "using {0}",
             typeid(T).name()
         )
@@ -37,7 +39,7 @@ inline void
         _TVLOG(_l_input_str);
         matcher_t _l_matcher;
         _BEGIN_NO_THROW_MATCHER(_l_matcher);
-        do_not_optimise(abc::convert_unicode_string_to_ascii_string(_l_input_str
+        do_not_optimise(abc::convert_unicode_to_ascii(_l_input_str
         ));
         // End the checks for an exception being thrown.
         _END_NO_THROW_MATCHER(_l_matcher);
@@ -49,7 +51,7 @@ inline void
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name = "Fuzzy tests for convert_unicode_string_to_ascii_string",
+        {.name = "Fuzzy tests for convert_unicode_to_ascii",
          .path = "abc_test_test::utility::str",
          .threads_required = 1}
     )
@@ -58,17 +60,17 @@ _TEST_CASE(
     using namespace abc;
     using namespace std;
     manual_data_generator_t _l_mdg;
-    RUN(_l_mdg, (fuzzy_convert_unicode_string_to_ascii_string<u8string>()));
-    RUN(_l_mdg, (fuzzy_convert_unicode_string_to_ascii_string<u16string>()));
-    RUN(_l_mdg, (fuzzy_convert_unicode_string_to_ascii_string<u32string>()));
-    RUN(_l_mdg, (fuzzy_convert_unicode_string_to_ascii_string<wstring>()));
+    RUN(_l_mdg, (fuzzy_convert_unicode_to_ascii<u8string>()));
+    RUN(_l_mdg, (fuzzy_convert_unicode_to_ascii<u16string>()));
+    RUN(_l_mdg, (fuzzy_convert_unicode_to_ascii<u32string>()));
+    RUN(_l_mdg, (fuzzy_convert_unicode_to_ascii<wstring>()));
 }
 
 namespace
 {
 template <typename T>
 inline void
-    unit_convert_unicode_string_to_ascii_string()
+    unit_convert_unicode_to_ascii()
 {
     using namespace abc;
     using namespace abc::data_gen;
@@ -76,7 +78,7 @@ inline void
     _BEGIN_MULTI_ELEMENT_BBA(
         _l_unit_tests,
         fmt::format(
-            "Unit tests for convert_unicode_string_to_ascii_string "
+            "Unit tests for convert_unicode_to_ascii "
             "using {0}",
             typeid(T).name()
         )
@@ -89,7 +91,7 @@ inline void
         _TVLOG(_l_input);
         const auto& [_l_str, _l_output]{_l_input};
         const result_t<string> _l_res{
-            convert_unicode_string_to_ascii_string(_l_str)
+            convert_unicode_to_ascii(_l_str)
         };
         if (_l_res.has_value())
         {
@@ -102,11 +104,11 @@ inline void
             else
             {
                 _l_unit_tests += _BLOCK_FAIL_WITH_MSG(fmt::format(
-                    u8"convert_unicode_string_to_ascii_string returned valid "
+                    u8"convert_unicode_to_ascii returned valid "
                     u8"result of "
                     u8"\"{0}\", however unit test suggested a failure should "
                     u8"occour, with the result message being \"{1}\".",
-                    checkless_convert_ascii_to_unicode_string<u8string>(
+                    checkless_convert_ascii_to_unicode<u8string>(
                         _l_res.value()
                     ),
                     get<u8string>(_l_output)
@@ -129,7 +131,7 @@ inline void
                     u8"should have occoured, with the result message being "
                     u8"\"{1}\".",
                     _l_res.error(),
-                    abc::checkless_convert_ascii_to_unicode_string<u8string>(
+                    abc::checkless_convert_ascii_to_unicode<u8string>(
                         get<string>(_l_output)
                     )
                 ));
@@ -142,7 +144,7 @@ inline void
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name = "Unit tests for convert_unicode_string_to_ascii_string",
+        {.name = "Unit tests for convert_unicode_to_ascii",
          .path = "abc_test_test::utility::str",
          .threads_required = 1}
     )
@@ -151,17 +153,17 @@ _TEST_CASE(
     using namespace abc;
     using namespace std;
     manual_data_generator_t _l_mdg;
-    RUN(_l_mdg, (unit_convert_unicode_string_to_ascii_string<u8string>()));
-    RUN(_l_mdg, (unit_convert_unicode_string_to_ascii_string<u16string>()));
-    RUN(_l_mdg, (unit_convert_unicode_string_to_ascii_string<u32string>()));
-    RUN(_l_mdg, (unit_convert_unicode_string_to_ascii_string<wstring>()));
+    RUN(_l_mdg, (unit_convert_unicode_to_ascii<u8string>()));
+    RUN(_l_mdg, (unit_convert_unicode_to_ascii<u16string>()));
+    RUN(_l_mdg, (unit_convert_unicode_to_ascii<u32string>()));
+    RUN(_l_mdg, (unit_convert_unicode_to_ascii<wstring>()));
 }
 
 namespace
 {
 template <typename T>
 inline void
-    fuzzy_checkless_convert_unicode_string_to_ascii_string()
+    fuzzy_checkless_convert_unicode_to_ascii()
 {
     using namespace abc;
     using namespace abc::data_gen;
@@ -169,7 +171,7 @@ inline void
     _BEGIN_MULTI_ELEMENT_BBA(
         _l_fuzzy_tests,
         fmt::format(
-            "Fuzzy tests for checkless_convert_unicode_string_to_ascii_string "
+            "Fuzzy tests for checkless_convert_unicode_to_ascii "
             "using {0}",
             typeid(T).name()
         )
@@ -182,7 +184,7 @@ inline void
         matcher_t _l_matcher;
         _BEGIN_NO_THROW_MATCHER(_l_matcher);
         do_not_optimise(
-            abc::checkless_convert_unicode_string_to_ascii_string(_l_input_str)
+            abc::checkless_convert_unicode_to_ascii(_l_input_str)
         );
         // End the checks for an exception being thrown.
         _END_NO_THROW_MATCHER(_l_matcher);
@@ -195,7 +197,7 @@ inline void
 _TEST_CASE(
     abc::test_case_t(
         {.name
-         = "Fuzzy tests for checkless_convert_unicode_string_to_ascii_string",
+         = "Fuzzy tests for checkless_convert_unicode_to_ascii",
          .path             = "abc_test_test::utility::str",
          .threads_required = 1}
     )
@@ -205,20 +207,20 @@ _TEST_CASE(
     using namespace std;
     manual_data_generator_t _l_mdg;
     RUN(_l_mdg,
-        (fuzzy_checkless_convert_unicode_string_to_ascii_string<u8string>()));
+        (fuzzy_checkless_convert_unicode_to_ascii<u8string>()));
     RUN(_l_mdg,
-        (fuzzy_checkless_convert_unicode_string_to_ascii_string<u16string>()));
+        (fuzzy_checkless_convert_unicode_to_ascii<u16string>()));
     RUN(_l_mdg,
-        (fuzzy_checkless_convert_unicode_string_to_ascii_string<u32string>()));
+        (fuzzy_checkless_convert_unicode_to_ascii<u32string>()));
     RUN(_l_mdg,
-        (fuzzy_checkless_convert_unicode_string_to_ascii_string<wstring>()));
+        (fuzzy_checkless_convert_unicode_to_ascii<wstring>()));
 }
 
 namespace
 {
 template <typename T>
 inline void
-    unit_checkless_convert_unicode_string_to_ascii_string()
+    unit_checkless_convert_unicode_to_ascii()
 {
     using namespace abc;
     using namespace abc::data_gen;
@@ -226,7 +228,7 @@ inline void
     _BEGIN_MULTI_ELEMENT_BBA(
         _l_unit_tests,
         fmt::format(
-            "Unit tests for checkless_convert_unicode_string_to_ascii_string "
+            "Unit tests for checkless_convert_unicode_to_ascii "
             "using {0}",
             typeid(T).name()
         )
@@ -239,7 +241,7 @@ inline void
         _TVLOG(_l_input);
         const auto& [_l_str, _l_output]{_l_input};
         const string _l_res{
-            checkless_convert_unicode_string_to_ascii_string(_l_str)
+            checkless_convert_unicode_to_ascii(_l_str)
         };
         _l_unit_tests += _BLOCK_CHECK(strings_equal(_l_res, _l_output));
     }
@@ -250,7 +252,7 @@ inline void
 _TEST_CASE(
     abc::test_case_t(
         {.name
-         = "Unit tests for checkless_convert_unicode_string_to_ascii_string",
+         = "Unit tests for checkless_convert_unicode_to_ascii",
          .path             = "abc_test_test::utility::str",
          .threads_required = 1}
     )
@@ -260,20 +262,20 @@ _TEST_CASE(
     using namespace std;
     manual_data_generator_t _l_mdg;
     RUN(_l_mdg,
-        (unit_checkless_convert_unicode_string_to_ascii_string<u8string>()));
+        (unit_checkless_convert_unicode_to_ascii<u8string>()));
     RUN(_l_mdg,
-        (unit_checkless_convert_unicode_string_to_ascii_string<u16string>()));
+        (unit_checkless_convert_unicode_to_ascii<u16string>()));
     RUN(_l_mdg,
-        (unit_checkless_convert_unicode_string_to_ascii_string<u32string>()));
+        (unit_checkless_convert_unicode_to_ascii<u32string>()));
     RUN(_l_mdg,
-        (unit_checkless_convert_unicode_string_to_ascii_string<wstring>()));
+        (unit_checkless_convert_unicode_to_ascii<wstring>()));
 }
 
 namespace
 {
 template <typename T>
 inline void
-    fuzzy_convert_ascii_to_unicode_string()
+    fuzzy_convert_ascii_to_unicode()
 {
     using namespace abc;
     using namespace abc::data_gen;
@@ -281,7 +283,7 @@ inline void
     _BEGIN_MULTI_ELEMENT_BBA(
         _l_fuzzy_tests,
         fmt::format(
-            "Fuzzy tests for convert_ascii_to_unicode_string "
+            "Fuzzy tests for convert_ascii_to_unicode "
             "using {0}",
             typeid(T).name()
         )
@@ -293,7 +295,7 @@ inline void
         _TVLOG(_l_input_str);
         matcher_t _l_matcher;
         _BEGIN_NO_THROW_MATCHER(_l_matcher);
-        do_not_optimise(abc::convert_ascii_to_unicode_string<T>(_l_input_str));
+        do_not_optimise(abc::convert_ascii_to_unicode<T>(_l_input_str));
         // End the checks for an exception being thrown.
         _END_NO_THROW_MATCHER(_l_matcher);
         _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
@@ -304,7 +306,7 @@ inline void
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name             = "Fuzzy tests for convert_ascii_to_unicode_string",
+        {.name             = "Fuzzy tests for convert_ascii_to_unicode",
          .path             = "abc_test_test::utility::str",
          .threads_required = 1}
     )
@@ -313,17 +315,17 @@ _TEST_CASE(
     using namespace abc;
     using namespace std;
     manual_data_generator_t _l_mdg;
-    RUN(_l_mdg, (fuzzy_convert_ascii_to_unicode_string<u8string>()));
-    RUN(_l_mdg, (fuzzy_convert_ascii_to_unicode_string<u16string>()));
-    RUN(_l_mdg, (fuzzy_convert_ascii_to_unicode_string<u32string>()));
-    RUN(_l_mdg, (fuzzy_convert_unicode_string_to_ascii_string<wstring>()));
+    RUN(_l_mdg, (fuzzy_convert_ascii_to_unicode<u8string>()));
+    RUN(_l_mdg, (fuzzy_convert_ascii_to_unicode<u16string>()));
+    RUN(_l_mdg, (fuzzy_convert_ascii_to_unicode<u32string>()));
+    RUN(_l_mdg, (fuzzy_convert_unicode_to_ascii<wstring>()));
 }
 
 namespace
 {
 template <typename T>
 inline void
-    unit_convert_ascii_to_unicode_string()
+    unit_convert_ascii_to_unicode()
 {
     using namespace abc;
     using namespace abc::data_gen;
@@ -331,7 +333,7 @@ inline void
     _BEGIN_MULTI_ELEMENT_BBA(
         _l_unit_tests,
         fmt::format(
-            "Unit tests for convert_ascii_to_unicode_string "
+            "Unit tests for convert_ascii_to_unicode "
             "using {0}",
             typeid(T).name()
         )
@@ -343,7 +345,7 @@ inline void
     {
         _TVLOG(_l_input);
         const auto& [_l_str, _l_output]{_l_input};
-        const result_t<T> _l_res{convert_ascii_to_unicode_string<T>(_l_str)};
+        const result_t<T> _l_res{convert_ascii_to_unicode<T>(_l_str)};
         if (_l_res.has_value())
         {
             if (_l_output.index() == 0)
@@ -355,7 +357,7 @@ inline void
             else
             {
                 _l_unit_tests += _BLOCK_FAIL_WITH_MSG(fmt::format(
-                    u8"convert_ascii_to_unicode_string returned valid result "
+                    u8"convert_ascii_to_unicode returned valid result "
                     u8"of "
                     u8"\"{0}\", however unit test suggested a failure should "
                     u8"occour, with the result message being \"{1}\".",
@@ -375,7 +377,7 @@ inline void
             else
             {
                 _l_unit_tests += _BLOCK_FAIL_WITH_MSG(fmt::format(
-                    u8"convert_ascii_to_unicode_string returned a failure "
+                    u8"convert_ascii_to_unicode returned a failure "
                     u8"result of "
                     u8"\"{0}\", however unit test suggested a valid result "
                     u8"should have occoured, with the result message being "
@@ -392,7 +394,7 @@ inline void
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name             = "Unit tests for convert_ascii_to_unicode_string",
+        {.name             = "Unit tests for convert_ascii_to_unicode",
          .path             = "abc_test_test::utility::str",
          .threads_required = 1}
     )
@@ -401,17 +403,17 @@ _TEST_CASE(
     using namespace abc;
     using namespace std;
     manual_data_generator_t _l_mdg;
-    RUN(_l_mdg, (unit_convert_ascii_to_unicode_string<u8string>()));
-    RUN(_l_mdg, (unit_convert_ascii_to_unicode_string<u16string>()));
-    RUN(_l_mdg, (unit_convert_ascii_to_unicode_string<u32string>()));
-    RUN(_l_mdg, (unit_convert_ascii_to_unicode_string<wstring>()));
+    RUN(_l_mdg, (unit_convert_ascii_to_unicode<u8string>()));
+    RUN(_l_mdg, (unit_convert_ascii_to_unicode<u16string>()));
+    RUN(_l_mdg, (unit_convert_ascii_to_unicode<u32string>()));
+    RUN(_l_mdg, (unit_convert_ascii_to_unicode<wstring>()));
 }
 
 namespace
 {
 template <typename T>
 inline void
-    fuzzy_checkless_convert_ascii_to_unicode_string()
+    fuzzy_checkless_convert_ascii_to_unicode()
 {
     using namespace abc;
     using namespace abc::data_gen;
@@ -419,7 +421,7 @@ inline void
     _BEGIN_MULTI_ELEMENT_BBA(
         _l_fuzzy_tests,
         fmt::format(
-            "Fuzzy tests for checkless_convert_ascii_to_unicode_string "
+            "Fuzzy tests for checkless_convert_ascii_to_unicode "
             "using {0}",
             typeid(T).name()
         )
@@ -432,7 +434,7 @@ inline void
         matcher_t _l_matcher;
         _BEGIN_NO_THROW_MATCHER(_l_matcher);
         do_not_optimise(
-            abc::checkless_convert_ascii_to_unicode_string<T>(_l_input_str)
+            abc::checkless_convert_ascii_to_unicode<T>(_l_input_str)
         );
         // End the checks for an exception being thrown.
         _END_NO_THROW_MATCHER(_l_matcher);
@@ -444,7 +446,7 @@ inline void
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name = "Fuzzy tests for checkless_convert_ascii_to_unicode_string",
+        {.name = "Fuzzy tests for checkless_convert_ascii_to_unicode",
          .path = "abc_test_test::utility::str",
          .threads_required = 1}
     )
@@ -453,17 +455,17 @@ _TEST_CASE(
     using namespace abc;
     using namespace std;
     manual_data_generator_t _l_mdg;
-    RUN(_l_mdg, (fuzzy_checkless_convert_ascii_to_unicode_string<u8string>()));
-    RUN(_l_mdg, (fuzzy_checkless_convert_ascii_to_unicode_string<u16string>()));
-    RUN(_l_mdg, (fuzzy_checkless_convert_ascii_to_unicode_string<u32string>()));
-    RUN(_l_mdg, (fuzzy_checkless_convert_ascii_to_unicode_string<wstring>()));
+    RUN(_l_mdg, (fuzzy_checkless_convert_ascii_to_unicode<u8string>()));
+    RUN(_l_mdg, (fuzzy_checkless_convert_ascii_to_unicode<u16string>()));
+    RUN(_l_mdg, (fuzzy_checkless_convert_ascii_to_unicode<u32string>()));
+    RUN(_l_mdg, (fuzzy_checkless_convert_ascii_to_unicode<wstring>()));
 }
 
 namespace
 {
 template <typename T>
 inline void
-    unit_checkless_convert_ascii_to_unicode_string()
+    unit_checkless_convert_ascii_to_unicode()
 {
     using namespace abc;
     using namespace abc::data_gen;
@@ -471,7 +473,7 @@ inline void
     _BEGIN_MULTI_ELEMENT_BBA(
         _l_unit_tests,
         fmt::format(
-            "Unit tests for checkless_convert_ascii_to_unicode_string "
+            "Unit tests for checkless_convert_ascii_to_unicode "
             "using {0}",
             typeid(T).name()
         )
@@ -483,7 +485,7 @@ inline void
     {
         _TVLOG(_l_input);
         const auto& [_l_str, _l_output]{_l_input};
-        const T _l_res{checkless_convert_ascii_to_unicode_string<T>(_l_str)};
+        const T _l_res{checkless_convert_ascii_to_unicode<T>(_l_str)};
         _l_unit_tests += _BLOCK_CHECK(strings_equal(_l_res, _l_output));
     }
     _END_BBA_CHECK(_l_unit_tests);
@@ -492,7 +494,7 @@ inline void
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name = "Unit tests for checkless_convert_ascii_to_unicode_string",
+        {.name = "Unit tests for checkless_convert_ascii_to_unicode",
          .path = "abc_test_test::utility::str",
          .threads_required = 1}
     )
@@ -501,10 +503,10 @@ _TEST_CASE(
     using namespace abc;
     using namespace std;
     manual_data_generator_t _l_mdg;
-    RUN(_l_mdg, (unit_checkless_convert_ascii_to_unicode_string<u8string>()));
-    RUN(_l_mdg, (unit_checkless_convert_ascii_to_unicode_string<u16string>()));
-    RUN(_l_mdg, (unit_checkless_convert_ascii_to_unicode_string<u32string>()));
-    RUN(_l_mdg, (unit_checkless_convert_ascii_to_unicode_string<wstring>()));
+    RUN(_l_mdg, (unit_checkless_convert_ascii_to_unicode<u8string>()));
+    RUN(_l_mdg, (unit_checkless_convert_ascii_to_unicode<u16string>()));
+    RUN(_l_mdg, (unit_checkless_convert_ascii_to_unicode<u32string>()));
+    RUN(_l_mdg, (unit_checkless_convert_ascii_to_unicode<wstring>()));
 }
 
 namespace
@@ -526,16 +528,6 @@ inline void
     );
     // Third index is either 0 or 1; 0 if valid result, non-zero if not
     using test_data_1 = std::tuple<string>;
-    /*for (const auto& [_l_input_str] : generate_data_randomly<test_data_1>())
-    {
-        _TVLOG(_l_input_str);
-        _l_property_tests += _BLOCK_CHECK(strings_equal(
-            _l_input_str,
-            checkless_convert_unicode_string_to_ascii_string(
-                checkless_convert_ascii_to_unicode_string<T>(_l_input_str)
-            )
-        ));
-    }*/
     using test_data_2 = T;
     using CharT       = typename T::value_type;
     for (const auto& _l_input_str :
@@ -546,8 +538,8 @@ inline void
         _TVLOG(_l_input_str);
         _l_property_tests += _BLOCK_CHECK(strings_equal(
             _l_input_str,
-            checkless_convert_ascii_to_unicode_string<T>(
-                checkless_convert_unicode_string_to_ascii_string(_l_input_str)
+            checkless_convert_ascii_to_unicode<T>(
+                checkless_convert_unicode_to_ascii(_l_input_str)
             )
         ));
     }
@@ -580,12 +572,12 @@ _TEST_CASE(
     //RUN(_l_mdg, (property_checkless_convert_ascii<u16string>()));
     //RUN(_l_mdg, (property_checkless_convert_ascii<u32string>()));
     //RUN(_l_mdg, (property_checkless_convert_ascii<wstring>()));
-}
+}*/
 
 /*_TEST_CASE(
     abc::test_case_t(
         {.name
-         = "Fuzzy tests for checkless_convert_unicode_string_to_ascii_string",
+         = "Fuzzy tests for checkless_convert_unicode_to_ascii",
          .path             = "abc_test_test::utility::str",
          .threads_required = 1}
     )
@@ -596,7 +588,7 @@ _TEST_CASE(
     using namespace std;
     _BEGIN_MULTI_ELEMENT_BBA(
         _l_fuzzy_tests,
-        "Fuzzy tests for checkless_convert_unicode_string_to_ascii_string"
+        "Fuzzy tests for checkless_convert_unicode_to_ascii"
     );
     // Third index is either 0 or 1; 0 if valid result, non-zero if not
     using test_data = std::tuple<u8string>;
@@ -605,7 +597,7 @@ _TEST_CASE(
         _TVLOG(_l_input_str);
         _BEGIN_NO_THROW_MATCHER(_l_matcher);
         do_not_optimise(
-            abc::checkless_convert_unicode_string_to_ascii_string(_l_input_str)
+            abc::checkless_convert_unicode_to_ascii(_l_input_str)
         );
         // End the checks for an exception being thrown.
         _END_NO_THROW_MATCHER(_l_matcher);
@@ -617,7 +609,7 @@ _TEST_CASE(
 _TEST_CASE(
     abc::test_case_t(
         {.name
-         = "Unit tests for checkless_convert_unicode_string_to_ascii_string",
+         = "Unit tests for checkless_convert_unicode_to_ascii",
          .path             = "abc_test_test::utility::str",
          .threads_required = 1}
     )
@@ -628,7 +620,7 @@ _TEST_CASE(
     using namespace std;
     _BEGIN_MULTI_ELEMENT_BBA(
         _l_unit_tests,
-        "Unit tests for checkless_convert_unicode_string_to_ascii_string"
+        "Unit tests for checkless_convert_unicode_to_ascii"
     );
     // Third index is either 0 or 1; 0 if valid result, non-zero if not
     using test_data
@@ -637,7 +629,7 @@ _TEST_CASE(
          read_data_from_file<test_data>("unit_tests"))
     {
         const result_t<string> _l_res{
-            convert_unicode_string_to_ascii_string(_l_input_str)
+            convert_unicode_to_ascii(_l_input_str)
         };
         if (_l_res.has_value())
         {
@@ -653,7 +645,7 @@ _TEST_CASE(
                     u8"convert_u8string_to_string returned valid result of "
                     u8"\"{0}\", however unit test suggested a failure should "
                     u8"occour, with the result message being \"{1}\".",
-                    checkless_convert_ascii_to_unicode_string<u8string>(
+                    checkless_convert_ascii_to_unicode<u8string>(
                         _l_res.value()
                     ),
                     get<u8string>(_l_output)
@@ -676,7 +668,7 @@ _TEST_CASE(
                     u8"should have occoured, with the result message being "
                     u8"\"{1}\".",
                     _l_res.error(),
-                    abc::checkless_convert_ascii_to_unicode_string<u8string>(
+                    abc::checkless_convert_ascii_to_unicode<u8string>(
                         get<string>(_l_output)
                     )
                 ));
@@ -759,7 +751,7 @@ _TEST_CASE(
     {
         _TVLOG(_l_input_str);
         _BEGIN_NO_THROW_MATCHER(_l_matcher);
-        do_not_optimise(convert_ascii_to_unicode_string<u8string>(_l_input_str)
+        do_not_optimise(convert_ascii_to_unicode<u8string>(_l_input_str)
         );
         // End the checks for an exception being thrown.
         _END_NO_THROW_MATCHER(_l_matcher);
@@ -789,7 +781,7 @@ _TEST_CASE(
          read_data_from_file<test_data>("unit_tests"))
     {
         const result_t<u8string> _l_res{
-            convert_ascii_to_unicode_string<u8string>(_l_input_str)
+            convert_ascii_to_unicode<u8string>(_l_input_str)
         };
         if (_l_res.has_value())
         {
@@ -897,7 +889,7 @@ __constexpr void
     using namespace std;
     _CHECK_EXPR(
         type_id<T>()
-        == checkless_convert_ascii_to_unicode_string<u8string>(_a_str)
+        == checkless_convert_ascii_to_unicode<u8string>(_a_str)
     );
 }
 
@@ -1045,7 +1037,7 @@ _TEST_CASE(
     {
         _TVLOG(_l_input_str);
         _BEGIN_NO_THROW_MATCHER(_l_matcher);
-        do_not_optimise(convert_unicode_string_to_ascii_string(_l_input_str));
+        do_not_optimise(convert_unicode_to_ascii(_l_input_str));
         // End the checks for an exception being thrown.
         _END_NO_THROW_MATCHER(_l_matcher);
         _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
@@ -1074,7 +1066,7 @@ _TEST_CASE(
          read_data_from_file<test_data>("unit_tests"))
     {
         const result_t<string> _l_res{
-            convert_unicode_string_to_ascii_string(_l_input_str)
+            convert_unicode_to_ascii(_l_input_str)
         };
         if (_l_res.has_value())
         {
@@ -1090,7 +1082,7 @@ _TEST_CASE(
                     u8"convert_u32string_to_string returned valid result of "
                     u8"\"{0}\", however unit test suggested a failure should "
                     u8"occour, with the result message being \"{1}\".",
-                    checkless_convert_ascii_to_unicode_string<u8string>(
+                    checkless_convert_ascii_to_unicode<u8string>(
                         _l_res.value()
                     ),
                     get<u8string>(_l_output)
@@ -1114,7 +1106,7 @@ _TEST_CASE(
                     u8"should have occoured, with the result message being "
                     u8"\"{1}\".",
                     _l_res.error(),
-                    checkless_convert_ascii_to_unicode_string<u8string>(
+                    checkless_convert_ascii_to_unicode<u8string>(
                         get<string>(_l_output)
                     )
                 ));
@@ -1145,7 +1137,7 @@ _TEST_CASE(
         _TVLOG(_l_input_str);
         _BEGIN_NO_THROW_MATCHER(_l_matcher);
         do_not_optimise(
-            checkless_convert_unicode_string_to_ascii_string(_l_input_str)
+            checkless_convert_unicode_to_ascii(_l_input_str)
         );
         // End the checks for an exception being thrown.
         _END_NO_THROW_MATCHER(_l_matcher);
@@ -1174,7 +1166,7 @@ _TEST_CASE(
          read_data_from_file<test_data>("unit_tests"))
     {
         const string _l_res{
-            checkless_convert_unicode_string_to_ascii_string(_l_input_str)
+            checkless_convert_unicode_to_ascii(_l_input_str)
         };
         _l_unit_tests += _BLOCK_CHECK(strings_equal(_l_res, _l_output));
     }

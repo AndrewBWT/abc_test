@@ -39,9 +39,9 @@ enum class enum_with_enum_list_4
     four  = 1
 };
 using type_list_t = abc::utility::type_list<
-     enum_with_enum_list_1,
-     enum_with_enum_list_2,
-     enum_with_enum_list_3,
+    enum_with_enum_list_1,
+    enum_with_enum_list_2,
+    enum_with_enum_list_3,
     enum_with_enum_list_4>;
 } // namespace
 
@@ -327,9 +327,7 @@ _TEST_CASE(
     auto _l_test_func = [&]<typename Enum>()
     {
         auto _l_type_name{typeid(Enum).name()};
-        auto _l_tn{
-            checkless_convert_ascii_to_unicode_string<u8string>(_l_type_name)
-        };
+        auto _l_tn{unpack_string_to_u8string(_l_type_name)};
         _TVLOG(_l_tn);
         enumerate_enum_helper_t<Enum> _l_helper(get_enum_list<Enum>());
         auto                          _l_increment =
@@ -452,7 +450,7 @@ _TEST_CASE(
             = [&]<typename F>(string_view _a_name, F _a_func)
         {
             auto _l_b_str
-                = checkless_convert_ascii_to_unicode_string<u8string>(_a_name);
+                = unpack_string_to_u8string(_a_name);
             _TVLOG(_l_b_str);
             for (auto& _l_data : enumerate_data<property_test_data_1>())
             {
@@ -1123,7 +1121,8 @@ _TEST_CASE(
                 [](const auto& _a_pair)
                 {
                     return make_pair(
-                        static_cast<Enum>(_a_pair.first), u8string_view(_a_pair.second)
+                        static_cast<Enum>(_a_pair.first),
+                        u8string_view(_a_pair.second)
                     );
                 }
             );
@@ -1139,8 +1138,7 @@ _TEST_CASE(
         _END_BBA_CHECK(_l_error_tests);
     };
 
-    using type_list = abc::utility::type_list<
-        enum_with_enum_list_4>;
+    using type_list = abc::utility::type_list<enum_with_enum_list_4>;
     manual_data_generator_t _l_mdg;
     for_each_type<type_list>(
         [&]<typename T>()

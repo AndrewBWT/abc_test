@@ -1,6 +1,6 @@
 #pragma once
 #include "abc_test/utility/internal/macros.hpp"
-#include "abc_test/utility/str/conversion.hpp"
+#include "abc_test/utility/str/unicode.hpp"
 
 #include <fmt/base.h>
 #include <optional>
@@ -93,9 +93,9 @@ __constexpr std::u8string
 {
     using namespace std;
     return u8string{}
-        .append(convert_ascii_to_unicode_string<u8string>(this->name).value())
+        .append(convert_ascii_to_unicode<char8_t>(this->name).value())
         .append(_a_delimiter)
-        .append(convert_ascii_to_unicode_string<u8string>(this->path).value());
+        .append(convert_ascii_to_unicode<char8_t>(this->path).value());
 }
 
 _END_ABC_DS_NS

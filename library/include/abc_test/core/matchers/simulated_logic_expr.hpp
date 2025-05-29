@@ -8,9 +8,41 @@ struct simulated_logic_expr_t
 {
     __constexpr
     simulated_logic_expr_t()
-        = default;
-    __constexpr explicit
-    simulated_logic_expr_t(const matcher_wrapper_t<false>& _a_matcher);
+        = delete;
+
+    simulated_logic_expr_t&
+        operator=(
+            const matcher_wrapper_t<false>& _a_matcher
+        )
+    {
+        _m_right_arm_of_matcher = _a_matcher;
+        return *this;
+    }
+
+    __constexpr ~simulated_logic_expr_t()
+    {
+        _m_attached_matcher
+            = mk_matcher_representing_binary_logical_expr<Logic_Enum>(
+                _m_attached_matcher, _m_right_arm_of_matcher, u8"<unevaluated>"
+            );
+    }
+
+    __constexpr explicit simulated_logic_expr_t(
+        matcher_wrapper_t<false>&   _a_matcher,
+        const std::string           _a_macro_str,
+        const std::string           _a_macro_args,
+        const std::source_location& _a_source_loc
+    )
+        : _m_attached_matcher(_a_matcher)
+    {
+        _m_attached_matcher.add_source_info(
+            _a_macro_str, _a_macro_args, _a_source_loc
+        );
+    }
+
+    __constexpr explicit simulated_logic_expr_t(
+        const matcher_wrapper_t<false>& _a_matcher
+    );
     __constexpr const std::optional<matcher_wrapper_t<false>>&
                       left_child() const noexcept;
     __constexpr void
@@ -32,6 +64,8 @@ struct simulated_logic_expr_t
     __constexpr matcher_wrapper_t<false>
                 matcher() const noexcept;
 private:
+    matcher_wrapper_t<false>&               _m_attached_matcher;
+    std::optional<matcher_wrapper_t<false>> _m_right_arm_of_matcher;
     std::optional<matcher_wrapper_t<false>> _m_matcher_l;
     std::optional<matcher_wrapper_t<false>> _m_matcher_r;
 };

@@ -244,7 +244,7 @@
     catch (const _a_exception_type& _a_error)                                \
     {                                                                        \
         u8string _l_rv{                                                      \
-            abc::checkless_convert_ascii_to_unicode_string<u8string>(        \
+            unpack_string_to_u8string(        \
                 _a_error.what()                                              \
             )                                                                \
         };                                                                   \
