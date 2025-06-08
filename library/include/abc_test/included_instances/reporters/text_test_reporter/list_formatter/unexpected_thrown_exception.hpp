@@ -94,8 +94,8 @@ __constexpr_imp void
         switch (*_l_ptr)
         {
         case EXCEPTION_TYPE:
-            _a_ttor.write(_a_pc.indent(_a_pc.exception_type_str()));
-            _a_ttor.write(_a_pc.indent(
+            _a_ttor.write_line(_a_pc.indent(_a_pc.exception_type_str()));
+            _a_ttor.write_line(_a_pc.indent(
                 _a_pc.exception_type(
                     unpack_string_to_u8string(
                         _a_element.exception_type()
@@ -105,8 +105,8 @@ __constexpr_imp void
             ));
             break;
         case EXCEPTION_MESSAGE:
-            _a_ttor.write(_a_pc.indent(_a_pc.exception_message_str()));
-            _a_ttor.write(_a_pc.indent(
+            _a_ttor.write_line(_a_pc.indent(_a_pc.exception_message_str()));
+            _a_ttor.write_line(_a_pc.indent(
                 _a_pc.exception_message(
                     unpack_string_to_u8string(
                         _a_element.exception_message()

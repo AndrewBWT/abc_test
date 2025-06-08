@@ -121,22 +121,22 @@ __constexpr_imp void
     case SOURCE:
         if constexpr (Single_Source)
         {
-            _a_ttor.write(fmt::format(
+            _a_ttor.write_line(fmt::format(
                 u8"{0}{1}",
                 prefix(_a_idx),
                 _a_pc.colon(_a_pc.source_location_str())
             ));
-            _a_ttor.write(fmt::format(
+            _a_ttor.write_line(fmt::format(
                 u8"{0}{1}",
                 prefix(_a_idx),
                 _a_pc.indent(
                     _a_pc.source_location(_a_element.source().source_location())
                 )
             ));
-            _a_ttor.write(fmt::format(
+            _a_ttor.write_line(fmt::format(
                 u8"{0}{1}", prefix(_a_idx), _a_pc.colon(_a_pc.source_code_str())
             ));
-            _a_ttor.write(fmt::format(
+            _a_ttor.write_line(fmt::format(
                 u8"{0}{1}",
                 prefix(_a_idx),
                 _a_pc.indent(_a_pc.source_representation(
@@ -148,17 +148,17 @@ __constexpr_imp void
         }
         else
         {
-            _a_ttor.write(fmt::format(
+            _a_ttor.write_line(fmt::format(
                 u8"{0}{1}",
                 prefix(_a_idx),
                 _a_pc.colon(_a_pc.source_location_pair_begin_str())
             ));
-            _a_ttor.write(fmt::format(
+            _a_ttor.write_line(fmt::format(
                 u8"{0}{1}",
                 prefix(_a_idx),
                 _a_pc.indent(_a_pc.colon(_a_pc.source_location_str()))
             ));
-            _a_ttor.write(fmt::format(
+            _a_ttor.write_line(fmt::format(
                 u8"{0}{1}",
                 prefix(_a_idx),
                 _a_pc.indent(
@@ -168,12 +168,12 @@ __constexpr_imp void
                     2
                 )
             ));
-            _a_ttor.write(fmt::format(
+            _a_ttor.write_line(fmt::format(
                 u8"{0}{1}",
                 prefix(_a_idx),
                 _a_pc.indent(_a_pc.colon(_a_pc.source_code_str()))
             ));
-            _a_ttor.write(fmt::format(
+            _a_ttor.write_line(fmt::format(
                 u8"{0}{1}",
                 prefix(_a_idx),
                 _a_pc.indent(
@@ -194,24 +194,24 @@ __constexpr_imp void
                 const ds::single_source_t _l_end{
                     _a_element.source().end_source().value()
                 };
-                _a_ttor.write(fmt::format(
+                _a_ttor.write_line(fmt::format(
                     u8"{0}{1}",
                     prefix(_a_idx),
                     _a_pc.indent(_a_pc.colon(_a_pc.source_location_str()))
                 ));
-                _a_ttor.write(fmt::format(
+                _a_ttor.write_line(fmt::format(
                     u8"{0}{1}",
                     prefix(_a_idx),
                     _a_pc.indent(
                         _a_pc.source_location(_l_end.source_location()), 2
                     )
                 ));
-                _a_ttor.write(fmt::format(
+                _a_ttor.write_line(fmt::format(
                     u8"{0}{1}",
                     prefix(_a_idx),
                     _a_pc.indent(_a_pc.colon(_a_pc.source_code_str()))
                 ));
-                _a_ttor.write(fmt::format(
+                _a_ttor.write_line(fmt::format(
                     u8"{0}{1}",
                     prefix(_a_idx),
                     _a_pc.indent(
@@ -226,12 +226,12 @@ __constexpr_imp void
         break;
     case LOG_INFOS:
     {
-        _a_ttor.write(fmt::format(
+        _a_ttor.write_line(fmt::format(
             u8"{0}{1}", prefix(_a_idx), _a_pc.colon(_a_pc.log_info_str())
         ));
         for (const u8string_view& _l_str : _a_element.log_infos())
         {
-            _a_ttor.write(fmt::format(
+            _a_ttor.write_line(fmt::format(
                 u8"{0}{1}", prefix(_a_idx), _a_pc.indent(_a_pc.log_info(_l_str))
             ));
         }

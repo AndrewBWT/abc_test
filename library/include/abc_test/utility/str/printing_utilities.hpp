@@ -84,6 +84,12 @@ struct char_underlying_type
 };
 
 template <>
+struct char_underlying_type<char>
+{
+    using type = char8_t;
+};
+
+template <>
 struct char_underlying_type<char8_t>
 {
     using type = uint8_t;
@@ -139,9 +145,9 @@ __constexpr std::u8string
 template <typename T>
 __constexpr std::basic_string<T>
             make_focused_string(
-                const std::basic_string<T>& _a_sv,
-                const std::size_t           _a_idx,
-                const std::size_t           _a_limit = 10
+                const std::basic_string_view<T> _a_sv,
+                const std::size_t               _a_idx,
+                const std::size_t               _a_limit = 10
             )
 {
     using namespace std;
@@ -158,6 +164,18 @@ __constexpr std::basic_string<T>
             : (_l_engouh_elements_after ? _a_sv.substr(0, _l_after_offset)
                                         : _a_sv)
     };
+}
+
+template <typename T>
+__constexpr std::basic_string<T>
+            make_focused_string(
+                const std::basic_string<T>& _a_sv,
+                const std::size_t           _a_idx,
+                const std::size_t           _a_limit = 10
+            )
+{
+    using namespace std;
+    return make_focused_string(basic_string_view<T>(_a_sv), _a_idx, _a_limit);
 }
 
 _END_ABC_NS
@@ -186,7 +204,7 @@ __constexpr_imp std::u8string
                 type_id() noexcept
 {
     using namespace std;
-    string _l_str{ typeid(T).name() };
+    string _l_str{typeid(T).name()};
     return u8string(_l_str.begin(), _l_str.end());
 }
 

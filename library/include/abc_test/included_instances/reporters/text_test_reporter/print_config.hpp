@@ -218,6 +218,8 @@ public:
     __constexpr std::u8string
                 message_str(const std::u8string& _a_str) const noexcept;
     __constexpr std::u8string
+        test_description(const std::u8string_view _a_str) const noexcept;
+    __constexpr std::u8string
                 message_str(const std::u8string_view& _a_str) const noexcept;
     __no_constexpr_imp std::u8string
                        time_taken(
@@ -301,6 +303,10 @@ public:
                       multi_element_collection_grouped_str() const noexcept;
     __constexpr const std::u8string_view
                       exception_type_str() const noexcept;
+    __constexpr const std::u8string_view
+        explanation_str() const noexcept {
+        return u8"Explanation";
+    }
     __constexpr       std::u8string
         exception_type(const std::u8string_view _a_str) const noexcept;
     __constexpr const std::u8string_view
@@ -476,7 +482,7 @@ __constexpr_imp std::u8string
         const std::u8string_view _a_str
     ) const noexcept
 {
-    return slight_highlight(quote(_a_str));
+    return slight_highlight(_a_str);
 }
 
 __constexpr_imp const std::u8string_view
@@ -1164,11 +1170,17 @@ __constexpr std::u8string
 }
 
 __constexpr std::u8string
+print_config_t::test_description(const std::u8string_view _a_str) const noexcept
+{
+    return slight_highlight(quote(_a_str));
+}
+
+__constexpr std::u8string
             print_config_t::message_str(
         const std::u8string_view& _a_str
     ) const noexcept
 {
-    return slight_highlight(quote(_a_str));
+    return slight_highlight(_a_str);
 }
 
 __constexpr_imp std::u8string

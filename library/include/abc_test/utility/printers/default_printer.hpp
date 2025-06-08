@@ -513,16 +513,16 @@ __constexpr std::u8string
     {
         _l_rv.append(u8" ");
     }
-    _l_rv.append(unpack_string_to_u8string(
-        string(1, _a_object_print_parser.begin_char)
-    ));
+    _l_rv.append(
+        unpack_string_to_u8string(string(1, _a_object_print_parser.begin_char))
+    );
     tuple<Ts...> _l_tuple{tie(_a_elements_to_print...)};
     object_printer_internal<0>(
         _a_object_print_parser, _l_rv, _a_object_names, _a_parsers, _l_tuple
     );
-    _l_rv.append(unpack_string_to_u8string(
-        string(1, _a_object_print_parser.end_char)
-    ));
+    _l_rv.append(
+        unpack_string_to_u8string(string(1, _a_object_print_parser.end_char))
+    );
     return _l_rv;
 }
 
@@ -550,18 +550,14 @@ __constexpr void
         _a_str.append(get<I>(_a_object_names.value()));
         if (_a_object_print_parser.space_before_field_name_and_field_separator)
         {
-            _a_str.append(
-                unpack_string_to_u8string(string(1, ' '))
-            );
+            _a_str.append(unpack_string_to_u8string(string(1, ' ')));
         }
         _a_str.append(unpack_string_to_u8string(string(
             1, _a_object_print_parser.delimiter_between_field_name_and_field
         )));
         if (_a_object_print_parser.space_after_field_name_and_field_separator)
         {
-            _a_str.append(
-                unpack_string_to_u8string(string(1, ' '))
-            );
+            _a_str.append(unpack_string_to_u8string(string(1, ' ')));
         }
     }
     _a_str.append(
@@ -571,18 +567,14 @@ __constexpr void
     {
         if (_a_object_print_parser.space_before_field_delimiter)
         {
-            _a_str.append(unpack_string_to_u8string(
-                string(1, ' ')
-            ));
+            _a_str.append(unpack_string_to_u8string(string(1, ' ')));
         }
         _a_str.append(unpack_string_to_u8string(
             string(1, _a_object_print_parser.delimiter_between_fields)
         ));
         if (_a_object_print_parser.space_after_field_delimieter)
         {
-            _a_str.append(unpack_string_to_u8string(
-                string(1, ' ')
-            ));
+            _a_str.append(unpack_string_to_u8string(string(1, ' ')));
         }
         object_printer_internal<I + 1>(
             _a_object_print_parser,
@@ -1028,9 +1020,7 @@ struct default_printer_t<std::basic_string_view<T>>
                             else
                             {
                                 _l_object_as_u8str.append(
-                                    abc::make_hex_from_char<uint16_t>(
-                                        trail_surrogate
-                                    )
+                                    abc::make_hex_from_char(trail_surrogate)
                                 );
                                 continue;
                             }
@@ -1038,7 +1028,7 @@ struct default_printer_t<std::basic_string_view<T>>
                         else
                         {
                             _l_object_as_u8str.append(
-                                abc::make_hex_from_char<uint16_t>(_l_char)
+                                abc::make_hex_from_char(_l_char)
                             );
                             continue;
                         }
@@ -1047,7 +1037,7 @@ struct default_printer_t<std::basic_string_view<T>>
                     else if (utf8::internal::is_trail_surrogate(_l_char))
                     {
                         _l_object_as_u8str.append(
-                            abc::make_hex_from_char<uint16_t>(_l_char)
+                            abc::make_hex_from_char(_l_char)
                         );
                     }
 

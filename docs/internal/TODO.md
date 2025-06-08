@@ -36,6 +36,8 @@
 - Add a way of automatically adding generated data to the current log stack. Make it able to be turned off.
 - Have some "type-map" available to log data, which would turn complicated types into simpler ones. e.g. "std::vector<int,std::allocator..." could become "vector<int>". This would have to be user-defined, and loaded at runtime.
 - Make it so that _EXPR(a==b) code runs some user-specified code for a==b. Currently it defaults to the default equals operator in C++. But for code such as when comparing strings, it would be better to use something which provides more information about where an error is. This should be investigated further.
+- Give warning when empty file has been processed. e.g. when reading data from file that should contain unit tests, tell the user if a file has nothing in it. 
+- Consider a type of executable which tells the user when there are unused test files in a file hierarchy.
 
 ## Information
 

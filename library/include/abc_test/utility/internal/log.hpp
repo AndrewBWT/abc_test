@@ -129,7 +129,7 @@ __constexpr_imp void
     using namespace std;
     if (_m_internal_logger_params.is_set(_a_internal_logger_enum))
     {
-        threaded_ostream_output_reporter_t::write(fmt::format(
+        threaded_ostream_output_reporter_t::write_line(fmt::format(
             u8"LOG: {0}: {1} - {2}",
             get_thread_id(),
             to_str(_a_internal_logger_enum),
@@ -147,7 +147,7 @@ __no_constexpr_imp std::size_t
     if (not _m_thread_map.contains(_l_id))
     {
         const size_t _l_new_thread_id{_m_thread_map.size()};
-        threaded_ostream_output_reporter_t::write(fmt::format(
+        threaded_ostream_output_reporter_t::write_line(fmt::format(
             u8"LOG: {0} : {1} - "
             u8"Mapping new thread ID (thread::id = {2}) to {3}",
             _l_new_thread_id,

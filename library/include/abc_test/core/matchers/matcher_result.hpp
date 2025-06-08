@@ -1,12 +1,67 @@
 #pragma once
 
+#include "abc_test/core/ds/type_synonyms.hpp"
 #include "abc_test/core/matchers/source_map.hpp"
 #include "abc_test/utility/internal/macros.hpp"
-#include "abc_test/core/ds/type_synonyms.hpp"
 
 #include <vector>
 
 _BEGIN_ABC_MATCHER_NS
+
+class matcher_result_infos_t
+{
+public:
+    using tree_structure_t = std::tuple<
+        std::u8string,
+        std::u8string,
+        std::shared_ptr<matcher_result_infos_t>>;
+    std::vector<tree_structure_t> _m_tree_info;
+    std::u8string                 _m_primary_data;
+    std::vector<std::u8string>    _m_additional_info;
+
+    __constexpr
+    matcher_result_infos_t()
+        : _m_primary_data(u8"false")
+        , _m_tree_info(std::vector<tree_structure_t>())
+    {}
+
+    __constexpr
+    matcher_result_infos_t(
+        const std::u8string_view _a_str
+    )
+        : _m_primary_data(_a_str), _m_tree_info(std::vector<tree_structure_t>())
+    {}
+
+    __constexpr
+    matcher_result_infos_t(
+        const std::u8string_view             _a_str,
+        const std::vector<std::u8string>&    _a_additional_info,
+        const std::vector<tree_structure_t>& _a_tree_info
+        = std::vector<tree_structure_t>()
+    )
+        : _m_primary_data(_a_str)
+        , _m_tree_info(_a_tree_info)
+        , _m_additional_info(_a_additional_info)
+    {}
+
+    __constexpr const std::vector<tree_structure_t>&
+                      get_tree() const noexcept
+    {
+        return _m_tree_info;
+    }
+
+    __constexpr const std::vector<std::u8string>&
+                      get_vector() const noexcept
+    {
+        return _m_additional_info;
+    }
+
+    __constexpr const std::u8string_view
+                      primary_data() const noexcept
+    {
+        return _m_primary_data;
+    }
+};
 
 /*!
  * @brief Structure holding a matcher's result.
@@ -29,8 +84,8 @@ public:
     __constexpr
     matcher_result_t(
         // const bool             _a_ran,
-        const bool             _a_passed,
-        const std::u8string_view _a_str
+        const bool                    _a_passed,
+        const matcher_result_infos_t& _a_matcher_result_infos
     ) noexcept;
     /*!
      * @brief Tells the caller whether the associated mathcer_t passed.
@@ -42,8 +97,8 @@ public:
      * @brief Gets a cref to the string associated with this matcher_result_t.
      * @return A cref to the internal object's string.
      */
-    __constexpr const std::u8string_view
-                      str() const noexcept;
+    __constexpr const matcher_result_infos_t&
+        str() const noexcept;
     /*!
      * @brief Tells the caller whether the matcher_t this matcher_result_t is
      * associated with has been ran.
@@ -53,8 +108,8 @@ public:
     // ran() const noexcept;
 private:
     // bool        _m_ran    = false;
-    bool        _m_passed = false;
-    std::u8string _m_str    = u8"false";
+    bool                   _m_passed = false;
+    matcher_result_infos_t _m_matcher_result_infos;
 };
 enum class enum_bba_inner_assertion_type_t
 {
@@ -98,12 +153,14 @@ public:
         bba_inner_assertion_type_t(
             const bool                                _a_terminate,
             const bool                                _a_pass_or_failure,
-            const std::optional<std::u8string>&         _a_opt_msg,
+            const std::optional<std::u8string>&       _a_opt_msg,
             const _ABC_NS_DS::log_infos_t&            _a_log_infos,
             const std::optional<ds::single_source_t>& _a_source
             = std::optional<ds::single_source_t>{}
         ) noexcept
-        : _m_matcher_result(matcher_result_t(_a_pass_or_failure, u8""))
+        : _m_matcher_result(
+              matcher_result_t(_a_pass_or_failure, matcher_result_infos_t())
+          )
         , _m_annotation(_a_opt_msg)
         , _m_source(_a_source)
         , _m_source_map(matcher_source_map_t{})
@@ -143,7 +200,7 @@ public:
             const bool                                _a_terminate,
             const matcher_result_t&                   _a_matcher_result,
             const std::optional<ds::single_source_t>& _a_source,
-            const std::optional<std::u8string>&         _a_annotation,
+            const std::optional<std::u8string>&       _a_annotation,
             const matcher_source_map_t&               _a_matcher_source_map,
             const enum_bba_inner_assertion_type_t
                 _a_enum_bba_inner_assertion_type
@@ -201,7 +258,7 @@ public:
 private:
     _ABC_NS_DS::log_infos_t            _m_log_infos;
     matcher_result_t                   _m_matcher_result;
-    std::optional<std::u8string>         _m_annotation;
+    std::optional<std::u8string>       _m_annotation;
     matcher_source_map_t               _m_source_map;
     std::optional<ds::single_source_t> _m_source;
     enum_bba_inner_assertion_type_t    _m_enum_bba_inner_assertion_type;
@@ -244,11 +301,11 @@ _BEGIN_ABC_MATCHER_NS
 __constexpr_imp
     matcher_result_t::matcher_result_t(
         // const bool             _a_ran,
-        const bool             _a_passed,
-        const std::u8string_view _a_str
+        const bool                    _a_passed,
+        const matcher_result_infos_t& _a_matcher_result_infos
     ) noexcept
     //: _m_ran(_a_ran)
-    : _m_passed(_a_passed), _m_str(_a_str)
+    : _m_passed(_a_passed), _m_matcher_result_infos(_a_matcher_result_infos)
 {}
 
 __constexpr_imp bool
@@ -257,10 +314,10 @@ __constexpr_imp bool
     return _m_passed;
 }
 
-__constexpr_imp const std::u8string_view
-                      matcher_result_t::str() const noexcept
+__constexpr_imp const matcher_result_infos_t&
+    matcher_result_t::str() const noexcept
 {
-    return _m_str;
+    return _m_matcher_result_infos;
 }
 
 //__constexpr_imp bool

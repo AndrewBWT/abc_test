@@ -82,7 +82,7 @@ public:
             {
                 if (_l_idx++ == 0)
                 {
-                    _a_ttor.write(fmt::format(
+                    _a_ttor.write_line(fmt::format(
                         u8"{0}{1}{2}",
                         _l_field,
                         u8string(_l_biggest_first_element - _l_field.size(), char8_t(' ')),
@@ -91,7 +91,7 @@ public:
                 }
                 else
                 {
-                    _a_ttor.write(fmt::format(
+                    _a_ttor.write_line(fmt::format(
                         u8"{0}{1}",
                         u8string(_l_biggest_first_element, char8_t(' ')),
                         _l_data

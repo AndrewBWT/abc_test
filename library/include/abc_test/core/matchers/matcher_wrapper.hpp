@@ -513,14 +513,42 @@ __constexpr_imp matcher_wrapper_t<false>
 {
     using namespace std;
     using namespace abc::ds;
-    u8string _l_left_str{
-        _a_matcher_l.has_value() ? _a_matcher_l.value().matcher_result().str()
-                                 : _a_default_str
+    std::vector<matcher_result_infos_t::tree_structure_t> _l_infos;
+    abc::matcher::matcher_result_infos_t                  _l_left_str{
+        _a_matcher_l.has_value()
+                             ? abc::matcher::matcher_result_infos_t(
+                  _a_matcher_l.value().matcher_result().str()
+              )
+                             : matcher_result_infos_t(_a_default_str)
     };
-    u8string _l_right_str{
+    std::vector<matcher_result_infos_t::tree_structure_t> _l_children;
+    if (_a_matcher_l.has_value()
+        && not _a_matcher_l.value().matcher_result().passed())
+    {
+        _l_children.push_back(make_tuple(
+            fmt::format(u8"Left-hand"),
+            u8"L",
+            make_shared<matcher_result_infos_t>(
+                _a_matcher_l.value().matcher_result().str()
+            )
+        ));
+    }
+
+    matcher_result_infos_t _l_right_str{
         _a_matcher_r.has_value() ? _a_matcher_r.value().matcher_result().str()
-                                 : _a_default_str
+                                 : matcher_result_infos_t(_a_default_str)
     };
+    if (_a_matcher_r.has_value()
+        && not _a_matcher_r.value().matcher_result().passed())
+    {
+        _l_children.push_back(make_tuple(
+            fmt::format(u8"Right-hand"),
+            u8"R",
+            make_shared<matcher_result_infos_t>(
+                _a_matcher_r.value().matcher_result().str()
+            )
+        ));
+    }
     bool _l_left_passed{
         _a_matcher_l.has_value()
             ? _a_matcher_l.value().matcher_result().passed()
@@ -549,23 +577,19 @@ __constexpr_imp matcher_wrapper_t<false>
     };
     matcher_result_t _l_mr(
         compute_logic_result<Logic_Enum>(_l_left_passed, _l_right_passed),
-        fmt::format(
-            u8"{0}{1}{2} {3} {4}{5}{6}",
-            unpack_string_to_u8string(
-                _l_str_pair_l.first
+        matcher_result_infos_t(
+            fmt::format(
+                u8"{0}{1}{2} {3} {4}{5}{6}",
+                unpack_string_to_u8string(_l_str_pair_l.first),
+                _l_left_str.primary_data(),
+                unpack_string_to_u8string(_l_str_pair_l.second),
+                logic_str<Logic_Enum>(),
+                unpack_string_to_u8string(_l_str_pair_r.first),
+                _l_right_str.primary_data(),
+                unpack_string_to_u8string(_l_str_pair_r.second)
             ),
-            _l_left_str,
-            unpack_string_to_u8string(
-                _l_str_pair_l.second
-            ),
-            logic_str<Logic_Enum>(),
-            unpack_string_to_u8string(
-                _l_str_pair_r.first
-            ),
-            _l_right_str,
-            unpack_string_to_u8string(
-                _l_str_pair_r.second
-            )
+            {},
+            _l_children
         )
     );
     vector<single_source_t> _l_sources_l

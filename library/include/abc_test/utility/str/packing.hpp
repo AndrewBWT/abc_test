@@ -45,11 +45,17 @@ __constexpr auto
     using namespace std;
     if constexpr (wchar_is_16_bit)
     {
-        return u16string{};
+        u16string _l_rv{};
+        _l_rv.resize(_a_str.size());
+        ranges::copy(_a_str, _l_rv.begin());
+        return _l_rv;
     }
     else if constexpr (wchar_is_32_bit)
     {
-        return u32string{};
+        u32string _l_rv{};
+        _l_rv.resize(_a_str.size());
+        ranges::copy(_a_str, _l_rv.begin());
+        return _l_rv;
     }
     else
     {

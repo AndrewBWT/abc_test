@@ -25,9 +25,20 @@ public:
 		write(
 			const std::u8string_view _a_line
 		) const noexcept;
+	__no_constexpr
+		void
+		write_line(
+			const std::u8string_view _a_line
+		) const noexcept;
 protected:
 	mutable std::osyncstream _m_output_stream;
 	mutable std::mutex _l_mutex;
+	template<bool Insert_Endline>
+	__no_constexpr
+		void
+		write(
+			const std::u8string_view _a_line
+		) const noexcept;
 };
 _END_ABC_UTILITY_IO_NS
 
@@ -40,6 +51,23 @@ __no_constexpr_imp
 {
 }
 __no_constexpr_imp
+void
+threaded_ostream_output_reporter_t::write(
+	const std::u8string_view _a_line
+) const noexcept
+{
+	write<false>(_a_line);
+}
+__no_constexpr_imp
+void
+threaded_ostream_output_reporter_t::write_line(
+	const std::u8string_view _a_line
+) const noexcept
+{
+	write<true>(_a_line);
+}
+template<bool Insert_Endline>
+__no_constexpr_imp
 	void
 	threaded_ostream_output_reporter_t::write(
 		const std::u8string_view _a_line
@@ -48,7 +76,14 @@ __no_constexpr_imp
 	using namespace std;
 	unique_lock _l_ul(_l_mutex);
 	string _l_to_print(_a_line.begin(), _a_line.end());
-	_m_output_stream << _l_to_print << endl;
+	if constexpr (Insert_Endline)
+	{
+		_m_output_stream << _l_to_print << endl;
+	}
+	else
+	{
+		_m_output_stream << _l_to_print;
+	}
 	_m_output_stream.flush();
 	_m_output_stream.emit();
 	_l_ul.unlock();

@@ -41,7 +41,7 @@ _TEST_CASE(
     abc::test_case_t(
         {.name             = "Tests for convert_unicode_to_ascii and "
                              "convert_ascii_to_unicode",
-         .path             = "abc_test_test::utility::str::conversion",
+         .path             = "abc_test_test::utility::str::unicode",
          .threads_required = 1}
     )
 )

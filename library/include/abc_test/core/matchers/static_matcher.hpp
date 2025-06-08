@@ -50,11 +50,11 @@ __constexpr_imp matcher_result_t
     using namespace reports;
     if constexpr (std::same_as<Assertion_Status, pass_t>)
     {
-        return matcher_result_t(true, u8"true");
+        return matcher_result_t(true, matcher_result_infos_t(u8"true"));
     }
     else if constexpr (std::same_as<Assertion_Status, fail_t>)
     {
-        return matcher_result_t(false, u8"false");
+        return matcher_result_t(false, matcher_result_infos_t(u8"false"));
     }
     else
     {

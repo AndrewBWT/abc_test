@@ -67,7 +67,8 @@ public:
                     else
                     {
                         throw abc::errors::test_library_exception_t(fmt::format(
-                            u8"{0} was able to successfully parse the {1} line of file {2}"
+                            u8"{0} was able to successfully parse the {1} line "
+                            u8"of file {2}"
                             u8"\"{3}\" to the the entity {4} of type {5}. "
                             u8"However, it was found that the internal map "
                             u8"already contains an element with this key. The "
@@ -85,7 +86,8 @@ public:
                 else
                 {
                     throw abc::errors::test_library_exception_t(fmt::format(
-                        u8"{0} could not parse line \"{1}\" of file {2}, which should "
+                        u8"{0} could not parse line \"{1}\" of file {2}, which "
+                        u8"should "
                         u8"contain a parsable entity of type {3}.",
                         type_id<decltype(*this)>(),
                         _l_flr.current_line(),
@@ -125,7 +127,7 @@ public:
                 using namespace abc::utility::printer;
                 return mk_matcher_using_result(matcher_result_t(
                     false,
-                    fmt::format(
+                    matcher_result_infos_t(fmt::format(
                         u8"basic_file_reader_t<T>, pointing to file {0}, "
                         u8"contains an entry for the {1} {2}. "
                         u8"However, the entry is set to an empty {3} value. "
@@ -136,7 +138,7 @@ public:
                         default_printer_t<Key>{}.run_printer(_a_key),
                         type_id<value_t>(),
                         type_id<Val>()
-                    )
+                    ))
                 ));
             }
         }
@@ -152,7 +154,7 @@ public:
             _m_inner_map.insert(_l_new_map_element);
             return mk_matcher_using_result(matcher_result_t(
                 false,
-                fmt::format(
+                matcher_result_infos_t(fmt::format(
                     u8"basic_file_reader_t<T>, pointing to file {0}, "
                     u8"does not contain an entry for the {1} \"{2}\". "
                     u8"The file has been ammended to contain an entriy for the "
@@ -166,7 +168,7 @@ public:
                     type_id<value_t>(),
                     type_id<Val>()
                 )
-            ));
+            )));
         }
     }
 private:

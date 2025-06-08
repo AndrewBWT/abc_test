@@ -135,7 +135,7 @@ __constexpr_imp void
             {
                 _l_pair
                     = {_a_pc.colon(_a_pc.test_description_str()),
-                       _a_pc.indent(_a_pc.message_str(abc::unpack_string_to_u8string(
+                       _a_pc.indent(_a_pc.test_description(abc::unpack_string_to_u8string(
                            _a_element.test_description()
                        )))};
             }
@@ -160,7 +160,7 @@ __constexpr_imp void
     }
     if (not _l_pair.first.empty() || not _l_pair.second.empty())
     {
-        _a_ttor.write(fmt::format(
+        _a_ttor.write_line(fmt::format(
             u8"{0}{1}{2}", this->prefix(_a_idx), _l_pair.first, _l_pair.second
         ));
     }

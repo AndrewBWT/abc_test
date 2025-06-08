@@ -128,6 +128,10 @@ template <typename T>
 requires char_type_is_unicode_c<T>
 __constexpr bool
     is_valid_unicode_string(const std::basic_string_view<T> _a_str) noexcept;
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr bool
+    is_valid_unicode_string(const std::basic_string<T>& _a_str) noexcept;
 __constexpr bool
     is_valid_char(const char32_t _a_char) noexcept;
 template <bool Return_Reason, typename T>
@@ -684,7 +688,11 @@ __constexpr bool
     ) noexcept
 {
     using namespace std;
-    if constexpr (same_as<T, char32_t>)
+    if constexpr (same_as<T, wchar_t>)
+    {
+        return is_valid_unicode_string(pack_wstring(_a_str));
+    }
+    else if constexpr (same_as<T, char32_t>)
     {
         return not detail::if_invalid_u32string_show_reason(_a_str).has_value();
     }
@@ -703,6 +711,17 @@ __constexpr bool
     {
         __STATIC_ASSERT(T, "Doesn't work");
     }
+}
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr bool
+    is_valid_unicode_string(
+        const std::basic_string<T>& _a_str
+    ) noexcept
+{
+    using namespace std;
+    return is_valid_unicode_string(basic_string_view<T>(_a_str));
 }
 
 __constexpr bool
@@ -962,7 +981,8 @@ __constexpr std::conditional_t<
         else
         {
             const CharT _l_char{*_a_itt};
-            if (auto _l_next_char{detail::if_invalid_char32_show_reason(_l_char)};
+            if (auto _l_next_char{detail::if_invalid_char32_show_reason(_l_char)
+                };
                 _l_next_char.has_value())
             {
                 if constexpr (Return_Reason)
@@ -1038,7 +1058,9 @@ __constexpr std::u8string
         };
         if (_l_char_opt.has_value())
         {
-            detail::add_char32_to_u8string(_l_char_opt.value(), _l_back_inserter);
+            detail::add_char32_to_u8string(
+                _l_char_opt.value(), _l_back_inserter
+            );
         }
         else
         {
@@ -1088,7 +1110,7 @@ result_t<std::conditional_t<Return_u32string, std::u32string, std::monostate>>
     using namespace std;
     conditional_t<Return_u32string, u32string, monostate> _l_rv;
     auto _l_end{std::end(_a_str)};
-    for (auto _l_itt{std::begin(_a_str)}; _l_itt != _l_end; ++_l_itt)
+    for (auto _l_itt{std::begin(_a_str)}; _l_itt != _l_end;)
     {
         auto _l_result{
             next_char32_t_and_increment_iterator<true>(_l_itt, _l_end)

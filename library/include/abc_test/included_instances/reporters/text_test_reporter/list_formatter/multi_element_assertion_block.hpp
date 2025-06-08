@@ -127,7 +127,7 @@ __constexpr_imp void
                     break;
                 }
             }
-            _a_ttor.write(fmt::format(
+            _a_ttor.write_line(fmt::format(
                 u8"{0}{1}",this->prefix(_a_idx), _a_pc.colon(_a_pc.multi_element_collection_grouped_str())
             ));
             vector<pair<
@@ -214,7 +214,7 @@ __constexpr_imp void
                 }
                 else
                 {
-                    _a_ttor.write(fmt::format(
+                    _a_ttor.write_line(fmt::format(
                         u8"{0}{1}", this->prefix(_a_idx), _a_pc.indent(fmt::format(
                         u8"The following {0} {1} assertions have the same source "
                         u8"data, "
@@ -246,7 +246,7 @@ __constexpr_imp void
                         );
                     // _l_rv.append_range(_l_data);
 
-                    _a_ttor.write(this->prefix(_a_idx) + _a_pc.indent(
+                    _a_ttor.write_line(this->prefix(_a_idx) + _a_pc.indent(
                         fmt::format(
                             u8"The data of the {0} {1} assertions:",
                             _l_element.second.size(),
@@ -282,7 +282,7 @@ __constexpr_imp void
         case SHOW_ALL_ASSERTIONS:
         {
             using namespace _ABC_NS_UTILITY;
-            _a_ttor.write(_a_pc.colon(_a_pc.multi_element_collection_str()));
+            _a_ttor.write_line(_a_pc.colon(_a_pc.multi_element_collection_str()));
             size_t              _l_idx{1};
             for (auto& _l_matcher : _a_element.get_matcher())
             {

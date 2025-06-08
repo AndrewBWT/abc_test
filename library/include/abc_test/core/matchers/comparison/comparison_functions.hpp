@@ -109,12 +109,47 @@ __constexpr matcher_result_t
     };
     return matcher_result_t(
         _l_result,
-        fmt::format(
+        matcher_result_infos_t(fmt::format(
             u8"{0} {1} {2}",
             _l_left_str,
             _l_result ? cmp_str<Cmp>() : not_cmp_str<Cmp>(),
             _l_right_str
-        )
+        ))
+    );
+}
+
+template <typename T1, typename T2, comparison_enum_t Cmp>
+struct matcher_default_comparable_t
+{
+public:
+    static constexpr bool is_specialized{false};
+    __constexpr virtual matcher_result_t
+        run(const T1& _a_arg1, const T2& _a_arg2) const;
+};
+
+template <typename T1, typename T2, comparison_enum_t Cmp>
+concept is_matcher_default_comparable_c
+    = (matcher_default_comparable_t<T1, T2, Cmp>::is_specialized == true);
+
+template <typename T1, typename T2, comparison_enum_t Cmp>
+__constexpr matcher_result_t
+    matcher_default_comparable_t<T1, T2, Cmp>::run(
+        const T1& _a_arg1,
+        const T2& _a_arg2
+    ) const
+{
+    using namespace std;
+    u8string   _l_left_str{format_str<T1>(_a_arg1)};
+    u8string   _l_right_str{format_str<T2>(_a_arg2)};
+    const bool _l_result{cmp<T1, T2, Cmp>(_a_arg1, _a_arg2)};
+    return matcher_result_t(
+        _l_result,
+        matcher_result_infos_t(fmt::format(
+            u8"{0} {1} {2}",
+            _l_left_str,
+            _l_result ? cmp_str<Cmp>() : not_cmp_str<Cmp>(),
+            _l_right_str
+        ))
     );
 }
 
@@ -147,11 +182,28 @@ __constexpr_imp matcher_t
     ) noexcept
 {
     using namespace std;
-    return mk_matcher_using_result_and_precedence(
-        make_matcher_result<Cmp_Enum>(
+    matcher_result_t _l_mr;
+    using Stripped_Type_T1 = typename std::remove_cvref<T1>::type;
+    using Stripped_Type_T2 = typename std::remove_cvref<T1>::type;
+    if constexpr (is_matcher_default_comparable_c<
+                      Stripped_Type_T1,
+                      Stripped_Type_T2,
+                      Cmp_Enum>)
+    {
+        _l_mr = matcher_default_comparable_t<
+                    Stripped_Type_T1,
+                    Stripped_Type_T2,
+                    Cmp_Enum>()
+                    .run(forward<T1>(_a_left_arg), forward<T2>(_a_right_arg));
+    }
+    else
+    {
+        _l_mr = make_matcher_result<Cmp_Enum>(
             forward<T1>(_a_left_arg), forward<T2>(_a_right_arg)
-        ),
-        cmp_precedence<Cmp_Enum>()
+        );
+    }
+    return mk_matcher_using_result_and_precedence(
+        _l_mr, cmp_precedence<Cmp_Enum>()
 
     );
 } // namespace

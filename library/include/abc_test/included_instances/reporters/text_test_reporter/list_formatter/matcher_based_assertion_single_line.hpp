@@ -156,12 +156,71 @@ __constexpr_imp void
                           _ABC_NS_REPORTS::pass_or_terminate_t> )
                 )
             );
-            _a_ttor.write(
-                this->prefix(_a_idx + 1)
-                + _a_pc.indent(_a_pc.matcher_output(
+            {
+                const auto& _l_matcher_strs{
                     _a_element.matcher_info().matcher_result().str()
-                ))
-            );
+                };
+                vector<variant<
+                    pair<size_t, u8string>,
+                    matcher::matcher_result_infos_t>>
+                    _l_stack;
+                vector<variant<
+                    pair<size_t, u8string>,
+                    matcher::matcher_result_infos_t>>
+                    _l_to_add;
+                _l_stack.push_back(_l_matcher_strs);
+                matcher::matcher_result_infos_t _l_matcher_element;
+                while (_l_stack.size() > 0)
+                {
+                    _l_to_add.clear();
+                    const auto _l_element{_l_stack.front()};
+                    _l_stack.erase(_l_stack.begin());
+                    switch (_l_element.index())
+                    {
+                    case 0:
+                        _a_ttor.write(this->prefix(_a_idx + 1));
+                        _a_ttor.write_line(_a_pc.indent(
+                            _a_pc.highlight(get<0>(_l_element).second),
+                            get<0>(_l_element).first
+                        ));
+                        break;
+                    case 1:
+                        _l_matcher_element = get<1>(_l_element);
+                        _a_ttor.write(this->prefix(_a_idx + 1));
+                        _a_ttor.write_line(
+                            _a_pc.indent(u8"Primary output from matcher:", 1)
+                        );
+                        _a_ttor.write(this->prefix(_a_idx + 1));
+                        _a_ttor.write_line(_a_pc.message_str(
+                            _a_pc.indent(_l_matcher_element.primary_data(), 2)
+                        ));
+                        if (_l_matcher_element.get_vector().size() > 0
+                            || _l_matcher_element.get_tree().size() > 0)
+                        {
+                            _a_ttor.write(this->prefix(_a_idx + 1));
+                            _a_ttor.write_line(
+                                _a_pc.indent(u8"Additional Information: ", 1)
+                            );
+                        }
+                        for (auto& _l_str : _l_matcher_element.get_vector())
+                        {
+                            _a_ttor.write(this->prefix(_a_idx + 1));
+                            _a_ttor.write_line(
+                                _a_pc.indent(_a_pc.highlight(_l_str), 2)
+                            );
+                        }
+                        for (auto& _l_str : _l_matcher_element.get_tree())
+                        {
+                            _l_to_add.push_back(make_pair(1, get<0>(_l_str)));
+                            _l_to_add.push_back(make_pair(0, u8"---"));
+                            _l_to_add.push_back(*get<2>(_l_str).get());
+                        }
+                        _l_stack.insert(
+                            _l_stack.begin(), _l_to_add.begin(), _l_to_add.end()
+                        );
+                    }
+                }
+            }
             break;
         case MATCHER_ANNOTATION:
             _a_ttor.write(

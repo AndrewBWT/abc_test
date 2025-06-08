@@ -67,7 +67,7 @@ __no_constexpr_imp void
     ) const noexcept
 {
     using namespace std;
-    write(fmt::format(
+    write_line(fmt::format(
         u8"ERROR:\n"
         u8"   Error Message: \"{0}\"\n"
         u8"   Source of error:\n"
@@ -97,13 +97,13 @@ __no_constexpr_imp void
     ) const noexcept
 {
     using namespace std;
-    write(u8"WARNING: " + unpack_string_to_u8string(_a_str));
+    write_line(u8"WARNING: " + unpack_string_to_u8string(_a_str));
 }
 
 __no_constexpr_imp void
     text_error_reporter_t::exit() const noexcept
 {
-    write(u8"Preparing to exit...");
+    write_line(u8"Preparing to exit...");
 }
 
 _END_ABC_REPORTERS_NS

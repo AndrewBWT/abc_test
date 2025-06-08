@@ -233,21 +233,17 @@
     _a_matcher_name                                                          \
         = abc::matcher::mk_matcher_using_result(matcher::matcher_result_t(   \
             false,                                                           \
-            fmt::format(                                                     \
+            abc::matcher::matcher_result_infos_t(fmt::format(                              \
                 u8"Expected an exception of type {0}, however no exception " \
                 u8"was "                                                     \
                 u8"thrown",                                                  \
                 abc::type_id<_a_exception_type>()                            \
-            )                                                                \
+            ))                                                               \
         ));                                                                  \
     }                                                                        \
     catch (const _a_exception_type& _a_error)                                \
     {                                                                        \
-        u8string _l_rv{                                                      \
-            unpack_string_to_u8string(        \
-                _a_error.what()                                              \
-            )                                                                \
-        };                                                                   \
+        u8string _l_rv{unpack_string_to_u8string(_a_error.what())};          \
         _a_matcher_name = abc::check_exception_string(                       \
             _l_rv, std::u8string(_a_expected_string)                         \
         );                                                                   \

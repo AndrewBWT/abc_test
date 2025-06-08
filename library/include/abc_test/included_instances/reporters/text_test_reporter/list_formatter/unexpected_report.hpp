@@ -74,10 +74,10 @@ __constexpr_imp void
     switch (_a_fid)
     {
     case SOURCE:
-        _a_ttor.write(_a_pc.indent(
+        _a_ttor.write_line(_a_pc.indent(
             _a_pc.colon(_a_pc.potential_source_str(_a_element.exact_source()))
         ));
-        _a_ttor.write(_a_pc.indent(
+        _a_ttor.write_line(_a_pc.indent(
             _a_pc.source_location(
                 _a_element.source().has_value()
                     ? optional<source_location>{_a_element.source()
@@ -87,10 +87,10 @@ __constexpr_imp void
             ),
             2
         ));
-        _a_ttor.write(_a_pc.indent(
+        _a_ttor.write_line(_a_pc.indent(
             _a_pc.colon(_a_pc.potential_code_str(_a_element.exact_source()))
         ));
-        _a_ttor.write(_a_pc.indent(
+        _a_ttor.write_line(_a_pc.indent(
             _a_pc.source_representation(
                 _a_element.source().has_value()
                     ? optional<
@@ -103,7 +103,7 @@ __constexpr_imp void
         ));
         break;
     case STR_REPRESENTATION:
-        _a_ttor.write(_a_pc.highlight_fail(
+        _a_ttor.write_line(_a_pc.highlight_fail(
             unpack_string_to_u8string(
                 get_str_representation(_a_element, _a_pc)
             )

@@ -40,12 +40,12 @@ stacktraces_equal(
     }
     return mk_matcher_using_result(matcher_result_t(
         _l_equal,
-        fmt::format(
+        matcher_result_infos_t(fmt::format(
             u8"{0} {1} {2}",
             unpack_string_to_u8string(to_string(_a_st1)),
             _l_equal ? u8"==" : u8"!=",
             unpack_string_to_u8string(to_string(_a_st2))
         )
-    ));
+    )));
 }
 _END_ABC_NS

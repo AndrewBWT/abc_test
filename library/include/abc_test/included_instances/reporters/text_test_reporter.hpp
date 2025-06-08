@@ -104,7 +104,7 @@ __no_constexpr_imp void
     using namespace reporters;
     using namespace reports;
     const u8string _l_line_break{_m_print_config.line_break()};
-    write(fmt::format(u8"{1}\n{0}", _l_line_break, u8"TEST INFO"));
+    write_line(fmt::format(u8"{1}\n{0}", _l_line_break, u8"TEST INFO"));
     test_report_list_formatter().process_all_data(
         _m_print_config.after_execution_test_report_fields(),
         _a_itd,
@@ -117,7 +117,7 @@ __no_constexpr_imp void
         const unexpected_report_t<true>& _l_unexpected_termination{
             *_a_itd.unexpected_termination()
         };
-        write(fmt::format(
+        write_line(fmt::format(
             u8"{1}{0}{0}", _l_line_break, u8"UNEXPECTED TERMINATION INFORMATION\n"
         ));
         process_termination(_l_unexpected_termination);
@@ -125,14 +125,14 @@ __no_constexpr_imp void
     if (_a_itd.warnings_recieved() > 0)
     {
         u8string _l_warning_str;
-        write(fmt::format(
+        write_line(fmt::format(
             u8"{2}{0}{1}{0}", _l_line_break, _l_warning_str, u8"WARNINGS\n"
         ));
     }
     const assertion_base_collection_t& _l_reports{_a_itd.assertions()};
     if (_l_reports.size() > 0)
     {
-        write(fmt::format(u8"{0}\n{1}\n{0}", _l_line_break, u8"ASSERTION INFO"));
+        write_line(fmt::format(u8"{0}\n{1}\n{0}", _l_line_break, u8"ASSERTION INFO"));
         for (const assertion_base_ptr_t& _l_report : _l_reports)
         {
             process_assertion(
@@ -142,7 +142,7 @@ __no_constexpr_imp void
             );
         }
     }
-    write(_l_line_break);
+    write_line(_l_line_break);
 }
 
 __no_constexpr_imp void
@@ -157,14 +157,14 @@ __no_constexpr_imp void
     using namespace reporters;
     using namespace reports;
     const u8string _l_line_break{_m_print_config.line_break()};
-    write(fmt::format(u8"{0}\n{1}\n{0}", _l_line_break, u8"TEST SUITE RESULTS"));
+    write_line(fmt::format(u8"{0}\n{1}\n{0}", _l_line_break, u8"TEST SUITE RESULTS"));
     finalised_test_set_data_list_formatter().process_all_data(
         _m_print_config.finalised_test_set_data_fields(),
         _a_test_set_data,
         _m_print_config,
         *this
     );
-    write(_l_line_break);
+    write_line(_l_line_break);
 }
 
 __no_constexpr_imp void
@@ -179,7 +179,7 @@ __no_constexpr_imp void
     using namespace reporters;
     using namespace reports;
     const u8string _l_line_break{_m_print_config.line_break()};
-    write(
+    write_line(
         fmt::format(u8"{0}\n{1}\n{0}", _l_line_break, u8"TEST SUITE CONFIGURATION")
     );
     pre_test_set_data_list_formatter().process_all_data(
@@ -188,7 +188,7 @@ __no_constexpr_imp void
         _m_print_config,
         *this
     );
-    write(_l_line_break);
+    write_line(_l_line_break);
 }
 
 __constexpr void

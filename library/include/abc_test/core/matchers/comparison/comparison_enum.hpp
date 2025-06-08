@@ -55,7 +55,7 @@ __constexpr precedence_t
  */
 template <typename T1, typename T2, comparison_enum_t Comparison_Enum>
 __constexpr bool
-    cmp(T1&& _a_l, T2&& _a_r) noexcept;
+    cmp(const T1& _a_l, const T2& _a_r) noexcept;
 /*!
  * @brief Gets a string representation of the enum argument.
  * 
@@ -98,8 +98,8 @@ __constexpr_imp precedence_t
 template <typename T1, typename T2, comparison_enum_t Comparison_Enum>
 __constexpr_imp bool
     cmp(
-        T1&& _a_l,
-        T2&& _a_r
+        const T1& _a_l,
+        const T2& _a_r
     ) noexcept
 {
     using enum comparison_enum_t;
