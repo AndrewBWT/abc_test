@@ -113,14 +113,11 @@ public:
                           ) const
     {
         using namespace std;
-        if (_a_object >= 0 && _a_object <= 0x7F)
-        {
-            return surround_str(fmt::format(u8"{0}", u8string(1, _a_object)));
-        }
-        else
-        {
-            return surround_str(make_hex_from_char<uint8_t>(_a_object));
-        }
+        return surround_str(
+            is_valid_ascii_char(_a_object)
+                ? fmt::format(u8"{0}", u8string(1, _a_object))
+                : make_hex_from_char<uint8_t>(_a_object)
+        );
     }
 private:
     std::optional<char> _m_surrounding_char;
@@ -139,14 +136,11 @@ public:
                           ) const
     {
         using namespace std;
-        if (_a_object <= 0x7F)
-        {
-            return surround_str(fmt::format(u8"{0}", u8string(1, _a_object)));
-        }
-        else
-        {
-            return surround_str(make_hex_from_char<uint8_t>(_a_object));
-        }
+        return surround_str(
+            is_valid_char(_a_object)
+            ? fmt::format(u8"{0}", u8string(1, _a_object))
+            : make_hex_from_char<uint8_t>(_a_object)
+        );
     }
 };
 
@@ -163,19 +157,11 @@ public:
                           ) const
     {
         using namespace std;
-        if (not (_a_object >= 0xD800 && _a_object <= 0xDFFF))
-        {
-            u8string  _l_rv;
-            u16string _l_u16str(1, _a_object);
-            utf8::utf16to8(
-                _l_u16str.begin(), _l_u16str.end(), std::back_inserter(_l_rv)
-            );
-            return surround_str(fmt::format(u8"'{0}'", _l_rv));
-        }
-        else
-        {
-            return surround_str(make_hex_from_char<uint16_t>(_a_object));
-        }
+        return surround_str(
+            is_valid_char(_a_object)
+            ? fmt::format(u8"{0}", u8string(1, _a_object))
+            : make_hex_from_char<uint8_t>(_a_object)
+        );
     }
 };
 
@@ -192,19 +178,11 @@ public:
                           ) const
     {
         using namespace std;
-        if (not (_a_object >= 0xD800 && _a_object <= 0xDFFF))
-        {
-            u8string  _l_rv;
-            u32string _l_u32str(1, _a_object);
-            utf8::utf32to8(
-                _l_u32str.begin(), _l_u32str.end(), std::back_inserter(_l_rv)
-            );
-            return surround_str(fmt::format(u8"'{0}'", _l_rv));
-        }
-        else
-        {
-            return surround_str(make_hex_from_char<uint32_t>(_a_object));
-        }
+        return surround_str(
+            is_valid_char(_a_object)
+            ? fmt::format(u8"{0}", u8string(1, _a_object))
+            : make_hex_from_char<uint8_t>(_a_object)
+        );
     }
 };
 

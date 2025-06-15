@@ -6,9 +6,9 @@
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name             = "Testing traits of of test_library_exception_t",
-         .path             = "abc_test_test::core::errors::test_library_exception",
-         .threads_required = 1}
+        { .name = "Testing traits of of test_library_exception_t",
+         .path = "abc_test_test::core::errors::test_library_exception",
+         .threads_required = 1 }
     )
 )
 {
@@ -17,22 +17,22 @@ _TEST_CASE(
     _CHECK(annotate(
         u8"Checks test_library_exception_t is derived from std::runtime_error",
         _EXPR(
-            ( std::is_base_of_v<std::runtime_error, test_library_exception_t> )
+            (std::is_base_of_v<std::runtime_error, test_library_exception_t>)
             == true
         )
     ));
     _CHECK(annotate(
         u8"Checks test_library_exception_t is not default constructable",
         _EXPR(not std::is_default_constructible_v<test_library_exception_t>)
-            == true
+        == true
     ));
 }
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name = "Testing constructors and getters of test_library_exception_t",
+        { .name = "Testing constructors and getters of test_library_exception_t",
          .path = "abc_test::core::errors",
-         .threads_required = 1}
+         .threads_required = 1 }
     )
 )
 {
@@ -47,7 +47,8 @@ _TEST_CASE(
             = test_library_exception_t(unpack_string_to_u8string(_l_str), _l_st);
         _l_test_lib_bba += _BLOCK_CHECK(annotate(
             u8"Checking test_library_exception_t what() function",
-            c_str_equal(_l_tle.what(), _l_str)
+            _EXPR(string_view(_l_tle.what()) == string_view(_l_str))
+            //c_str_equal(_l_tle.what(), _l_str)
         ));
         _l_test_lib_bba += _BLOCK_CHECK(annotate(
             u8"Checking test_library_exception_t source_location() function",

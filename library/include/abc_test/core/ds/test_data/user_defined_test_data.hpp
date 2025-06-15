@@ -93,9 +93,9 @@ __constexpr std::u8string
 {
     using namespace std;
     return u8string{}
-        .append(convert_ascii_to_unicode<char8_t>(this->name).value())
+        .append(unpack_string_to_u8string(this->name))
         .append(_a_delimiter)
-        .append(convert_ascii_to_unicode<char8_t>(this->path).value());
+        .append(unpack_string_to_u8string(this->path));
 }
 
 _END_ABC_DS_NS

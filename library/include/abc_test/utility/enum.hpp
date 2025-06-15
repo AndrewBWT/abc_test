@@ -423,7 +423,7 @@ __constexpr_imp
             _l_str_cpy.begin(),
             [](enum_list_str_char_t _l_char)
             {
-                return _l_char <= 0x7F
+                return is_valid_ascii_char(_l_char)
                            ? static_cast<enum_list_str_char_t>(
                                  std::tolower(static_cast<char>(_l_char))
                              )
@@ -446,7 +446,7 @@ __constexpr_imp
             _l_str_cpy.begin(),
             [](enum_list_str_char_t _l_char)
             {
-                return _l_char <= 0x7F
+                return is_valid_ascii_char(_l_char)
                            ? static_cast<enum_list_str_char_t>(
                                  std::toupper(static_cast<char>(_l_char))
                              )

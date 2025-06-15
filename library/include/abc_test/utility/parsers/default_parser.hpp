@@ -258,10 +258,27 @@ public:
             }
             else
             {
-                _l_char = abc::checkless_unicode_conversion<char16_t>(
-                              _a_parse_input.process_characters(1)
-                )
-                              .at(0);
+                auto _l_result{unicode_conversion<char16_t>(
+                    _a_parse_input.process_characters(1)
+                )};
+                if (not _l_result.has_value())
+                {
+                    return unexpected(_l_result.error());
+                }
+                else
+                {
+                    auto& _l_result_val{_l_result.value()};
+                    switch (_l_result_val.size())
+                    {
+                    case 0:
+                        return unexpected(u8"");
+                    case 1:
+                        _l_char = _l_result_val.at(0);
+                        break;
+                    default:
+                        std::unreachable();
+                    }
+                }
             }
             if (const result_t<monostate> _l_result_2{
                     this->remove_surrounding_str(_a_parse_input)
@@ -383,7 +400,7 @@ struct default_parser_t<T> : public parser_base_t<T>
                 return result_t<T>(unexpected(fmt::format(
                     u8"Could not parse \"{0}\" using std::from_chars, as the "
                     u8"std::string argument is invalid",
-                    checkless_unicode_conversion<char8_t>(_l_u32str)
+                    unicode_string_to_u8string(_l_u32str)
                 )));
             }
             else if (ec == errc::result_out_of_range)
@@ -393,7 +410,7 @@ struct default_parser_t<T> : public parser_base_t<T>
                     u8"conversion, number is out of range. Min and max value "
                     u8"of "
                     u8"{1} are {2} and {3}",
-                    checkless_unicode_conversion<char8_t, char32_t>(_l_u32str),
+                    unicode_string_to_u8string(_l_u32str),
                     type_id<T>(),
                     numeric_limits<T>::min(),
                     numeric_limits<T>::max()
@@ -408,7 +425,7 @@ struct default_parser_t<T> : public parser_base_t<T>
                     u8"unknown reason. The error code returned was unexpected. "
                     u8"Its "
                     u8"integer represention is {1}",
-                    checkless_unicode_conversion<char8_t, char32_t>(_l_u32str),
+                    unicode_string_to_u8string(_l_u32str),
                     std::to_underlying(ec)
                 )
 
@@ -902,7 +919,7 @@ struct default_parser_t<std::basic_string<T>>
                 u8"Expected {0} to have a prefix of the string \"{1}\". "
                 u8"Remaining string = {2}",
                 type_id<T>(),
-                checkless_unicode_conversion<char8_t, char32_t>(u32string(1, _l_char)),
+                unicode_char_to_u8string(_l_char),
                 _a_parse_input.get_u8string()
             ));
         }

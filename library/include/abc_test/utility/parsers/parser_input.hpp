@@ -62,11 +62,9 @@ public:
     __constexpr const    std::u8string_view
                          get_u8string(const std::size_t _a_size) const noexcept;
     __no_constexpr const std::u32string
-                         get_u32string() const noexcept;
-    __no_constexpr const std::u32string
-                      get_u32string(const std::size_t _a_size) const noexcept;
-    __constexpr const result_t<std::string>
-                      ascii_string() const noexcept;
+                         get_u32string(const std::size_t _a_size = 0) const;
+    __constexpr const    result_t<std::string>
+                         ascii_string() const noexcept;
     __constexpr char32_t
         peek_char(const std::size_t _a_offset = 0) const noexcept;
     __no_constexpr const std::u32string
@@ -129,7 +127,7 @@ __constexpr void
             throw parser_could_not_match_string_t(
                 _m_complete_string,
                 u8string_view(_m_cur_itt, _m_end_itt),
-                checkless_unicode_conversion<char8_t>(_a_char_to_check_against)
+                unicode_char_to_u8string(_a_char_to_check_against)
             );
         }
     }
@@ -152,7 +150,7 @@ __constexpr void
             throw parser_could_not_match_string_t(
                 _m_complete_string,
                 u8string_view(_m_cur_itt, _m_end_itt),
-                checkless_unicode_conversion<char8_t>(_a_str_to_check_against)
+                unicode_string_to_u8string(_a_str_to_check_against)
             );
         }
     }
@@ -194,7 +192,7 @@ __constexpr char32_t
 {
     using namespace std;
     const optional<pair<char32_t, size_t>> _l_char_opt{
-        abc::next_char32_t<false>((_m_cur_itt + _a_offset), _m_end_itt)
+        next_char32_t<false>((_m_cur_itt + _a_offset), _m_end_itt)
     };
     return _l_char_opt.value().first;
 }
@@ -210,9 +208,7 @@ __no_constexpr_imp std::u32string
     vector<size_t> _l_sizes;
     while (_m_cur_itt < _m_end_itt)
     {
-        const auto _l_char_opt{
-            abc::next_char32_t<false>(_m_cur_itt, _m_end_itt)
-        };
+        const auto _l_char_opt{next_char32_t<false>(_m_cur_itt, _m_end_itt)};
         if (_l_char_opt.has_value())
         {
             const auto& [_l_char, _l_size]{_l_char_opt.value()};
@@ -373,20 +369,12 @@ __constexpr const std::u8string_view
 }
 
 __no_constexpr_imp const std::u32string
-                         parser_input_t::get_u32string() const noexcept
-{
-    using namespace std;
-    return unicode_conversion<char32_t>(u8string_view(_m_cur_itt, _m_end_itt))
-        .value();
-}
-
-__no_constexpr_imp const std::u32string
                          parser_input_t::get_u32string(
         const std::size_t _a_size
-    ) const noexcept
+    ) const
 {
     using namespace std;
-    return checkless_unicode_conversion<char32_t>(
+    return unicode_conversion_with_exception<char32_t>(
         u8string_view(_m_cur_itt, _m_cur_itt + _a_size)
     );
 }

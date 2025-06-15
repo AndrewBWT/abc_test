@@ -240,16 +240,18 @@ _TEST_CASE(
                 const auto& [_l_enum1_as_underlying, _l_enum2_as_underlying, _l_error]{
                     _l_data
                 };
-                matcher_t _l_matcher;
-                auto      _l_enum1{static_cast<Enum>(_l_enum1_as_underlying)};
-                auto      _l_enum2{static_cast<Enum>(_l_enum2_as_underlying)};
-                __BEGIN_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher
+                auto _l_enum1{static_cast<Enum>(_l_enum1_as_underlying)};
+                auto _l_enum2{static_cast<Enum>(_l_enum2_as_underlying)};
+                _l_error_tests += _BLOCK_CHECK(
+                    _MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
+                        abc::unreachable_exception_t,
+                        _l_error,
+                        [&]()
+                        {
+                            do_not_optimise(_a_func(_l_enum1, _l_enum2));
+                        }
+                    )
                 );
-                do_not_optimise(_a_func(_l_enum1, _l_enum2));
-                __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(
-                    _l_matcher, abc::unreachable_exception_t, _l_error
-                );
-                _l_error_tests += _BLOCK_CHECK(_l_matcher);
             }
         };
         _l_error_func("less_than", _l_less_than);
@@ -449,8 +451,7 @@ _TEST_CASE(
         auto _l_property_test_func
             = [&]<typename F>(string_view _a_name, F _a_func)
         {
-            auto _l_b_str
-                = unpack_string_to_u8string(_a_name);
+            auto _l_b_str = unpack_string_to_u8string(_a_name);
             _TVLOG(_l_b_str);
             for (auto& _l_data : enumerate_data<property_test_data_1>())
             {
@@ -581,7 +582,6 @@ _TEST_CASE(
                 const auto& [_l_underlying_enum, _l_underlying_enum_limit, _l_error_msg]{
                     _l_data
                 };
-                matcher_t      _l_matcher;
                 auto           _l_enum{static_cast<Enum>(_l_underlying_enum)};
                 optional<Enum> _l_enum_limit{
                     _l_underlying_enum_limit.has_value()
@@ -590,13 +590,16 @@ _TEST_CASE(
                           ))
                         : std::nullopt
                 };
-                __BEGIN_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher
+                _l_error_tests += _BLOCK_CHECK(
+                    _MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
+                        abc::unreachable_exception_t,
+                        _l_error_msg,
+                        [&]()
+                        {
+                            do_not_optimise(_a_func(_l_enum, _l_enum_limit));
+                        }
+                    )
                 );
-                do_not_optimise(_a_func(_l_enum, _l_enum_limit));
-                __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(
-                    _l_matcher, abc::unreachable_exception_t, _l_error_msg
-                );
-                _l_error_tests += _BLOCK_CHECK(_l_matcher);
             }
         };
         _l_error_func_1(
@@ -629,14 +632,16 @@ _TEST_CASE(
                  ))
             {
                 const auto& [_l_enum, _l_enum_limit, _l_error_msg]{_l_data};
-                matcher_t _l_matcher;
-                __BEGIN_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher
+                _l_error_tests += _BLOCK_CHECK(
+                    _MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
+                        abc::unreachable_exception_t,
+                        _l_error_msg,
+                        [&]()
+                        {
+                            do_not_optimise(_a_func(_l_enum, _l_enum_limit));
+                        }
+                    )
                 );
-                do_not_optimise(_a_func(_l_enum, _l_enum_limit));
-                __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(
-                    _l_matcher, abc::unreachable_exception_t, _l_error_msg
-                );
-                _l_error_tests += _BLOCK_CHECK(_l_matcher);
             }
         };
         _l_error_func_2(
@@ -884,13 +889,15 @@ _TEST_CASE(
             enum_helper_string_type_e _l_str_type{
                 static_cast<enum_helper_string_type_e>(_l_str_type_underlying)
             };
-            matcher_t _l_matcher;
-            __BEGIN_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher);
-            do_not_optimise(_l_helper.print(_l_enum, _l_str_type));
-            __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(
-                _l_matcher, abc::unreachable_exception_t, _l_expected_error
-            );
-            _l_error_tests += _BLOCK_CHECK(_l_matcher);
+            _l_error_tests
+                += _BLOCK_CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
+                    abc::unreachable_exception_t,
+                    _l_expected_error,
+                    [&]()
+                    {
+                        do_not_optimise(_l_helper.print(_l_enum, _l_str_type));
+                    }
+                ));
         }
         using error_test_type_parse = std::
             tuple<u8string, enum_helper_string_type_underlying_e, u8string>;
@@ -905,14 +912,17 @@ _TEST_CASE(
                 static_cast<enum_helper_string_type_e>(_l_str_type_as_underlying
                 )
             };
-            matcher_t _l_matcher;
-            __BEGIN_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher);
-            parser::parser_input_t _l_pi(_l_str);
-            do_not_optimise(_l_helper.parse_enum(_l_pi, _l_str_type));
-            __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(
-                _l_matcher, abc::unreachable_exception_t, _l_expected_error
-            );
-            _l_error_tests += _BLOCK_CHECK(_l_matcher);
+            _l_error_tests
+                += _BLOCK_CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
+                    abc::unreachable_exception_t,
+                    _l_expected_error,
+                    [&]()
+                    {
+                        parser::parser_input_t _l_pi(_l_str);
+                        do_not_optimise(_l_helper.parse_enum(_l_pi, _l_str_type)
+                        );
+                    }
+                ));
         }
         _END_BBA_CHECK(_l_error_tests);
     };
@@ -1030,14 +1040,16 @@ _TEST_CASE(
         {
             _TVLOG(_l_data);
             auto& [_l_enum_underlying, _l_expected_error]{_l_data};
-            Enum      _l_enum{static_cast<Enum>(_l_enum_underlying)};
-            matcher_t _l_matcher;
-            __BEGIN_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher);
-            do_not_optimise(_l_helper.enums_idx(_l_enum));
-            __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(
-                _l_matcher, abc::unreachable_exception_t, _l_expected_error
-            );
-            _l_error_tests += _BLOCK_CHECK(_l_matcher);
+            Enum _l_enum{static_cast<Enum>(_l_enum_underlying)};
+            _l_error_tests
+                += _BLOCK_CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
+                    abc::unreachable_exception_t,
+                    _l_expected_error,
+                    [&]()
+                    {
+                        do_not_optimise(_l_helper.enums_idx(_l_enum));
+                    }
+                ));
         }
         using error_test_type_idxs_enum = std::tuple<size_t, u8string>;
         for (auto& _l_data : read_data_from_file<error_test_type_idxs_enum>(
@@ -1046,13 +1058,15 @@ _TEST_CASE(
         {
             _TVLOG(_l_data);
             auto& [_l_size, _l_expected_error]{_l_data};
-            matcher_t _l_matcher;
-            __BEGIN_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher);
-            do_not_optimise(_l_helper.idxs_enum(_l_size));
-            __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(
-                _l_matcher, abc::unreachable_exception_t, _l_expected_error
-            );
-            _l_error_tests += _BLOCK_CHECK(_l_matcher);
+            _l_error_tests
+                += _BLOCK_CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
+                    abc::unreachable_exception_t,
+                    _l_expected_error,
+                    [&]()
+                    {
+                        do_not_optimise(_l_helper.idxs_enum(_l_size));
+                    }
+                ));
         }
         _END_BBA_CHECK(_l_error_tests);
     };
@@ -1126,14 +1140,16 @@ _TEST_CASE(
                     );
                 }
             );
-            matcher_t _l_matcher;
-            __BEGIN_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher);
-            enumerate_enum_helper_t<Enum> _l_helper(_l_arg);
-            do_not_optimise(_l_helper);
-            __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(
-                _l_matcher, abc::errors::test_library_exception_t, _l_error
-            );
-            _l_error_tests += _BLOCK_CHECK(_l_matcher);
+            _l_error_tests
+                += _BLOCK_CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
+                    abc::errors::test_library_exception_t,
+                    _l_error,
+                    [&]()
+                    {
+                        enumerate_enum_helper_t<Enum> _l_helper(_l_arg);
+                        do_not_optimise(_l_helper);
+                    }
+                ));
         }
         _END_BBA_CHECK(_l_error_tests);
     };

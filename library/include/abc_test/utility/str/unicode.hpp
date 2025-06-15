@@ -81,8 +81,6 @@ __constexpr result_t<std::basic_string<T>>
  * If the input unicode string is invalid, then this function returns expected
  * value with an error mesage in it. Otherwise, it returns the converted string.
  *
- *
- *
  * @tparam T The internal character type of the output argument.
  * @tparam U The internal character type of the input argument.
  * @param _a_str The input argument.
@@ -112,28 +110,108 @@ template <typename T, typename U>
 requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
 __constexpr result_t<std::basic_string<T>>
             unicode_conversion(const std::basic_string<U>& _a_str) noexcept;
+/*!
+ * @brief Converts a unicode string from one format to another.
+ *
+ * Will throw an exception if there is an error with the input unicode encoding.
+ *
+ * @tparam T The character type of the output basic string.
+ * @tparam U The character type of the input std::basic_string.
+ * @param _a_str The string entity to convert.
+ * @return The converted unicode string.
+ */
 template <typename T, typename U>
 requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
 __constexpr std::basic_string<T>
-    checkless_unicode_conversion(const std::basic_string_view<U> _a_str);
+    unicode_conversion_with_exception(const std::basic_string_view<U> _a_str);
+/*!
+ * @brief Converts a unicode string from one format to another.
+ *
+ * Will throw an exception if there is an error with the input unicode encoding.
+ *
+ * @tparam T The character type of the output basic string.
+ * @tparam U The character type of the input std::basic_string.
+ * @param _a_str The string entity to convert.
+ * @return The converted unicode string.
+ */
 template <typename T, typename U>
 requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
 __constexpr std::basic_string<T>
-            checkless_unicode_conversion(const std::basic_string<U>& _a_str);
+    unicode_conversion_with_exception(const std::basic_string<U>& _a_str);
+/*!
+ * @brief Converts a unicode character from one format to another formatted
+ * unicode string.
+ *
+ * Will throw an exception if there is an error with the input unicode encoding.
+ *
+ * @tparam T The character type of the output basic string.
+ * @tparam U The character type of the input character.
+ * @param _a_str The character entity to convert.
+ * @return The converted unicode string.
+ */
 template <typename T, typename U>
 requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
 __constexpr std::basic_string<T>
-            checkless_unicode_conversion(const U _a_char);
+            unicode_conversion_with_exception(const U _a_char);
+/*!
+ * @brief Checks if a unicode string is valid.
+ *
+ * @param _a_str The string to check.
+ * @return True if _a_str is valid, false otherwise.
+ */
 template <typename T>
 requires char_type_is_unicode_c<T>
 __constexpr bool
     is_valid_unicode_string(const std::basic_string_view<T> _a_str) noexcept;
+/*!
+ * @brief Checks if a unicode string is valid.
+ *
+ * @param _a_str The string to check.
+ * @return True if _a_str is valid, false otherwise.
+ */
 template <typename T>
 requires char_type_is_unicode_c<T>
 __constexpr bool
     is_valid_unicode_string(const std::basic_string<T>& _a_str) noexcept;
+/*!
+ * @brief Checks if a character is valid unicode on its own.
+ *
+ * That is to say, if its a char8, checks that it is in the ascii range. If
+ * char16_t, that it is not a surrogate character, and a char32_t that it is
+ * valid.
+ *
+ * @param _a_str The character to check
+ * @return True if _a_char is valid, false otherwise.
+ */
+template <typename T>
+requires char_type_is_unicode_c<T>
 __constexpr bool
-    is_valid_char(const char32_t _a_char) noexcept;
+    is_valid_char(const T _a_char) noexcept;
+/*!
+ * @brief Checks if a character is valid ascii.
+ *
+ * @param _a_char The character to check.
+ * @return True if _a_char is valid, false otherwise.
+ */
+template <typename T>
+requires is_char_type_c<T>
+__constexpr bool
+    is_valid_ascii_char(const T _a_char) noexcept;
+/*!
+ * @brief Gets the next character from a stream of characters.
+ *
+ * This function assumes _a_itt and _a_end are part of the same iterator.
+ *
+ * @tparam T The type of the iterators _a_itt and _a_end.
+ * @tparam Return_Reason A boolean paramter which controls the return type; if
+ * its true, then the return type is an std::expected of pair of char32_t and
+ * size. If false an optional of pair of char32_t and size. The char32_t is the
+ * next char32_t character from the stream, and the size is the number of
+ * elements of the iterator _a_itt which were read to create this chracter.
+ * @param _a_itt The current iterator.
+ * @param _a_end The end iterator.
+ * @return See above.
+ */
 template <bool Return_Reason, typename T>
 requires char_type_is_unicode_c<typename T::value_type>
 __constexpr std::conditional_t<
@@ -141,19 +219,116 @@ __constexpr std::conditional_t<
     result_t<std::pair<char32_t, std::size_t>>,
     std::optional<std::pair<char32_t, std::size_t>>>
     next_char32_t(const T _a_itt, const T _a_end) noexcept;
-template <bool Return_Reason, typename T>
-requires char_type_is_unicode_c<typename T::value_type>
-__constexpr
-std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
-    next_char32_t_and_increment_iterator(T& _a_itt, const T _a_end) noexcept;
+/*!
+ * @brief Converts an arbitrary unicode string to a u8string.
+ *
+ * This function assumes that the input string is a valid unicode string.
+ *
+ * @tparam CharT The character type of the input string.
+ * @param _a_str The string to convert.
+ * @return The converted string.
+ */
 template <typename CharT>
 __constexpr std::u8string
     unicode_string_to_u8string(const std::basic_string_view<CharT> _a_str
     ) noexcept;
-
+/*!
+ * @brief Converts an arbitrary unicode string to a u8string.
+ *
+ * This function assumes that the input string is a valid unicode string.
+ *
+ * @tparam CharT The character type of the input string.
+ * @param _a_str The string to convert.
+ * @return The converted string.
+ */
 template <typename CharT>
 __constexpr std::u8string
     unicode_string_to_u8string(const std::basic_string<CharT>& _a_str) noexcept;
+/*!
+ * @brief Converts an arbitrary unicode character to a u8string.
+ *
+ * This function assumes that the character is a valid unicode string.
+ *
+ * @tparam CharT The character type of the input character.
+ * @param _a_str The character to convert.
+ * @return The converted character in string form.
+ */
+template <typename CharT>
+__constexpr std::u8string
+            unicode_char_to_u8string(const CharT _a_char) noexcept;
+
+/*!
+ * @brief Gets the specified constant.
+ *
+ * Equal to 0x7F.
+ *
+ * @tparam T The return type paramter.
+ * @return The encoded constant.
+ */
+template <typename T>
+requires is_char_type_c<T>
+__constexpr T
+    ascii_limit() noexcept;
+/*!
+ * @brief Gets the specified constant.
+ *
+ * Equal to 0xFFFF.
+ *
+ * @tparam T The return type paramter.
+ * @return The encoded constant.
+ */
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr T
+    single_char16_limit_and_three_char8_limit() noexcept;
+/*!
+ * @brief Gets the specified constant.
+ *
+ * Equal to 0x7FF.
+ *
+ * @tparam T The return type paramter.
+ * @return The encoded constant.
+ */
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr T
+    two_char8_limit() noexcept;
+/*!
+ * @brief Gets the specified constant.
+ *
+ * Equal to 0x10'FFFF.
+ *
+ * @tparam T The return type paramter.
+ * @return The encoded constant.
+ */
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr T
+    char32_limit() noexcept;
+/*!
+ * @brief Gets the specified constant.
+ *
+ * Equal to 0xD800.
+ *
+ * @tparam T The return type paramter.
+ * @return The encoded constant.
+ */
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr T
+    high_surrogate_lower_value() noexcept;
+/*!
+ * @brief Gets the specified constant.
+ *
+ * Equal to 0xDFFF.
+ *
+ * @tparam T The return type paramter.
+ * @return The encoded constant.
+ */
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr T
+    low_surrogate_upper_value() noexcept;
 
 namespace detail
 {
@@ -180,6 +355,39 @@ __constexpr void
         const char32_t                                         _a_char,
         std::back_insert_iterator<std::basic_string<char8_t>>& _a_inserter
     ) noexcept;
+template <bool Return_Reason, typename T>
+requires char_type_is_unicode_c<typename T::value_type>
+__constexpr
+std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
+    next_char32_t_and_increment_iterator(T& _a_itt, const T _a_end) noexcept;
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr T
+    char16_offset_for_char32_conversion() noexcept;
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr T
+    high_surrogate_upper_value() noexcept;
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr T
+    low_surrogate_lower_value() noexcept;
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr bool
+    is_surrogate(const T _a_char) noexcept;
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr bool
+    is_high_surrogate(const T _a_char) noexcept;
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr bool
+    is_low_surrogate(const T _a_char) noexcept;
 } // namespace detail
 
 _END_ABC_NS
@@ -215,14 +423,14 @@ __constexpr_imp result_t<std::string>
     {
         // Gets each char32_t from the string view.
         const optional<char32_t> _l_char_opt{
-            abc::next_char32_t_and_increment_iterator<false>(_l_itt, _l_end)
+            detail::next_char32_t_and_increment_iterator<false>(_l_itt, _l_end)
         };
         // If it sa valid unicode character.
         if (_l_char_opt.has_value())
         {
             const auto& _l_char{_l_char_opt.value()};
             // If doesn't fit within ASCII.
-            if (not (_l_char <= 0x7F))
+            if (not (is_valid_ascii_char(_l_char)))
             {
                 return unexpected(fmt::format(
                     u8"The function convert_unicode_to_ascii "
@@ -231,7 +439,7 @@ __constexpr_imp result_t<std::string>
                     u8"encode std::string objects. This error occoured "
                     u8"when processing the {1} character in the unicode "
                     u8"string \"{2}\".",
-                    unicode_string_to_u8string(u32string(1, _l_char)),
+                    unicode_char_to_u8string(_l_char),
                     positive_integer_to_placement(_l_idx),
                     unicode_string_to_u8string(_a_str)
                 ));
@@ -245,8 +453,11 @@ __constexpr_imp result_t<std::string>
         {
             // Invalid unicode character.
             using namespace std;
-            const u8string _l_unicode{
-                unicode_string_to_u8string(basic_string<CharT>(1, *_l_itt))
+            const u8string _l_unicode{unicode_char_to_u8string(*_l_itt)};
+            const result_t<char32_t> _l_char_opt{
+                detail::next_char32_t_and_increment_iterator<true>(
+                    _l_itt, _l_end
+                )
             };
             return unexpected(fmt::format(
                 u8"The function convert_unicode_to_ascii "
@@ -265,11 +476,8 @@ __constexpr_imp result_t<std::string>
                     std::distance(_a_str.begin(), _l_itt) + 1
                 ),
                 type_id<CharT>(),
-                abc::unicode_string_to_u8string(basic_string<CharT>(1, *_l_itt)
-                ),
-                abc::unicode_string_to_u8string(
-                    basic_string<CharT>(_l_itt, _l_end)
-                )
+                unicode_char_to_u8string(*_l_itt),
+                unicode_string_to_u8string(basic_string<CharT>(_l_itt, _l_end))
             ));
         }
     }
@@ -307,7 +515,7 @@ __constexpr result_t<std::basic_string<T>>
     for (size_t _l_idx{1}; _l_itt != _l_end; ++_l_idx)
     {
         const char _l_char{*_l_itt};
-        if (_l_char < 0 || _l_char > 0x7F)
+        if (not is_valid_ascii_char(_l_char))
         {
             return unexpected(fmt::format(
                 u8"The function convert_ascii_to_unicode could not "
@@ -350,19 +558,28 @@ __constexpr result_t<std::basic_string<T>>
         {
             const char32_t _l_char{*_l_itt};
             // Encode as UTF-16
-            if (_l_char <= 0xFFFF)
+            if (_l_char
+                <= single_char16_limit_and_three_char8_limit<char32_t>())
             {
                 // BMP (Basic Multilingual Plane)
                 _l_back_inserter = static_cast<char16_t>(_l_char);
             }
-            else if (_l_char <= 0x10'FFFF)
+            else if (_l_char <= char32_limit<char32_t>())
             {
                 // Supplementary Plane → surrogate pair
-                const char32_t _l_char_cpy{_l_char - 0x1'0000};
-                _l_back_inserter
-                    = static_cast<char16_t>((_l_char_cpy >> 10) + 0xD800);
-                _l_back_inserter
-                    = static_cast<char16_t>((_l_char_cpy & 0x3FF) + 0xDC00);
+                // Moves the character from the range 0x10000 to 0x10FFFF to
+                // 0... 0xFFFFF.
+                const char32_t _l_char_cpy{
+                    _l_char
+                    - detail::char16_offset_for_char32_conversion<char32_t>()
+                };
+                _l_back_inserter = static_cast<char16_t>(
+                    (_l_char_cpy >> 10) + high_surrogate_lower_value<char32_t>()
+                );
+                _l_back_inserter = static_cast<char16_t>(
+                    (_l_char_cpy & 0b0011'1111'1111)
+                    + detail::low_surrogate_lower_value<char32_t>()
+                );
             }
             else
             {
@@ -441,15 +658,18 @@ __constexpr result_t<std::basic_string<T>>
             }
             else
             {
-                __STATIC_ASSERT(T, "Invalid wchar_t size.");
+                __STATIC_ASSERT(
+                    T,
+                    "unicode_conversion valid for wchar_t, however Invalid for this "
+                    "wchar_t size."
+                );
             }
         }
         else
         {
             __STATIC_ASSERT(
                 T,
-                "Invalid argument for "
-                "_l_run_char16"
+                "unicode_conversion invalid for this character type"
             );
         }
     };
@@ -492,15 +712,18 @@ __constexpr result_t<std::basic_string<T>>
             }
             else
             {
-                __STATIC_ASSERT(T, "Invalid wchar_t size.");
+                __STATIC_ASSERT(
+                    T,
+                    "unicode_conversion valid for wchar_t, however Invalid for this "
+                    "wchar_t size."
+                );
             }
         }
         else
         {
             __STATIC_ASSERT(
                 T,
-                "Invalid argument for "
-                "_l_run_char32"
+                "unicode_conversion invalid for this character type"
             );
         }
     };
@@ -514,7 +737,7 @@ __constexpr result_t<std::basic_string<T>>
         {
             if (_l_result.has_value())
             {
-                return _a_str;
+                return basic_string<T>(_a_str);
             }
             else
             {
@@ -525,7 +748,7 @@ __constexpr result_t<std::basic_string<T>>
         else if constexpr (same_as<char16_t, T>)
         {
             return _l_result.transform(
-                [](auto _a_str2)
+                [&](auto _a_str2)
                 {
                     return _l_convert_u32string_to_u16string(_a_str2);
                 }
@@ -535,13 +758,13 @@ __constexpr result_t<std::basic_string<T>>
         {
             return _l_result;
         }
-        else if constexpr (same_as<wstring, T>)
+        else if constexpr (same_as<wchar_t, T>)
         {
             if constexpr (wchar_is_16_bit)
             {
                 return _l_result
                     .transform(
-                        [](auto _a_str2)
+                        [&](auto _a_str2)
                         {
                             return _l_convert_u32string_to_u16string(_a_str2);
                         }
@@ -549,7 +772,7 @@ __constexpr result_t<std::basic_string<T>>
                     .transform(
                         [](auto _a_str2)
                         {
-                            return pack_wstring(_a_str2);
+                            return unpack_wstring(_a_str2);
                         }
                     );
             }
@@ -558,21 +781,24 @@ __constexpr result_t<std::basic_string<T>>
                 return _l_result.transform(
                     [](auto _a_str2)
                     {
-                        return pack_wstring(_a_str2);
+                        return unpack_wstring(_a_str2);
                     }
                 );
             }
             else
             {
-                __STATIC_ASSERT(T, "Invalid wchar_t size.");
+                __STATIC_ASSERT(
+                    T,
+                    "unicode_conversion valid for wchar_t, however Invalid for this "
+                    "wchar_t size."
+                );
             }
         }
         else
         {
             __STATIC_ASSERT(
                 T,
-                "Invalid argument for "
-                "unicode_conversion"
+                "unicode_conversion invalid for this character type"
             );
         }
     }
@@ -598,8 +824,8 @@ __constexpr result_t<std::basic_string<T>>
         {
             __STATIC_ASSERT(
                 T,
-                "Invalid argument for "
-                "unicode_conversion"
+                "unicode_conversion valid for wchar_t, however Invalid for this "
+                "wchar_t size."
             );
         }
     }
@@ -607,8 +833,7 @@ __constexpr result_t<std::basic_string<T>>
     {
         __STATIC_ASSERT(
             T,
-            "Invalid argument for "
-            "unicode_conversion"
+            "unicode_conversion invalid for this character type"
         );
     }
 }
@@ -627,7 +852,7 @@ __constexpr_imp result_t<std::basic_string<T>>
 template <typename T, typename U>
 requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
 __constexpr_imp std::basic_string<T>
-                checkless_unicode_conversion(
+                unicode_conversion_with_exception(
                     const std::basic_string_view<U> _a_str
                 )
 {
@@ -661,23 +886,23 @@ __constexpr_imp std::basic_string<T>
 template <typename T, typename U>
 requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
 __constexpr_imp std::basic_string<T>
-                checkless_unicode_conversion(
+                unicode_conversion_with_exception(
                     const std::basic_string<U>& _a_str
                 )
 {
     using namespace std;
-    return checkless_unicode_conversion<T>(basic_string_view<U>(_a_str));
+    return unicode_conversion_with_exception<T>(basic_string_view<U>(_a_str));
 }
 
 template <typename T, typename U>
 requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
 __constexpr_imp std::basic_string<T>
-                checkless_unicode_conversion(
+                unicode_conversion_with_exception(
                     const U _a_char
                 )
 {
     using namespace std;
-    return checkless_unicode_conversion<T>(basic_string<U>(1, _a_char));
+    return unicode_conversion_with_exception<T>(basic_string<U>(1, _a_char));
 }
 
 template <typename T>
@@ -709,7 +934,10 @@ __constexpr bool
     }
     else
     {
-        __STATIC_ASSERT(T, "Doesn't work");
+        __STATIC_ASSERT(
+            T,
+            "is_valid_unicode_string invalid for this character type"
+        );
     }
 }
 
@@ -724,12 +952,47 @@ __constexpr bool
     return is_valid_unicode_string(basic_string_view<T>(_a_str));
 }
 
+template <typename T>
+requires char_type_is_unicode_c<T>
 __constexpr bool
     is_valid_char(
-        const char32_t _a_char
+        const T _a_char
     ) noexcept
 {
-    return not detail::if_invalid_char32_show_reason(_a_char).has_value();
+    using namespace std;
+    if constexpr (same_as<T, char8_t>)
+    {
+        return is_valid_ascii_char(_a_char);
+    }
+    else if constexpr (same_as<T, char16_t> || is_wchar_and_16_bit_c<T>)
+    {
+        return not (detail::is_surrogate(_a_char));
+    }
+    else if constexpr (same_as<T, char32_t> || is_wchar_and_32_bit_c<T>)
+    {
+        return not detail::if_invalid_char32_show_reason(_a_char).has_value();
+    }
+    else
+    {
+        __STATIC_ASSERT(T, "is_valid_char invalid for this character type");
+    }
+}
+
+template <typename T>
+requires is_char_type_c<T>
+__constexpr bool
+    is_valid_ascii_char(
+        const T _a_char
+    ) noexcept
+{
+    if constexpr (std::signed_integral<T>)
+    {
+        return _a_char >= 0 && _a_char <= ascii_limit<T>();
+    }
+    else
+    {
+        return _a_char <= ascii_limit<T>();
+    }
 }
 
 template <bool Return_Reason, typename T>
@@ -752,12 +1015,16 @@ __constexpr std::conditional_t<
     {
         auto       _l_itt{_a_itt};
         const auto _l_byte_1{*_l_itt};
-        if (not (_l_byte_1 <= 0x7F))
+        if (not (is_valid_ascii_char(_l_byte_1)))
         {
-            constexpr array<char32_t, 3> _l_and_array{0x1F, 0x0F, 0x07};
+            constexpr array<char32_t, 3> _l_and_array{
+                0b0001'1111, 0b0000'1111, 0b0000'0111
+            };
             constexpr array<pair<char8_t, char8_t>, 3>
                 _l_byte_1_and_equal_values{
-                    {{0xE0, 0xC0}, {0xF0, 0xE0}, {0xF8, 0xF0}}
+                    {{0b1110'0000, 0b1100'0000},
+                     {0b1111'0000, 0b1110'0000},
+                     {0b1111'1000, 0b1111'0000}}
             };
             size_t _l_code_point_size{_l_byte_1_and_equal_values.size()};
             for (size_t _l_idx{0}; _l_idx < _l_byte_1_and_equal_values.size();
@@ -787,7 +1054,7 @@ __constexpr std::conditional_t<
                 static_cast<char32_t>(_l_byte_1)
                 & (_l_and_array[_l_code_point_size])
             };
-            if (std::distance(_l_itt, _a_end) <= _l_code_point_size + 2)
+            if (std::distance(_l_itt, _a_end) <= _l_code_point_size + 1)
             {
                 if constexpr (Return_Reason)
                 {
@@ -811,7 +1078,7 @@ __constexpr std::conditional_t<
             {
                 ++_l_itt;
                 const auto _l_byte{*_l_itt};
-                if ((_l_byte & 0xC0) != 0x80)
+                if ((_l_byte & 0b1100'0000) != 0b1000'0000)
                 {
                     if constexpr (Return_Reason)
                     {
@@ -822,6 +1089,7 @@ __constexpr std::conditional_t<
                             "first two binary digits should be 10. Instead, "
                             "the first 2 binary digits of the {0} byte in the "
                             "sequence {1} are {3}.",
+                            1,
                             1,
                             1,
                             1
@@ -836,10 +1104,10 @@ __constexpr std::conditional_t<
                 // 6 due to each byte in a UTF8 string only using
                 // the last 6 bits. The & 0x3F isolates these 6
                 // bits.
-                _l_code_point = (_l_code_point << 6) | (_l_byte & 0x3F);
+                _l_code_point = (_l_code_point << 6) | (_l_byte & 0b0011'1111);
             }
             constexpr array<char32_t, 3> _l_code_point_limits{
-                0x80, 0x800, 0x1'0000
+                0b1000'0000, 0b1000'0000'0000, 0b0001'0000'0000'0000'0000
             };
             if (_l_code_point < _l_code_point_limits[_l_code_point_size])
             {
@@ -899,9 +1167,10 @@ __constexpr std::conditional_t<
             result_t<std::pair<char32_t, std::size_t>>,
             std::optional<std::pair<char32_t, std::size_t>>>
     {
-        auto       _l_itt{_a_itt};
-        const auto _l_first{*_l_itt};
-        if (_l_first >= 0xD800 && _l_first <= 0xDBFF)
+        using CharT = T::value_type;
+        auto           _l_itt{_a_itt};
+        const char16_t _l_first{static_cast<char16_t>(*_l_itt)};
+        if (detail::is_high_surrogate(_l_first))
         {
             if (std::distance(_l_itt, _a_end) <= 1)
             {
@@ -917,8 +1186,8 @@ __constexpr std::conditional_t<
                 }
             }
             ++_l_itt;
-            const auto _l_second{*_l_itt};
-            if (_l_second < 0xDC00 || _l_second > 0xDFFF)
+            const auto _l_second{static_cast<char16_t>(*_l_itt)};
+            if (not detail::is_low_surrogate(_l_second))
             {
                 if constexpr (Return_Reason)
                 {
@@ -932,12 +1201,18 @@ __constexpr std::conditional_t<
                 }
             }
             // Decode surrogate pair to code point
-            char32_t _l_char  = 0x1'0000;
-            _l_char          += ((_l_first - 0xD800) << 10);
-            _l_char          += (_l_second - 0xDC00);
+            char32_t _l_char
+                = detail::char16_offset_for_char32_conversion<char32_t>();
+            _l_char
+                += ((static_cast<char32_t>(_l_first)
+                     - high_surrogate_lower_value<char32_t>())
+                    << 10);
+            _l_char
+                += (static_cast<char32_t>(_l_second)
+                    - detail::low_surrogate_lower_value<char32_t>());
             return make_pair(_l_char, 2);
         }
-        else if (_l_first >= 0xDC00 && _l_first <= 0xDFFF)
+        else if (detail::is_low_surrogate(_l_first))
         {
             // Unpaired low surrogate
             if constexpr (Return_Reason)
@@ -1002,40 +1277,7 @@ __constexpr std::conditional_t<
     }
     else
     {
-        __STATIC_ASSERT(T, "Couldn't");
-    }
-}
-
-template <bool Return_Reason, typename T>
-requires char_type_is_unicode_c<typename T::value_type>
-__constexpr
-std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
-    next_char32_t_and_increment_iterator(
-        T&      _a_itt,
-        const T _a_end
-    ) noexcept
-{
-    using namespace std;
-    auto _l_next_char32_t_result{
-        abc::next_char32_t<Return_Reason>(_a_itt, _a_end)
-    };
-    // If it sa valid unicode character.
-    if (_l_next_char32_t_result.has_value())
-    {
-        const auto& [_l_char, _l_size]{_l_next_char32_t_result.value()};
-        std::advance(_a_itt, _l_size);
-        return _l_char;
-    }
-    else
-    {
-        if constexpr (Return_Reason)
-        {
-            return unexpected(_l_next_char32_t_result.error());
-        }
-        else
-        {
-            return nullopt;
-        }
+        __STATIC_ASSERT(T, "next_char32_t invalid for this character type");
     }
 }
 
@@ -1054,7 +1296,7 @@ __constexpr std::u8string
     while (_l_itt != _l_end)
     {
         const optional<char32_t> _l_char_opt{
-            abc::next_char32_t_and_increment_iterator<false>(_l_itt, _l_end)
+            detail::next_char32_t_and_increment_iterator<false>(_l_itt, _l_end)
         };
         if (_l_char_opt.has_value())
         {
@@ -1079,6 +1321,64 @@ __constexpr std::u8string
 {
     using namespace std;
     return unicode_string_to_u8string(basic_string_view<CharT>(_a_str));
+}
+
+template <typename CharT>
+__constexpr_imp std::u8string
+                unicode_char_to_u8string(
+                    const CharT _a_char
+                ) noexcept
+{
+    using namespace std;
+    return unicode_string_to_u8string(basic_string<CharT>(1, _a_char));
+}
+
+template <typename T>
+requires is_char_type_c<T>
+__constexpr T
+    ascii_limit() noexcept
+{
+    return T{0x7F};
+}
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr T
+    single_char16_limit_and_three_char8_limit() noexcept
+{
+    return T(0xFFFF);
+}
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr T
+    two_char8_limit() noexcept
+{
+    return T{0x7FF};
+}
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr T
+    char32_limit() noexcept
+{
+    return T{0x10'FFFF};
+}
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr T
+    high_surrogate_lower_value() noexcept
+{
+    return T{0xD800};
+}
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr T
+    low_surrogate_upper_value() noexcept
+{
+    return T{0xDFFF};
 }
 
 namespace detail
@@ -1168,24 +1468,24 @@ __constexpr std::optional<std::u8string>
             ) noexcept
 {
     using namespace std;
-    if (_a_char >= 0xD7FF && _a_char <= 0xE000)
+    if (is_surrogate<T>(_a_char))
     {
         return fmt::format(
             u8"UTF32 character found to be in the surrogate range. "
             u8"The surrogate range is beteween {0} and {1}. Character in "
             u8"question has a hex value value of {2}.",
-            u8"0xD800",
-            u8"0xDFFF",
+            make_hex_from_char(high_surrogate_lower_value<T>()),
+            make_hex_from_char(low_surrogate_upper_value<T>()),
             make_hex_from_char(_a_char)
         );
     }
-    else if (_a_char > 0x10'FFFF)
+    else if (_a_char > char32_limit<T>())
     {
         return fmt::format(
             u8"UTF32 character found to outisde the valid UTF32 range - that "
             u8"is, greater than {0}. Character in question has a hex value "
             u8"value of {1}.",
-            u8"0x10FFFF",
+            make_hex_from_char(char32_limit<T>()),
             make_hex_from_char(_a_char)
         );
     }
@@ -1198,36 +1498,148 @@ __constexpr void
         std::back_insert_iterator<std::basic_string<char8_t>>& _a_inserter
     ) noexcept
 {
-    if (_a_char <= 0x7F)
+    constexpr char8_t _l_final_six_bits_set{0b0011'1111};
+    constexpr char8_t _l_first_four_bits_set{0b1111'0000};
+    constexpr char8_t _l_first_three_bits_set{0b1110'0000};
+    constexpr char8_t _l_first_bit_set{0b1000'0000};
+    if (is_valid_ascii_char(_a_char))
     {
         // 1-byte UTF-8
-        _a_inserter = static_cast<char>(_a_char);
+        _a_inserter = static_cast<char8_t>(_a_char);
     }
-    else if (_a_char <= 0x7FF)
+    else if (_a_char <= two_char8_limit<char32_t>())
     {
-        // 2-byte UTF-8
-        _a_inserter = static_cast<char>(0xC0 | (_a_char >> 6));
-        _a_inserter = static_cast<char>(0x80 | (_a_char & 0x3F));
+        // 2-byte UTF-8.
+        // Isolate first 6 bits by rshift, then use binary or to set the other
+        // bits.
+        _a_inserter = static_cast<char8_t>(0b1100'0000 | (_a_char >> 6));
+        // Isolate first 6 bits by binary and, then use binary or to set the
+        // other bit.
+        _a_inserter = static_cast<char8_t>(
+            _l_first_bit_set | (_a_char & _l_final_six_bits_set)
+        );
     }
-    else if (_a_char <= 0xFFFF)
+    else if (_a_char <= single_char16_limit_and_three_char8_limit<char32_t>())
     {
         // 3-byte UTF-8
-        _a_inserter = static_cast<char>(0xE0 | (_a_char >> 12));
-        _a_inserter = static_cast<char>(0x80 | ((_a_char >> 6) & 0x3F));
-        _a_inserter = static_cast<char>(0x80 | (_a_char & 0x3F));
+        _a_inserter
+            = static_cast<char8_t>(_l_first_three_bits_set | (_a_char >> 12));
+        _a_inserter = static_cast<char8_t>(
+            _l_first_bit_set | ((_a_char >> 6) & _l_final_six_bits_set)
+        );
+        _a_inserter = static_cast<char8_t>(
+            _l_first_bit_set | (_a_char & _l_final_six_bits_set)
+        );
     }
-    else if (_a_char <= 0x10'FFFF)
+    else if (_a_char <= char32_limit<char32_t>())
     {
         // 4-byte UTF-8
-        _a_inserter = static_cast<char>(0xF0 | (_a_char >> 18));
-        _a_inserter = static_cast<char>(0x80 | ((_a_char >> 12) & 0x3F));
-        _a_inserter = static_cast<char>(0x80 | ((_a_char >> 6) & 0x3F));
-        _a_inserter = static_cast<char>(0x80 | (_a_char & 0x3F));
+        _a_inserter
+            = static_cast<char>(_l_first_four_bits_set | (_a_char >> 18));
+        _a_inserter = static_cast<char>(
+            _l_first_bit_set | ((_a_char >> 12) & _l_final_six_bits_set)
+        );
+        _a_inserter = static_cast<char>(
+            _l_first_bit_set | ((_a_char >> 6) & _l_final_six_bits_set)
+        );
+        _a_inserter = static_cast<char>(
+            _l_first_bit_set | (_a_char & _l_final_six_bits_set)
+        );
     }
     else
     {
         std::unreachable();
     }
+}
+
+template <bool Return_Reason, typename T>
+requires char_type_is_unicode_c<typename T::value_type>
+__constexpr
+std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
+    next_char32_t_and_increment_iterator(
+        T&      _a_itt,
+        const T _a_end
+    ) noexcept
+{
+    using namespace std;
+    auto _l_next_char32_t_result{
+        abc::next_char32_t<Return_Reason>(_a_itt, _a_end)
+    };
+    // If it sa valid unicode character.
+    if (_l_next_char32_t_result.has_value())
+    {
+        const auto& [_l_char, _l_size]{_l_next_char32_t_result.value()};
+        std::advance(_a_itt, _l_size);
+        return _l_char;
+    }
+    else
+    {
+        if constexpr (Return_Reason)
+        {
+            return unexpected(_l_next_char32_t_result.error());
+        }
+        else
+        {
+            return nullopt;
+        }
+    }
+}
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr T
+    char16_offset_for_char32_conversion() noexcept
+{
+    return T{0x1'0000};
+}
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr T
+    high_surrogate_upper_value() noexcept
+{
+    return T{0xDBFF};
+}
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr T
+    low_surrogate_lower_value() noexcept
+{
+    return T{0xDC00};
+}
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr bool
+    is_surrogate(
+        const T _a_char
+    ) noexcept
+{
+    return _a_char >= high_surrogate_lower_value<T>()
+           && _a_char <= low_surrogate_upper_value<T>();
+}
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr bool
+    is_high_surrogate(
+        const T _a_char
+    ) noexcept
+{
+    return _a_char >= high_surrogate_lower_value<T>()
+           && _a_char <= high_surrogate_upper_value<T>();
+}
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr bool
+    is_low_surrogate(
+        const T _a_char
+    ) noexcept
+{
+    return _a_char >= low_surrogate_lower_value<T>()
+           && _a_char <= low_surrogate_upper_value<T>();
 }
 } // namespace detail
 

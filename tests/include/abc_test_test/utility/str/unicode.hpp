@@ -5,44 +5,44 @@
 
 namespace
 {
-template <typename T>
-constexpr auto
-    get_name() -> std::string
-{
-    using namespace std;
-    if constexpr (same_as<T, string>)
+    template <typename T>
+    constexpr auto
+        get_name() -> std::string
     {
-        return "string";
+        using namespace std;
+        if constexpr (same_as<T, string>)
+        {
+            return "string";
+        }
+        else if constexpr (same_as<T, u8string>)
+        {
+            return "u8string";
+        }
+        else if constexpr (same_as<T, u16string>)
+        {
+            return "u16string";
+        }
+        else if constexpr (same_as<T, u32string>)
+        {
+            return "u32string";
+        }
+        else if constexpr (same_as<T, wstring>)
+        {
+            return "wstring";
+        }
+        else
+        {
+            return "unknown";
+        }
     }
-    else if constexpr (same_as<T, u8string>)
-    {
-        return "u8string";
-    }
-    else if constexpr (same_as<T, u16string>)
-    {
-        return "u16string";
-    }
-    else if constexpr (same_as<T, u32string>)
-    {
-        return "u32string";
-    }
-    else if constexpr (same_as<T, wstring>)
-    {
-        return "wstring";
-    }
-    else
-    {
-        return "unknown";
-    }
-}
 } // namespace
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name             = "Tests for convert_unicode_to_ascii and "
+        { .name = "Tests for convert_unicode_to_ascii and "
                              "convert_ascii_to_unicode",
-         .path             = "abc_test_test::utility::str::unicode",
-         .threads_required = 1}
+         .path = "abc_test_test::utility::str::unicode",
+         .threads_required = 1 }
     )
 )
 {
@@ -53,8 +53,8 @@ _TEST_CASE(
     using namespace abc::utility::io;
     auto _l_test_func = [&]<typename T>()
     {
-        auto _l_type_name{typeid(T).name()};
-        auto _l_name{get_name<T>()};
+        auto _l_type_name{ typeid(T).name() };
+        auto _l_name{ get_name<T>() };
         _TVLOG(_l_name);
         using CharT = typename T::value_type;
         _BEGIN_MULTI_ELEMENT_BBA(
@@ -69,12 +69,12 @@ _TEST_CASE(
         // Anything outside of the ascii range is caught.
         using unit_test_data_1 = tuple<T, result_t<string>>;
         for (const auto& _l_data : read_data_from_file<unit_test_data_1>(
-                 fmt::format("unit_test_1_{0}", _l_name),
-                 fmt::format("unit_test_1", _l_name)
-             ))
+            fmt::format("unit_test_1_{0}", _l_name),
+            fmt::format("unit_test_1", _l_name)
+        ))
         {
             _TVLOG(_l_data);
-            const auto& [_l_unicode_str, _l_result]{_l_data};
+            const auto& [_l_unicode_str, _l_result] {_l_data};
             _l_unit_tests += _BLOCK_CHECK(
                 _EXPR(convert_unicode_to_ascii(_l_unicode_str) == _l_result)
 
@@ -87,12 +87,11 @@ _TEST_CASE(
         // Running unit tests the other way.
         using unit_test_data_3 = std::tuple<string, result_t<T>>;
         for (const auto& _l_data : read_data_from_file<unit_test_data_3>(
-                 fmt::format("unit_test_2_{0}", _l_name),
-                 fmt::format("unit_test_2", _l_name)
-             ))
+            fmt::format("unit_test_2", _l_name)
+        ))
         {
             _TVLOG(_l_data);
-            const auto& [_l_str, _l_result]{_l_data};
+            const auto& [_l_str, _l_result] {_l_data};
             _l_unit_tests += _BLOCK_CHECK(
                 _EXPR(convert_ascii_to_unicode<CharT>(_l_str) == _l_result)
                 && _EXPR(
@@ -116,17 +115,17 @@ _TEST_CASE(
         // unicode strings.
         using fuzzy_test_data_1 = std::tuple<T>;
         for (const auto& _l_data :
-             generate_data_randomly<fuzzy_test_data_1>()
-                 & generate_data_randomly<fuzzy_test_data_1>(
-                     default_random_generator<fuzzy_test_data_1>(
-                         default_random_generator<T>(
-                             default_random_generator<typename T::value_type>()
-                         )
-                     )
-                 ))
+            generate_data_randomly<fuzzy_test_data_1>()
+            & generate_data_randomly<fuzzy_test_data_1>(
+                default_random_generator<fuzzy_test_data_1>(
+                    default_random_generator<T>(
+                        default_random_generator<typename T::value_type>()
+                    )
+                )
+            ))
         {
             _TVLOG(_l_data);
-            const auto& [_l_unicode_str]{_l_data};
+            const auto& [_l_unicode_str] {_l_data};
             matcher_t _l_matcher;
             _BEGIN_NO_THROW_MATCHER(_l_matcher);
             do_not_optimise(convert_unicode_to_ascii(_l_unicode_str));
@@ -137,17 +136,17 @@ _TEST_CASE(
         // Same as above; generate valid ascii strings and invalid strings.
         using fuzzy_test_data_2 = std::tuple<string>;
         for (const auto& _l_data :
-             generate_data_randomly<fuzzy_test_data_2>()
-                 & generate_data_randomly<fuzzy_test_data_2>(
-                     default_random_generator<fuzzy_test_data_2>(
-                         default_random_generator<string>(
-                             default_random_generator<char>()
-                         )
-                     )
-                 ))
+            generate_data_randomly<fuzzy_test_data_2>()
+            & generate_data_randomly<fuzzy_test_data_2>(
+                default_random_generator<fuzzy_test_data_2>(
+                    default_random_generator<string>(
+                        default_random_generator<char>()
+                    )
+                )
+            ))
         {
             _TVLOG(_l_data);
-            const auto& [_l_str]{_l_data};
+            const auto& [_l_str] {_l_data};
             matcher_t _l_matcher;
             _BEGIN_NO_THROW_MATCHER(_l_matcher);
             do_not_optimise(convert_ascii_to_unicode<CharT>(_l_str));
@@ -169,14 +168,14 @@ _TEST_CASE(
         // This will generate strings with characters in the ASCII range, and
         // convert ascii/convert unicode will always work.
         for (const auto& _l_data :
-             generate_data_randomly<property_test_data_1>())
+            generate_data_randomly<property_test_data_1>())
         {
             _TVLOG(_l_data);
-            const auto& [_l_str]{_l_data};
+            const auto& [_l_str] {_l_data};
             auto _l_f1 = [](const T& _a_str)
-            {
-                return convert_unicode_to_ascii(_a_str);
-            };
+                {
+                    return convert_unicode_to_ascii(_a_str);
+                };
             _l_property_tests += _BLOCK_CHECK(
                 _EXPR(
                     convert_ascii_to_unicode<CharT>(_l_str).and_then(_l_f1)
@@ -184,29 +183,54 @@ _TEST_CASE(
                 )
                 && _EXPR(
                     convert_ascii_to_unicode<CharT>(string(_l_str))
-                        .and_then(_l_f1)
+                    .and_then(_l_f1)
+                    == _l_str
+                )
+            );
+        }
+        using property_test_data_2 = std::tuple<T>;
+        for (const auto& _l_data : generate_data_randomly<property_test_data_2>(
+            default_random_generator<
+            property_test_data_2>(default_random_generator<T>(
+                default_random_generator<typename T::value_type>(0x0, 0x7F)
+            ))
+        ))
+        {
+            _TVLOG(_l_data);
+            const auto& [_l_str] {_l_data};
+            auto _l_f1 = [](const std::string& _a_str)
+                {
+                    return convert_ascii_to_unicode<CharT>(_a_str);
+                };
+            _l_property_tests += _BLOCK_CHECK(
+                _EXPR(
+                    convert_unicode_to_ascii(_l_str).and_then(_l_f1) == _l_str
+                )
+                && _EXPR(
+                    convert_unicode_to_ascii(T(_l_str)).and_then(_l_f1)
                     == _l_str
                 )
             );
         }
         _END_BBA_CHECK(_l_property_tests);
     };
-    using data_types_t = abc::utility::type_list<
-     u8string, u16string, u32string, wstring>;
+    using data_types_t
+        = abc::utility::type_list<u8string, u16string, u32string, wstring>;
     manual_data_generator_t _l_mdg;
     for_each_type<data_types_t>(
         [&]<typename T>()
-        {
-            RUN(_l_mdg, (_l_test_func.operator()<T>()));
-        }
+    {
+        RUN(_l_mdg, (_l_test_func.operator() < T > ()));
+    }
     );
 }
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name             = "Tests for unicode_conversion",
-         .path             = "abc_test_test::utility::str::conversion",
-         .threads_required = 1}
+        { .name
+         = "Tests for unicode_conversion_with_exception and unicode_conversion",
+         .path = "abc_test_test::utility::str::unicode",
+         .threads_required = 1 }
     )
 )
 {
@@ -217,7 +241,7 @@ _TEST_CASE(
     using namespace abc::utility::io;
     auto _l_test_func = [&]<typename T, typename U>()
     {
-        auto _l_name{get_name<T>()};
+        auto _l_name{ get_name<T>() };
         using CharT = typename T::value_type;
         using CharU = typename U::value_type;
         auto _l_type_name{
@@ -225,61 +249,198 @@ _TEST_CASE(
         };
         _BEGIN_MULTI_ELEMENT_BBA(
             _l_unit_tests,
-            fmt::format("Unit testing unicode_conversion {0}", _l_type_name)
+            fmt::format(
+                "Unit testing unicode_conversion_with_exception and "
+                "unicode_conversion {0}",
+                _l_type_name
+            )
         );
-        using unit_test_data_1 = std::tuple<T, U>;
+        using unit_test_data_1 = std::tuple<T, result_t<U>>;
         for (const auto& _l_data : read_data_from_file<unit_test_data_1>(
-                 fmt::format("unit_test_1_{0}", _l_name)
-             ))
+            fmt::format("unit_test_1_{0}", _l_name)
+        ))
         {
             _TVLOG(_l_data);
-            const auto& [_l_unicode_str1, _l_unicode_str2]{_l_data};
-            /*_l_unit_tests += _BLOCK_CHECK(
+            const auto& [_l_unicode_str1, _l_result_str] {_l_data};
+            _l_unit_tests += _BLOCK_CHECK(
                 _EXPR(
-                    checkless_unicode_conversion<CharU>(_l_unicode_str1)
-                    == _l_unicode_str2
+                    unicode_conversion<CharU>(_l_unicode_str1) == _l_result_str
                 )
                 && _EXPR(
-                    checkless_unicode_conversion<CharT>(_l_unicode_str2)
-                    == _l_unicode_str1
+                    unicode_conversion<CharU>(T(_l_unicode_str1))
+                    == _l_result_str
                 )
-                && _EXPR(
-                    checkless_unicode_conversion<CharU>(T(_l_unicode_str1))
-                    == _l_unicode_str2
-                )
-                && _EXPR(
-                    checkless_unicode_conversion<CharT>(U(_l_unicode_str2))
-                    == _l_unicode_str1
-                )
-            );*/
+            );
+            if (_l_result_str.has_value())
+            {
+                const auto& _l_unicode_str2{ _l_result_str.value() };
+                _l_unit_tests += _BLOCK_CHECK(
+                    _EXPR(
+                        unicode_conversion_with_exception<CharU>(_l_unicode_str1
+                        )
+                        == _l_unicode_str2
+                    )
+                    && _EXPR(
+                        unicode_conversion_with_exception<CharT>(_l_unicode_str2
+                        )
+                        == _l_unicode_str1
+                    )
+                    && _EXPR(
+                        unicode_conversion_with_exception<CharU>(
+                            T(_l_unicode_str1)
+                        )
+                        == _l_unicode_str2
+                    )
+                    && _EXPR(
+                        unicode_conversion_with_exception<CharT>(
+                            U(_l_unicode_str2)
+                        )
+                        == _l_unicode_str1
+                    )
+                );
+            }
+            else
+            {
+                _l_unit_tests += _BLOCK_CHECK(
+                    _MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
+                        errors::test_library_exception_t,
+                        _l_result_str.error(),
+                        [&]()
+                        {
+                            do_not_optimise(
+                                unicode_conversion_with_exception<CharU>(
+                                    _l_unicode_str1
+                                )
+                            );
+                        }
+                    )
+                );
+                /*__CHECK_EXCEPTIONS_TYPE_AND_MSG(
+                    errors::test_library_exception_t,
+                    _l_result_str.error(),
+                    _l_unit_tests,
+                    [&]()
+                    {
+                        do_not_optimise(
+                            unicode_conversion_with_exception<CharU>(
+                                T(_l_unicode_str1)
+                            )
+                        );
+                    }
+                );
+                matcher_t _l_matcher;
+                __BEGIN_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(_l_matcher
+                );
+                do_not_optimise(
+                    unicode_conversion_with_exception<CharU>(_l_unicode_str1)
+                );
+                __END_MAKE_MATCHER_TO_CHECK_EXCEPTION_TYPE_AND_MSG(
+                    _l_matcher,
+                    errors::test_library_exception_t,
+                    _l_result_str.error()
+                );
+                _l_unit_tests += _BLOCK_CHECK(_l_matcher);
+                _BEGIN_EXCEPTION_TYPE_AND_MSG(_l_matcher);
+                do_not_optimise(
+                    unicode_conversion_with_exception<CharU>(T(_l_unicode_str1))
+                );
+                _END_CHECK_EXCEPTION_TYPE_AND_MSG(
+                    _l_matcher,
+                    errors::test_library_exception_t,
+                    _l_result_str.error()
+                );
+                _l_unit_tests += _BLOCK_CHECK(_l_matcher);*/
+            }
         }
         _END_BBA_CHECK(_l_unit_tests);
 
         _BEGIN_MULTI_ELEMENT_BBA(
             _l_fuzzy_tests,
             fmt::format(
-                "Fuzzy testing unicode_conversion using {0}", _l_type_name
+                "Fuzzy testing unicode_conversion_with_exception and "
+                "unicode_conversion using {0}",
+                _l_type_name
             )
         );
-        using fuzzy_test_data_1 = std::tuple<T, U>;
+        using fuzzy_test_data_1 = std::tuple<T>;
         for (const auto& _l_data : generate_data_randomly<fuzzy_test_data_1>())
         {
             _TVLOG(_l_data);
-            const auto& [_l_unicode_str1, _l_unicode_str2]{_l_data};
+            const auto& [_l_unicode_str1] {_l_data};
             matcher_t _l_matcher;
             _BEGIN_NO_THROW_MATCHER(_l_matcher);
-            // do_not_optimise(checkless_unicode_conversion<CharU>(_l_unicode_str1)
-            // );
-            // do_not_optimise(checkless_unicode_conversion<CharT>(_l_unicode_str2)
-            // );
-            // do_not_optimise(
-            //     checkless_unicode_conversion<CharU>(T(_l_unicode_str1))
-            // );
-            // do_not_optimise(
-            // checkless_unicode_conversion<CharT>(U(_l_unicode_str2))
-            // );
+            do_not_optimise(
+                unicode_conversion_with_exception<CharU>(_l_unicode_str1)
+            );
+            do_not_optimise(
+                unicode_conversion_with_exception<CharU>(T(_l_unicode_str1))
+            );
+            do_not_optimise(unicode_conversion<CharU>(_l_unicode_str1));
+            do_not_optimise(unicode_conversion<CharU>(T(_l_unicode_str1)));
             _END_NO_THROW_MATCHER(_l_matcher);
             _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
+        }
+        using fuzzy_test_data_2 = std::tuple<T>;
+        for (const auto& _l_data : generate_data_randomly<fuzzy_test_data_2>(
+            default_random_generator<fuzzy_test_data_2>(
+                default_random_generator<T>(
+                    default_random_generator<CharT>(
+                        0, numeric_limits<CharT>::max()
+                    )
+                )
+            )
+        ))
+        {
+            _TVLOG(_l_data);
+            const auto& [_l_unicode_str1] {_l_data};
+            matcher_t _l_matcher_1;
+            _BEGIN_NO_THROW_MATCHER(_l_matcher_1);
+            do_not_optimise(unicode_conversion<CharU>(_l_unicode_str1));
+            do_not_optimise(unicode_conversion<CharU>(T(_l_unicode_str1)));
+            _END_NO_THROW_MATCHER(_l_matcher_1);
+            _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher_1);
+            matcher_t _l_matcher;
+            if (abc::is_valid_unicode_string(_l_unicode_str1))
+            {
+                _BEGIN_NO_THROW_MATCHER(_l_matcher);
+                do_not_optimise(
+                    unicode_conversion_with_exception<CharU>(_l_unicode_str1)
+                );
+                do_not_optimise(
+                    unicode_conversion_with_exception<CharU>(T(_l_unicode_str1))
+                );
+                do_not_optimise(unicode_conversion<CharU>(_l_unicode_str1));
+                do_not_optimise(unicode_conversion<CharU>(T(_l_unicode_str1)));
+                _END_NO_THROW_MATCHER(_l_matcher);
+                _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
+            }
+            else
+            {
+                _l_fuzzy_tests
+                    += _BLOCK_CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE(
+                        errors::test_library_exception_t,
+                        [&]()
+                        {
+                            do_not_optimise(
+                                unicode_conversion_with_exception<CharU>(
+                                    _l_unicode_str1
+                                )
+                            );
+                        }
+                    ));
+                _l_fuzzy_tests
+                    += _BLOCK_CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE(
+                        errors::test_library_exception_t,
+                        [&]()
+                        {
+                            do_not_optimise(
+                                unicode_conversion_with_exception<CharU>(
+                                    T(_l_unicode_str1)
+                                )
+                            );
+                        }
+                    ));
+            }
         }
         _END_BBA_CHECK(_l_fuzzy_tests);
 
@@ -291,24 +452,24 @@ _TEST_CASE(
         );
         using property_test_data_1 = std::tuple<T>;
         for (const auto& _l_data :
-             generate_data_randomly<property_test_data_1>())
+            generate_data_randomly<property_test_data_1>())
         {
             _TVLOG(_l_data);
-            const auto& [_l_str]{_l_data};
-            /*_l_property_tests += _BLOCK_CHECK(
+            const auto& [_l_str] {_l_data};
+            _l_property_tests += _BLOCK_CHECK(
                 _EXPR(
-                    checkless_unicode_conversion<CharT>(
-                        checkless_unicode_conversion<CharU>(_l_str)
+                    unicode_conversion_with_exception<CharT>(
+                        unicode_conversion_with_exception<CharU>(_l_str)
                     )
                     == _l_str
                 )
                 && _EXPR(
-                    checkless_unicode_conversion<CharT>(
-                        checkless_unicode_conversion<CharU>(T(_l_str))
+                    unicode_conversion_with_exception<CharT>(
+                        unicode_conversion_with_exception<CharU>(T(_l_str))
                     )
                     == _l_str
                 )
-            );*/
+            );
         }
 
         _END_BBA_CHECK(_l_property_tests);
@@ -318,22 +479,22 @@ _TEST_CASE(
     manual_data_generator_t _l_mdg;
     for_each_type<data_types_t>(
         [&]<typename T1>()
-        {
-            RUN(_l_mdg,
-                (
-                    [&]()
+    {
+        RUN(_l_mdg,
+            (
+                [&]()
+                {
+                    manual_data_generator_t _l_mdg2;
+                    for_each_type<data_types_t>(
+                        [&]<typename T2>()
                     {
-                        manual_data_generator_t _l_mdg2;
-                        for_each_type<data_types_t>(
-                            [&]<typename T2>()
-                            {
-                                RUN(_l_mdg2,
-                                    (_l_test_func.operator()<T1, T2>()));
-                            }
-                        );
+                        RUN(_l_mdg2,
+                            (_l_test_func.operator() < T1, T2 > ()));
                     }
+                    );
+                }
                 ));
-        }
+    }
     );
 }
 

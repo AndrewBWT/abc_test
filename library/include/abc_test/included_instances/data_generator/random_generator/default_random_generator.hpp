@@ -162,12 +162,12 @@ __constexpr std::size_t
 __constexpr char32_t
     generate_valid_unicode_char32_t(
         utility::rng_t& _a_rng,
-        const char32_t  _a_limit = 0x1'0FFF
+        const char32_t  _a_limit = char32_limit<char32_t>()
     )
 {
     using namespace std;
-    constexpr char32_t _l_low_surrogate{0xD800};
-    constexpr char32_t _l_high_surrogate{0xDFFF};
+    constexpr char32_t _l_low_surrogate{ high_surrogate_lower_value<char32_t>()};
+    constexpr char32_t _l_high_surrogate{ low_surrogate_upper_value<char32_t>()};
     char32_t           _l_rv;
     if (_a_limit < _l_low_surrogate)
     {
@@ -228,7 +228,7 @@ __constexpr std::optional<std::basic_string<T>>
     {
         auto _l_conversion_func = [](const char32_t _l_char)
         {
-            return checkless_unicode_conversion<T>(u32string(1, _l_char));
+            return unicode_conversion_with_exception<T>(_l_char);
         };
         // Ths is the largest amount of space that a char32_t will take in this
         // encoding (assuming not plain ASCII chars).
@@ -250,7 +250,7 @@ __constexpr std::optional<std::basic_string<T>>
                 switch (_a_biggest_string)
                 {
                 case 1:
-                    _l_limit = 0xFFFF;
+                    _l_limit = single_char16_limit_and_three_char8_limit<char32_t>();
                     break;
                 default:
                     std::unreachable();
@@ -261,13 +261,13 @@ __constexpr std::optional<std::basic_string<T>>
                 switch (_a_biggest_string)
                 {
                 case 1:
-                    _l_limit = 0x7F;
+                    _l_limit = ascii_limit<char32_t>();
                     break;
                 case 2:
-                    _l_limit = 0x7FF;
+                    _l_limit = two_char8_limit<char32_t>();
                     break;
                 case 3:
-                    _l_limit = 0xFFFF;
+                    _l_limit = single_char16_limit_and_three_char8_limit<char32_t>();
                     break;
                 default:
                     std::unreachable();
