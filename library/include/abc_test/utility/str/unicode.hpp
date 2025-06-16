@@ -218,7 +218,7 @@ __constexpr std::conditional_t<
     Return_Reason,
     result_t<std::pair<char32_t, std::size_t>>,
     std::optional<std::pair<char32_t, std::size_t>>>
-    next_char32_t(const T _a_itt, const T _a_end) noexcept;
+    next_char32_t(const T _a_begin, const T _a_itt, const T _a_end) noexcept;
 /*!
  * @brief Converts an arbitrary unicode string to a u8string.
  *
@@ -266,21 +266,19 @@ __constexpr std::u8string
  * @return The encoded constant.
  */
 template <typename T>
-requires is_char_type_c<T>
-__constexpr T
-    ascii_limit() noexcept;
+requires is_char_type_c<T> && (sizeof(T) >= 1)
+__constexpr T ascii_limit() noexcept;
 /*!
  * @brief Gets the specified constant.
  *
  * Equal to 0xFFFF.
  *
- * @tparam T The return type paramter.
  * @return The encoded constant.
  */
+
 template <typename T>
-requires char_type_is_unicode_c<T>
-__constexpr T
-    single_char16_limit_and_three_char8_limit() noexcept;
+requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
+__constexpr T single_char16_limit_and_three_char8_limit() noexcept;
 /*!
  * @brief Gets the specified constant.
  *
@@ -290,9 +288,8 @@ __constexpr T
  * @return The encoded constant.
  */
 template <typename T>
-requires char_type_is_unicode_c<T>
-__constexpr T
-    two_char8_limit() noexcept;
+requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
+__constexpr T two_char8_limit() noexcept;
 /*!
  * @brief Gets the specified constant.
  *
@@ -302,9 +299,8 @@ __constexpr T
  * @return The encoded constant.
  */
 template <typename T>
-requires char_type_is_unicode_c<T>
-__constexpr T
-    char32_limit() noexcept;
+requires char_type_is_unicode_c<T> && (sizeof(T) >= 4)
+__constexpr T char32_limit() noexcept;
 /*!
  * @brief Gets the specified constant.
  *
@@ -314,9 +310,8 @@ __constexpr T
  * @return The encoded constant.
  */
 template <typename T>
-requires char_type_is_unicode_c<T>
-__constexpr T
-    high_surrogate_lower_value() noexcept;
+requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
+__constexpr T high_surrogate_lower_value() noexcept;
 /*!
  * @brief Gets the specified constant.
  *
@@ -326,9 +321,8 @@ __constexpr T
  * @return The encoded constant.
  */
 template <typename T>
-requires char_type_is_unicode_c<T>
-__constexpr T
-    low_surrogate_upper_value() noexcept;
+requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
+__constexpr T low_surrogate_upper_value() noexcept;
 
 namespace detail
 {
@@ -359,35 +353,43 @@ template <bool Return_Reason, typename T>
 requires char_type_is_unicode_c<typename T::value_type>
 __constexpr
 std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
-    next_char32_t_and_increment_iterator(T& _a_itt, const T _a_end) noexcept;
+    next_char32_t_and_increment_iterator(
+        const T& _a_begin,
+        T&       _a_itt,
+        const T  _a_end
+    ) noexcept;
 
 template <typename T>
-requires char_type_is_unicode_c<T>
-__constexpr T
-    char16_offset_for_char32_conversion() noexcept;
+requires char_type_is_unicode_c<T> && (sizeof(T) >= 4)
+__constexpr T char16_offset_for_char32_conversion() noexcept;
 
 template <typename T>
-requires char_type_is_unicode_c<T>
-__constexpr T
-    high_surrogate_upper_value() noexcept;
+requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
+__constexpr T high_surrogate_upper_value() noexcept;
 
 template <typename T>
-requires char_type_is_unicode_c<T>
-__constexpr T
-    low_surrogate_lower_value() noexcept;
+requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
+__constexpr T low_surrogate_lower_value() noexcept;
 template <typename T>
-requires char_type_is_unicode_c<T>
-__constexpr bool
-    is_surrogate(const T _a_char) noexcept;
+requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
+__constexpr bool is_surrogate(const T _a_char) noexcept;
 template <typename T>
-requires char_type_is_unicode_c<T>
-__constexpr bool
-    is_high_surrogate(const T _a_char) noexcept;
+requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
+__constexpr bool is_high_surrogate(const T _a_char) noexcept;
 
 template <typename T>
+requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
+__constexpr bool is_low_surrogate(const T _a_char) noexcept;
+template <typename T>
 requires char_type_is_unicode_c<T>
-__constexpr bool
-    is_low_surrogate(const T _a_char) noexcept;
+__constexpr std::u8string
+            convert_string_view_to_hex_vector(const std::basic_string<T>& _a_str
+            ) noexcept;
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr std::u8string
+    convert_string_view_to_hex_vector(const std::basic_string_view<T> _a_str
+    ) noexcept;
 } // namespace detail
 
 _END_ABC_NS
@@ -422,13 +424,15 @@ __constexpr_imp result_t<std::string>
     for (size_t _l_idx{1}; _l_itt != _l_end; ++_l_idx)
     {
         // Gets each char32_t from the string view.
-        const optional<char32_t> _l_char_opt{
-            detail::next_char32_t_and_increment_iterator<false>(_l_itt, _l_end)
+        const result_t<char32_t> _l_char_res{
+            detail::next_char32_t_and_increment_iterator<true>(
+                _a_str.begin(), _l_itt, _l_end
+            )
         };
         // If it sa valid unicode character.
-        if (_l_char_opt.has_value())
+        if (_l_char_res.has_value())
         {
-            const auto& _l_char{_l_char_opt.value()};
+            const auto& _l_char{_l_char_res.value()};
             // If doesn't fit within ASCII.
             if (not (is_valid_ascii_char(_l_char)))
             {
@@ -452,32 +456,12 @@ __constexpr_imp result_t<std::string>
         else
         {
             // Invalid unicode character.
-            using namespace std;
-            const u8string _l_unicode{unicode_char_to_u8string(*_l_itt)};
-            const result_t<char32_t> _l_char_opt{
-                detail::next_char32_t_and_increment_iterator<true>(
-                    _l_itt, _l_end
-                )
-            };
             return unexpected(fmt::format(
                 u8"The function convert_unicode_to_ascii "
-                u8"encountered an invalid unicode character when processing "
-                u8"its input. "
-                u8"The {0} {1} character \"{2}\" was unable to be processed. "
-                u8"\"{3}\" "
-                u8"is the "
-                u8"entirety of the remaining unicode string to process. In the "
-                u8"unicode "
-                u8"output shown in "
-                u8"this message, bytes which do not represent specific unicode "
-                u8"characters are shown in hex, and prepended by the string "
-                u8"\"\\x\".",
-                positive_integer_to_placement(
-                    std::distance(_a_str.begin(), _l_itt) + 1
-                ),
-                type_id<CharT>(),
-                unicode_char_to_u8string(*_l_itt),
-                unicode_string_to_u8string(basic_string<CharT>(_l_itt, _l_end))
+                u8"encountered an error when processing "
+                u8"the input \"{0}\". The error encountered is as follows; {1}",
+                unicode_string_to_u8string(_a_str),
+                _l_char_res.error()
             ));
         }
     }
@@ -660,7 +644,8 @@ __constexpr result_t<std::basic_string<T>>
             {
                 __STATIC_ASSERT(
                     T,
-                    "unicode_conversion valid for wchar_t, however Invalid for this "
+                    "unicode_conversion valid for wchar_t, however Invalid for "
+                    "this "
                     "wchar_t size."
                 );
             }
@@ -668,8 +653,7 @@ __constexpr result_t<std::basic_string<T>>
         else
         {
             __STATIC_ASSERT(
-                T,
-                "unicode_conversion invalid for this character type"
+                T, "unicode_conversion invalid for this character type"
             );
         }
     };
@@ -714,7 +698,8 @@ __constexpr result_t<std::basic_string<T>>
             {
                 __STATIC_ASSERT(
                     T,
-                    "unicode_conversion valid for wchar_t, however Invalid for this "
+                    "unicode_conversion valid for wchar_t, however Invalid for "
+                    "this "
                     "wchar_t size."
                 );
             }
@@ -722,8 +707,7 @@ __constexpr result_t<std::basic_string<T>>
         else
         {
             __STATIC_ASSERT(
-                T,
-                "unicode_conversion invalid for this character type"
+                T, "unicode_conversion invalid for this character type"
             );
         }
     };
@@ -789,7 +773,8 @@ __constexpr result_t<std::basic_string<T>>
             {
                 __STATIC_ASSERT(
                     T,
-                    "unicode_conversion valid for wchar_t, however Invalid for this "
+                    "unicode_conversion valid for wchar_t, however Invalid for "
+                    "this "
                     "wchar_t size."
                 );
             }
@@ -797,8 +782,7 @@ __constexpr result_t<std::basic_string<T>>
         else
         {
             __STATIC_ASSERT(
-                T,
-                "unicode_conversion invalid for this character type"
+                T, "unicode_conversion invalid for this character type"
             );
         }
     }
@@ -824,7 +808,8 @@ __constexpr result_t<std::basic_string<T>>
         {
             __STATIC_ASSERT(
                 T,
-                "unicode_conversion valid for wchar_t, however Invalid for this "
+                "unicode_conversion valid for wchar_t, however Invalid for "
+                "this "
                 "wchar_t size."
             );
         }
@@ -832,8 +817,7 @@ __constexpr result_t<std::basic_string<T>>
     else
     {
         __STATIC_ASSERT(
-            T,
-            "unicode_conversion invalid for this character type"
+            T, "unicode_conversion invalid for this character type"
         );
     }
 }
@@ -864,21 +848,12 @@ __constexpr_imp std::basic_string<T>
     }
     else
     {
-        using namespace std;
-        u8string _l_str;
-        ranges::for_each(
-            _l_str,
-            [&](auto _l_char)
-            {
-                _l_str.append(make_hex_from_char(_l_char));
-            }
-        );
         throw test_library_exception_t(fmt::format(
             u8"checkless_unicode_conversion failed. Input {0} "
             u8"argument \"_a_str\" contains invalid unicode "
             u8"character(s). In hex _a_str = \"{1}\".",
             type_id<basic_string<U>>(),
-            _l_str
+            detail::convert_string_view_to_hex_vector(_a_str)
         ));
     }
 }
@@ -935,8 +910,7 @@ __constexpr bool
     else
     {
         __STATIC_ASSERT(
-            T,
-            "is_valid_unicode_string invalid for this character type"
+            T, "is_valid_unicode_string invalid for this character type"
         );
     }
 }
@@ -1002,12 +976,14 @@ __constexpr std::conditional_t<
     result_t<std::pair<char32_t, std::size_t>>,
     std::optional<std::pair<char32_t, std::size_t>>>
     next_char32_t(
+        const T _a_begin,
         const T _a_itt,
         const T _a_end
     ) noexcept
 {
     using namespace std;
-    auto _l_next_from_u8string = [](const T _a_itt, const T _a_end)
+    auto _l_next_from_u8string
+        = [](const T _a_begin, const T _a_itt, const T _a_end)
         -> std::conditional_t<
             Return_Reason,
             result_t<std::pair<char32_t, std::size_t>>,
@@ -1043,7 +1019,30 @@ __constexpr std::conditional_t<
             {
                 if constexpr (Return_Reason)
                 {
-                    return unexpected(fmt::format(u8"couldnt'"));
+                    return unexpected(fmt::format(
+                        u8"the {0} char8_t code unit encountered, represented "
+                        u8"in hex as {1}, was found to be invalid under the "
+                        u8"UTF8 standard. An attempt was made to recognise it "
+                        u8"as a leading code unit as part of a unicode code "
+                        u8"point, however this was not possible. "
+                        u8"To be a leading code unit, a code unit "
+                        u8"must be inclusively between either {2} and "
+                        u8"{3}, {4} and {5}, {6} and {7}, or "
+                        u8"{8} and {9}. {1} did not meet "
+                        u8"this criteria.",
+                        positive_integer_to_placement(
+                            std::distance(_a_begin, _l_itt) + 1
+                        ),
+                        represent_char_as_hex_for_output(_l_byte_1),
+                        represent_char_as_hex_for_output(char8_t(0x00)),
+                        represent_char_as_hex_for_output(char8_t(0x7F)),
+                        represent_char_as_hex_for_output(char8_t(0xC0)),
+                        represent_char_as_hex_for_output(char8_t(0xDF)),
+                        represent_char_as_hex_for_output(char8_t(0xE0)),
+                        represent_char_as_hex_for_output(char8_t(0xEF)),
+                        represent_char_as_hex_for_output(char8_t(0xF0)),
+                        represent_char_as_hex_for_output(char8_t(0xF7))
+                    ));
                 }
                 else
                 {
@@ -1058,15 +1057,28 @@ __constexpr std::conditional_t<
             {
                 if constexpr (Return_Reason)
                 {
+                    const std::size_t _l_code_points_remaining{
+                        static_cast<size_t>(std::distance(_l_itt, _a_end))
+                    };
                     return unexpected(fmt::format(
-                        u8"UTF8 validation error. The code point \"{0}\" "
-                        u8"(represented in hex)"
-                        u8"signified that there should be {1} bytes "
-                        u8"representing a unicide character. Instead, only {2} "
-                        u8"bytes were remaining in the byte sequences.",
-                        make_hex_from_char(_l_byte_1),
+                        u8"the {0} char8_t code unit encountered, represented "
+                        u8"in hex as {1}, was found to be invalid under the "
+                        u8"UTF8 standard. It was processed as a leading code "
+                        u8"unit, in an attempt to process a unicode code "
+                        u8"point, however this was not possible. When "
+                        u8"processed as a leading code unit, {1} should be "
+                        u8"the first of {2} code units making up the code "
+                        u8"point. "
+                        u8"However the sequence of code units ends after {3} "
+                        u8"code unit{4}, meaning that it is part of an invalid "
+                        u8"code unit sequence.",
+                        positive_integer_to_placement(
+                            std::distance(_a_begin, _l_itt) + 1
+                        ),
+                        represent_char_as_hex_for_output(_l_byte_1),
                         _l_code_point_size + 2,
-                        std::distance(_l_itt, _a_end)
+                        _l_code_points_remaining,
+                        (_l_code_points_remaining > 1 ? u8"s" : u8"")
                     ));
                 }
                 else
@@ -1077,22 +1089,47 @@ __constexpr std::conditional_t<
             for (size_t _l_idx{0}; _l_idx <= _l_code_point_size; ++_l_idx)
             {
                 ++_l_itt;
-                const auto _l_byte{*_l_itt};
-                if ((_l_byte & 0b1100'0000) != 0b1000'0000)
+                const auto _l_byte_n{*_l_itt};
+                if ((_l_byte_n & 0b1100'0000) != 0b1000'0000)
                 {
                     if constexpr (Return_Reason)
                     {
+                        auto _l_itt_limit{
+                            _l_itt + (_l_code_point_size - _l_idx)
+                        };
+                        u8string _l_sequence_as_hex{u8"["};
+                        for (auto _l_jtt{std::prev(_l_itt, _l_idx + 1)};
+                             _l_jtt <= _l_itt_limit;
+                             ++_l_jtt)
+                        {
+                            _l_sequence_as_hex.append(
+                                represent_char_as_hex_for_output(*_l_jtt)
+                            );
+                            if (_l_jtt + 1 <= _l_itt_limit)
+                            {
+                                _l_sequence_as_hex.append(u8",");
+                            }
+                        }
+                        _l_sequence_as_hex.append(u8"]");
                         return unexpected(fmt::format(
-                            u8"UTF8 validation error. Each byte set except the "
-                            u8"leading byte, used to represent a unicode "
-                            u8"character, "
-                            "first two binary digits should be 10. Instead, "
-                            "the first 2 binary digits of the {0} byte in the "
-                            "sequence {1} are {3}.",
-                            1,
-                            1,
-                            1,
-                            1
+                            u8"the {0} char8_t code unit encountered, "
+                            u8"represented in hex as {1}, was found to be "
+                            u8"invalid under the UTF8 standard. It was "
+                            u8"processed as a continuation code unit, as part "
+                            u8"of an attempt to process the sub-sequence {4} "
+                            u8"as a unicode code point, "
+                            u8"however this was not possible. Continuation "
+                            u8"code units must be inclusively between {2} and "
+                            u8"{3}. {1} "
+                            u8"is not, therefore meaning that it is part of an "
+                            u8"invalid code unit sequence.",
+                            positive_integer_to_placement(
+                                std::distance(_a_begin, _l_itt) + 1
+                            ),
+                            represent_char_as_hex_for_output(_l_byte_n),
+                            represent_char_as_hex_for_output(char8_t(0x80)),
+                            represent_char_as_hex_for_output(char8_t(0xBF)),
+                            _l_sequence_as_hex
                         ));
                     }
                     else
@@ -1102,9 +1139,10 @@ __constexpr std::conditional_t<
                 }
                 // Shifts the bit into the code point. It shifts by
                 // 6 due to each byte in a UTF8 string only using
-                // the last 6 bits. The & 0x3F isolates these 6
+                // the last 6 bits. The logical and isolates these 6
                 // bits.
-                _l_code_point = (_l_code_point << 6) | (_l_byte & 0b0011'1111);
+                _l_code_point
+                    = (_l_code_point << 6) | (_l_byte_n & 0b0011'1111);
             }
             constexpr array<char32_t, 3> _l_code_point_limits{
                 0b1000'0000, 0b1000'0000'0000, 0b0001'0000'0000'0000'0000
@@ -1113,18 +1151,37 @@ __constexpr std::conditional_t<
             {
                 if constexpr (Return_Reason)
                 {
+                    const u8string _l_smaller_char8_sequence{
+                        unicode_char_to_u8string(_l_code_point)
+                    };
                     return unexpected(fmt::format(
-                        u8"UTF8 validation error. Created UTF32 unicode "
-                        u8"character is not the shortest representation in "
-                        u8"UTF8. "
-                        u8"Specifically, {0} code points require the created "
-                        u8"UTF32 character to be at least {1}. The created "
-                        u8"UTF32 character has a value of {2}.",
-                        _l_code_point_size,
-                        make_hex_from_char(
-                            _l_code_point_limits[_l_code_point_size - 1]
+                        u8"when attempting to "
+                        u8"process the {0} through to the {1} char8_t code "
+                        u8"unit as a single unicode code point, an error was "
+                        u8"detected under the UTF8 standard. This error was "
+                        u8"found when processing the "
+                        u8"code unit sub-sequence {2}. After "
+                        u8"converting it to the single UTF32 code unit `{3}' "
+                        u8"({4} in hex), it was found that `{3}' can be "
+                        u8"represented using the smaller sub-sequence of "
+                        u8"char8_t code units {5}. Therefore, this code "
+                        u8"unit sub-sequence is invalid.",
+                        positive_integer_to_placement(
+                            std::distance(_a_begin, _a_itt) + 1
                         ),
-                        make_hex_from_char(_l_code_point)
+                        positive_integer_to_placement(
+                            std::distance(_a_begin, _l_itt) + 1
+                        ),
+                        detail::convert_string_view_to_hex_vector(
+                            basic_string_view<typename T::value_type>(
+                                _a_itt, _l_itt + 1
+                            )
+                        ),
+                        _l_smaller_char8_sequence,
+                        represent_char_as_hex_for_output(_l_code_point),
+                        detail::convert_string_view_to_hex_vector(
+                            _l_smaller_char8_sequence
+                        )
 
                     ));
                 }
@@ -1141,9 +1198,29 @@ __constexpr std::conditional_t<
                 if constexpr (Return_Reason)
                 {
                     return unexpected(fmt::format(
-                        u8"UTF8 validation error found after conversion to "
-                        u8"UTF32. {0}",
-                        _l_invalid_char_reason.value()
+                        u8"when attempting to process the {0} through to the "
+                        u8"{1} char8_t code unit as a single unicode code "
+                        u8"point, an error was detected under the UTF8 "
+                        u8"standard. This error was found when processing the "
+                        u8"code unit sub-sequence {2}. After "
+                        u8"converting it to a single UTF32 code unit, it was "
+                        u8"found to be invalid. {3} As {4} is not "
+                        u8"within this range, this code unit sub-sequence is "
+                        u8"invalid.",
+                        positive_integer_to_placement(
+                            std::distance(_a_begin, _a_itt) + 1
+                        ),
+                        positive_integer_to_placement(
+                            std::distance(_a_begin, _l_itt) + 1
+                        ),
+                        detail::convert_string_view_to_hex_vector(
+                            basic_string_view<typename T::value_type>(
+                                _a_itt, _l_itt + 1
+                            )
+                        ),
+                        _l_invalid_char_reason.value(),
+                        represent_char_as_hex_for_output(_l_code_point)
+
                     ));
                 }
                 else
@@ -1161,7 +1238,8 @@ __constexpr std::conditional_t<
             return make_pair(static_cast<char32_t>(_l_byte_1), 1);
         }
     };
-    auto _l_next_from_u16_string = [](const T _a_itt, const T _a_end)
+    auto _l_next_from_u16_string
+        = [](const T _a_begin, const T _a_itt, const T _a_end)
         -> std::conditional_t<
             Return_Reason,
             result_t<std::pair<char32_t, std::size_t>>,
@@ -1230,30 +1308,41 @@ __constexpr std::conditional_t<
         }
     };
     using CharT = typename T::value_type;
-    if constexpr (same_as<CharT, char8_t>)
+    if (_a_itt > _a_end)
     {
-        return _l_next_from_u8string(_a_itt, _a_end);
-    }
-    else if constexpr (same_as<CharT, char16_t> || is_wchar_and_16_bit_c<CharT>)
-    {
-        return _l_next_from_u16_string(_a_itt, _a_end);
-    }
-    else if constexpr (same_as<CharT, char32_t> || is_wchar_and_32_bit_c<CharT>)
-    {
-        if (_a_itt == _a_end)
+        if constexpr (Return_Reason)
         {
-            if constexpr (Return_Reason)
-            {
-                return unexpected(
-                    u8"Invalid low surrogate following high surrogate"
-                );
-            }
-            else
-            {
-                return nullopt;
-            }
+            return unexpected(u8"Unpaired low surrogate");
         }
         else
+        {
+            return nullopt;
+        }
+    }
+    else if (_a_itt == _a_end)
+    {
+        if constexpr (Return_Reason)
+        {
+            return unexpected(u8"Unpaired low surrogate");
+        }
+        else
+        {
+            return nullopt;
+        }
+    }
+    else
+    {
+        if constexpr (same_as<CharT, char8_t>)
+        {
+            return _l_next_from_u8string(_a_begin, _a_itt, _a_end);
+        }
+        else if constexpr (same_as<CharT, char16_t>
+                           || is_wchar_and_16_bit_c<CharT>)
+        {
+            return _l_next_from_u16_string(_a_begin, _a_itt, _a_end);
+        }
+        else if constexpr (same_as<CharT, char32_t>
+                           || is_wchar_and_32_bit_c<CharT>)
         {
             const CharT _l_char{*_a_itt};
             if (auto _l_next_char{detail::if_invalid_char32_show_reason(_l_char)
@@ -1274,10 +1363,10 @@ __constexpr std::conditional_t<
                 return make_pair(_l_char, 1);
             }
         }
-    }
-    else
-    {
-        __STATIC_ASSERT(T, "next_char32_t invalid for this character type");
+        else
+        {
+            __STATIC_ASSERT(T, "next_char32_t invalid for this character type");
+        }
     }
 }
 
@@ -1296,7 +1385,9 @@ __constexpr std::u8string
     while (_l_itt != _l_end)
     {
         const optional<char32_t> _l_char_opt{
-            detail::next_char32_t_and_increment_iterator<false>(_l_itt, _l_end)
+            detail::next_char32_t_and_increment_iterator<false>(
+                std::begin(_a_str), _l_itt, _l_end
+            )
         };
         if (_l_char_opt.has_value())
         {
@@ -1306,7 +1397,7 @@ __constexpr std::u8string
         }
         else
         {
-            _l_rv.append(make_hex_from_char(*_l_itt));
+            _l_rv.append(represent_char_as_hex_for_printing(*_l_itt));
             ++_l_itt;
         }
     }
@@ -1335,48 +1426,60 @@ __constexpr_imp std::u8string
 
 template <typename T>
 requires is_char_type_c<T>
-__constexpr T
-    ascii_limit() noexcept
+         && (
+             sizeof(T) >= 1
+         )
+__constexpr T ascii_limit() noexcept
 {
     return T{0x7F};
 }
 
 template <typename T>
 requires char_type_is_unicode_c<T>
-__constexpr T
-    single_char16_limit_and_three_char8_limit() noexcept
+         && (
+             sizeof(T) >= 2
+         )
+__constexpr T single_char16_limit_and_three_char8_limit() noexcept
 {
-    return T(0xFFFF);
+    return 0xFFFF;
 }
 
 template <typename T>
 requires char_type_is_unicode_c<T>
-__constexpr T
-    two_char8_limit() noexcept
+         && (
+             sizeof(T) >= 2
+         )
+__constexpr T two_char8_limit() noexcept
 {
-    return T{0x7FF};
+    return 0x7FF;
 }
 
 template <typename T>
 requires char_type_is_unicode_c<T>
-__constexpr T
-    char32_limit() noexcept
+         && (
+             sizeof(T) >= 4
+         )
+__constexpr T char32_limit() noexcept
 {
     return T{0x10'FFFF};
 }
 
 template <typename T>
 requires char_type_is_unicode_c<T>
-__constexpr T
-    high_surrogate_lower_value() noexcept
+         && (
+             sizeof(T) >= 2
+         )
+__constexpr T high_surrogate_lower_value() noexcept
 {
     return T{0xD800};
 }
 
 template <typename T>
 requires char_type_is_unicode_c<T>
-__constexpr T
-    low_surrogate_upper_value() noexcept
+         && (
+             sizeof(T) >= 2
+         )
+__constexpr T low_surrogate_upper_value() noexcept
 {
     return T{0xDFFF};
 }
@@ -1410,10 +1513,11 @@ result_t<std::conditional_t<Return_u32string, std::u32string, std::monostate>>
     using namespace std;
     conditional_t<Return_u32string, u32string, monostate> _l_rv;
     auto _l_end{std::end(_a_str)};
-    for (auto _l_itt{std::begin(_a_str)}; _l_itt != _l_end;)
+    auto _l_begin{std::begin(_a_str)};
+    for (auto _l_itt{_l_begin}; _l_itt != _l_end;)
     {
         auto _l_result{
-            next_char32_t_and_increment_iterator<true>(_l_itt, _l_end)
+            next_char32_t_and_increment_iterator<true>(_l_begin, _l_itt, _l_end)
         };
         if (_l_result.has_value())
         {
@@ -1440,10 +1544,11 @@ result_t<std::conditional_t<Return_u32string, std::u32string, std::monostate>>
     using namespace std;
     conditional_t<Return_u32string, u32string, monostate> _l_rv;
     auto _l_end{std::end(_a_str)};
-    for (auto _l_itt{std::begin(_a_str)}; _l_itt != _l_end; ++_l_itt)
+    auto _l_begin{std::begin(_a_str)};
+    for (auto _l_itt{_l_begin}; _l_itt != _l_end;)
     {
         auto _l_result{
-            next_char32_t_and_increment_iterator<true>(_l_itt, _l_end)
+            next_char32_t_and_increment_iterator<true>(_l_begin, _l_itt, _l_end)
         };
         if (_l_result.has_value())
         {
@@ -1468,28 +1573,29 @@ __constexpr std::optional<std::u8string>
             ) noexcept
 {
     using namespace std;
-    if (is_surrogate<T>(_a_char))
+    if (is_surrogate<T>(_a_char) || _a_char > char32_limit<T>())
     {
         return fmt::format(
-            u8"UTF32 character found to be in the surrogate range. "
-            u8"The surrogate range is beteween {0} and {1}. Character in "
-            u8"question has a hex value value of {2}.",
-            make_hex_from_char(high_surrogate_lower_value<T>()),
-            make_hex_from_char(low_surrogate_upper_value<T>()),
-            make_hex_from_char(_a_char)
+            u8"The UTF32 "
+            u8"code unit in question is represented in hex as {0}, "
+            u8"and is outside the unicode range. "
+            u8"The unicode range is inclusively from "
+            u8"{1} to {2}, and from {3} to {4}.",
+            represent_char_as_hex_for_output(_a_char),
+            represent_char_as_hex_for_output(static_cast<char32_t>(0x0)),
+            represent_char_as_hex_for_output<T>(
+                high_surrogate_lower_value<T>() - T(0x01)
+            ),
+            represent_char_as_hex_for_output<T>(
+                low_surrogate_upper_value<T>() + T(0x01)
+            ),
+            represent_char_as_hex_for_output(char32_limit<T>())
         );
     }
-    else if (_a_char > char32_limit<T>())
+    else
     {
-        return fmt::format(
-            u8"UTF32 character found to outisde the valid UTF32 range - that "
-            u8"is, greater than {0}. Character in question has a hex value "
-            u8"value of {1}.",
-            make_hex_from_char(char32_limit<T>()),
-            make_hex_from_char(_a_char)
-        );
+        return nullopt;
     }
-    return nullopt;
 }
 
 __constexpr void
@@ -1557,13 +1663,14 @@ requires char_type_is_unicode_c<typename T::value_type>
 __constexpr
 std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
     next_char32_t_and_increment_iterator(
-        T&      _a_itt,
-        const T _a_end
+        const T& _a_begin,
+        T&       _a_itt,
+        const T  _a_end
     ) noexcept
 {
     using namespace std;
     auto _l_next_char32_t_result{
-        abc::next_char32_t<Return_Reason>(_a_itt, _a_end)
+        next_char32_t<Return_Reason>(_a_begin, _a_itt, _a_end)
     };
     // If it sa valid unicode character.
     if (_l_next_char32_t_result.has_value())
@@ -1587,34 +1694,42 @@ std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
 
 template <typename T>
 requires char_type_is_unicode_c<T>
-__constexpr T
-    char16_offset_for_char32_conversion() noexcept
+         && (
+             sizeof(T) >= 4
+         )
+__constexpr T char16_offset_for_char32_conversion() noexcept
 {
     return T{0x1'0000};
 }
 
 template <typename T>
 requires char_type_is_unicode_c<T>
-__constexpr T
-    high_surrogate_upper_value() noexcept
+         && (
+             sizeof(T) >= 2
+         )
+__constexpr T high_surrogate_upper_value() noexcept
 {
     return T{0xDBFF};
 }
 
 template <typename T>
 requires char_type_is_unicode_c<T>
-__constexpr T
-    low_surrogate_lower_value() noexcept
+         && (
+             sizeof(T) >= 2
+         )
+__constexpr T low_surrogate_lower_value() noexcept
 {
     return T{0xDC00};
 }
 
 template <typename T>
 requires char_type_is_unicode_c<T>
-__constexpr bool
-    is_surrogate(
-        const T _a_char
-    ) noexcept
+         && (
+             sizeof(T) >= 2
+         )
+__constexpr bool is_surrogate(
+    const T _a_char
+) noexcept
 {
     return _a_char >= high_surrogate_lower_value<T>()
            && _a_char <= low_surrogate_upper_value<T>();
@@ -1622,10 +1737,12 @@ __constexpr bool
 
 template <typename T>
 requires char_type_is_unicode_c<T>
-__constexpr bool
-    is_high_surrogate(
-        const T _a_char
-    ) noexcept
+         && (
+             sizeof(T) >= 2
+         )
+__constexpr bool is_high_surrogate(
+    const T _a_char
+) noexcept
 {
     return _a_char >= high_surrogate_lower_value<T>()
            && _a_char <= high_surrogate_upper_value<T>();
@@ -1633,13 +1750,51 @@ __constexpr bool
 
 template <typename T>
 requires char_type_is_unicode_c<T>
-__constexpr bool
-    is_low_surrogate(
-        const T _a_char
-    ) noexcept
+         && (
+             sizeof(T) >= 2
+         )
+__constexpr bool is_low_surrogate(
+    const T _a_char
+) noexcept
 {
     return _a_char >= low_surrogate_lower_value<T>()
            && _a_char <= low_surrogate_upper_value<T>();
+}
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr std::u8string
+            convert_string_view_to_hex_vector(
+                const std::basic_string<T>& _a_str
+            ) noexcept
+{
+    using namespace std;
+    return convert_string_view_to_hex_vector(basic_string_view<T>(_a_str));
+}
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr std::u8string
+            convert_string_view_to_hex_vector(
+                const std::basic_string_view<T> _a_str
+            ) noexcept
+{
+    using namespace std;
+    u8string _l_rv{u8"["};
+    auto     _l_itt{std::begin(_a_str)};
+    auto     _l_size{std::size(_a_str)};
+    for (size_t _l_idx{0}; _l_idx < _l_size; ++_l_idx)
+    {
+        auto _l_char{*_l_itt};
+        _l_rv.append(represent_char_as_hex_for_output(_l_char));
+        if (_l_idx + 1 < _l_size)
+        {
+            _l_rv.append(u8",");
+        }
+        ++_l_itt;
+    }
+    _l_rv.append(u8"]");
+    return _l_rv;
 }
 } // namespace detail
 

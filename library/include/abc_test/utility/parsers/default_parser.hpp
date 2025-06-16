@@ -128,7 +128,7 @@ protected:
         {
             return unexpected(fmt::format(
                 u8"Could not find expected surrounding string \"{0}\".",
-                _m_surrounding_str
+                unicode_string_to_u8string(_m_surrounding_str)
             ));
         }
     }
@@ -150,14 +150,14 @@ __constexpr result_t<T>
     const result_t<string> _l_sv_as_str{abc::convert_unicode_to_ascii(_l_sv)};
     if (_l_sv_as_str.has_value())
     {
-        T _l_res;
+        uint32_t _l_res;
         auto [ptr, ec] = from_chars(
             _l_sv_as_str.value().data(),
             _l_sv_as_str.value().data() + _l_sv_as_str.value().size(),
             _l_res,
             16
         );
-        return _l_res;
+        return static_cast<T>(_l_res);
     }
     else
     {

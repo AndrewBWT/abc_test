@@ -1,1 +1,0 @@
-#class std::tuple<class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,class std::basic_string<char32_t,struct std::char_traits<char32_t>,class std::allocator<char32_t> > >

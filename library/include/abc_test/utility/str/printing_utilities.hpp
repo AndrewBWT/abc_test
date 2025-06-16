@@ -124,22 +124,51 @@ struct char_underlying_type<T>
 template <typename T>
 using char_underlying_type_t = typename char_underlying_type<T>::type;
 
-template <typename T>
+template <typename T, bool Use_Capitols = true>
 __constexpr std::u8string
-            make_hex_from_char(
-                const T _a_char
+            make_hex_from_char_with_prefix(
+                const T                  _a_char,
+                const std::u8string_view _a_prefix
             ) noexcept
 {
     using namespace std;
     using Type_To_Cast_To = char_underlying_type_t<T>;
+    u8string _l_format_specifier;
+    if constexpr (Use_Capitols)
+    {
+        _l_format_specifier = u8"{:X}";
+    }
+    else
+    {
+        _l_format_specifier = u8"{:x}";
+    }
     const u8string _l_char_as_hex{
-        fmt::format(u8"{:x}", static_cast<Type_To_Cast_To>(_a_char))
+        fmt::format(_l_format_specifier, static_cast<Type_To_Cast_To>(_a_char))
     };
     return fmt::format(
-        u8"\\x{0}{1}",
+        u8"{0}{1}{2}",
+        _a_prefix,
         u8string((sizeof(Type_To_Cast_To) * 2) - _l_char_as_hex.size(), u8'0'),
         _l_char_as_hex
     );
+}
+
+template <typename T>
+__constexpr std::u8string
+            represent_char_as_hex_for_printing(
+                const T _a_char
+            )
+{
+    return make_hex_from_char_with_prefix(_a_char, u8"\\x");
+}
+
+template <typename T>
+__constexpr std::u8string
+            represent_char_as_hex_for_output(
+                const T _a_char
+            )
+{
+    return make_hex_from_char_with_prefix(_a_char, u8"0x");
 }
 
 template <typename T>

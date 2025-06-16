@@ -949,7 +949,7 @@ struct default_printer_t<std::basic_string_view<T>>
                 if (not utf8::internal::is_code_point_valid(_l_char))
                 {
                     u8string _l_char_as_hex{
-                        abc::make_hex_from_char<char8_t>(_l_char)
+                        represent_char_as_hex_for_printing(_l_char)
                     };
                     _l_object_as_u8str.append(_l_char_as_hex);
                 }
@@ -998,7 +998,7 @@ struct default_printer_t<std::basic_string_view<T>>
                             else
                             {
                                 _l_object_as_u8str.append(
-                                    abc::make_hex_from_char(trail_surrogate)
+                                    represent_char_as_hex_for_printing(trail_surrogate)
                                 );
                                 continue;
                             }
@@ -1006,7 +1006,7 @@ struct default_printer_t<std::basic_string_view<T>>
                         else
                         {
                             _l_object_as_u8str.append(
-                                abc::make_hex_from_char(_l_char)
+                                represent_char_as_hex_for_printing(_l_char)
                             );
                             continue;
                         }
@@ -1015,7 +1015,7 @@ struct default_printer_t<std::basic_string_view<T>>
                     else if (utf8::internal::is_trail_surrogate(_l_char))
                     {
                         _l_object_as_u8str.append(
-                            abc::make_hex_from_char(_l_char)
+                            represent_char_as_hex_for_printing(_l_char)
                         );
                     }
 

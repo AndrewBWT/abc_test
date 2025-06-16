@@ -6,15 +6,15 @@
 
 _BEGIN_ABC_NS
 __no_constexpr matcher_t
-c_str_equal(const char* _a_str1, const std::string_view _a_str2) noexcept;
+    c_str_equal(const char* _a_str1, const std::string_view _a_str2) noexcept;
 
 template <matcher::comparison_enum_t Cmp, typename T1, typename T2>
 __constexpr_imp std::u8string
-comparison_expr_to_string(
-    const T1& _a_arg1,
-    const T2& _a_arg2,
-    const bool _a_pass
-) noexcept
+                comparison_expr_to_string(
+                    const T1&  _a_arg1,
+                    const T2&  _a_arg2,
+                    const bool _a_pass
+                ) noexcept
 {
     using namespace std;
     using namespace abc::utility::printer;
@@ -31,128 +31,128 @@ comparison_expr_to_string(
 
 template <typename R1, typename R2, abc::matcher::comparison_enum_t Cmp>
 __constexpr_imp std::pair<bool, std::vector<std::u8string>>
-compare_strings(
-    const R1& _a_str1,
-    const R2& _a_str2
-) noexcept
+                compare_strings(
+                    const R1& _a_str1,
+                    const R2& _a_str2
+                ) noexcept
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
     using namespace abc::utility::printer;
-    using T = ranges::range_value_t<R1>;
-    using R1_Type = remove_cvref_t<R1>;
-    using R2_Type = remove_cvref_t<R2>;
+    using T            = ranges::range_value_t<R1>;
+    using R1_Type      = remove_cvref_t<R1>;
+    using R2_Type      = remove_cvref_t<R2>;
     using R1_const_itt = decltype(std::begin(_a_str1));
     using R2_const_itt = decltype(std::begin(_a_str2));
-    R1_const_itt                                _l_itt_1{ std::begin(_a_str1) };
-    R1_const_itt                                _l_itt_1_end{ std::end(_a_str1) };
-    R2_const_itt                                _l_itt_2{ std::begin(_a_str2) };
-    R2_const_itt                                _l_itt_2_end{ std::end(_a_str2) };
+    R1_const_itt                                _l_itt_1{std::begin(_a_str1)};
+    R1_const_itt                                _l_itt_1_end{std::end(_a_str1)};
+    R2_const_itt                                _l_itt_2{std::begin(_a_str2)};
+    R2_const_itt                                _l_itt_2_end{std::end(_a_str2)};
     optional<tuple<size_t, u8string, u8string>> _l_diverging_index;
-    size_t                                      _l_idx{ 1 };
+    size_t                                      _l_idx{1};
     vector<u8string>                            _l_explanation_strs;
     auto                                        _l_specific_character_print_func
         = [&](const T _a_char, const size_t _a_index, const size_t _a_char_idx
-            ) -> u8string
+          ) -> u8string
+    {
+        optional<T> _l_arg_as_single_char;
+        if constexpr (same_as<char, T>)
         {
-            optional<T> _l_arg_as_single_char;
-            if constexpr (same_as<char, T>)
+            if (is_valid_ascii_char(_a_char))
             {
-                if (is_valid_ascii_char(_a_char))
-                {
-                    _l_arg_as_single_char = _a_char;
-                }
+                _l_arg_as_single_char = _a_char;
+            }
+        }
+        else
+        {
+            if (is_valid_unicode_string(basic_string<T>(1, _a_char)))
+            {
+                _l_arg_as_single_char = _a_char;
+            }
+        }
+        auto _l_single_char_to_unicode_str = [&](const T _a_single_char)
+        {
+            if constexpr (same_as<T, char>)
+            {
+                return unpack_string_to_u8string(string(1, _a_single_char));
             }
             else
             {
-                if (is_valid_unicode_string(basic_string<T>(1, _a_char)))
-                {
-                    _l_arg_as_single_char = _a_char;
-                }
+                return unicode_string_to_u8string(
+                    basic_string<T>(1, _a_single_char)
+                );
             }
-            auto _l_single_char_to_unicode_str = [&](const T _a_single_char)
-                {
-                    if constexpr (same_as<T, char>)
-                    {
-                        return unpack_string_to_u8string(string(1, _a_single_char));
-                    }
-                    else
-                    {
-                        return unicode_string_to_u8string(
-                            basic_string<T>(1, _a_single_char)
-                        );
-                    }
-                };
-            return fmt::format(
-                u8"The {0} {1} element in the {2} argument {3}. "
-                u8"In hex, this element is \"{4}\".",
-                positive_integer_to_placement(_a_char_idx),
-                type_id<T>(),
-                positive_integer_to_placement(_a_index),
-                (_l_arg_as_single_char.has_value()
-                    ? fmt::format(
-                        u8"can be represented as the single character "
-                        u8"'{0}'",
-                        _l_single_char_to_unicode_str(
-                            _l_arg_as_single_char.value()
-                        )
-                    )
-                    : fmt::format(u8"cannot be represented as a single character")
-                    ),
-                make_hex_from_char(_a_char)
-            );
         };
+        return fmt::format(
+            u8"The {0} {1} element in the {2} argument {3}. "
+            u8"In hex, this element is {4}.",
+            positive_integer_to_placement(_a_char_idx),
+            type_id<T>(),
+            positive_integer_to_placement(_a_index),
+            (_l_arg_as_single_char.has_value()
+                 ? fmt::format(
+                       u8"can be represented as the single character "
+                       u8"'{0}'",
+                       _l_single_char_to_unicode_str(
+                           _l_arg_as_single_char.value()
+                       )
+                   )
+                 : fmt::format(u8"cannot be represented as a single character")
+            ),
+            represent_char_as_hex_for_output(_a_char)
+        );
+    };
     auto _l_surrounding_str_print_func
         = [&](auto& _a_str, const size_t _a_idx, const size_t _a_argument_idx
-            ) -> u8string
-        {
-            return fmt::format(
-                u8"To aid in locating the error, we have constructed a sub-string "
-                u8"from the {0} argument, concenrated around its {1} element. The "
-                u8"sub-string is as follows: \"...{3}...\".",
-                positive_integer_to_placement(_a_argument_idx),
-                positive_integer_to_placement(_a_idx),
-                _a_argument_idx,
-                default_printer_t<basic_string<T>>{u8""}.run_printer(
-                    make_focused_string(_a_str, _a_idx)
-                )
-            );
-        };
+          ) -> u8string
+    {
+        return fmt::format(
+            u8"To aid in locating the error, we have constructed a sub-string "
+            u8"from the {0} argument, concenrated around its {1} element. The "
+            u8"sub-string is as follows: \"...{3}...\".",
+            positive_integer_to_placement(_a_argument_idx),
+            positive_integer_to_placement(_a_idx),
+            _a_argument_idx,
+            default_printer_t<basic_string<T>>{u8""}.run_printer(
+                make_focused_string(_a_str, _a_idx)
+            )
+        );
+    };
     auto _l_func_add_types_to_explanation_str = [&]()
+    {
+        const u8string _l_suffix{fmt::format(
+            u8"Both argument's internal elements are of type \"{0}\".",
+            type_id<T>()
+        )};
+        if constexpr (same_as<R1, R2>)
         {
-            const u8string _l_suffix{ fmt::format(
-                u8"Both argument's internal elements are of type \"{0}\".",
-                type_id<T>()
-            ) };
-            if constexpr (same_as<R1, R2>)
-            {
-                _l_explanation_strs.push_back(fmt::format(
-                    u8"Both the {0} and the {1} arguments are of type "
-                    u8"\"{2}\". {3}",
-                    positive_integer_to_placement(1),
-                    positive_integer_to_placement(2),
-                    type_id<R1>(),
-                    _l_suffix
-                ));
-            }
-            else
-            {
-                _l_explanation_strs.push_back(fmt::format(
-                    u8"The {0} argument's type is \"{1}\", while the "
-                    u8"{2} argument's "
-                    u8"type is \"{3}\". {4}",
-                    positive_integer_to_placement(1),
-                    type_id<R1>(),
-                    positive_integer_to_placement(2),
-                    type_id<R2>(),
-                    _l_suffix
-                ));
-            }
-        };
+            _l_explanation_strs.push_back(fmt::format(
+                u8"Both the {0} and the {1} arguments are of type "
+                u8"\"{2}\". {3}",
+                positive_integer_to_placement(1),
+                positive_integer_to_placement(2),
+                type_id<R1>(),
+                _l_suffix
+            ));
+        }
+        else
+        {
+            _l_explanation_strs.push_back(fmt::format(
+                u8"The {0} argument's type is \"{1}\", while the "
+                u8"{2} argument's "
+                u8"type is \"{3}\". {4}",
+                positive_integer_to_placement(1),
+                type_id<R1>(),
+                positive_integer_to_placement(2),
+                type_id<R2>(),
+                _l_suffix
+            ));
+        }
+    };
     while (_l_itt_1 != _l_itt_1_end && _l_itt_2 != _l_itt_2_end)
     {
-        const T& _l_element_1{ *_l_itt_1 };
-        const T& _l_element_2{ *_l_itt_2 };
+        const T& _l_element_1{*_l_itt_1};
+        const T& _l_element_2{*_l_itt_2};
         if constexpr (Cmp == matcher::comparison_enum_t::EQ)
         {
             if (_l_element_1 != _l_element_2)
@@ -233,14 +233,14 @@ compare_strings(
     if (not _l_diverging_index.has_value())
     {
         // Atleast one of the strings must be at the end.
-        const bool _l_left_at_end{ _l_itt_1 == _l_itt_1_end };
+        const bool _l_left_at_end{_l_itt_1 == _l_itt_1_end};
         if (_l_left_at_end && (_l_itt_2 == _l_itt_2_end))
         {
             if constexpr (Cmp == matcher::comparison_enum_t::EQ
-                || Cmp == matcher::comparison_enum_t::LEQ
-                || Cmp == matcher::comparison_enum_t::GEQ)
+                          || Cmp == matcher::comparison_enum_t::LEQ
+                          || Cmp == matcher::comparison_enum_t::GEQ)
             {
-                return { true, {} };
+                return {true, {}};
             }
             else
             {
@@ -252,16 +252,16 @@ compare_strings(
                     positive_integer_to_placement(1),
                     positive_integer_to_placement(2)
                 ));
-                return { false, _l_explanation_strs };
+                return {false, _l_explanation_strs};
             }
         }
         else if (not _l_left_at_end)
         {
             if constexpr (Cmp == matcher::comparison_enum_t::LT
-                || Cmp == matcher::comparison_enum_t::LEQ
-                || Cmp == matcher::comparison_enum_t::NEQ)
+                          || Cmp == matcher::comparison_enum_t::LEQ
+                          || Cmp == matcher::comparison_enum_t::NEQ)
             {
-                return { true, _l_explanation_strs };
+                return {true, _l_explanation_strs};
             }
             else
             {
@@ -272,16 +272,16 @@ compare_strings(
                     positive_integer_to_placement(1),
                     positive_integer_to_placement(2)
                 ));
-                return { false, _l_explanation_strs };
+                return {false, _l_explanation_strs};
             }
         }
         else
         {
             if constexpr (Cmp == matcher::comparison_enum_t::GT
-                || Cmp == matcher::comparison_enum_t::GEQ
-                || Cmp == matcher::comparison_enum_t::NEQ)
+                          || Cmp == matcher::comparison_enum_t::GEQ
+                          || Cmp == matcher::comparison_enum_t::NEQ)
             {
-                return { true, _l_explanation_strs };
+                return {true, _l_explanation_strs};
             }
             else
             {
@@ -292,7 +292,7 @@ compare_strings(
                     positive_integer_to_placement(1),
                     positive_integer_to_placement(2)
                 ));
-                return { false, _l_explanation_strs };
+                return {false, _l_explanation_strs};
             }
         }
     }
@@ -321,36 +321,36 @@ compare_strings(
         _l_explanation_strs.push_back(
             _l_surrounding_str_print_func(_a_str2, _l_idx, 2)
         );
-        return { false, _l_explanation_strs };
+        return {false, _l_explanation_strs};
     }
 }
 
 template <typename R1, typename R2>
 __constexpr_imp matcher_t
-strings_equal(
-    R1&& _a_range_1,
-    R2&& _a_range_2
-) noexcept
+    strings_equal(
+        R1&& _a_range_1,
+        R2&& _a_range_2
+    ) noexcept
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
     using namespace abc::utility::printer;
-    using T = ranges::range_value_t<R1>;
-    using R1_Type = remove_cvref_t<R1>;
-    using R2_Type = remove_cvref_t<R2>;
+    using T            = ranges::range_value_t<R1>;
+    using R1_Type      = remove_cvref_t<R1>;
+    using R2_Type      = remove_cvref_t<R2>;
     using R1_const_itt = R1_Type::const_iterator;
     using R2_const_itt = R1_Type::const_iterator;
-    R1_const_itt     _l_itt_1{ std::begin(_a_range_1) };
-    R1_const_itt     _l_itt_1_end{ std::end(_a_range_1) };
-    R2_const_itt     _l_itt_2{ std::begin(_a_range_2) };
-    R2_const_itt     _l_itt_2_end{ std::end(_a_range_2) };
+    R1_const_itt     _l_itt_1{std::begin(_a_range_1)};
+    R1_const_itt     _l_itt_1_end{std::end(_a_range_1)};
+    R2_const_itt     _l_itt_2{std::begin(_a_range_2)};
+    R2_const_itt     _l_itt_2_end{std::end(_a_range_2)};
     optional<size_t> _l_unequal_index;
-    size_t           _l_idx{ 1 };
+    size_t           _l_idx{1};
     u8string         _l_explanation_str;
     while (_l_itt_1 != _l_itt_1_end && _l_itt_2 != _l_itt_2_end)
     {
-        const T& _l_element_1{ *_l_itt_1 };
-        const T& _l_element_2{ *_l_itt_2 };
+        const T& _l_element_1{*_l_itt_1};
+        const T& _l_element_2{*_l_itt_2};
         if (_l_element_1 != _l_element_2)
         {
             _l_unequal_index = _l_idx;
@@ -362,7 +362,7 @@ strings_equal(
     }
     if (not _l_unequal_index.has_value())
     {
-        const bool _l_left_smaller{ _l_itt_1 == _l_itt_1_end };
+        const bool _l_left_smaller{_l_itt_1 == _l_itt_1_end};
         if (not _l_left_smaller && (_l_itt_2 == _l_itt_2_end))
         {
             return mk_matcher_using_result(matcher_result_t(
@@ -382,13 +382,13 @@ strings_equal(
                 _l_idx - 1,
                 _l_left_smaller ? u8"right" : u8"left",
                 (ranges::sized_range<R2>
-                    ? fmt::format(
-                        u8"{}",
-                        ranges::size(
-                            _l_left_smaller ? _a_range_2 : _a_range_1
-                        )
-                    )
-                    : u8"unknown size")
+                     ? fmt::format(
+                           u8"{}",
+                           ranges::size(
+                               _l_left_smaller ? _a_range_2 : _a_range_1
+                           )
+                       )
+                     : u8"unknown size")
             );
         }
         else
@@ -443,7 +443,7 @@ struct matcher_default_comparable_t<
     Cmp>
 {
 public:
-    static constexpr bool is_specialized{ true };
+    static constexpr bool is_specialized{true};
 
     __constexpr virtual matcher_result_t
         run(
@@ -452,11 +452,11 @@ public:
         ) const
     {
         using namespace std;
-        const auto& [_l_passed, _l_explanation_strs] {
+        const auto& [_l_passed, _l_explanation_strs]{
             compare_strings<basic_string_view<T>, basic_string_view<T>, Cmp>(
                 _a_arg1, _a_arg2
             )
-            };
+        };
         return matcher_result_t(
             _l_passed,
             matcher_result_infos_t(
@@ -474,7 +474,7 @@ struct matcher_default_comparable_t<
     Cmp>
 {
 public:
-    static constexpr bool is_specialized{ true };
+    static constexpr bool is_specialized{true};
 
     __constexpr virtual matcher_result_t
         run(
@@ -484,10 +484,10 @@ public:
     {
         using namespace std;
         return matcher_default_comparable_t<
-            basic_string_view<T>,
-            basic_string_view<T>,
-            Cmp>{}
-        .run(_a_arg1, _a_arg2);
+                   basic_string_view<T>,
+                   basic_string_view<T>,
+                   Cmp>{}
+            .run(_a_arg1, _a_arg2);
     }
 };
 
@@ -498,7 +498,7 @@ struct matcher_default_comparable_t<
     Cmp>
 {
 public:
-    static constexpr bool is_specialized{ true };
+    static constexpr bool is_specialized{true};
 
     __constexpr virtual matcher_result_t
         run(
@@ -510,17 +510,17 @@ public:
         matcher_result_t _l_result;
         vector<u8string> _l_explanation_strs;
         auto _l_same_type_explanation_func = [&](const size_t _a_idx)
-            {
-                _l_explanation_strs.push_back(fmt::format(
-                    u8"Both arguments, of type \"{0}\", have a value inhabiting "
-                    u8"the "
-                    u8"{1} type \"{2}\". Due to the result from the sub-matcher "
-                    u8"comparing these values, this matcher fails.",
-                    type_id<decltype(_a_arg1)>(),
-                    positive_integer_to_placement(_a_arg1.has_value() ? 0 : 1),
-                    _a_arg1.has_value() ? type_id<T>() : type_id<U>()
-                ));
-            };
+        {
+            _l_explanation_strs.push_back(fmt::format(
+                u8"Both arguments, of type \"{0}\", have a value inhabiting "
+                u8"the "
+                u8"{1} type \"{2}\". Due to the result from the sub-matcher "
+                u8"comparing these values, this matcher fails.",
+                type_id<decltype(_a_arg1)>(),
+                positive_integer_to_placement(_a_arg1.has_value() ? 0 : 1),
+                _a_arg1.has_value() ? type_id<T>() : type_id<U>()
+            ));
+        };
         if (_a_arg1.has_value() && _a_arg2.has_value())
         {
             _l_result = matcher_default_comparable_t<T, T, Cmp>().run(
@@ -541,8 +541,8 @@ public:
             if (_a_arg1.has_value())
             {
                 if constexpr (Cmp == matcher::comparison_enum_t::LT
-                    || Cmp == matcher::comparison_enum_t::LEQ
-                    || Cmp == matcher::comparison_enum_t::NEQ)
+                              || Cmp == matcher::comparison_enum_t::LEQ
+                              || Cmp == matcher::comparison_enum_t::NEQ)
                 {
                     return matcher_result_t(
                         true,
@@ -555,8 +555,8 @@ public:
             if (_a_arg2.has_value())
             {
                 if constexpr (Cmp == matcher::comparison_enum_t::GT
-                    || Cmp == matcher::comparison_enum_t::GEQ
-                    || Cmp == matcher::comparison_enum_t::NEQ)
+                              || Cmp == matcher::comparison_enum_t::GEQ
+                              || Cmp == matcher::comparison_enum_t::NEQ)
                 {
                     return matcher_result_t(
                         true,
@@ -568,20 +568,20 @@ public:
             }
             auto _l_add_reaosn_to_explanation
                 = [&](const std::expected<T, U>& _a_arg,
-                    const size_t               _a_expected_idx)
-                {
-                    const size_t   _l_type_idx = _a_arg.has_value() ? 1 : 2;
-                    const u8string _l_type_id
-                        = _a_arg.has_value() ? type_id<T>() : type_id<U>();
-                    _l_explanation_strs.push_back(fmt::format(
-                        u8"The {0} argument has a value of type \"{1}\", "
-                        u8"inhabiting "
-                        u8"the {2} index in the ovearching type.",
-                        positive_integer_to_placement(_a_expected_idx),
-                        _l_type_id,
-                        positive_integer_to_placement(_l_type_idx)
-                    ));
-                };
+                      const size_t               _a_expected_idx)
+            {
+                const size_t   _l_type_idx = _a_arg.has_value() ? 1 : 2;
+                const u8string _l_type_id
+                    = _a_arg.has_value() ? type_id<T>() : type_id<U>();
+                _l_explanation_strs.push_back(fmt::format(
+                    u8"The {0} argument has a value of type \"{1}\", "
+                    u8"inhabiting "
+                    u8"the {2} index in the ovearching type.",
+                    positive_integer_to_placement(_a_expected_idx),
+                    _l_type_id,
+                    positive_integer_to_placement(_l_type_idx)
+                ));
+            };
             _l_explanation_strs.push_back(fmt::format(
                 u8"Both arguments, of type \"{0}\", have values which "
                 u8"inhabit "

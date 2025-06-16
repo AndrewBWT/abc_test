@@ -191,9 +191,9 @@ __constexpr char32_t
     ) const noexcept
 {
     using namespace std;
-    const optional<pair<char32_t, size_t>> _l_char_opt{
-        next_char32_t<false>((_m_cur_itt + _a_offset), _m_end_itt)
-    };
+    const optional<pair<char32_t, size_t>> _l_char_opt{next_char32_t<false>(
+        std::begin(_m_complete_string), (_m_cur_itt + _a_offset), _m_end_itt
+    )};
     return _l_char_opt.value().first;
 }
 
@@ -208,7 +208,9 @@ __no_constexpr_imp std::u32string
     vector<size_t> _l_sizes;
     while (_m_cur_itt < _m_end_itt)
     {
-        const auto _l_char_opt{next_char32_t<false>(_m_cur_itt, _m_end_itt)};
+        const auto _l_char_opt{next_char32_t<false>(
+            std::cbegin(_m_complete_string), _m_cur_itt, _m_end_itt
+        )};
         if (_l_char_opt.has_value())
         {
             const auto& [_l_char, _l_size]{_l_char_opt.value()};
