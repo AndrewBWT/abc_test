@@ -110,6 +110,7 @@ __constexpr_imp void
 {
     using namespace std;
     using namespace errors;
+    using namespace _ABC_NS_UTILITY_STR;
     using enum enum_user_initialised_report_fields_t;
     switch (_a_fid)
     {

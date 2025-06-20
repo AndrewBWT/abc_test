@@ -67,6 +67,7 @@ __no_constexpr_imp void
     ) const noexcept
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     write_line(fmt::format(
         u8"ERROR:\n"
         u8"   Error Message: \"{0}\"\n"
@@ -97,6 +98,7 @@ __no_constexpr_imp void
     ) const noexcept
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     write_line(u8"WARNING: " + unpack_string_to_u8string(_a_str));
 }
 

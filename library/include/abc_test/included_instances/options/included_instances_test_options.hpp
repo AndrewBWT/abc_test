@@ -113,6 +113,7 @@ __no_constexpr_imp std::vector<std::filesystem::path>
 {
     using namespace std::filesystem;
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     vector<path> _l_rv;
     for (const auto& [_l_path, _l_duplicates_allowed] : _a_potential_files)
     {

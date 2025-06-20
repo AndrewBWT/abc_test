@@ -38,6 +38,7 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
+    using namespace _ABC_NS_UTILITY_STR;
     using namespace abc::utility::printer;
     using T            = ranges::range_value_t<R1>;
     using R1_Type      = remove_cvref_t<R1>;
@@ -65,7 +66,7 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
         }
         else
         {
-            if (is_valid_unicode_string(basic_string<T>(1, _a_char)))
+            if (is_valid_char(_a_char))
             {
                 _l_arg_as_single_char = _a_char;
             }
@@ -507,6 +508,7 @@ public:
         ) const
     {
         using namespace std;
+        using namespace _ABC_NS_UTILITY_STR;
         matcher_result_t _l_result;
         vector<u8string> _l_explanation_strs;
         auto _l_same_type_explanation_func = [&](const size_t _a_idx)

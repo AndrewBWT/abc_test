@@ -113,6 +113,7 @@ public:
                           ) const
     {
         using namespace std;
+        using namespace _ABC_NS_UTILITY_STR;
         return surround_str(
             is_valid_ascii_char(_a_object)
                 ? fmt::format(u8"{0}", u8string(1, _a_object))
@@ -136,6 +137,7 @@ public:
                           ) const
     {
         using namespace std;
+        using namespace _ABC_NS_UTILITY_STR;
         return surround_str(
             is_valid_char(_a_object)
             ? fmt::format(u8"{0}", u8string(1, _a_object))
@@ -157,6 +159,7 @@ public:
                           ) const
     {
         using namespace std;
+        using namespace _ABC_NS_UTILITY_STR;
         return surround_str(
             is_valid_char(_a_object)
             ? fmt::format(u8"{0}", u8string(1, _a_object))
@@ -178,6 +181,7 @@ public:
                           ) const
     {
         using namespace std;
+        using namespace _ABC_NS_UTILITY_STR;
         return surround_str(
             is_valid_char(_a_object)
             ? fmt::format(u8"{0}", u8string(1, _a_object))
@@ -297,6 +301,7 @@ struct default_printer_t<T> : public printer_base_t<T>
                           ) const
     {
         using namespace std;
+        using namespace _ABC_NS_UTILITY_STR;
         char* _l_holder = new char[1'000](0);
         to_chars(_l_holder, _l_holder + 1'000, _a_object);
         string _l_rv(_l_holder);
@@ -486,6 +491,7 @@ __constexpr std::u8string
             )
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     u8string _l_rv{_a_begin_str};
     if (_a_object_print_parser.space_after_object_name)
     {
@@ -523,6 +529,7 @@ __constexpr void
     bool space_before_field_delimiter = false;
     */
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     if (_a_object_names.has_value())
     {
         _a_str.append(get<I>(_a_object_names.value()));
@@ -850,6 +857,7 @@ struct default_printer_t<std::basic_string<T>>
                 ) const
     {
         using namespace std;
+        using namespace _ABC_NS_UTILITY_STR;
         using arg_type_t = basic_string<T>;
         if constexpr (same_as<arg_type_t, string>)
         {
@@ -911,6 +919,7 @@ struct default_printer_t<std::basic_string_view<T>>
                 ) const
     {
         using namespace std;
+        using namespace _ABC_NS_UTILITY_STR;
         using arg_type_t = basic_string_view<T>;
         if constexpr (same_as<arg_type_t, string_view>)
         {
@@ -1679,6 +1688,7 @@ public:
             const value_type& _a_object
         ) const
     {
+        using namespace _ABC_NS_UTILITY_STR;
         using enum enum_pointer_print_parse_type_t;
         switch (_m_enum)
         {

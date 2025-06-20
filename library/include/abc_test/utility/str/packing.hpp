@@ -4,7 +4,7 @@
 
 #include <string>
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_UTILITY_STR_NS
 __constexpr std::string
             pack_u8string_into_string(const std::u8string_view _a_str) noexcept;
 __constexpr std::u8string
@@ -16,9 +16,9 @@ requires (wchar_is_16_bit && std::same_as<typename T::value_type, char16_t>)
          || ( wchar_is_32_bit
               && std::same_as<typename T::value_type, char32_t> )
 __constexpr std::wstring unpack_wstring(const T _a_str_view);
-_END_ABC_NS
+         _END_ABC_UTILITY_STR_NS
 
-_BEGIN_ABC_NS
+             _BEGIN_ABC_UTILITY_STR_NS
 __constexpr_imp std::string
                 pack_u8string_into_string(
                     const std::u8string_view _a_str
@@ -74,4 +74,4 @@ __constexpr_imp std::wstring
     return wstring(_a_str_view.begin(), _a_str_view.end());
 }
 
-_END_ABC_NS
+         _END_ABC_UTILITY_STR_NS

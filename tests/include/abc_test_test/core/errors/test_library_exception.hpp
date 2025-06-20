@@ -37,6 +37,7 @@ _TEST_CASE(
 )
 {
     using namespace _ABC_NS_ERRORS;
+    using namespace _ABC_NS_UTILITY_STR;
     using namespace abc;
     using namespace std;
     _BEGIN_MULTI_ELEMENT_BBA(_l_test_lib_bba, "Testing properties of test_library_exception_t");

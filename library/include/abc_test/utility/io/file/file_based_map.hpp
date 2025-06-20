@@ -39,6 +39,7 @@ public:
         using namespace std;
         using namespace abc::utility::io;
         using namespace abc;
+        using namespace _ABC_NS_UTILITY_STR;
         if (not std::filesystem::exists(_m_file_name))
         {
             file_line_writer_t _l_flw(_m_file_name);
@@ -111,6 +112,7 @@ public:
         )
     {
         using namespace abc;
+        using namespace _ABC_NS_UTILITY_STR;
         if (auto _l_finder{_m_inner_map.find(_a_key)};
             _l_finder != _m_inner_map.end())
         {

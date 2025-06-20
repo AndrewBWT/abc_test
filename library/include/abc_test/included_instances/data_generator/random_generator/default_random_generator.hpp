@@ -162,10 +162,11 @@ __constexpr std::size_t
 __constexpr char32_t
     generate_valid_unicode_char32_t(
         utility::rng_t& _a_rng,
-        const char32_t  _a_limit = char32_limit<char32_t>()
+        const char32_t  _a_limit = _ABC_NS_UTILITY_STR::char32_limit<char32_t>()
     )
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     constexpr char32_t _l_low_surrogate{ high_surrogate_lower_value<char32_t>()};
     constexpr char32_t _l_high_surrogate{ low_surrogate_upper_value<char32_t>()};
     char32_t           _l_rv;
@@ -205,6 +206,7 @@ __constexpr std::optional<std::basic_string<T>>
             ) noexcept
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     if (_a_biggest_string == 0)
     {
         // Should always be > 0. This should be optimised away.
@@ -830,6 +832,7 @@ struct default_random_generator_t<std::basic_string<T>>
     )
         : _m_bounds(_a_bounds)
     {
+        using namespace _ABC_NS_UTILITY_STR;
         if constexpr (is_char_type_c<T>)
         {
             _m_rng = std::optional<
@@ -863,6 +866,7 @@ struct default_random_generator_t<std::basic_string<T>>
         )
     {
         using namespace std;
+        using namespace _ABC_NS_UTILITY_STR;
         const basic_string<T>::size_type _l_size{
             detail::generate_rng_value_between_bounds<
                 basic_string<T>::size_type>(
@@ -925,7 +929,7 @@ struct default_random_generator_t<std::basic_string<T>>
     }
 private:
     std::conditional_t<
-        is_char_type_c<T>,
+        _ABC_NS_UTILITY_STR::is_char_type_c<T>,
         std::optional<
             random_generator_t<typename std::basic_string<T>::value_type>>,
         random_generator_t<typename std::basic_string<T>::value_type>>

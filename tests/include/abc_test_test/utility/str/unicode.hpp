@@ -51,6 +51,7 @@ _TEST_CASE(
     using namespace std;
     using namespace utility;
     using namespace abc::utility::io;
+    using namespace _ABC_NS_UTILITY_STR;
     auto _l_test_func = [&]<typename T>()
     {
         auto _l_type_name{typeid(T).name()};
@@ -239,6 +240,7 @@ _TEST_CASE(
     using namespace std;
     using namespace utility;
     using namespace abc::utility::io;
+    using namespace _ABC_NS_UTILITY_STR;
     auto _l_test_func = [&]<typename T, typename U>()
     {
         auto _l_name{get_name<T>()};
@@ -405,7 +407,7 @@ _TEST_CASE(
             _END_NO_THROW_MATCHER(_l_matcher_1);
             _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher_1);
             matcher_t _l_matcher;
-            if (abc::is_valid_unicode_string(_l_unicode_str1))
+            if (is_valid_unicode_string(_l_unicode_str1))
             {
                 _BEGIN_NO_THROW_MATCHER(_l_matcher);
                 do_not_optimise(
@@ -530,6 +532,7 @@ _TEST_CASE(
     using namespace std;
     using namespace abc;
     using namespace utility;
+    using namespace _ABC_NS_UTILITY_STR;
     auto _l_test_func = [&]<typename T>()
     {
         auto _l_name{get_name<T>()};
@@ -624,6 +627,7 @@ _TEST_CASE(
     using namespace std;
     using namespace abc;
     using namespace utility;
+    using namespace _ABC_NS_UTILITY_STR;
     auto _l_test_func = [&]<typename T>()
     {
         auto _l_name{pack_u8string_into_string(type_id<T>())};
@@ -736,6 +740,7 @@ _TEST_CASE(
     using namespace std;
     using namespace abc;
     using namespace utility;
+    using namespace _ABC_NS_UTILITY_STR;
     auto _l_test_func = [&]<typename T>()
     {
         auto _l_name{get_name<T>()};
@@ -833,6 +838,7 @@ _TEST_CASE(
     using namespace std;
     using namespace abc;
     using namespace utility;
+    using namespace _ABC_NS_UTILITY_STR;
     auto _l_test_func = [&]<typename T>()
     {
         auto _l_name{get_name<T>()};
@@ -904,6 +910,7 @@ _TEST_CASE(
     using namespace std;
     using namespace abc;
     using namespace utility;
+    using namespace _ABC_NS_UTILITY_STR;
     auto _l_test_func = [&]<typename T>()
     {
         auto _l_name{typeid(T).name()};
@@ -970,6 +977,7 @@ _TEST_CASE(
     using namespace std;
     using namespace abc;
     using namespace utility;
+    using namespace _ABC_NS_UTILITY_STR;
     auto _l_test_func = [&]<typename T>()
     {
         auto _l_name{typeid(T).name()};

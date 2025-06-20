@@ -125,6 +125,7 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
         , _m_position_data(_a_arg._m_position_data)
         , _m_index_rw_info(_a_arg._m_index_rw_info)
     {
+        using namespace _ABC_NS_UTILITY_STR;
         _m_current_file_data = begin(_m_files);
         advance(_m_current_file_data, _m_position_data.file_index);
         if (_m_current_file_data != std::end(_m_files))
@@ -340,6 +341,7 @@ __constexpr_imp
 {
     using namespace abc::utility::io;
     using namespace std::filesystem;
+    using namespace _ABC_NS_UTILITY_STR;
     for (auto& _l_element : _m_files)
     {
         auto& _l_path{_l_element.general_data_file().path()};
@@ -405,6 +407,7 @@ __constexpr_imp void
 {
     using namespace std;
     using namespace abc::utility::io;
+    using namespace _ABC_NS_UTILITY_STR;
     _m_current_file_data = begin(_m_files);
     std::advance(_m_current_file_data, _a_file_index);
     _m_position_data.file_index    = _a_file_index;
@@ -476,6 +479,7 @@ template <typename T>
 __constexpr_imp bool
     file_data_generator_t<T>::generate_next()
 {
+    using namespace _ABC_NS_UTILITY_STR;
     bool _l_element_found{false};
     do
     {

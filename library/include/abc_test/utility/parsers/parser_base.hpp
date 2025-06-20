@@ -59,6 +59,7 @@ __constexpr_imp result_t<T>
 {
     using namespace std;
     using namespace utility::parser;
+    using namespace _ABC_NS_UTILITY_STR;
     parser_input_t _l_pit(_a_str);
     try
     {

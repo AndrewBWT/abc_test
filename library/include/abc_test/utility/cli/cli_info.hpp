@@ -289,6 +289,7 @@ public:
         ) const noexcept
     {
         using namespace std;
+        using namespace _ABC_NS_UTILITY_STR;
         abc::utility::parser::parser_input_t _l_pi(_a_args[0]);
         if (const result_t<U> _l_parse_result{
                 _m_processing_info.parser_func(_l_pi)
@@ -367,6 +368,7 @@ public:
         ) const noexcept
     {
         using namespace std;
+        using namespace _ABC_NS_UTILITY_STR;
         for (const u8string_view _l_arg : _a_args)
         {
             abc::utility::parser::parser_input_t _l_pi(_l_arg);

@@ -33,6 +33,7 @@ __no_constexpr_imp int
     using namespace _ABC_NS_DS;
     using namespace _ABC_NS_UTILITY;
     using namespace _ABC_NS_UTILITY_CLI;
+    using namespace _ABC_NS_UTILITY_STR;
     included_instances_test_options_t                  _l_iito;
     cli_results_t                                      _l_cli_results;
     result_t<cli_t<included_instances_test_options_t>> _l_cli_res{

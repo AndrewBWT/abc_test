@@ -120,7 +120,8 @@ __constexpr void
     )
 {
     using namespace std;
-    if (abc::is_valid_char(_a_char_to_check_against))
+    using namespace _ABC_NS_UTILITY_STR;
+    if (is_valid_char(_a_char_to_check_against))
     {
         if (not check_and_advance(_a_char_to_check_against))
         {
@@ -143,6 +144,7 @@ __constexpr void
     )
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     if (is_valid_unicode_string(_a_str_to_check_against))
     {
         if (not check_and_advance(_a_str_to_check_against))
@@ -191,6 +193,7 @@ __constexpr char32_t
     ) const noexcept
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     const optional<pair<char32_t, size_t>> _l_char_opt{next_char32_t<false>(
         (_m_cur_itt + _a_offset), _m_end_itt
     )};
@@ -203,6 +206,7 @@ __no_constexpr_imp std::u32string
     )
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     u32string      _l_str;
     auto           _l_back_inserter{back_inserter(_l_str)};
     vector<size_t> _l_sizes;
@@ -376,6 +380,7 @@ __no_constexpr_imp const std::u32string
     ) const
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     return unicode_conversion_with_exception<char32_t>(
         u8string_view(_m_cur_itt, _m_cur_itt + _a_size)
     );
@@ -385,6 +390,7 @@ __constexpr const result_t<std::string>
                   parser_input_t::ascii_string() const noexcept
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     return convert_unicode_to_ascii(u8string_view(_m_cur_itt, _m_end_itt));
 }
 

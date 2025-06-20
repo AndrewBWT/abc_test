@@ -78,6 +78,7 @@ __no_constexpr_imp matcher_t
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
+    using namespace _ABC_NS_UTILITY_STR;
     return mk_matcher_using_result(matcher_result_t(
         false,
         matcher_result_infos_t(fmt::format(
@@ -305,6 +306,7 @@ __no_constexpr_imp abc::matcher_t
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
+    using namespace _ABC_NS_UTILITY_STR;
     return mk_matcher_using_result(matcher_result_t(
         false,
         matcher_result_infos_t(fmt::format(
@@ -323,6 +325,7 @@ __no_constexpr_imp abc::matcher_t
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
+    using namespace _ABC_NS_UTILITY_STR;
     return mk_matcher_using_result(matcher_result_t(
         true,
         matcher_result_infos_t(fmt::format(
@@ -341,6 +344,7 @@ __no_constexpr_imp abc::matcher_t
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
+    using namespace _ABC_NS_UTILITY_STR;
     return mk_matcher_using_result(matcher_result_t(
         false,
         matcher_result_infos_t(fmt::format(
@@ -356,6 +360,7 @@ __no_constexpr_imp abc::matcher_t
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
+    using namespace _ABC_NS_UTILITY_STR;
     return mk_matcher_using_result(matcher_result_t(
         false,
         matcher_result_infos_t(fmt::format(
@@ -468,6 +473,7 @@ __no_constexpr_imp matcher_t
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
+    using namespace _ABC_NS_UTILITY_STR;
     bool _l_result{true};
     return mk_matcher_using_result(matcher_result_t(
         _l_result,
@@ -491,6 +497,7 @@ __no_constexpr_imp matcher_t
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
+    using namespace _ABC_NS_UTILITY_STR;
     bool _l_result{true};
     if constexpr (derived_from<T, std::exception>)
     {
@@ -562,6 +569,7 @@ __no_constexpr_imp matcher_t
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
+    using namespace _ABC_NS_UTILITY_STR;
     auto _l_str_result{
         abc::matcher::matcher_default_comparable_t<
             u8string_view,

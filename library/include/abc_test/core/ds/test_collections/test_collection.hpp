@@ -98,6 +98,7 @@ __no_constexpr_imp void
     using namespace ds;
     using namespace utility;
     using namespace errors;
+    using namespace _ABC_NS_UTILITY_STR;
     const map<key_t, tdg_collection_stack_trie_t>& _l_map{
         _m_options.map_of_unique_ids_and_for_loop_stack_tries.map()
     };

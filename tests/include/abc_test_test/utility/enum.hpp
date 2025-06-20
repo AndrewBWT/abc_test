@@ -101,6 +101,7 @@ _TEST_CASE(
     using namespace std;
     using namespace abc::utility;
     using namespace abc::utility::io;
+    using namespace _ABC_NS_UTILITY_STR;
     file_based_map_t<u8string, bool> _l_data("unit_test");
     auto                             _l_test_func = [&]<typename T>()
     {
@@ -141,6 +142,7 @@ _TEST_CASE(
     using namespace std;
     using namespace abc::utility;
     using namespace abc::utility::io;
+    using namespace _ABC_NS_UTILITY_STR;
     // The lambda function operating over types.
     auto _l_test_func = [&]<typename Enum>()
     {
@@ -280,6 +282,7 @@ _TEST_CASE(
     using namespace std;
     using namespace abc::utility;
     using namespace abc::utility::io;
+    using namespace _ABC_NS_UTILITY_STR;
     auto _l_test_func = [&]<typename Enum>()
     {
         auto _l_type_name{typeid(Enum).name()};
@@ -326,6 +329,7 @@ _TEST_CASE(
     using namespace std;
     using namespace abc::utility;
     using namespace abc::utility::io;
+    using namespace _ABC_NS_UTILITY_STR;
     auto _l_test_func = [&]<typename Enum>()
     {
         auto _l_type_name{typeid(Enum).name()};

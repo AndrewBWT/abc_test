@@ -20,7 +20,7 @@ public:
         unreachable_exception_t(
             const std::u8string_view _a_error
         ) noexcept
-        : std::runtime_error(pack_u8string_into_string(_a_error))
+        : std::runtime_error(_ABC_NS_UTILITY_STR::pack_u8string_into_string(_a_error))
     {}
 };
 
@@ -51,6 +51,7 @@ __constexpr std::u8string
 {
 #if _TESTING_BUILD
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     throw abc::unreachable_exception_t(fmt::format(
         u8"No code for enum of type "
         u8"\"{0}\" encountered in function "
@@ -77,6 +78,7 @@ __constexpr std::u8string
             unreachable_does_not_throw_exception
         )
 {
+    using namespace _ABC_NS_UTILITY_STR;
 #if _TESTING_BUILD
     using namespace std;
     throw abc::unreachable_exception_t(fmt::format(

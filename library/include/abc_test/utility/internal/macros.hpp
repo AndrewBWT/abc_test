@@ -86,6 +86,10 @@
 
 #define _ABC_NS_UTILITY   _ABC_NS::utility
 
+#define _ABC_NS_UTILITY_STR _ABC_NS_UTILITY::str
+
+#define _ABC_NS_UTILITY_PRINTER _ABC_NS_UTILITY::printer
+
 #define _ABC_NS_REPORTERS _ABC_NS::reporters
 
 #define _ABC_NS_REPORTS   _ABC_NS::reports

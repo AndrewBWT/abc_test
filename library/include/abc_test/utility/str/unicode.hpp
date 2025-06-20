@@ -9,7 +9,7 @@
 #include <array>
 #include <string>
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_UTILITY_STR_NS
 /*!
  * @brief This function converts a unicode string to an ASCII string.
  *
@@ -395,7 +395,7 @@ template <typename T>
 requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
 __constexpr T low_surrogate_lower_value() noexcept;
 template <typename T>
-requires char_type_is_unicode_c<T>
+requires is_char_type_c<T>
 __constexpr T
     zero() noexcept;
 template <typename T>
@@ -437,9 +437,9 @@ __constexpr std::u8string
             ) noexcept;
 } // namespace detail
 
-_END_ABC_NS
+_END_ABC_UTILITY_STR_NS
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_UTILITY_STR_NS
 template <typename T>
 requires char_type_is_unicode_c<T>
 __constexpr_imp result_t<std::string>
@@ -588,7 +588,7 @@ __constexpr result_t<std::basic_string<T>>
                 positive_integer_to_placement(_l_idx),
                 represent_char_as_hex_for_output(_l_char),
                 represent_char_as_hex_for_output(detail::zero<char>()),
-                represent_char_as_hex_for_output(char(ascii_limit<char>()))
+                represent_char_as_hex_for_output(ascii_limit<char>())
             ));
         }
         else
@@ -2143,7 +2143,7 @@ __constexpr T low_surrogate_lower_value() noexcept
 }
 
 template <typename T>
-requires char_type_is_unicode_c<T>
+requires is_char_type_c<T>
 __constexpr T
     zero() noexcept
 {
@@ -2314,4 +2314,4 @@ __constexpr std::u8string
 }
 } // namespace detail
 
-_END_ABC_NS
+_END_ABC_UTILITY_STR_NS

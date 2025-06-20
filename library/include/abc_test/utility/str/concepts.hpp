@@ -3,7 +3,7 @@
 
 #include <concepts>
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_UTILITY_STR_NS
 /*!
  * @brief This concept identifies a wchar_t type which is 4 bytes long - 32
  * bits.
@@ -32,4 +32,4 @@ concept char_type_is_unicode_c
  */
 template <typename T>
 concept is_char_type_c = char_type_is_unicode_c<T> || std::same_as<T, char>;
-_END_ABC_NS
+_END_ABC_UTILITY_STR_NS

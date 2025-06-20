@@ -43,11 +43,13 @@ __no_constexpr_imp
         const std::u8string_view _a_str,
         const std::size_t        _a_elements_read
     ) noexcept
-    : std::runtime_error(pack_u8string_into_string(fmt::format(
-          u8"Parser at end of u8string \"{0}\". Parser read {1} characters",
-          _a_str,
-          _a_elements_read
-      )))
+    : std::runtime_error(
+          _ABC_NS_UTILITY_STR::pack_u8string_into_string(fmt::format(
+              u8"Parser at end of u8string \"{0}\". Parser read {1} characters",
+              _a_str,
+              _a_elements_read
+          ))
+      )
 {}
 
 __no_constexpr_imp
@@ -56,14 +58,17 @@ __no_constexpr_imp
         const std::u8string_view _a_remaining_string,
         const std::u8string_view _a_str_failed_to_match
     ) noexcept
-    : std::runtime_error(pack_u8string_into_string(fmt::format(
-          u8"Parser could not find string it expected to find. Remaining "
-          u8"string = \"{0}\", string parser failed to match = \"{1}\", total "
-          u8"string = \"{2}\".",
-          _a_remaining_string,
-          _a_str_failed_to_match,
-          _a_str
-      )))
+    : std::runtime_error(
+          _ABC_NS_UTILITY_STR::pack_u8string_into_string(fmt::format(
+              u8"Parser could not find string it expected to find. Remaining "
+              u8"string = \"{0}\", string parser failed to match = \"{1}\", "
+              u8"total "
+              u8"string = \"{2}\".",
+              _a_remaining_string,
+              _a_str_failed_to_match,
+              _a_str
+          ))
+      )
 {}
 
 _END_ABC_UTILITY_PARSER_NS

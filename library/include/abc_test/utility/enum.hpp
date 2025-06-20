@@ -391,6 +391,7 @@ __constexpr_imp
     )
 {
     using namespace _ABC_NS_ERRORS;
+    using namespace _ABC_NS_UTILITY_STR;
     using namespace std;
     for (auto& [_l_element, _l_str] : _a_enum_list)
     {
@@ -465,7 +466,7 @@ __constexpr_imp
     }
     if (_a_enum_list.size() == 0)
     {
-        detail::create_constructor_exception(
+        _ABC_NS_UTILITY::detail::create_constructor_exception(
             _a_enum_list,
             u8"enumerate_enum_helper_t objects created using empty "
             u8"enum_list_t objects are not allowed"
@@ -530,6 +531,7 @@ __constexpr_imp bool
     )
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     const size_t _l_current_idx{enums_idx(_a_element)};
     const size_t _l_max_value{
         _a_max_value.has_value() ? enums_idx(_a_max_value.value())
@@ -582,6 +584,7 @@ __constexpr_imp bool
     )
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     const size_t _l_current_idx{enums_idx(_a_element)};
     const size_t _l_min_value{
         _a_min_value.has_value() ? enums_idx(_a_min_value.value()) : 0
@@ -670,6 +673,7 @@ __constexpr result_t<T>
     )
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     const str_ref_to_idx_t& _l_string_to_elements_ref{
         get_string_to_elements_map(_a_enum_string_case)
     };
@@ -705,6 +709,7 @@ __constexpr std::size_t
         unreachable_does_not_throw_exception
     )
 {
+    using namespace _ABC_NS_UTILITY_STR;
     if (_m_elements_to_idx.contains(_a_enum))
     {
         return _m_elements_to_idx.at(_a_enum);
@@ -736,6 +741,7 @@ __constexpr T
         unreachable_does_not_throw_exception
     )
 {
+    using namespace _ABC_NS_UTILITY_STR;
     if (_m_idx_to_elements.contains(_a_idx))
     {
         return _m_idx_to_elements.at(_a_idx);
@@ -827,6 +833,7 @@ __constexpr void
     )
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     auto _l_str_ref{
         _a_str_set_to_insert_into.insert(str_t(_a_string_to_insert)).first
     };
@@ -834,7 +841,7 @@ __constexpr void
     if (_l_found_idx != end(_a_str_ref_to_idx_to_insert_into)
         && _l_found_idx->second != _a_index_to_insert)
     {
-        detail::create_constructor_exception(
+        _ABC_NS_UTILITY::detail::create_constructor_exception(
             _a_enum_list,
             fmt::format(
                 u8"in enumerate_enum_helper_t, enums with overlapping "
@@ -896,6 +903,7 @@ __constexpr void
 {
     using namespace errors;
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     vector<pair<underlying_type_t<T>, u8string_view>> _l_underlying_enum_list;
     ranges::transform(
         _a_enum_list,

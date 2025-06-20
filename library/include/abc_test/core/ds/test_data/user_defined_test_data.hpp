@@ -92,6 +92,7 @@ __constexpr std::u8string
     ) const noexcept
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     return u8string{}
         .append(unpack_string_to_u8string(this->name))
         .append(_a_delimiter)

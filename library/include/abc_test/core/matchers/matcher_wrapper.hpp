@@ -513,6 +513,7 @@ __constexpr_imp matcher_wrapper_t<false>
 {
     using namespace std;
     using namespace abc::ds;
+    using namespace _ABC_NS_UTILITY_STR;
     std::vector<matcher_result_infos_t::tree_structure_t> _l_infos;
     abc::matcher::matcher_result_infos_t                  _l_left_str{
         _a_matcher_l.has_value()

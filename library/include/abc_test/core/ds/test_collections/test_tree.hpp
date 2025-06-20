@@ -159,6 +159,7 @@ __no_constexpr_imp errors::opt_setup_error_t
 {
     using namespace std;
     using namespace errors;
+    using namespace _ABC_NS_UTILITY_STR;
     const post_setup_test_data_t& _l_test{_a_test.get()};
     if (_l_test.thread_resourses_required() > _a_options.threads)
     {
@@ -288,6 +289,7 @@ __no_constexpr_imp errors::opt_setup_error_t
     // Find the node of the test hierarchy.
     using namespace std;
     using namespace errors;
+    using namespace _ABC_NS_UTILITY_STR;
     test_tree_ref_t   _l_node{find_or_create_test_node(
         _a_test_tree, _a_test_ref.test_path_hierarchy()
     )};

@@ -197,6 +197,7 @@ __constexpr void
     ) const
 {
     using namespace reports;
+    using namespace _ABC_NS_UTILITY_STR;
     if (auto _l_ptr{dynamic_cast<const unexpected_thrown_exception_t*>(
             &_a_unexpected_report
         )};
@@ -250,6 +251,7 @@ __constexpr_imp void
     ) const
 {
     using namespace reports;
+    using namespace _ABC_NS_UTILITY_STR;
     if (auto _l_ptr{dynamic_cast<
             const matcher_based_assertion_single_line_t<pass_or_fail_t>*>(_a_gur
         )};

@@ -104,6 +104,7 @@ __constexpr_imp bool
 {
     using namespace errors;
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     bool _l_exit{true};
     if (_m_finished_reading)
     {

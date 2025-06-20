@@ -412,6 +412,7 @@ __no_constexpr_imp std::string
     using namespace std;
     using namespace utility;
     using namespace utility::printer;
+    using namespace _ABC_NS_UTILITY_STR;
     const string _l_rv{fmt::format(
         "{0} = {1}"
         ", {2} = {3}"
@@ -428,13 +429,13 @@ __no_constexpr_imp std::string
         "root_path",
         _a_opts.root_path,
         "global_seed",
-        abc::pack_u8string_into_string(default_printer_t<global_seed_t>{}.run_printer(_a_opts.global_seed)),
+        pack_u8string_into_string(default_printer_t<global_seed_t>{}.run_printer(_a_opts.global_seed)),
         "number_of_integers_used_to_seed_random_generators",
         _a_opts.number_of_integers_used_to_seed_random_generators,
         "general_data_extension",
-        abc::pack_u8string_into_string(_a_opts.general_data_extension),
+        pack_u8string_into_string(_a_opts.general_data_extension),
         "comment_str",
-        abc::pack_u8string_into_string(_a_opts.comment_str),
+        pack_u8string_into_string(_a_opts.comment_str),
         "write_data_to_files",
         _a_opts.write_data_to_files,
         "threads",

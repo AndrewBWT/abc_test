@@ -481,6 +481,7 @@ __constexpr_imp void
     )
 {
     using namespace reports;
+    using namespace _ABC_NS_UTILITY_STR;
     using enum enum_test_status_t;
     if (terminated(_m_test_status))
     {
@@ -543,6 +544,7 @@ __constexpr_imp void
     )
 {
     using namespace reports;
+    using namespace _ABC_NS_UTILITY_STR;
     using enum enum_test_status_t;
     if (terminated(_m_test_status))
     {
@@ -666,6 +668,7 @@ __no_constexpr_imp std::filesystem::path
     using namespace std::filesystem;
     using namespace utility;
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     path_t  _l_absolute_path{std::filesystem::absolute(_a_root_path).string()};
     wstring _l_wstr{_l_absolute_path.native()};
     path_t  _l_path = path_t(L"\\\\?\\" + _l_wstr);

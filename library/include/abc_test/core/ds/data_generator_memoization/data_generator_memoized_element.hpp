@@ -80,6 +80,7 @@ struct default_printer_t<
             _a_object
         ) const
     {
+        using namespace _ABC_NS_UTILITY_STR;
         return object_printer_with_field_names(
             object_printer_parser_t{},
             type_id<decltype(_a_object)>(),

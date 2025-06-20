@@ -139,6 +139,7 @@ __no_constexpr_imp void
     using enum enum_assertion_block_matcher_data_fields_t;
     using enum _ABC_NS_MATCHER::enum_bba_inner_assertion_type_t;
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     pair<u8string, u8string> _l_pair;
     switch (_a_fid)
     {

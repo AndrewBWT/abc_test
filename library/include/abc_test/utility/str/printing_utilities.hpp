@@ -5,7 +5,7 @@
 #include <fmt/xchar.h>
 #include <string>
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_UTILITY_STR_NS
 template <typename T>
 __constexpr    std::u8string
                type_id() noexcept;
@@ -207,9 +207,9 @@ __constexpr std::basic_string<T>
     return make_focused_string(basic_string_view<T>(_a_sv), _a_idx, _a_limit);
 }
 
-_END_ABC_NS
+_END_ABC_UTILITY_STR_NS
 
-_BEGIN_ABC_NS
+_BEGIN_ABC_UTILITY_STR_NS
 __no_constexpr_imp std::u8string
                    positive_integer_to_placement(
                        const std::size_t _a_number
@@ -237,4 +237,4 @@ __constexpr_imp std::u8string
     return u8string(_l_str.begin(), _l_str.end());
 }
 
-_END_ABC_NS
+_END_ABC_UTILITY_STR_NS

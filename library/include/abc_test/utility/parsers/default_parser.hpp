@@ -120,6 +120,7 @@ protected:
                 ) const
     {
         using namespace std;
+        using namespace _ABC_NS_UTILITY_STR;
         if (_a_parse_input.check_and_advance(_m_surrounding_str))
         {
             return monostate{};
@@ -146,8 +147,9 @@ __constexpr result_t<T>
             ) noexcept
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     const u32string _l_sv{_a_parse_input.get_u32string(_a_characters_to_take)};
-    const result_t<string> _l_sv_as_str{abc::convert_unicode_to_ascii(_l_sv)};
+    const result_t<string> _l_sv_as_str{convert_unicode_to_ascii(_l_sv)};
     if (_l_sv_as_str.has_value())
     {
         uint32_t _l_res;
@@ -237,6 +239,7 @@ public:
                 ) const
     {
         using namespace std;
+        using namespace _ABC_NS_UTILITY_STR;
         T _l_char;
         if (const result_t<monostate> _l_result_1{
                 this->remove_surrounding_str(_a_parse_input)
@@ -382,6 +385,7 @@ struct default_parser_t<T> : public parser_base_t<T>
                 ) const
     {
         using namespace std;
+        using namespace _ABC_NS_UTILITY_STR;
         T               result{};
         const u32string _l_u32str{
             _a_parse_input.take_string_containing(U"0123456789-")
@@ -769,6 +773,7 @@ struct default_parser_t<std::basic_string<T>>
                           ) const
     {
         using namespace std;
+        using namespace _ABC_NS_UTILITY_STR;
         using arg_type_t = basic_string<T>;
         char32_t   _l_char{U'"'};
         char32_t   _l_prev_char;
@@ -781,7 +786,7 @@ struct default_parser_t<std::basic_string<T>>
             if constexpr (same_as<arg_type_t, string>)
             {
                 const result_t<arg_type_t> _l_rv{
-                    abc::convert_unicode_to_ascii(_a_str)
+                    convert_unicode_to_ascii(_a_str)
                 };
                 if (_l_rv.has_value())
                 {
@@ -794,7 +799,7 @@ struct default_parser_t<std::basic_string<T>>
             }
             else
             {
-                _l_rv_str.append(abc::unicode_conversion<T>(_a_str).value());
+                _l_rv_str.append(unicode_conversion<T>(_a_str).value());
             }
         };
         // Function for reading hex digits into a T value.
@@ -807,7 +812,7 @@ struct default_parser_t<std::basic_string<T>>
             {
                 const u32string _l_str{_a_parse_input.process_characters(2)};
                 const result_t<string> _l_str_as_ascii_opt{
-                    abc::convert_unicode_to_ascii(_l_str)
+                    convert_unicode_to_ascii(_l_str)
                 };
                 if (_l_str_as_ascii_opt.has_value())
                 {

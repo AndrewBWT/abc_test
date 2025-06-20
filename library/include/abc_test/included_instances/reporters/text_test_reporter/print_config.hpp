@@ -437,6 +437,7 @@ __constexpr_imp std::u8string
                 print_config_t::line_break() const noexcept
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     return unpack_string_to_u8string(
         string(_m_line_break_len, _m_line_break_char)
     );
@@ -1015,6 +1016,7 @@ __constexpr_imp std::u8string
     ) const noexcept
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     if (_a_sl.has_value())
     {
         return highlight(fmt::format(

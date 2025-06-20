@@ -86,7 +86,7 @@ __no_constexpr_imp
         const std::u8string    _a_error,
         const std::stacktrace& _a_stacktrace
     ) noexcept
-    : std::runtime_error(pack_u8string_into_string(_a_error))
+    : std::runtime_error(_ABC_NS_UTILITY_STR::pack_u8string_into_string(_a_error))
     , _m_stacktrace(_a_stacktrace)
 {}
 
@@ -103,6 +103,7 @@ __constexpr_imp test_library_exception_t
         T _a_integer_value
     ) noexcept
 {
+    using namespace _ABC_NS_UTILITY_STR;
     return test_library_exception_t(fmt::format(
         u8"Switch does not contain enum value. Enum type = {0}, underlying "
         u8"value = {1}",
@@ -117,6 +118,7 @@ __constexpr_imp test_library_exception_t
         T _a_variant
     ) noexcept
 {
+    using namespace _ABC_NS_UTILITY_STR;
     return test_library_exception_t(fmt::format(
         u8"Variant's type is not accounted for. Variant has type {0}",
         type_id<T>()
@@ -129,6 +131,7 @@ __constexpr test_library_exception_t
         const T* _a_ptr
     ) noexcept
 {
+    using namespace _ABC_NS_UTILITY_STR;
     return test_library_exception_t(fmt::format(
         u8"Unaccounted for nullptr encountered. Type is {0}", 
         type_id<T>()

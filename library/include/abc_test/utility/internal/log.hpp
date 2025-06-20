@@ -127,6 +127,7 @@ __constexpr_imp void
     ) noexcept
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     if (_m_internal_logger_params.is_set(_a_internal_logger_enum))
     {
         threaded_ostream_output_reporter_t::write_line(fmt::format(

@@ -99,6 +99,7 @@ __constexpr_imp void
         ) const
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     if (auto _l_ptr{
             get_if<enum_matcher_based_assertion_single_line_fields_t>(&_a_fid)
         };

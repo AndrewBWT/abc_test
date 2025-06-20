@@ -20,6 +20,7 @@ stacktraces_equal(
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
+    using namespace _ABC_NS_UTILITY_STR;
     bool _l_equal{ true };
     if (_a_st1.size() != _a_st2.size())
     {

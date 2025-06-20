@@ -77,6 +77,7 @@ __constexpr_imp void
     ) const
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     if (auto _l_ptr{get_if<
             combined_enum_unexpected_thrown_non_descript_entity_fields_t>(
             &_a_fid

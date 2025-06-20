@@ -92,6 +92,7 @@ __no_constexpr_imp auto
         ) const -> format_context::iterator
 {
     using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
     const string _l_rv{fmt::format(
         "{0} {{"
         "{1} = {2}"
@@ -100,7 +101,7 @@ __no_constexpr_imp auto
         "_m_for_loop_index",
         _a_rd.for_loop_index,
         "_m_flid",
-        abc::pack_u8string_into_string(
+        pack_u8string_into_string(
             abc::utility::printer::default_printer<
                 decltype(_a_rd.for_loop_iteration_data)>()
                 ->run_printer(_a_rd.for_loop_iteration_data)

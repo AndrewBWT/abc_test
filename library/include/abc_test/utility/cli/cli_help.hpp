@@ -81,11 +81,12 @@ public:
         ) const noexcept
     {
         using namespace std;
+        using namespace _ABC_NS_UTILITY_STR;
         // _a_cli.set_terminate_early(true);
         // Read the file.
         // Go thorugh the args and
         const result_t<string> _l_file_name{
-            abc::convert_unicode_to_ascii(_a_args[0])
+            convert_unicode_to_ascii(_a_args[0])
         };
         if (_l_file_name.has_value())
         {
@@ -241,6 +242,7 @@ public:
         ) const noexcept
     {
         using namespace std;
+        using namespace _ABC_NS_UTILITY_STR;
         tuple<
             u8string,
             auto_configuration_load_configuration_t,
