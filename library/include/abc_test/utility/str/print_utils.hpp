@@ -1,81 +1,22 @@
 #pragma once
 #include "abc_test/external/utfcpp/utf8.hpp"
 #include "abc_test/utility/internal/macros.hpp"
+#include "abc_test/utility/str/string_cast.hpp"
 
 #include <fmt/xchar.h>
 #include <string>
 
 _BEGIN_ABC_UTILITY_STR_NS
 template <typename T>
-__constexpr    std::u8string
-               type_id() noexcept;
+__constexpr std::u8string
+            type_id() noexcept;
+template <typename T>
+requires std::unsigned_integral<T>
 __no_constexpr std::u8string
-               positive_integer_to_placement(const std::size_t _a_number);
-
-/*template <typename T>
-__constexpr_imp std::optional<std::pair<char32_t, std::size_t>>
-                next_char32_t(
-                    const T _a_itt,
-                    const T _a_end
-                )
-{
-    using namespace std;
-    using VT = typename T::value_type;
-    auto _l_itt_cpy{_a_itt};
-    if constexpr (same_as<VT, char8_t>)
-    {
-        try
-        {
-            char32_t _l_char{utf8::next(_l_itt_cpy, _a_end)};
-            return make_pair(_l_char, distance(_a_itt, _l_itt_cpy));
-        }
-        catch (const std::exception& _a_exception)
-        {
-            return std::nullopt;
-        }
-    }
-    else if constexpr (same_as<VT, char16_t>
-                       || (same_as<VT, wchar_t> && sizeof(wchar_t) == 2))
-    {
-        using namespace utf8;
-        utfchar32_t               _l_char = 0;
-        utf8::internal::utf_error _l_error_code
-            = utf8::internal::validate_next16(_l_itt_cpy, _a_end, _l_char);
-        if (_l_error_code != utf8::internal::UTF8_OK)
-        {
-            return std::nullopt;
-        }
-        else
-        {
-            return make_pair(_l_char, std::distance(_a_itt, _l_itt_cpy));
-        }
-    }
-    else if constexpr (same_as<VT, char32_t>
-                       || (same_as<VT, wchar_t> && sizeof(wchar_t) == 4))
-    {
-        if (_a_itt == _a_end)
-        {
-            return std::nullopt;
-        }
-        else
-        {
-            char32_t _l_char{*_a_itt};
-            if ((_l_char <= 0xD7FF)
-                || (_l_char >= 0xE000 && _l_char <= 0x10'FFFF))
-            {
-                return make_pair(_l_char, size_t(1));
-            }
-            else
-            {
-                return std::nullopt;
-            }
-        }
-    }
-    else
-    {
-        __STATIC_ASSERT(T, "next_char32_t not valid for this type");
-    }
-}*/
+               positive_integer_to_placement(const T _a_number) noexcept;
+template <std::size_t I>
+__no_constexpr std::u8string
+positive_integer_to_placement() noexcept;
 
 template <typename T>
 struct char_underlying_type
@@ -210,31 +151,51 @@ __constexpr std::basic_string<T>
 _END_ABC_UTILITY_STR_NS
 
 _BEGIN_ABC_UTILITY_STR_NS
-__no_constexpr_imp std::u8string
-                   positive_integer_to_placement(
-                       const std::size_t _a_number
-                   )
-{
-    switch (_a_number)
-    {
-    case 1:
-        return u8"1st";
-    case 2:
-        return u8"2nd";
-    case 3:
-        return u8"3rd";
-    default:
-        return fmt::format(u8"{0}th", _a_number);
-    }
-}
-
 template <typename T>
 __constexpr_imp std::u8string
                 type_id() noexcept
 {
     using namespace std;
-    string _l_str{typeid(T).name()};
-    return u8string(_l_str.begin(), _l_str.end());
+    const string_view _l_str{typeid(T).name()};
+    return cast_string_to_u8string(_l_str);
 }
 
+template <typename T>
+requires std::unsigned_integral<T>
+__no_constexpr_imp std::u8string
+                   positive_integer_to_placement(
+                       const T _a_number
+                   ) noexcept
+{
+    using namespace std;
+    auto _l_suffix_func = [&]() -> u8string_view
+    {
+        T _l_normalised{_a_number % 100};
+        if (_l_normalised > 10 && _l_normalised < 13)
+        {
+            return u8"th";
+        }
+        else
+        {
+            switch (_a_number % T(10))
+            {
+            case 1:
+                return u8"st";
+            case 2:
+                return u8"nd";
+            case 3:
+                return u8"rd";
+            default:
+                return u8"th";
+            }
+        }
+    };
+    return fmt::format(u8"{0}{1}", _a_number, _l_suffix_func());
+}
+template <std::size_t I>
+__no_constexpr std::u8string
+positive_integer_to_placement() noexcept
+{
+    return positive_integer_to_placement(I);
+}
 _END_ABC_UTILITY_STR_NS

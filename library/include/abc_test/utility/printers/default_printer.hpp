@@ -140,8 +140,8 @@ public:
         using namespace _ABC_NS_UTILITY_STR;
         return surround_str(
             is_valid_char(_a_object)
-            ? fmt::format(u8"{0}", u8string(1, _a_object))
-            : make_hex_from_char<uint8_t>(_a_object)
+                ? fmt::format(u8"{0}", u8string(1, _a_object))
+                : make_hex_from_char<uint8_t>(_a_object)
         );
     }
 };
@@ -162,8 +162,8 @@ public:
         using namespace _ABC_NS_UTILITY_STR;
         return surround_str(
             is_valid_char(_a_object)
-            ? fmt::format(u8"{0}", u8string(1, _a_object))
-            : make_hex_from_char<uint8_t>(_a_object)
+                ? fmt::format(u8"{0}", u8string(1, _a_object))
+                : make_hex_from_char<uint8_t>(_a_object)
         );
     }
 };
@@ -184,8 +184,8 @@ public:
         using namespace _ABC_NS_UTILITY_STR;
         return surround_str(
             is_valid_char(_a_object)
-            ? fmt::format(u8"{0}", u8string(1, _a_object))
-            : make_hex_from_char<uint8_t>(_a_object)
+                ? fmt::format(u8"{0}", u8string(1, _a_object))
+                : make_hex_from_char<uint8_t>(_a_object)
         );
     }
 };
@@ -938,120 +938,29 @@ struct default_printer_t<std::basic_string_view<T>>
         }
         else if constexpr (same_as<arg_type_t, u16string_view>)
         {
-            u8string _l_object_as_u8str;
-            utf8::utf16to8(
-                _a_object.begin(),
-                _a_object.end(),
-                std::back_inserter(_l_object_as_u8str)
-            );
             return fmt::format(
-                u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
+                u8"{0}{1}{0}",
+                _m_surrounding_str,
+                unicode_string_to_u8string(_a_object)
             );
         }
         else if constexpr (same_as<arg_type_t, u32string_view>)
         {
-            u8string _l_object_as_u8str;
-            for (auto _l_itt{_a_object.begin()}; _l_itt != _a_object.end();
-                 ++_l_itt)
-            {
-                char32_t _l_char{*_l_itt};
-                if (not utf8::internal::is_code_point_valid(_l_char))
-                {
-                    u8string _l_char_as_hex{
-                        represent_char_as_hex_for_printing(_l_char)
-                    };
-                    _l_object_as_u8str.append(_l_char_as_hex);
-                }
-                else
-                {
-                    utf8::internal::append(
-                        _l_char, std::back_inserter(_l_object_as_u8str)
-                    );
-                }
-            }
-
-            // utf8::utf32to8(
-            // _a_object.begin(),
-            // _a_object.end(),
-            // std::back_inserter(_l_object_as_u8str)
-            // );
             return fmt::format(
-                u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
+                u8"{0}{1}{0}",
+                _m_surrounding_str,
+                unicode_string_to_u8string(_a_object)
             );
         }
         else if constexpr (same_as<arg_type_t, wstring_view>)
         {
-            if constexpr (sizeof(wchar_t) == 2)
-            {
-                u8string _l_object_as_u8str;
-                auto     _l_itt{_a_object.begin()};
-                auto     _l_end{_a_object.end()};
-                auto     result = std::back_inserter(_l_object_as_u8str);
-                while (_l_itt != _l_end)
-                {
-                    char32_t _l_char = utf8::internal::mask16(*_l_itt++);
-                    // Take care of surrogate pairs first
-                    if (utf8::internal::is_lead_surrogate(_l_char))
-                    {
-                        if (_l_itt != _l_end)
-                        {
-                            const char32_t trail_surrogate
-                                = utf8::internal::mask16(*_l_itt++);
-                            if (utf8::internal::is_trail_surrogate(
-                                    trail_surrogate
-                                ))
-                            {
-                                _l_char = (_l_char << 10) + trail_surrogate
-                                          + utf8::internal::SURROGATE_OFFSET;
-                            }
-                            else
-                            {
-                                _l_object_as_u8str.append(
-                                    represent_char_as_hex_for_printing(trail_surrogate)
-                                );
-                                continue;
-                            }
-                        }
-                        else
-                        {
-                            _l_object_as_u8str.append(
-                                represent_char_as_hex_for_printing(_l_char)
-                            );
-                            continue;
-                        }
-                    }
-                    // Lone trail surrogate
-                    else if (utf8::internal::is_trail_surrogate(_l_char))
-                    {
-                        _l_object_as_u8str.append(
-                            represent_char_as_hex_for_printing(_l_char)
-                        );
-                    }
-
-                    result = utf8::append(_l_char, result);
-                }
-                return fmt::format(
-                    u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
-                );
-            }
-            else if constexpr (sizeof(wchar_t) == 4)
-            {
-                u8string _l_object_as_u8str;
-                utf8::utf32to8(
-                    _a_object.begin(),
-                    _a_object.end(),
-                    std::back_inserter(_l_object_as_u8str)
-                );
-                return fmt::format(
-                    u8"{0}{1}{0}", _m_surrounding_str, _l_object_as_u8str
-                );
-            }
-            else
-            {
-                __STATIC_ASSERT(
-                    T, "wchar_t of this specific size is not supported"
-                );
-            }
+            return fmt::format(
+                u8"{0}{1}{0}",
+                _m_surrounding_str,
+                unicode_string_to_u8string(
+                    cast_wstring_to_unicode_string(_a_object)
+                )
+            );
         }
         else
         {

@@ -175,7 +175,7 @@ set(LIBRARY_FILES
   include/abc_test/utility/printers/printer_base.hpp
   include/abc_test/utility/printers/default_printer.hpp
   include/abc_test/utility/object_printer_parser.hpp
-  include/abc_test/utility/str/printing_utilities.hpp
+  include/abc_test/utility/str/print_utils.hpp
   include/abc_test/utility/str/concepts.hpp
   include/abc_test/utility/str/unicode.hpp
   include/abc_test/utility/str/string_utility.hpp

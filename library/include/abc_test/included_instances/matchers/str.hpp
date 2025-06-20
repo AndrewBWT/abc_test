@@ -130,8 +130,8 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
             _l_explanation_strs.push_back(fmt::format(
                 u8"Both the {0} and the {1} arguments are of type "
                 u8"\"{2}\". {3}",
-                positive_integer_to_placement(1),
-                positive_integer_to_placement(2),
+                positive_integer_to_placement<1>(),
+                positive_integer_to_placement<2>(),
                 type_id<R1>(),
                 _l_suffix
             ));
@@ -142,9 +142,9 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
                 u8"The {0} argument's type is \"{1}\", while the "
                 u8"{2} argument's "
                 u8"type is \"{3}\". {4}",
-                positive_integer_to_placement(1),
+                positive_integer_to_placement<1>(),
                 type_id<R1>(),
-                positive_integer_to_placement(2),
+                positive_integer_to_placement<2>(),
                 type_id<R2>(),
                 _l_suffix
             ));
@@ -162,14 +162,14 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
                     _l_idx,
                     fmt::format(
                         u8"the {0} and the {1} argument are equal",
-                        positive_integer_to_placement(1),
-                        positive_integer_to_placement(2)
+                        positive_integer_to_placement<1>(),
+                        positive_integer_to_placement<2>()
                     ),
                     fmt::format(
                         u8"internal elements of the {0} and {1} argument are "
                         u8"not equal",
-                        positive_integer_to_placement(1),
-                        positive_integer_to_placement(2)
+                        positive_integer_to_placement<1>(),
+                        positive_integer_to_placement<2>()
                     )
                 );
                 break;
@@ -250,8 +250,8 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
                     u8"The matcher determined that the {0} and the "
                     u8"{1} argument are equal, which fails the "
                     u8"matcher's test.",
-                    positive_integer_to_placement(1),
-                    positive_integer_to_placement(2)
+                    positive_integer_to_placement<1>(),
+                    positive_integer_to_placement<2>()
                 ));
                 return {false, _l_explanation_strs};
             }
@@ -270,8 +270,8 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
                 _l_explanation_strs.push_back(fmt::format(
                     u8"TThe {0} argument is smaller than the "
                     u8"{1} argument, causing the matcher's test to fail.",
-                    positive_integer_to_placement(1),
-                    positive_integer_to_placement(2)
+                    positive_integer_to_placement<1>(),
+                    positive_integer_to_placement<2>()
                 ));
                 return {false, _l_explanation_strs};
             }
@@ -290,8 +290,8 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
                 _l_explanation_strs.push_back(fmt::format(
                     u8"TThe {0} argument is bigger than the "
                     u8"{1} argument, causing the matcher's test to fail.",
-                    positive_integer_to_placement(1),
-                    positive_integer_to_placement(2)
+                    positive_integer_to_placement<1>(),
+                    positive_integer_to_placement<2>()
                 ));
                 return {false, _l_explanation_strs};
             }
@@ -519,7 +519,7 @@ public:
                 u8"{1} type \"{2}\". Due to the result from the sub-matcher "
                 u8"comparing these values, this matcher fails.",
                 type_id<decltype(_a_arg1)>(),
-                positive_integer_to_placement(_a_arg1.has_value() ? 0 : 1),
+                positive_integer_to_placement(_a_arg1.has_value() ? 0u : 1u),
                 _a_arg1.has_value() ? type_id<T>() : type_id<U>()
             ));
         };

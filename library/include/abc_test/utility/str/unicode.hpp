@@ -3,7 +3,7 @@
 #include "abc_test/core/errors/test_library_exception.hpp"
 #include "abc_test/utility/internal/unreachable.hpp"
 #include "abc_test/utility/str/concepts.hpp"
-#include "abc_test/utility/str/printing_utilities.hpp"
+#include "abc_test/utility/str/print_utils.hpp"
 #include "abc_test/utility/types.hpp"
 
 #include <array>
@@ -1638,7 +1638,7 @@ __constexpr std::conditional_t<
                                 basic_string_view<CharT>(_l_itt, _a_end)
                             ),
                             _l_code_point_size + 2,
-                            positive_integer_to_placement(1),
+                            positive_integer_to_placement<1>(),
                             _l_char_as_str
                         ));
                     }
