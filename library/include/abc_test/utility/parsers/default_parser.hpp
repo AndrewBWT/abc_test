@@ -109,7 +109,7 @@ struct character_parser_t : public parser_base_t<T>
 {
     __constexpr
     character_parser_t(
-        const std::u32string _a_surrounding_str = std::u32string{}
+        const std::u32string _a_surrounding_str = std::u32string{U"'"}
     )
         : _m_surrounding_str(_a_surrounding_str)
     {}
@@ -193,6 +193,7 @@ public:
                     _l_char_result.has_value())
                 {
                     _l_char = _l_char_result.value();
+                    _a_parse_input.advance(2);
                 }
                 else
                 {
@@ -250,6 +251,7 @@ public:
                     _l_char_result.has_value())
                 {
                     _l_char = _l_char_result.value();
+                    _a_parse_input.advance(4);
                 }
                 else
                 {
@@ -321,11 +323,12 @@ public:
             if (_a_parse_input.check_and_advance(U"\\x"))
             {
                 if (const result_t<T> _l_char_result{
-                        detail::from_hex<T>(_a_parse_input, 4)
+                        detail::from_hex<T>(_a_parse_input, 8)
                     };
                     _l_char_result.has_value())
                 {
                     _l_char = _l_char_result.value();
+                    _a_parse_input.advance(8);
                 }
                 else
                 {

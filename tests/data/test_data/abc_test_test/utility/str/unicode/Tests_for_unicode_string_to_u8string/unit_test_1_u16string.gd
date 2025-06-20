@@ -1,1 +1,2 @@
 #class std::tuple<class std::basic_string<char16_t,struct std::char_traits<char16_t>,class std::allocator<char16_t> >,class std::basic_string<char8_t,struct std::char_traits<char8_t>,class std::allocator<char8_t> > >
+("\xDC02","\\xDC02")

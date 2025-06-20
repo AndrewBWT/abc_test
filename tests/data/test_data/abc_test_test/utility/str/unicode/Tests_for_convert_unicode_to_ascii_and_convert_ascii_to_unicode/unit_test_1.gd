@@ -1,3 +1,4 @@
 #class std::tuple<class std::basic_string<char8_t,struct std::char_traits<char8_t>,class std::allocator<char8_t> >,class std::expected<class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,class std::basic_string<char8_t,struct std::char_traits<char8_t>,class std::allocator<char8_t> > > >
 ("hello",(0,"hello"))
-("hello😊",(1,"The function convert_unicode_to_ascii could not encode the character '😊' into basic ASCII, which is the encoding the function uses to encode std::string objects. This error occoured when processing the 6th character in the unicode string \"hello😊\"."))
+("hello😊",(1,"The function convert_unicode_to_ascii encountered an error when processing the unicode input \"hello😊\". The error encountered is as follows; the 6th char32_t code point extracted from the unicode input string, representing the character `😊' (hex 0x0001F60A), was found to be outside the basic ASCII range - that is, it was not inclusively within the range 0x00000000 and 0x0000007F."))
+("",(0,""))

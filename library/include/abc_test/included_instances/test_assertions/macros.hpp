@@ -20,12 +20,12 @@
         );                                                      \
         return _l_rv;                                           \
     }()
- /*!
-  * Given a matcher to write to, is part of a pair of macros for checking that a
-  * block of code does not throw an exception.
-  *
-  * The argument is the matcher to write to.
-  */
+/*!
+ * Given a matcher to write to, is part of a pair of macros for checking that a
+ * block of code does not throw an exception.
+ *
+ * The argument is the matcher to write to.
+ */
 #define _BEGIN_NO_THROW_MATCHER(_a_matcher_name) \
     _a_matcher_name.add_source_info(             \
         "_BEGIN_NO_THROW_MATCHER",               \
@@ -33,12 +33,12 @@
         std::source_location::current()          \
     );                                           \
     __ABC_INTERNAL_BEGIN_NO_THROW_MATCHER(_a_matcher_name)
-  /*!
-   * Given a matcher to write to, is part of a pair of macros for checking that a
-   * block of code does not throw an exception.
-   *
-   * The argument is the matcher to write to.
-   */
+/*!
+ * Given a matcher to write to, is part of a pair of macros for checking that a
+ * block of code does not throw an exception.
+ *
+ * The argument is the matcher to write to.
+ */
 #define _END_NO_THROW_MATCHER(_a_matcher_name) \
     _a_matcher_name.add_source_info(           \
         "_END_NO_THROW_MATCHER",               \
@@ -47,34 +47,34 @@
     );                                         \
     __ABC_INTERNAL_END_NO_THROW_MATCHER(_a_matcher_name)
 
-   // Internal macro. Should only be used by developer.
-    _BEGIN_ABC_NS
-    template <bool Expected_Behaviour>
+// Internal macro. Should only be used by developer.
+_BEGIN_ABC_NS
+template <bool Expected_Behaviour>
 __no_constexpr_imp matcher_t
-no_exception_thrown() noexcept
+    no_exception_thrown() noexcept
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
-    bool     _l_result{ true };
+    bool     _l_result{true};
     u8string _l_str;
     if constexpr (not Expected_Behaviour)
     {
         _l_result = false;
-        _l_str = u8"not ";
+        _l_str    = u8"not ";
     }
     return mk_matcher_using_result(matcher_result_t(
         _l_result,
         matcher_result_infos_t(fmt::format(
-            u8"No exception was thrown, which is {0}the expected behaviour",
+            u8"No exception was thrown, which was {0}the expected behaviour.",
             _l_str
         ))
     ));
 }
 
 __no_constexpr_imp matcher_t
-unexpected_exception_thrown(
-    const std::exception& _a_exception
-) noexcept
+    unexpected_exception_thrown(
+        const std::exception& _a_exception
+    ) noexcept
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
@@ -90,7 +90,7 @@ unexpected_exception_thrown(
 }
 
 __no_constexpr_imp matcher_t
-unexpected_exception_of_unknown_type_thrown() noexcept
+    unexpected_exception_of_unknown_type_thrown() noexcept
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
@@ -143,22 +143,22 @@ _END_ABC_NS
         );                                                   \
         return _l_rv;                                        \
     }()
- /*!
-  * Given a matcher to write to, is part of a pair of macros for checking that a
-  * block of code definitely throws an exception.
-  *
-  * The argument is the matcher to write to.
-  */
+/*!
+ * Given a matcher to write to, is part of a pair of macros for checking that a
+ * block of code definitely throws an exception.
+ *
+ * The argument is the matcher to write to.
+ */
 #define _BEGIN_THROW_MATCHER(_a_matcher_name)         \
     __ABC_INTERNAL_BEGIN_THROW_MATCHER(               \
         _a_matcher_name, true, "_BEGIN_THROW_MATCHER" \
     )
-  /*!
-   * Given a matcher to write to, is part of a pair of macros for checking that a
-   * block of code definitely throws an exception.
-   *
-   * The argument is the matcher to write to.
-   */
+/*!
+ * Given a matcher to write to, is part of a pair of macros for checking that a
+ * block of code definitely throws an exception.
+ *
+ * The argument is the matcher to write to.
+ */
 #define _END_THROW_MATCHER(_a_matcher_name) \
     _a_matcher_name.add_source_info(        \
         "_END_THROW_MATCHER",               \
@@ -166,7 +166,7 @@ _END_ABC_NS
         std::source_location::current()     \
     );                                      \
     __ABC_INTERNAL_END_THROW_MATCHER(_a_matcher_name)
-   // Internal macro.
+// Internal macro.
 #define __ABC_INTERNAL_BEGIN_THROW_MATCHER(_a_matcher_name) \
     _a_matcher_name = abc::unexpected_no_exception();       \
     try                                                     \
@@ -205,11 +205,11 @@ _END_ABC_NS
         );                                                             \
         return _l_rv;                                                  \
     }()
- /*!
-  * Given a matcher to write to, is part of a pair of macros for checking that a
-  * block of code throws an exception with a specific message.
-  *
-  */
+/*!
+ * Given a matcher to write to, is part of a pair of macros for checking that a
+ * block of code throws an exception with a specific message.
+ *
+ */
 #define _BEGIN_EXCEPTION_MSG_MATCHER(_a_matcher_name, _a_msg)          \
     _a_matcher_name.add_source_info(                                   \
         "_BEGIN_EXCEPTION_MSG_MATCHER",                                \
@@ -217,11 +217,11 @@ _END_ABC_NS
         std::source_location::current()                                \
     );                                                                 \
     __ABC_INTERNAL_BEGIN_EXCEPTION_MSG_MATCHER(_a_matcher_name, _a_msg)
-  /*!
-   * Given a matcher to write to, is part of a pair of macros for checking that a
-   * block of code throws an exception with a specific message.
-   *
-   */
+/*!
+ * Given a matcher to write to, is part of a pair of macros for checking that a
+ * block of code throws an exception with a specific message.
+ *
+ */
 #define _END_EXCEPTION_MSG_MATCHER(_a_matcher_name, _a_msg)            \
     _a_matcher_name.add_source_info(                                   \
         "_END_EXCEPTION_MSG_MATCHER",                                  \
@@ -229,7 +229,7 @@ _END_ABC_NS
         std::source_location::current()                                \
     );                                                                 \
     __ABC_INTERNAL_END_EXCEPTION_MSG_MATCHER(_a_matcher_name, _a_msg)
-   // Internal macro
+// Internal macro
 #define __ABC_INTERNAL_BEGIN_EXCEPTION_MSG_MATCHER(_a_matcher_name, _a_msg) \
     _a_matcher_name = abc::unexpected_no_exception();                       \
     \                                                                       \
@@ -265,19 +265,19 @@ _END_ABC_NS
         __ABC_INTERNAL_BEGIN_EXCEPTION_TYPE_MATCHER(_l_rv, _a_type);    \
         _a_function();                                                  \
         __ABC_INTERNAL_END_EXCEPTION_TYPE_MATCHER(_l_rv, _a_type);      \
-        _l_rv.add_source_info(                                \
+        _l_rv.add_source_info(                                          \
             "_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE",                    \
             abc::utility::str::create_string({#_a_type, #_a_function}), \
             std::source_location::current()                             \
         );                                                              \
         return _l_rv;                                                   \
     }()
- /*!
-  * Given a matcher to write to, is part of a pair of macros for checking that a
-  * block of code throws an exception that is either of a specific type, or
-  * derived from that type..
-  *
-  */
+/*!
+ * Given a matcher to write to, is part of a pair of macros for checking that a
+ * block of code throws an exception that is either of a specific type, or
+ * derived from that type..
+ *
+ */
 #define _BEGIN_EXCEPTION_TYPE_MATCHER(_a_matcher_name, _a_type)         \
     _a_matcher_name.add_source_info(                                    \
         "_BEGIN_EXCEPTION_TYPE_MATCHER",                                \
@@ -285,11 +285,11 @@ _END_ABC_NS
         std::source_location::current()                                 \
     );                                                                  \
     __ABC_INTERNAL_BEGIN_EXCEPTION_TYPE_MATCHER(_a_matcher_name, _a_type)
-  /*!
-   * Given a matcher to write to, is part of a pair of macros for checking that a
-   * block of code throws an exception that is either of a specific type, or
-   * derived from that type..
-   */
+/*!
+ * Given a matcher to write to, is part of a pair of macros for checking that a
+ * block of code throws an exception that is either of a specific type, or
+ * derived from that type..
+ */
 #define _END_EXCEPTION_TYPE_MATCHER(_a_matcher_name, _a_type)           \
     _a_matcher_name.add_source_info(                                    \
         "_END_EXCEPTION_TYPE_MATCHER",                                  \
@@ -298,42 +298,46 @@ _END_ABC_NS
     );                                                                  \
     __ABC_INTERNAL_END_EXCEPTION_TYPE_MATCHER(_a_matcher_name, _a_type)
 
-    _BEGIN_ABC_NS
-    template <typename T>
+_BEGIN_ABC_NS
+template <typename T>
 __no_constexpr_imp abc::matcher_t
-unexpected_no_exception()
+                   unexpected_no_exception()
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
     return mk_matcher_using_result(matcher_result_t(
         false,
         matcher_result_infos_t(fmt::format(
-            u8"Expected an exception of type \"{0}\".", type_id<T>()
+            u8"No exception was thrown, which was not the expected behaviour. "
+            u8"Function expected an exception of type \"{0}\".",
+            type_id<T>()
         ))
     ));
 }
 
 template <typename T>
 __no_constexpr_imp abc::matcher_t
-expected_exception_thrown(
-    const T& _a_exception
-)
+                   expected_exception_thrown(
+                       const T& _a_exception
+                   )
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
     return mk_matcher_using_result(matcher_result_t(
-        false,
+        true,
         matcher_result_infos_t(fmt::format(
-            u8"Expected an exception of type \"{0}\".", type_id<T>()
+            u8"An exception of type \"{0}\" was thrown, which was the expected "
+            u8"behaviour.",
+            type_id<T>()
         ))
     ));
 }
 
 template <typename T>
 __no_constexpr_imp abc::matcher_t
-expected_exception_not_thrown(
-    const std::exception& _a_exception
-)
+                   expected_exception_not_thrown(
+                       const std::exception& _a_exception
+                   )
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
@@ -348,7 +352,7 @@ expected_exception_not_thrown(
 
 template <typename T>
 __no_constexpr_imp abc::matcher_t
-expected_exception_not_thrown()
+                   expected_exception_not_thrown()
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
@@ -416,12 +420,12 @@ _END_ABC_NS
         );                                                   \
         return _l_rv;                                        \
     }()
- /*!
-  * Given a matcher to write to, is part of a pair of macros for checking that a
-  * block of code throws an exception that is either of a specific type, or
-  * derived from that type..
-  *
-  */
+/*!
+ * Given a matcher to write to, is part of a pair of macros for checking that a
+ * block of code throws an exception that is either of a specific type, or
+ * derived from that type..
+ *
+ */
 #define _BEGIN_EXCEPTION_TYPE_AND_MSG_MATCHER(              \
     _a_matcher_name, _a_exception_type, _a_msg              \
 )                                                           \
@@ -435,11 +439,11 @@ _END_ABC_NS
     __ABC_INTERNAL_BEGIN_EXCEPTION_TYPE_AND_MSG_MATCHER(    \
         _a_matcher_name, _a_exception_type, _a_msg          \
     )
-  /*!
-   * Given a matcher to write to, is part of a pair of macros for checking that a
-   * block of code throws an exception that is either of a specific type, or
-   * derived from that type..
-   */
+/*!
+ * Given a matcher to write to, is part of a pair of macros for checking that a
+ * block of code throws an exception that is either of a specific type, or
+ * derived from that type..
+ */
 #define _END_EXCEPTION_TYPE_AND_MSG_MATCHER(                \
     _a_matcher_name, _a_exception_type, _a_msg              \
 )                                                           \
@@ -454,17 +458,17 @@ _END_ABC_NS
         _a_matcher_name, _a_exception_type, _a_msg          \
     )
 
-   // Internal macro
-    _BEGIN_ABC_NS
-    template <typename T>
+// Internal macro
+_BEGIN_ABC_NS
+template <typename T>
 __no_constexpr_imp matcher_t
-no_exception_thrown(
-    const std::u8string_view _a_msg
-) noexcept
+    no_exception_thrown(
+        const std::u8string_view _a_msg
+    ) noexcept
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
-    bool _l_result{ true };
+    bool _l_result{true};
     return mk_matcher_using_result(matcher_result_t(
         _l_result,
         matcher_result_infos_t(fmt::format(
@@ -480,14 +484,14 @@ no_exception_thrown(
 
 template <typename T>
 __no_constexpr_imp matcher_t
-check_expected_exception(
-    const T& _a_exception,
-    const std::u8string_view _a_msg
-) noexcept
+    check_expected_exception(
+        const T&                 _a_exception,
+        const std::u8string_view _a_msg
+    ) noexcept
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
-    bool _l_result{ true };
+    bool _l_result{true};
     if constexpr (derived_from<T, std::exception>)
     {
         auto _l_str_result{
@@ -521,7 +525,7 @@ check_expected_exception(
                         u8"not "
                         u8"match the expected std::u8string. The discrepencies "
                         u8"are "
-                        u8"shown below. This was the expected behaviour."
+                        u8"shown below. This was not the expected behaviour."
                     ),
                     _l_str_result.str().get_vector()
                 )
@@ -551,10 +555,10 @@ check_expected_exception(
 
 template <typename T, typename U>
 __no_constexpr_imp matcher_t
-incorrect_exception(
-    const U& _a_exception,
-    const std::u8string_view _a_msg
-) noexcept
+    incorrect_exception(
+        const U&                 _a_exception,
+        const std::u8string_view _a_msg
+    ) noexcept
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
@@ -600,9 +604,9 @@ incorrect_exception(
 
 template <typename T>
 __no_constexpr_imp matcher_t
-incorrect_exception(
-    const std::u8string_view _a_msg
-) noexcept
+    incorrect_exception(
+        const std::u8string_view _a_msg
+    ) noexcept
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
@@ -610,13 +614,13 @@ incorrect_exception(
         false,
         matcher_result_infos_t(
             fmt::format(u8"An exception was thrown of the correct type, "
-                u8"however "
-                u8"the exception's "
-                u8"what() function returned a std::u8string which did "
-                u8"not "
-                u8"match the expected std::u8string. The discrepencies "
-                u8"are "
-                u8"shown below. This was the expected behaviour.")
+                        u8"however "
+                        u8"the exception's "
+                        u8"what() function returned a std::u8string which did "
+                        u8"not "
+                        u8"match the expected std::u8string. The discrepencies "
+                        u8"are "
+                        u8"shown below. This was the expected behaviour.")
         )
     ));
 }

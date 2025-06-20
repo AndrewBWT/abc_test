@@ -1,1 +1,10 @@
 #class std::tuple<char32_t,bool>
+('\x00000000',true)
+('\x0000D7FF',true)
+('\x0000D800',false)
+('\x0000DFFF',false)
+('\x0000E000',true)
+('\x0000FFFF',true)
+('\x0010FFFF',true)
+('\x00110000',false)
+('\xFFFFFFFF',false)

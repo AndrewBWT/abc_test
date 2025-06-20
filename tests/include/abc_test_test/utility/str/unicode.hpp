@@ -255,15 +255,25 @@ _TEST_CASE(
                 _l_type_name
             )
         );
-        using unit_test_data_1 = std::tuple<T, result_t<U>>;
+        using unit_test_data_1 = std::tuple<T, variant<U,pair<u8string,u8string>>>;
         for (const auto& _l_data : read_data_from_file<unit_test_data_1>(
                  fmt::format("unit_test_1", _l_name),
                  fmt::format("unit_test_1_{0}", _l_name)
              ))
         {
             _TVLOG(_l_data);
-            const auto& [_l_unicode_str1, _l_result_str]{_l_data};
+            const auto& [_l_unicode_str1, _l_result]{_l_data};
             // Checking conversion one way.
+            result_t<U> _l_result_str;
+            switch (_l_result.index())
+            {
+            case 0:
+                _l_result_str = get<0>(_l_result);
+                break;
+            case 1:
+                _l_result_str = unexpected(get<1>(_l_result).first);
+                break;
+            }
             _l_unit_tests += _BLOCK_CHECK(
                 _EXPR(
                     unicode_conversion<CharU>(_l_unicode_str1) == _l_result_str
@@ -273,11 +283,11 @@ _TEST_CASE(
                     == _l_result_str
                 )
             );
-            if (_l_result_str.has_value())
+            if (_l_result.index() == 0)
             {
                 // If it has a positive result, we can run checking with
                 // exception and run the function backwards.
-                const auto& _l_unicode_str2{_l_result_str.value()};
+                const auto& _l_unicode_str2{ get<0>(_l_result) };
                 _l_unit_tests += _BLOCK_CHECK(
                     _EXPR(
                         unicode_conversion_with_exception<CharU>(_l_unicode_str1
@@ -313,11 +323,12 @@ _TEST_CASE(
             }
             else
             {
+                const auto _l_expection_str{ get<1>(_l_result).second };
                 // If theres an error, let us check for the exception.
                 _l_unit_tests += _BLOCK_CHECK(
                     _MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
                         errors::test_library_exception_t,
-                        _l_result_str.error(),
+                        _l_expection_str,
                         [&]()
                         {
                             do_not_optimise(
@@ -331,7 +342,7 @@ _TEST_CASE(
                 _l_unit_tests += _BLOCK_CHECK(
                     _MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
                         errors::test_library_exception_t,
-                        _l_result_str.error(),
+                        _l_expection_str,
                         [&]()
                         {
                             do_not_optimise(
@@ -616,6 +627,7 @@ _TEST_CASE(
     auto _l_test_func = [&]<typename T>()
     {
         auto _l_name{pack_u8string_into_string(type_id<T>())};
+        _TVLOG(type_id<T>());
         auto _l_type_name{fmt::format("{0}", typeid(T).name())};
         _BEGIN_MULTI_ELEMENT_BBA(
             _l_unit_tests,
@@ -628,7 +640,6 @@ _TEST_CASE(
         if constexpr (not (same_as<T, char>))
         {
             for (const auto& _l_data : read_data_from_file<unit_test_data_1>(
-                     fmt::format("unit_test_1_valid_char", _l_name),
                      fmt::format("unit_test_1_valid_char_{0}", _l_name)
                  ))
             {
@@ -640,7 +651,6 @@ _TEST_CASE(
             }
         }
         for (const auto& _l_data : read_data_from_file<unit_test_data_1>(
-                 fmt::format("unit_test_1_valid_ascii", _l_name),
                  fmt::format("unit_test_1_valid_ascii_{0}", _l_name)
              ))
         {
@@ -650,6 +660,33 @@ _TEST_CASE(
                 is_valid_ascii_char(_l_unicode_char) == _l_result_valid_ascii
             ));
         }
+        for (const auto& _l_data : enumerate_data<T>(
+                 from_m_to_n(static_cast<T>(0x00), static_cast<T>(0x7F))
+             ))
+        {
+            _TVLOG(_l_data);
+            _l_unit_tests
+                += _BLOCK_CHECK(_EXPR(is_valid_ascii_char(_l_data) == true));
+            if constexpr (not (same_as<T, char>))
+            {
+                _l_unit_tests
+                    += _BLOCK_CHECK(_EXPR(is_valid_char(_l_data) == true));
+            }
+        }
+        for (const auto& _l_data : enumerate_data<T>(
+                 from_m_to_n(static_cast<T>(0x80), static_cast<T>(0xFF))
+             ))
+        {
+            _TVLOG(_l_data);
+            _l_unit_tests
+                += _BLOCK_CHECK(_EXPR(is_valid_ascii_char(_l_data) == false));
+            if constexpr (same_as<T, char8_t>)
+            {
+                _l_unit_tests
+                    += _BLOCK_CHECK(_EXPR(is_valid_char(_l_data) == false));
+            }
+        }
+
         _END_BBA_CHECK(_l_unit_tests);
 
         _BEGIN_MULTI_ELEMENT_BBA(
@@ -709,12 +746,8 @@ _TEST_CASE(
             fmt::format("Unit testing next_char32_t {0}", _l_type_name)
         );
         using next_char32_result_type_t = pair<char32_t, size_t>;
-        using unit_test_data_1          = tuple<
-                     T,
-                     vector<tuple<
-                         int,
-                         optional<next_char32_result_type_t>,
-                         result_t<next_char32_result_type_t>>>>;
+        using unit_test_data_1
+            = tuple<T, vector<tuple<int, result_t<next_char32_result_type_t>>>>;
         for (const auto& _l_data : read_data_from_file<unit_test_data_1>(
                  fmt::format("unit_test_1", _l_name),
                  fmt::format("unit_test_1_{0}", _l_name)
@@ -725,16 +758,23 @@ _TEST_CASE(
             typename T::const_iterator _l_begin_c_itt{std::cbegin(_l_unicode_str
             )};
             typename T::const_iterator _l_end_c_itt{std::cend(_l_unicode_str)};
-            for (auto& [_l_offset, _l_opt_result, _l_result_result] :
-                 _l_results)
+            for (auto& [_l_offset, _l_result_result] : _l_results)
             {
                 typename T::const_iterator _l_c_itt{
                     std::begin(_l_unicode_str) + _l_offset
                 };
-                _l_unit_tests += _BLOCK_CHECK(_EXPR(
-                    next_char32_t<true>(_l_begin_c_itt, _l_c_itt, _l_end_c_itt)
-                    == _l_result_result
-                ));
+                _l_unit_tests += _BLOCK_CHECK(
+                    _EXPR(
+                        next_char32_t<true>(_l_c_itt, _l_end_c_itt)
+                        == _l_result_result
+                    )
+                    && _EXPR(
+                        next_char32_t<false>(_l_c_itt, _l_end_c_itt)
+                        == (_l_result_result.has_value()
+                                ? make_optional(_l_result_result.value())
+                                : nullopt)
+                    )
+                );
             }
         }
         _END_BBA_CHECK(_l_unit_tests);
@@ -763,12 +803,8 @@ _TEST_CASE(
                     std::begin(_l_unicode_str) + _l_idx
                 };
                 _BEGIN_NO_THROW_MATCHER(_l_matcher);
-                do_not_optimise(
-                    next_char32_t<true>(_l_begin_c_itt, _l_c_itt, _l_end_c_itt)
-                );
-                do_not_optimise(
-                    next_char32_t<false>(_l_begin_c_itt, _l_c_itt, _l_end_c_itt)
-                );
+                do_not_optimise(next_char32_t<true>(_l_c_itt, _l_end_c_itt));
+                do_not_optimise(next_char32_t<false>(_l_c_itt, _l_end_c_itt));
                 _END_NO_THROW_MATCHER(_l_matcher);
                 _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
             }
@@ -870,7 +906,7 @@ _TEST_CASE(
     using namespace utility;
     auto _l_test_func = [&]<typename T>()
     {
-        auto _l_name{get_name<T>()};
+        auto _l_name{typeid(T).name()};
         auto _l_type_name{fmt::format("{0}", typeid(T).name())};
         _BEGIN_MULTI_ELEMENT_BBA(
             _l_unit_tests,
@@ -936,7 +972,7 @@ _TEST_CASE(
     using namespace utility;
     auto _l_test_func = [&]<typename T>()
     {
-        auto _l_name{get_name<T>()};
+        auto _l_name{typeid(T).name()};
         auto _l_type_name{fmt::format("{0}", typeid(T).name())};
         _BEGIN_MULTI_ELEMENT_BBA(
             _l_unit_tests,
@@ -948,7 +984,7 @@ _TEST_CASE(
              ))
         {
             _TVLOG(_l_data);
-            const auto& [_l_ascii_limit, _l_single_char16_limit, _l_two_char8_limit, _l_char32_limit, _l_high_surrogate_lower, _l_low_surrogate_higher]{
+            const auto& [_l_ascii_limit, _l_single_char16_limit, _l_two_char8_limit, _l_high_surrogate_lower, _l_low_surrogate_higher, _l_char32_limit]{
                 _l_data
             };
             if constexpr (sizeof(T) >= 1)

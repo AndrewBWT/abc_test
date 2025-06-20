@@ -1,1 +1,13 @@
 #class std::tuple<class std::basic_string<char8_t,struct std::char_traits<char8_t>,class std::allocator<char8_t> >,bool>
+("hello\x80",false)
+("hello\xC0", false)
+("hello\xE0\xC0", false)
+("hello\xF0\xE0\xC0", false)
+("hello\xC0\xC0", false)
+("hello\xE0\xC0\xC0", false)
+("hello\xE0\xBF\xC0", false)
+("hello\xF0\xC0\xC0\xC0", false)
+("hello\xF0\xBF\xC0\xC0", false)
+("hello\xF0\xBF\xBF\xC0", false)
+("hello\xF0\x80\x81\xA1", false)
+("hello\xF4\x90\x80\x80", false)

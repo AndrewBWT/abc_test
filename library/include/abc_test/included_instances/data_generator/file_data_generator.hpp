@@ -142,7 +142,7 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
             )};
             if (_l_parsed_result.has_value())
             {
-                _m_element       = _l_parsed_result.value();
+                _m_element = _l_parsed_result.value();
             }
             else
             {
@@ -152,7 +152,10 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
                     u8"reported "
                     u8"error \"{3}\".",
                     type_id<T>(),
-                    (*_m_current_file_data).general_data_file().path().u8string(),
+                    (*_m_current_file_data)
+                        .general_data_file()
+                        .path()
+                        .u8string(),
                     _m_line_reader.line_number(),
                     _l_parsed_result.error()
                 ));
@@ -506,12 +509,47 @@ __constexpr_imp bool
         }
         else
         {
+            /*
+    abc::utility::io::file_line_reader_t          _m_line_reader;
+    T                                             _m_element;
+            */
             ++_m_current_file_data;
             _m_position_data.file_index++;
             _m_position_data.element_index = 0;
             if (_m_current_file_data == _m_files.end())
             {
                 return false;
+            }
+            _m_line_reader = utility::io::file_line_reader_t(
+                (*_m_current_file_data).general_data_file().path()
+            );
+            if (_m_line_reader.has_current_line())
+            {
+                const result_t<T> _l_parsed_result{abc::utility::parser::parse(
+                    _m_line_reader.current_line(),
+                    (*_m_current_file_data).rw_info().internal_parser
+                )};
+                if (_l_parsed_result.has_value())
+                {
+                    _m_element = _l_parsed_result.value();
+                    _l_element_found = true;
+                }
+                else
+                {
+                    throw errors::test_library_exception_t(fmt::format(
+                        u8"Error encountered in file_data_generator_t<{0}> "
+                        u8"when reading file \"{1}\" at line {2}. Parser "
+                        u8"reported "
+                        u8"error \"{3}\".",
+                        type_id<T>(),
+                        (*_m_current_file_data)
+                            .general_data_file()
+                            .path()
+                            .u8string(),
+                        _m_line_reader.line_number(),
+                        _l_parsed_result.error()
+                    ));
+                }
             }
         }
     }
