@@ -14,6 +14,7 @@ set(TEST_FILES
   include/abc_test_test/utility/str.hpp
   include/abc_test_test/utility/str/unicode.hpp
   include/abc_test_test/utility/str/concepts.hpp
+  include/abc_test_test/utility/str/string_cast.hpp
   include/abc_test_test/utility/rng.hpp
   include/abc_test_test/utility/enum.hpp
   include/abc_test_test/utility/ranges.hpp

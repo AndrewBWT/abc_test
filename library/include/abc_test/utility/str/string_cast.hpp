@@ -6,21 +6,21 @@
 
 _BEGIN_ABC_UTILITY_STR_NS
 __constexpr std::string
-            pack_u8string_into_string(const std::u8string_view _a_str) noexcept;
+            cast_u8string_to_string(const std::u8string_view _a_str) noexcept;
 __constexpr std::u8string
-            unpack_string_to_u8string(const std::string_view _a_str) noexcept;
+            cast_string_to_u8string(const std::string_view _a_str) noexcept;
 __constexpr auto
-    pack_wstring(const std::wstring_view _a_str) noexcept;
+    cast_wstring_to_unicode_string(const std::wstring_view _a_str) noexcept;
 template <typename T>
 requires (wchar_is_16_bit && std::same_as<typename T::value_type, char16_t>)
          || ( wchar_is_32_bit
               && std::same_as<typename T::value_type, char32_t> )
-__constexpr std::wstring unpack_wstring(const T _a_str_view);
-         _END_ABC_UTILITY_STR_NS
+__constexpr std::wstring cast_unicode_string_to_wstring(const T _a_str_view);
+_END_ABC_UTILITY_STR_NS
 
-             _BEGIN_ABC_UTILITY_STR_NS
+_BEGIN_ABC_UTILITY_STR_NS
 __constexpr_imp std::string
-                pack_u8string_into_string(
+                cast_u8string_to_string(
                     const std::u8string_view _a_str
                 ) noexcept
 {
@@ -29,7 +29,7 @@ __constexpr_imp std::string
 }
 
 __constexpr_imp std::u8string
-                unpack_string_to_u8string(
+                cast_string_to_u8string(
                     const std::string_view _a_str
                 ) noexcept
 {
@@ -38,27 +38,26 @@ __constexpr_imp std::u8string
 }
 
 __constexpr auto
-    pack_wstring(
+    cast_wstring_to_unicode_string(
         const std::wstring_view _a_str
     ) noexcept
 {
     using namespace std;
     if constexpr (wchar_is_16_bit)
     {
-        u16string _l_rv{};
-        _l_rv.resize(_a_str.size());
-        ranges::copy(_a_str, _l_rv.begin());
-        return _l_rv;
+        return u16string(_a_str.begin(), _a_str.end());
     }
     else if constexpr (wchar_is_32_bit)
     {
-        u32string _l_rv{};
-        _l_rv.resize(_a_str.size());
-        ranges::copy(_a_str, _l_rv.begin());
-        return _l_rv;
+        return u32string(_a_str.begin(), _a_str.end());
     }
     else
     {
+       // __STATIC_ASSERT(
+       //     wchar_t,
+        //    "cast_wstring_to_unicode_string not defined for wchar_t of this "
+       //     "size"
+      //  );
     }
 }
 
@@ -66,7 +65,7 @@ template <typename T>
 requires (wchar_is_16_bit && std::same_as<typename T::value_type,char16_t>)
          || (wchar_is_32_bit && std::same_as<typename T::value_type, char32_t>)
 __constexpr_imp std::wstring
-                unpack_wstring(
+                cast_unicode_string_to_wstring(
                     const T _a_str_view
                 )
 {
@@ -74,4 +73,4 @@ __constexpr_imp std::wstring
     return wstring(_a_str_view.begin(), _a_str_view.end());
 }
 
-         _END_ABC_UTILITY_STR_NS
+_END_ABC_UTILITY_STR_NS

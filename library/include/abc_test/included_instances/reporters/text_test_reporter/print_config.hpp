@@ -438,7 +438,7 @@ __constexpr_imp std::u8string
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
-    return unpack_string_to_u8string(
+    return cast_string_to_u8string(
         string(_m_line_break_len, _m_line_break_char)
     );
 }
@@ -1021,7 +1021,7 @@ __constexpr_imp std::u8string
     {
         return highlight(fmt::format(
             u8"{0}:{1}",
-            unpack_string_to_u8string(_a_sl.value().file_name(
+            cast_string_to_u8string(_a_sl.value().file_name(
             )),
             _a_sl.value().line()
         ));

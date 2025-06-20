@@ -490,7 +490,7 @@ __constexpr_imp void
         throw errors::test_library_exception_t(fmt::format(
             u8"add_assertions function has been entered, however should have "
             u8"already termianted. _m_test_status = {0}",
-            unpack_string_to_u8string(
+            cast_string_to_u8string(
                 fmt::format("{}", _m_test_status)
             )
         ));
@@ -553,7 +553,7 @@ __constexpr_imp void
         throw errors::test_library_exception_t(fmt::format(
             u8"set_unexpected_termination function has been entered, however "
             u8"should have already termianted. _m_test_status = {0}",
-            unpack_string_to_u8string(
+            cast_string_to_u8string(
                 fmt::format("{}", _m_test_status)
             )
         ));
@@ -679,7 +679,7 @@ __no_constexpr_imp std::filesystem::path
             /= abc::utility::io::normalise_for_file_use(_a_test_path_component);
     }
     _l_path /= abc::utility::io::normalise_for_file_use(
-        unpack_string_to_u8string(
+        cast_string_to_u8string(
             _a_test_info.registered_test_data()._m_user_data.name
         )
     );

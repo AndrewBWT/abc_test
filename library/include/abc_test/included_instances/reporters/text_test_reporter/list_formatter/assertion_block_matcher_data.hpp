@@ -423,7 +423,7 @@ __no_constexpr_imp void
                     prefix(_a_idx + 1),
                     _a_pc.indent(
                         _a_pc.source_representation(
-                            unpack_string_to_u8string(_l_str)
+                            cast_string_to_u8string(_l_str)
                         ),
                         _m_indent_offset + 2
                     )
@@ -438,7 +438,7 @@ __no_constexpr_imp void
                    _a_pc.colon(_a_pc.source_code_str()), _m_indent_offset
                ),
                _a_pc.indent(
-                   _a_pc.source_representation(unpack_string_to_u8string(
+                   _a_pc.source_representation(cast_string_to_u8string(
                        _a_element.source().value().source_code_representation()
                    )),
                    _m_indent_offset + 1

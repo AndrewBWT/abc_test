@@ -45,7 +45,7 @@ _TEST_CASE(
     {
         stacktrace               _l_st = stacktrace::current();
         test_library_exception_t _l_tle
-            = test_library_exception_t(unpack_string_to_u8string(_l_str), _l_st);
+            = test_library_exception_t(cast_string_to_u8string(_l_str), _l_st);
         _l_test_lib_bba += _BLOCK_CHECK(annotate(
             u8"Checking test_library_exception_t what() function",
             _EXPR(string_view(_l_tle.what()) == string_view(_l_str))

@@ -839,7 +839,7 @@ struct default_parser_t<std::basic_string<T>>
                                 : fmt::format(
                                       u8" Previously the characters \"{0}\""
                                       u8" had been parsed correctly.",
-                                      unpack_string_to_u8string(
+                                      cast_string_to_u8string(
                                           _l_previously_processed_chars
                                       )
                                   )
@@ -854,7 +854,7 @@ struct default_parser_t<std::basic_string<T>>
                             hex_size * 2,
                             type_id<T>(),
                             positive_integer_to_placement(_l_idx + 1),
-                            unpack_string_to_u8string(string_view(
+                            cast_string_to_u8string(string_view(
                                 _l_str_as_ascii, _l_str_as_ascii + 2
                             )),
                             _l_prev_str_info

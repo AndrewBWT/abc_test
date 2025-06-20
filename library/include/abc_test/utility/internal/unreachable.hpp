@@ -1,7 +1,7 @@
 #pragma once
 
 #include "abc_test/utility/internal/macros.hpp"
-#include "abc_test/utility/str/packing.hpp"
+#include "abc_test/utility/str/string_cast.hpp"
 
 #include <source_location>
 #include <stdexcept>
@@ -20,7 +20,7 @@ public:
         unreachable_exception_t(
             const std::u8string_view _a_error
         ) noexcept
-        : std::runtime_error(_ABC_NS_UTILITY_STR::pack_u8string_into_string(_a_error))
+        : std::runtime_error(_ABC_NS_UTILITY_STR::cast_u8string_to_string(_a_error))
     {}
 };
 

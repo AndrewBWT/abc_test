@@ -333,7 +333,7 @@ _TEST_CASE(
     auto _l_test_func = [&]<typename Enum>()
     {
         auto _l_type_name{typeid(Enum).name()};
-        auto _l_tn{unpack_string_to_u8string(_l_type_name)};
+        auto _l_tn{cast_string_to_u8string(_l_type_name)};
         _TVLOG(_l_tn);
         enumerate_enum_helper_t<Enum> _l_helper(get_enum_list<Enum>());
         auto                          _l_increment =
@@ -455,7 +455,7 @@ _TEST_CASE(
         auto _l_property_test_func
             = [&]<typename F>(string_view _a_name, F _a_func)
         {
-            auto _l_b_str = unpack_string_to_u8string(_a_name);
+            auto _l_b_str = cast_string_to_u8string(_a_name);
             _TVLOG(_l_b_str);
             for (auto& _l_data : enumerate_data<property_test_data_1>())
             {

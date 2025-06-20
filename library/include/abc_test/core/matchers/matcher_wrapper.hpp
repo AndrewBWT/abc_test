@@ -581,13 +581,13 @@ __constexpr_imp matcher_wrapper_t<false>
         matcher_result_infos_t(
             fmt::format(
                 u8"{0}{1}{2} {3} {4}{5}{6}",
-                unpack_string_to_u8string(_l_str_pair_l.first),
+                cast_string_to_u8string(_l_str_pair_l.first),
                 _l_left_str.primary_data(),
-                unpack_string_to_u8string(_l_str_pair_l.second),
+                cast_string_to_u8string(_l_str_pair_l.second),
                 logic_str<Logic_Enum>(),
-                unpack_string_to_u8string(_l_str_pair_r.first),
+                cast_string_to_u8string(_l_str_pair_r.first),
                 _l_right_str.primary_data(),
-                unpack_string_to_u8string(_l_str_pair_r.second)
+                cast_string_to_u8string(_l_str_pair_r.second)
             ),
             {},
             _l_children

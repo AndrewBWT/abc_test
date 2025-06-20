@@ -75,7 +75,7 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
         {
             if constexpr (same_as<T, char>)
             {
-                return unpack_string_to_u8string(string(1, _a_single_char));
+                return cast_string_to_u8string(string(1, _a_single_char));
             }
             else
             {

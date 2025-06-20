@@ -692,7 +692,7 @@ __constexpr bool
     using namespace std;
     if constexpr (same_as<T, wchar_t>)
     {
-        return is_valid_unicode_string(pack_wstring(_a_str));
+        return is_valid_unicode_string(cast_wstring_to_unicode_string(_a_str));
     }
     else if constexpr (same_as<T, char32_t>)
     {
@@ -1060,7 +1060,7 @@ __constexpr result_t<std::basic_string<T>>
             {
                 if (_l_result.has_value())
                 {
-                    return unpack_wstring(_a_str_2);
+                    return cast_unicode_string_to_wstring(_a_str_2);
                 }
                 else
                 {
@@ -1072,7 +1072,7 @@ __constexpr result_t<std::basic_string<T>>
                 return _l_result.transform(
                     [](const auto _a_str_3)
                     {
-                        unpack_wstring(_a_str_3);
+                        cast_unicode_string_to_wstring(_a_str_3);
                     }
                 );
             }
@@ -1125,7 +1125,7 @@ __constexpr result_t<std::basic_string<T>>
         {
             if constexpr (wchar_is_16_bit)
             {
-                return unpack_wstring(_l_convert_u32string_to_u16string(_a_str_2
+                return cast_unicode_string_to_wstring(_l_convert_u32string_to_u16string(_a_str_2
                 ));
             }
             else if constexpr (wchar_is_32_bit)
@@ -1195,7 +1195,7 @@ __constexpr result_t<std::basic_string<T>>
                     .transform(
                         [](auto _a_str2)
                         {
-                            return unpack_wstring(_a_str2);
+                            return cast_unicode_string_to_wstring(_a_str2);
                         }
                     );
             }
@@ -1204,7 +1204,7 @@ __constexpr result_t<std::basic_string<T>>
                 return _l_result.transform(
                     [](auto _a_str2)
                     {
-                        return unpack_wstring(_a_str2);
+                        return cast_unicode_string_to_wstring(_a_str2);
                     }
                 );
             }
@@ -1239,11 +1239,11 @@ __constexpr result_t<std::basic_string<T>>
     {
         if constexpr (wchar_is_16_bit)
         {
-            return _l_run_char16(pack_wstring(_a_str));
+            return _l_run_char16(cast_wstring_to_unicode_string(_a_str));
         }
         else if constexpr (wchar_is_32_bit)
         {
-            return _l_run_char32(pack_wstring(_a_str));
+            return _l_run_char32(cast_wstring_to_unicode_string(_a_str));
         }
         else
         {

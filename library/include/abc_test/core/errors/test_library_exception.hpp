@@ -10,7 +10,7 @@
 
 #include <fmt/xchar.h>
 
-#include "abc_test/utility/str/packing.hpp"
+#include "abc_test/utility/str/string_cast.hpp"
 
 _BEGIN_ABC_ERRORS_NS
 
@@ -86,7 +86,7 @@ __no_constexpr_imp
         const std::u8string    _a_error,
         const std::stacktrace& _a_stacktrace
     ) noexcept
-    : std::runtime_error(_ABC_NS_UTILITY_STR::pack_u8string_into_string(_a_error))
+    : std::runtime_error(_ABC_NS_UTILITY_STR::cast_u8string_to_string(_a_error))
     , _m_stacktrace(_a_stacktrace)
 {}
 

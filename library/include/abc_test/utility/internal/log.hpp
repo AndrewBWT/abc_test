@@ -134,7 +134,7 @@ __constexpr_imp void
             u8"LOG: {0}: {1} - {2}",
             get_thread_id(),
             to_str(_a_internal_logger_enum),
-            unpack_string_to_u8string(_a_str)
+            cast_string_to_u8string(_a_str)
         ));
     }
 }

@@ -940,7 +940,7 @@ __no_constexpr_imp void
         abc::utility::printer::default_printer_t<pair<bool, size_t>>{}
             .run_printer(make_pair(_a_test_success, _l_next_index))
     };
-    _l_output << pack_u8string_into_string(
+    _l_output << cast_u8string_to_string(
         _a_option_class.autofile_metadata_string
     ) << "_" << string(_l_printed_str.begin(), _l_printed_str.end())
               << std::endl;
@@ -988,7 +988,7 @@ __constexpr_imp std::vector<std::u8string>
     vector<u8string> _l_strs(_a_argc > 1 ? (_a_argc - 1) : 0);
     for (size_t _l_idx{1}; _l_idx < _a_argc; ++_l_idx)
     {
-        _l_strs[_l_idx - 1] = unpack_string_to_u8string(_a_argv[_l_idx]);
+        _l_strs[_l_idx - 1] = cast_string_to_u8string(_a_argv[_l_idx]);
     }
     return _l_strs;
 }
@@ -1004,7 +1004,7 @@ __no_constexpr_imp std::optional<std::string>
     string _l_unprocessed_line;
     while (getline(_a_fstream, _l_unprocessed_line))
     {
-        u8string _l_line{unpack_string_to_u8string(_l_unprocessed_line)};
+        u8string _l_line{cast_string_to_u8string(_l_unprocessed_line)};
         if (_l_line.starts_with(_a_str_to_find))
         {
             return _l_unprocessed_line;
@@ -1036,7 +1036,7 @@ __constexpr_imp std::optional<found_data_t>
                                                    ? _l_unprocessed_line.value()
                                                    : _l_line;
         const u8string _l_line_to_get{
-            unpack_string_to_u8string(_l_line_to_get_as_str)
+            cast_string_to_u8string(_l_line_to_get_as_str)
         };
         if (_l_unprocessed_line.has_value())
         {

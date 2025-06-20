@@ -98,7 +98,7 @@ public:
                 while (getline(_l_config_file, _l_unprocessed_line))
                 {
                     ++_l_line_idx;
-                    u8string _l_line{unpack_string_to_u8string(_l_unprocessed_line
+                    u8string _l_line{cast_string_to_u8string(_l_unprocessed_line
                     )};
                     // Split string into parts. Then process.
                     if (_l_line.size() == 0 || _l_line[0] == char8_t('#'))

@@ -85,7 +85,7 @@ __no_constexpr_imp matcher_t
             u8"An unexpected exception, of a type derived from {0} was thrown. "
             u8"The exception's what() function returned \"{1}\".",
             type_id<std::exception>(),
-            unpack_string_to_u8string(_a_exception.what())
+            cast_string_to_u8string(_a_exception.what())
         ))
     ));
 }
@@ -349,7 +349,7 @@ __no_constexpr_imp abc::matcher_t
         false,
         matcher_result_infos_t(fmt::format(
             u8"Expected an exception of type \"{0}\".",
-            unpack_string_to_u8string(_a_exception.what())
+            cast_string_to_u8string(_a_exception.what())
         ))
     ));
 }
@@ -506,7 +506,7 @@ __no_constexpr_imp matcher_t
                 u8string_view,
                 u8string_view,
                 abc::matcher::comparison_enum_t::EQ>{}
-                .run(_a_msg, unpack_string_to_u8string(_a_exception.what()))
+                .run(_a_msg, cast_string_to_u8string(_a_exception.what()))
         };
         if (_l_str_result.passed())
         {
@@ -575,7 +575,7 @@ __no_constexpr_imp matcher_t
             u8string_view,
             u8string_view,
             abc::matcher::comparison_enum_t::EQ>{}
-            .run(_a_msg, unpack_string_to_u8string(_a_exception.what()))
+            .run(_a_msg, cast_string_to_u8string(_a_exception.what()))
     };
     if (_l_str_result.passed())
     {

@@ -77,15 +77,15 @@ __no_constexpr_imp void
         u8"      Line: {3}\n"
         u8"   Stacktrace: {4}",
         _a_setup_test_error.error_msg(),
-        unpack_string_to_u8string(
+        cast_string_to_u8string(
             _a_setup_test_error.source_location().file_name()
         ),
-        unpack_string_to_u8string(
+        cast_string_to_u8string(
             _a_setup_test_error.source_location().function_name()
         ),
         _a_setup_test_error.source_location().line(),
         _a_setup_test_error.opt_stacktrace().has_value()
-            ? unpack_string_to_u8string(
+            ? cast_string_to_u8string(
                   to_string(_a_setup_test_error.opt_stacktrace().value())
               )
             : u8"No stacktrace"
@@ -99,7 +99,7 @@ __no_constexpr_imp void
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
-    write_line(u8"WARNING: " + unpack_string_to_u8string(_a_str));
+    write_line(u8"WARNING: " + cast_string_to_u8string(_a_str));
 }
 
 __no_constexpr_imp void

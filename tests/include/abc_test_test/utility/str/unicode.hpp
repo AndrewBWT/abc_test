@@ -630,7 +630,7 @@ _TEST_CASE(
     using namespace _ABC_NS_UTILITY_STR;
     auto _l_test_func = [&]<typename T>()
     {
-        auto _l_name{pack_u8string_into_string(type_id<T>())};
+        auto _l_name{cast_u8string_to_string(type_id<T>())};
         _TVLOG(type_id<T>());
         auto _l_type_name{fmt::format("{0}", typeid(T).name())};
         _BEGIN_MULTI_ELEMENT_BBA(

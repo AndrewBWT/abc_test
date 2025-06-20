@@ -135,7 +135,7 @@ __constexpr_imp void
                         this->prefix(_a_idx + 1)
                         + _a_pc.indent(
                             _a_pc.source_representation(
-                                unpack_string_to_u8string(_l_str)
+                                cast_string_to_u8string(_l_str)
                             ),
                             2
                         )
