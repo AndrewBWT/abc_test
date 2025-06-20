@@ -341,7 +341,7 @@ result_t<std::conditional_t<Return_u32string, std::u32string, std::monostate>>
     ) noexcept;
 
 template <bool Return_u32string, typename Original_Type>
-    requires char_type_is_unicode_c<Original_Type>
+requires char_type_is_unicode_c<Original_Type>
 __constexpr
 result_t<std::conditional_t<Return_u32string, std::u32string, std::monostate>>
     validate_u16string_and_convert_to_u32string(const std::u16string_view _a_str
@@ -395,12 +395,21 @@ template <typename T>
 requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
 __constexpr T low_surrogate_lower_value() noexcept;
 template <typename T>
+requires char_type_is_unicode_c<T>
+__constexpr T
+    zero() noexcept;
+template <typename T>
+requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
+__constexpr T one_below_high_surrogate_lower_value() noexcept;
+template <typename T>
+requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
+__constexpr T one_above_low_surrogate_upper_value() noexcept;
+template <typename T>
 requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
 __constexpr bool is_surrogate(const T _a_char) noexcept;
 template <typename T>
 requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
 __constexpr bool is_high_surrogate(const T _a_char) noexcept;
-
 template <typename T>
 requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
 __constexpr bool is_low_surrogate(const T _a_char) noexcept;
@@ -418,14 +427,14 @@ __constexpr std::u8string
 template <typename T, bool Part_Of_Sequence>
 requires char_type_is_unicode_c<T>
 __constexpr std::u8string
-unicode_error_description() noexcept;
+            unicode_error_description() noexcept;
 
 template <typename CharT, bool Is_Substring>
 __constexpr std::u8string
-single_code_unit_error_description(
-    const size_t             _a_index,
-    const std::u8string_view _a_char
-) noexcept;
+            single_code_unit_error_description(
+                const size_t             _a_index,
+                const std::u8string_view _a_char
+            ) noexcept;
 } // namespace detail
 
 _END_ABC_NS
@@ -493,7 +502,7 @@ __constexpr_imp result_t<std::string>
                     positive_integer_to_placement(_l_idx),
                     unicode_char_to_u8string(_l_char32t),
                     represent_char_as_hex_for_output(_l_char32t),
-                    represent_char_as_hex_for_output(char32_t(0x00)),
+                    represent_char_as_hex_for_output(detail::zero<char32_t>()),
                     represent_char_as_hex_for_output(ascii_limit<char32_t>())
                 ));
             }
@@ -578,7 +587,7 @@ __constexpr result_t<std::basic_string<T>>
                 _l_str_as_u8string,
                 positive_integer_to_placement(_l_idx),
                 represent_char_as_hex_for_output(_l_char),
-                represent_char_as_hex_for_output(char(0x0)),
+                represent_char_as_hex_for_output(detail::zero<char>()),
                 represent_char_as_hex_for_output(char(ascii_limit<char>()))
             ));
         }
@@ -691,7 +700,8 @@ __constexpr bool
     }
     else if constexpr (same_as<T, char16_t>)
     {
-        return detail::validate_u16string_and_convert_to_u32string<false,T>(_a_str
+        return detail::validate_u16string_and_convert_to_u32string<false, T>(
+                   _a_str
         )
             .has_value();
     }
@@ -807,9 +817,11 @@ __constexpr std::conditional_t<
     }
     else
     {
-        auto _l_rv{detail::next_char32_t_internal<Return_Reason, true, T, CharT>(
-            _a_itt, _a_itt, _a_end
-        )};
+        auto _l_rv{
+            detail::next_char32_t_internal<Return_Reason, true, T, CharT>(
+                _a_itt, _a_itt, _a_end
+            )
+        };
         if constexpr (Return_Reason)
         {
             return _l_rv.or_else(
@@ -1312,7 +1324,7 @@ result_t<std::conditional_t<Return_u32string, std::u32string, std::monostate>>
 }
 
 template <bool Return_u32string, typename Original_Type>
-    requires char_type_is_unicode_c<Original_Type>
+requires char_type_is_unicode_c<Original_Type>
 __constexpr
 result_t<std::conditional_t<Return_u32string, std::u32string, std::monostate>>
     validate_u16string_and_convert_to_u32string(
@@ -1368,12 +1380,12 @@ __constexpr std::optional<std::u8string>
             u8"UTF32 code units must be inclusively between either {0} "
             u8"and {1}, or {2} and {3}. Therefore, the "
             u8"code unit {4} is invalid.",
-            represent_char_as_hex_for_output(static_cast<char32_t>(0x0)),
+            represent_char_as_hex_for_output(detail::zero<char32_t>()),
             represent_char_as_hex_for_output<T>(
-                high_surrogate_lower_value<T>() - T(0x01)
+                detail::one_below_high_surrogate_lower_value<T>()
             ),
             represent_char_as_hex_for_output<T>(
-                low_surrogate_upper_value<T>() + T(0x01)
+                detail::one_above_low_surrogate_upper_value<T>()
             ),
             represent_char_as_hex_for_output(char32_limit<T>()),
             represent_char_as_hex_for_output(_a_char)
@@ -1576,8 +1588,8 @@ __constexpr std::conditional_t<
                             Is_Substring>(
                             std::distance(_a_begin, _l_itt) + 1, _l_char_as_str
                         ),
-                        represent_char_as_hex_for_output(char8_t(0x00)),
-                        represent_char_as_hex_for_output(char8_t(0x7F)),
+                        represent_char_as_hex_for_output(zero<char8_t>()),
+                        represent_char_as_hex_for_output(ascii_limit<char8_t>()),
                         represent_char_as_hex_for_output(char8_t(0xC0)),
                         represent_char_as_hex_for_output(char8_t(0xDF)),
                         represent_char_as_hex_for_output(char8_t(0xE0)),
@@ -1798,15 +1810,13 @@ __constexpr std::conditional_t<
                         ),
                         represent_char_as_hex_for_output(_l_code_point),
                         represent_char_as_hex_for_output(
-                            static_cast<char32_t>(0x0)
+                            detail::zero<char32_t>()
                         ),
                         represent_char_as_hex_for_output<char32_t>(
-                            high_surrogate_lower_value<char32_t>()
-                            - char32_t(0x01)
+                            detail::one_below_high_surrogate_lower_value<char32_t>()
                         ),
                         represent_char_as_hex_for_output<char32_t>(
-                            low_surrogate_upper_value<char32_t>()
-                            + char32_t(0x01)
+                            detail::one_above_low_surrogate_upper_value<char32_t>()
                         ),
                         represent_char_as_hex_for_output(char32_limit<char32_t>(
                         ))
@@ -2134,6 +2144,34 @@ __constexpr T low_surrogate_lower_value() noexcept
 
 template <typename T>
 requires char_type_is_unicode_c<T>
+__constexpr T
+    zero() noexcept
+{
+    return T(0x0);
+}
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+         && (
+             sizeof(T) >= 2
+         )
+__constexpr T one_below_high_surrogate_lower_value() noexcept
+{
+    return high_surrogate_lower_value<T>() - T(0x01);
+}
+
+template <typename T>
+requires char_type_is_unicode_c<T>
+         && (
+             sizeof(T) >= 2
+         )
+__constexpr T one_above_low_surrogate_upper_value() noexcept
+{
+    return low_surrogate_upper_value<T>() + T(0x01);
+}
+
+template <typename T>
+requires char_type_is_unicode_c<T>
          && (
              sizeof(T) >= 2
          )
@@ -2206,10 +2244,11 @@ __constexpr std::u8string
     _l_rv.append(u8"]");
     return _l_rv;
 }
+
 template <typename T, bool Part_Of_Sequence>
-    requires char_type_is_unicode_c<T>
+requires char_type_is_unicode_c<T>
 __constexpr std::u8string
-unicode_error_description() noexcept
+            unicode_error_description() noexcept
 {
     using namespace std;
     u8string _l_standard_name;
@@ -2252,10 +2291,10 @@ unicode_error_description() noexcept
 
 template <typename CharT, bool Is_Substring>
 __constexpr std::u8string
-single_code_unit_error_description(
-    const size_t             _a_index,
-    const std::u8string_view _a_char
-) noexcept
+            single_code_unit_error_description(
+                const size_t             _a_index,
+                const std::u8string_view _a_char
+            ) noexcept
 {
     using namespace std;
     u8string _l_substring_str;
