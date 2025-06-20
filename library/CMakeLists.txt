@@ -180,7 +180,6 @@ set(LIBRARY_FILES
   include/abc_test/utility/str/unicode.hpp
   include/abc_test/utility/str/string_utility.hpp
   include/abc_test/utility/str/string_cast.hpp
-  include/abc_test/utility/str/string_table.hpp
   include/abc_test/utility/ranges.hpp
   include/abc_test/utility/str/rw_info.hpp
   include/abc_test/utility/enum.hpp

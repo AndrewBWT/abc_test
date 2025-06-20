@@ -21,7 +21,6 @@
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_thrown_non_descript_entity.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/print_config.hpp"
 #include "abc_test/utility/io/threaded_text_output_reporter.hpp"
-#include "abc_test/utility/str/string_table.hpp"
 
 #include <array>
 #include <fmt/color.h>

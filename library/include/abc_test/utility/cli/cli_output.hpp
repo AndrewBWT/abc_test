@@ -3,7 +3,6 @@
 
 #include "abc_test/core/ds/type_synonyms.hpp"
 #include "abc_test/utility/internal/macros.hpp"
-#include "abc_test/utility/str/string_table.hpp"
 
 _BEGIN_ABC_UTILITY_CLI_NS
 
@@ -57,10 +56,10 @@ public:
 
     __constexpr void
         add_table_output(
-            abc::utility::str::string_table_t&& _a_table
+            std::u8string&& _a_table
         ) noexcept
     {
-        _m_output.push_back(_a_table());
+        _m_output.push_back(_a_table);
     }
 
     __constexpr const std::vector<std::u8string>&

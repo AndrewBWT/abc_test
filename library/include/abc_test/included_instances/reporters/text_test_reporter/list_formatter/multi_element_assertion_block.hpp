@@ -1,7 +1,6 @@
 #pragma once
 #include "abc_test/core/test_reports/multi_element_assertion_block.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/multi_element_assertion_block.hpp"
-#include "abc_test/utility/str/string_table.hpp"
 _BEGIN_ABC_REPORTERS_NS
 
 template <typename Assertion_Status>
@@ -186,7 +185,6 @@ __constexpr_imp void
             {
                 if (_l_element.second.size() == 1)
                 {
-                    str::string_table_t _l_st({0});
                     std::tuple<
                         matcher_result_t,
                         std::optional<std::u8string>,

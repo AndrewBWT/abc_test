@@ -90,20 +90,20 @@ __no_constexpr_imp int
             }
             else
             {
-                str::string_table_t _l_st({1});
+                std::u8string _l_st;
                 for (size_t _l_idx{0};
                      u8string & _l_error : _l_validated_test_options.error())
                 {
-                    _l_st.push_back(fmt::format(u8" {0})  ", ++_l_idx));
-                    _l_st.push_back(_l_error);
-                    _l_st.new_line();
+                    _l_st.append(fmt::format(u8" {0})  ", ++_l_idx));
+                    _l_st.append(_l_error);
+                    _l_st.append(u8"\n");
                 }
                 const u8string _l_rv{fmt::format(
                     u8"Error(s) encountered when validating test_options_t. "
                     u8"The following errors were returned from the validation "
                     u8"function:\n{0}\nThe program will now terminate. "
                     u8"included_instances_test_options_t = {1}",
-                    _l_st(),
+                    _l_st,
                     cast_string_to_u8string(
                         fmt::format("{}", _l_iito)
                     )

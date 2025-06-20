@@ -6,7 +6,6 @@
 #include "abc_test/utility/cli/cli_info.hpp"
 #include "abc_test/utility/internal/macros.hpp"
 #include "abc_test/utility/printers/default_printer.hpp"
-#include "abc_test/utility/str/string_table.hpp"
 #include "abc_test/utility/str/string_utility.hpp"
 
 #include <expected>
@@ -72,7 +71,7 @@ public:
         add_file_config_flag() noexcept;
     __no_constexpr void
                    add_auto_configuration() noexcept;
-    __no_constexpr abc::utility::str::string_table_t
+    __no_constexpr std::u8string
                    make_help_output() const noexcept;
     __constexpr bool
         process_config_line(
@@ -326,19 +325,20 @@ __no_constexpr_imp void
 }
 
 template <typename Option_Class>
-__no_constexpr_imp abc::utility::str::string_table_t
+__no_constexpr_imp std::u8string
                    cli_t<Option_Class>::make_help_output() const noexcept
 {
     using namespace abc::utility::str;
-    string_table_t _l_st({0, 1});
-    _l_st.push_back(u8"Flag(s):");
-    _l_st.push_back(u8"    ");
-    _l_st.push_back(u8"Description:");
-    _l_st.new_line();
+    using namespace std;
+    u8string _l_st;
+    _l_st.append(u8"Flag(s):");
+    _l_st.append(u8"    ");
+    _l_st.append(u8"Description:");
+    _l_st.append(u8"\n");
     for (const std::shared_ptr<cli_info_t<Option_Class>>& _l_flag : _m_clp_info)
     {
         const cli_info_t<Option_Class>& _l_cli_info{*_l_flag.get()};
-        _l_st.push_back(fmt::format(
+        _l_st.append(fmt::format(
             u8"{0}{1}{2}",
             _m_multi_char_identifier,
             _l_cli_info.flag(),
@@ -350,15 +350,15 @@ __no_constexpr_imp abc::utility::str::string_table_t
                    )
                  : u8"")
         ));
-        _l_st.push_empty();
-        _l_st.push_back(fmt::format(
+        _l_st.append(u8"\n");
+        _l_st.append(fmt::format(
             u8"{0}{1}",
             _l_cli_info.description(),
             not _l_cli_info.enabled_for_config_file()
                 ? u8" Option will not be recognised in a configuration file."
                 : u8""
         ));
-        _l_st.new_line();
+        _l_st.append(u8"\n");
     }
     return _l_st;
 }
