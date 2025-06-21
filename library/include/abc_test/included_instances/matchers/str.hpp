@@ -3,6 +3,7 @@
 
 #include "abc_test/core/matchers/matcher_wrapper.hpp"
 #include "abc_test/utility/printers/default_printer.hpp"
+#include "abc_test/utility/str/string_utility.hpp"
 
 _BEGIN_ABC_NS
 __no_constexpr matcher_t

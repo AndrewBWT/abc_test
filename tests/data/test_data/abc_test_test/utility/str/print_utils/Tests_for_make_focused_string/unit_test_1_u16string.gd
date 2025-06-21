@@ -1,0 +1,1 @@
+#class std::tuple<class std::basic_string<char16_t,struct std::char_traits<char16_t>,class std::allocator<char16_t> >,unsigned __int64,unsigned __int64,class std::basic_string<char16_t,struct std::char_traits<char16_t>,class std::allocator<char16_t> > >

@@ -7,96 +7,121 @@
 #include <string>
 
 _BEGIN_ABC_UTILITY_STR_NS
+/*!
+ * @brief Returns a u8string representing a type's name. Used instead of
+ * type_id(T).name(), where a u8string is required.
+ * @tparam T The type to get the name of.
+ * @return A u8string representing T's type.
+ */
 template <typename T>
 __constexpr std::u8string
             type_id() noexcept;
+/*!
+ * @brief Returns a textual representation of a number with a suffix
+ * representing its position.
+ *
+ * For example, "1" would return "1st".
+ *
+ * @tparam T The number type. Must be unsigned.
+ * @param _a_number The number to get the textual representation of.
+ * @return The textual representation of _a_number.
+ */
 template <typename T>
 requires std::unsigned_integral<T>
 __no_constexpr std::u8string
                positive_integer_to_placement(const T _a_number) noexcept;
+/*!
+ * @brief Same as above, except it works with a tempalte numeric parameter.
+ * @tparam I The number to print out.
+ * @return A u8string representation of I.
+ */
 template <std::size_t I>
 __no_constexpr std::u8string
                positive_integer_to_placement() noexcept;
+/*!
+ * @brief Prints out a character in its hex form in the following format.
+ * 
+ * "\x<HEX-DIGITS-HERE>"
+ * 
+ * @tparam T The character parmaeter. Must be a character type.
+ * @param _a_char The character in question.
+ * @return A u8string representation the character in hex.
+ */
 template <typename T>
 requires is_char_type_c<T>
 __constexpr std::u8string
             represent_char_as_hex_for_printing(const T _a_char) noexcept;
-
+/*!
+ * @brief Prints out a character in its hex form in the following format.
+ *
+ * "0x<HEX-DIGITS-HERE>"
+ *
+ * @tparam T The character parmaeter. Must be a character type.
+ * @param _a_char The character in question.
+ * @return A u8string representation the character in hex.
+ */
 template <typename T>
-    requires is_char_type_c<T>
+requires is_char_type_c<T>
 __constexpr std::u8string
             represent_char_as_hex_for_output(const T _a_char) noexcept;
-template <typename T>
-__constexpr std::basic_string<T>
-make_focused_string(
-    const std::basic_string_view<T> _a_sv,
-    const std::size_t               _a_idx,
-    const std::size_t               _a_limit = 10
-) noexcept;
-template <typename T>
-__constexpr std::basic_string<T>
-make_focused_string(
-    const std::basic_string<T>& _a_sv,
-    const std::size_t           _a_idx,
-    const std::size_t           _a_limit = 10
-) noexcept;
+
 namespace detail
 {
-    template <typename T>
-    struct char_underlying_type
-    {
-        using type = void;
-    };
+template <typename T>
+struct char_underlying_type
+{
+    using type = void;
+};
 
-    template <>
-    struct char_underlying_type<char>
-    {
-        using type = char8_t;
-    };
+template <>
+struct char_underlying_type<char>
+{
+    using type = char8_t;
+};
 
-    template <>
-    struct char_underlying_type<char8_t>
-    {
-        using type = uint8_t;
-    };
+template <>
+struct char_underlying_type<char8_t>
+{
+    using type = uint8_t;
+};
 
-    template <>
-    struct char_underlying_type<char16_t>
-    {
-        using type = uint16_t;
-    };
+template <>
+struct char_underlying_type<char16_t>
+{
+    using type = uint16_t;
+};
 
-    template <>
-    struct char_underlying_type<char32_t>
-    {
-        using type = uint32_t;
-    };
+template <>
+struct char_underlying_type<char32_t>
+{
+    using type = uint32_t;
+};
 
-    template <typename T>
-        requires is_wchar_and_16_bit_c<T>
-    struct char_underlying_type<T>
-    {
-        using type = uint16_t;
-    };
+template <typename T>
+requires is_wchar_and_16_bit_c<T>
+struct char_underlying_type<T>
+{
+    using type = uint16_t;
+};
 
-    template <typename T>
-        requires is_wchar_and_32_bit_c<T>
-    struct char_underlying_type<T>
-    {
-        using type = uint32_t;
-    };
+template <typename T>
+requires is_wchar_and_32_bit_c<T>
+struct char_underlying_type<T>
+{
+    using type = uint32_t;
+};
 
-    template <typename T>
-    using char_underlying_type_t = typename char_underlying_type<T>::type;
+template <typename T>
+using char_underlying_type_t = typename char_underlying_type<T>::type;
 
-    template <typename T, bool Use_Capitols = true>
-        requires is_char_type_c<T>
-    __constexpr std::u8string
-        make_hex_from_char_with_prefix(
-            const T                  _a_char,
-            const std::u8string_view _a_prefix
-        ) noexcept;
-}
+template <typename T, bool Use_Capitols = true>
+requires is_char_type_c<T>
+__constexpr std::u8string
+            make_hex_from_char_with_prefix(
+                const T                  _a_char,
+                const std::u8string_view _a_prefix
+            ) noexcept;
+} // namespace detail
 
 _END_ABC_UTILITY_STR_NS
 
@@ -151,7 +176,7 @@ __no_constexpr std::u8string
 }
 
 template <typename T>
-    requires is_char_type_c<T>
+requires is_char_type_c<T>
 __constexpr std::u8string
             represent_char_as_hex_for_printing(
                 const T _a_char
@@ -161,7 +186,7 @@ __constexpr std::u8string
 }
 
 template <typename T>
-    requires is_char_type_c<T>
+requires is_char_type_c<T>
 __constexpr std::u8string
             represent_char_as_hex_for_output(
                 const T _a_char
@@ -169,71 +194,38 @@ __constexpr std::u8string
 {
     return detail::make_hex_from_char_with_prefix(_a_char, u8"0x");
 }
-template <typename T>
-__constexpr std::basic_string<T>
-make_focused_string(
-    const std::basic_string_view<T> _a_sv,
-    const std::size_t               _a_idx,
-    const std::size_t               _a_limit
-) noexcept
-{
-    using namespace std;
-    const size_t _l_offset{ _a_limit + 1 };
-    const bool   _l_enough_elements_before{ _a_idx >= _l_offset };
-    const bool   _l_engouh_elements_after{ _a_idx + _l_offset <= _a_sv.size() };
-    const size_t _l_after_offset{ _a_idx + _l_offset };
-    const size_t _l_before_offset{ _a_idx - _l_offset };
-    return basic_string<T>{
-        _l_enough_elements_before
-            ? (_l_engouh_elements_after
-                ? _a_sv.substr(_l_before_offset, _l_after_offset)
-                : _a_sv.substr(_l_before_offset))
-            : (_l_engouh_elements_after ? _a_sv.substr(0, _l_after_offset)
-                : _a_sv)
-    };
-}
 
-template <typename T>
-__constexpr std::basic_string<T>
-make_focused_string(
-    const std::basic_string<T>& _a_sv,
-    const std::size_t           _a_idx,
-    const std::size_t           _a_limit
-) noexcept
-{
-    using namespace std;
-    return make_focused_string(basic_string_view<T>(_a_sv), _a_idx, _a_limit);
-}
 namespace detail
 {
-    template <typename T, bool Use_Capitols>
-        requires is_char_type_c<T>
-    __constexpr std::u8string
-        make_hex_from_char_with_prefix(
-            const T                  _a_char,
-            const std::u8string_view _a_prefix
-        ) noexcept
+template <typename T, bool Use_Capitols>
+requires is_char_type_c<T>
+__constexpr std::u8string
+            make_hex_from_char_with_prefix(
+                const T                  _a_char,
+                const std::u8string_view _a_prefix
+            ) noexcept
+{
+    using namespace std;
+    using Type_To_Cast_To = char_underlying_type_t<T>;
+    u8string _l_format_specifier;
+    if constexpr (Use_Capitols)
     {
-        using namespace std;
-        using Type_To_Cast_To = char_underlying_type_t<T>;
-        u8string _l_format_specifier;
-        if constexpr (Use_Capitols)
-        {
-            _l_format_specifier = u8"{:X}";
-        }
-        else
-        {
-            _l_format_specifier = u8"{:x}";
-        }
-        const u8string _l_char_as_hex{
-            fmt::format(_l_format_specifier, static_cast<Type_To_Cast_To>(_a_char))
-        };
-        return fmt::format(
-            u8"{0}{1}{2}",
-            _a_prefix,
-            u8string((sizeof(Type_To_Cast_To) * 2) - _l_char_as_hex.size(), u8'0'),
-            _l_char_as_hex
-        );
+        _l_format_specifier = u8"{:X}";
     }
+    else
+    {
+        _l_format_specifier = u8"{:x}";
+    }
+    const u8string _l_char_as_hex{
+        fmt::format(_l_format_specifier, static_cast<Type_To_Cast_To>(_a_char))
+    };
+    return fmt::format(
+        u8"{0}{1}{2}",
+        _a_prefix,
+        u8string((sizeof(Type_To_Cast_To) * 2) - _l_char_as_hex.size(), u8'0'),
+        _l_char_as_hex
+    );
 }
+} // namespace detail
+
 _END_ABC_UTILITY_STR_NS

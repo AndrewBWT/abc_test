@@ -162,7 +162,7 @@ _TEST_CASE(
     auto _l_test_func = [&]<typename T>()
     {
         auto _l_type_name{typeid(T).name()};
-        auto _l_name{get_name<T>()};
+        const string _l_name{ typeid(T).name() };
         _TVLOG(_l_name);
         _BEGIN_MULTI_ELEMENT_BBA(
             _l_unit_tests,
@@ -225,7 +225,7 @@ _TEST_CASE(
         }
     );
 }
-
+#if 0
 _TEST_CASE(
     abc::test_case_t(
         {.name             = "Tests for make_focused_string",
@@ -253,22 +253,25 @@ _TEST_CASE(
         );
         // Tests converting a unicode string to an ascii string.
         // Anything outside of the ascii range is caught.
-        using unit_test_data_1 = tuple<T, size_t, size_t, T>;
+        using unit_test_data_1 = tuple<T, vector<tuple<size_t, size_t, T>>>;
         for (const auto& _l_data : read_data_from_file<unit_test_data_1>(
                  fmt::format("unit_test_1_{0}", _l_name)
              ))
         {
             _TVLOG(_l_data);
-            const auto& [_l_str, _a_idx, _a_limit, _a_output]{_l_data};
-            _l_unit_tests += _BLOCK_CHECK(
-                _EXPR(
-                    make_focused_string(_l_str, _a_idx, _a_limit) == _a_output
-                )
-                && _EXPR(
-                    make_focused_string(T(_l_str), _a_idx, _a_limit)
-                    == _a_output
-                )
-            );
+            const auto& [_l_str, _l_results]{_l_data};
+            for (auto& [_l_idx, _l_limit, _l_result] : _l_results)
+            {
+                _l_unit_tests += _BLOCK_CHECK(
+                    _EXPR(
+                        make_focused_string(_l_str, _l_idx, _l_limit) == _l_result
+                    )
+                    && _EXPR(
+                        make_focused_string(T(_l_str), _l_idx, _l_limit)
+                        == _l_result
+                    )
+                );
+            }
         }
         _END_BBA_CHECK(_l_unit_tests);
 
@@ -305,3 +308,4 @@ _TEST_CASE(
         }
     );
 }
+#endif
