@@ -8,92 +8,6 @@
 
 _BEGIN_ABC_UTILITY_STR_NS
 
-namespace detail
-{
-template <typename T>
-struct char_type_of;
-
-template <typename CharT, std::size_t N>
-struct char_type_of<CharT[N]>
-{
-    using type = CharT;
-};
-
-template <typename CharT>
-struct char_type_of<CharT*>
-{
-    using type = CharT;
-};
-
-template <typename CharT, typename Traits, typename Alloc>
-struct char_type_of<std::basic_string<CharT, Traits, Alloc>>
-{
-    using type = CharT;
-};
-
-template <typename CharT, typename Traits>
-struct char_type_of<std::basic_string_view<CharT, Traits>>
-{
-    using type = CharT;
-};
-
-template <typename T>
-using char_type_of_t = typename char_type_of<std::remove_cvref_t<T>>::type;
-
-template <typename T>
-struct char_underlying_type
-{
-    using type = void;
-};
-
-template <>
-struct char_underlying_type<char>
-{
-    using type = char8_t;
-};
-
-template <>
-struct char_underlying_type<char8_t>
-{
-    using type = uint8_t;
-};
-
-template <>
-struct char_underlying_type<char16_t>
-{
-    using type = uint16_t;
-};
-
-template <>
-struct char_underlying_type<char32_t>
-{
-    using type = uint32_t;
-};
-
-template <typename T>
-requires is_wchar_and_16_bit_c<T>
-struct char_underlying_type<T>
-{
-    using type = uint16_t;
-};
-
-template <typename T>
-requires is_wchar_and_32_bit_c<T>
-struct char_underlying_type<T>
-{
-    using type = uint32_t;
-};
-
-template <typename T>
-using char_underlying_type_t = typename char_underlying_type<T>::type;
-template <typename... Args>
-concept all_string_like_same_char = (sizeof...(Args) == 0) || requires {
-    typename std::common_type_t<detail::char_type_of_t<Args>...>;
-} && (std::convertible_to<Args, std::basic_string_view<std::common_type_t<detail::char_type_of_t<Args>...>>> && ...);
-template <typename... Args>
-using common_char_type_t = std::common_type_t<detail::char_type_of_t<Args>...>;
-} // namespace detail
-
 /*!
  * @brief Returns a u8string representing a type's name. Used instead of
  * type_id(T).name(), where a u8string is required.
@@ -151,47 +65,73 @@ template <typename T>
 requires is_char_type_c<T>
 __constexpr std::u8string
             represent_char_as_hex_for_output(const T _a_char) noexcept;
-
+/*!
+ * @brief Given a function name and a list of string-like objects, creates a
+ * string which looks like a function call. That is:
+ *
+ * function_name(arg1,arg2,arg3)
+ *
+ * While the arguments can be different string types (as long as they are
+ * convertable to basic_string_view), the itnernal types must be all the same -
+ * e.g. char8_t, whcar_t or char.
+ *
+ * @tparam FuncName Type parameter of first argument.
+ * @tparam ...Args Rest of arguments.
+ * @param _a_function_name The function name.
+ * @param ..._a_args The function arguments.
+ * @return A string in the format given by the arguments.
+ */
 template <typename FuncName, typename... Args>
-requires requires { typename detail::char_type_of_t<FuncName>; }
+requires has_string_like_underlying_type_c<FuncName>
          && (sizeof...(Args) == 0
              || (std::convertible_to<
                      Args,
-                     std::basic_string_view<detail::char_type_of_t<FuncName>>>
+                     std::basic_string_view<
+                         string_like_underlying_char_type_t<FuncName>>>
                  && ...))
-__constexpr std::
-    basic_string<typename detail::char_type_of_t<FuncName>> mk_str_representing_function_call(
-        FuncName&& _a_function_name,
-        Args&&... _a_args
-    ) noexcept;
+__constexpr std::basic_string<typename string_like_underlying_char_type_t<
+    FuncName>> mk_str_representing_function_call(FuncName&& _a_function_name, Args&&... _a_args)
+    noexcept;
 
-
+/*!
+ * @brief Given a list of string-like objects, will create one string from them,
+ * interlacing each element with a comma.
+ *
+ * This function cannot accpet no arguments. Must be atleast one.
+ *
+ * @tparam ...Args The types of the parameters.
+ * @param ..._a_args The string-like object as a parameter list.
+ * @return The string result.
+ */
 template <typename... Args>
-requires (sizeof...(Args) > 0) && detail::all_string_like_same_char<Args...>
-__constexpr std::basic_string<detail::common_char_type_t<Args...>>
-            mk_str_representing_function_args(Args&&... _a_args) noexcept;
-
+requires (sizeof...(Args) > 0) && all_string_like_with_same_char_c<Args...>
+__constexpr std::basic_string<
+    std::common_type_t<string_like_underlying_char_type_t<Args>...>>
+    mk_str_representing_function_args(Args&&... _a_args) noexcept;
+/*!
+ * @brief Given two string-like objects, creates one string from it, surrounding
+ * the second with brackets. Return value is in the form
+ *
+ * _a_function_name(_a_args).
+ *
+ * Note both parameters must have the same internal character type.
+ * @tparam FuncName The type parameter of the first argument.
+ * @tparam Args The type parameter of the second argument.
+ * @param _a_function_name The first argument.
+ * @param _a_args The second argument.
+ * @return The created string.
+ */
 template <typename FuncName, typename Args>
-requires requires {
-    typename detail::char_type_of_t<FuncName>;
-    (std::convertible_to<
-        Args,
-        std::basic_string_view<detail::char_type_of_t<FuncName>>>);
-}
-__constexpr std::basic_string<typename detail::char_type_of_t<FuncName>>
-            mk_str_appending_function_name_and_function_args(
-                FuncName&& _a_function_name,
-                Args&&     _a_args
-            ) noexcept;
-
-// mk_str_representing_function_args
-// mk_str_appending_function_name_and_function_args
-/*template <typename T, typename... Args>
-requires is_char_type_c<T> && (detail::is_string_like_c<T, Args> && ...)
-__constexpr std::basic_string<T> mk_str_representing_function_call(
-    const std::basic_string<T>& _a_function_name,
-    Args&&... _a_args
-) noexcept;*/
+requires has_string_like_underlying_type_c<FuncName>
+         && ( std::convertible_to<
+              Args,
+              std::basic_string_view<
+                  string_like_underlying_char_type_t<FuncName>>> )
+__constexpr std::
+    basic_string<typename string_like_underlying_char_type_t<FuncName>> mk_str_appending_function_name_and_function_args(
+        FuncName&& _a_function_name,
+        Args&&     _a_args
+    ) noexcept;
 
 namespace detail
 {
@@ -276,25 +216,24 @@ __constexpr std::u8string
     return detail::make_hex_from_char_with_prefix(_a_char, u8"0x");
 }
 
-// mk_str_representing_function_args
-// mk_str_appending_function_name_and_function_args
 template <typename FuncName, typename... Args>
-requires requires { typename detail::char_type_of_t<FuncName>; }
+requires has_string_like_underlying_type_c<FuncName>
          && (
              sizeof...(Args) == 0
              || (std::convertible_to<
                      Args,
-                     std::basic_string_view<detail::char_type_of_t<FuncName>>>
+                     std::basic_string_view<
+                         string_like_underlying_char_type_t<FuncName>>>
                  && ...)
          )
 __constexpr std::
-    basic_string<typename detail::char_type_of_t<FuncName>> mk_str_representing_function_call(
+    basic_string<typename string_like_underlying_char_type_t<FuncName>> mk_str_representing_function_call(
         FuncName&& _a_function_name,
         Args&&... _a_args
     ) noexcept
 {
     using namespace std;
-    using CharT = typename detail::char_type_of_t<FuncName>;
+    using CharT = string_like_underlying_char_type_t<FuncName>;
     if constexpr (sizeof...(Args) == 0)
     {
         return mk_str_appending_function_name_and_function_args(
@@ -311,14 +250,15 @@ __constexpr std::
 }
 
 template <typename... Args>
-requires (sizeof...(Args) > 0) && detail::all_string_like_same_char<Args...>
-__constexpr std::basic_string<detail::common_char_type_t<Args...>>
-            mk_str_representing_function_args(
-                Args&&... _a_args
-            ) noexcept
+requires (sizeof...(Args) > 0) && all_string_like_with_same_char_c<Args...>
+__constexpr std::basic_string<
+    std::common_type_t<string_like_underlying_char_type_t<Args>...>>
+    mk_str_representing_function_args(
+        Args&&... _a_args
+    ) noexcept
 {
     using namespace std;
-    using T = detail::common_char_type_t<Args...>;
+    using T = std::common_type_t<string_like_underlying_char_type_t<Args>...>;
     auto            _l_comma{static_cast<T>(0x2C)};
     basic_string<T> _l_result{};
     bool            _l_first_arg{true};
@@ -336,20 +276,18 @@ __constexpr std::basic_string<detail::common_char_type_t<Args...>>
 }
 
 template <typename FuncName, typename Args>
-requires requires {
-    typename detail::char_type_of_t<FuncName>;
-    (std::convertible_to<
-        Args,
-        std::basic_string_view<detail::char_type_of_t<FuncName>>>);
-}
-__constexpr std::basic_string<typename detail::char_type_of_t<FuncName>>
+    requires has_string_like_underlying_type_c<FuncName>
+&& (std::convertible_to<
+    Args,
+    std::basic_string_view<string_like_underlying_char_type_t<FuncName>>>)
+__constexpr std::basic_string<typename string_like_underlying_char_type_t<FuncName>>
             mk_str_appending_function_name_and_function_args(
                 FuncName&& _a_function_name,
                 Args&&     _a_args
             ) noexcept
 {
     using namespace std;
-    using T = detail::char_type_of_t<FuncName>;
+    using T = string_like_underlying_char_type_t<FuncName>;
     auto            _l_l_bracket{static_cast<T>(0x28)};
     auto            _l_r_bracket{static_cast<T>(0x29)};
     basic_string<T> _l_rv{};
@@ -359,22 +297,6 @@ __constexpr std::basic_string<typename detail::char_type_of_t<FuncName>>
     _l_rv.push_back(_l_r_bracket);
     return _l_rv;
 }
-
-/*template <typename T, typename... Args>
-requires is_char_type_c<T>
-         && (
-             detail::is_string_like_c<T, Args> && ...
-         )
-__constexpr std::basic_string<T> mk_str_representing_function_call(
-    const std::basic_string<T>& _a_function_name,
-    Args&&... _a_args
-) noexcept
-{
-    using namespace std;
-    return mk_str_representing_function_call(
-        basic_string_view<T>(_a_function_name), forward<Args>(_a_args)...
-    );
-}*/
 
 namespace detail
 {
