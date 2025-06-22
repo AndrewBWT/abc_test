@@ -1,6 +1,6 @@
 #pragma once
 #include "abc_test/utility/parsers/parser_exceptions.hpp"
-#include "abc_test/utility/str/string_utility.hpp"
+#include "abc_test/utility/str/string_utils.hpp"
 
 _BEGIN_ABC_UTILITY_PARSER_NS
 

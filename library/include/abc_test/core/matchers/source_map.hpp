@@ -2,7 +2,7 @@
 
 #include "abc_test/core/ds/source/single_source.hpp"
 #include "abc_test/utility/internal/macros.hpp"
-#include "abc_test/utility/str/string_utility.hpp"
+#include "abc_test/utility/str/string_utils.hpp"
 
 #include <fmt/ranges.h>
 #include <fmt/std.h>

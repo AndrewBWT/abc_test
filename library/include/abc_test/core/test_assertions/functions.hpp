@@ -15,7 +15,7 @@
 #include "abc_test/core/test_reports/multi_element_assertion_block.hpp"
 #include "abc_test/core/test_reports/static_assertion.hpp"
 #include "abc_test/core/test_runner.hpp"
-#include "abc_test/utility/str/string_utility.hpp"
+#include "abc_test/utility/str/string_utils.hpp"
 
 #include <concepts>
 

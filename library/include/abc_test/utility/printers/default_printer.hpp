@@ -4,7 +4,7 @@
 #include "abc_test/utility/enum.hpp"
 #include "abc_test/utility/object_printer_parser.hpp"
 #include "abc_test/utility/printers/printer_base.hpp"
-#include "abc_test/utility/str/string_utility.hpp"
+#include "abc_test/utility/str/string_utils.hpp"
 
 #include <deque>
 #include <filesystem>

@@ -6,19 +6,21 @@
  * throw an exception, and wraps the result up in a matcher which is returned
  * from this macro.
  */
-#define _MAKE_MATCHER_CHECKING_NO_EXCEPTION_THROWN(_a_function) \
-    [&]() -> abc::matcher_t                                     \
-    {                                                           \
-        abc::matcher_t _l_rv;                                   \
-        __ABC_INTERNAL_BEGIN_NO_THROW_MATCHER(_l_rv);           \
-        _a_funcion();                                           \
-        __ABC_INTERNAL_END_NO_THROW_MATCHER(_l_rv);             \
-        _a_matcher_name.add_source_info(                        \
-            "_MAKE_MATCHER_CHECKING_NO_EXCEPTION_THROWN",       \
-            #_a_function,                                       \
-            std::source_location::current()                     \
-        );                                                      \
-        return _l_rv;                                           \
+#define _MAKE_MATCHER_CHECKING_NO_EXCEPTION_THROWN(_a_function)     \
+    [&]() -> abc::matcher_t                                         \
+    {                                                               \
+        abc::matcher_t _l_rv;                                       \
+        __ABC_INTERNAL_BEGIN_NO_THROW_MATCHER(_l_rv);               \
+        _a_funcion();                                               \
+        __ABC_INTERNAL_END_NO_THROW_MATCHER(_l_rv);                 \
+        _a_matcher_name.add_source_info(                            \
+            "_MAKE_MATCHER_CHECKING_NO_EXCEPTION_THROWN",           \
+            _ABC_NS_UTILITY_STR::mk_str_representing_function_args( \
+                #_a_function                                        \
+            ),                                                      \
+            std::source_location::current()                         \
+        );                                                          \
+        return _l_rv;                                               \
     }()
 /*!
  * Given a matcher to write to, is part of a pair of macros for checking that a
@@ -26,12 +28,14 @@
  *
  * The argument is the matcher to write to.
  */
-#define _BEGIN_NO_THROW_MATCHER(_a_matcher_name) \
-    _a_matcher_name.add_source_info(             \
-        "_BEGIN_NO_THROW_MATCHER",               \
-        #_a_matcher_name,                        \
-        std::source_location::current()          \
-    );                                           \
+#define _BEGIN_NO_THROW_MATCHER(_a_matcher_name)                \
+    _a_matcher_name.add_source_info(                            \
+        "_BEGIN_NO_THROW_MATCHER",                              \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_args( \
+            #_a_matcher_name                                    \
+        ),                                                      \
+        std::source_location::current()                         \
+    );                                                          \
     __ABC_INTERNAL_BEGIN_NO_THROW_MATCHER(_a_matcher_name)
 /*!
  * Given a matcher to write to, is part of a pair of macros for checking that a
@@ -39,12 +43,14 @@
  *
  * The argument is the matcher to write to.
  */
-#define _END_NO_THROW_MATCHER(_a_matcher_name) \
-    _a_matcher_name.add_source_info(           \
-        "_END_NO_THROW_MATCHER",               \
-        #_a_matcher_name,                      \
-        std::source_location::current()        \
-    );                                         \
+#define _END_NO_THROW_MATCHER(_a_matcher_name)                  \
+    _a_matcher_name.add_source_info(                            \
+        "_END_NO_THROW_MATCHER",                                \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_args( \
+            #_a_matcher_name                                    \
+        ),                                                      \
+        std::source_location::current()                         \
+    );                                                          \
     __ABC_INTERNAL_END_NO_THROW_MATCHER(_a_matcher_name)
 
 // Internal macro. Should only be used by developer.
@@ -130,19 +136,21 @@ _END_ABC_NS
  *
  * The exception type is irrilevant, just that an exception is thrown.
  */
-#define _MAKE_MATCHER_CHECKING_EXCEPTION_THROWN(_a_function) \
-    [&]() -> abc::matcher_t                                  \
-    {                                                        \
-        abc::matcher_t _l_rv;                                \
-        __ABC_INTERNAL_BEGIN_THROW_MATCHER(_l_rv);           \
-        _a_funcion();                                        \
-        __ABC_INTERNAL_END_THROW_MATCHER(_l_rv);             \
-        _a_matcher_name.add_source_info(                     \
-            "_MAKE_MATCHER_CHECKING_EXCEPTION_THROWN",       \
-            #_a_function,                                    \
-            std::source_location::current()                  \
-        );                                                   \
-        return _l_rv;                                        \
+#define _MAKE_MATCHER_CHECKING_EXCEPTION_THROWN(_a_function)        \
+    [&]() -> abc::matcher_t                                         \
+    {                                                               \
+        abc::matcher_t _l_rv;                                       \
+        __ABC_INTERNAL_BEGIN_THROW_MATCHER(_l_rv);                  \
+        _a_funcion();                                               \
+        __ABC_INTERNAL_END_THROW_MATCHER(_l_rv);                    \
+        _a_matcher_name.add_source_info(                            \
+            "_MAKE_MATCHER_CHECKING_EXCEPTION_THROWN",              \
+            _ABC_NS_UTILITY_STR::mk_str_representing_function_args( \
+                #_a_function                                        \
+            ),                                                      \
+            std::source_location::current()                         \
+        );                                                          \
+        return _l_rv;                                               \
     }()
 /*!
  * Given a matcher to write to, is part of a pair of macros for checking that a
@@ -160,12 +168,14 @@ _END_ABC_NS
  *
  * The argument is the matcher to write to.
  */
-#define _END_THROW_MATCHER(_a_matcher_name) \
-    _a_matcher_name.add_source_info(        \
-        "_END_THROW_MATCHER",               \
-        #_a_matcher_name,                   \
-        std::source_location::current()     \
-    );                                      \
+#define _END_THROW_MATCHER(_a_matcher_name)                     \
+    _a_matcher_name.add_source_info(                            \
+        "_END_THROW_MATCHER",                                   \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_args( \
+            #_a_matcher_name                                    \
+        ),                                                      \
+        std::source_location::current()                         \
+    );                                                          \
     __ABC_INTERNAL_END_THROW_MATCHER(_a_matcher_name)
 // Internal macro.
 #define __ABC_INTERNAL_BEGIN_THROW_MATCHER(_a_matcher_name) \
@@ -192,43 +202,49 @@ _END_ABC_NS
  * std::exception, or use it as a base class.
  *
  */
-#define _MAKE_MATCHER_CHECKING_EXCEPTION_MSG(_a_msg, _a_function)      \
-    [&]() -> abc::matcher_t                                            \
-    {                                                                  \
-        abc::matcher_t _l_rv;                                          \
-        __ABC_INTERNAL_BEGIN_EXCEPTION_MSG_MATCHER(_l_rv, _a_msg);     \
-        _a_funcion();                                                  \
-        __ABC_INTERNAL_END_EXCEPTION_MSG_MATCHER(_l_rv, _a_msg);       \
-        _a_matcher_name.add_source_info(                               \
-            "_MAKE_MATCHER_CHECKING_EXCEPTION_MSG",                    \
-            abc::utility::str::create_string({#_a_msg, #_a_function}), \
-            std::source_location::current()                            \
-        );                                                             \
-        return _l_rv;                                                  \
+#define _MAKE_MATCHER_CHECKING_EXCEPTION_MSG(_a_msg, _a_function)   \
+    [&]() -> abc::matcher_t                                         \
+    {                                                               \
+        abc::matcher_t _l_rv;                                       \
+        __ABC_INTERNAL_BEGIN_EXCEPTION_MSG_MATCHER(_l_rv, _a_msg);  \
+        _a_funcion();                                               \
+        __ABC_INTERNAL_END_EXCEPTION_MSG_MATCHER(_l_rv, _a_msg);    \
+        _a_matcher_name.add_source_info(                            \
+            "_MAKE_MATCHER_CHECKING_EXCEPTION_MSG",                 \
+            _ABC_NS_UTILITY_STR::mk_str_representing_function_args( \
+                #_a_msg, #_a_function                               \
+            ),                                                      \
+            std::source_location::current()                         \
+        );                                                          \
+        return _l_rv;                                               \
     }()
 /*!
  * Given a matcher to write to, is part of a pair of macros for checking that a
  * block of code throws an exception with a specific message.
  *
  */
-#define _BEGIN_EXCEPTION_MSG_MATCHER(_a_matcher_name, _a_msg)          \
-    _a_matcher_name.add_source_info(                                   \
-        "_BEGIN_EXCEPTION_MSG_MATCHER",                                \
-        abc::utility::str::create_string({#_a_matcher_name, #_a_msg}), \
-        std::source_location::current()                                \
-    );                                                                 \
+#define _BEGIN_EXCEPTION_MSG_MATCHER(_a_matcher_name, _a_msg)   \
+    _a_matcher_name.add_source_info(                            \
+        "_BEGIN_EXCEPTION_MSG_MATCHER",                         \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_args( \
+            #_a_matcher_name, #_a_msg                           \
+        ),                                                      \
+        std::source_location::current()                         \
+    );                                                          \
     __ABC_INTERNAL_BEGIN_EXCEPTION_MSG_MATCHER(_a_matcher_name, _a_msg)
 /*!
  * Given a matcher to write to, is part of a pair of macros for checking that a
  * block of code throws an exception with a specific message.
  *
  */
-#define _END_EXCEPTION_MSG_MATCHER(_a_matcher_name, _a_msg)            \
-    _a_matcher_name.add_source_info(                                   \
-        "_END_EXCEPTION_MSG_MATCHER",                                  \
-        abc::utility::str::create_string({#_a_matcher_name, #_a_msg}), \
-        std::source_location::current()                                \
-    );                                                                 \
+#define _END_EXCEPTION_MSG_MATCHER(_a_matcher_name, _a_msg)     \
+    _a_matcher_name.add_source_info(                            \
+        "_END_EXCEPTION_MSG_MATCHER",                           \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_args( \
+            #_a_matcher_name, #_a_msg                           \
+        ),                                                      \
+        std::source_location::current()                         \
+    );                                                          \
     __ABC_INTERNAL_END_EXCEPTION_MSG_MATCHER(_a_matcher_name, _a_msg)
 // Internal macro
 #define __ABC_INTERNAL_BEGIN_EXCEPTION_MSG_MATCHER(_a_matcher_name, _a_msg) \
@@ -259,19 +275,21 @@ _END_ABC_NS
  *
  *
  */
-#define _MAKE_MATCHER_CHECKING_EXCEPTION_TYPE(_a_type, _a_function)     \
-    [&]() -> abc::matcher_t                                             \
-    {                                                                   \
-        abc::matcher_t _l_rv;                                           \
-        __ABC_INTERNAL_BEGIN_EXCEPTION_TYPE_MATCHER(_l_rv, _a_type);    \
-        _a_function();                                                  \
-        __ABC_INTERNAL_END_EXCEPTION_TYPE_MATCHER(_l_rv, _a_type);      \
-        _l_rv.add_source_info(                                          \
-            "_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE",                    \
-            abc::utility::str::create_string({#_a_type, #_a_function}), \
-            std::source_location::current()                             \
-        );                                                              \
-        return _l_rv;                                                   \
+#define _MAKE_MATCHER_CHECKING_EXCEPTION_TYPE(_a_type, _a_function)  \
+    [&]() -> abc::matcher_t                                          \
+    {                                                                \
+        abc::matcher_t _l_rv;                                        \
+        __ABC_INTERNAL_BEGIN_EXCEPTION_TYPE_MATCHER(_l_rv, _a_type); \
+        _a_function();                                               \
+        __ABC_INTERNAL_END_EXCEPTION_TYPE_MATCHER(_l_rv, _a_type);   \
+        _l_rv.add_source_info(                                       \
+            "_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE",                 \
+            _ABC_NS_UTILITY_STR::mk_str_representing_function_args(  \
+                #_a_type, #_a_function                               \
+            ),                                                       \
+            std::source_location::current()                          \
+        );                                                           \
+        return _l_rv;                                                \
     }()
 /*!
  * Given a matcher to write to, is part of a pair of macros for checking that a
@@ -279,24 +297,28 @@ _END_ABC_NS
  * derived from that type..
  *
  */
-#define _BEGIN_EXCEPTION_TYPE_MATCHER(_a_matcher_name, _a_type)         \
-    _a_matcher_name.add_source_info(                                    \
-        "_BEGIN_EXCEPTION_TYPE_MATCHER",                                \
-        abc::utility::str::create_string({#_a_matcher_name, #_a_type}), \
-        std::source_location::current()                                 \
-    );                                                                  \
+#define _BEGIN_EXCEPTION_TYPE_MATCHER(_a_matcher_name, _a_type) \
+    _a_matcher_name.add_source_info(                            \
+        "_BEGIN_EXCEPTION_TYPE_MATCHER",                        \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_args( \
+            #_a_matcher_name, #_a_type                          \
+        ),                                                      \
+        std::source_location::current()                         \
+    );                                                          \
     __ABC_INTERNAL_BEGIN_EXCEPTION_TYPE_MATCHER(_a_matcher_name, _a_type)
 /*!
  * Given a matcher to write to, is part of a pair of macros for checking that a
  * block of code throws an exception that is either of a specific type, or
  * derived from that type..
  */
-#define _END_EXCEPTION_TYPE_MATCHER(_a_matcher_name, _a_type)           \
-    _a_matcher_name.add_source_info(                                    \
-        "_END_EXCEPTION_TYPE_MATCHER",                                  \
-        abc::utility::str::create_string({#_a_matcher_name, #_a_type}), \
-        std::source_location::current()                                 \
-    );                                                                  \
+#define _END_EXCEPTION_TYPE_MATCHER(_a_matcher_name, _a_type)   \
+    _a_matcher_name.add_source_info(                            \
+        "_END_EXCEPTION_TYPE_MATCHER",                          \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_args( \
+            #_a_matcher_name, #_a_type                          \
+        ),                                                      \
+        std::source_location::current()                         \
+    );                                                          \
     __ABC_INTERNAL_END_EXCEPTION_TYPE_MATCHER(_a_matcher_name, _a_type)
 
 _BEGIN_ABC_NS
@@ -403,27 +425,27 @@ _END_ABC_NS
  *
  *
  */
-#define _MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(       \
-    _a_exception_type, _a_msg, _a_function                   \
-)                                                            \
-    [&]() -> abc::matcher_t                                  \
-    {                                                        \
-        abc::matcher_t _l_rv;                                \
-        __ABC_INTERNAL_BEGIN_EXCEPTION_TYPE_AND_MSG_MATCHER( \
-            _l_rv, _a_exception_type, _a_msg                 \
-        );                                                   \
-        _a_function();                                       \
-        __ABC_INTERNAL_END_EXCEPTION_TYPE_AND_MSG_MATCHER(   \
-            _l_rv, _a_exception_type, _a_msg                 \
-        );                                                   \
-        _l_rv.add_source_info(                               \
-            "_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG", \
-            abc::utility::str::create_string(                \
-                {#_a_exception_type, #_a_msg, #_a_function}  \
-            ),                                               \
-            std::source_location::current()                  \
-        );                                                   \
-        return _l_rv;                                        \
+#define _MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(              \
+    _a_exception_type, _a_msg, _a_function                          \
+)                                                                   \
+    [&]() -> abc::matcher_t                                         \
+    {                                                               \
+        abc::matcher_t _l_rv;                                       \
+        __ABC_INTERNAL_BEGIN_EXCEPTION_TYPE_AND_MSG_MATCHER(        \
+            _l_rv, _a_exception_type, _a_msg                        \
+        );                                                          \
+        _a_function();                                              \
+        __ABC_INTERNAL_END_EXCEPTION_TYPE_AND_MSG_MATCHER(          \
+            _l_rv, _a_exception_type, _a_msg                        \
+        );                                                          \
+        _l_rv.add_source_info(                                      \
+            "_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG",        \
+            _ABC_NS_UTILITY_STR::mk_str_representing_function_args( \
+                #_a_exception_type, #_a_msg, #_a_function           \
+            ),                                                      \
+            std::source_location::current()                         \
+        );                                                          \
+        return _l_rv;                                               \
     }()
 /*!
  * Given a matcher to write to, is part of a pair of macros for checking that a
@@ -431,36 +453,36 @@ _END_ABC_NS
  * derived from that type..
  *
  */
-#define _BEGIN_EXCEPTION_TYPE_AND_MSG_MATCHER(              \
-    _a_matcher_name, _a_exception_type, _a_msg              \
-)                                                           \
-    _a_matcher_name.add_source_info(                        \
-        "_BEGIN_EXCEPTION_TYPE_AND_MSG_MATCHER",            \
-        abc::utility::str::create_string(                   \
-            {#_a_matcher_name, #_a_exception_type, #_a_msg} \
-        ),                                                  \
-        std::source_location::current()                     \
-    );                                                      \
-    __ABC_INTERNAL_BEGIN_EXCEPTION_TYPE_AND_MSG_MATCHER(    \
-        _a_matcher_name, _a_exception_type, _a_msg          \
+#define _BEGIN_EXCEPTION_TYPE_AND_MSG_MATCHER(                  \
+    _a_matcher_name, _a_exception_type, _a_msg                  \
+)                                                               \
+    _a_matcher_name.add_source_info(                            \
+        "_BEGIN_EXCEPTION_TYPE_AND_MSG_MATCHER",                \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_args( \
+            #_a_matcher_name, #_a_exception_type, #_a_msg       \
+        ),                                                      \
+        std::source_location::current()                         \
+    );                                                          \
+    __ABC_INTERNAL_BEGIN_EXCEPTION_TYPE_AND_MSG_MATCHER(        \
+        _a_matcher_name, _a_exception_type, _a_msg              \
     )
 /*!
  * Given a matcher to write to, is part of a pair of macros for checking that a
  * block of code throws an exception that is either of a specific type, or
  * derived from that type..
  */
-#define _END_EXCEPTION_TYPE_AND_MSG_MATCHER(                \
-    _a_matcher_name, _a_exception_type, _a_msg              \
-)                                                           \
-    _a_matcher_name.add_source_info(                        \
-        "_END_EXCEPTION_TYPE_AND_MSG_MATCHER",              \
-        abc::utility::str::create_string(                   \
-            {#_a_matcher_name, #_a_exception_type, #_a_msg} \
-        ),                                                  \
-        std::source_location::current()                     \
-    );                                                      \
-    __ABC_INTERNAL_END_EXCEPTION_TYPE_AND_MSG_MATCHER(      \
-        _a_matcher_name, _a_exception_type, _a_msg          \
+#define _END_EXCEPTION_TYPE_AND_MSG_MATCHER(                    \
+    _a_matcher_name, _a_exception_type, _a_msg                  \
+)                                                               \
+    _a_matcher_name.add_source_info(                            \
+        "_END_EXCEPTION_TYPE_AND_MSG_MATCHER",                  \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_args( \
+            #_a_matcher_name, #_a_exception_type, #_a_msg       \
+        ),                                                      \
+        std::source_location::current()                         \
+    );                                                          \
+    __ABC_INTERNAL_END_EXCEPTION_TYPE_AND_MSG_MATCHER(          \
+        _a_matcher_name, _a_exception_type, _a_msg              \
     )
 
 // Internal macro

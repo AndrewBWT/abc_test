@@ -14,11 +14,6 @@
 
 _BEGIN_ABC_UTILITY_STR_NS
 /*!
- * Appends together a set of strings into a single output string.
- */
-__constexpr std::string
-    create_string(const std::vector<std::string_view>& _a_strs) noexcept;
-/*!
  * Splits a string using the given delimiter
  */
 template <typename T>
@@ -100,19 +95,6 @@ make_focused_string(
 _END_ABC_UTILITY_STR_NS
 
 _BEGIN_ABC_UTILITY_STR_NS
-__constexpr_imp std::string
-                create_string(
-                    const std::vector<std::string_view>& _a_strs
-                ) noexcept
-{
-    using namespace std;
-    string _l_rv{};
-    for (auto&& _l_s : _a_strs)
-    {
-        _l_rv.append(_l_s);
-    }
-    return _l_rv;
-}
 
 template <typename T>
 __constexpr_imp std::vector<std::basic_string<T>>

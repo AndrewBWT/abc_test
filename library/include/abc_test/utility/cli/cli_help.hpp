@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/utility/cli.hpp"
 #include "abc_test/utility/cli/cli_info.hpp"
-#include "abc_test/utility/str/string_utility.hpp"
+#include "abc_test/utility/str/string_utils.hpp"
 
 #include <fmt/core.h>
 #include <fstream>

@@ -390,8 +390,8 @@ __constexpr_imp abc::ds::single_source_t
         _m_sources.push_back(_m_primary_source.value());
     }
     _m_primary_source = ds::single_source_t(
-        abc::utility::str::create_string(
-            {_a_macro_str, "(", _a_matcher_str, ")"}
+        _ABC_NS_UTILITY_STR::mk_str_appending_function_name_and_function_args(
+            _a_macro_str, _a_matcher_str
         ),
         _a_sl
     );

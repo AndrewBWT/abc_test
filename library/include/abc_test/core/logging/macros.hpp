@@ -36,11 +36,13 @@
  *
  * @param _a_str_to_log The string to log.
  */
-#define _TLOG(_a_str_to_log)                                              \
-    __ABC_INTERNAL_LOG(                                                   \
-        _a_str_to_log,                                                    \
-        false,                                                            \
-        abc::utility::str::create_string({"_TLOG(", #_a_str_to_log, ")"}) \
+#define _TLOG(_a_str_to_log)                                    \
+    __ABC_INTERNAL_LOG(                                         \
+        _a_str_to_log,                                          \
+        false,                                                  \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+            "_TLOG", #_a_str_to_log                             \
+        )                                                       \
     )
 /*!
  * @brief Macro used to log a message. This macro will log a message which will
@@ -48,11 +50,13 @@
  *
  * @param _a_str_to_log The string to log.
  */
-#define _TLOG_(_a_str_to_log)                                              \
-    __ABC_INTERNAL_LOG(                                                    \
-        _a_str_to_log,                                                     \
-        true,                                                              \
-        abc::utility::str::create_string({"_TLOG_(", #_a_str_to_log, ")"}) \
+#define _TLOG_(_a_str_to_log)                                   \
+    __ABC_INTERNAL_LOG(                                         \
+        _a_str_to_log,                                          \
+        true,                                                   \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+            "_TLOG_", #_a_str_to_log                            \
+        )                                                       \
     )
 /*!
  * @brief Internal macro which processed a VLOG macro. Specifically it calls
@@ -68,8 +72,8 @@
 )                                                             \
     __ABC_INTERNAL_LOG(                                       \
         fmt::format(                                          \
-            u8"{0} = {1}",                                      \
-            u8#_a_variable,                                     \
+            u8"{0} = {1}",                                    \
+            u8#_a_variable,                                   \
             abc::utility::printer::default_printer_t<         \
                 std::remove_cvref_t<decltype(_a_variable)>>() \
                 .run_printer(_a_variable)                     \
@@ -81,20 +85,24 @@
  * @brief Macro used to log a single variable to an assertion.
  * @param _a_var The variable in question.
  */
-#define _TVLOG(_a_var)                                              \
-    __ABC_INTERNAL_VLOG(                                            \
-        _a_var,                                                     \
-        false,                                                      \
-        abc::utility::str::create_string({"_TVLOG(", #_a_var, ")"}) \
+#define _TVLOG(_a_var)                                          \
+    __ABC_INTERNAL_VLOG(                                        \
+        _a_var,                                                 \
+        false,                                                  \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+            "_TVLOG", #_a_var                                   \
+        )                                                       \
     )
 /*!
  * @brief Macro used to log a single variable to an assertion. The log message
  * is deleted after its first used.
  * @param _a_var The variable in question.
  */
-#define _TVLOG_(_a_var)                                              \
-    __ABC_INTERNAL_VLOG(                                             \
-        _a_var,                                                      \
-        true,                                                        \
-        abc::utility::str::create_string({"_TVLOG_(", #_a_var, ")"}) \
+#define _TVLOG_(_a_var)                                         \
+    __ABC_INTERNAL_VLOG(                                        \
+        _a_var,                                                 \
+        true,                                                   \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+            "_TVLOG_", #_a_var                                  \
+        )                                                       \
     )

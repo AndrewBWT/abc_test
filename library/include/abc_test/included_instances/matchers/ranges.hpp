@@ -9,6 +9,10 @@ template <typename T, typename R>
 requires std::same_as<std::ranges::range_value_t<R>, T>
 __constexpr matcher_t
     contains(R&& _a_range, const T& _a_value) noexcept;
+template <typename R>
+requires std::ranges::range<R>
+__constexpr matcher_t
+    all_equal(R&& _a_range) noexcept;
 
 template <typename R1, typename R2>
 requires std::
@@ -111,6 +115,62 @@ __constexpr matcher_t
             _l_contains ? "contains" : "does not contain",
             _a_value
         )
+    ));
+}
+
+template <typename R>
+requires std::ranges::range<R>
+__constexpr matcher_t
+    all_equal(
+        R&& _a_range
+    ) noexcept
+{
+    using namespace std;
+    using namespace _ABC_NS_MATCHER;
+    bool _l_all_equal{true};
+    using T          = std::ranges::range_value_t<R>;
+    using Range_Type = std::remove_cvref_t<R>;
+    optional<T> _l_value_to_check_against;
+    for (auto&& _l_element : _a_range)
+    {
+        if (_l_value_to_check_against.has_value())
+        {
+            auto _l_result{
+                abc::matcher::matcher_default_comparable_t<
+                    T,
+                    T,
+                    abc::matcher::comparison_enum_t::EQ>{}
+                    .run(_l_value_to_check_against.value(), _l_element)
+            };
+            if (not _l_result.passed())
+            {
+                return mk_matcher_using_result(matcher_result_t(
+                    false,
+                    matcher_result_infos_t(
+                        fmt::format(
+                            u8"All elements in {0} are not equal.",
+                            abc::utility::printer::default_printer_t<
+                                Range_Type>{}
+                                .run_printer(_a_range)
+                        ),
+                        {u8"Element at index {0} not equal to the previous "
+                         u8"elements.",
+                         u8"Below we show the result of the matcher checking "
+                         u8"equality between the first element and the element "
+                         u8"in question."},
+                        {_l_result.str().get_tree()}
+                    )
+                ));
+            }
+        }
+    }
+    return mk_matcher_using_result(matcher_result_t(
+        true,
+        matcher_result_infos_t(fmt::format(
+            u8"All elements in {0} are equal.",
+            abc::utility::printer::default_printer_t<Range_Type>{}
+                .run_printer(_a_range)
+        ))
     ));
 }
 

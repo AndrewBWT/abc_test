@@ -105,11 +105,13 @@
  * This macro will register a failed assertion for the test it is used in. It
  * will not terminate the test function.
  */
-#define _FAIL_WITH_MSG(_a_msg)                                                 \
-    __ABC_TEST_INTERNAL_STATIC_ASSERTION(                                      \
-        _ABC_NS_REPORTS::fail_t,                                               \
-        std::optional<std::string>(_a_msg),                                    \
-        _ABC_NS_UTILITY::str::create_string({"_FAIL_WITH_MSG(", #_a_msg, ")"}) \
+#define _FAIL_WITH_MSG(_a_msg)                                  \
+    __ABC_TEST_INTERNAL_STATIC_ASSERTION(                       \
+        _ABC_NS_REPORTS::fail_t,                                \
+        std::optional<std::string>(_a_msg),                     \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+            "_FAIL_WITH_MSG", #_a_msg                           \
+        )                                                       \
     )
 /*!
  * @brief Macro used to raise a static termination assertion with the message
@@ -120,13 +122,13 @@
  * This macro will register a failed assertion for the test it is used in, and
  * terminate the test.
  */
-#define _TERMINATE_WITH_MSG(_a_msg)                \
-    __ABC_TEST_INTERNAL_STATIC_ASSERTION(          \
-        _ABC_NS_REPORTS::terminate_t,              \
-        std::optional<std::string>(_a_msg),        \
-        _ABC_NS_UTILITY::str::create_string(       \
-            {"_TERMINATE_WITH_MSG(", #_a_msg, ")"} \
-        )                                          \
+#define _TERMINATE_WITH_MSG(_a_msg)                             \
+    __ABC_TEST_INTERNAL_STATIC_ASSERTION(                       \
+        _ABC_NS_REPORTS::terminate_t,                           \
+        std::optional<std::string>(_a_msg),                     \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+            "_TERMINATE_WITH_MSG", #_a_msg                      \
+        )                                                       \
     )
 /*!
  * @brief Macro used to raise a succeeded assertion with the string argument
@@ -136,13 +138,13 @@
  *
  * This macro will register a passed assertion with the test_runner_t.
  */
-#define _SUCCEED_WITH_MSG(_a_msg)                \
-    __ABC_TEST_INTERNAL_STATIC_ASSERTION(        \
-        _ABC_NS_REPORTS::pass_t,                 \
-        std::optional<std::string>(_a_msg),      \
-        _ABC_NS_UTILITY::str::create_string(     \
-            {"_SUCCEED_WITH_MSG(", #_a_msg, ")"} \
-        )                                        \
+#define _SUCCEED_WITH_MSG(_a_msg)                               \
+    __ABC_TEST_INTERNAL_STATIC_ASSERTION(                       \
+        _ABC_NS_REPORTS::pass_t,                                \
+        std::optional<std::string>(_a_msg),                     \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+            "_SUCCEED_WITH_MSG", #_a_msg                        \
+        )                                                       \
     )
 
 /*!
@@ -180,12 +182,12 @@
  *
  * @param _a_matcher The matcher_t to use.
  */
-#define _IF_AND_OPERATOR(_a_matcher)                          \
-    if (_a_matcher.and_statement(_ABC_NS_DS::single_source_t( \
-            _ABC_NS_UTILITY::str::create_string(              \
-                {"_IF_AND_OPERATOR(", #_a_matcher, ")"}       \
-            ),                                                \
-            std::source_location::current()                   \
+#define _IF_AND_OPERATOR(_a_matcher)                                \
+    if (_a_matcher.and_statement(_ABC_NS_DS::single_source_t(       \
+            _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+                "_IF_AND_OPERATOR", #_a_matcher                     \
+            ),                                                      \
+            std::source_location::current()                         \
         )))
 
 /*!
@@ -196,19 +198,15 @@
  * @param _a_matcher_to_add_as_expression The matcher_t to add as the
  * right-child of _a_matcher.
  */
-#define _PROCESS(_a_matcher, _a_matcher_to_add_as_expression) \
-    _a_matcher.process(                                       \
-        _a_matcher_to_add_as_expression,                      \
-        _ABC_NS_DS::single_source_t(                          \
-            _ABC_NS_UTILITY::str::create_string(              \
-                {"_PROCESS(",                                 \
-                 #_a_matcher,                                 \
-                 ",",                                         \
-                 #_a_matcher_to_add_as_expression,            \
-                 ")"}                                         \
-            ),                                                \
-            std::source_location::current()                   \
-        )                                                     \
+#define _PROCESS(_a_matcher, _a_matcher_to_add_as_expression)             \
+    _a_matcher.process(                                                   \
+        _a_matcher_to_add_as_expression,                                  \
+        _ABC_NS_DS::single_source_t(                                      \
+            _ABC_NS_UTILITY_STR::mk_str_representing_function_call(       \
+                "_PROCESS", #_a_matcher, #_a_matcher_to_add_as_expression \
+            ),                                                            \
+            std::source_location::current()                               \
+        )                                                                 \
     )
 
 #define __GENERIC_MATCHER_BBA_TRANSFORM(                                   \
@@ -228,77 +226,81 @@
         std::source_location::current()                           \
     )
 
-#define _BLOCK_REQUIRE(_a_matcher)                \
-    __GENERIC_MATCHER_BBA_TRANSFORM(              \
-        _a_matcher,                               \
-        _ABC_NS_REPORTS::pass_or_terminate_t,     \
-        _ABC_NS_UTILITY::str::create_string(      \
-            {"_BLOCK_REQUIRE(", #_a_matcher, ")"} \
-        )                                         \
+#define _BLOCK_REQUIRE(_a_matcher)                              \
+    __GENERIC_MATCHER_BBA_TRANSFORM(                            \
+        _a_matcher,                                             \
+        _ABC_NS_REPORTS::pass_or_terminate_t,                   \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+            "_BLOCK_REQUIRE", #_a_matcher                       \
+        )                                                       \
     )
 
-#define _BLOCK_SUCCESS()                                          \
-    __GENERIC_STATIC_BBA_TRANSFORM(                               \
-        true,                                                     \
-        optional<std::string>{},                                  \
-        _ABC_NS_REPORTS::pass_t,                                  \
-        _ABC_NS_UTILITY::str::create_string({"_BLOCK_SUCCESS()"}) \
+#define _BLOCK_SUCCESS()                                        \
+    __GENERIC_STATIC_BBA_TRANSFORM(                             \
+        true,                                                   \
+        optional<std::string>{},                                \
+        _ABC_NS_REPORTS::pass_t,                                \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+            "_BLOCK_SUCCESS"                                    \
+        )                                                       \
     )
 
-#define _BLOCK_FAIL()                                          \
-    __GENERIC_STATIC_BBA_TRANSFORM(                            \
-        false,                                                 \
-        optional<std::string>{},                               \
-        _ABC_NS_REPORTS::fail_t,                               \
-        _ABC_NS_UTILITY::str::create_string({"_BLOCK_FAIL()"}) \
+#define _BLOCK_FAIL()                                                         \
+    __GENERIC_STATIC_BBA_TRANSFORM(                                           \
+        false,                                                                \
+        optional<std::string>{},                                              \
+        _ABC_NS_REPORTS::fail_t,                                              \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call("_BLOCK_FAIL") \
     )
 
-#define _BLOCK_TERMINATE()                                          \
-    __GENERIC_STATIC_BBA_TRANSFORM(                                 \
-        false,                                                      \
-        optional<std::string>{},                                    \
-        _ABC_NS_REPORTS::terminate_t,                               \
-        _ABC_NS_UTILITY::str::create_string({"_BLOCK_TERMINATE()"}) \
+#define _BLOCK_TERMINATE()                                      \
+    __GENERIC_STATIC_BBA_TRANSFORM(                             \
+        false,                                                  \
+        optional<std::string>{},                                \
+        _ABC_NS_REPORTS::terminate_t,                           \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+            "_BLOCK_TERMINATE"                                  \
+        )                                                       \
     )
 
-#define _BLOCK_SUCCESS_WITH_MSG(_a_msg)                \
-    __GENERIC_STATIC_BBA_TRANSFORM(                    \
-        true,                                          \
-        optional<std::string>{_a_msg},                 \
-        _ABC_NS_REPORTS::pass_t,                       \
-        _ABC_NS_UTILITY::str::create_string(           \
-            {"_BLOCK_SUCCESS_WITH_MSG(", #_a_msg, ")"} \
-        )                                              \
+#define _BLOCK_SUCCESS_WITH_MSG(_a_msg)                         \
+    __GENERIC_STATIC_BBA_TRANSFORM(                             \
+        true,                                                   \
+        optional<std::string>{_a_msg},                          \
+        _ABC_NS_REPORTS::pass_t,                                \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+            "_BLOCK_SUCCESS_WITH_MSG", #_a_msg                  \
+        )                                                       \
     )
 
-#define _BLOCK_FAIL_WITH_MSG(_a_msg)                \
-    __GENERIC_STATIC_BBA_TRANSFORM(                 \
-        false,                                      \
-        std::optional<std::u8string>{_a_msg},              \
-        _ABC_NS_REPORTS::fail_t,                    \
-        _ABC_NS_UTILITY::str::create_string(        \
-            {"_BLOCK_FAIL_WITH_MSG(", #_a_msg, ")"} \
-        )                                           \
+#define _BLOCK_FAIL_WITH_MSG(_a_msg)                            \
+    __GENERIC_STATIC_BBA_TRANSFORM(                             \
+        false,                                                  \
+        std::optional<std::u8string>{_a_msg},                   \
+        _ABC_NS_REPORTS::fail_t,                                \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+            "_BLOCK_FAIL_WITH_MSG", #_a_msg                     \
+        )                                                       \
     )
 
-#define _BLOCK_TERMINATE_WITH_MSG(_a_msg)                \
-    __GENERIC_STATIC_BBA_TRANSFORM(                      \
-        false,                                           \
-        optional<std::string>{_a_msg},                   \
-        _ABC_NS_REPORTS::terminate_t,                    \
-        _ABC_NS_UTILITY::str::create_string(             \
-            {"_BLOCK_TERMINATE_WITH_MSG(", #_a_msg, ")"} \
-        )                                                \
+#define _BLOCK_TERMINATE_WITH_MSG(_a_msg)                       \
+    __GENERIC_STATIC_BBA_TRANSFORM(                             \
+        false,                                                  \
+        optional<std::string>{_a_msg},                          \
+        _ABC_NS_REPORTS::terminate_t,                           \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+            "_BLOCK_TERMINATE_WITH_MSG", #_a_msg                \
+        )                                                       \
     )
 
 
-#define _BLOCK_CHECK(_a_matcher)                \
-    __GENERIC_MATCHER_BBA_TRANSFORM(            \
-        _a_matcher,                             \
-        _ABC_NS_REPORTS::pass_or_fail_t,        \
-        _ABC_NS_UTILITY::str::create_string(    \
-            {"_BLOCK_CHECK(", #_a_matcher, ")"} \
-        )                                       \
+#define _BLOCK_CHECK(_a_matcher)                                \
+    __GENERIC_MATCHER_BBA_TRANSFORM(                            \
+        _a_matcher,                                             \
+        _ABC_NS_REPORTS::pass_or_fail_t,                        \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+            "_BLOCK_CHECK", #_a_matcher                         \
+        )                                                       \
     )
 
 #define __GENERIC_MATCHER_BBA_TRANSFORM_NO_SOURCE( \
@@ -354,18 +356,20 @@
         _a_name, abc::reports::pass_or_terminate_t, _a_source_representation \
     )
 
-#define _END_BBA_CHECK(_a_name)                                                \
-    _END_BBA_CHECK_CUSTOM_SOURCE(                                              \
-        _a_name,                                                               \
-        _ABC_NS_UTILITY::str::create_string({"_END_BBA_CHECK(", #_a_name, ")"} \
-        )                                                                      \
+#define _END_BBA_CHECK(_a_name)                                 \
+    _END_BBA_CHECK_CUSTOM_SOURCE(                               \
+        _a_name,                                                \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+            "_END_BBA_CHECK", #_a_name                          \
+        )                                                       \
     )
 
-#define _END_BBA_REQUIRE(_a_name)                                              \
-    _END_BBA_REQUIRE_CUSTOM_SOURCE(                                            \
-        _a_name,                                                               \
-        _ABC_NS_UTILITY::str::create_string({"_END_BBA_CHECK(", #_a_name, ")"} \
-        )                                                                      \
+#define _END_BBA_REQUIRE(_a_name)                               \
+    _END_BBA_REQUIRE_CUSTOM_SOURCE(                             \
+        _a_name,                                                \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+            "_END_BBA_CHECK", #_a_name                          \
+        )                                                       \
     )
 
 /*!
@@ -401,13 +405,13 @@
  * @param _a_name The name of the testing block.
  * @param _a_description The annotation of the block assertion.
  */
-#define _BEGIN_SINGLE_ELEMENT_BBA(_a_name, _a_description) \
-    _BEGIN_SINGLE_ELEMENT_BBA_CUSTOM_SOURCE(               \
-        _a_name,                                           \
-        _a_description,                                    \
-        _ABC_NS_UTILITY::str::create_string(               \
-            {"_BEGIN_SINGLE_ELEMENT_BBA(", #_a_name, ")"}  \
-        )                                                  \
+#define _BEGIN_SINGLE_ELEMENT_BBA(_a_name, _a_description)      \
+    _BEGIN_SINGLE_ELEMENT_BBA_CUSTOM_SOURCE(                    \
+        _a_name,                                                \
+        _a_description,                                         \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+            "_BEGIN_SINGLE_ELEMENT_BBA", #_a_name               \
+        )                                                       \
     )
 #define _BEGIN_MULTI_ELEMENT_BBA_CUSTOM_SOURCE(                             \
     _a_name, _a_description, _a_source                                      \
@@ -416,13 +420,13 @@
         abc::multi_element_test_block_t, _a_name, _a_description, _a_source \
     )
 
-#define _BEGIN_MULTI_ELEMENT_BBA(_a_name, _a_description) \
-    _BEGIN_MULTI_ELEMENT_BBA_CUSTOM_SOURCE(               \
-        _a_name,                                          \
-        _a_description,                                   \
-        _ABC_NS_UTILITY::str::create_string(              \
-            {"_BEGIN_MULTI_ELEMENT_BBA(", #_a_name, ")"}  \
-        )                                                 \
+#define _BEGIN_MULTI_ELEMENT_BBA(_a_name, _a_description)       \
+    _BEGIN_MULTI_ELEMENT_BBA_CUSTOM_SOURCE(                     \
+        _a_name,                                                \
+        _a_description,                                         \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call( \
+            "_BEGIN_MULTI_ELEMENT_BBA", #_a_name                \
+        )                                                       \
     )
 
 /*!

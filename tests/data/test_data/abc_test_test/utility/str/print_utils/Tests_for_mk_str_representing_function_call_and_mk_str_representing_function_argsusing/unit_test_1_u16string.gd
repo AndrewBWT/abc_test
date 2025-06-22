@@ -1,0 +1,3 @@
+#class std::tuple<class std::basic_string<char16_t,struct std::char_traits<char16_t>,class std::allocator<char16_t> >,class std::vector<class std::basic_string<char16_t,struct std::char_traits<char16_t>,class std::allocator<char16_t> >,class std::allocator<class std::basic_string<char16_t,struct std::char_traits<char16_t>,class std::allocator<char16_t> > > >,class std::basic_string<char16_t,struct std::char_traits<char16_t>,class std::allocator<char16_t> > >
+("function",["one","two","three"],("function(one,two,three)","one,two,three"))
+("function",[],("function()",""))

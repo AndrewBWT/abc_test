@@ -75,7 +75,7 @@
         );                                                                    \
     auto __ABC_TEST_NAMED_COUNTER(__ABC_TEST_FUNCTION_PREFIX                  \
     ){_ABC_NS_GLOBAL::add_test(registered_test_data_t(                        \
-        mk_function(_a_function_name),                                                     \
+        mk_function(_a_function_name),                                        \
         _a_user_defined_test_data_name,                                       \
         _ABC_NS_DS::single_source_t(                                          \
             _a_str_representation, std::source_location::current()            \
@@ -96,8 +96,8 @@
         __ABC_TEST_NAMED_COUNTER(__ABC_TEST_USER_DEFINED_TEST_DATA_STR), \
         _a_name,                                                         \
         _a_user_data,                                                    \
-        _ABC_NS_UTILITY::str::create_string(                             \
-            {"_NAMED_TEST_CASE(", #_a_name, ",", #_a_user_data, ")"}     \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call(          \
+            "_NAMED_TEST_CASE", #_a_name, #_a_user_data                  \
         )                                                                \
     )
 
@@ -113,7 +113,7 @@
         __ABC_TEST_NAMED_COUNTER(__ABC_TEST_USER_DEFINED_TEST_DATA_STR), \
         __ABC_TEST_NAMED_COUNTER(__ABC_TEST_TEST_CASE_STR),              \
         _a_user_data,                                                    \
-        _ABC_NS_UTILITY::str::create_string(                             \
-            {"_TEST_CASE(", #_a_user_data, ")"}                          \
+        _ABC_NS_UTILITY_STR::mk_str_representing_function_call(          \
+            "_TEST_CASE", #_a_user_data                                  \
         )                                                                \
     )
