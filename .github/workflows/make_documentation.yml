@@ -20,4 +20,4 @@ jobs:
 
       - name: Run code injection script
         run: |
-          python G:\MyProjects\cpp\git_projects\abc_test\docs\scripts\inject_code.py G:\MyProjects\cpp\git_projects\abc_test\docs\user_written_docs\README.md --out README_pc.md
+          python docs/scripts/inject_code.py docs/user_written_docs/README.md --out README_pc.md
