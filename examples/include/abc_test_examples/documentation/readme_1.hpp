@@ -27,3 +27,13 @@ _TEST_CASE(
     _CHECK_EXPR(fib(6) == 8);
     _CHECK_EXPR(fib(7) == 14);
 }
+
+// <example_1>
+inline int
+fib2(
+    const int i
+)
+{
+    return (i <= 1) ? i : fib2(i - 1) + fib2(i - 2);
+}
+// </example_1>
