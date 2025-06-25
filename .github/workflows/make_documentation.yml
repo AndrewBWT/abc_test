@@ -1,0 +1,23 @@
+name: Run Python on Push
+
+on:
+  push:
+    branches:
+      - '**'  # Runs on any branch.
+
+jobs:
+  setup-documentation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Run code injection script
+        run: |
+          python G:\MyProjects\cpp\git_projects\abc_test\docs\scripts\inject_code.py G:\MyProjects\cpp\git_projects\abc_test\docs\user_written_docs\README.md --out README_pc.md
