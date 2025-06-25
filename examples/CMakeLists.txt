@@ -27,6 +27,8 @@ set(EXAMPLE_FILES
   include/abc_test_examples/documentation/declaring_tests.hpp
   include/abc_test_examples/documentation.hpp
   include/abc_test_examples/documentation/data_generators.hpp
+  include/abc_test_examples/documentation/readme_1.hpp
+  include/abc_test_examples/documentation/readme_2.hpp
 )
 
 # These are the libs required for the examples executable.

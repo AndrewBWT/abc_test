@@ -8,7 +8,7 @@ Plan for documentation files:
 Status: Incomplete
 TODOS:
 - [ ] Write out blurb for each user-written documentation.
-- [ ] Include pertinant information about the organisation of includes and namespaces.
+- [ ] Include pertinent information about the organisation of includes and namespaces.
 
 ## Overview of framework
 Status: Incomplete
@@ -23,28 +23,28 @@ Status: Incomplete
 
 ## Declaring Tests
 Status: First Draft Complete
-- [x] Write introduction
-- [x] Show how to declare tests.
-- [x] Explain what the GLOT is.
-- [x] Show how to add non-GLOT tests to test framework.
-- [x] Discuss when tests may fail or not be added.
+- [ ] Write introduction
+- [ ] Show how to declare tests.
+- [ ] Explain what the GLOT is.
+- [ ] Show how to add non-GLOT tests to test framework.
+- [ ] Discuss when tests may fail or not be added.
 
 ## Assertions
 Status: First Draft Complete
-- [x] Introduction
-- [x] Matchers introduction
-- [x] Single-line assertions. Annotations, adding source code.
-- [x] Static assertions.
-- [x] Multi-line assertions.
-- [x] Exceptions.
+- [ ] Introduction
+- [ ] Matchers introduction
+- [ ] Single-line assertions. Annotations, adding source code.
+- [ ] Static assertions.
+- [ ] Multi-line assertions.
+- [ ] Exceptions.
 
 ## Matchers
 Status: Incomplete
-- [x] Introduction
-- [x] Basic matchers.
-- [x] Logical operators.
-- [x] Simulating logical operators.
-- [x] Included matchers.
+- [ ] Introduction
+- [ ] Basic matchers.
+- [ ] Logical operators.
+- [ ] Simulating logical operators.
+- [ ] Included matchers.
 
 ## Data Generators
 Status: Incomplete

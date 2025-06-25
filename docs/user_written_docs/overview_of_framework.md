@@ -1,5 +1,7 @@
 # Overview of test framework{#overview_of_framework}
 
+**Please note that this document was written based around an earlier version of abc_test. As such, it is likely to be incorrect.**
+
 This file documents how the primary `abc` framework works. Specifically, it provides an overview of how the user creates tests, configures how the tests are to be ran, and runs the tests themselves. 
 
 We also discuss the nomenclature used in `abc_test`; giving the user a basis for terms used throughout the rest of the documentation.

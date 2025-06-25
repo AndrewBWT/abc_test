@@ -211,29 +211,32 @@ create_assertion(
     using namespace _ABC_NS_MATCHER;
     using namespace std;
     assertion_ptr_t<true, T> _l_gur;
-    bool                     _l_passed{true};
-    optional<string>         _l_matcher_annotation{};
+    bool                     _l_passed{ true };
+    optional<u8string>         _l_matcher_annotation{};
     ds::single_source_t      _l_source
         = _a_matcher.add_source_info(_a_macro_str, _a_matcher_str, _a_sl);
     if constexpr (Has_Annotation)
     {
-        _l_matcher_annotation = optional<string>(_a_matcher.annotation());
+        _l_matcher_annotation = optional<u8string>(_a_matcher.annotation());
     }
-    matcher_result_t     _l_mr{_a_matcher.matcher_result()};
+    matcher_result_t     _l_mr{ _a_matcher.matcher_result() };
     matcher_source_map_t _l_msm;
     _a_matcher.gather_map_source(_l_msm);
     _l_passed = _l_mr.passed();
-    _l_gur    = make_unique<const matcher_based_assertion_single_line_t<T>>(
+    auto ki = _a_test_runner.get_log_infos(false);
+    _l_gur = make_unique<const matcher_based_assertion_single_line_t<T>>(
         _l_source,
         _a_test_runner.get_log_infos(false),
         bba_inner_assertion_type_t(
-            ( std::same_as<T, _ABC_NS_REPORTS::terminate_t>
-              || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t> ),
+            (std::same_as<T, _ABC_NS_REPORTS::terminate_t>
+                || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t>),
             _l_mr,
+            ki,
             _l_source,
             _l_matcher_annotation,
             _l_msm
-        )
+        ),
+        _a_test_runner.current_assertion_index()
     );
     _a_test_runner.add_assertion(_l_gur);
     _a_matcher.remove_primary_source();

@@ -1,4 +1,7 @@
 # Declaring Tests
+
+**Please note that this document was written based around an earlier version of abc_test. As such, it is likely to be incorrect.**
+
 This page contains documentation concerning the declaration of tests in `abc_test`. It covers the following topics:
 
 - The basic ways to declare tests.

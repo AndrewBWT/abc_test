@@ -157,6 +157,7 @@ __constexpr_imp void
                           _ABC_NS_REPORTS::pass_or_terminate_t> )
                 )
             );
+            _a_ttor.write_line(u8"");
             {
                 const auto& _l_matcher_strs{
                     _a_element.matcher_info().matcher_result().str()
@@ -192,8 +193,10 @@ __constexpr_imp void
                             _a_pc.indent(u8"Primary output from matcher:", 1)
                         );
                         _a_ttor.write(this->prefix(_a_idx + 1));
-                        _a_ttor.write_line(_a_pc.message_str(
-                            _a_pc.indent(_l_matcher_element.primary_data(), 2)
+                        _a_ttor.write_line(_a_pc.indent(
+                            _a_pc.message_str(_l_matcher_element.primary_data()
+                            ),
+                            2
                         ));
                         if (_l_matcher_element.get_vector().size() > 0
                             || _l_matcher_element.get_tree().size() > 0)

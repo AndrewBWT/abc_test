@@ -213,7 +213,7 @@ __no_constexpr_or_inline_imp std::pair<std::u8string, std::u8string>
     case THREADS:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.threads_used())),
-            _a_pc.print_integer(_a_element.get_options().use_global_test_list)
+            _a_pc.print_integer(_a_element.get_options().threads)
         };
     case COMMENT_STR:
         return {

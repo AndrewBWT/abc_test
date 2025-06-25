@@ -1,4 +1,7 @@
 # Test Assertions
+
+**Please note that this document was written based around an earlier version of abc_test. As such, it is likely to be incorrect.**
+
 This page contains documentation concerning assertions in `abc_test`. It covers the following topics:
 
 - What are Assertions?

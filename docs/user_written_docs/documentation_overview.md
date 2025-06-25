@@ -1,5 +1,7 @@
 # Documentation
 
+**Please note that this document was written based around an earlier version of abc_test. As such, it is likely to be incorrect.**
+
 This is the main documentation page for `abc_test`, a C++ testing library.
 
 We provide hand-written documentation and Doxygen generated documentation to the reader. We envisage that the majority of readers will only need the user-written documentation. Below we provide a brief overview of each of the hand-written documents, which should help the reader understand which file they need to read to find the answer to their current question.
