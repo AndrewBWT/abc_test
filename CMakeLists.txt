@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.30)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
-#FetchContent needed to get fmt, scn and Catch2.
+#FetchContent needed to get fmt.
 include(FetchContent)
  
 #Fetch and make fmt available
@@ -13,14 +13,6 @@ FetchContent_Declare(
   GIT_TAG 			master
 )
 FetchContent_MakeAvailable(fmt)
-
-#Fetch and make scn available
-FetchContent_Declare(
-  scn
-  GIT_REPOSITORY  	https://github.com/eliaskosunen/scnlib
-  GIT_TAG        	master
-)
-FetchContent_MakeAvailable(scn)
 
 # Set up the project information
 project(

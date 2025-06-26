@@ -12,7 +12,6 @@
 #include <fmt/base.h>
 #include <fmt/ranges.h>
 #include <functional>
-#include <scn/scan.h>
 
 _BEGIN_ABC_DS_NS
 // Forward declare

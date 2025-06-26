@@ -2,7 +2,6 @@
 set(LIBRARY_NAME abc_test)
 # Set the required libs for the library.
 set(REQUIRED_LIBS
-  scn::scn
   fmt::fmt
 )
 # The set of all files included with the library.

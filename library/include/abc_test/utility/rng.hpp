@@ -5,7 +5,6 @@
 
 #include <memory>
 #include <random>
-#include <scn/scan.h>
 
 
 _BEGIN_ABC_UTILITY_NS

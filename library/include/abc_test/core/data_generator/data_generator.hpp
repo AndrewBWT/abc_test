@@ -13,7 +13,6 @@
 #include <functional>
 #include <memory>
 #include <optional>
-#include <scn/scan.h>
 #include <string>
 #include <vector>
 

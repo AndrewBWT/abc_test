@@ -13,8 +13,6 @@
 #include <fstream>
 #include <initializer_list>
 #include <iostream>
-#include <scn/ranges.h>
-#include <scn/scan.h>
 #include <vector>
 
 _BEGIN_ABC_DG_NS

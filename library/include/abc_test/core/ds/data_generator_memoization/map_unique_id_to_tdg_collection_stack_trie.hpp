@@ -4,7 +4,6 @@
 #include "abc_test/utility/printers/default_printer.hpp"
 
 #include <cuchar>
-#include <scn/scan.h>
 
 _BEGIN_ABC_DS_NS
 struct map_unique_id_to_tdg_collection_stack_trie_t;
