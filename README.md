@@ -20,7 +20,6 @@ If any of these features have piqued your interest, `abc_test` may be of interes
 
 We will begin with a minimal example, which shows how easy it is to begin working with `abc_test`.
 
-G:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples\documentation
 ```cpp
 _TEST_CASE(
     abc::test_case_t(
