@@ -10,6 +10,7 @@
     return abc::run_test_suite_using_command_line_args(argc, argv);
 }*/
 
+
 inline int
     fib(
         const int i
@@ -18,6 +19,7 @@ inline int
     return (i <= 1) ? i : fib(i - 1) + fib(i - 2);
 }
 
+// <simple_example>
 _TEST_CASE(
     abc::test_case_t(
         {.name = "Testing fibonacci function", .path = "tests::fib"}
@@ -27,6 +29,7 @@ _TEST_CASE(
     _CHECK_EXPR(fib(6) == 8);
     _CHECK_EXPR(fib(7) == 14);
 }
+// </simple_example>
 
 // <example_1>
 inline int
