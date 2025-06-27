@@ -257,7 +257,8 @@ _TEST_CASE(
                 _l_type_name
             )
         );
-        using unit_test_data_1 = std::tuple<T, variant<U,pair<u8string,u8string>>>;
+        using unit_test_data_1
+            = std::tuple<T, variant<U, pair<u8string, u8string>>>;
         for (const auto& _l_data : read_data_from_file<unit_test_data_1>(
                  fmt::format("unit_test_1", _l_name),
                  fmt::format("unit_test_1_{0}", _l_name)
@@ -289,7 +290,7 @@ _TEST_CASE(
             {
                 // If it has a positive result, we can run checking with
                 // exception and run the function backwards.
-                const auto& _l_unicode_str2{ get<0>(_l_result) };
+                const auto& _l_unicode_str2{get<0>(_l_result)};
                 _l_unit_tests += _BLOCK_CHECK(
                     _EXPR(
                         unicode_conversion_with_exception<CharU>(_l_unicode_str1
@@ -325,7 +326,7 @@ _TEST_CASE(
             }
             else
             {
-                const auto _l_expection_str{ get<1>(_l_result).second };
+                const auto _l_expection_str{get<1>(_l_result).second};
                 // If theres an error, let us check for the exception.
                 _l_unit_tests += _BLOCK_CHECK(
                     _MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
@@ -731,7 +732,8 @@ _TEST_CASE(
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name             = "Tests for next_char32_t",
+        {.name
+         = "Tests for next_char32_t and next_char32_t_and_increment_iterator",
          .path             = "abc_test_test::utility::str::unicode",
          .threads_required = 1}
     )
@@ -748,37 +750,80 @@ _TEST_CASE(
         auto _l_type_name{fmt::format("{0}", typeid(T).name())};
         _BEGIN_MULTI_ELEMENT_BBA(
             _l_unit_tests,
-            fmt::format("Unit testing next_char32_t {0}", _l_type_name)
+            fmt::format(
+                "Unit testing next_char32_t and "
+                "next_char32_t_and_increment_iterator {0}",
+                _l_type_name
+            )
         );
-        using next_char32_result_type_t = pair<char32_t, size_t>;
         using unit_test_data_1
-            = tuple<T, vector<tuple<int, result_t<next_char32_result_type_t>>>>;
+            = tuple<T, vector<tuple<int, variant<pair<char32_t,size_t>,
+            pair<u8string,u8string>>>>>;
         for (const auto& _l_data : read_data_from_file<unit_test_data_1>(
                  fmt::format("unit_test_1", _l_name),
                  fmt::format("unit_test_1_{0}", _l_name)
              ))
         {
             _TVLOG(_l_data);
-            const auto& [_l_unicode_str, _l_results]{_l_data};
+            const auto& [_l_unicode_str, _l_inner_test_data]{_l_data};
             typename T::const_iterator _l_begin_c_itt{std::cbegin(_l_unicode_str
             )};
             typename T::const_iterator _l_end_c_itt{std::cend(_l_unicode_str)};
-            for (auto& [_l_offset, _l_result_result] : _l_results)
+            for (auto& [_l_offset, _l_result] : _l_inner_test_data)
             {
                 typename T::const_iterator _l_c_itt{
-                    std::begin(_l_unicode_str) + _l_offset
+    std::begin(_l_unicode_str) + _l_offset
                 };
+                result_t < pair<char32_t, size_t>> _l_next_char32_t_res;
+                optional < pair<char32_t, size_t>> _l_next_char32_t_opt;
+                result_t<char32_t> _l_next_char32_with_increment_res;
+                optional<char32_t> _l_next_char32_with_increment_opt;
+                auto _l_expected_itt{ _l_c_itt };
+                switch (_l_result.index())
+                {
+                case 0:
+                    _l_next_char32_t_res = get<0>(_l_result);
+                    _l_next_char32_t_opt = get<0>(_l_result);
+                    _l_next_char32_with_increment_res = get<0>(_l_result).first;
+                    _l_next_char32_with_increment_opt = get<0>(_l_result).first;
+                    _l_expected_itt += get<0>(_l_result).second;
+                    break;
+                case 1:
+                    _l_next_char32_t_res = unexpected(get<1>(_l_result).first);
+                    _l_next_char32_t_opt = std::nullopt;
+                    _l_next_char32_with_increment_res = unexpected(get<1>(_l_result).second);
+                    _l_next_char32_with_increment_opt = std::nullopt;
+                    break;
+                }
                 _l_unit_tests += _BLOCK_CHECK(
                     _EXPR(
                         next_char32_t<true>(_l_c_itt, _l_end_c_itt)
-                        == _l_result_result
+                        == _l_next_char32_t_res
                     )
                     && _EXPR(
                         next_char32_t<false>(_l_c_itt, _l_end_c_itt)
-                        == (_l_result_result.has_value()
-                                ? make_optional(_l_result_result.value())
-                                : nullopt)
+                        == _l_next_char32_t_opt
                     )
+                );
+                auto _l_itt_cpy{_l_c_itt};
+                _l_unit_tests += _BLOCK_CHECK(
+                    _EXPR(
+                        next_char32_t_and_increment_iterator<true>(
+                            _l_itt_cpy, _l_end_c_itt
+                        )
+                        == _l_next_char32_with_increment_res
+                    )
+                    && _EXPR(std::distance(_l_expected_itt, _l_itt_cpy) == 0)
+                );
+                _l_itt_cpy = _l_c_itt;
+                _l_unit_tests += _BLOCK_CHECK(
+                    _EXPR(
+                        next_char32_t_and_increment_iterator<false>(
+                            _l_itt_cpy, _l_end_c_itt
+                        )
+                        == _l_next_char32_with_increment_opt
+                    )
+                    && _EXPR(std::distance(_l_expected_itt, _l_itt_cpy) == 0)
                 );
             }
         }

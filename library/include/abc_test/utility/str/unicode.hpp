@@ -220,6 +220,25 @@ __constexpr std::conditional_t<
     std::optional<std::pair<char32_t, std::size_t>>>
     next_char32_t(const T _a_itt, const T _a_end) noexcept;
 /*!
+ * @brief Gets the next character from a stream of characters.
+ *
+ * This function assumes _a_itt and _a_end are part of the same iterator.
+ *
+ * @tparam T The type of the iterators _a_itt and _a_end.
+ * @tparam Return_Reason A boolean paramter which controls the return type; if
+ * its true, then the return type is an std::expected of char32_t. If false an
+ * optional of char32_t. The char32_t is the next char32_t character from the
+ * stream.
+ * @param _a_itt The current iterator.
+ * @param _a_end The end iterator.
+ * @return See above.
+ */
+template <bool Return_Reason, typename T>
+requires char_type_is_unicode_c<typename T::value_type>
+__constexpr
+std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
+    next_char32_t_and_increment_iterator(T& _a_itt, const T _a_end) noexcept;
+/*!
  * @brief Converts an arbitrary unicode string to a u8string.
  *
  * This function assumes that the input string is a valid unicode string.
@@ -372,17 +391,23 @@ __constexpr std::conditional_t<
     std::optional<std::pair<char32_t, std::size_t>>>
     next_char32_t_internal(const T _a_begin, const T _a_itt, const T _a_end)
         noexcept;
-template <bool Return_Reason, typename T, typename Original_Type>
+
+__no_constexpr std::u8string
+               next_char_error_func(
+                   const std::u8string_view _a_func_name,
+                   const std::u8string_view _a_str
+               ) noexcept;
+
+template <bool Return_Reason, bool Is_Substring, typename T, typename Original_Type>
 requires char_type_is_unicode_c<typename T::value_type>
          && char_type_is_unicode_c<Original_Type>
 __constexpr
 std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
     next_char32_t_and_increment_iterator(
-        const T& _a_begin,
-        T&       _a_itt,
-        const T  _a_end
+        const T _a_begin,
+        T&      _a_itt,
+        const T _a_end
     ) noexcept;
-
 template <typename T>
 requires char_type_is_unicode_c<T> && (sizeof(T) >= 4)
 __constexpr T char16_offset_for_char32_conversion() noexcept;
@@ -482,8 +507,8 @@ __constexpr_imp result_t<std::string>
             // function (there are checks for ascii in next_char32_t) however as
             // this is not the "hot path" we don't think it really matters.
             const result_t<char32_t> _l_char_res{
-                detail::next_char32_t_and_increment_iterator<true, itt, CharT>(
-                    _a_str.begin(), _l_itt, _l_end
+                detail::next_char32_t_and_increment_iterator<true, false, itt, CharT>(
+                    std::begin(_a_str), _l_itt, _l_end
                 )
             };
             if (_l_char_res.has_value())
@@ -787,56 +812,71 @@ __constexpr std::conditional_t<
     using CharT        = T::value_type;
     auto _l_error_func = [&]() -> u8string
     {
-        return fmt::format(
-            u8"The function next_char32_t was unable to get the next UTF32 "
-            u8"code point from the unicide substring \"{0}\". This substring "
-            u8"has "
-            u8"been created using the iterator arguments for next_char32_t. "
-            u8"next_char32_t was unable to get the next UF32 code point due to "
-            u8"the following reason;",
+        return detail::next_char_error_func(
+            u8"next_char32_t",
             unicode_string_to_u8string(basic_string_view<CharT>(
                 _a_itt > _a_end ? _a_end : _a_itt, _a_end
             ))
         );
     };
-    if (_a_itt >= _a_end)
+    auto _l_rv{detail::next_char32_t_internal<Return_Reason, true, T, CharT>(
+        _a_itt, _a_itt, _a_end
+    )};
+    if constexpr (Return_Reason)
     {
-        if constexpr (Return_Reason)
-        {
-            return unexpected(fmt::format(
-                u8"{0} the current iterator is either equal to, or "
-                u8"past, the end iterator. Therefore, no more code "
-                u8"units can be processed.",
-                _l_error_func()
-            ));
-        }
-        else
-        {
-            return nullopt;
-        }
+        return _l_rv.or_else(
+            [&](const u8string _a_str) -> result_t<pair<char32_t, size_t>>
+            {
+                return unexpected(
+                    fmt::format(u8"{0} {1}", _l_error_func(), _a_str)
+                );
+            }
+        );
     }
     else
     {
-        auto _l_rv{
-            detail::next_char32_t_internal<Return_Reason, true, T, CharT>(
-                _a_itt, _a_itt, _a_end
-            )
-        };
-        if constexpr (Return_Reason)
-        {
-            return _l_rv.or_else(
-                [&](const u8string _a_str) -> result_t<pair<char32_t, size_t>>
-                {
-                    return unexpected(
-                        fmt::format(u8"{0} {1}", _l_error_func(), _a_str)
-                    );
-                }
-            );
-        }
-        else
-        {
-            return _l_rv;
-        }
+        return _l_rv;
+    }
+}
+
+template <bool Return_Reason, typename T>
+requires char_type_is_unicode_c<typename T::value_type>
+__constexpr
+std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
+    next_char32_t_and_increment_iterator(
+        T&      _a_itt,
+        const T _a_end
+    ) noexcept
+{
+    using namespace std;
+    using CharT        = T::value_type;
+    auto _l_error_func = [&]() -> u8string
+    {
+        return detail::next_char_error_func(
+            u8"next_char32_t_and_increment_iterator",
+            unicode_string_to_u8string(basic_string_view<CharT>(
+                _a_itt > _a_end ? _a_end : _a_itt, _a_end
+            ))
+        );
+    };
+    auto _l_rv{detail::next_char32_t_and_increment_iterator<
+        Return_Reason,true,
+        T,
+        typename T::value_type>(_a_itt, _a_itt, _a_end)};
+    if constexpr (Return_Reason)
+    {
+        return _l_rv.or_else(
+            [&](const u8string _a_str) -> result_t<char32_t>
+            {
+                return unexpected(
+                    fmt::format(u8"{0} {1}", _l_error_func(), _a_str)
+                );
+            }
+        );
+    }
+    else
+    {
+        return _l_rv;
     }
 }
 
@@ -855,10 +895,9 @@ __constexpr std::u8string
     while (_l_itt != _l_end)
     {
         const optional<char32_t> _l_char_opt{
-            detail::next_char32_t_and_increment_iterator<
-                false,
-                decltype(_l_itt),
-                CharT>(std::begin(_a_str), _l_itt, _l_end)
+            next_char32_t_and_increment_iterator<false, decltype(_l_itt)>(
+                _l_itt, _l_end
+            )
         };
         if (_l_char_opt.has_value())
         {
@@ -1125,8 +1164,9 @@ __constexpr result_t<std::basic_string<T>>
         {
             if constexpr (wchar_is_16_bit)
             {
-                return cast_unicode_string_to_wstring(_l_convert_u32string_to_u16string(_a_str_2
-                ));
+                return cast_unicode_string_to_wstring(
+                    _l_convert_u32string_to_u16string(_a_str_2)
+                );
             }
             else if constexpr (wchar_is_32_bit)
             {
@@ -1304,10 +1344,10 @@ result_t<std::conditional_t<Return_u32string, std::u32string, std::monostate>>
     auto _l_begin{std::begin(_a_str)};
     for (auto _l_itt{_l_begin}; _l_itt != _l_end;)
     {
-        auto _l_result{next_char32_t_and_increment_iterator<
-            true,
+        auto _l_result{detail::next_char32_t_and_increment_iterator<
+            true,false,
             decltype(_l_itt),
-            char8_t>(_l_begin, _l_itt, _l_end)};
+            char8_t>(std::begin(_a_str), _l_itt, _l_end)};
         if (_l_result.has_value())
         {
             if constexpr (Return_u32string)
@@ -1337,10 +1377,10 @@ result_t<std::conditional_t<Return_u32string, std::u32string, std::monostate>>
     auto _l_begin{std::begin(_a_str)};
     for (auto _l_itt{_l_begin}; _l_itt != _l_end;)
     {
-        auto _l_result{next_char32_t_and_increment_iterator<
-            true,
+        auto _l_result{detail::next_char32_t_and_increment_iterator<
+            true,false,
             decltype(_l_itt),
-            Original_Type>(_l_begin, _l_itt, _l_end)};
+            Original_Type>(std::begin(_a_str), _l_itt, _l_end)};
         if (_l_result.has_value())
         {
             if constexpr (Return_u32string)
@@ -1589,7 +1629,8 @@ __constexpr std::conditional_t<
                             std::distance(_a_begin, _l_itt) + 1, _l_char_as_str
                         ),
                         represent_char_as_hex_for_output(zero<char8_t>()),
-                        represent_char_as_hex_for_output(ascii_limit<char8_t>()),
+                        represent_char_as_hex_for_output(ascii_limit<char8_t>()
+                        ),
                         represent_char_as_hex_for_output(char8_t(0xC0)),
                         represent_char_as_hex_for_output(char8_t(0xDF)),
                         represent_char_as_hex_for_output(char8_t(0xE0)),
@@ -1809,14 +1850,15 @@ __constexpr std::conditional_t<
                             )
                         ),
                         represent_char_as_hex_for_output(_l_code_point),
-                        represent_char_as_hex_for_output(
-                            detail::zero<char32_t>()
+                        represent_char_as_hex_for_output(detail::zero<char32_t>(
+                        )),
+                        represent_char_as_hex_for_output<char32_t>(
+                            detail::one_below_high_surrogate_lower_value<
+                                char32_t>()
                         ),
                         represent_char_as_hex_for_output<char32_t>(
-                            detail::one_below_high_surrogate_lower_value<char32_t>()
-                        ),
-                        represent_char_as_hex_for_output<char32_t>(
-                            detail::one_above_low_surrogate_upper_value<char32_t>()
+                            detail::one_above_low_surrogate_upper_value<
+                                char32_t>()
                         ),
                         represent_char_as_hex_for_output(char32_limit<char32_t>(
                         ))
@@ -1977,47 +2019,15 @@ __constexpr std::conditional_t<
             return make_pair(static_cast<char32_t>(_l_first), 1);
         }
     };
-    if (_a_itt > _a_end)
+    if (_a_itt >= _a_end)
     {
         if constexpr (Return_Reason)
         {
-            return unexpected(fmt::format(
-                u8"the supplied iterators were inconsistent. Specifically "
-                u8"the "
-                u8"current iterator is greater than the end iterator."
-            ));
-        }
-        else
-        {
-            return nullopt;
-        }
-    }
-    else if (_a_itt < _a_begin)
-    {
-        if constexpr (Return_Reason)
-        {
-            return unexpected(fmt::format(
-                u8"the supplied iterators were inconsistent. Specifically "
-                u8"the "
-                u8"current iterator is less than the beginning iterator."
-            ));
-        }
-        else
-        {
-            return nullopt;
-        }
-    }
-    else if (_a_itt == _a_end)
-    {
-        if constexpr (Return_Reason)
-        {
-            return unexpected(fmt::format(
-                u8"the supplied iterators were inconsistent. Specifically "
-                u8"the "
-                u8"current iterator is equal to the end iterator. "
-                u8"Therefore, "
-                u8"no characters are able to be extracted from it."
-            ));
+            return unexpected(
+                fmt::format(u8"the current iterator is either equal to, or "
+                            u8"past, the end iterator. Therefore, no more code "
+                            u8"units can be processed.")
+            );
         }
         else
         {
@@ -2075,20 +2085,39 @@ __constexpr std::conditional_t<
     }
 }
 
-template <bool Return_Reason, typename T, typename Original_Type>
+__no_constexpr_imp std::u8string
+                   next_char_error_func(
+                       const std::u8string_view _a_func_name,
+                       const std::u8string_view _a_str
+                   ) noexcept
+{
+    return fmt::format(
+        u8"The function {0} was unable to get the next UTF32 "
+        u8"code point from the unicide substring \"{1}\". This substring "
+        u8"has "
+        u8"been created using the iterator arguments for {0}. "
+        u8"{0} was unable to get the next UF32 code point due to "
+        u8"the following reason;",
+        _a_func_name,
+        unicode_string_to_u8string(_a_str)
+
+    );
+}
+
+template <bool Return_Reason, bool Is_Substring, typename T, typename Original_Type>
 requires char_type_is_unicode_c<typename T::value_type>
          && char_type_is_unicode_c<Original_Type>
 __constexpr
 std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
     next_char32_t_and_increment_iterator(
-        const T& _a_begin,
-        T&       _a_itt,
-        const T  _a_end
+        const T _a_begin,
+        T&      _a_itt,
+        const T _a_end
     ) noexcept
 {
     using namespace std;
     auto _l_next_char32_t_result{
-        next_char32_t_internal<Return_Reason, false, T, Original_Type>(
+        detail::next_char32_t_internal<Return_Reason, Is_Substring, T, Original_Type>(
             _a_begin, _a_itt, _a_end
         )
     };
