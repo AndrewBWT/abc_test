@@ -855,6 +855,10 @@ _TEST_CASE(
                 _BEGIN_NO_THROW_MATCHER(_l_matcher);
                 do_not_optimise(next_char32_t<true>(_l_c_itt, _l_end_c_itt));
                 do_not_optimise(next_char32_t<false>(_l_c_itt, _l_end_c_itt));
+                auto _l_cpy_itt = _l_c_itt;
+                do_not_optimise(next_char32_t_and_increment_iterator<true>(_l_cpy_itt, _l_end_c_itt));
+                _l_cpy_itt = _l_c_itt;
+                do_not_optimise(next_char32_t_and_increment_iterator<false>(_l_cpy_itt, _l_end_c_itt));
                 _END_NO_THROW_MATCHER(_l_matcher);
                 _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
             }

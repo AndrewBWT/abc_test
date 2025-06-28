@@ -1,5 +1,4 @@
 #pragma once
-#include "abc_test/external/utfcpp/utf8.hpp"
 #include "abc_test/utility/internal/macros.hpp"
 #include "abc_test/utility/str/string_cast.hpp"
 

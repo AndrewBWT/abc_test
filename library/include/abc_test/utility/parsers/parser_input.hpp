@@ -40,7 +40,11 @@ public:
         u32string _l_str;
         while (_l_itt_cpy < _m_end_itt && _l_idx < _a_size)
         {
-            _l_str.push_back(utf8::next(_l_itt_cpy, _m_end_itt));
+            auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(_l_itt_cpy,_m_end_itt) };
+            if (_l_char_res.has_value())
+            {
+                _l_str.push_back(_l_char_res.value());
+            }
             ++_l_idx;
         }
         return _l_str;
@@ -181,7 +185,11 @@ __no_constexpr_imp std::u32string
     size_t    _l_idx{0};
     while (_m_cur_itt < _m_end_itt && _l_idx < _a_max_size)
     {
-        _l_str.push_back(utf8::next(_m_cur_itt, _m_end_itt));
+        auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(_m_cur_itt,_m_end_itt) };
+        if (_l_char_res.has_value())
+        {
+            _l_str.push_back(_l_char_res.value());
+        }
         ++_l_idx;
     }
     return _l_str;
@@ -248,7 +256,12 @@ __no_constexpr_imp std::u32string
     size_t    _l_idx{0};
     while (_m_cur_itt < _m_end_itt)
     {
-        char32_t _l_char{utf8::next(_m_cur_itt, _m_end_itt)};
+        char32_t _l_char;
+        auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(_m_cur_itt,_m_end_itt) };
+        if (_l_char_res.has_value())
+        {
+            _l_char = _l_char_res.value();
+        }
         if (_l_char == _a_char1)
         {
             if (_l_idx > 0 && _l_str.back() == _a_char2)
@@ -300,7 +313,12 @@ __constexpr bool
     {
         if (_l_curr_itt_cpy < _m_end_itt)
         {
-            char32_t _l_char{utf8::next(_l_curr_itt_cpy, _m_end_itt)};
+            char32_t _l_char;
+            auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(_l_curr_itt_cpy,_m_end_itt) };
+            if (_l_char_res.has_value())
+            {
+                _l_char = _l_char_res.value();
+            }
             if (_l_char != *_l_itt)
             {
                 return false;
@@ -329,8 +347,18 @@ __constexpr bool
     {
         if (_l_curr_itt_cpy < _m_end_itt)
         {
-            char32_t _l_char{utf8::next(_l_curr_itt_cpy, _m_end_itt)};
-            char32_t _l_char_to_check{utf8::next(_l_itt, _l_end)};
+            char32_t _l_char;
+            auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(_l_curr_itt_cpy,_m_end_itt) };
+            if (_l_char_res.has_value())
+            {
+                _l_char = _l_char_res.value();
+            }
+            char32_t _l_char_to_check;
+            auto _l_char_res_2{ _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(_l_itt,_l_end) };
+            if (_l_char_res_2.has_value())
+            {
+                _l_char_to_check = _l_char_res_2.value();
+            }
             if (_l_char != _l_char_to_check)
             {
                 return false;
@@ -353,7 +381,12 @@ __constexpr void
     size_t _l_idx{0};
     while (_m_cur_itt < _m_end_itt && _l_idx < _a_new_itereator)
     {
-        utf8::next(_m_cur_itt, _m_end_itt);
+
+        auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(_m_cur_itt,_m_end_itt) };
+        if (_l_char_res.has_value())
+        {
+
+        }
         ++_l_idx;
     }
 }
@@ -404,11 +437,19 @@ __no_constexpr_imp const std::u32string
 
     while (_m_cur_itt < _m_end_itt)
     {
-        char32_t _l_char{utf8::peek_next(_m_cur_itt, _m_end_itt)};
-        if (_a_str.contains(_l_char))
+        auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t<false>(_m_cur_itt,_m_end_itt) };
+        if (_l_char_res.has_value())
         {
-            _l_rv.push_back(_l_char);
-            utf8::next(_m_cur_itt, _m_end_itt);
+            char32_t _l_char{ _l_char_res.value().first };
+            if (_a_str.contains(_l_char))
+            {
+                _l_rv.push_back(_l_char);
+                std::advance(_m_cur_itt, _l_char_res.value().second);
+            }
+            else
+            {
+                break;
+            }
         }
         else
         {
@@ -427,7 +468,16 @@ __constexpr std::size_t
 __no_constexpr_imp char32_t
     parser_input_t::operator*() const noexcept
 {
-    return utf8::peek_next(_m_cur_itt, _m_end_itt);
+    char32_t _l_char;
+    auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t<false>(_m_cur_itt,_m_end_itt) };
+    if (_l_char_res.has_value())
+    {
+        return _l_char_res.value().first;
+    }
+    else
+    {
+        return char32_t();
+    }
 }
 
 __constexpr parser_input_t&

@@ -257,14 +257,6 @@ set(LIBRARY_FILES
   include/abc_test/external/bigint/BigUnsignedInABase.hpp
       src/abc_test/external/bigint/BigUnsignedInABase.cpp
   include/abc_test/external/bigint/NumberlikeArray.hpp
-  # utfcpp. The include directives of these files have been changed to ensure they work with our file hierarchy.
-  include/abc_test/external/utfcpp/utf8/checked.hpp
-  include/abc_test/external/utfcpp/utf8/core.hpp
-  include/abc_test/external/utfcpp/utf8/cpp11.hpp
-  include/abc_test/external/utfcpp/utf8/cpp17.hpp
-  include/abc_test/external/utfcpp/utf8/cpp20.hpp
-  include/abc_test/external/utfcpp/utf8/unchecked.hpp
-  include/abc_test/external/utfcpp/utf8.hpp
 )
 
 
