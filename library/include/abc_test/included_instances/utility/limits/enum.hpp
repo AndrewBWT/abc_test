@@ -9,7 +9,10 @@ template <typename T>
 struct min_value_t<T>
 {
     __constexpr T
-        min_value() const noexcept;
+        min_value() const noexcept
+    {
+        return get_thread_local_enumerate_enum_helper<T>().min();
+    }
 };
 
 template <typename T>
@@ -17,13 +20,16 @@ template <typename T>
 struct max_value_t<T>
 {
     __constexpr_imp T
-        max_value() const noexcept;
+        max_value() const noexcept
+    {
+        return get_thread_local_enumerate_enum_helper<T>().max();
+    }
 };
 
 _END_ABC_UTILITY_NS
 
 _BEGIN_ABC_UTILITY_NS
-template <typename T>
+/*template <typename T>
     requires _ABC_NS_UTILITY::enum_has_list_c<T>
 __constexpr_imp T
 min_value_t<T>::min_value() const noexcept
@@ -37,5 +43,5 @@ __constexpr_imp T
 max_value_t<T>::max_value() const noexcept
 {
     return get_thread_local_enumerate_enum_helper<T>().max();
-}
+}*/
 _END_ABC_UTILITY_NS

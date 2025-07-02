@@ -432,9 +432,9 @@ __no_constexpr_imp matcher_wrapper_t<Has_Annotation>
             fmt::format(
                 u8"{0}{1}{2}{3}",
                 logic_str<logic_enum_t::NOT>(),
-                cast_string_to_u8string(_l_str_pair.first),
+                abc::utility::str::cast_string_to_u8string(_l_str_pair.first),
                 _l_child_res.str().primary_data(),
-                cast_string_to_u8string(_l_str_pair.second)
+                abc::utility::str::cast_string_to_u8string(_l_str_pair.second)
             ),
             {},
             _l_children
