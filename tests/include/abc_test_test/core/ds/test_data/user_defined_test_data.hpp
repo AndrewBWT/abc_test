@@ -16,7 +16,6 @@ _TEST_CASE(
     using namespace abc;
     using namespace std;
     using namespace abc::ds;
-    using test_data_t = tuple<string, optional<string>, string, size_t>;
     for (auto& _l_test_name : generate_data_randomly<string>())
     {
         for (auto& _l_test_description :

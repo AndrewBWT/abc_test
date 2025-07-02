@@ -47,51 +47,81 @@ __constexpr    std::u8string
                from_hex_with_exception(const std::u8string_view _a_str);
 __no_constexpr std::string
                remove_whitespace(const std::string_view _a_str) noexcept;
+
 template <typename T>
 __constexpr std::basic_string<T>
-make_focused_string(
-    const std::basic_string_view<T> _a_sv,
-    const std::size_t               _a_idx,
-    const std::size_t               _a_limit = 10
-) noexcept
+            make_focused_string(
+                const std::basic_string_view<T> _a_sv,
+                const std::size_t               _a_idx,
+                const std::size_t               _a_limit = 10
+            ) noexcept
 {
     using namespace std;
+    auto will_overflow_unsigned = [&](size_t a, size_t b) -> size_t {
+        return b > std::numeric_limits<size_t>::max() - a;
+        };
     if (_a_sv.empty())
     {
         return basic_string<T>();
     }
     else
     {
-        const size_t _l_idx{ _a_idx >= _a_sv.size() ? _a_sv.size() - 1 : _a_idx };
-        const size_t _l_offset{
-            _a_limit + (_a_limit == numeric_limits<size_t>::max() ? 0 : 1)
-        };
-        const bool _l_enough_elements_before{ _l_idx >= _l_offset };
-        const bool _l_engouh_elements_after{ _l_idx + _l_offset <= _a_sv.size() };
-        const size_t _l_after_offset{ _l_idx + _l_offset };
-        const size_t _l_before_offset{ _l_idx - _l_offset };
-        return basic_string<T>{
+        const size_t _l_idx{_a_idx >= _a_sv.size() ? _a_sv.size() - 1 : _a_idx};
+        const size_t _l_before_offset{_a_limit};
+        const size_t _l_after_offset{_a_limit + (_a_limit == numeric_limits<size_t>::max() ? 0 : 1)};
+        const bool _l_enough_elements_before{_l_idx > _l_before_offset};
+        bool _l_enough_elements_after;
+        if (will_overflow_unsigned(_l_idx, _l_after_offset))
+        {
+            _l_enough_elements_after = false;
+        }
+        else
+        {
+            _l_enough_elements_after = _l_idx + _l_after_offset < _a_sv.size();
+        }
+        const size_t _l_after_offset_pos{_l_idx + _l_after_offset};
+        const size_t _l_before_offset_pos{_l_idx - _l_before_offset};
+        const size_t _l_length{_l_after_offset_pos - _l_before_offset_pos};
+        const basic_string_view<T> _l_sv{
             _l_enough_elements_before
-                ? (_l_engouh_elements_after
-                    ? _a_sv.substr(_l_before_offset, _l_after_offset)
-                    : _a_sv.substr(_l_before_offset))
-                : (_l_engouh_elements_after ? _a_sv.substr(0, _l_after_offset)
-                    : _a_sv)
+                ? (_l_enough_elements_after
+                       ? _a_sv.substr(_l_before_offset_pos, _l_length)
+                       : _a_sv.substr(_l_before_offset_pos))
+                : (_l_enough_elements_after
+                       ? _a_sv.substr(0, _l_after_offset_pos)
+                       : _a_sv)
         };
+        basic_string<T> _l_dots{};
+        for (size_t _l_idx{0}; _l_idx < 3; ++_l_idx)
+        {
+            _l_dots.push_back(static_cast<T>(0x2E));
+        }
+        basic_string<T> _l_rv;
+        if (_l_enough_elements_before)
+        {
+            _l_rv.append(_l_dots);
+        }
+        _l_rv.append(_l_sv);
+        if (_l_enough_elements_after)
+        {
+            _l_rv.append(_l_dots);
+        }
+        return _l_rv;
     }
 }
 
 template <typename T>
 __constexpr std::basic_string<T>
-make_focused_string(
-    const std::basic_string<T>& _a_sv,
-    const std::size_t           _a_idx,
-    const std::size_t           _a_limit = 10
-) noexcept
+            make_focused_string(
+                const std::basic_string<T>& _a_sv,
+                const std::size_t           _a_idx,
+                const std::size_t           _a_limit = 10
+            ) noexcept
 {
     using namespace std;
     return make_focused_string(basic_string_view<T>(_a_sv), _a_idx, _a_limit);
 }
+
 _END_ABC_UTILITY_STR_NS
 
 _BEGIN_ABC_UTILITY_STR_NS
@@ -225,9 +255,7 @@ __constexpr_imp result_t<std::u8string>
     }
     else
     {
-        const result_t<string> _l_str_result{
-            convert_unicode_to_ascii(_a_str)
-        };
+        const result_t<string> _l_str_result{convert_unicode_to_ascii(_a_str)};
         if (_l_str_result.has_value())
         {
             // Parse the bytes.

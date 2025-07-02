@@ -15,11 +15,21 @@ struct static_assertion_list_formatter_t
 {
 public:
     using assertion_list_formatter_t<true, Assertion_Status>::assertion_list_formatter_t;
+    using list_formattable_t<
+        reports::static_assertion_t<Assertion_Status>,
+        combined_enum_static_assertion_fields_t,
+        print_config_t>::check_data;
+    using assertion_list_formatter_t<true, Assertion_Status>::check_data;
     __constexpr virtual bool
         check_data(
             const combined_enum_static_assertion_fields_t&       _a_fid,
             const reports::static_assertion_t<Assertion_Status>& _a_element
         ) const override;
+    using list_formattable_t<
+        reports::static_assertion_t<Assertion_Status>,
+        combined_enum_static_assertion_fields_t,
+        print_config_t>::get_data;
+    using assertion_list_formatter_t<true, Assertion_Status>::get_data;
     __constexpr virtual void
         get_data(
             const combined_enum_static_assertion_fields_t&       _a_fid,

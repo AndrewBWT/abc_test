@@ -166,8 +166,8 @@ __constexpr_imp
         const std::size_t _a_index
     ) noexcept
     : user_initialised_report_t<Single_Source>(_a_source, _a_log_infos)
-    , _m_test_description(_a_annotation)
     , _m_status(_a_status)
+    , _m_test_description(_a_annotation)
     , _m_index(_a_index)
 {}
 

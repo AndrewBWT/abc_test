@@ -175,12 +175,13 @@ __constexpr assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>
     matcher_source_map_t _l_msm;
     _a_matcher.gather_map_source(_l_msm);
     global::get_this_threads_current_test().add_current_for_loop_stack_to_trie(
+        true
     );
     if constexpr (Annotated)
     {
         bba_inner_assertion_type_t _l_tuple(
-            (std::same_as<T, _ABC_NS_REPORTS::terminate_t>
-                || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t>),
+            ( std::same_as<T, _ABC_NS_REPORTS::terminate_t>
+              || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t> ),
             _a_matcher.matcher_result(),
             std::optional<ds::single_source_t>{},
             std::optional<std::string>(_a_matcher.annotation()),
@@ -191,8 +192,8 @@ __constexpr assertion_wp_t<_ABC_NS_REPORTS::pass_or_fail_t>
     else
     {
         bba_inner_assertion_type_t _l_tuple(
-            (std::same_as<T, _ABC_NS_REPORTS::terminate_t>
-                || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t>),
+            ( std::same_as<T, _ABC_NS_REPORTS::terminate_t>
+              || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t> ),
             _a_matcher.matcher_result(),
             std::optional<ds::single_source_t>{},
             std::optional<std::string>{},
@@ -206,10 +207,10 @@ template <typename T>
 requires std::derived_from<T, _ABC_NS_REPORTS::static_status_t>
 __constexpr assertion_wp_t<T>
             make_entity_bba_compatable(
-                const bool                        _a_pass,
+                const bool                          _a_pass,
                 const std::optional<std::u8string>& _a_opt_str_msg,
-                const std::string_view            _a_str_representation,
-                const std::source_location&       _a_source_location
+                const std::string_view              _a_str_representation,
+                const std::source_location&         _a_source_location
             )
 {
     using namespace _ABC_NS_MATCHER;
@@ -241,7 +242,8 @@ __constexpr assertion_wp_t<T>
     using namespace _ABC_NS_MATCHER;
     matcher_source_map_t _l_msm;
     global::get_this_threads_current_test().add_current_for_loop_stack_to_trie(
-        not _a_matcher.matcher_result().passed());
+        not _a_matcher.matcher_result().passed()
+    );
     auto ki = global::get_this_threads_test_runner_ref().get_log_infos(false);
     _a_matcher.gather_map_source(_l_msm);
     if constexpr (Annotated)
@@ -272,7 +274,6 @@ __constexpr assertion_wp_t<T>
     }
 }
 
-
 class multi_element_test_block_t : public test_block_t //<T>
 {
 public:
@@ -293,7 +294,6 @@ public:
                 using namespace _ABC_NS_REPORTS;
                 using namespace _ABC_NS_MATCHER;
                 assertion_ptr_t<false, T2> _l_gur;
-                bool                       _l_passed{true};
                 matcher_res_infos_t        _l_mtr{get_matcher()};
                 _l_gur = std::make_unique<multi_element_assertion_block_t<T2>>(
                     _a_element._m_matcher_info.matcher_result().passed(),
@@ -314,7 +314,6 @@ public:
             using namespace _ABC_NS_REPORTS;
             using namespace _ABC_NS_MATCHER;
             assertion_ptr_t<false, T2> _l_gur;
-            bool                       _l_passed{true};
             matcher_res_infos_t        _l_mtr{get_matcher()};
             _l_gur = std::make_unique<multi_element_assertion_block_t<T2>>(
                 std::monostate(),

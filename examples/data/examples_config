@@ -1,7 +1,7 @@
 use_global_test_list = true
 # path_delimiter = default
 root_path = ../../examples/data/test_data
-threads = 10
+threads = 1
 general_data_file_extension = gd
 n_integers_used_for_rng_generation = 1000
 global_seed = 067239336

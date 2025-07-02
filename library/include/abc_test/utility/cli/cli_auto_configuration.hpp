@@ -24,7 +24,7 @@ _END_ABC_UTILITY_CLI_NS
 _BEGIN_ABC_NS
 template <>
 auto
-    utility::get_enum_list()
+    utility::get_enum_list() noexcept
         -> utility::enum_list_t<utility::cli::auto_configuration_load_type_e>
 {
     using enum utility::cli::auto_configuration_load_type_e;
@@ -83,7 +83,7 @@ _END_ABC_UTILITY_CLI_NS
 _BEGIN_ABC_NS
 template <>
 auto
-    utility::get_enum_list() -> utility::enum_list_t<
+    utility::get_enum_list() noexcept -> utility::enum_list_t<
         utility::cli::enum_auto_configuration_write_to_file_t>
 {
     using enum utility::cli::enum_auto_configuration_write_to_file_t;
@@ -143,7 +143,7 @@ struct default_parser_t<cli::auto_configuration_load_configuration_t>
         using namespace _ABC_NS_CLI;
         using namespace _ABC_NS_UTILITY_STR;
         if (const result_t<auto_configuration_load_type_e> _l_result{
-                default_parser_t<auto_configuration_load_type_e>(
+                make_default_parser< auto_configuration_load_type_e>(
                     enum_helper_string_type_e::lower
                 )
                     .run_parser(_a_parse_input)
@@ -192,7 +192,6 @@ public:
     std::size_t           min_index;
     std::size_t           max_index;
 };
-struct test_options_base_t;
 
 class cli_auto_configuration_t
 {
@@ -234,8 +233,8 @@ __constexpr_imp
     : _m_repetition_folder(_a_repetition_folder)
     , _m_rep_file_index(_a_rep_file_index)
     , _m_rep_write_data_type(_a_rep_write_data_type)
-    , _m_last_config_info(_a_last_config_info)
     , _m_loaded_configuration(_a_loaded_configuration)
+    , _m_last_config_info(_a_last_config_info)
 {}
 
 _END_ABC_UTILITY_CLI_NS

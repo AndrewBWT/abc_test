@@ -188,7 +188,7 @@ __no_constexpr_imp bool
     }
     else
     {
-        for (const pair<source_location, vector<string>>& _l_element :
+        for (const pair<source_location, vector<string>> _l_element :
              _m_internal_map)
         {
             if (not _l_msm_map.contains(_l_element.first))
@@ -228,7 +228,6 @@ __no_constexpr_imp auto
         format_context&                       _a_ctx
     ) const -> format_context::iterator
 {
-    size_t _m_thread_resourses_required;
     using namespace std;
     string _l_rv{fmt::format(
         "{0} {{"

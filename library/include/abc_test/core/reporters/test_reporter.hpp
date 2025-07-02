@@ -12,6 +12,7 @@ _BEGIN_ABC_REPORTERS_NS
 struct test_reporter_t
 {
 public:
+    __constexpr virtual ~test_reporter_t() = default;
     /*!
      * @brief Abstract function used to process a test after it has finished running.
      * @param _a_itd The test to process.

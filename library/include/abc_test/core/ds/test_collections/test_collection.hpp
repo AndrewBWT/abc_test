@@ -176,7 +176,7 @@ __no_constexpr_imp post_setup_test_list_t
 {
     using namespace std;
     post_setup_test_list_t _l_rv;
-    for (const reference_wrapper<const post_setup_test_data_t>& _l_element :
+    for (const reference_wrapper<const post_setup_test_data_t> _l_element :
          _m_test_tree)
     {
         if (_l_element.get().is_test_to_be_ran())

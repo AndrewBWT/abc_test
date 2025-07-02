@@ -49,7 +49,7 @@ namespace abc
 {
 template <>
 inline auto
-    utility::get_enum_list() -> utility::enum_list_t<enum_with_enum_list_1>
+    utility::get_enum_list() noexcept -> utility::enum_list_t<enum_with_enum_list_1>
 {
     using enum enum_with_enum_list_1;
     return {
@@ -59,7 +59,7 @@ inline auto
 
 template <>
 inline auto
-    utility::get_enum_list() -> utility::enum_list_t<enum_with_enum_list_2>
+    utility::get_enum_list() noexcept -> utility::enum_list_t<enum_with_enum_list_2>
 {
     using enum enum_with_enum_list_2;
     return {_ENUM_LIST_ENTRY(one)};
@@ -67,7 +67,7 @@ inline auto
 
 template <>
 inline auto
-    utility::get_enum_list() -> utility::enum_list_t<enum_with_enum_list_3>
+    utility::get_enum_list() noexcept -> utility::enum_list_t<enum_with_enum_list_3>
 {
     using enum enum_with_enum_list_3;
     return {
@@ -77,7 +77,7 @@ inline auto
 
 template <>
 inline auto
-    utility::get_enum_list() -> utility::enum_list_t<enum_with_enum_list_4>
+    utility::get_enum_list() noexcept -> utility::enum_list_t<enum_with_enum_list_4>
 {
     using enum enum_with_enum_list_4;
     return {
@@ -186,11 +186,11 @@ _TEST_CASE(
             }
         };
         // Unit testing less than.
-        unit_test_func.operator()<unit_test_data_1>("less_than", _l_less_than);
+        unit_test_func.template operator()<unit_test_data_1>("less_than", _l_less_than);
         // Unit testing equal.
-        unit_test_func.operator()<unit_test_data_1>("equal", _l_equal);
+        unit_test_func.template operator()<unit_test_data_1>("equal", _l_equal);
         // Unit testing difference.
-        unit_test_func.operator(
+        unit_test_func.template operator(
         )<unit_test_data_2>("difference", _l_difference);
         _END_BBA_CHECK(_l_unit_tests);
         _BEGIN_MULTI_ELEMENT_BBA(

@@ -122,7 +122,8 @@ __no_constexpr_imp
         const T&                             _a_to,
         const _ABC_NS_UTILITY_CLI::cli_t<T>& _a_cli
     ) noexcept
-    : _m_test_list_collection(make_test_list_collection(
+    : _m_cli(_a_cli)
+    , _m_test_list_collection(make_test_list_collection(
           _a_to.test_lists,
           _a_to.use_global_test_list
       ))
@@ -133,7 +134,6 @@ __no_constexpr_imp
     , _m_current_thread_pool(_a_to.threads)
     , _m_threads(std::vector<std::jthread>(_a_to.threads))
     , _m_threads_free(set_from_min_to_n(_a_to.threads))
-    , _m_cli(_a_cli)
 //, _m_test_set_data(std::vector<_ABC_NS_DS::test_set_data_t>(_a_to.threads))
 {}
 

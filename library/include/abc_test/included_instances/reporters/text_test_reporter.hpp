@@ -53,10 +53,14 @@ public:
         report_test(const ds::invoked_test_data_t& _a_itd) const override;
     __no_constexpr virtual void
         final_report(ds::finalised_test_set_data_t& _a_test_set_data
-        ) const noexcept;
+        ) const noexcept override;
     __no_constexpr virtual void
         pre_test_run_report(ds::pre_test_run_report_t& _a_pre_test_run_report
-        ) const noexcept;
+        ) const noexcept override;
+    __constexpr bool has_colour_output() const noexcept
+    {
+        return _m_has_colour_output;
+    }
 private:
     bool           _m_has_colour_output;
     print_config_t _m_print_config;
@@ -78,8 +82,8 @@ _BEGIN_ABC_REPORTERS_NS
 __no_constexpr_imp
     text_test_reporter_t::text_test_reporter_t() noexcept
     : threated_text_output_reporter_t(std::cout)
-    , _m_print_config(print_config_t(true))
     , _m_has_colour_output(false)
+    , _m_print_config(print_config_t(true))
 {}
 
 __no_constexpr_imp
@@ -87,8 +91,8 @@ __no_constexpr_imp
         const std::filesystem::path& _a_file_output
     ) noexcept
     : threated_text_output_reporter_t(_a_file_output)
-    , _m_print_config(print_config_t(false))
     , _m_has_colour_output(true)
+    , _m_print_config(print_config_t(false))
 {}
 
 __no_constexpr_imp void

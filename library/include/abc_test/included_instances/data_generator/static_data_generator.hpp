@@ -100,8 +100,8 @@ __constexpr_imp
     ) // II. copy constructor
     : _m_rw_info(other._m_rw_info)
     , _m_idx(other._m_idx)
-    , _m_elements_size(other._m_elements_size)
     , _m_elements(new T[other._m_elements_size])
+    , _m_elements_size(other._m_elements_size)
 {
     std::ranges::copy(
         other._m_elements, other._m_elements + _m_elements_size, _m_elements

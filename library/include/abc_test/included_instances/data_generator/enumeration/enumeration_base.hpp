@@ -30,6 +30,7 @@ struct enumeration_base_t
 {
 public:
     using value_type_t = T;
+    __constexpr virtual ~enumeration_base_t() = default;
     __constexpr_imp virtual bool
         less_than(
             const T& _a_l,

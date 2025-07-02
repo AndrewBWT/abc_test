@@ -569,7 +569,6 @@ __constexpr result_t<std::basic_string<T>>
     using namespace std;
     using namespace std;
     using ResultType  = std::basic_string<T>;
-    using CharT       = typename ResultType::value_type;
     using itt         = typename string_view::const_iterator;
     // Use utf8cpp to iterate over code points
     itt        _l_itt = _a_str.begin();
@@ -887,7 +886,6 @@ __constexpr std::u8string
             ) noexcept
 {
     using namespace std;
-    using arg_type_t = basic_string<CharT>;
     u8string _l_rv{};
     auto     _l_itt{std::begin(_a_str)};
     auto     _l_end{std::end(_a_str)};
@@ -1674,7 +1672,7 @@ __constexpr std::conditional_t<
                             u8"the {2} code unit {3}, therefore meaning "
                             u8"this "
                             u8"code unit sequence is invalid.",
-                            _l_multi_code_unit_description.operator()<true>(
+                            _l_multi_code_unit_description.template operator()<true>(
                                 std::distance(_a_begin, _l_itt) + 1,
                                 basic_string_view<CharT>(_l_itt, _a_end)
                             ),
@@ -1695,7 +1693,7 @@ __constexpr std::conditional_t<
                             u8"the {3} code unit {4}, therefore meaning "
                             u8"this "
                             u8"code unit sequence is invalid.",
-                            _l_multi_code_unit_description.operator()<false>(
+                            _l_multi_code_unit_description.template operator()<false>(
                                 std::distance(_a_begin, _l_itt) + 1,
                                 basic_string_view<CharT>(_l_itt, _a_end)
                             ),
@@ -1754,7 +1752,7 @@ __constexpr std::conditional_t<
                             u8"between {3} and {4}. As {2} did not meet "
                             u8"this criteria, this code unit sequence is "
                             u8"invalid.",
-                            _l_multi_code_unit_description.operator()<false>(
+                            _l_multi_code_unit_description.template operator()<false>(
                                 std::distance(_a_begin, _l_itt) - _l_idx,
                                 basic_string_view<CharT>(
                                     std::prev(_l_itt, _l_idx + 1),
@@ -1802,7 +1800,7 @@ __constexpr std::conditional_t<
                         u8"using "
                         u8"the smallest possible char8_t representation. "
                         u8"Therefore, this code unit sequence is invalid.",
-                        _l_multi_code_unit_description.operator()<false>(
+                        _l_multi_code_unit_description.template operator()<false>(
                             std::distance(_a_begin, _l_itt)
                                 - (_l_code_point_size),
                             basic_string_view<CharT>(
@@ -1841,7 +1839,7 @@ __constexpr std::conditional_t<
                         u8"{2} to {3}, and from {4} to {5}. "
                         u8"As {1} is not within this range, this code unit "
                         u8"sequence is invalid.",
-                        _l_multi_code_unit_description.operator()<false>(
+                        _l_multi_code_unit_description.template operator()<false>(
                             std::distance(_a_begin, _l_itt)
                                 - (_l_code_point_size),
                             basic_string_view<CharT>(
@@ -1942,7 +1940,7 @@ __constexpr std::conditional_t<
                         u8"low surrogate code unit - inclusively between "
                         u8"{3} and {4}. As such, the code unit sequence "
                         u8"is invalid.",
-                        _l_multi_code_unit_description.operator()<false>(
+                        _l_multi_code_unit_description.template operator()<false>(
                             std::distance(_a_begin, _l_itt),
                             basic_string_view<CharT>(
                                 std::prev(_l_itt, 1), _l_itt + 1

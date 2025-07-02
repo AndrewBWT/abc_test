@@ -97,6 +97,7 @@ template <typename Option_Class>
 class cli_info_t
 {
 public:
+    __constexpr virtual ~cli_info_t() = default;
     __constexpr
     cli_info_t()
         = delete;
@@ -108,10 +109,10 @@ public:
         const std::size_t          _a_max_args,
         bool                       _a_enabled_for_config_file = true
     ) noexcept
-        : _m_option_config(_a_option_config)
-        , _m_enabled_for_config_file(_a_enabled_for_config_file)
-        , _m_min_arguments(_a_min_args)
+        : _m_min_arguments(_a_min_args)
         , _m_max_arguments(_a_max_args)
+        , _m_option_config(_a_option_config)
+        , _m_enabled_for_config_file(_a_enabled_for_config_file)
     {}
 
     __constexpr std::u8string_view
@@ -229,8 +230,8 @@ public:
     cli_no_args_t()
         = delete;
 
-    __constexpr virtual std::optional<std::string>
-        print() const noexcept
+    __constexpr virtual std::optional<std::u8string>
+        print() const noexcept override
     {
         using namespace abc::utility::printer;
         return default_printer_t<bool>().run_printer(_m_element_to_set.get());
@@ -250,8 +251,8 @@ public:
         return false;
     }
 private:
-    std::string_view             _m_positive_set;
-    std::string_view             _m_negative_set;
+    std::u8string_view             _m_positive_set;
+    std::u8string_view             _m_negative_set;
     std::reference_wrapper<bool> _m_element_to_set;
 };
 

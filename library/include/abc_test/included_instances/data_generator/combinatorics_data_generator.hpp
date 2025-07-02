@@ -1,8 +1,8 @@
 #pragma once
 
-#include "abc_test/included_instances/data_generator/combinatorics_data_generator/permutations_generator.hpp"
 #include "abc_test/core/data_generator/data_generator_collection.hpp"
 #include "abc_test/core/data_generator/data_generator_with_file_support.hpp"
+#include "abc_test/included_instances/data_generator/combinatorics_data_generator/permutations_generator.hpp"
 
 #include <unordered_set>
 
@@ -929,7 +929,8 @@ __constexpr_imp _ABC_NS_DG::data_generator_collection_t<
     )
 {
     using namespace _ABC_NS_DG;
-    auto ki = _a_es.get()->enumerate_all_values<std::vector<T>>(_a_edo);
+    auto ki
+        = _a_es.get()->template enumerate_all_values<std::vector<T>>(_a_edo);
     const std::size_t _l_range_size{std::ranges::size(ki)};
     return using_combinatorics_generator<
         T,

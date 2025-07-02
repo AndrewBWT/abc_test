@@ -119,7 +119,7 @@ public:
      */
     __constexpr bool
         operator==(const post_setup_test_data_t& _a_rhs) const noexcept
-        = default;
+        = delete;
 private:
     // A cref to the registered_test_data_t object associated with this test.
     const registered_test_data_t& _m_registered_test_data;
@@ -176,7 +176,6 @@ __constexpr_imp
     , _m_test_path_hierarchy(_a_test_path_hierarchy)
     , _m_discovery_id(_a_discovery_id)
     , _m_is_test_to_be_ran(_a_is_test_to_be_ran)
-    , _m_for_loop_stack_trie(_a_repetition_data)
     , _m_thread_resourses_required(
           _a_registered_test_data._m_user_data.threads_required == 0
               ? _a_maximum_threads_allowed
@@ -185,6 +184,7 @@ __constexpr_imp
                     _a_registered_test_data._m_user_data.threads_required
                 )
       )
+    , _m_for_loop_stack_trie(_a_repetition_data)
     , _m_unique_id(_a_unique_id)
 {}
 

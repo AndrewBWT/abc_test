@@ -26,7 +26,6 @@ requires std::
     using namespace std;
     using namespace _ABC_NS_MATCHER;
     using T = std::ranges::range_value_t<R1>;
-    size_t                      _l_idx{0};
     typename R1::const_iterator _l_itt_1{std::begin(_a_range_1)};
     typename R1::const_iterator _l_itt_1_end{std::end(_a_range_2)};
     typename R2::const_iterator _l_itt_2{std::begin(_a_range_2)};
@@ -127,7 +126,6 @@ __constexpr matcher_t
 {
     using namespace std;
     using namespace _ABC_NS_MATCHER;
-    bool _l_all_equal{true};
     using T          = std::ranges::range_value_t<R>;
     using Range_Type = std::remove_cvref_t<R>;
     optional<T> _l_value_to_check_against;

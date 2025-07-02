@@ -37,8 +37,9 @@ __no_constexpr_imp
         const std::filesystem::path& _a_file_name
         //	const test_options_base_t* _a_test_options
     )
-    : _m_file_handler(std::shared_ptr<std::ofstream>())
-    , _m_current_line_idx(0)
+    
+   : _m_current_line_idx(0)
+    , _m_file_handler(std::shared_ptr<std::ofstream>())
     , _m_file_name(normalise_for_file_use(_a_file_name.u8string()))
 //	, _m_test_options(_a_test_options)
 {

@@ -508,7 +508,7 @@ matcher_based_assertion_block(
     matcher_source_map_t        _l_msm;
     _a_matcher.gather_map_source(_l_msm);
     _l_passed = _l_mr.passed();
-    _l_gur    = new assertion_t<T>(
+    _l_gur    = new assertion_t<true, T>(
         _a_source,
         _a_test_runner.get_log_infos(false),
         _a_str_to_print,

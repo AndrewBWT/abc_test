@@ -15,6 +15,12 @@ struct matcher_based_assertion_single_line_list_formatter_t
 public:
     using assertion_list_formatter_t<true, Assertion_Status>::
         assertion_list_formatter_t;
+    using assertion_list_formatter_t<true, Assertion_Status>::
+        assertion_list_formatter_t::check_data;
+    using list_formattable_t<
+        reports::matcher_based_assertion_single_line_t<Assertion_Status>,
+        combined_enum_matcher_based_assertion_single_line_fields_t,
+        print_config_t>::check_data;
     __constexpr virtual bool
         check_data(
             const combined_enum_matcher_based_assertion_single_line_fields_t&
@@ -22,6 +28,12 @@ public:
             const reports::matcher_based_assertion_single_line_t<
                 Assertion_Status>& _a_element
         ) const override;
+    using assertion_list_formatter_t<true, Assertion_Status>::
+        assertion_list_formatter_t::get_data;
+    using list_formattable_t<
+        reports::matcher_based_assertion_single_line_t<Assertion_Status>,
+        combined_enum_matcher_based_assertion_single_line_fields_t,
+        print_config_t>::get_data;
     __constexpr virtual void
         get_data(
             const combined_enum_matcher_based_assertion_single_line_fields_t&

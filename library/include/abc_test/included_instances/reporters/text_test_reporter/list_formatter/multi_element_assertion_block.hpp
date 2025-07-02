@@ -14,12 +14,22 @@ struct multi_element_test_block_list_formatter_t
 public:
     using assertion_list_formatter_t<false, Assertion_Status>::
         assertion_list_formatter_t;
+    using list_formattable_t<
+        reports::multi_element_assertion_block_t<Assertion_Status>,
+        combined_enum_multi_element_assertion_block_fields_t,
+        print_config_t>::check_data;
+    using assertion_list_formatter_t<false, Assertion_Status>::check_data;
     __constexpr virtual bool
         check_data(
             const combined_enum_multi_element_assertion_block_fields_t& _a_fid,
             const reports::multi_element_assertion_block_t<Assertion_Status>&
                 _a_element
         ) const override;
+    using list_formattable_t<
+        reports::multi_element_assertion_block_t<Assertion_Status>,
+        combined_enum_multi_element_assertion_block_fields_t,
+        print_config_t>::get_data;
+    using assertion_list_formatter_t<false, Assertion_Status>::get_data;
     __constexpr virtual void
         get_data(
             const combined_enum_multi_element_assertion_block_fields_t& _a_fid,
@@ -185,10 +195,6 @@ __constexpr_imp void
             {
                 if (_l_element.second.size() == 1)
                 {
-                    std::tuple<
-                        matcher_result_t,
-                        std::optional<std::u8string>,
-                        matcher_source_map_t>;
                     bba_inner_assertion_type_t _l_matcher(
                         get<3>(_l_element.second[0]),
                         get<0>(_l_element.first),
@@ -220,10 +226,6 @@ __constexpr_imp void
                         _l_element.second.size(),
                         get_str(get<1>(_l_element.first))
                     ))));
-                    std::tuple<
-                        matcher_result_t,
-                        std::optional<std::string>,
-                        matcher_source_map_t>;
                     bba_inner_assertion_type_t _l_matcher(
                         get<3>(_l_element.second[0]),
                         get<0>(_l_element.first),

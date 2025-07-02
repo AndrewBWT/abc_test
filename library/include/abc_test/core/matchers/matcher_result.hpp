@@ -21,15 +21,17 @@ public:
 
     __constexpr
     matcher_result_infos_t()
-        : _m_primary_data(u8"false")
-        , _m_tree_info(std::vector<tree_structure_t>())
+        
+        : _m_tree_info(std::vector<tree_structure_t>())
+        , _m_primary_data(u8"false")
     {}
 
     __constexpr
     matcher_result_infos_t(
         const std::u8string_view _a_str
     )
-        : _m_primary_data(_a_str), _m_tree_info(std::vector<tree_structure_t>())
+        : _m_tree_info(std::vector<tree_structure_t>())
+        , _m_primary_data(_a_str)
     {}
 
     __constexpr
@@ -39,8 +41,9 @@ public:
         const std::vector<tree_structure_t>& _a_tree_info
         = std::vector<tree_structure_t>()
     )
-        : _m_primary_data(_a_str)
-        , _m_tree_info(_a_tree_info)
+        
+        : _m_tree_info(_a_tree_info)
+        , _m_primary_data(_a_str)
         , _m_additional_info(_a_additional_info)
     {}
 
@@ -158,17 +161,17 @@ public:
             const std::optional<ds::single_source_t>& _a_source
             = std::optional<ds::single_source_t>{}
         ) noexcept
-        : _m_matcher_result(
-              matcher_result_t(_a_pass_or_failure, matcher_result_infos_t())
-          )
+        : _m_log_infos(_a_log_infos)
+        , _m_matcher_result(
+            matcher_result_t(_a_pass_or_failure, matcher_result_infos_t())
+        )
         , _m_annotation(_a_opt_msg)
-        , _m_source(_a_source)
         , _m_source_map(matcher_source_map_t{})
+        , _m_source(_a_source)
         , _m_enum_bba_inner_assertion_type(
-              enum_bba_inner_assertion_type_t::STATIC_ASSERTION
-          )
+            enum_bba_inner_assertion_type_t::STATIC_ASSERTION
+        )
         , _m_terminate(_a_terminate)
-        , _m_log_infos(_a_log_infos)
     {}
 
     __no_constexpr_imp
@@ -183,15 +186,15 @@ public:
             const matcher_source_map_t& _a_matcher_source_map
             = matcher_source_map_t()
         ) noexcept
-        : _m_matcher_result(_a_matcher_result)
+        : _m_log_infos(_a_log_infos)
+        , _m_matcher_result(_a_matcher_result)
         , _m_annotation(_a_annotation)
-        , _m_source(_a_source)
         , _m_source_map(_a_matcher_source_map)
+        , _m_source(_a_source)
         , _m_enum_bba_inner_assertion_type(
-              enum_bba_inner_assertion_type_t::MATCHER_BASED_ASSERTION
-          )
+            enum_bba_inner_assertion_type_t::MATCHER_BASED_ASSERTION
+        )
         , _m_terminate(_a_terminate)
-        , _m_log_infos(_a_log_infos)
     {}
 
     __no_constexpr_imp
@@ -205,13 +208,13 @@ public:
             const enum_bba_inner_assertion_type_t
                 _a_enum_bba_inner_assertion_type
         ) noexcept
-        : _m_matcher_result(_a_matcher_result)
+        :  _m_log_infos(_a_log_infos)
+        , _m_matcher_result(_a_matcher_result)
         , _m_annotation(_a_annotation)
-        , _m_source(_a_source)
         , _m_source_map(_a_matcher_source_map)
+        , _m_source(_a_source)
         , _m_enum_bba_inner_assertion_type(_a_enum_bba_inner_assertion_type)
         , _m_terminate(_a_terminate)
-        , _m_log_infos(_a_log_infos)
     {}
 
     __constexpr_imp const matcher_result_t&

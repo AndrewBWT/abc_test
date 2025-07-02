@@ -80,8 +80,7 @@ __constexpr_imp precedence_t
     }
     else
     {
-        __STATIC_ASSERT(
-            Logic_Enum,
+        __STATIC_ASSERT_NO_TYPE(
             "precedence function does not have value for given template type."
         );
         return 0;
@@ -107,8 +106,7 @@ __constexpr_imp const std::u8string_view
     }
     else
     {
-        __STATIC_ASSERT(
-            Logic_Enum,
+        __STATIC_ASSERT_NO_TYPE(
             "precedence function does not have value for given template type."
         );
         return u8"";
@@ -137,8 +135,7 @@ __constexpr_imp bool
     }
     else
     {
-        __STATIC_ASSERT(
-            Logic_Enum,
+        __STATIC_ASSERT_NO_TYPE(
             "compute_logic_result function does not have value for given "
             "template type."
         );

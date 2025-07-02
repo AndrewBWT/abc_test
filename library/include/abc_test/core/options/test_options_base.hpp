@@ -14,6 +14,7 @@
 #include <fmt/color.h>
 #include <fstream>
 #include <map>
+#include <vector>
 
 _BEGIN_ABC_NS
 
@@ -40,8 +41,8 @@ public:
     __no_constexpr
         test_options_base_t() noexcept
         = default;
-    std::size_t autofile_size                      = 1'000;
-    std::u8string autofile_name                      = u8"autofile";
+    std::size_t   autofile_size                    = 1'000;
+    std::u8string autofile_name                    = u8"autofile";
     /*!
      * @brief Path delimiter used to separate tests into their components.
      *
@@ -76,15 +77,15 @@ public:
      * elements. This is specifically for those files where the reader and
      * writer uses fmt::format and scn::scan.
      */
-    std::u8string general_data_extension                       = u8"gd";
-    std::u8string tertiary_data_file_extension                 = u8"td";
+    std::u8string general_data_extension                     = u8"gd";
+    std::u8string tertiary_data_file_extension               = u8"td";
     /*!
      * @brief The comment line string.
      *
      * In read data files, lines beginning with this string are identified as
      * comments and ignored.
      */
-    std::u8string comment_str                                  = u8"#";
+    std::u8string comment_str                                = u8"#";
     /*!
      * @brief Turn on (or off) the ability for the system to write data to
      * files.
@@ -149,8 +150,8 @@ public:
      */
     std::vector<std::u8string> test_paths_to_run;
     std::u8string              autofile_metadata_string = u8"metadata";
-    std::size_t maximum_individual_alloctable_memory = 2'147;// 483'648;
-    bool retain_passed_assertions = false;
+    std::size_t maximum_individual_alloctable_memory    = 2'147; // 483'648;
+    bool        retain_passed_assertions                = false;
     /*!
      * @brief Function to validate the input.
      *
@@ -279,7 +280,7 @@ __no_constexpr_imp void
             u8"test_reporters must have atleast one element. Otherwise tests "
             u8"cannot be reported. "
             u8"If no others are available, "
-            u8"included_instances/reporters/text_test_reporter.h contains an "
+            u8"included_instances/reporters/text_test_reporter.hpp contains an "
             u8"instance which prints tests to the console."
         ));
     }
@@ -300,7 +301,8 @@ __no_constexpr_imp void
     if (test_lists.size() == 0 && use_global_test_list == false)
     {
         _a_error_ref.push_back(fmt::format(
-            u8"test_lists must have atleast one element or use_global_test_list "
+            u8"test_lists must have atleast one element or "
+            u8"use_global_test_list "
             u8"must be set to true. use_global_test_list = {0}",
             use_global_test_list
         ));
@@ -346,11 +348,13 @@ __no_constexpr_imp void
             comment_str
         ));
     }
-    if (general_data_extension.empty() || general_data_extension.contains(u8"\n")
+    if (general_data_extension.empty()
+        || general_data_extension.contains(u8"\n")
         || general_data_extension.contains(u8"."))
     {
         _a_error_ref.push_back(fmt::format(
-            u8"Invalid general_data_extension ({0}). Cannot be empty or contain "
+            u8"Invalid general_data_extension ({0}). Cannot be empty or "
+            u8"contain "
             u8"any of the following: {{\\n,'.'",
             general_data_extension
         ));
@@ -429,7 +433,9 @@ __no_constexpr_imp std::string
         "root_path",
         _a_opts.root_path,
         "global_seed",
-        cast_u8string_to_string(default_printer_t<global_seed_t>{}.run_printer(_a_opts.global_seed)),
+        cast_u8string_to_string(
+            default_printer_t<global_seed_t>{}.run_printer(_a_opts.global_seed)
+        ),
         "number_of_integers_used_to_seed_random_generators",
         _a_opts.number_of_integers_used_to_seed_random_generators,
         "general_data_extension",

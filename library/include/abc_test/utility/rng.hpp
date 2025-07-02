@@ -166,7 +166,7 @@ __constexpr_imp rng_t
     {
         *_l_itt = (*this)();
     }
-    return rng_t(move(_l_rng.make_rng(_l_seed)), move(_l_seed));
+    return rng_t(_l_rng.make_rng(_l_seed), _l_seed);
 }
 
 template <typename Rng>
@@ -194,7 +194,7 @@ __constexpr_imp rng_t
         {
             *_l_itt = rand();
         }
-        return make_rng<Rng>(move(_l_seed));
+        return make_rng<Rng>(std::move(_l_seed));
     }
     case 1:
         return make_rng<Rng>(get<1>(_a_global_seed));
@@ -213,7 +213,7 @@ __constexpr_imp rng_t
     ) noexcept
 {
     using namespace std;
-    return rng_t(make_unique<Rng>(_a_seed), move(_a_seed));
+    return rng_t(make_unique<Rng>(_a_seed), std::move(_a_seed));
 }
 
 template <typename Rng>

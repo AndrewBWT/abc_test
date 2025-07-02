@@ -4,7 +4,7 @@
 #include "abc_test/utility/cli/cli_option_config.hpp"
 #include "abc_test/core/ds/type_synonyms.hpp"
 _BEGIN_ABC_NS
-class included_instances_test_options_t;
+struct included_instances_test_options_t;
 _END_ABC_NS
 _BEGIN_ABC_DS_NS
 

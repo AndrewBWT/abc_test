@@ -102,10 +102,10 @@ __constexpr matcher_result_t
     ) noexcept
 {
     using namespace std;
-    u8string   _l_left_str{format_str<T1>(forward<T1>(_a_t1))};
-    u8string   _l_right_str{format_str<T2>(forward<T2>(_a_t2))};
+    u8string   _l_left_str{format_str<T1>(std::forward<T1>(_a_t1))};
+    u8string   _l_right_str{format_str<T2>(std::forward<T2>(_a_t2))};
     const bool _l_result{
-        cmp<T1, T2, Cmp>(forward<T1>(_a_t1), forward<T2>(_a_t2))
+        cmp<T1, T2, Cmp>(std::forward<T1>(_a_t1), std::forward<T2>(_a_t2))
     };
     return matcher_result_t(
         _l_result,
@@ -194,12 +194,12 @@ __constexpr_imp matcher_t
                     Stripped_Type_T1,
                     Stripped_Type_T2,
                     Cmp_Enum>()
-                    .run(forward<T1>(_a_left_arg), forward<T2>(_a_right_arg));
+                    .run(std::forward<T1>(_a_left_arg), std::forward<T2>(_a_right_arg));
     }
     else
     {
         _l_mr = make_matcher_result<Cmp_Enum>(
-            forward<T1>(_a_left_arg), forward<T2>(_a_right_arg)
+            std::forward<T1>(_a_left_arg), std::forward<T2>(_a_right_arg)
         );
     }
     return mk_matcher_using_result_and_precedence(
@@ -223,7 +223,7 @@ __constexpr_imp matcher_t
     using namespace _ABC_NS_MATCHER;
     using enum comparison_enum_t;
     return make_cmp_matcher<T1, T2, EQ>(
-        forward<T1>(_a_left_arg), forward<T2>(_a_right_arg)
+        std::forward<T1>(_a_left_arg), std::forward<T2>(_a_right_arg)
     );
 }
 
@@ -238,7 +238,7 @@ __constexpr_imp matcher_t
     using namespace _ABC_NS_MATCHER;
     using enum comparison_enum_t;
     return make_cmp_matcher<T1, T2, NEQ>(
-        forward<T1>(_a_left_arg), forward<T2>(_a_right_arg)
+        std::forward<T1>(_a_left_arg), std::forward<T2>(_a_right_arg)
     );
 }
 
@@ -253,7 +253,7 @@ __constexpr_imp matcher_t
     using namespace _ABC_NS_MATCHER;
     using enum comparison_enum_t;
     return make_cmp_matcher<T1, T2, LT>(
-        forward<T1>(_a_left_arg), forward<T2>(_a_right_arg)
+        std::forward<T1>(_a_left_arg), std::forward<T2>(_a_right_arg)
     );
 }
 
@@ -268,7 +268,7 @@ __constexpr_imp matcher_t
     using namespace _ABC_NS_MATCHER;
     using enum comparison_enum_t;
     return make_cmp_matcher<T1, T2, LEQ>(
-        forward<T1>(_a_left_arg), forward<T2>(_a_right_arg)
+        std::forward<T1>(_a_left_arg), std::forward<T2>(_a_right_arg)
     );
 }
 
@@ -283,7 +283,7 @@ __constexpr_imp matcher_t
     using namespace _ABC_NS_MATCHER;
     using enum comparison_enum_t;
     return make_cmp_matcher<T1, T2, GT>(
-        forward<T1>(_a_left_arg), forward<T2>(_a_right_arg)
+        std::forward<T1>(_a_left_arg), std::forward<T2>(_a_right_arg)
     );
 }
 
@@ -298,7 +298,7 @@ __constexpr_imp matcher_t
     using namespace _ABC_NS_MATCHER;
     using enum comparison_enum_t;
     return make_cmp_matcher<T1, T2, GEQ>(
-        forward<T1>(_a_left_arg), forward<T2>(_a_right_arg)
+        std::forward<T1>(_a_left_arg), std::forward<T2>(_a_right_arg)
     );
 }
 

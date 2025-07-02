@@ -118,6 +118,8 @@ parser_input_t::parser_input_t(
     _m_end_itt = _m_complete_string.end();
 }
 
+
+
 __constexpr void
     parser_input_t::check_advance_and_throw(
         const char32_t _a_char_to_check_against
@@ -256,7 +258,7 @@ __no_constexpr_imp std::u32string
     size_t    _l_idx{0};
     while (_m_cur_itt < _m_end_itt)
     {
-        char32_t _l_char;
+        char32_t _l_char{ U'\0' };
         auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(_m_cur_itt,_m_end_itt) };
         if (_l_char_res.has_value())
         {
@@ -313,7 +315,7 @@ __constexpr bool
     {
         if (_l_curr_itt_cpy < _m_end_itt)
         {
-            char32_t _l_char;
+            char32_t _l_char{ U'\0' };
             auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(_l_curr_itt_cpy,_m_end_itt) };
             if (_l_char_res.has_value())
             {
@@ -347,13 +349,13 @@ __constexpr bool
     {
         if (_l_curr_itt_cpy < _m_end_itt)
         {
-            char32_t _l_char;
+            char32_t _l_char{ U'\0' };
             auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(_l_curr_itt_cpy,_m_end_itt) };
             if (_l_char_res.has_value())
             {
                 _l_char = _l_char_res.value();
             }
-            char32_t _l_char_to_check;
+            char32_t _l_char_to_check{ U'\0' };
             auto _l_char_res_2{ _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(_l_itt,_l_end) };
             if (_l_char_res_2.has_value())
             {
@@ -468,7 +470,6 @@ __constexpr std::size_t
 __no_constexpr_imp char32_t
     parser_input_t::operator*() const noexcept
 {
-    char32_t _l_char;
     auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t<false>(_m_cur_itt,_m_end_itt) };
     if (_l_char_res.has_value())
     {

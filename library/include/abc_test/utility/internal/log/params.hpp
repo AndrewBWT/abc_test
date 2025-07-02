@@ -23,7 +23,7 @@ _BEGIN_ABC_UTILITY_INTERNAL_NS
 			is_set(
 				const internal_log_enum_t _a_internal_looger_enum
 			) const noexcept;
-		friend class internal_log_t;
+		friend struct internal_log_t;
 		bool _m_parsing_seed_on;
 		bool _m_test_info_on;
 		bool _m_repetition_info_on;

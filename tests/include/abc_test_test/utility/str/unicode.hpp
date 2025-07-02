@@ -665,6 +665,7 @@ _TEST_CASE(
                 is_valid_ascii_char(_l_unicode_char) == _l_result_valid_ascii
             ));
         }
+        auto kidf = default_enumeration<size_t>();
         for (const auto& _l_data : enumerate_data<T>(
                  from_m_to_n(static_cast<T>(0x00), static_cast<T>(0x7F))
              ))
@@ -746,7 +747,6 @@ _TEST_CASE(
     auto _l_test_func = [&]<typename T>()
     {
         auto _l_name{get_name<T>()};
-        using CharT = typename T::value_type;
         auto _l_type_name{fmt::format("{0}", typeid(T).name())};
         _BEGIN_MULTI_ELEMENT_BBA(
             _l_unit_tests,
@@ -891,7 +891,6 @@ _TEST_CASE(
     auto _l_test_func = [&]<typename T>()
     {
         auto _l_name{get_name<T>()};
-        using CharT = typename T::value_type;
         auto _l_type_name{fmt::format("{0}", typeid(T).name())};
         _BEGIN_MULTI_ELEMENT_BBA(
             _l_unit_tests,

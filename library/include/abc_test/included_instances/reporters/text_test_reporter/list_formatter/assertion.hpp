@@ -16,12 +16,24 @@ struct assertion_list_formatter_t
 public:
     using user_initialised_report_list_formatter_t<
         Single_Source>::user_initialised_report_list_formatter_t;
+    using user_initialised_report_list_formatter_t<
+        Single_Source>::user_initialised_report_list_formatter_t::check_data;
+    using list_formattable_t<
+        reports::assertion_t<Single_Source, Assertion_Status>,
+        combined_enum_assertion_fields_t,
+        print_config_t>::check_data;
     __constexpr virtual bool
         check_data(
             const combined_enum_assertion_fields_t& _a_fid,
             const reports::assertion_t<Single_Source, Assertion_Status>&
                 _a_element
-        ) const;
+        ) const override;
+    using user_initialised_report_list_formatter_t<
+        Single_Source>::user_initialised_report_list_formatter_t::get_data;
+    using list_formattable_t<
+        reports::assertion_t<Single_Source, Assertion_Status>,
+        combined_enum_assertion_fields_t,
+        print_config_t>::get_data;
     __constexpr virtual void
         get_data(
             const combined_enum_assertion_fields_t& _a_fid,
@@ -30,7 +42,7 @@ public:
             const print_config_t&                               _a_pc,
             const utility::io::threated_text_output_reporter_t& _a_ttor,
             const std::size_t                                   _a_idx
-        ) const;
+        ) const override;
     __constexpr virtual std::u8string
         get_str_representation(
             const reports::assertion_t<Single_Source, Assertion_Status>&
@@ -134,11 +146,12 @@ __constexpr_imp void
         case TEST_DESCRIPTION:
             if constexpr (not Single_Source)
             {
-                _l_pair
-                    = {_a_pc.colon(_a_pc.test_description_str()),
-                       _a_pc.indent(_a_pc.test_description(cast_string_to_u8string(
-                           _a_element.test_description()
-                       )))};
+                _l_pair = {
+                    _a_pc.colon(_a_pc.test_description_str()),
+                    _a_pc.indent(_a_pc.test_description(
+                        cast_string_to_u8string(_a_element.test_description())
+                    ))
+                };
             }
             else
             {
@@ -167,7 +180,6 @@ __constexpr_imp void
     }
     else
     {
-        int i = 3;
     }
 }
 
@@ -181,9 +193,9 @@ __constexpr_imp std::u8string
 {
     using namespace std;
     using namespace reports;
-    const bool   _l_passed{_a_element.get_pass_status()};
+    const bool     _l_passed{_a_element.get_pass_status()};
     const u8string _l_terminate_function_str{
-        (not _l_passed && same_as<Assertion_Status, pass_or_terminate_t>
+        (not (_l_passed && same_as<Assertion_Status, pass_or_terminate_t>)
          || same_as<Assertion_Status, terminate_t>)
             ? u8" Assertion terminated function."
             : u8""

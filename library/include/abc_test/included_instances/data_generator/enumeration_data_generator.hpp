@@ -69,10 +69,10 @@ __constexpr_imp
         const _ABC_NS_DG::enumeration_schema_t<T>& _a_es
     ) noexcept
     : _m_enum_schema(_a_es)
-    , _m_tertiary_data(tertiary_type{0})
-    , _m_has_current_element{true}
-    , _m_start_value(_a_es->start_value())
     , _m_current_element(_a_es->start_value())
+    , _m_tertiary_data(tertiary_type{0})
+    , _m_has_current_element{ true }
+    , _m_start_value(_a_es->start_value())
     , _m_end_value(_a_es->end_value())
     , _m_forward_direction(_a_es->is_direction_forward())
     , _m_number_of_complete_advancements_to_end(

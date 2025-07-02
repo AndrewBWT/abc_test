@@ -96,8 +96,8 @@ assertion_block_matcher_data_list_formatter_t::
     ) noexcept
     : _m_indent_offset(_a_indent_offset)
     , _m_index(_a_index)
-    , _m_max_index(_a_max_index)
     , _m_global_indent(_a_global_indent)
+    , _m_max_index(_a_max_index)
     , _m_use_indexes(_a_use_indexes)
 {}
 
@@ -190,7 +190,6 @@ __no_constexpr_imp void
                 ),
                 _m_indent_offset
             ));
-            const auto& _l_matcher_strs{_l_matcher_result.str()};
             vector<variant<
                 tuple<size_t, size_t, u8string>,
                 pair<vector<u8string>, matcher::matcher_result_infos_t>>>
@@ -390,7 +389,7 @@ __no_constexpr_imp void
                 _a_pc.colon(_a_pc.matcher_source_map_str()), _m_indent_offset
             )
         ));
-        for (const pair<std::source_location, vector<string>>& _l_element :
+        for (const pair<std::source_location, vector<string>> _l_element :
              _a_element.source_map().map())
         {
             _a_ttor.write_line(fmt::format(
@@ -448,7 +447,7 @@ __no_constexpr_imp void
         _a_ttor.write_line(fmt::format(
             u8"{0}{1}", prefix(_a_idx), _a_pc.colon(_a_pc.log_info_str())
         ));
-        for (const u8string_view& _l_str : _a_element.log_infos())
+        for (const u8string_view _l_str : _a_element.log_infos())
         {
             _a_ttor.write_line(fmt::format(
                 u8"{0}{1}",

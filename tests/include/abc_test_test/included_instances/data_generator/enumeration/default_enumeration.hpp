@@ -28,12 +28,12 @@ inline void
         size_t _l_tmp_size_t{_l_idx + 1};
         T      _l_value2{0};
         _l_size_t = 1;
-        bool _l_has_result{
+       
             _l_enumerator.increment(_l_value, _l_size_t, optional<T>{})
-        };
-        bool _l_has_result2{
+        ;
+        
             _l_enumerator.increment(_l_value2, _l_tmp_size_t, optional<T>{})
-        };
+        ;
         _REQUIRE(_EXPR(_l_value == _l_value2));
     }
 }
@@ -67,6 +67,7 @@ inline void
              ))
         {
             ++_l_idx;
+            std::cout << _l_vector.size() << std::endl;
         }
         if (_l_diff.second != 0)
         {

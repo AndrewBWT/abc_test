@@ -9,6 +9,7 @@ _BEGIN_ABC_REPORTERS_NS
  */
 struct error_reporter_t
 {
+    __constexpr virtual ~error_reporter_t() = default;
     /*!
      * @brief Function to manage a setup_error_t being reported.
      * @param _a_error The error being reported.

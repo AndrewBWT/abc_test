@@ -4,9 +4,10 @@
 #include "abc_test/utility/printers/default_printer.hpp"
 
 #include <cuchar>
+#include "abc_test/utility/types.hpp"
 
 _BEGIN_ABC_DS_NS
-struct map_unique_id_to_tdg_collection_stack_trie_t;
+class map_unique_id_to_tdg_collection_stack_trie_t;
 using parse_map_unique_id_to_tdg_collection_stack_trie_result_t
     = result_t<map_unique_id_to_tdg_collection_stack_trie_t>;
 using key_t = std::u8string;
@@ -181,9 +182,6 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
             = abc::utility::str::from_hex_with_exception(_l_str_hex);
         if (_l_compressed_scan_result.has_value())
         {
-            const typeless_data_generator_collection_stack_trie_t& _l_it{
-                _l_compressed_scan_result.value()
-            };
             const bool _l_result{
                 _l_map.insert(_l_str, _l_compressed_scan_result.value())
             };
@@ -220,7 +218,7 @@ __no_constexpr_imp std::u8string
 {
     using namespace std;
     u8string _l_rv;
-    for (const pair<key_t, tdg_collection_stack_trie_t>& _l_element :
+    for (const pair<key_t, tdg_collection_stack_trie_t> _l_element :
          _a_map.map())
     {
         u8string _l_key_compressed, _l_key_compressed_2;
@@ -255,7 +253,7 @@ __no_constexpr_imp std::u8string
     using namespace std;
     using namespace abc::utility::printer;
     u8string _l_rv;
-    for (const pair<key_t, tdg_collection_stack_trie_t>& _l_element :
+    for (const pair<key_t, tdg_collection_stack_trie_t> _l_element :
          _a_map.map())
     {
         u8string _l_key_compressed, _l_key_compressed_2;

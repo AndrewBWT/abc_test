@@ -87,8 +87,7 @@ __constexpr_imp precedence_t
     }
     else
     {
-        __STATIC_ASSERT(
-            Comparison_Enum,
+        __STATIC_ASSERT_NO_TYPE(
             "precedence function does not have value for given template type."
         );
         return 0;
@@ -129,8 +128,7 @@ __constexpr_imp bool
     }
     else
     {
-        __STATIC_ASSERT(
-            Comparison_Enum,
+        __STATIC_ASSERT_NO_TYPE(
             "cmp function does not have value for given template type."
         );
         return true;
@@ -168,11 +166,10 @@ __constexpr_imp std::u8string_view
     }
     else
     {
-        __STATIC_ASSERT(
-            Comparison_Enum,
+        __STATIC_ASSERT_NO_TYPE(
             "str function does not have value for given template type."
         );
-        return "";
+        return u8"";
     }
 }
 template<comparison_enum_t Comparison_Enum>
@@ -206,11 +203,10 @@ not_cmp_str() noexcept
     }
     else
     {
-        __STATIC_ASSERT(
-            Comparison_Enum,
+        __STATIC_ASSERT_NO_TYPE(
             "not_cmp_str function does not have value for given template type."
         );
-        return "";
+        return u8"";
     }
 }
 _END_ABC_MATCHER_NS

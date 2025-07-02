@@ -406,31 +406,32 @@ __constexpr_imp
     print_config_t::print_config_t(
         const bool _a_colours_enabled
     ) noexcept
-    : _m_matcher_assertion_fields(default_matcher_based_assertion_fields())
-    , _m_matcher_assertion_block_fields(
-          default_matcher_based_assertion_block_fields()
-      )
-    , _m_static_assertion_fields(default_static_fields())
-    , _m_after_execution_test_report_fields_t(
+    
+    : _m_after_execution_test_report_fields_t(
           default_after_execution_test_report_fields()
       )
-    , _m_colours_enabled(_a_colours_enabled)
-    , _m_unexpected_thrown_non_descript_entity_fields(
-          default_unexpected_thrown_non_descript_entity_fields()
-      )
-    , _m_thrown_exception_fields(default_unexpected_exception_fields())
     , _m_finalised_test_set_data_fields(default_finalised_test_set_data_fields()
-      )
+    )
     , _m_pre_test_set_data_fields(default_pre_test_set_data_fields())
-    , _m_matcher_assertion_single_block_assertion_list_fields(
-          default_matcher_based_assertion_single_block_assertion_fields()
-      )
-    , _m_matcher_assertion_multi_block_assertion_list_fields(
-          default_matcher_based_assertion_multi_block_assertion_fields()
-      )
+    , _m_matcher_assertion_fields(default_matcher_based_assertion_fields())
+    , _m_matcher_assertion_block_fields(
+        default_matcher_based_assertion_block_fields()
+    )
     , _m_multi_element_test_block_fields(
           default_multi_element_assertion_block_fields()
       )
+    , _m_static_assertion_fields(default_static_fields())
+    , _m_unexpected_thrown_non_descript_entity_fields(
+        default_unexpected_thrown_non_descript_entity_fields()
+    )
+    , _m_thrown_exception_fields(default_unexpected_exception_fields())
+    , _m_matcher_assertion_single_block_assertion_list_fields(
+        default_matcher_based_assertion_single_block_assertion_fields()
+    )
+    , _m_matcher_assertion_multi_block_assertion_list_fields(
+        default_matcher_based_assertion_multi_block_assertion_fields()
+    )
+    , _m_colours_enabled(_a_colours_enabled)
 {}
 
 __constexpr_imp std::u8string

@@ -11,7 +11,7 @@
 _BEGIN_ABC_DS_NS
 // Forward declarations
 class test_tree_t;
-struct test_tree_iterator_t;
+class test_tree_iterator_t;
 
 namespace
 {

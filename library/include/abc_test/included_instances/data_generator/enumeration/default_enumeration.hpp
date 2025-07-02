@@ -1,6 +1,7 @@
 #pragma once
 #include "abc_test/external/bigint/BigIntegerUtils.hpp"
 #include "abc_test/included_instances/data_generator/enumeration/enumeration_base.hpp"
+#include "abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_to_n_inner.hpp"
 #include "abc_test/included_instances/data_generator/enumeration/enumeration_schema_base.hpp"
 #include "abc_test/utility/enum.hpp"
 #include "abc_test/utility/limits/max_value_concept.hpp"
@@ -35,14 +36,27 @@ public:
 };
 
 _END_ABC_DG_NS
-
 _BEGIN_ABC_NS
 template <typename T, typename... Ts>
 __constexpr data_gen::enumeration_t<T>
             default_enumeration(Ts... _a_elements) noexcept;
 _END_ABC_NS
 
+_BEGIN_ABC_NS
+template <typename T, typename... Ts>
+__constexpr_imp data_gen::enumeration_t<T>
+                default_enumeration(
+                    Ts... _a_elements
+                ) noexcept
+{
+    using namespace std;
+    using namespace _ABC_NS_DG;
+    return make_shared<default_enumeration_t<T>>(_a_elements...);
+}
+
+_END_ABC_NS
 _BEGIN_ABC_DG_NS
+
 template <typename T>
 __constexpr_imp bool
     default_enumeration_t<T>::less_than(
@@ -327,8 +341,6 @@ __constexpr std::size_t
     }
     for (size_t _l_idx{sizeof(T) * CHAR_BIT - 1}; _l_idx > 0; --_l_idx)
     {
-        auto ki = sizeof(size_t) * CHAR_BIT - _l_idx;
-        auto k2 = sizeof(T) * CHAR_BIT - _l_idx;
         _l_sizet_bitset[sizeof(size_t) * CHAR_BIT - _l_idx - 1]
             = _l_bitset[sizeof(T) * CHAR_BIT - _l_idx - 1];
     }
@@ -346,16 +358,16 @@ struct default_enumeration_t<T> : public enumeration_base_t<T>
         = 0b0111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111;
     std::optional<T> _m_point_at_which_increment_will_not_work;
 
-    template <typename T>
-    static T
+    template <typename T1>
+    static T1
         encode_into_t(
             const std::size_t _a_element
         ) noexcept
     {
         const bool _l_sign_bit{(_c_highest_bit & _a_element) == _c_highest_bit};
-        T          _l_rv{0};
+        T1         _l_rv{0};
         const std::size_t _l_element{_a_element & _c_non_highest_bit};
-        std::memcpy(&_l_rv, &_l_element, sizeof(T));
+        std::memcpy(&_l_rv, &_l_element, sizeof(T1));
         if (_l_sign_bit)
         {
             _l_rv = -_l_rv;
@@ -379,8 +391,6 @@ struct default_enumeration_t<T> : public enumeration_base_t<T>
         }
         for (size_t _l_idx{sizeof(T) * CHAR_BIT - 1}; _l_idx > 0; --_l_idx)
         {
-            auto ki = sizeof(size_t) * CHAR_BIT - _l_idx;
-            auto k2 = sizeof(T) * CHAR_BIT - _l_idx;
             _l_sizet_bitset[sizeof(size_t) * CHAR_BIT - _l_idx - 1]
                 = _l_bitset[sizeof(T) * CHAR_BIT - _l_idx - 1];
         }
@@ -860,12 +870,13 @@ private:
 public:
     __constexpr_imp
         default_enumeration_t(
-            const std::size_t              _a_n_jumps = std::size_t{ 1 },
-            const enumeration_schema_t<T>& _a_enumerate = all_values<T>()
+            const std::size_t              _a_n_jumps = std::size_t{1},
+            const enumeration_schema_t<T>& _a_enumerate
+            = all_values<T>(default_enumeration<T>())
         )
-        : _m_n_jumps(_a_n_jumps), _m_enumerate(_a_enumerate)
-    {
-    }
+        : _m_enumerate(_a_enumerate)
+        , _m_n_jumps(_a_n_jumps)
+    {}
 
     __constexpr_imp virtual bool
         less_than(
@@ -973,22 +984,22 @@ public:
             }
             if (_a_opt.has_value())
             {
-                bool _l_opt_result;
+                // bool _l_opt_result;
                 if (_l_min_value.has_value())
                 {
-                    _l_opt_result = _m_enumerate->decrement(
-                        _a_opt.value(),
-                        _a_n_times_to_increment,
-                        _l_min_value.value()
-                    );
+                    // _l_opt_result = _m_enumerate->decrement(
+                    //     _a_opt.value(),
+                    //     _a_n_times_to_increment,
+                    //     _l_min_value.value()
+                    // );
                 }
                 else
                 {
-                    _l_opt_result = _m_enumerate->decrement(
-                        _a_opt.value(),
-                        _a_n_times_to_increment,
-                        _m_enumerate->start_value()
-                    );
+                    // _l_opt_result = _m_enumerate->decrement(
+                    //     _a_opt.value(),
+                    //     _a_n_times_to_increment,
+                    //     _m_enumerate->start_value()
+                    // );
                 }
                 if (_a_n_times_to_increment == 0)
                 {
@@ -1088,7 +1099,7 @@ public:
         {
             size_t _l_idx_offset{_l_idx - 1};
             // To get to i requires (X,Y).
-            enumeration_diff_t _l_this_diff{0, 0};
+            // enumeration_diff_t _l_this_diff{0, 0};
             if (_m_enumerate->equal(
                     _l_lesser[_l_idx_offset], _l_greater[_l_greater_idx]
                 ))
@@ -1611,7 +1622,7 @@ __constexpr_imp
         const std::size_t              _a_n_jumps,
         const enumeration_schema_t<T>& _a_schema
     )
-    : _m_n_jumps(_a_n_jumps), _m_enumerate(_a_schema)
+    : _m_enumerate(_a_schema), _m_n_jumps(_a_n_jumps)
 {}
 
 template <typename T>
@@ -1948,7 +1959,7 @@ private:
     template <std::size_t I>
     __constexpr bool
         decrement_(
-            value_type_t& _a_element,
+            value_type_t&      _a_element,
             enumerate_index_t& _a_n_times_to_increment
         );
     template <std::size_t I>
@@ -1969,20 +1980,6 @@ private:
 
 _END_ABC_DG_NS
 
-_BEGIN_ABC_NS
-template <typename T, typename... Ts>
-__constexpr_imp data_gen::enumeration_t<T>
-                default_enumeration(
-                    Ts... _a_elements
-                ) noexcept
-{
-    using namespace std;
-    using namespace _ABC_NS_DG;
-    return make_shared<default_enumeration_t<T>>(_a_elements...);
-}
-
-_END_ABC_NS
-
 _BEGIN_ABC_DG_NS
 template <typename... Ts>
 __constexpr_imp
@@ -1996,7 +1993,9 @@ template <typename... Ts>
 __constexpr_imp
     default_enumeration_t<std::tuple<Ts...>>::default_enumeration_t() noexcept
 requires (std::is_default_constructible_v<enumeration_schema_t<Ts>> && ...)
-    : _m_enumeration_schemas(std::make_tuple(all_values<Ts>()...))
+    : _m_enumeration_schemas(
+          std::make_tuple(all_values<Ts>(default_enumeration<Ts>())...)
+      )
 {}
 
 template <typename... Ts>
@@ -2055,9 +2054,9 @@ __constexpr bool
     using namespace std;
     while (_a_n_times_to_increment > 0)
     {
-        if (not decrement_ < tuple_size<value_type_t>{} - 1 > (
-            _a_element, _a_n_times_to_increment
-        ))
+        if (not decrement_<tuple_size<value_type_t>{} - 1>(
+                _a_element, _a_n_times_to_increment
+            ))
         {
             return false;
         }
@@ -2186,18 +2185,18 @@ __constexpr bool
 template <typename... Ts>
 template <std::size_t I>
 __constexpr bool
-default_enumeration_t<std::tuple<Ts...>>::decrement_(
-    value_type_t& _a_element,
-    enumerate_index_t& _a_n_times_to_increment
-)
+    default_enumeration_t<std::tuple<Ts...>>::decrement_(
+        value_type_t&      _a_element,
+        enumerate_index_t& _a_n_times_to_increment
+    )
 {
     using namespace std;
-    const auto& _l_enum{ get<I>(_m_enumeration_schemas) };
-    auto& _l_elem{ get<I>(_a_element) };
-    size_t      _l_n_times_to_increment{ 1 };
+    const auto& _l_enum{get<I>(_m_enumeration_schemas)};
+    auto&       _l_elem{get<I>(_a_element)};
+    size_t      _l_n_times_to_increment{1};
     if (_l_enum->decrement(
-        _l_elem, _l_n_times_to_increment, _l_enum->start_value()
-    ))
+            _l_elem, _l_n_times_to_increment, _l_enum->start_value()
+        ))
     {
         --_a_n_times_to_increment;
         return true;
@@ -2215,7 +2214,6 @@ default_enumeration_t<std::tuple<Ts...>>::decrement_(
         }
     }
 }
-
 
 template <typename... Ts>
 template <std::size_t I>

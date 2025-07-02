@@ -12,6 +12,7 @@ _BEGIN_ABC_UTILITY_NS
 class inner_rng_t
 {
 public:
+    virtual ~inner_rng_t() = default;
     /*!
      * @brief Advances the RNG by the given number of advancements.
      * @param _a_n_to_progress The number of number generations the state of the

@@ -144,7 +144,7 @@ __constexpr std::size_t
     {
         return 4;
     }
-    else if constexpr (same_as<wchar_t>)
+    else if constexpr (same_as<T, wchar_t>)
     {
         __STATIC_ASSERT(
             T,
@@ -167,8 +167,8 @@ __constexpr char32_t
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
-    constexpr char32_t _l_low_surrogate{ high_surrogate_lower_value<char32_t>()};
-    constexpr char32_t _l_high_surrogate{ low_surrogate_upper_value<char32_t>()};
+    constexpr char32_t _l_low_surrogate{high_surrogate_lower_value<char32_t>()};
+    constexpr char32_t _l_high_surrogate{low_surrogate_upper_value<char32_t>()};
     char32_t           _l_rv;
     if (_a_limit < _l_low_surrogate)
     {
@@ -190,7 +190,8 @@ __constexpr char32_t
             // Total range of char32_t = 1114111
             // Surrogate range between 55296 and 57343. Cannot be these numbers.
         };
-        char32_t _l_rnd{_a_rng() % (_l_limit + 1)};
+        uint64_t _l_rnd_val{_a_rng()};
+        char32_t _l_rnd{static_cast<char32_t>(_l_rnd_val) % (_l_limit + 1)};
         _l_rv = (_l_rnd >= _l_low_surrogate && _l_rnd <= _l_high_surrogate)
                     ? (_l_rnd + _l_surrogate_diff)
                     : _l_rnd;
@@ -237,9 +238,7 @@ __constexpr std::optional<std::basic_string<T>>
         const size_t _l_biggest_char{biggest_character_size<T>()};
         if (_l_biggest_char <= _a_biggest_string)
         {
-            return _l_conversion_func(
-                generate_valid_unicode_char32_t(_a_rng)
-            );
+            return _l_conversion_func(generate_valid_unicode_char32_t(_a_rng));
         }
         else
         {
@@ -252,7 +251,8 @@ __constexpr std::optional<std::basic_string<T>>
                 switch (_a_biggest_string)
                 {
                 case 1:
-                    _l_limit = single_char16_limit_and_three_char8_limit<char32_t>();
+                    _l_limit
+                        = single_char16_limit_and_three_char8_limit<char32_t>();
                     break;
                 default:
                     std::unreachable();
@@ -269,7 +269,8 @@ __constexpr std::optional<std::basic_string<T>>
                     _l_limit = two_char8_limit<char32_t>();
                     break;
                 case 3:
-                    _l_limit = single_char16_limit_and_three_char8_limit<char32_t>();
+                    _l_limit
+                        = single_char16_limit_and_three_char8_limit<char32_t>();
                     break;
                 default:
                     std::unreachable();
@@ -417,11 +418,12 @@ public:
         )
     {
         using namespace std;
-        return _m_bounds.lower() + (_m_bounds.difference() == 0)
-                   ? 0
-                   : static_cast<T>(
-                         _a_rnd_generator() % _m_bounds.difference()
-                     );
+        return _m_bounds.lower()
+               + ((_m_bounds.difference() == 0)
+                      ? 0
+                      : static_cast<T>(
+                            _a_rnd_generator() % _m_bounds.difference()
+                        ));
     }
 private:
     utility::bounds_t<T> _m_bounds;
@@ -867,9 +869,9 @@ struct default_random_generator_t<std::basic_string<T>>
     {
         using namespace std;
         using namespace _ABC_NS_UTILITY_STR;
-        const basic_string<T>::size_type _l_size{
+        const typename basic_string<T>::size_type _l_size{
             detail::generate_rng_value_between_bounds<
-                basic_string<T>::size_type>(
+                typename basic_string<T>::size_type>(
                 _m_bounds, _a_index, _a_rnd_generator
             )
         };
@@ -898,7 +900,6 @@ struct default_random_generator_t<std::basic_string<T>>
                         const basic_string<T>& _l_generated{
                             _l_opt_generated.value()
                         };
-                        auto ki = _l_idx;
                         for (const T _l_char : _l_generated)
                         {
                             _l_rv[_l_idx++] = _l_char;

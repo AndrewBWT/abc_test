@@ -620,12 +620,12 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T> read_data_from_file(
             __STATIC_ASSERT(Arg, "Coulnd't work");
         }
     };
-    (_l_process_func(forward<Args>(_a_file_elements)), ...);
+    (_l_process_func(std::forward<Args>(_a_file_elements)), ...);
     return unary_collection<
         T>(make_shared<
            data_generator_with_file_support_t<file_data_generator_t<T>, false>>(
         file_data_generator_t<T>(
-            forward<R>(_a_init_data), forward<decltype(_l_fdns)>(_l_fdns)
+            std::forward<R>(_a_init_data), std::forward<decltype(_l_fdns)>(_l_fdns)
         )
     ));
 }

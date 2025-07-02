@@ -520,7 +520,6 @@ __no_constexpr_imp matcher_t
     using namespace std;
     using namespace _ABC_NS_MATCHER;
     using namespace _ABC_NS_UTILITY_STR;
-    bool _l_result{true};
     if constexpr (derived_from<T, std::exception>)
     {
         auto _l_str_result{

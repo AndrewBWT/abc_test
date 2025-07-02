@@ -233,6 +233,8 @@ template <typename>
 constexpr bool dependent_false = false; // workaround before CWG2518/P2593R1
 } // namespace abc::internal
 
+#define __STATIC_ASSERT_NO_TYPE(_a_msg)\
+    static_assert(abc::internal::dependent_false<bool>, _a_msg);
 #define __STATIC_ASSERT(_a_type, _a_msg) \
     static_assert(abc::internal::dependent_false<_a_type>, _a_msg);
 

@@ -104,9 +104,7 @@ __no_constexpr_imp int
                     u8"function:\n{0}\nThe program will now terminate. "
                     u8"included_instances_test_options_t = {1}",
                     _l_st,
-                    cast_string_to_u8string(
-                        fmt::format("{}", _l_iito)
-                    )
+                    cast_string_to_u8string(fmt::format("{}", _l_iito))
                 )};
                 std::cout << string(_l_rv.begin(), _l_rv.end()) << std::endl;
                 return -1;
@@ -139,64 +137,91 @@ __no_constexpr_imp void
     _a_cli.add_file_config_flag();
     _a_cli.add_option(
         _s_show_configuration_explanations,
-        &included_instances_test_options_t::show_configuration_explanations,
+        static_cast<bool included_instances_test_options_t::*>(
+            &test_options_base_t::show_configuration_explanations
+        ),
         _a_cli_results
     );
     _a_cli.add_option(
         _s_global_test_list,
-        &included_instances_test_options_t::use_global_test_list,
+        static_cast<bool included_instances_test_options_t::*>(
+            &test_options_base_t::use_global_test_list
+        ),
         _a_cli_results
     );
     _a_cli.add_option(
         _s_write_data_to_files,
-        &included_instances_test_options_t::write_data_to_files,
+        static_cast<bool included_instances_test_options_t::*>(
+            &test_options_base_t::write_data_to_files
+        ),
         _a_cli_results
     );
     _a_cli.add_option(
         _s_path_delimiter,
-        &included_instances_test_options_t::path_delimiter,
+        static_cast<_ABC_NS_DS::test_path_delimiter
+                        included_instances_test_options_t::*>(
+            &included_instances_test_options_t::path_delimiter
+        ),
         _a_cli_results
     );
     _a_cli.add_option(
         _s_root_path,
-        &included_instances_test_options_t::root_path,
+        static_cast<std::filesystem::path included_instances_test_options_t::*>(
+            &included_instances_test_options_t::root_path
+        ),
         _a_cli_results
     );
     _a_cli.add_option(
-        _s_threads, &included_instances_test_options_t::threads, _a_cli_results
+        _s_threads,
+        static_cast<std::size_t included_instances_test_options_t::*>(
+            &included_instances_test_options_t::threads
+        ),
+        _a_cli_results
     );
     _a_cli.add_option(
         _s_comment_str,
-        &included_instances_test_options_t::comment_str,
+        static_cast<std::u8string included_instances_test_options_t::*>(
+            &included_instances_test_options_t::comment_str
+        ),
         _a_cli_results
     );
     _a_cli.add_option(
         _s_general_data_file_extension,
-        &included_instances_test_options_t::general_data_extension,
+        static_cast<std::u8string included_instances_test_options_t::*>(
+            &included_instances_test_options_t::general_data_extension
+        ),
         _a_cli_results
     );
     _a_cli.add_option(
         _s_tertiary_data_file_extension,
-        &included_instances_test_options_t::tertiary_data_file_extension,
+        static_cast<std::u8string included_instances_test_options_t::*>(
+            &included_instances_test_options_t::tertiary_data_file_extension
+        ),
         _a_cli_results
     );
     _a_cli.add_option(
         _s_retain_passed_assertions,
-        &included_instances_test_options_t::retain_passed_assertions,
+        static_cast<bool included_instances_test_options_t::*>(
+            &test_options_base_t::retain_passed_assertions
+        ),
         _a_cli_results
     );
     _a_cli.add_option(
         _s_integers_used_for_rng_generation,
-        &included_instances_test_options_t::
-            number_of_integers_used_to_seed_random_generators,
+        static_cast<size_t included_instances_test_options_t::*>(
+            &test_options_base_t::
+                number_of_integers_used_to_seed_random_generators
+        ),
         _a_cli_results
     );
     _a_cli.add_option<
         _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t,
         u8string>(
         _s_repetition_config,
-        &included_instances_test_options_t::
-            map_of_unique_ids_and_for_loop_stack_tries,
+        static_cast<_ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t
+                        included_instances_test_options_t::*>(
+            &test_options_base_t::map_of_unique_ids_and_for_loop_stack_tries
+        ),
         _a_cli_results,
         cli_argument_processing_info_t<
             _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t,
@@ -235,7 +260,10 @@ __no_constexpr_imp void
     using namespace abc::utility;
     _a_cli.add_option<utility::global_seed_t, utility::global_seed_t>(
         _s_global_seed,
-        &included_instances_test_options_t::global_seed,
+        static_cast<_ABC_NS_UTILITY::global_seed_t
+                        included_instances_test_options_t::*>(
+            &test_options_base_t::global_seed
+        ),
         _a_cli_results,
         cli_argument_processing_info_t<
             utility::global_seed_t,
@@ -277,33 +305,45 @@ __no_constexpr_imp void
     );
     _a_cli.add_option(
         _s_force_run_all_tests,
-        &included_instances_test_options_t::force_run_all_tests,
+        static_cast<bool included_instances_test_options_t::*>(
+            &test_options_base_t::force_run_all_tests
+        ),
         _a_cli_results
     );
     _a_cli.add_option(
         _s_autofile_name,
-        &included_instances_test_options_t::autofile_name,
+        static_cast<u8string included_instances_test_options_t::*>(
+            &test_options_base_t::autofile_name
+        ),
         _a_cli_results
     );
     _a_cli.add_option(
         _s_autofile_size,
-        &included_instances_test_options_t::autofile_size,
+        static_cast<size_t included_instances_test_options_t::*>(
+            &test_options_base_t::autofile_size
+        ),
         _a_cli_results
     );
     _a_cli.add_option(
         _s_repetition_file_metadata_string,
-        &included_instances_test_options_t::autofile_metadata_string,
+        static_cast<u8string included_instances_test_options_t::*>(
+            &test_options_base_t::autofile_metadata_string
+        ),
         _a_cli_results
     );
     _a_cli.add_option(
         _s_tertiary_data_file_extension,
-        &included_instances_test_options_t::tertiary_data_file_extension,
+        static_cast<u8string included_instances_test_options_t::*>(
+            &test_options_base_t::tertiary_data_file_extension
+        ),
         _a_cli_results
     );
     _a_cli.add_auto_configuration();
     _a_cli.add_multi_element_option<vector<u8string>, u8string>(
         _c_test_paths_to_run,
-        &included_instances_test_options_t::test_paths_to_run,
+        static_cast<vector<u8string> included_instances_test_options_t::*>(
+            &test_options_base_t::test_paths_to_run
+        ),
         _a_cli_results,
         cli_argument_processing_info_t<vector<u8string>, u8string>{
             .print_func =

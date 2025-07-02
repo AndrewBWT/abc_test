@@ -13,7 +13,7 @@ __no_constexpr_or_inline_imp test_options_base_t&
     ) noexcept
 {
     using namespace reporters;
-    test_options_base_t& _l_to{get_inner_global_test_options()};
+    test_options_base_t& _l_to{detail::get_inner_global_test_options()};
     _l_to = _a_options;
     return _l_to;
 }
@@ -44,7 +44,7 @@ __no_constexpr_or_inline_imp void
 __no_constexpr_or_inline_imp const test_options_base_t&
     get_global_test_options() noexcept
 {
-    return get_inner_global_test_options();
+    return detail::get_inner_global_test_options();
 }
 
 __no_constexpr_or_inline_imp test_runner_t*&
@@ -80,10 +80,10 @@ __no_constexpr_or_inline_imp const test_options_base_t*
 __no_constexpr_or_inline_imp reporters::error_reporter_controller_t&
                              get_global_error_reporter_controller() noexcept
 {
-    return get_inner_global_error_reporter_controller();
+    return detail::get_inner_global_error_reporter_controller();
 }
 
-namespace
+namespace detail
 {
 __no_constexpr_or_inline_imp test_options_base_t&
     get_inner_global_test_options() noexcept
@@ -112,7 +112,7 @@ __no_constexpr_or_inline_imp utility::complete_global_seed_t&
 __no_constexpr_or_inline_imp const ds::test_list_t&
                                    get_global_test_list() noexcept
 {
-    return get_mutable_test_list();
+    return detail::get_mutable_test_list();
 }
 
 __no_constexpr_or_inline_imp std::size_t
@@ -121,7 +121,7 @@ __no_constexpr_or_inline_imp std::size_t
                              ) noexcept
 {
     using namespace ds;
-    test_list_t& _l_test_list{get_mutable_test_list()};
+    test_list_t& _l_test_list{detail::get_mutable_test_list()};
     _l_test_list.push_back(_a_test_list_internal);
     return 0;
 }
@@ -130,7 +130,7 @@ __no_constexpr_or_inline_imp void
     clear_test_list() noexcept
 {
     using namespace ds;
-    test_list_t& _l_test_list{get_mutable_test_list()};
+    test_list_t& _l_test_list{detail::get_mutable_test_list()};
     _l_test_list.clear();
 }
 
@@ -139,14 +139,13 @@ __no_constexpr_or_inline_imp void
 {
     using namespace std;
     using namespace utility;
-    complete_global_seed_t& _l_complete_global_seed{get_inner_global_seed()};
-    get_inner_global_seed() = set_complete_global_seed(global::get_global_test_options().global_seed);
+    detail::get_inner_global_seed() = set_complete_global_seed(global::get_global_test_options().global_seed);
 }
 
 __no_constexpr_or_inline_imp const utility::complete_global_seed_t&
                                    get_global_seed()
 {
-    return get_inner_global_seed();
+    return detail::get_inner_global_seed();
 }
 
 __no_constexpr_or_inline_imp _ABC_NS_UTILITY::volatilte_volatile_void_ptr_t&
@@ -157,7 +156,7 @@ __no_constexpr_or_inline_imp _ABC_NS_UTILITY::volatilte_volatile_void_ptr_t&
     return _tl_tr;
 }
 
-namespace
+namespace detail
 {
 
 __no_constexpr_or_inline_imp ds::test_list_t&

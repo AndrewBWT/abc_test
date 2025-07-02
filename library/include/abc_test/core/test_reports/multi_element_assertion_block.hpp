@@ -18,7 +18,7 @@ public:
     __constexpr
         multi_element_assertion_block_t(
             const status_t<Assertion_Status>& _a_status,
-            typename const user_initialised_report_t<false>::source_t& _a_source,
+            const user_initialised_report_t<false>::source_t& _a_source,
             const ds::log_infos_t& _a_log_infos,
             const _ABC_NS_MATCHER::matcher_res_infos_t& _a_matcher_info,
             const opt_description_t<false>& _a_opt_description,
@@ -40,7 +40,7 @@ __constexpr_imp
 multi_element_assertion_block_t<Assertion_Status>::
 multi_element_assertion_block_t(
     const status_t<Assertion_Status>& _a_status,
-    typename const user_initialised_report_t<false>::source_t&
+    const user_initialised_report_t<false>::source_t&
     _a_source,
     const ds::log_infos_t& _a_log_infos,
     const _ABC_NS_MATCHER::matcher_res_infos_t& _a_matcher_info,

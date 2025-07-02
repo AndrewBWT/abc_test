@@ -95,7 +95,7 @@ __constexpr void
     using namespace std;
     if constexpr (has_append_range_c<R1, R2>)
     {
-        _a_range1.append_range(forward<R2>(_a_range2));
+        _a_range1.append_range(std::forward<R2>(_a_range2));
     }
     else if constexpr (has_inserter_c<R1>)
     {
@@ -135,9 +135,9 @@ __constexpr_imp R
     }
     else
     {
-        detail::append_range(_l_rv, forward<R1>(_a_r1));
+        detail::append_range(_l_rv, std::forward<R1>(_a_r1));
     }
-    detail::append_range(_l_rv, forward<R2>(_a_r2));
+    detail::append_range(_l_rv, std::forward<R2>(_a_r2));
     return _l_rv;
 }
 

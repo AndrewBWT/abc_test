@@ -11,6 +11,7 @@ struct random_generator_base_t
 {
 public:
     using value_type_t = T;
+    __constexpr virtual ~random_generator_base_t() = default;
     __constexpr_imp virtual T
         operator()(utility::rng_t& _a_rnd_generator, const utility::rng_counter_t& _a_index)
         = 0;

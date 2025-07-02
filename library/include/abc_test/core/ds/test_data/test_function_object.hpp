@@ -8,6 +8,7 @@ _BEGIN_ABC_DS_NS
 class test_function_object_t
 {
 public:
+    __constexpr virtual ~test_function_object_t() = default;
     __constexpr virtual void
         run() const
         = 0;

@@ -6,7 +6,20 @@
 _BEGIN_ABC_UTILITY_NS
 
 template <typename T>
-concept min_value_c = requires (const min_value_t<T>&_l_mvt) {
-    { _l_mvt.min_value() } -> std::same_as<T>;
+concept has_min_value_expr = requires {
+    min_value_t<T>().min_value();
 };
+
+template <typename T>
+concept returns_exact_type = requires {
+    requires std::same_as<decltype(min_value_t<T>().min_value()), T>;
+};
+
+template <typename T>
+concept min_value_c = has_min_value_expr<T> && returns_exact_type<T>;
+
+/*template <typename T>
+concept min_value_c = requires {
+    { min_value_t<T>().min_value() } -> std::same_as<T>;
+};*/
 _END_ABC_UTILITY_NS

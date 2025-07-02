@@ -119,10 +119,10 @@ __constexpr_imp
             test_runner_t*        _a_test_runner
         )
     : _m_this_iterator(_a_begin_iterator)
-    , _m_iterator_length(_a_iterator_length)
     // , _m_iterator_index(0)
     , _m_this_iterators_index{0}
     , _m_test_runner(_a_test_runner)
+    , _m_iterator_length(_a_iterator_length)
 {
     using namespace std;
     using namespace ds;

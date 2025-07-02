@@ -66,7 +66,7 @@ private:
     std::size_t _m_total_assertions_ran{0};
     std::size_t _m_total_assertions_passed{0};
     std::size_t _m_total_assertions_failed{0};
-    friend class finalised_test_set_data_t;
+    friend struct finalised_test_set_data_t;
 };
 
 _END_ABC_DS_NS

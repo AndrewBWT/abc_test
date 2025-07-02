@@ -32,6 +32,7 @@ set(LIBRARY_FILES
   include/abc_test/core/ds/data_generator_memoization/map_unique_id_to_tdg_collection_stack_trie.hpp
   # Contains code for test data - e.g. name, location, repetition data.
   include/abc_test/core/ds/test_data/invoked_test_data.hpp
+      src/abc_test/core/ds/test_data/invoked_test_data.cpp
   include/abc_test/core/ds/test_data/registered_test_data.hpp
   include/abc_test/core/ds/test_data/post_setup_test_data.hpp
   include/abc_test/core/ds/test_data/user_defined_test_data.hpp
@@ -133,6 +134,7 @@ set(LIBRARY_FILES
   include/abc_test/included_instances/data_generator/enumeration/enumeration_from_functions.hpp
   include/abc_test/included_instances/data_generator/enumeration/enumeration_from_list.hpp
   include/abc_test/included_instances/data_generator/enumeration/enumeration_schema_base.hpp
+  include/abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_to_n_inner.hpp
   include/abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_to_n.hpp
   include/abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_move_k_elements.hpp
   # utility subfolder. Contains axillary helper classes and functions not necessary

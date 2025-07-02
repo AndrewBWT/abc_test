@@ -90,17 +90,18 @@ __no_constexpr_imp
         const checked_user_defined_test_data_t _a_user_data,
         const ds::single_source_t&             _a_source
     ) noexcept
-    : _m_user_data(_a_user_data.user_defined_test_data())
+    : _m_test_function(_a_test_function)
+    , _m_user_data(_a_user_data.user_defined_test_data())
     , _m_source(_a_source)
-    , _m_test_function(_a_test_function)
 {}
 __no_constexpr_imp
 registered_test_data_t::registered_test_data_t(
     const test_function_t                  _a_test_function,
     const checked_user_defined_test_data_t _a_user_data
 ) noexcept
-    : _m_user_data(_a_user_data.user_defined_test_data())
-    , _m_test_function(_a_test_function)
+    : _m_test_function(_a_test_function)
+    , _m_user_data(_a_user_data.user_defined_test_data())
+    
 {
 
 }

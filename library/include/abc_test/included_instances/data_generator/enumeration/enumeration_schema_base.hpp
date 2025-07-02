@@ -6,7 +6,7 @@
 
 _BEGIN_ABC_DG_NS
 template <typename T>
-class enumeration_base_t;
+struct enumeration_base_t;
 template <typename T>
 using enumeration_t = std::shared_ptr<enumeration_base_t<T>>;
 
@@ -14,6 +14,7 @@ template <typename T>
 class enumeration_schema_base_t
 {
 public:
+    __constexpr virtual ~enumeration_schema_base_t() = default;
     __constexpr
     enumeration_schema_base_t(
         const T&                _a_start_value,

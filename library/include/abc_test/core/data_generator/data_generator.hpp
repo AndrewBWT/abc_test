@@ -23,6 +23,7 @@ template <typename T>
 class data_generator_t
 {
 public:
+//    __constexpr virtual ~data_generator_t() = default;
     __constexpr virtual void
         set_data_generator_using_data_generator_memoized_element(
             const ds::dg_memoized_element_t& _a_dgme

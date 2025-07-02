@@ -14,6 +14,7 @@ class data_generator_with_file_support_t
     : public data_generator_t<typename T::generator_type>
 {
 public:
+    __constexpr virtual ~data_generator_with_file_support_t() = default;
     __constexpr
     data_generator_with_file_support_t(const T& _a_element);
     __constexpr
@@ -333,7 +334,7 @@ __constexpr ds::dg_memoized_element_t
     {
         if (_a_get_original_dg_memoized_element_data)
         {
-            string _l_rv;
+            u8string _l_rv;
             switch (_m_mode)
             {
             case 0:
@@ -353,7 +354,7 @@ __constexpr ds::dg_memoized_element_t
         }
         else
         {
-            string _l_rv;
+            u8string _l_rv;
             size_t _l_mode = _m_mode;
             switch (_m_mode)
             {

@@ -7,12 +7,12 @@ template <typename T>
 struct min_value_t
 {
     __constexpr T
-        min_value() const noexcept;
+        min_value() const noexcept = delete;
 };
 _END_ABC_UTILITY_NS
 
 _BEGIN_ABC_UTILITY_NS
-template <typename T>
+/*template <typename T>
 __constexpr_imp T
 min_value_t<T>::min_value() const noexcept
 {
@@ -21,6 +21,6 @@ min_value_t<T>::min_value() const noexcept
         "Function requires a specialization of the function "
         "min_value_t<T>::min_value."
     );
-}
+}*/
 
 _END_ABC_UTILITY_NS

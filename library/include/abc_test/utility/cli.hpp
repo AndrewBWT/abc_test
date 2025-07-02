@@ -134,8 +134,8 @@ private:
             const std::optional<std::u8string_view>& _a_source,
             cli_results_t&                           _a_cli_results
         ) const noexcept;
-    char8_t       _m_single_char_identifier = '-';
-    std::u8string _m_multi_char_identifier  = "--";
+    char8_t       _m_single_char_identifier = u8'-';
+    std::u8string _m_multi_char_identifier  = u8"--";
     __no_constexpr void
         inner_add_option(const std::shared_ptr<cli_info_t<Option_Class>> _a_cli
         ) noexcept;

@@ -42,8 +42,6 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
     using namespace _ABC_NS_UTILITY_STR;
     using namespace abc::utility::printer;
     using T            = ranges::range_value_t<R1>;
-    using R1_Type      = remove_cvref_t<R1>;
-    using R2_Type      = remove_cvref_t<R2>;
     using R1_const_itt = decltype(std::begin(_a_str1));
     using R2_const_itt = decltype(std::begin(_a_str2));
     R1_const_itt                                _l_itt_1{std::begin(_a_str1)};
@@ -226,7 +224,7 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
         }
         else
         {
-            __STATIC_ASSERT(Cmp, "Couldn't work out");
+            __STATIC_ASSERT_NO_TYPE("Couldn't work out");
         }
         ++_l_itt_1;
         ++_l_itt_2;

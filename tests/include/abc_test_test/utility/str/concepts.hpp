@@ -19,7 +19,6 @@ _TEST_CASE(
     using namespace utility;
     using namespace abc::utility::io;
     using namespace _ABC_NS_UTILITY_STR;
-    using Value_Type = int;
     using data_types_t
         = abc::utility::type_list<char, char8_t, char16_t, char32_t, wchar_t>;
     file_based_map_t<u8string, std::tuple<bool, bool, bool, bool>> _l_data(
@@ -67,7 +66,6 @@ _TEST_CASE(
     using namespace utility;
     using namespace abc::utility::io;
     using namespace _ABC_NS_UTILITY_STR;
-    using Value_Type   = int;
     using data_types_t = abc::utility::type_list<
         const char*,
         const wchar_t*,

@@ -14,6 +14,7 @@ struct parser_base_t
 {
 public:
     using value_type_t = T;
+    __constexpr virtual ~parser_base_t() = default;
     __constexpr virtual result_t<T>
         run_parser(parser_input_t& _a_parse_input) const = 0;
 };

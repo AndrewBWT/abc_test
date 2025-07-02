@@ -72,7 +72,7 @@ _END_ABC_DS_NS
 _BEGIN_ABC_NS
 struct test_options_base_t;
 template <typename T>
-struct validated_test_options_t;
+class validated_test_options_t;
 _END_ABC_NS
 _BEGIN_ABC_LOGGING_NS
 struct log_msg_t;

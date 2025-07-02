@@ -279,7 +279,6 @@ _TEST_CASE(
         = std::numeric_limits<std::size_t>::max()
         )
     {
-        constexpr size_t _l_n_values_to_generate{ 1'000 };
         if constexpr (same_as<T, simple_rng_t>)
         {
             _BEGIN_MULTI_ELEMENT_BBA(
@@ -378,7 +377,6 @@ _TEST_CASE(
     RUN(_l_mdg, (_l_func.operator() < simple_rng_t > (100'000)));
     RUN(_l_mdg, (_l_func.operator() < inner_rng_mt19937_64_t > (100'000)));
 }
-
 _TEST_CASE(
     abc::test_case_t(
         { .name = "Testing all rng_t object's functions",

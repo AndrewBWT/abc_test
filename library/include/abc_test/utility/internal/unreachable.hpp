@@ -2,6 +2,7 @@
 
 #include "abc_test/utility/internal/macros.hpp"
 #include "abc_test/utility/str/string_cast.hpp"
+#include "abc_test/utility/str/print_utils.hpp"
 
 #include <source_location>
 #include <stdexcept>

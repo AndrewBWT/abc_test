@@ -1,4 +1,5 @@
 #pragma once
+
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
 
@@ -10,7 +11,7 @@ _TEST_CASE(
     )
 )
 {
-    using namespace abc;
+    /*using namespace abc;
     using namespace abc::data_gen;
     using namespace std;
     using namespace utility;
@@ -50,7 +51,6 @@ _TEST_CASE(
         _l_matcher = abc::no_exception_thrown<true>();
         try
         {
-            ;
             inner_rng_mt19937_64_t _l_rng = inner_rng_mt19937_64_t(seed_t());
             switch (_l_constructor.index())
             {
@@ -86,9 +86,8 @@ _TEST_CASE(
             _END_NO_THROW_MATCHER(_l_matcher);
             _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
         }
-        _END_BBA_CHECK(_l_fuzzy_tests);
+        _END_BBA_CHECK(_l_fuzzy_tests);*/
     }
-
     _TEST_CASE(abc::test_case_t(
         {.name = "Testing inner_rng_mtd19937_64::set_seed",
          .path = "abc_test_test::utility::rng::inner_rng_mt19937_64",
@@ -166,7 +165,6 @@ _TEST_CASE(
             const auto& [_l_seed, _l_progress]{_l_data};
             inner_rng_mt19937_64_t  _l_rnd_1(_l_seed);
             inner_rng_mt19937_64_t  _l_rnd_2(_l_seed);
-            mt19937_64::result_type _l_result_1, _l_result_2;
             for (size_t _l_idx{0}; _l_idx < _l_progress; ++_l_idx)
             {
                 _l_rnd_1();

@@ -24,7 +24,7 @@ public:
      *
      * Builds a matcher_wrapper_t containing an element which is always true.
      */
-    template <typename = typename std::enable_if_t<not Has_Annotation>>
+    template <bool B = not Has_Annotation, typename = std::enable_if_t<B>>
     __no_constexpr
         matcher_wrapper_t() noexcept;
 
@@ -85,7 +85,7 @@ public:
      * Can only be called when Has_Annotation is true.
      * @return A const std::string_view to the element's internal annotation.
      */
-    template <typename = typename std::enable_if_t<Has_Annotation>>
+    template <bool B = Has_Annotation, typename = std::enable_if_t<B>>
     __constexpr const std::u8string_view
                       annotation() const noexcept;
 
@@ -122,21 +122,21 @@ public:
      * @brief Logical not operator. Nots the result from the internal matcher.
      * @return A new matcher.
      */
-    template <typename = typename std::enable_if_t<not Has_Annotation>>
+    template <bool B = not Has_Annotation, typename = std::enable_if_t<B>>
     __no_constexpr matcher_wrapper_t<Has_Annotation>
                    operator!() const noexcept;
     /*!
      * @brief Logical not operator. Ands the result from the internal matcher.
      * @return A new matcher.
      */
-    template <typename = typename std::enable_if_t<not Has_Annotation>>
+    template <bool B = not Has_Annotation, typename = std::enable_if_t<B>>
     __no_constexpr matcher_wrapper_t
         operator&&(const matcher_wrapper_t& _a_matcher) const noexcept;
     /*!
      * @brief Logical not operator. Ors the result from the internal matcher.
      * @return A new matcher.
      */
-    template <typename = typename std::enable_if_t<not Has_Annotation>>
+    template <bool B = not Has_Annotation, typename = std::enable_if_t<B>>
     __no_constexpr matcher_wrapper_t
         operator||(const matcher_wrapper_t& _a_matcher) const noexcept;
     friend matcher_wrapper_t<not Has_Annotation>;
@@ -179,10 +179,10 @@ public:
      * @return A matcher_wrapper_t object whose primary source is set to the
      * macro information given.
      */
-    template <bool Has_Annotation>
-    __constexpr friend _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>
+    template <bool Arg_Has_Annotation>
+    __constexpr friend _ABC_NS_MATCHER::matcher_wrapper_t<Arg_Has_Annotation>
         mk_matcher_from_MATCHER_macro(
-            const _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>&
+            const _ABC_NS_MATCHER::matcher_wrapper_t<Arg_Has_Annotation>&
                                         _a_element,
             const std::string_view      _a_macro_str,
             const std::string_view      _a_matcher_str,
@@ -260,7 +260,7 @@ private:
     /*!
      * @brief Constructor for annotated member
      */
-    template <typename = typename std::enable_if_t<Has_Annotation>>
+    template <bool B = Has_Annotation, typename = std::enable_if_t<B>>
     __constexpr
     matcher_wrapper_t(
         const matcher_wrapper_t<false>& _a_matcher,
@@ -309,7 +309,7 @@ _END_ABC_NS
 
 _BEGIN_ABC_MATCHER_NS
 template <bool Has_Annotation>
-template <typename>
+template <bool B, typename>
 __no_constexpr_imp
     matcher_wrapper_t<Has_Annotation>::matcher_wrapper_t() noexcept
     : matcher_wrapper_t(mk_matcher_result<_ABC_NS_REPORTS::pass_t>())
@@ -366,7 +366,7 @@ __no_constexpr_imp void
 }
 
 template <bool Has_Annotation>
-template <typename>
+template <bool B, typename>
 __constexpr_imp const std::u8string_view
     matcher_wrapper_t<Has_Annotation>::annotation() const noexcept
 {
@@ -399,37 +399,51 @@ __constexpr_imp abc::ds::single_source_t
 }
 
 template <bool Has_Annotation>
-template <typename>
+template <bool B, typename>
 __no_constexpr_imp matcher_wrapper_t<Has_Annotation>
                    matcher_wrapper_t<Has_Annotation>::operator!() const noexcept
 {
     using namespace std;
-    string                  _l_child_str{"<false>"};
+    std::vector<matcher_result_infos_t::tree_structure_t> _l_children;
     bool                    _l_child_passed{false};
     bool                    _l_precdence_less_than_logic_enum{false};
     const matcher_result_t& _l_child_res{_m_test_result};
-    _l_child_str    = _l_child_res.str();
-    _l_child_passed = not _l_child_res.passed();
+    auto                    _l_child_str = _l_child_res.str();
+    _l_child_passed                      = not _l_child_res.passed();
     _l_precdence_less_than_logic_enum
         = is_precdence_less_than_child<logic_enum_t::NOT>(_m_precedence);
     pair<const char*, const char*>& _l_str_pair{
         _l_precdence_less_than_logic_enum ? _c_normal_bracket_pair
                                           : _c_normal_bracket_pair
     };
+    if (not _l_child_passed)
+    {
+        _l_children.push_back(make_tuple(
+            fmt::format(u8"Child"),
+            u8"C",
+            make_shared<matcher_result_infos_t>(
+                _l_child_str
+            )
+        ));
+    }
     return matcher_result_t(
         _l_child_passed,
-        fmt::format(
-            "{0}{1}{2}{3}",
-            logic_str<logic_enum_t::NOT>(),
-            _l_str_pair.first,
-            _l_child_str,
-            _l_str_pair.second
+        matcher_result_infos_t(
+            fmt::format(
+                u8"{0}{1}{2}{3}",
+                logic_str<logic_enum_t::NOT>(),
+                cast_string_to_u8string(_l_str_pair.first),
+                _l_child_res.str().primary_data(),
+                cast_string_to_u8string(_l_str_pair.second)
+            ),
+            {},
+            _l_children
         )
     );
 }
 
 template <bool Has_Annotation>
-template <typename>
+template <bool B, typename>
 __no_constexpr_imp matcher_wrapper_t<Has_Annotation>
                    matcher_wrapper_t<Has_Annotation>::operator&&(
         const matcher_wrapper_t& _a_matcher
@@ -441,7 +455,7 @@ __no_constexpr_imp matcher_wrapper_t<Has_Annotation>
 }
 
 template <bool Has_Annotation>
-template <typename>
+template <bool B, typename>
 __no_constexpr_imp matcher_wrapper_t<Has_Annotation>
                    matcher_wrapper_t<Has_Annotation>::operator||(
         const matcher_wrapper_t& _a_matcher
@@ -480,16 +494,17 @@ __no_constexpr_imp matcher_wrapper_t<false>
     );
 }
 
-template <bool Has_Annotation>
-__constexpr_imp _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>
+template <bool Arg_Has_Annotation>
+__constexpr_imp _ABC_NS_MATCHER::matcher_wrapper_t<Arg_Has_Annotation>
                 mk_matcher_from_MATCHER_macro(
-                    const _ABC_NS_MATCHER::matcher_wrapper_t<Has_Annotation>& _a_element,
-                    const std::string_view                                    _a_macro_str,
+                    const _ABC_NS_MATCHER::matcher_wrapper_t<Arg_Has_Annotation>&
+                                                _a_element,
+                    const std::string_view      _a_macro_str,
                     const std::string_view      _a_matcher_str,
                     const std::source_location& _a_sl
                 ) noexcept
 {
-    return matcher_wrapper_t<Has_Annotation>(
+    return matcher_wrapper_t<Arg_Has_Annotation>(
         _a_element, _a_macro_str, _a_matcher_str, _a_sl
     );
 }
@@ -655,17 +670,17 @@ __no_constexpr_imp
 }
 
 template <bool Has_Annotation>
-template <typename>
+template <bool B, typename>
 __constexpr_imp
     matcher_wrapper_t<Has_Annotation>::matcher_wrapper_t(
         const matcher_wrapper_t<false>& _a_matcher,
         const std::u8string_view        _a_annotation
     ) noexcept
-    : _m_test_result(_a_matcher._m_test_result)
+    :  _m_annotation(_a_annotation)
+    , _m_test_result(_a_matcher._m_test_result)
     , _m_sources(_a_matcher._m_sources)
     , _m_primary_source(_a_matcher._m_primary_source)
     , _m_precedence(_a_matcher._m_precedence)
-    , _m_annotation(_a_annotation)
 {}
 
 namespace

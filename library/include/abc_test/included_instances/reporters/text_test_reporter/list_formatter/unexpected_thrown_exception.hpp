@@ -11,11 +11,21 @@ struct unexpected_thrown_exception_list_formatter_t
     , public unexpected_thrown_non_descript_entity_list_formatter_t
 {
 public:
+    using list_formattable_t<
+        reports::unexpected_thrown_exception_t,
+        combined_enum_unexpected_exception_fields_t,
+        print_config_t>::check_data;
+    using unexpected_thrown_non_descript_entity_list_formatter_t::check_data;
     __constexpr virtual bool
         check_data(
             const combined_enum_unexpected_exception_fields_t& _a_fid,
             const reports::unexpected_thrown_exception_t&      _a_element
-        ) const;
+        ) const override;
+    using list_formattable_t<
+        reports::unexpected_thrown_exception_t,
+        combined_enum_unexpected_exception_fields_t,
+        print_config_t>::get_data;
+    using unexpected_thrown_non_descript_entity_list_formatter_t::get_data;
     __constexpr virtual void
         get_data(
             const combined_enum_unexpected_exception_fields_t&  _a_fid,
@@ -23,13 +33,13 @@ public:
             const print_config_t&                               _a_pc,
             const utility::io::threated_text_output_reporter_t& _a_ttor,
             const std::size_t                                   _a_idx
-        ) const;
+        ) const override;
 protected:
     __constexpr virtual std::string
         get_str_representation(
             const reports::unexpected_report_t<true>& _a_element,
             const print_config_t&                     _a_pc
-        ) const;
+        ) const override;
 };
 
 _END_ABC_REPORTERS_NS

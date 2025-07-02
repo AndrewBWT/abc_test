@@ -1,6 +1,7 @@
 #pragma once
 #include "abc_test/utility/internal/macros.hpp"
 #include "abc_test/utility/str/string_cast.hpp"
+#include "abc_test/utility/str/concepts.hpp"
 
 #include <fmt/xchar.h>
 #include <string>
@@ -88,7 +89,7 @@ requires has_string_like_underlying_type_c<FuncName>
                      std::basic_string_view<
                          string_like_underlying_char_type_t<FuncName>>>
                  && ...))
-__constexpr std::basic_string<typename string_like_underlying_char_type_t<
+__constexpr std::basic_string<string_like_underlying_char_type_t<
     FuncName>> mk_str_representing_function_call(FuncName&& _a_function_name, Args&&... _a_args)
     noexcept;
 
@@ -127,7 +128,7 @@ requires has_string_like_underlying_type_c<FuncName>
               std::basic_string_view<
                   string_like_underlying_char_type_t<FuncName>>> )
 __constexpr std::
-    basic_string<typename string_like_underlying_char_type_t<FuncName>> mk_str_appending_function_name_and_function_args(
+    basic_string<string_like_underlying_char_type_t<FuncName>> mk_str_appending_function_name_and_function_args(
         FuncName&& _a_function_name,
         Args&&     _a_args
     ) noexcept;
@@ -226,7 +227,7 @@ requires has_string_like_underlying_type_c<FuncName>
                  && ...)
          )
 __constexpr std::
-    basic_string<typename string_like_underlying_char_type_t<FuncName>> mk_str_representing_function_call(
+    basic_string<string_like_underlying_char_type_t<FuncName>> mk_str_representing_function_call(
         FuncName&& _a_function_name,
         Args&&... _a_args
     ) noexcept
@@ -236,14 +237,14 @@ __constexpr std::
     if constexpr (sizeof...(Args) == 0)
     {
         return mk_str_appending_function_name_and_function_args(
-            forward<FuncName>(_a_function_name), basic_string_view<CharT>{}
+            std::forward<FuncName>(_a_function_name), basic_string_view<CharT>{}
         );
     }
     else
     {
         return mk_str_appending_function_name_and_function_args(
-            forward<FuncName>(_a_function_name),
-            mk_str_representing_function_args(forward<Args>(_a_args)...)
+            std::forward<FuncName>(_a_function_name),
+            mk_str_representing_function_args(std::forward<Args>(_a_args)...)
         );
     }
 }
@@ -268,9 +269,9 @@ __constexpr std::basic_string<
             _l_result.push_back(_l_comma);
         }
         _l_first_arg = false;
-        _l_result.append(basic_string_view<T>(forward<decltype(arg)>(arg)));
+        _l_result.append(basic_string_view<T>(std::forward<decltype(arg)>(arg)));
     };
-    (_l_append_func(forward<Args>(_a_args)), ...);
+    (_l_append_func(std::forward<Args>(_a_args)), ...);
     return _l_result;
 }
 
@@ -279,7 +280,7 @@ template <typename FuncName, typename Args>
 && (std::convertible_to<
     Args,
     std::basic_string_view<string_like_underlying_char_type_t<FuncName>>>)
-__constexpr std::basic_string<typename string_like_underlying_char_type_t<FuncName>>
+__constexpr std::basic_string<string_like_underlying_char_type_t<FuncName>>
             mk_str_appending_function_name_and_function_args(
                 FuncName&& _a_function_name,
                 Args&&     _a_args
@@ -290,9 +291,9 @@ __constexpr std::basic_string<typename string_like_underlying_char_type_t<FuncNa
     auto            _l_l_bracket{static_cast<T>(0x28)};
     auto            _l_r_bracket{static_cast<T>(0x29)};
     basic_string<T> _l_rv{};
-    _l_rv.append(forward<FuncName>(_a_function_name));
+    _l_rv.append(std::forward<FuncName>(_a_function_name));
     _l_rv.push_back(_l_l_bracket);
-    _l_rv.append(forward<Args>(_a_args));
+    _l_rv.append(std::forward<Args>(_a_args));
     _l_rv.push_back(_l_r_bracket);
     return _l_rv;
 }

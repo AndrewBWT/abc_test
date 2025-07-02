@@ -19,6 +19,7 @@ struct printer_base_t
 {
 public:
     using value_type = T;
+    virtual ~printer_base_t() = default;
     __constexpr virtual std::u8string
         run_printer(const T& _a_parse_input) const
         = 0;

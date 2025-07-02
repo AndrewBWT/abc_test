@@ -13,11 +13,6 @@
 #include <functional>
 
 _BEGIN_ABC_DS_NS
-
-/*!
- * @brief Object used to represent a test currently being ran.
- */
-
 /*!
  * @brief Structure used to represent a test which is currently invoked.
  *
@@ -313,6 +308,7 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> _m_begin_time,
         _m_end_time;
 };
+__no_constexpr_or_inline bool get_global_retain_passed_assertions() noexcept;
 
 namespace
 {
@@ -530,7 +526,8 @@ __constexpr_imp void
         }
         // This has to be the last thing, or accessing _a_ptr would be invalid.
         if (_l_ref.get_pass_status() == false
-            || global::get_global_test_options().retain_passed_assertions)
+            || get_global_retain_passed_assertions())
+  //          || global::get_global_test_options().retain_passed_assertions)
         {
             _m_largest_assertion_index_added = _l_ref.assertion_index();
             _m_assertions.push_back(assertion_base_ptr_t(std::move(_a_ptr)));
@@ -672,7 +669,7 @@ __no_constexpr_imp std::filesystem::path
     path_t  _l_absolute_path{std::filesystem::absolute(_a_root_path).string()};
     wstring _l_wstr{_l_absolute_path.native()};
     path_t  _l_path = path_t(L"\\\\?\\" + _l_wstr);
-    for (const test_path_element_ref_t& _a_test_path_component :
+    for (const test_path_element_ref_t _a_test_path_component :
          _a_test_info.test_path_hierarchy())
     {
         _l_path
@@ -691,7 +688,7 @@ __no_constexpr_imp std::filesystem::path
         }
         catch (const std::filesystem::filesystem_error& _a_exception)
         {
-            int x = 4;
+            
         }
     }
     return _l_path;

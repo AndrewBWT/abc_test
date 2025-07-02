@@ -13,13 +13,23 @@ struct unexpected_thrown_non_descript_entity_list_formatter_t
     , public unexpected_report_list_formatter_t<true>
 {
 public:
+    using unexpected_report_list_formatter_t<true>::check_data;
+    using list_formattable_t<
+        reports::unexpected_thrown_not_derived_from_std_exception_t,
+        combined_enum_unexpected_thrown_non_descript_entity_fields_t,
+        print_config_t>::check_data;
     __constexpr virtual bool
         check_data(
             const combined_enum_unexpected_thrown_non_descript_entity_fields_t&
                 _a_fid,
             const reports::unexpected_thrown_not_derived_from_std_exception_t&
                 _a_element
-        ) const;
+        ) const override;
+    using unexpected_report_list_formatter_t<true>::get_data;
+    using list_formattable_t<
+        reports::unexpected_thrown_not_derived_from_std_exception_t,
+        combined_enum_unexpected_thrown_non_descript_entity_fields_t,
+        print_config_t>::get_data;
     __constexpr virtual void
         get_data(
             const combined_enum_unexpected_thrown_non_descript_entity_fields_t&
@@ -29,13 +39,13 @@ public:
             const print_config_t&                               _a_pc,
             const utility::io::threated_text_output_reporter_t& _a_ttor,
             const std::size_t _a_idx
-        ) const;
+        ) const override;
 protected:
     __constexpr virtual std::string
         get_str_representation(
             const reports::unexpected_report_t<true>& _a_element,
             const print_config_t&                     _a_pc
-        ) const;
+        ) const override;
 };
 
 _END_ABC_REPORTERS_NS

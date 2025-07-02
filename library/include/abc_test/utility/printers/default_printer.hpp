@@ -622,7 +622,7 @@ struct default_printer_t<std::variant<Ts...>>
         const variant_print_parse_e _a_enum_variant_print_parse,
         printer_t<Ts>... _a_printers
     )
-        : _m_printers(_a_printers)
+        : _m_printers(_a_printers...)
         , _m_enum_variant_print_parse(_a_enum_variant_print_parse)
     {}
 
@@ -630,8 +630,8 @@ struct default_printer_t<std::variant<Ts...>>
     default_printer_t(
         const variant_print_parse_e _a_enum_variant_print_parse
     )
-        : _m_printers(std::make_tuple(mk_printer(default_printer_t<Ts>())...))
-        , _m_enum_variant_print_parse(_a_enum_variant_print_parse)
+        : _m_enum_variant_print_parse(_a_enum_variant_print_parse)
+        , _m_printers(std::make_tuple(mk_printer(default_printer_t<Ts>())...))
     {}
 
     __constexpr
@@ -819,7 +819,6 @@ __constexpr_imp void
     ) const
 {
     using namespace std;
-    using U = tuple_element<I, value_type>::type;
     _a_str.append(get<I>(_m_printers)->run_printer(get<I>(_a_object)));
     if constexpr (I + 1 < tuple_size<value_type>{})
     {

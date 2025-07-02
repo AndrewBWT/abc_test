@@ -7,19 +7,6 @@
 _BEGIN_ABC_MATCHER_NS
 /*!
  * @brief Operator used to create comparison-based matchers which model the
- * checking of equality between two elements.
- * @tparam T1 The paramter contained in the comparison_wrapper_t.
- * @tparam T2 The parameter of the second argument.
- * @param _a_left_arg A comparison_wrapper_t entity containing a T1 element.
- * @param _a_right_arg An element of type T2.
- * @return matcher_t modelling equality between the entity in _a_left_arg and
- * _a_right_arg.
-template <typename T1, typename T2>
-__constexpr matcher_t
-    operator==(comparison_wrapper_t<T1>&& _a_left_arg, T2&& _a_right_arg)
-        noexcept;
-/*!
- * @brief Operator used to create comparison-based matchers which model the
  * checking of inequality between two elements.
  * @tparam T1 The paramter contained in the comparison_wrapper_t.
  * @tparam T2 The parameter of the second argument.
@@ -123,7 +110,7 @@ __constexpr_imp matcher_t
 {
     using namespace std;
     return eq<T1, T2>(
-        forward<T1>(_a_left_arg.object()), forward<T2>(_a_right_arg)
+        std::forward<T1>(_a_left_arg.object()), std::forward<T2>(_a_right_arg)
     );
 }
 
@@ -136,7 +123,7 @@ __constexpr_imp matcher_t
 {
     using namespace std;
     return neq<T1, T2>(
-        forward<T1>(_a_left_arg.object()), forward<T2>(_a_right_arg)
+        std::forward<T1>(_a_left_arg.object()), std::forward<T2>(_a_right_arg)
     );
 }
 
@@ -149,7 +136,7 @@ __constexpr_imp matcher_t
 {
     using namespace std;
     return lt<T1, T2>(
-        forward<T1>(_a_left_arg.object()), forward<T2>(_a_right_arg)
+        std::forward<T1>(_a_left_arg.object()), std::forward<T2>(_a_right_arg)
     );
 }
 
@@ -162,7 +149,7 @@ __constexpr_imp matcher_t
 {
     using namespace std;
     return leq<T1, T2>(
-        forward<T1>(_a_left_arg.object()), forward<T2>(_a_right_arg)
+        std::forward<T1>(_a_left_arg.object()), std::forward<T2>(_a_right_arg)
     );
 }
 
@@ -175,7 +162,7 @@ __constexpr_imp matcher_t
 {
     using namespace std;
     return gt<T1, T2>(
-        forward<T1>(_a_left_arg.object()), forward<T2>(_a_right_arg)
+        std::forward<T1>(_a_left_arg.object()), std::forward<T2>(_a_right_arg)
     );
 }
 
@@ -188,7 +175,7 @@ __constexpr_imp matcher_t
 {
     using namespace std;
     return geq<T1, T2>(
-        forward<T1>(_a_left_arg.object()), forward<T2>(_a_right_arg)
+        std::forward<T1>(_a_left_arg.object()), std::forward<T2>(_a_right_arg)
     );
 }
 
@@ -200,7 +187,7 @@ __constexpr_imp comparison_wrapper_t<T>
     ) noexcept
 {
     using namespace std;
-    return comparison_wrapper_t<T>(forward<T>(_a_t));
+    return comparison_wrapper_t<T>(std::forward<T>(_a_t));
 }
 
 _END_ABC_MATCHER_NS

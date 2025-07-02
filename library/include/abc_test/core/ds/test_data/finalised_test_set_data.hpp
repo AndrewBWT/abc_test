@@ -101,7 +101,7 @@ __no_constexpr_imp void
     ) noexcept
 {
     using namespace std;
-    for (const pair<key_t, tdg_collection_stack_trie_t>& _l_element :
+    for (const pair<key_t, tdg_collection_stack_trie_t> _l_element :
          _a_test_set_data._m_map_ids_to_tdg_collection_stack_tries.map())
     {
         _m_map_ids_to_tdg_collection_stack_tries.insert(

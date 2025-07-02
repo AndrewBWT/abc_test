@@ -23,3 +23,8 @@
 ("class std::vector<int,class std::allocator<int> >", {("")})
 ("class std::basic_string_view<int,struct std::char_traits<int> >", {("")})
 ("class std::basic_string<int,struct std::char_traits<int>,class std::allocator<int> >", {("")})
+("char [1]", {("char")})
+("wchar_t [1]", {("wchar_t")})
+("char8_t [1]", {("char8_t")})
+("char16_t [1]", {("char16_t")})
+("char32_t [1]", {("char32_t")})

@@ -11,6 +11,8 @@
 #include <functional>
 #include <variant>
 
+#include <random>
+
 _BEGIN_ABC_UTILITY_PARSER_NS
 
 template <typename T>
@@ -80,11 +82,10 @@ struct default_parser_t<bool> : public parser_base_t<bool>
 };
 
 template <typename T>
-requires enum_has_list_c<T>
+requires abc::utility::enum_has_list_c<T>
 struct default_parser_t<T> : public parser_base_t<T>
 {
     using value_type_t = T;
-
     default_parser_t(
         const enum_helper_string_type_e _a_enum_helper_string_case
         = enum_helper_string_type_e::unchanged
@@ -103,7 +104,12 @@ struct default_parser_t<T> : public parser_base_t<T>
             .parse_enum(_a_parse_input, _m_enum_helper_string_case);
     }
 };
-
+template <typename T>
+    requires enum_has_list_c<T>
+__constexpr default_parser_t<T>
+make_default_parser(enum_helper_string_type_e case_type) {
+    return default_parser_t<T>(case_type);
+}
 template <typename T>
 struct character_parser_t : public parser_base_t<T>
 {
@@ -153,7 +159,7 @@ __constexpr result_t<T>
     if (_l_sv_as_str.has_value())
     {
         uint32_t _l_res;
-        auto [ptr, ec] = from_chars(
+        from_chars(
             _l_sv_as_str.value().data(),
             _l_sv_as_str.value().data() + _l_sv_as_str.value().size(),
             _l_res,
@@ -450,7 +456,7 @@ template <typename T, typename... Ts>
 __constexpr result_t<T>
             object_printer_with_custom_parsers(
                 const utility::object_printer_parser_t& _a_object_print_parser,
-                const std::string_view&                 _a_begin_str,
+                const std::u8string_view&               _a_begin_str,
                 std::tuple<parser_t<Ts>...>             _a_parsers,
                 parser_input_t&                         _a_parse_input
             );
@@ -459,7 +465,7 @@ template <typename T, typename... Ts>
 __constexpr result_t<T>
             object_parser(
                 const utility::object_printer_parser_t& _a_object_print_parser,
-                const std::string_view&                 _a_begin_str,
+                const std::u8string_view&               _a_begin_str,
                 parser_input_t&                         _a_parse_input
             );
 
@@ -467,19 +473,19 @@ template <typename T, typename... Ts>
 __constexpr result_t<T>
             object_parser_with_field_names_and_custom_parsers(
                 const utility::object_printer_parser_t& _a_object_print_parser,
-                const std::string_view&                 _a_begin_str,
-                const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
-                std::tuple<parser_t<Ts>...>                        _a_parsers,
-                parser_input_t&                                    _a_parse_input
+                const std::u8string_view&               _a_begin_str,
+                const std::array<std::u8string_view, sizeof...(Ts)>& _a_object_names,
+                std::tuple<parser_t<Ts>...>                          _a_parsers,
+                parser_input_t&                                      _a_parse_input
             );
 
 template <typename T, typename... Ts>
 __constexpr result_t<T>
             object_parser_with_field_names(
                 const utility::object_printer_parser_t& _a_object_print_parser,
-                const std::string_view&                 _a_begin_str,
-                const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
-                parser_input_t&                                    _a_parse_input
+                const std::u8string_view&               _a_begin_str,
+                const std::array<std::u8string_view, sizeof...(Ts)>& _a_object_names,
+                parser_input_t&                                      _a_parse_input
             );
 
 namespace
@@ -488,8 +494,8 @@ template <typename T, typename... Ts>
 __constexpr result_t<T>
             object_parser_internal(
                 const utility::object_printer_parser_t& _a_object_print_parser,
-                const std::string_view&                 _a_begin_str,
-                const std::optional<std::array<std::string_view, sizeof...(Ts)>>&
+                const std::u8string_view&               _a_begin_str,
+                const std::optional<std::array<std::u8string_view, sizeof...(Ts)>>&
                                             _a_object_names,
                 std::tuple<parser_t<Ts>...> _a_parsers,
                 parser_input_t&             _a_parse_input
@@ -499,7 +505,7 @@ template <std::size_t I, typename... Ts>
 __constexpr_imp void
     run_object_reader(
         const utility::object_printer_parser_t& _a_object_print_parser,
-        const std::optional<std::array<std::string_view, sizeof...(Ts)>>&
+        const std::optional<std::array<std::u8string_view, sizeof...(Ts)>>&
                                     _a_object_names,
         std::tuple<parser_t<Ts>...> _a_parsers,
         parser_input_t&             _a_parse_input,
@@ -542,7 +548,7 @@ template <typename T, typename... Ts>
 __constexpr result_t<T>
             object_printer_with_custom_parsers(
                 const utility::object_printer_parser_t& _a_object_print_parser,
-                const std::string_view&                 _a_begin_str,
+                const std::u8string_view&               _a_begin_str,
                 std::tuple<parser_t<Ts>...>             _a_parsers,
                 parser_input_t&                         _a_parse_input
             )
@@ -551,7 +557,7 @@ __constexpr result_t<T>
     return object_parser_internal<T>(
         _a_object_print_parser,
         _a_begin_str,
-        optional<array<string_view, sizeof...(Ts)>>{},
+        optional<array<u8string_view, sizeof...(Ts)>>{},
         _a_parsers,
         _a_parse_input
     );
@@ -561,7 +567,7 @@ template <typename T, typename... Ts>
 __constexpr result_t<T>
             object_parser(
                 const utility::object_printer_parser_t& _a_object_print_parser,
-                const std::string_view&                 _a_begin_str,
+                const std::u8string_view&               _a_begin_str,
                 parser_input_t&                         _a_parse_input
             )
 {
@@ -571,7 +577,7 @@ __constexpr result_t<T>
     return object_parser_internal(
         _a_object_print_parser,
         _a_begin_str,
-        optional<array<string_view, sizeof...(Ts)>>{},
+        optional<array<u8string_view, sizeof...(Ts)>>{},
         _l_printers,
         _a_parse_input
     );
@@ -581,17 +587,17 @@ template <typename T, typename... Ts>
 __constexpr result_t<T>
             object_parser_with_field_names_and_custom_parsers(
                 const utility::object_printer_parser_t& _a_object_print_parser,
-                const std::string_view&                 _a_begin_str,
-                const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
-                std::tuple<parser_t<Ts>...>                        _a_parsers,
-                parser_input_t&                                    _a_parse_input
+                const std::u8string_view&               _a_begin_str,
+                const std::array<std::u8string_view, sizeof...(Ts)>& _a_object_names,
+                std::tuple<parser_t<Ts>...>                          _a_parsers,
+                parser_input_t&                                      _a_parse_input
             )
 {
     using namespace std;
     return object_parser_internal(
         _a_object_print_parser,
         _a_begin_str,
-        optional<array<string_view, sizeof...(Ts)>>{_a_object_names},
+        optional<array<u8string_view, sizeof...(Ts)>>{_a_object_names},
         _a_parsers,
         _a_parse_input
     );
@@ -601,9 +607,9 @@ template <typename T, typename... Ts>
 __constexpr result_t<T>
             object_parser_with_field_names(
                 const utility::object_printer_parser_t& _a_object_print_parser,
-                const std::string_view&                 _a_begin_str,
-                const std::array<std::string_view, sizeof...(Ts)>& _a_object_names,
-                parser_input_t&                                    _a_parse_input
+                const std::u8string_view&               _a_begin_str,
+                const std::array<std::u8string_view, sizeof...(Ts)>& _a_object_names,
+                parser_input_t&                                      _a_parse_input
             )
 {
     using namespace std;
@@ -612,7 +618,7 @@ __constexpr result_t<T>
     return object_parser_internal<T>(
         _a_object_print_parser,
         _a_begin_str,
-        optional<array<string_view, sizeof...(Ts)>>{_a_object_names},
+        optional<array<u8string_view, sizeof...(Ts)>>{_a_object_names},
         _l_parsers,
         _a_parse_input
     );
@@ -624,8 +630,8 @@ template <typename T, typename... Ts>
 __constexpr result_t<T>
             object_parser_internal(
                 const utility::object_printer_parser_t& _a_object_print_parser,
-                const std::string_view&                 _a_begin_str,
-                const std::optional<std::array<std::string_view, sizeof...(Ts)>>&
+                const std::u8string_view&               _a_begin_str,
+                const std::optional<std::array<std::u8string_view, sizeof...(Ts)>>&
                                             _a_object_names,
                 std::tuple<parser_t<Ts>...> _a_parsers,
                 parser_input_t&             _a_parse_input
@@ -633,13 +639,20 @@ __constexpr result_t<T>
 {
     using namespace std;
     using namespace abc::utility::str;
+    using namespace _ABC_NS_UTILITY_STR;
     tuple<Ts...> default_tuple;
-    _a_parse_input.check_advance_and_throw(_a_begin_str);
+    _a_parse_input.check_advance_and_throw(
+        unicode_conversion_with_exception<char32_t>(_a_begin_str)
+    );
     if (_a_object_print_parser.space_after_object_name)
     {
-        _a_parse_input.check_advance_and_throw(' ');
+        _a_parse_input.check_advance_and_throw(U' ');
     }
-    _a_parse_input.check_advance_and_throw(_a_object_print_parser.begin_char);
+    _a_parse_input.check_advance_and_throw(
+        unicode_conversion_with_exception<char32_t>(
+            _a_object_print_parser.begin_char
+        )
+    );
     run_object_reader<0>(
         _a_object_print_parser,
         _a_object_names,
@@ -776,18 +789,14 @@ struct default_parser_t<std::basic_string<T>>
         using namespace _ABC_NS_UTILITY_STR;
         using arg_type_t = basic_string<T>;
         char32_t   _l_char{U'"'};
-        char32_t   _l_prev_char;
-        char32_t   _l_char2{U'\\'};
-        size_t     _l_idx{0};
         u32string  _l_str{};
         arg_type_t _l_rv_str;
         auto       _l_add_str_func = [&](const u32string_view _a_str)
         {
             if constexpr (same_as<arg_type_t, string>)
             {
-                const result_t<arg_type_t> _l_rv{
-                    convert_unicode_to_ascii(_a_str)
-                };
+                const result_t<arg_type_t> _l_rv{convert_unicode_to_ascii(_a_str
+                )};
                 if (_l_rv.has_value())
                 {
                     _l_rv_str.append(_l_rv.value());
@@ -1251,8 +1260,9 @@ struct default_parser_t<std::variant<Ts...>>
     default_parser_t(
         const variant_print_parse_e _a_enum_variant_print_parse
     )
-        : _m_parsers(std::make_tuple(mk_parser(default_parser_t<Ts>())...))
-        , _m_enum_variant_print_parse(_a_enum_variant_print_parse)
+        : _m_enum_variant_print_parse(_a_enum_variant_print_parse)
+        , _m_parsers(std::make_tuple(mk_parser(default_parser_t<Ts>())...))
+        
     {}
 
     __constexpr
@@ -1260,13 +1270,13 @@ struct default_parser_t<std::variant<Ts...>>
         const variant_print_parse_e _a_enum_variant_print_parse,
         parser_t<Ts>... _a_parsers
     )
-        : _m_parsers(_a_parsers)
+        : _m_parsers(_a_parsers...)
         , _m_enum_variant_print_parse(_a_enum_variant_print_parse)
     {}
 
     __constexpr
     default_parser_t()
-    requires (std::is_default_constructible_v<default_parser_t<Ts>> && ...)
+   // requires (std::is_default_constructible_v<default_parser_t<Ts>> && ...)
         : _m_parsers(std::make_tuple(mk_parser(default_parser_t<Ts>())...))
     {}
 
@@ -1320,7 +1330,6 @@ struct default_parser_t<std::optional<T>>
         ) const
     {
         using namespace std;
-        value_type _l_rv;
         _a_parse_input.check_advance_and_throw(U"{");
         if (_a_parse_input.check_and_advance(U"}"))
         {
@@ -1356,7 +1365,8 @@ struct default_parser_t<std::shared_ptr<T>>
         const enum_pointer_print_parse_type_t _a_enum
         = enum_pointer_print_parse_type_t::AS_OBJECT
     )
-        : _m_parser(_a_parser), _m_enum(_a_enum)
+        : _m_enum(_a_enum)
+        , _m_parser(_a_parser)
     {}
 
     __constexpr
@@ -1395,6 +1405,40 @@ struct default_parser_t<std::filesystem::path>
 {
     __constexpr virtual result_t<std::filesystem::path>
         run_parser(parser_input_t& _a_parse_input) const;
+};
+
+template <>
+struct default_parser_t<std::monostate> : public parser_base_t<std::monostate>
+{
+    __constexpr virtual result_t<std::monostate>
+        run_parser(parser_input_t& _a_parse_input) const
+    {
+        if (_a_parse_input.check_and_advance(u8"std::monostate"))
+        {
+            return std::monostate{};
+        }
+        else
+        {
+            return std::unexpected(u8"");
+        }
+    }
+};
+
+template <>
+struct default_parser_t<std::mt19937_64> : public parser_base_t<std::mt19937_64>
+{
+    __constexpr virtual result_t<std::mt19937_64>
+        run_parser(parser_input_t& _a_parse_input) const
+    {
+        if (_a_parse_input.check_and_advance(u8"std::mt19937_64"))
+        {
+            return std::mt19937_64{};
+        }
+        else
+        {
+            return std::unexpected(u8"");
+        }
+    }
 };
 
 _END_ABC_UTILITY_PARSER_NS

@@ -554,7 +554,7 @@ _TEST_CASE(
         }
     );
 }
-#if 0
+
 _TEST_CASE(
     abc::test_case_t(
         {.name             = "Tests for make_focused_string",
@@ -584,13 +584,15 @@ _TEST_CASE(
         // Anything outside of the ascii range is caught.
         using unit_test_data_1 = tuple<T, vector<tuple<size_t, size_t, T>>>;
         for (const auto& _l_data : read_data_from_file<unit_test_data_1>(
-                 fmt::format("unit_test_1_{0}", _l_name)
+                 fmt::format("unit_test_1", _l_name)
              ))
         {
             _TVLOG(_l_data);
             const auto& [_l_str, _l_results]{_l_data};
-            for (auto& [_l_idx, _l_limit, _l_result] : _l_results)
+            for (auto& _l_inner_data : _l_results)
             {
+                _TVLOG(_l_inner_data);
+                const auto& [_l_idx, _l_limit, _l_result] {_l_inner_data};
                 _l_unit_tests += _BLOCK_CHECK(
                     _EXPR(
                         make_focused_string(_l_str, _l_idx, _l_limit) == _l_result
@@ -637,4 +639,3 @@ _TEST_CASE(
         }
     );
 }
-#endif

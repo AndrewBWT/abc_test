@@ -166,7 +166,7 @@ public:
         ) const noexcept;
     friend class itdg_collection_stack_trie_t;
     template <bool Is_Hex, bool Is_Head>
-    friend class
+    friend struct
         compressed_typless_data_generator_collection_stack_trie_parser_t;
 
     __constexpr const dgc_memoized_element_t&

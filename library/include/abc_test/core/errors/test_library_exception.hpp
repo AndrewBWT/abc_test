@@ -11,6 +11,7 @@
 #include <fmt/xchar.h>
 
 #include "abc_test/utility/str/string_cast.hpp"
+#include "abc_test/utility/str/print_utils.hpp"
 
 _BEGIN_ABC_ERRORS_NS
 

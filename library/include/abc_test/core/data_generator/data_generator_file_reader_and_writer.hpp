@@ -16,7 +16,7 @@ public:
     data_generator_file_reader_and_writer_t(
         const T&                                                    _a_object,
         const utility::io::file_name_t<typename T::generator_type>& _a_frw,
-        const std::string_view _a_comment_str
+        const std::u8string_view _a_comment_str
     );
     __constexpr std::size_t
                 write_data_to_file(const T& _a_element);
@@ -57,7 +57,7 @@ data_generator_file_reader_and_writer_t<T>::
     data_generator_file_reader_and_writer_t(
         const T&                                                    _a_object,
         const utility::io::file_name_t<typename T::generator_type>& _a_frw,
-        const std::string_view _a_comment_str
+        const std::u8string_view _a_comment_str
     )
     : _m_opt_rw_info(opt_rw_info(_a_frw))
     , _m_path(path(_a_frw))

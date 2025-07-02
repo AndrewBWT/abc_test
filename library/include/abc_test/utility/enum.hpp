@@ -39,14 +39,6 @@ using enum_list_str_t      = std::basic_string_view<enum_list_str_char_t>;
 template <typename T>
 using enum_list_t = std::vector<std::pair<T, enum_list_str_t>>;
 /*!
- * @brief A concept for enums that have a get_enum_list function associated with
- * them.
- */
-template <typename T>
-concept enum_has_list_c = std::is_enum_v<T> && requires () {
-    { get_enum_list<T>() } -> std::same_as<enum_list_t<T>>;
-};
-/*!
  * @brief This function, defined for a specific enum, when paired with the
  * enum_helper_string_t class, allows enusm to be printed, parsed and
  * enumerated.
@@ -54,9 +46,17 @@ concept enum_has_list_c = std::is_enum_v<T> && requires () {
  * @return
  */
 template <typename T>
-requires std::is_enum_v<T>
+    requires std::is_enum_v<T>
 __constexpr enum_list_t<T>
-            get_enum_list() noexcept = delete;
+get_enum_list() noexcept = delete;
+/*!
+ * @brief A concept for enums that have a get_enum_list function associated with
+ * them.
+ */
+template <typename T>
+concept enum_has_list_c = std::is_enum_v<T> && requires () {
+    { get_enum_list<T>() } -> std::same_as<enum_list_t<T>>;
+};
 /*!
  * @brief This enum is used to denote how to print and parse strings associated
  * with an enum.
@@ -374,13 +374,18 @@ requires enum_has_list_c<T>
 __constexpr const enumerate_enum_helper_t<T>&
                   get_thread_local_enumerate_enum_helper() noexcept;
 _END_ABC_UTILITY_NS
-
+/*!
+* Helper macro for creating u8 concatenated with the enum's name.
+* 
+* Required so that clang does not throw an error.
+*/
+#define _ENUM_U8_STR(x) u8###x
 /*!
  * @brief Enum for creating list of entries for an enum_list_t object.
  *
  * The created string will exactly minimc the name of the enum.
  */
-#define _ENUM_LIST_ENTRY(x) {x, u8#x}
+#define _ENUM_LIST_ENTRY(x) {x, _ENUM_U8_STR(x)}
 
 _BEGIN_ABC_UTILITY_NS
 template <typename T>
@@ -653,7 +658,6 @@ __constexpr std::u8string
 {
     using namespace std;
     using enum enum_helper_string_type_e;
-    enum_list_str_t           _l_rv;
     const size_t              _l_idx{enums_idx(_a_element)};
     const idx_t_to_str_ref_t& _l_idx_to_str_ref{
         get_elements_to_string_map(_a_enum_string_case)
