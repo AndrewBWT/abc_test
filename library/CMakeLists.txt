@@ -268,7 +268,10 @@ add_library(${LIBRARY_NAME} ${LIBRARY_FILES})
 # Add the include directory to the target.
 target_include_directories(${LIBRARY_NAME} PUBLIC include)
 # Link the REQUIRED_LIBS to the LIBRARY
-target_link_libraries(${LIBRARY_NAME} PUBLIC ${REQUIRED_LIBS} stdc++_libbacktrace)
+target_link_libraries(${LIBRARY_NAME} PUBLIC ${REQUIRED_LIBS})
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  target_link_libraries(${LIBRARY_NAME} PUBLIC stdc++_libbacktrace)
+endif()
 # Ensure that REQUIRED_LIBS are built before the library.
 add_dependencies(${LIBRARY_NAME} ${REQUIRED_LIBS})
 

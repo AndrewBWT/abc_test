@@ -70,7 +70,14 @@ __constexpr_imp std::wstring
                 )
 {
     using namespace std;
-    return wstring(_a_str_view.begin(), _a_str_view.end());
+    if constexpr (sizeof(typename T::value_type) == sizeof(wchar_t))
+    {
+        return wstring(_a_str_view.begin(), _a_str_view.end());
+    }
+    else
+    {
+        return wstring{};
+    }
 }
 
 _END_ABC_UTILITY_STR_NS
