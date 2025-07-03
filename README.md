@@ -38,6 +38,8 @@ This example shows how to use data generators to write a test case which perform
 
 ## Installation ##
 
+`abc_test` has been tested under Windows, built using Visual Studio 17.13.5, and also built using clang 18.1.8 under Visual Studio.
+
 ## Roadmap ##
 
 As stated in the introduction, `abc_test` is currently a personal project. It was originally conceived from ideas in previous projects of mine, where I was wanting to have both fuzzy testing capabilities alongside unit testing capabilities. It grew significantly, and is now in a state where I want to share it and see what others think, and whether there is any interest in developing it further.
