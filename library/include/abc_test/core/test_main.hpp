@@ -14,6 +14,8 @@
 #include <set>
 #include <syncstream>
 #include <thread>
+#include <condition_variable>
+
 
 _BEGIN_ABC_NS
 

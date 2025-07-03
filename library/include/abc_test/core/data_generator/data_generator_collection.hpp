@@ -88,7 +88,11 @@ public:
         ) const noexcept
     {
         dgc_internal_t<T> _l_elements{ get_elements()};
-        _l_elements.append_range(_a_arg.get_elements());
+        for (auto& _l_element : _a_arg.get_elements())
+        {
+			_l_elements.push_back(_l_element);
+	    }
+     //   _l_elements.append_range(_a_arg.get_elements());
         return data_generator_collection_t<T>(_l_elements);
     }
 

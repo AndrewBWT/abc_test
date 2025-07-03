@@ -12,7 +12,6 @@ public:
         file_line_writer_t(const std::filesystem::path& _a_file_name
                            //		const test_options_base_t* _a_test_options
         );
-    __constexpr
     file_line_writer_t() noexcept
         = default;
     __no_constexpr void

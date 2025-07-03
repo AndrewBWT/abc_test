@@ -213,7 +213,7 @@ __constexpr bool
  * @return See above.
  */
 template <bool Return_Reason, typename T>
-requires char_type_is_unicode_c<typename T::value_type>
+requires char_type_is_unicode_c<typename std::iterator_traits<T>::value_type>
 __constexpr std::conditional_t<
     Return_Reason,
     result_t<std::pair<char32_t, std::size_t>>,
@@ -234,7 +234,7 @@ __constexpr std::conditional_t<
  * @return See above.
  */
 template <bool Return_Reason, typename T>
-requires char_type_is_unicode_c<typename T::value_type>
+requires char_type_is_unicode_c<typename std::iterator_traits<T>::value_type>
 __constexpr
 std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
     next_char32_t_and_increment_iterator(T& _a_itt, const T _a_end) noexcept;
@@ -383,7 +383,7 @@ template <
     bool Is_Substring,
     typename T,
     typename Original_Value_Type>
-requires char_type_is_unicode_c<typename T::value_type>
+requires char_type_is_unicode_c<typename std::iterator_traits<T>::value_type>
          && char_type_is_unicode_c<Original_Value_Type>
 __constexpr std::conditional_t<
     Return_Reason,
@@ -399,7 +399,7 @@ __no_constexpr std::u8string
                ) noexcept;
 
 template <bool Return_Reason, bool Is_Substring, typename T, typename Original_Type>
-requires char_type_is_unicode_c<typename T::value_type>
+requires char_type_is_unicode_c<typename std::iterator_traits<T>::value_type>
          && char_type_is_unicode_c<Original_Type>
 __constexpr
 std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
@@ -797,7 +797,7 @@ __constexpr bool
 }
 
 template <bool Return_Reason, typename T>
-requires char_type_is_unicode_c<typename T::value_type>
+requires char_type_is_unicode_c<typename std::iterator_traits<T>::value_type>
 __constexpr std::conditional_t<
     Return_Reason,
     result_t<std::pair<char32_t, std::size_t>>,
@@ -839,7 +839,7 @@ __constexpr std::conditional_t<
 }
 
 template <bool Return_Reason, typename T>
-requires char_type_is_unicode_c<typename T::value_type>
+requires char_type_is_unicode_c<typename std::iterator_traits<T>::value_type>
 __constexpr
 std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
     next_char32_t_and_increment_iterator(
@@ -848,7 +848,7 @@ std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
     ) noexcept
 {
     using namespace std;
-    using CharT        = T::value_type;
+    using CharT        = std::iterator_traits<T>::value_type;
     auto _l_error_func = [&]() -> u8string
     {
         return detail::next_char_error_func(
@@ -861,7 +861,7 @@ std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
     auto _l_rv{detail::next_char32_t_and_increment_iterator<
         Return_Reason,true,
         T,
-        typename T::value_type>(_a_itt, _a_itt, _a_end)};
+        CharT>(_a_itt, _a_itt, _a_end)};
     if constexpr (Return_Reason)
     {
         return _l_rv.or_else(
@@ -1109,7 +1109,7 @@ __constexpr result_t<std::basic_string<T>>
                 return _l_result.transform(
                     [](const auto _a_str_3)
                     {
-                        cast_unicode_string_to_wstring(_a_str_3);
+                        return cast_unicode_string_to_wstring(_a_str_3);
                     }
                 );
             }
@@ -1168,7 +1168,9 @@ __constexpr result_t<std::basic_string<T>>
             }
             else if constexpr (wchar_is_32_bit)
             {
-                // return unpack_wstring(_a_str_2);
+                return cast_unicode_string_to_wstring(
+                    (_a_str_2)
+                );
             }
             else
             {
@@ -1500,7 +1502,7 @@ template <
     bool Is_Substring,
     typename T,
     typename Original_Value_Type>
-requires char_type_is_unicode_c<typename T::value_type>
+requires char_type_is_unicode_c<typename std::iterator_traits<T>::value_type>
          && char_type_is_unicode_c<Original_Value_Type>
 __constexpr std::conditional_t<
     Return_Reason,
@@ -1513,7 +1515,7 @@ __constexpr std::conditional_t<
     ) noexcept
 {
     using namespace std;
-    using CharT = T::value_type;
+    using CharT = std::iterator_traits<T>::value_type;
     using rv_t  = conditional_t<
          Return_Reason,
          result_t<pair<char32_t, size_t>>,
@@ -1880,7 +1882,7 @@ __constexpr std::conditional_t<
     auto _l_next_from_u16_string
         = [&](const T _a_begin, const T _a_itt, const T _a_end) -> rv_t
     {
-        using CharT = T::value_type;
+        using CharT = std::iterator_traits<T>::value_type;
         auto           _l_itt{_a_itt};
         const char16_t _l_first{static_cast<char16_t>(*_l_itt)};
         if (detail::is_high_surrogate(_l_first))
@@ -2103,7 +2105,7 @@ __no_constexpr_imp std::u8string
 }
 
 template <bool Return_Reason, bool Is_Substring, typename T, typename Original_Type>
-requires char_type_is_unicode_c<typename T::value_type>
+requires char_type_is_unicode_c<typename std::iterator_traits<T>::value_type>
          && char_type_is_unicode_c<Original_Type>
 __constexpr
 std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>

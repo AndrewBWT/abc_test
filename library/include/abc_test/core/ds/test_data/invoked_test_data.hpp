@@ -667,8 +667,12 @@ __no_constexpr_imp std::filesystem::path
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
     path_t  _l_absolute_path{std::filesystem::absolute(_a_root_path).string()};
-    wstring _l_wstr{_l_absolute_path.native()};
+    auto _l_wstr{_l_absolute_path.native()};
+#if defined(_WIN32)
     path_t  _l_path = path_t(L"\\\\?\\" + _l_wstr);
+    #else
+    path_t _l_path = _l_wstr;
+    #endif
     for (const test_path_element_ref_t _a_test_path_component :
          _a_test_info.test_path_hierarchy())
     {

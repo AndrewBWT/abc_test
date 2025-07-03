@@ -114,7 +114,13 @@ __no_constexpr_imp
     inner_rng_mt19937_64_t::inner_rng_mt19937_64_t(
         const std::seed_seq& _a_seed_seq
     ) noexcept
-    : _m_rng(_a_seed_seq)
-{}
+//    : _m_rng(_a_seed_seq)
+{
+	std::vector<uint32_t> _l_seeds;
+	_l_seeds.reserve(_a_seed_seq.size());
+//	_a_seed_seq.param(_l_seeds);
+	std::seed_seq _l_seed(_l_seeds.begin(),_l_seeds.end());
+	_m_rng = std::mt19937_64(_l_seed);
+	}
 
 _END_ABC_UTILITY_NS

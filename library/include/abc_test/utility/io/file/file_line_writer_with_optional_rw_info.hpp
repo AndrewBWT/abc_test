@@ -27,7 +27,7 @@ private:
         file_line_writer_with_optional_rw_info_t(
             const utility::io::file_name_t<T>& _a_frw,
             const bool _a_exists,
-            const std::string_view _a_comment_if_new_file
+            const std::u8string_view _a_comment_if_new_file
         );
 };
 _END_ABC_UTILITY_IO_NS
@@ -65,7 +65,7 @@ __no_constexpr_imp
 file_line_writer_with_optional_rw_info_t<T>::file_line_writer_with_optional_rw_info_t(
     const utility::io::file_name_t<T>& _a_frw,
     const bool _a_exists,
-    const std::string_view _a_comment_if_new_file
+    const std::u8string_view _a_comment_if_new_file
 )
       : file_line_writer_t(path(_a_frw))
       , _m_opt_rw_info(opt_rw_info(_a_frw))

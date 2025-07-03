@@ -227,6 +227,7 @@ __constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 ) noexcept
 {
     using namespace _ABC_NS_DG;
+    using namespace _ABC_NS_UTILITY;
     return from_m_to_n(
         _a_value, max_value_t<T>().max_value(), _a_enumerate_base
     );
@@ -241,6 +242,7 @@ __constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 ) noexcept
 {
     using namespace _ABC_NS_DG;
+    using namespace _ABC_NS_UTILITY;
     return from_m_to_n(
         max_value_t<T>().max_value(), _a_value, _a_enumerate_base
     );
@@ -255,6 +257,7 @@ __constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
                 ) noexcept
 {
     using namespace _ABC_NS_DG;
+    using namespace _ABC_NS_UTILITY;
     return from_m_to_n(
         _a_value, min_value_t<T>().min_value(), _a_enumerate_base
     );

@@ -11,6 +11,7 @@
 #include <random>
 #include <set>
 #include <unordered_set>
+#include <forward_list>
 
 _BEGIN_ABC_UTILITY_PRINTER_NS
 
@@ -48,6 +49,7 @@ __constexpr std::u8string
         "Function requires a specialization of the function "
         "run_printer<T>()."
     );
+    return std::u8string{};
 }
 
 _END_ABC_UTILITY_PRINTER_NS
@@ -270,7 +272,7 @@ struct default_printer_t<T> : public printer_base_t<T>
 {
     static constexpr bool is_specialized{true};
 
-    default_printer_t<T>(
+    __constexpr default_printer_t(
         const enum_helper_string_type_e _a_enum_helper_string_case
         = enum_helper_string_type_e::lower
     )

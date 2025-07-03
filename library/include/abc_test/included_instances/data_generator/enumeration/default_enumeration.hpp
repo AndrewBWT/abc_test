@@ -69,6 +69,7 @@ __constexpr_imp bool
         "Function requires a specialization of the function "
         "less_than<T>()."
     );
+    return false;
 }
 
 template <typename T>
@@ -83,6 +84,7 @@ __constexpr_imp bool
         "Function requires a specialization of the function "
         "equal<T>()."
     );
+    return false;
 }
 
 template <typename T>
@@ -98,6 +100,7 @@ __constexpr bool
         "Function requires a specialization of the function "
         "increment<T>()."
     );
+    return false;
 }
 
 template <typename T>
@@ -113,6 +116,7 @@ __constexpr bool
         "Function requires a specialization of the function "
         "decrement<T>()."
     );
+    return false;
 }
 
 template <typename T>
@@ -127,6 +131,7 @@ __constexpr enumeration_diff_t
         "Function requires a specialization of the function "
         "difference<T>()."
     );
+    return enumeration_diff_t{};
 }
 
 template <typename T>

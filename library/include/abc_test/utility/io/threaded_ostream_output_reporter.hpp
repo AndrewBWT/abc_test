@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <set>
+#include <mutex>
 
 _BEGIN_ABC_UTILITY_IO_NS
 struct threaded_ostream_output_reporter_t

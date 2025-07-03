@@ -8,8 +8,8 @@ _BEGIN_ABC_UTILITY_STR_NS
  * @brief This concept identifies a wchar_t type which is 4 bytes long - 32
  * bits.
  */
-constexpr bool wchar_is_16_bit = sizeof(wchar_t) == 2;
-constexpr bool wchar_is_32_bit = sizeof(wchar_t) == 4;
+constexpr bool wchar_is_16_bit = (sizeof(wchar_t) == 2);
+constexpr bool wchar_is_32_bit = (sizeof(wchar_t) == 4);
 template <typename T>
 concept is_wchar_and_32_bit_c = std::same_as<T, wchar_t> && wchar_is_32_bit;
 /*!

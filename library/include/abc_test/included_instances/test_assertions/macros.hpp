@@ -684,3 +684,4 @@ _END_ABC_NS
             incorrect_exception<_a_exception_type>(_a_msg)               \
         );                                                               \
     }
+

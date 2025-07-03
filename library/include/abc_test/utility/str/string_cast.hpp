@@ -12,9 +12,9 @@ __constexpr std::u8string
 __constexpr auto
     cast_wstring_to_unicode_string(const std::wstring_view _a_str) noexcept;
 template <typename T>
-requires (wchar_is_16_bit && std::same_as<typename T::value_type, char16_t>)
-         || ( wchar_is_32_bit
-              && std::same_as<typename T::value_type, char32_t> )
+//requires (wchar_is_16_bit && std::same_as<typename T::value_type, char16_t>)
+//         || ( wchar_is_32_bit
+//              && std::same_as<typename T::value_type, char32_t> )
 __constexpr std::wstring cast_unicode_string_to_wstring(const T _a_str_view);
 _END_ABC_UTILITY_STR_NS
 
@@ -62,8 +62,8 @@ __constexpr auto
 }
 
 template <typename T>
-requires (wchar_is_16_bit && std::same_as<typename T::value_type,char16_t>)
-         || (wchar_is_32_bit && std::same_as<typename T::value_type, char32_t>)
+//requires (wchar_is_16_bit && std::same_as<typename T::value_type,char16_t>)
+//         || (wchar_is_32_bit && std::same_as<typename T::value_type, char32_t>)
 __constexpr_imp std::wstring
                 cast_unicode_string_to_wstring(
                     const T _a_str_view

@@ -263,12 +263,12 @@ set(LIBRARY_FILES
 
 
 # Add the set of files to the library.
-add_library(${LIBRARY_NAME} ${LIBRARY_FILES})
+add_library(${LIBRARY_NAME} ${LIBRARY_FILES}) 
   
 # Add the include directory to the target.
 target_include_directories(${LIBRARY_NAME} PUBLIC include)
 # Link the REQUIRED_LIBS to the LIBRARY
-target_link_libraries(${LIBRARY_NAME} PUBLIC ${REQUIRED_LIBS})
+target_link_libraries(${LIBRARY_NAME} PUBLIC ${REQUIRED_LIBS} stdc++_libbacktrace)
 # Ensure that REQUIRED_LIBS are built before the library.
 add_dependencies(${LIBRARY_NAME} ${REQUIRED_LIBS})
 

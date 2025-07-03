@@ -68,9 +68,10 @@ enumeration_from_list<T>::enumeration_from_list(
         if (not _l_added_elements.contains(_l_element))
         {
             _l_added_elements.insert(_l_element);
+            _m_elements.push_back(_l_element);
         }
     }
-    _m_elements = ranges::to<vector<T>>(_l_added_elements);
+    //_m_elements = ranges::to<vector<T>>(_l_added_elements);
     for (const T& _l_element : _m_elements)
     {
         _m_indexes.insert({_l_element, _m_indexes.size()});

@@ -216,7 +216,7 @@ __constexpr void
             );
             break;
         default:
-            throw std::exception("Couldn't work");
+            throw std::runtime_error("Couldn't work");
         }
     }
 }
@@ -246,7 +246,7 @@ __constexpr bool
         case 0:
             return _m_object.has_current_element();
         default:
-            throw std::exception("Couldn't work");
+            throw std::runtime_error("Couldn't work");
         }
     }
 }
@@ -266,7 +266,7 @@ __constexpr const T::generator_type&
         case 1:
             return _m_object.current_element();
         default:
-            throw std::exception("Couldn't work");
+            throw std::runtime_error("Couldn't work");
         }
     }
     else
@@ -276,7 +276,7 @@ __constexpr const T::generator_type&
         case 0:
             return _m_object.current_element();
         default:
-            throw std::exception("Couldn't work");
+            throw std::runtime_error("Couldn't work");
         }
     }
 }
@@ -304,7 +304,7 @@ __constexpr bool
         case 1:
             return _m_object.generate_next();
         default:
-            throw std::exception("Couldn't work");
+            throw std::runtime_error("Couldn't work");
         }
     }
     else
@@ -314,7 +314,7 @@ __constexpr bool
         case 0:
             return _m_object.generate_next();
         default:
-            throw std::exception("Couldn't work");
+            throw std::runtime_error("Couldn't work");
         }
     }
 }
@@ -348,7 +348,7 @@ __constexpr ds::dg_memoized_element_t
                 );
                 break;
             default:
-                throw std::exception("Couldn't work");
+                throw std::runtime_error("Couldn't work");
             }
             return dg_memoized_element_t{_m_mode, _l_rv};
         }
@@ -401,7 +401,7 @@ __constexpr ds::dg_memoized_element_t
                 }
                 break;
             default:
-                throw std::exception("Couldn't work");
+                throw std::runtime_error("Couldn't work");
             }
             return dg_memoized_element_t{_l_mode, _l_rv};
         }
@@ -436,14 +436,14 @@ __constexpr void
                     _m_file_read_writer.set_to_write();
                     break;
                 default:
-                    throw std::exception("couldn't");
+                    throw std::runtime_error("couldn't");
                 }
                 _m_mode = _a_new_mode;
             }
         }
         else
         {
-            throw std::exception("coudln't");
+            throw std::runtime_error("coudln't");
         }
     }
 }
