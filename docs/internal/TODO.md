@@ -10,7 +10,6 @@
 ## Not Currently a Focus
 
 - Run clang-tidy on the code.
-- Check if code compiles using g++ and clang.
 - Add some functionality which would allow the user to set an options object per test. Either we set it via a name, via an object, or via a file.
 	- Such functionality would raise questions regarding memoized data; either we store each test's options file, or we assume it won't change.
 	- Some options are not things which we would want to change per-test. It may be that actually we want the functionality to change certain things in a test - e.g. number of random elements generated from a data generator.

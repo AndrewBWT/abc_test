@@ -5,8 +5,8 @@
 - `abc_test` is designed to be easy to set up, and allows the user to quickly begin writing tests. 
 - `abc_test`'s design does not guide the user to any one test methodology. Instead, it provides the tools to write different types of tests such as unit tests, fuzzy tests and property tests, to name but a few examples. The user is able to interleave different types of tests in individual test cases, with the design goal being that the user is able to ringfence testing components into individual test cases, should they desire.
 - `abc_test` is designed with concurrency in mind. The user is able to run tests in parallel should they desire.
-- `abc_test` tracks where test assertions fail, and for which values. A test executable can be configured to be re-ran, and skip previously passed test assertions. This allows the user spends less time configuring their test executable, and more solving issues.
-- `abc_test'`s test assertions are designed to be human-readable and easy to understand, while also being highly configurable. The design goal behind this was to allow the user to be able to quickly discern what is being tested, without requiring deep knowledge of the `abc_test` framework.
+- `abc_test` tracks where test assertions fail, and for which values. A test executable can be configured to be re-ran, and skip previously passed test assertions. This allows the user spends less time configuring their test executable, and more time solving issues.
+- `abc_test'`s test assertions are designed to be human-readable and easy to understand, while also being highly configurable. The design goal behind this was to allow the user to be able to quickly discern what is being tested, without requiring intricate knowledge of the `abc_test` framework.
 
 If any of these features have piqued your interest, `abc_test` may be of interest to you.
 
@@ -38,7 +38,21 @@ This example shows how to use data generators to write a test case which perform
 
 ## Installation ##
 
-`abc_test` has been tested under Windows, built using Visual Studio 17.13.5, and also built using clang 18.1.8 under Visual Studio.
+`abc_test` targets C++23. It has been built using `cmake` and, for now at-least, we recommend using `cmake` to install it.
+
+Given a 
+
+See above for the environments it has been tested in. To install it run the following from the main folder.
+
+```
+mkdir build && cd build
+cmake ..
+```
+
+`abc_test` has been compiled under Windows using the MSVC and Clang compilers. The MSVC compiler in question is that which ships with 17.13.5. The Clang compiler used is version 18.1.8.
+
+`abc_test` has also been built under Linux, specifically Ubuntu 24. It was compiled using the GNU compiler on that platform.
+
 
 ## Roadmap ##
 
