@@ -85,12 +85,13 @@ public:
     __constexpr reference
         operator*() const;
 private:
-    dgc_internal_itt_t<T>           _m_this_iterator;
-    ds::opt_idgc_memoized_element_t _m_repetition_data;
-    size_t                          _m_this_iterators_index;
-    bool                            _m_add_repeatable_test_config;
-    test_runner_t*                  _m_test_runner;
-    std::size_t                     _m_iterator_length;
+    dgc_internal_itt_t<T>                     _m_this_iterator;
+    ds::opt_idgc_memoized_element_t           _m_repetition_data;
+    size_t                                    _m_this_iterators_index;
+    bool                                      _m_add_repeatable_test_config;
+    test_runner_t*                            _m_test_runner;
+    std::size_t                               _m_iterator_length;
+    mutable std::optional<logging::log_msg_t> _m_log_msg;
     // std::size_t                     _m_iterator_index;
     /*!
      * Increment iterator using an optional set of repetition data.
@@ -143,13 +144,13 @@ __constexpr_imp
         else
         {
             this->_m_generation_collection_index = _m_iterator_length;
-            //throw errors::test_library_exception_t(fmt::format(
-          //      u8"Could not initialise tests for loop stack. For loop stack = "
-          //      u8"{0}",
-          //      checkless_convert_ascii_to_unicode<u8string>(
-           //         fmt::format("{}", _l_current_test.for_loop_stack_trie())
-          //      )
-         //   ));
+            // throw errors::test_library_exception_t(fmt::format(
+            // u8"Could not initialise tests for loop stack. For loop stack = "
+            // u8"{0}",
+            // checkless_convert_ascii_to_unicode<u8string>(
+            //    fmt::format("{}", _l_current_test.for_loop_stack_trie())
+            // )
+            // ));
         }
     }
     // If not at the end, increment the current test's CURRENT for loop stack
@@ -263,6 +264,17 @@ __constexpr_imp data_generator_collection_iterator_t<T>::reference
     {
         auto&     _l_this_iterator_ref{*_m_this_iterator};
         reference _l_current_element{_l_this_iterator_ref->current_element()};
+        _m_log_msg = logging::log_msg_t(
+            ds::single_source_t(),
+            fmt::format(
+                u8"{0} = {1}",
+                u8"data generator's value",
+                abc::utility::printer::default_printer_t<
+                    std::remove_cvref_t<decltype(_l_current_element)>>()
+                    .run_printer(_l_current_element)
+            ),
+            false
+        );
         return _l_current_element;
     }
 }

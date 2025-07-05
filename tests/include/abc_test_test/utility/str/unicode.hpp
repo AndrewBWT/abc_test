@@ -69,30 +69,24 @@ _TEST_CASE(
         // Tests converting a unicode string to an ascii string.
         // Anything outside of the ascii range is caught.
         using unit_test_data_1 = tuple<T, result_t<string>>;
-        for (const auto& _l_data : read_data_from_file<unit_test_data_1>(
+        for (const auto& [_l_unicode_str, _l_result] : read_data_from_file<unit_test_data_1>(
                  fmt::format("unit_test_1_{0}", _l_name),
                  fmt::format("unit_test_1", _l_name)
              ))
         {
-            _TVLOG(_l_data);
-            const auto& [_l_unicode_str, _l_result]{_l_data};
             _l_unit_tests += _BLOCK_CHECK(
-                _EXPR(convert_unicode_to_ascii(_l_unicode_str) == _l_result)
-
+                _EXPR(convert_unicode_to_ascii(_l_unicode_str) != _l_result)
                 && _EXPR(
                     convert_unicode_to_ascii(T(_l_unicode_str)) == _l_result
                 )
-
             );
         }
         // Running unit tests the other way.
         using unit_test_data_3 = std::tuple<string, result_t<T>>;
-        for (const auto& _l_data : read_data_from_file<unit_test_data_3>(
+        for (const auto& [_l_str, _l_result] : read_data_from_file<unit_test_data_3>(
                  fmt::format("unit_test_2", _l_name)
              ))
         {
-            _TVLOG(_l_data);
-            const auto& [_l_str, _l_result]{_l_data};
             _l_unit_tests += _BLOCK_CHECK(
                 _EXPR(convert_ascii_to_unicode<CharT>(_l_str) == _l_result)
                 && _EXPR(
@@ -115,7 +109,7 @@ _TEST_CASE(
         // Either generate valid unicode strings, or (potentially) invalid
         // unicode strings.
         using fuzzy_test_data_1 = std::tuple<T>;
-        for (const auto& _l_data :
+        for (const auto& [_l_unicode_str] :
              generate_data_randomly<fuzzy_test_data_1>()
                  & generate_data_randomly<fuzzy_test_data_1>(
                      default_random_generator<fuzzy_test_data_1>(
@@ -125,8 +119,6 @@ _TEST_CASE(
                      )
                  ))
         {
-            _TVLOG(_l_data);
-            const auto& [_l_unicode_str]{_l_data};
             matcher_t _l_matcher;
             _BEGIN_NO_THROW_MATCHER(_l_matcher);
             do_not_optimise(convert_unicode_to_ascii(_l_unicode_str));
@@ -136,7 +128,7 @@ _TEST_CASE(
         }
         // Same as above; generate valid ascii strings and invalid strings.
         using fuzzy_test_data_2 = std::tuple<string>;
-        for (const auto& _l_data :
+        for (const auto& [_l_str] :
              generate_data_randomly<fuzzy_test_data_2>()
                  & generate_data_randomly<fuzzy_test_data_2>(
                      default_random_generator<fuzzy_test_data_2>(
@@ -146,8 +138,6 @@ _TEST_CASE(
                      )
                  ))
         {
-            _TVLOG(_l_data);
-            const auto& [_l_str]{_l_data};
             matcher_t _l_matcher;
             _BEGIN_NO_THROW_MATCHER(_l_matcher);
             do_not_optimise(convert_ascii_to_unicode<CharT>(_l_str));
@@ -168,11 +158,9 @@ _TEST_CASE(
         using property_test_data_1 = std::tuple<string>;
         // This will generate strings with characters in the ASCII range, and
         // convert ascii/convert unicode will always work.
-        for (const auto& _l_data :
+        for (const auto& [_l_str] :
              generate_data_randomly<property_test_data_1>())
         {
-            _TVLOG(_l_data);
-            const auto& [_l_str]{_l_data};
             auto _l_f1 = [](const T& _a_str)
             {
                 return convert_unicode_to_ascii(_a_str);
@@ -190,15 +178,13 @@ _TEST_CASE(
             );
         }
         using property_test_data_2 = std::tuple<T>;
-        for (const auto& _l_data : generate_data_randomly<property_test_data_2>(
+        for (const auto& [_l_str] : generate_data_randomly<property_test_data_2>(
                  default_random_generator<
                      property_test_data_2>(default_random_generator<T>(
                      default_random_generator<typename T::value_type>(0x0, 0x7F)
                  ))
              ))
         {
-            _TVLOG(_l_data);
-            const auto& [_l_str]{_l_data};
             auto _l_f1 = [](const std::string& _a_str)
             {
                 return convert_ascii_to_unicode<CharT>(_a_str);
@@ -259,13 +245,11 @@ _TEST_CASE(
         );
         using unit_test_data_1
             = std::tuple<T, variant<U, pair<u8string, u8string>>>;
-        for (const auto& _l_data : read_data_from_file<unit_test_data_1>(
+        for (const auto& [_l_unicode_str1, _l_result] : read_data_from_file<unit_test_data_1>(
                  fmt::format("unit_test_1", _l_name),
                  fmt::format("unit_test_1_{0}", _l_name)
              ))
         {
-            _TVLOG(_l_data);
-            const auto& [_l_unicode_str1, _l_result]{_l_data};
             // Checking conversion one way.
             result_t<U> _l_result_str;
             switch (_l_result.index())
@@ -370,10 +354,8 @@ _TEST_CASE(
         );
         using fuzzy_test_data_1 = std::tuple<T>;
         // Normal unicode strings shouldn't throw exceptions.
-        for (const auto& _l_data : generate_data_randomly<fuzzy_test_data_1>())
+        for (const auto& [_l_unicode_str1] : generate_data_randomly<fuzzy_test_data_1>())
         {
-            _TVLOG(_l_data);
-            const auto& [_l_unicode_str1]{_l_data};
             matcher_t _l_matcher;
             _BEGIN_NO_THROW_MATCHER(_l_matcher);
             do_not_optimise(
@@ -389,7 +371,7 @@ _TEST_CASE(
         }
         // These can generate valid or invalid unicode strings.
         using fuzzy_test_data_2 = std::tuple<T>;
-        for (const auto& _l_data : generate_data_randomly<fuzzy_test_data_2>(
+        for (const auto& [_l_unicode_str1] : generate_data_randomly<fuzzy_test_data_2>(
                  default_random_generator<fuzzy_test_data_2>(
                      default_random_generator<T>(
                          default_random_generator<CharT>(
@@ -399,8 +381,6 @@ _TEST_CASE(
                  )
              ))
         {
-            _TVLOG(_l_data);
-            const auto& [_l_unicode_str1]{_l_data};
             matcher_t _l_matcher_1;
             _BEGIN_NO_THROW_MATCHER(_l_matcher_1);
             do_not_optimise(unicode_conversion<CharU>(_l_unicode_str1));
@@ -460,11 +440,9 @@ _TEST_CASE(
         );
         // Valid unicode strings should be able to go back and forth.
         using property_test_data_1 = std::tuple<T>;
-        for (const auto& _l_data :
+        for (const auto& [_l_str] :
              generate_data_randomly<property_test_data_1>())
         {
-            _TVLOG(_l_data);
-            const auto& [_l_str]{_l_data};
             _l_property_tests += _BLOCK_CHECK(
                 _EXPR(
                     unicode_conversion_with_exception<CharT>(

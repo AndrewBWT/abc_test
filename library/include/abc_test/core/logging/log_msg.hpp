@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/core/ds/source/single_source.hpp"
-#include "abc_test/core/test_runner.hpp"
 #include "abc_test/core/global.hpp"
+#include "abc_test/core/test_runner.hpp"
 #include "abc_test/utility/internal/macros.hpp"
 
 #include <exception>
@@ -33,7 +33,7 @@ public:
     __no_constexpr
         log_msg_t(
             const ds::single_source_t& _a_single_source,
-            const std::u8string_view     _a_str,
+            const std::u8string_view   _a_str,
             const bool                 _a_delete_after_use
         ) noexcept;
     /*!
@@ -48,6 +48,40 @@ public:
      * @return
      */
     __no_constexpr ~log_msg_t() noexcept;
+
+    __no_constexpr_imp
+        log_msg_t(
+            const log_msg_t& _a_arg
+        )
+        : _m_str(_a_arg._m_str)
+        , _m_iterator(global::get_this_threads_test_runner_ref().add_log_msg(
+              std::ref(*this),
+              _a_arg._m_single_source
+          ))
+        , _m_delete_after_use(_a_arg._m_delete_after_use)
+        , _m_single_source(_a_arg._m_single_source)
+    {}
+
+    __no_constexpr_imp log_msg_t&
+        operator=(
+            const log_msg_t& _a_arg
+        ) // III. copy assignment
+    {
+        using namespace global;
+        _m_str = _a_arg._m_str;
+
+        if (not _m_delete_after_use)
+        {
+            get_this_threads_test_runner_ref().remove_log_msg(_m_iterator);
+        }
+        _m_iterator = global::get_this_threads_test_runner_ref().add_log_msg(
+            std::ref(*this), _a_arg._m_single_source
+        );
+        _m_delete_after_use = _a_arg._m_delete_after_use;
+        _m_single_source    = _a_arg._m_single_source;
+        return *this;
+    }
+
     /*!
      * @brief Returns a cref to the string component of the log_msg_t object.
      * @return A cref to the string component of the object.
@@ -63,9 +97,10 @@ public:
     __constexpr bool
         delete_after_use() const noexcept;
 protected:
-    std::u8string   _m_str;
-    log_msg_itt_t _m_iterator;
-    bool          _m_delete_after_use;
+    std::u8string       _m_str;
+    log_msg_itt_t       _m_iterator;
+    bool                _m_delete_after_use;
+    ds::single_source_t _m_single_source;
 };
 
 /*!
@@ -92,13 +127,14 @@ _BEGIN_ABC_LOGGING_NS
 __no_constexpr_imp
     log_msg_t::log_msg_t(
         const ds::single_source_t& _a_single_source,
-        const std::u8string_view     _a_str,
+        const std::u8string_view   _a_str,
         const bool                 _a_delete_after_use
     ) noexcept
     : _m_str(_a_str)
     , _m_iterator(global::get_this_threads_test_runner_ref()
                       .add_log_msg(std::ref(*this), _a_single_source))
     , _m_delete_after_use(_a_delete_after_use)
+    , _m_single_source(_a_single_source)
 {}
 
 __no_constexpr_imp log_msg_t::~log_msg_t() noexcept

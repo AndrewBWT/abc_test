@@ -174,6 +174,27 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
                 break;
             }
         }
+        else if constexpr (Cmp == matcher::comparison_enum_t::NEQ)
+        {
+            if (_l_element_1 == _l_element_2)
+            {
+                _l_diverging_index = make_tuple(
+                    _l_idx,
+                    fmt::format(
+                        u8"the {0} and the {1} argument are not equal",
+                        positive_integer_to_placement<1>(),
+                        positive_integer_to_placement<2>()
+                    ),
+                    fmt::format(
+                        u8"internal elements of the {0} and {1} argument are "
+                        u8"equal",
+                        positive_integer_to_placement<1>(),
+                        positive_integer_to_placement<2>()
+                    )
+                );
+                break;
+            }
+        }
         else if constexpr (Cmp == matcher::comparison_enum_t::LEQ)
         {
             if (_l_element_1 > _l_element_2)
