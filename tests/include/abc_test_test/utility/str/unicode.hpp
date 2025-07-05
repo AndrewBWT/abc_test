@@ -75,7 +75,7 @@ _TEST_CASE(
              ))
         {
             _l_unit_tests += _BLOCK_CHECK(
-                _EXPR(convert_unicode_to_ascii(_l_unicode_str) != _l_result)
+                _EXPR(convert_unicode_to_ascii(_l_unicode_str) == _l_result)
                 && _EXPR(
                     convert_unicode_to_ascii(T(_l_unicode_str)) == _l_result
                 )
