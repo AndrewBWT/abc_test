@@ -6,6 +6,7 @@
 #include "abc_test/utility/limits/min_value_concept.hpp"
 #include "abc_test/utility/limits/min_value_object.hpp"
 #include "abc_test/utility/printers/default_printer.hpp"
+
 #include <limits>
 
 _BEGIN_ABC_UTILITY_NS
@@ -37,8 +38,8 @@ public:
      * max_value_t<T>.max_value().
      */
     __constexpr
-        bounds_t() noexcept;
-  //  requires min_value_c<T> && max_value_c<T>;
+    bounds_t() noexcept;
+    // requires min_value_c<T> && max_value_c<T>;
     /*!
      * @brief Creates a bounds_t object where the min and max value are set at
      * the same element.
@@ -74,10 +75,10 @@ public:
      * @return The difference between the contained values.
      */
     __constexpr const std::size_t&
-        difference() const noexcept;
+                      difference() const noexcept;
 private:
-    T _m_min;
-    T _m_max;
+    T           _m_min;
+    T           _m_max;
     std::size_t _m_difference;
     enum class bounds_ordering_e
     {
@@ -124,7 +125,7 @@ template <typename T>
 requires detail::bounds_c<T>
 __constexpr_imp
     bounds_t<T>::bounds_t() noexcept
-//requires min_value_c<T> && max_value_c<T>
+    // requires min_value_c<T> && max_value_c<T>
     : bounds_t(min_value_t<T>{}.min_value(), max_value_t<T>{}.max_value())
 {}
 
@@ -171,7 +172,7 @@ __constexpr_imp const T&
 template <typename T>
 requires detail::bounds_c<T>
 __constexpr_imp const std::size_t&
-    bounds_t<T>::difference() const noexcept
+                      bounds_t<T>::difference() const noexcept
 
 {
     return _m_difference;

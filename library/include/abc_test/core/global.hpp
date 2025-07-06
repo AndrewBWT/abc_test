@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef GLOBAL_HPP
+#define GLOBAL_HPP
 #include "abc_test/core/ds/type_synonyms.hpp"
 #include "abc_test/utility/rng.hpp"
 
@@ -118,6 +118,7 @@ __no_constexpr_or_inline test_options_base_t&
 __no_constexpr_or_inline reporters::error_reporter_controller_t&
                          get_inner_global_error_reporter_controller() noexcept;
 __no_constexpr_or_inline utility::complete_global_seed_t& get_inner_global_seed() noexcept;
-} // namespace
+}
 
 _END_ABC_GLOBAL_NS
+#endif

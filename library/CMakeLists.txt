@@ -277,6 +277,33 @@ add_dependencies(${LIBRARY_NAME} ${REQUIRED_LIBS})
 
 # Ensure that the IDE sees the files in the file structure they are organised in.
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/.." FILES ${LIBRARY_FILES})
+
+# Gets all the sources from abc_test.
+get_target_property(ALL_SOURCES abc_test SOURCES)
+
+# Define the output path.
+set(CLANG_TIDY_FILE "${CMAKE_BINARY_DIR}/../metadata/clang_tidy_files.txt")
+
+# Step 3: Write a custom command that outputs the source file list to the file
+file(WRITE ${CLANG_TIDY_FILE} "")  
+
+message(STATUS, "${CMAKE_CURRENT_SOURCE_DIR}")
+
+foreach(FILE_PATH IN LISTS ALL_SOURCES)
+  # Check if FILE_PATH contains 'include/external' or 'src/external'
+  string(FIND "${FILE_PATH}" "include/abc_test/external" EXTERNAL_INCLUDE_POS)
+  string(FIND "${FILE_PATH}" "src/abc_test/external" EXTERNAL_SRC_POS)
+  if(EXTERNAL_INCLUDE_POS EQUAL -1 AND EXTERNAL_SRC_POS EQUAL -1)
+  # Normalize to absolute path
+    get_filename_component(ABS_PATH ${FILE_PATH} ABSOLUTE BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+  # Write to the file, one file per line
+    file(APPEND ${CLANG_TIDY_FILE} "${ABS_PATH}\n")
+  else()
+    # File filtered out, do nothing.
+  endif()
+endforeach()
+
+
 # Unset variable defined in this file.
 unset(LIBRARY_NAME)
 unset(REQUIRED_LIBS)

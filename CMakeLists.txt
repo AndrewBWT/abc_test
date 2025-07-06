@@ -57,6 +57,7 @@ endif()
 
 #If top level directory, we can generate the documentation.
 if(TOP_LEVEL_PROJECT)
+  set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Export compile commands" FORCE)
   # Find Doxygen on the system.
   find_package(Doxygen)
   # If Doxygen is on the system.

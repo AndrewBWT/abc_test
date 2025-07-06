@@ -4,3 +4,7 @@ build_clang/*
 commit_msg.txt
 commit_msg_base.txt
 test_data/*
+metadata/*
+clang_ninja_cmake/*
+clang_build/*
+build_3/*

@@ -38,7 +38,8 @@ set(TEST_FILES
 
 # These are the libs required for the testing suite.
 set(REQUIRED_LIBS
-  abc_test
+  abc_test 
+  fmt::fmt
 )
 
 # Add the set of files to executable.
