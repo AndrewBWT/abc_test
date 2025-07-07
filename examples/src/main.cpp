@@ -1,5 +1,3 @@
-#pragma once
-
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
 

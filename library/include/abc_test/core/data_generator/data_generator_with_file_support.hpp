@@ -201,7 +201,7 @@ __constexpr void
             );
             break;
         default:
-            throw std::exception("Couldn't work");
+            throw std::runtime_error("Couldn't work");
         }
     }
     else
@@ -236,7 +236,7 @@ __constexpr bool
         case 1:
             return _m_object.has_current_element();
         default:
-            throw std::exception("Couldn't work");
+            throw std::runtime_error("Couldn't work");
         }
     }
     else

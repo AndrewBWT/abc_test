@@ -8,6 +8,7 @@ def run_clang_tidy_batch(
     file_list_path,
     clang_tidy_path="clang-tidy",
     config_file=".clang-tidy",
+    json_file="compile_commands.json",
     extra_args=None,
     only_cpp=True,
 ):
@@ -25,7 +26,7 @@ def run_clang_tidy_batch(
         print("⚠️ No files to analyze.")
         return
 
-    cmd = [clang_tidy_path, "--config-file", config_file] + files
+    cmd = [clang_tidy_path, "-p",json_file,"--config-file", config_file] + files
 
     if extra_args:
         cmd += ["--"] + extra_args
@@ -47,6 +48,7 @@ if __name__ == "__main__":
     parser.add_argument("--clang-tidy", default="clang-tidy", help="Path to the clang-tidy executable.")
     parser.add_argument("--config-file", default=".clang-tidy", help="Path to the .clang-tidy config file.")
     parser.add_argument("--all", action="store_true", help="Include headers (*.h, *.hpp) in analysis.")
+    parser.add_argument("--json",default="compile_commands.json",help="Json Compile commands file")
     parser.add_argument("--extra-args", nargs=argparse.REMAINDER, help="Extra args passed after '--'")
 
     args = parser.parse_args()
@@ -55,6 +57,7 @@ if __name__ == "__main__":
         file_list_path=args.file_list,
         clang_tidy_path=args.clang_tidy,
         config_file=args.config_file,
+        json_file=args.json,
         extra_args=args.extra_args,
-        only_cpp=not args.all,
+        only_cpp=not args.all
     )
