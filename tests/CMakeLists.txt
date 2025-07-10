@@ -53,7 +53,12 @@ target_link_libraries(${TEST_LIB_NAME} PUBLIC ${REQUIRED_LIBS})
 add_dependencies(${TEST_LIB_NAME} ${REQUIRED_LIBS})
 
 # Adds the test as a command
-add_test(NAME ${TEST_LIB_NAME} COMMAND ${TEST_LIB_NAME})
+add_test(NAME ${TEST_LIB_NAME} COMMAND ${TEST_LIB_NAME} --config ${CMAKE_SOURCE_DIR}/tests/data/testlib_config)
+
+# Interpreted scripts
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+add_test(NAME MyPythonTest
+         COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/script_to_use_library.py)
 
 # Ensure that the IDE sees the files in the file structure they are organised in.
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/.." FILES ${TEST_FILES})

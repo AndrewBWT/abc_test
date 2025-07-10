@@ -9,3 +9,5 @@ clang_ninja_cmake/*
 clang_build/*
 build_3/*
 build_4/*
+scripts/test_build/*
+scripts/metadata/*

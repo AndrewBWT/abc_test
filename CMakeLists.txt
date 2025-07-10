@@ -30,7 +30,7 @@ set (TOP_LEVEL_PROJECT (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME))
 set(RUNNING_TESTS (TOP_LEVEL_PROJECT AND BUILD_TESTING))
 
 if(TOP_LEVEL_PROJECT)
-
+  message("top level project")
   #Set C++ standard
   set(CMAKE_CXX_STANDARD 23)
   # Set the linker language to C++.
