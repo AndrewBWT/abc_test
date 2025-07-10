@@ -11,6 +11,9 @@
 
 1 - Run clang-tidy on the code. Also consider other programs, and add warnings when building from the three major compilers. Tried this in VS, got some odd results - specifically results from the fmt library. Think we'll have to try it under Ubuntu.
 	- One of the issues appears to be that our dependencies are publicly available. This causes clang-tidy to run on fmt. To fix this, it would be best to only use fmt privately - so not exposed outside of our code. This would mean moving all fmt code to a cpp file. Instead we think we'll just ignore the fmt results for now.
+	- We have a script which puts all the source files we use into a text file. A script is then run, running clang-tidy on all of the elements in that list. While a good start, we ran into issues running this on Windows - primarily the different clang-tidy versions in Cygwin and VS causes issues. We couldn't run clang-tidy directly from VS as it won't let us put our headers in.
+	- Our next effort was a VM, running Ubuntu. We got that working, however clang-tidy was then throwing errors complaining about files it could not find.
+	- We were able to get it working on the code we wanted under Ubuntu. However, as fmt was included from files, the errors were still being reported from it. 
 2 - Create tests which use CMake to build a project, using abc_test to create the testing library. Not sure how these will be created - perhaps github actions. We are testing that cmake can fetch the content, build an executable, and a simple "hello world" can be made using abc_test in this manner.
 3 - Our CMakeLists.txt sets some variables globally. This needs to be amended, otherwise we may be polluting other's CMake build.
 	- In addition to this, we want to address how we use public/private keywords to expose our dependencies.

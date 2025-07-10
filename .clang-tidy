@@ -1,2 +1,8 @@
-Checks: '*'
 HeaderFilterRegex: '^(library)/'
+
+Checks: >
+  -*,                    # Disable all checks first
+  -abseil-*,				 # Disable all abseil checks
+  clang-analyzer-*,      # Enable static analyzer checks
+  modernize-*,           # Enable modernize checks
+  -modernize-use-auto    # Disable one specific modernize check
