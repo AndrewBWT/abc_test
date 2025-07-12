@@ -398,7 +398,11 @@ __no_constexpr std::u8string
                    const std::u8string_view _a_str
                ) noexcept;
 
-template <bool Return_Reason, bool Is_Substring, typename T, typename Original_Type>
+template <
+    bool Return_Reason,
+    bool Is_Substring,
+    typename T,
+    typename Original_Type>
 requires char_type_is_unicode_c<typename std::iterator_traits<T>::value_type>
          && char_type_is_unicode_c<Original_Type>
 __constexpr
@@ -507,9 +511,11 @@ __constexpr_imp result_t<std::string>
             // function (there are checks for ascii in next_char32_t) however as
             // this is not the "hot path" we don't think it really matters.
             const result_t<char32_t> _l_char_res{
-                detail::next_char32_t_and_increment_iterator<true, false, itt, CharT>(
-                    std::begin(_a_str), _l_itt, _l_end
-                )
+                detail::next_char32_t_and_increment_iterator<
+                    true,
+                    false,
+                    itt,
+                    CharT>(std::begin(_a_str), _l_itt, _l_end)
             };
             if (_l_char_res.has_value())
             {
@@ -858,10 +864,12 @@ std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
             ))
         );
     };
-    auto _l_rv{detail::next_char32_t_and_increment_iterator<
-        Return_Reason,true,
-        T,
-        CharT>(_a_itt, _a_itt, _a_end)};
+    auto _l_rv{
+        detail::
+            next_char32_t_and_increment_iterator<Return_Reason, true, T, CharT>(
+                _a_itt, _a_itt, _a_end
+            )
+    };
     if constexpr (Return_Reason)
     {
         return _l_rv.or_else(
@@ -1168,9 +1176,7 @@ __constexpr result_t<std::basic_string<T>>
             }
             else if constexpr (wchar_is_32_bit)
             {
-                return cast_unicode_string_to_wstring(
-                    (_a_str_2)
-                );
+                return cast_unicode_string_to_wstring(_a_str_2);
             }
             else
             {
@@ -1345,7 +1351,8 @@ result_t<std::conditional_t<Return_u32string, std::u32string, std::monostate>>
     for (auto _l_itt{_l_begin}; _l_itt != _l_end;)
     {
         auto _l_result{detail::next_char32_t_and_increment_iterator<
-            true,false,
+            true,
+            false,
             decltype(_l_itt),
             char8_t>(std::begin(_a_str), _l_itt, _l_end)};
         if (_l_result.has_value())
@@ -1378,7 +1385,8 @@ result_t<std::conditional_t<Return_u32string, std::u32string, std::monostate>>
     for (auto _l_itt{_l_begin}; _l_itt != _l_end;)
     {
         auto _l_result{detail::next_char32_t_and_increment_iterator<
-            true,false,
+            true,
+            false,
             decltype(_l_itt),
             Original_Type>(std::begin(_a_str), _l_itt, _l_end)};
         if (_l_result.has_value())
@@ -1580,13 +1588,18 @@ __constexpr std::conditional_t<
         if (not (is_valid_ascii_char(_l_byte_1)))
         {
             constexpr array<char32_t, 3> _l_and_array{
-                0b0001'1111, 0b0000'1111, 0b0000'0111
+                static_cast<char32_t>(0b0001'1111),
+                static_cast<char32_t>(0b0000'1111),
+                static_cast<char32_t>(0b0000'0111)
             };
             constexpr array<pair<char8_t, char8_t>, 3>
                 _l_byte_1_and_equal_values{
-                    {{0b1110'0000, 0b1100'0000},
-                     {0b1111'0000, 0b1110'0000},
-                     {0b1111'1000, 0b1111'0000}}
+                    {{static_cast<char8_t>(0b1110'0000),
+                      static_cast<char8_t>(0b1100'0000)},
+                     {static_cast<char8_t>(0b1111'0000),
+                      static_cast<char8_t>(0b1110'0000)},
+                     {static_cast<char8_t>(0b1111'1000),
+                      static_cast<char8_t>(0b1111'0000)}}
             };
             size_t _l_code_point_size{_l_byte_1_and_equal_values.size()};
             for (size_t _l_idx{0}; _l_idx < _l_byte_1_and_equal_values.size();
@@ -1674,7 +1687,8 @@ __constexpr std::conditional_t<
                             u8"the {2} code unit {3}, therefore meaning "
                             u8"this "
                             u8"code unit sequence is invalid.",
-                            _l_multi_code_unit_description.template operator()<true>(
+                            _l_multi_code_unit_description.template operator(
+                            )<true>(
                                 std::distance(_a_begin, _l_itt) + 1,
                                 basic_string_view<CharT>(_l_itt, _a_end)
                             ),
@@ -1695,7 +1709,8 @@ __constexpr std::conditional_t<
                             u8"the {3} code unit {4}, therefore meaning "
                             u8"this "
                             u8"code unit sequence is invalid.",
-                            _l_multi_code_unit_description.template operator()<false>(
+                            _l_multi_code_unit_description.template operator(
+                            )<false>(
                                 std::distance(_a_begin, _l_itt) + 1,
                                 basic_string_view<CharT>(_l_itt, _a_end)
                             ),
@@ -1754,7 +1769,8 @@ __constexpr std::conditional_t<
                             u8"between {3} and {4}. As {2} did not meet "
                             u8"this criteria, this code unit sequence is "
                             u8"invalid.",
-                            _l_multi_code_unit_description.template operator()<false>(
+                            _l_multi_code_unit_description.template operator(
+                            )<false>(
                                 std::distance(_a_begin, _l_itt) - _l_idx,
                                 basic_string_view<CharT>(
                                     std::prev(_l_itt, _l_idx + 1),
@@ -1802,7 +1818,8 @@ __constexpr std::conditional_t<
                         u8"using "
                         u8"the smallest possible char8_t representation. "
                         u8"Therefore, this code unit sequence is invalid.",
-                        _l_multi_code_unit_description.template operator()<false>(
+                        _l_multi_code_unit_description.template operator(
+                        )<false>(
                             std::distance(_a_begin, _l_itt)
                                 - (_l_code_point_size),
                             basic_string_view<CharT>(
@@ -1841,7 +1858,8 @@ __constexpr std::conditional_t<
                         u8"{2} to {3}, and from {4} to {5}. "
                         u8"As {1} is not within this range, this code unit "
                         u8"sequence is invalid.",
-                        _l_multi_code_unit_description.template operator()<false>(
+                        _l_multi_code_unit_description.template operator(
+                        )<false>(
                             std::distance(_a_begin, _l_itt)
                                 - (_l_code_point_size),
                             basic_string_view<CharT>(
@@ -1942,7 +1960,8 @@ __constexpr std::conditional_t<
                         u8"low surrogate code unit - inclusively between "
                         u8"{3} and {4}. As such, the code unit sequence "
                         u8"is invalid.",
-                        _l_multi_code_unit_description.template operator()<false>(
+                        _l_multi_code_unit_description.template operator(
+                        )<false>(
                             std::distance(_a_begin, _l_itt),
                             basic_string_view<CharT>(
                                 std::prev(_l_itt, 1), _l_itt + 1
@@ -2104,7 +2123,11 @@ __no_constexpr_imp std::u8string
     );
 }
 
-template <bool Return_Reason, bool Is_Substring, typename T, typename Original_Type>
+template <
+    bool Return_Reason,
+    bool Is_Substring,
+    typename T,
+    typename Original_Type>
 requires char_type_is_unicode_c<typename std::iterator_traits<T>::value_type>
          && char_type_is_unicode_c<Original_Type>
 __constexpr
@@ -2116,11 +2139,11 @@ std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
     ) noexcept
 {
     using namespace std;
-    auto _l_next_char32_t_result{
-        detail::next_char32_t_internal<Return_Reason, Is_Substring, T, Original_Type>(
-            _a_begin, _a_itt, _a_end
-        )
-    };
+    auto _l_next_char32_t_result{detail::next_char32_t_internal<
+        Return_Reason,
+        Is_Substring,
+        T,
+        Original_Type>(_a_begin, _a_itt, _a_end)};
     // If it sa valid unicode character.
     if (_l_next_char32_t_result.has_value())
     {

@@ -15,8 +15,6 @@
 	- Our next effort was a VM, running Ubuntu. We got that working, however clang-tidy was then throwing errors complaining about files it could not find.
 	- We were able to get it working on the code we wanted under Ubuntu. However, as fmt was included from files, the errors were still being reported from it. 
 	- Even questioning whether clang-tidy is worth the effort it appears I have to go through to get it working the way I want it to.
-3 - Our CMakeLists.txt sets some variables globally. This needs to be amended, otherwise we may be polluting other's CMake build.
-	- In addition to this, we want to address how we use public/private keywords to expose our dependencies.
 4 - Want to set up automatic builds for Windows and Linux. Specifically we want one script which can be ran, which builds using g++, clang and msvc (depending on environment). It then runs the linters+compilers on all the code, and tells the user what passed and what failed. This way, we can go backwards to older versions of the compilers, finding any errors. The code should also run the test suite of our code, ensuring that it all works correctly.
 5 - Address how some of our tests fail in linux due to our files for wchar_t assuming UTF16, when it is UTF32 on linux.
 6 - Add the functionality which allows the user to set an options object for a test. Either it can be set via an object or macro (e.g. _SET_OPTIONS(...)) where the argument is an object or a string, and it sets it for that object. Or, we can set it in the list of options associated with a test case (either an object or a string). An object can allow us to set the data manually. A string can allow us to refer to some pre-loaded named option. This can allow us to set the same test options across multiple tests.
@@ -26,7 +24,7 @@
 	- This could be through a simple binary test. Of course, it brings into question things regarding random generation, as there must be a cutoff when we stop assuming that eventually a filter will pass.
 8 - Check CMakeLists to ensure that examples and tests subfolders are only being build when specified. Currently it appears that they are always built.
 9 - Look into supporting older versions of C++, and older compiler versions.
-10 - Combinatorics algorithm has some issues. Specifically, when re-generating values, we go through the list of combinations in order. This is because we use heap's algorithm for the permutation component of our combinatorics generator - and we are unsure of how to, when giving an integer, find the permutation corresponding to that integer. We could consider changing from that algorithm to a different one, however that algorithm only requires one change to move to the next permutation. 
+10 - Combinatorics algorithm has some issues. Specifically, when re-generating values, we go through the list of combinations in order. This is because we use heap's algorithm for the permutation component of our combinatorics generator - and we are unsure of how to, when giving an integer, find the permutation corresponding to that integer. We could consider changing from that algorithm to a different one, however that algorithm only requires one change to move to the next permutation (its more effecient than the alternatives).
 11 - We should have a document which documents our coding style.
 12 - We should have a document which goes through the terminology we use, to ensure it is consistent, and explains exactly what we mean by a term.
 13 - We should consider our testing terminology, as we have not checked we are using the correct terms e.g. test case, test suite, test executable, assertion.
@@ -51,6 +49,9 @@
 32 - Try making fmt private again.
 33 - CTest executable build location is incorrect. Needs to be in a different build directory.
 34 - CTest executable creates list of clang tidy files, which it should not.
+35 - Run CMakeLists.txt files through cmake linters, to check for any errors.
+36 - Consider adding functionality so "find_package" works with CMake.
+37 - Consider functionality for "install" being viable for abc_test from cmake.
 
 ## Information
 
@@ -58,4 +59,3 @@ The todo list has been re-organised. There are now two sets of elements in the t
 
 - Elements in the focus list are what we are currently working on.
 - Elements in the non-focus list are what we are not currently working on.
-- Elements in the focus list may have sub-lists associated with them, especially if it is a big project. - We may use numbers to enforce ordering on lists or sub-lists of elements.

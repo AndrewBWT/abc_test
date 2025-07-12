@@ -1,76 +1,95 @@
 # Current CMake version. We have not tested with other versions.
 cmake_minimum_required(VERSION 3.28)
-
-add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/bigobj>")
-add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
-add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
-#FetchContent needed to get fmt.
-include(FetchContent)
-#Fetch and make fmt available
-FetchContent_Declare(
-  fmt
-  GIT_REPOSITORY 	https://github.com/fmtlib/fmt.git
-  GIT_TAG 			master
-)
-FetchContent_MakeAvailable(fmt)
-
+include(scripts/cmake/compile_options.cmake)
 # Set up the project information
 project(
   abc_test
-  VERSION 			0.1.0.5
+  VERSION 			0.0.1
   DESCRIPTION 		"A C++ testing library."
   LANGUAGES 		CXX
 )
 
-# Boolean variable which states whether this is the top-level project being built.
-set (TOP_LEVEL_PROJECT (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME))
+# Set up the variables TOP_LEVEL_PROJECT and RUNNING_TESTS
 
-# Boolean variable which states whether tests are to be ran or not. Testa are only ran
-# when build testing is set to true, and when the TOP_LEVEL_PROJECT variable is set to true.
-set(RUNNING_TESTS (TOP_LEVEL_PROJECT AND BUILD_TESTING))
+# ABC_TOP_LEVEL_PROJECT informs the user if this is the top level project.
+# If it is the top level project, we assume that it is being built on its own.
+set(ABC_TOP_LEVEL_PROJECT FALSE)
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+  set(ABC_TOP_LEVEL_PROJECT TRUE)
+endif()
 
-if(TOP_LEVEL_PROJECT)
-  message("top level project")
-  #Set C++ standard
-  set(CMAKE_CXX_STANDARD 23)
-  # Set the linker language to C++.
-  set(LINKER_LANGUAGE CXX)
-  
-  # Don't allow extensions
-  set(CMAKE_CXX_EXTENSIONS OFF)
-
-  # Ensure that the folders work nicely with IDE's.
-  set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-  # Enable testing.
+# We include this here so that the variable BUILD_TESTING is now defined as TRUE (due to its inclusion by CTest).
+# Remember, the user can set BUILD_TESTING themselves if they so wish, include(CTest) won't override that value.
+if(ABC_TOP_LEVEL_PROJECT)
   include(CTest)
 endif()
+
+# Ensures that BUILD_TESTING is defined as FALSE. If ABC_TOP_LEVEL_PROJECT == FALSE, it would be an undefined value.
+if(NOT DEFINED BUILD_TESTING)
+  set(BUILD_TESTING OFF)
+endif()
+
+# Sets up the ABC_RUNNING_TESTS variable.
+set(ABC_RUNNING_TESTS FALSE)
+if(ABC_TOP_LEVEL_PROJECT AND BUILD_TESTING)
+  set(ABC_RUNNING_TESTS TRUE)
+endif()
+
+# Set up the options for the user.
+option(ABC_TEST_ENABLE_DOCS "Build abc_test documentation" ${ABC_TOP_LEVEL_PROJECT})
+option(ABC_TEST_ENABLE_TESTS "Build abc_test tests" ${ABC_RUNNING_TESTS})
+option(ABC_TEST_ENABLE_EXAMPLES "Build abc_test examples" ${ABC_TOP_LEVEL_PROJECT})
+
+# Set these if its the top level directory. Kept for when building the project itself, as I have found issues when not setting these in some older versions of visual studio.
+# We have commented this out for now, as we want to test with older compilers to check whether this is actually an issue, or whether this is something that was caused by incorrect configuration by us.
+#if(ABC_TOP_LEVEL_PROJECT)
+#  set(CMAKE_CXX_STANDARD 23)
+#  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+#  set(CMAKE_CXX_EXTENSIONS OFF)
+#endif()
+
+# Fetch the fmt library if its the top level project
+if(ABC_TOP_LEVEL_PROJECT)
+  include(FetchContent)
+  FetchContent_Declare(
+    fmt
+    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+    GIT_TAG 11.2.0
+  )
+  FetchContent_MakeAvailable(fmt)
+endif()
+
+# If fmt not available
+FetchContent_GetProperties(fmt)
+if(NOT fmt_POPULATED)
+  message(FATAL_ERROR "Required target fmt::fmt not found. Either build abc_test as a top-level project, or ensure fmt is available and linked before including this project.")
+endif()
+
+# Show the user the status of the core variables.
+message(STATUS "Top level project: ${ABC_TOP_LEVEL_PROJECT}")
+message(STATUS "Building tests: ${ABC_TEST_ENABLE_TESTS}")
+message(STATUS "Building docs: ${ABC_TEST_ENABLE_DOCS}")
+message(STATUS "Building examples: ${ABC_TEST_ENABLE_EXAMPLES}")
   
 # Add the library folder.
 add_subdirectory(library)
 
-# If the tests are being ran.
-if(RUNNING_TESTS)
-  # Add the test folder.
-  add_subdirectory(tests)
-endif()
-
-#If top level directory, we can generate the documentation.
-if(TOP_LEVEL_PROJECT)
-  set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Export compile commands" FORCE)
-  # Find Doxygen on the system.
+# Enable documentation if required.
+if(ABC_TEST_ENABLE_DOCS)
   find_package(Doxygen)
-  # If Doxygen is on the system.
   if(Doxygen_FOUND)
-    # Add documentation folder.
     add_subdirectory(docs)
   else()
-    # Else, tell the developer that we could not load the documentation.
-    message(STATUS "Doxygen not found, not building docs")
+    message(STATUS "Doxygen not found, skipping documentation creation.")
   endif()
 endif()
 
-# If top level project, build the examples.
-if (TOP_LEVEL_PROJECT)
+# Enable tests if required
+if(ABC_TEST_ENABLE_TESTS)
+  add_subdirectory(tests)
+endif()
+
+# Enable examples if required
+if(ABC_TEST_ENABLE_EXAMPLES)
   add_subdirectory(examples)
 endif()

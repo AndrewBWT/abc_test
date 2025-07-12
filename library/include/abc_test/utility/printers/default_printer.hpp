@@ -164,7 +164,7 @@ public:
         using namespace _ABC_NS_UTILITY_STR;
         return surround_str(
             is_valid_char(_a_object)
-                ? fmt::format(u8"{0}", u8string(1, _a_object))
+                ? fmt::format(u8"{0}", unicode_char_to_u8string(_a_object))
                 : make_hex_from_char<uint8_t>(_a_object)
         );
     }
@@ -186,7 +186,7 @@ public:
         using namespace _ABC_NS_UTILITY_STR;
         return surround_str(
             is_valid_char(_a_object)
-                ? fmt::format(u8"{0}", u8string(1, _a_object))
+            ? fmt::format(u8"{0}", unicode_char_to_u8string(_a_object))
                 : make_hex_from_char<uint8_t>(_a_object)
         );
     }
