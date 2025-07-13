@@ -52,8 +52,11 @@ def main():
         cmake_cmd.append(f"-DCMAKE_CXX_COMPILER={cxx_compiler}")
     if not is_multi_config:
         cmake_cmd.append(f"-DCMAKE_BUILD_TYPE={build_type}")
-
-    subprocess.run(cmake_cmd, cwd=test_root, check=True)
+        
+    result = subprocess.run(["ls"], capture_output=True, text=True)
+    #print("Output:", result.stdout)
+    result2 = subprocess.run(cmake_cmd, cwd=test_root, check=True)
+    #print("Output:", result2.stdout)
 
     # Build
     build_cmd = ["cmake", "--build", "."]

@@ -4,11 +4,10 @@ if(NOT DEFINED ABC_TEST_EXAMPLES_INCLUDED)
   # Set library name so that, if we change it, we only have to change this line
   # Set the name of the example executable once
   set(EXAMPLE_EXECUTABLE_NAME abc_test_examples)
-
-
+	  
   set(ABC_TEST_EXAMPLE_RUN_ARGS
-      "--configfile ${CMAKE_CURRENT_SOURCE_DIR}/data/example_config"
-      CACHE STRING "Optional runtime args for abc_test_examples executable")
+    "${CMAKE_CURRENT_SOURCE_DIR}/data/examples_config"
+    CACHE STRING "Optional runtime args for abc_test_examples executable")
 
   # These are the libs required for the testing suite.
   set(ABC_EXAMPLES_REQUIRED_LIBS
@@ -61,8 +60,8 @@ if(NOT DEFINED ABC_TEST_EXAMPLES_INCLUDED)
   # Link the REQUIRED_LIBS to the LIBRARY
   target_link_libraries(${EXAMPLE_EXECUTABLE_NAME} PUBLIC ${ABC_EXAMPLES_REQUIRED_LIBS})
   # Ensure that the IDE sees the files in the file structure they are organised in.
-  
-  # Add the executable to CTest, so its compilation can be easily tested.
-  add_test(NAME run_example
-           COMMAND ${EXAMPLE_EXECUTABLE_NAME} ${ABC_TEST_EXAMPLE_RUN_ARGS})
+		   
+  # Adds the test as a command
+  add_test(NAME "Run abc_test examples executable"
+           COMMAND ${EXAMPLE_EXECUTABLE_NAME} "--config" ${ABC_TEST_EXAMPLE_RUN_ARGS})
 endif()

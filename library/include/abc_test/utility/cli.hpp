@@ -682,7 +682,7 @@ __no_constexpr_imp bool
         const size_t _l_equals_pos{_l_line.find_first_of(u8"=")};
         if (_l_equals_pos == u8string::npos)
         {
-            _a_cli_results.add_error(fmt::format(u8"couldn't run file"));
+            _a_cli_results.add_error(fmt::format(u8"couldn't run file 3"));
             return true;
         }
         else
@@ -741,8 +741,14 @@ __constexpr_imp result_t<std::u8string_view>
         }
         else
         {
+            vector<u8string> _l_options;
+            for (auto& _l_option : _m_sv_to_clp_info)
+            {
+                _l_options.push_back(u8string(_l_option.first));
+            }
             return unexpected(fmt::format(
-                u8"Could not find multi-character option \"{0}\".", _l_str
+                u8"Could not find multi-character option \"{0}\". All options available are: {1}", _l_str,
+                _l_options
             ));
         }
     }

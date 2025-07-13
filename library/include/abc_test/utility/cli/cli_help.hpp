@@ -85,12 +85,13 @@ public:
         // _a_cli.set_terminate_early(true);
         // Read the file.
         // Go thorugh the args and
-        const result_t<string> _l_file_name{
+        const result_t<string> _l_result_file_name{
             convert_unicode_to_ascii(_a_args[0])
         };
-        if (_l_file_name.has_value())
+        if (_l_result_file_name.has_value())
         {
-            fstream _l_config_file{_l_file_name.value()};
+            auto&   _l_file_name{_l_result_file_name.value()};
+            fstream _l_config_file{_l_file_name};
             size_t  _l_line_idx{0};
             if (_l_config_file.is_open())
             {
@@ -110,7 +111,7 @@ public:
                     {
                         _l_config_file.close();
                         _a_cli_results.add_error(
-                            fmt::format(u8"couldn't run file")
+                            fmt::format(u8"couldn't run file 1")
                         );
                         return true;
                     }
@@ -146,7 +147,9 @@ public:
             }
             else
             {
-                _a_cli_results.add_error(fmt::format(u8"couldn't run file"));
+                _a_cli_results.add_error(
+                    fmt::format(u8"Couldn't open file \"{0}\"", _a_args[0])
+                );
                 return true;
             }
         }
@@ -155,7 +158,7 @@ public:
             _a_cli_results.add_error(fmt::format(
                 u8"Could not convert file name from std::u8string to "
                 u8"std::string. Conversion error was \"{0}\".",
-                _l_file_name.error()
+                _l_result_file_name.error()
             ));
             return true;
         }
@@ -269,7 +272,7 @@ public:
         {
             _a_cli_results.add_error(fmt::format(
                 u8"Error parsing {0}. Parser reported error: \"{1}\".",
-                type_id< auto_configuration_load_configuration_t>(),
+                type_id<auto_configuration_load_configuration_t>(),
                 _l_rfli.error()
             ));
             return true;
@@ -278,7 +281,7 @@ public:
         {
             _a_cli_results.add_error(fmt::format(
                 u8"Error parsing {0}. Parser reported error: \"{1}\".",
-                type_id< enum_auto_configuration_write_to_file_t>(),
+                type_id<enum_auto_configuration_write_to_file_t>(),
                 _l_rf.error()
             ));
             return true;

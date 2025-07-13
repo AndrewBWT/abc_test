@@ -6,7 +6,7 @@ if(NOT DEFINED ABC_TEST_TESTS_INCLUDED)
   set(ABC_TESTLIB_EXECUTABLE_NAME abc_test_test)
   
   set(ABC_TEST_TEST_RUN_ARGS
-    "--configfile ${CMAKE_CURRENT_SOURCE_DIR}/tests/data/abc_test_test_config"
+    "${CMAKE_CURRENT_SOURCE_DIR}/data/abc_test_test_config"
     CACHE STRING "Optional runtime args for abc_test_test executable")
 
   # The set of all test files. The idea behind these is they mirror the files in the library.
@@ -66,11 +66,11 @@ if(NOT DEFINED ABC_TEST_TESTS_INCLUDED)
   # Ensure that the IDE sees the files in the file structure they are organised in.
   
   # Adds the test as a command
-  add_test(NAME ${ABC_TESTLIB_EXECUTABLE_NAME}
-           COMMAND ${ABC_TESTLIB_EXECUTABLE_NAME} ${ABC_TEST_TEST_RUN_ARGS})
+  add_test(NAME "Run abc_tests test suite executable"
+           COMMAND ${ABC_TESTLIB_EXECUTABLE_NAME} "--config" ${ABC_TEST_TEST_RUN_ARGS})
 
   # Interpreted scripts
   find_package(Python3 REQUIRED COMPONENTS Interpreter)
-  add_test(NAME MyPythonTest
+  add_test(NAME "Check abc_test can be used as external testing library"
            COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/script_to_use_library.py)
 endif()

@@ -1,7 +1,13 @@
 cmake_minimum_required(VERSION 3.14)
 set(CMAKE_CXX_STANDARD 23)
 project(test_library)
-
+include(FetchContent)
+FetchContent_Declare(
+  fmt
+  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+  GIT_TAG 11.2.0
+)
+FetchContent_MakeAvailable(fmt)
 # Add your library as a subdirectory (simulate a user adding your project)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../.. abc_test)
 

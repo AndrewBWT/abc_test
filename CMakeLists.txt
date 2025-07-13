@@ -49,20 +49,26 @@ option(ABC_TEST_ENABLE_EXAMPLES "Build abc_test examples" ${ABC_TOP_LEVEL_PROJEC
 #endif()
 
 # Fetch the fmt library if its the top level project
-if(ABC_TOP_LEVEL_PROJECT)
+# Only use FetchContent if fmt::fmt is not already provided
+if(NOT TARGET fmt::fmt)
   include(FetchContent)
-  FetchContent_Declare(
-    fmt
-    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-    GIT_TAG 11.2.0
-  )
-  FetchContent_MakeAvailable(fmt)
-endif()
 
-# If fmt not available
-FetchContent_GetProperties(fmt)
-if(NOT fmt_POPULATED)
-  message(FATAL_ERROR "Required target fmt::fmt not found. Either build abc_test as a top-level project, or ensure fmt is available and linked before including this project.")
+  if(ABC_TOP_LEVEL_PROJECT)
+    FetchContent_Declare(
+      fmt
+      GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+      GIT_TAG 11.2.0
+    )
+    FetchContent_MakeAvailable(fmt)
+  else()
+    FetchContent_GetProperties(fmt)
+    if(NOT fmt_POPULATED)
+      message(FATAL_ERROR "Required target fmt::fmt not found.
+Please make sure:
+  - fmt::fmt is available (e.g., via find_package(fmt CONFIG REQUIRED)),
+  - or build abc_test as a top-level project.")
+    endif()
+  endif()
 endif()
 
 # Show the user the status of the core variables.
