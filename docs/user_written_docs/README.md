@@ -19,7 +19,9 @@ If any of these features have piqued your interest, `abc_test` may be of interes
 
 ## Examples ##
 
-We will begin with a minimal example, which shows how easy it is to begin working with `abc_test`.
+Below we show a minimal example, which shows how easy it is to begin working with `abc_test`.
+
+The source for this example can be found [here](scripts/script_to_use_library/main_to_cpy.cpp).
 
 <!-- inject:scripts/script_to_use_library/main_to_cpy.cpp:initial_example -->
 
