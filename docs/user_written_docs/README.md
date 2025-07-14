@@ -33,9 +33,11 @@ The source for this example can be found [here](scripts/script_to_use_library/ma
 
 ### Unit Testing Example ###
 
-Through the first example is valid testing code in `abc_test`, it relies on the user re-writing the same statement each time they want to test a new value, and would need to be re-compiled each time the user wants to test a new value.
+Through the example above is valid testing code in `abc_test`, it relies on the user re-writing the same statement each time they want to test a new value, which in turn would require re-compilation.
 
-Below we show how easy it is to use a data generator to read files from a user-defined file. The data values can then be used to write assertions.
+`abc_test` contains many different types of data generators which can be used to loop through data. One of these data generators is the file-based data generator. Below we show an example of its use.
+
+<!-- inject:examples/include/abc_test_examples/readme.hpp:unit_test_example -->
 
 This next example shows the user how to write assertions.
 

@@ -74,9 +74,47 @@ _TEST_CASE(
 
 ### Unit Testing Example ###
 
-Through the first example is valid testing code in `abc_test`, it relies on the user re-writing the same statement each time they want to test a new value, and would need to be re-compiled each time the user wants to test a new value.
+Through the example above is valid testing code in `abc_test`, it relies on the user re-writing the same statement each time they want to test a new value, which in turn would require re-compilation.
 
-Below we show how easy it is to use a data generator to read files from a user-defined file. The data values can then be used to write assertions.
+`abc_test` contains many different types of data generators which can be used to loop through data. One of these data generators is the file-based data generator. Below we show an example of its use.
+
+```cpp
+_TEST_CASE(
+    abc::test_case_t(
+        {.name = "Testing Fibonacci function using data from a file",
+         .path = "tests::fib"}
+    )
+)
+{
+    // This namespace is needed for some of the more complicated abc test
+    // functionality.
+    using namespace abc;
+    // This macro creates an object which can have assertions passed into it.
+    // The string argument represents an annotation.
+    auto _l_unit_tests = _MULTI_MATCHER("Unit tests for Fibonacci function");
+    // This for loop gathers the values from the file.
+    // The type identifies what is being read from the file. The string
+    // represents the name of the file. The file is in the folder tests/fib,
+    // with the root file being set by either the system or the user.
+    for (auto& [_l_input, _l_expected_output] :
+         read_data_from_file<std::pair<int, int>>("unit_tests"))
+    {
+        // At this point, each line is read from the file, and its contents are
+        // available to the user.
+        // The result of the assertion is streamed to the multi matcher.
+        _l_unit_tests << _CHECK_EXPR(fib(_l_input) == _l_expected_output);
+    }
+    // The multi matcher is then checked. It is this line which sneds the
+    // information to the testing framework.
+    _CHECK(_l_unit_tests);
+}
+
+// tests/fib/unit_tests.gd
+// (0, 0)
+// (6, 8)
+// (7, 14)
+
+```
 
 This next example shows the user how to write assertions.
 
