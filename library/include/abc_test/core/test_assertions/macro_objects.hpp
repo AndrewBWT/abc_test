@@ -101,7 +101,7 @@ struct MacroAProxy
                 _m_matcher.matcher_result(),
                 ki,
                 std::optional<ds::single_source_t>{},
-                std::optional<std::string>(_m_matcher.annotation()),
+                std::optional<std::u8string>(_m_matcher.annotation()),
                 _l_msm
             );
             return _l_tuple;

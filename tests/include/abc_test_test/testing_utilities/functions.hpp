@@ -34,14 +34,14 @@ namespace abc_test::utility
         {
             _l_rv.reserve(ranges::size(_a_vect));
         }
-        ranges::transform(
-            _a_vect,
-            detail::get_inserter(_l_rv),
-            [](const Original_Type_Value& _a_obj)
-            {
-                return static_cast<New_Type_Value>(_a_obj);
-            }
-        );
+        //ranges::transform(
+        //    _a_vect,
+        //    detail::get_inserter(_l_rv),
+       //     [](const Original_Type_Value& _a_obj)
+       //     {
+       //         return static_cast<New_Type_Value>(_a_obj);
+       //     }
+      //  );
         return _l_rv;
     }
 

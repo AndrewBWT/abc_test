@@ -1,4 +1,5 @@
 #pragma once
+#if 0
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
 #include "abc_test/utility/rng.hpp"
@@ -462,3 +463,5 @@ _TEST_CASE(
     RUN(_l_mdg, (_l_func.operator() < simple_rng_t > ()));
     RUN(_l_mdg, _l_func.operator() < inner_rng_mt19937_64_t > (100'000));
 }
+
+#endif

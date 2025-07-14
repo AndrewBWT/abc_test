@@ -40,25 +40,20 @@ _TEST_CASE(
     using namespace _ABC_NS_UTILITY_STR;
     using namespace abc;
     using namespace std;
-    multi_element_test_block_t _l_test_lib(
-        "Testing properties", std::source_location::current()
-    );
-    //_BEGIN_MULTI_ELEMENT_BBA(_l_test_lib_bba, "Testing properties of
-    //test_library_exception_t");
+    auto _l_test_lib = _MULTI_MATCHER("Testing properties of test_library_exception_t");
     for (const string& _l_str : generate_data_randomly<string>())
     {
         stacktrace               _l_st = stacktrace::current();
         test_library_exception_t _l_tle
             = test_library_exception_t(cast_string_to_u8string(_l_str), _l_st);
-        _l_test_lib += _CHECK(annotate(
+        _l_test_lib << _CHECK(annotate(
             u8"Checking test_library_exception_t what() function",
             _EXPR(string_view(_l_tle.what()) == string_view(_l_str))
-            // c_str_equal(_l_tle.what(), _l_str)
         ));
-        _l_test_lib += _CHECK(annotate(
+        _l_test_lib << _CHECK(annotate(
             u8"Checking test_library_exception_t source_location() function",
             stacktraces_equal(_l_tle.stacktrace(), _l_st)
         ));
     }
-    //_END_BBA_CHECK(_l_test_lib_bba);
+    _CHECK(_l_test_lib);
 }
