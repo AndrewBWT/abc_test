@@ -90,7 +90,7 @@ struct MacroAProxy
         matcher_source_map_t _l_msm;
         _m_matcher.gather_map_source(_l_msm);
         global::get_this_threads_current_test()
-            .add_current_for_loop_stack_to_trie(true);
+            .add_current_for_loop_stack_to_trie(not _m_matcher.matcher_result().passed());
         auto ki
             = global::get_this_threads_test_runner_ref().get_log_infos(false);
         if constexpr (Has_Annotation)

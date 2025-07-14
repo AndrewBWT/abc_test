@@ -1,5 +1,5 @@
 #pragma once
-#if 0
+
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
 #include "abc_test/included_instances/data_generator/enumeration/default_enumeration.hpp"
@@ -162,8 +162,7 @@ _TEST_CASE(
         {
             return _l_helper.difference(_a_enum1, _a_enum2);
         };
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_unit_tests,
+        auto _l_unit_tests = _MULTI_MATCHER(
             fmt::format(
                 "Unit testing less_than, equal and difference using {0}",
                 _l_type_name
@@ -176,12 +175,11 @@ _TEST_CASE(
                                   const string_view _a_name, F _a_func
                               )
         {
-            for (const auto& _l_data : read_data_from_file<Test_Type>(
+            for (const auto& [_l_enum1, _l_enum2, _l_result] : read_data_from_file<Test_Type>(
                      fmt::format("unit_tests_{0}_{1}", _a_name, _l_type_name)
                  ))
             {
-                const auto& [_l_enum1, _l_enum2, _l_result]{_l_data};
-                _l_unit_tests += _BLOCK_CHECK(
+                _l_unit_tests << _CHECK(
                     _EXPR(_a_func(_l_enum1, _l_enum2) == _l_result)
                 );
             }
@@ -193,9 +191,8 @@ _TEST_CASE(
         // Unit testing difference.
         unit_test_func.template operator(
         )<unit_test_data_2>("difference", _l_difference);
-        _END_BBA_CHECK(_l_unit_tests);
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_fuzzy_tests,
+        _CHECK(_l_unit_tests);
+        auto _l_fuzzy_tests = _MULTI_MATCHER(
             fmt::format(
                 "Fuzzy testing less_than and equal using {0}", _l_type_name
             )
@@ -205,23 +202,20 @@ _TEST_CASE(
         auto fuzzy_test_func
             = [&]<typename F>(const string_view _a_name, F _a_func)
         {
-            for (const auto& _l_data : enumerate_data<fuzzy_test_data_t>())
+            for (const auto& [_l_enum1, _l_enum2] : enumerate_data<fuzzy_test_data_t>())
             {
-                const auto& [_l_enum1, _l_enum2]{_l_data};
                 matcher_t _l_matcher;
                 _BEGIN_NO_THROW_MATCHER(_l_matcher);
                 do_not_optimise(_a_func(_l_enum1, _l_enum2));
                 _END_NO_THROW_MATCHER(_l_matcher);
-                _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
+                _l_fuzzy_tests << _CHECK(_l_matcher);
             }
         };
         fuzzy_test_func("less_than", _l_less_than);
         fuzzy_test_func("equal", _l_equal);
         fuzzy_test_func("difference", _l_difference);
-        _END_BBA_CHECK(_l_fuzzy_tests);
-
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_error_tests,
+        _CHECK(_l_fuzzy_tests);
+        auto _l_error_tests = _MULTI_MATCHER(
             fmt::format(
                 "Checking unreachable conditions on less_than, equal and "
                 "difference for "
@@ -235,17 +229,13 @@ _TEST_CASE(
         auto _l_error_func
             = [&]<typename F>(const string_view _a_name, F _a_func)
         {
-            for (const auto& _l_data : read_data_from_file<error_test_data_t>(
+            for (const auto& [_l_enum1_as_underlying, _l_enum2_as_underlying, _l_error] : read_data_from_file<error_test_data_t>(
                      fmt::format("error_tests_{0}_{1}", _a_name, _l_type_name)
                  ))
             {
-                _TVLOG(_l_data);
-                const auto& [_l_enum1_as_underlying, _l_enum2_as_underlying, _l_error]{
-                    _l_data
-                };
                 auto _l_enum1{static_cast<Enum>(_l_enum1_as_underlying)};
                 auto _l_enum2{static_cast<Enum>(_l_enum2_as_underlying)};
-                _l_error_tests += _BLOCK_CHECK(
+                _l_error_tests << _CHECK(
                     _MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
                         abc::unreachable_exception_t,
                         _l_error,
@@ -260,7 +250,7 @@ _TEST_CASE(
         _l_error_func("less_than", _l_less_than);
         _l_error_func("equal", _l_equal);
         _l_error_func("difference", _l_difference);
-        _END_BBA_CHECK(_l_error_tests);
+        _CHECK(_l_error_tests);
     };
     manual_data_generator_t _l_mdg;
     for_each_type<type_list_t>(
@@ -287,27 +277,25 @@ _TEST_CASE(
     auto _l_test_func = [&]<typename Enum>()
     {
         auto _l_type_name{typeid(Enum).name()};
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_unit_tests,
+        auto _l_unit_tests = _MULTI_MATCHER(
             fmt::format(
                 "Unit testing min, max and size using enum {0}", _l_type_name
             )
         );
         using test_data_t = std::tuple<Enum, Enum, size_t>;
         enumerate_enum_helper_t<Enum> _l_helper(get_enum_list<Enum>());
-        for (const auto& _l_data : read_data_from_file<test_data_t>(
+        for (const auto& [_l_min, _l_max, _l_size] : read_data_from_file<test_data_t>(
                  fmt::format("unit_tests_{0}", _l_type_name)
              ))
         {
-            auto& [_l_min, _l_max, _l_size]{_l_data};
 
-            _l_unit_tests += _BLOCK_CHECK(
+            _l_unit_tests << _CHECK(
                 _EXPR(_l_helper.min() == _l_min)
                 && _EXPR(_l_helper.max() == _l_max)
                 && _EXPR(_l_helper.size() == _l_size)
             );
         }
-        _END_BBA_CHECK(_l_unit_tests);
+        _CHECK(_l_unit_tests);
     };
     manual_data_generator_t _l_mdg;
     for_each_type<type_list_t>(
@@ -347,8 +335,7 @@ _TEST_CASE(
         {
             return _l_helper.decrement(_a_enum1, _a_size, _a_limit);
         };
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_unit_tests,
+        auto _l_unit_tests = _MULTI_MATCHER(
             fmt::format(
                 "Unit testing increment and decrement using {0}", _l_type_name
             )
@@ -358,18 +345,14 @@ _TEST_CASE(
         auto unit_test_func
             = [&]<typename F>(const string_view _a_name, F _a_func)
         {
-            for (const auto& _l_data : read_data_from_file<unit_test_data_t>(
+            for (const auto& [_l_enum, _l_size, _l_limit, _l_bool_res, _l_enum_res, _l_size_res] : read_data_from_file<unit_test_data_t>(
                      fmt::format("unit_tests_{0}_{1}", _a_name, _l_type_name)
                  ))
             {
-                _TVLOG(_l_data);
-                const auto& [_l_enum, _l_size, _l_limit, _l_bool_res, _l_enum_res, _l_size_res]{
-                    _l_data
-                };
                 auto _l_enum_cpy{_l_enum};
                 auto _l_size_cpy{_l_size};
                 auto _l_res{_a_func(_l_enum_cpy, _l_size_cpy, _l_limit)};
-                _l_unit_tests += _BLOCK_CHECK(
+                _l_unit_tests << _CHECK(
                     _EXPR(_l_enum_cpy == _l_enum_res)
                     && _EXPR(_l_bool_res == _l_res)
                     && _EXPR(_l_size_cpy == _l_size_res)
@@ -378,10 +361,9 @@ _TEST_CASE(
         };
         unit_test_func("increment", _l_increment);
         unit_test_func("decrement", _l_decrement);
-        _END_BBA_CHECK(_l_unit_tests);
+        _CHECK(_l_unit_tests);
 
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_fuzzy_tests,
+        auto _l_fuzzy_tests = _MULTI_MATCHER(
             fmt::format(
                 "Fuzzy testing increment and decrement using {0}", _l_type_name
             )
@@ -426,26 +408,23 @@ _TEST_CASE(
                     return _l_rv;
                 }
             );
-            for (const auto& _l_data :
+            for (const auto& [_l_enum, _l_size, _l_limit] :
                  generate_data_randomly<fuzzy_test_data_t>(_l_rnd_func))
             {
-                _TVLOG(_l_data);
-                const auto& [_l_enum, _l_size, _l_limit]{_l_data};
                 auto      _l_enum_cpy{_l_enum};
                 auto      _l_size_cpy{_l_size};
                 matcher_t _l_matcher;
                 _BEGIN_NO_THROW_MATCHER(_l_matcher);
                 do_not_optimise(_a_func(_l_enum_cpy, _l_size_cpy, _l_limit));
                 _END_NO_THROW_MATCHER(_l_matcher);
-                _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
+                _l_fuzzy_tests << _CHECK(_l_matcher);
             }
         };
         _l_fuzzy_test("increment", _l_increment, true);
         _l_fuzzy_test("decrement", _l_decrement, false);
-        _END_BBA_CHECK(_l_fuzzy_tests);
+        _CHECK(_l_fuzzy_tests);
 
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_property_tests,
+        auto _l_property_tests = _MULTI_MATCHER(
             fmt::format(
                 "Property testing increment and decrement using {0}",
                 _l_type_name
@@ -458,10 +437,8 @@ _TEST_CASE(
         {
             auto _l_b_str = cast_string_to_u8string(_a_name);
             _TVLOG(_l_b_str);
-            for (auto& _l_data : enumerate_data<property_test_data_1>())
+            for (auto& [_l_enum1, _l_enum2] : enumerate_data<property_test_data_1>())
             {
-                _TVLOG(_l_data);
-                auto& [_l_enum1, _l_enum2]{_l_data};
                 auto& _l_lower{
                     _l_helper.less_than(_l_enum1, _l_enum2) ? _l_enum1
                                                             : _l_enum2
@@ -482,7 +459,6 @@ _TEST_CASE(
                 for (auto& _l_enum_start :
                      enumerate_data<Enum>(from_m_to_n(_l_lower, _l_upper)))
                 {
-                    _TVLOG(_l_enum_start);
                     // Now generate some size_t values.
                     for (auto& _l_size :
                          generate_data_randomly<size_t>()
@@ -494,7 +470,6 @@ _TEST_CASE(
                                  from_min_to_val(_l_helper.size() + 10)
                              ))
                     {
-                        _TVLOG(_l_size);
                         auto                   _l_enum_start_cpy{_l_enum_start};
                         auto                   _l_size_1{_l_size};
                         auto                   _l_size_2{_l_size};
@@ -505,7 +480,7 @@ _TEST_CASE(
                             _l_min_val,
                             _l_max_val
                         )};
-                        _l_property_tests += _BLOCK_CHECK(
+                        _l_property_tests << _CHECK(
                             // Enums are same.
                             _EXPR(_l_enum_start_cpy == _l_enum_start)
                             // the second size == 0 and the second results
@@ -560,11 +535,9 @@ _TEST_CASE(
             }
         );
 
-        _END_BBA_CHECK(_l_property_tests);
+        _CHECK(_l_property_tests);
 
-
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_error_tests,
+        auto _l_error_tests = _MULTI_MATCHER(
             fmt::format(
                 "Checking unreachable conditions on increment and decrement "
                 "for "
@@ -579,14 +552,10 @@ _TEST_CASE(
         {
             using error_test_data_t = std::
                 tuple<Enum_underlying, optional<Enum_underlying>, u8string>;
-            for (const auto& _l_data : read_data_from_file<error_test_data_t>(
+            for (const auto& [_l_underlying_enum, _l_underlying_enum_limit, _l_error_msg] : read_data_from_file<error_test_data_t>(
                      fmt::format("error_tests_1_{0}_{1}", _a_name, _l_type_name)
                  ))
             {
-                _TVLOG(_l_data);
-                const auto& [_l_underlying_enum, _l_underlying_enum_limit, _l_error_msg]{
-                    _l_data
-                };
                 auto           _l_enum{static_cast<Enum>(_l_underlying_enum)};
                 optional<Enum> _l_enum_limit{
                     _l_underlying_enum_limit.has_value()
@@ -595,7 +564,7 @@ _TEST_CASE(
                           ))
                         : std::nullopt
                 };
-                _l_error_tests += _BLOCK_CHECK(
+                _l_error_tests << _CHECK(
                     _MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
                         abc::unreachable_exception_t,
                         _l_error_msg,
@@ -632,12 +601,11 @@ _TEST_CASE(
             = [&]<typename F>(const string_view _a_name, F _a_func)
         {
             using error_test_data_t = std::tuple<Enum, Enum, u8string>;
-            for (const auto& _l_data : read_data_from_file<error_test_data_t>(
+            for (const auto& [_l_enum, _l_enum_limit, _l_error_msg] : read_data_from_file<error_test_data_t>(
                      fmt::format("error_tests_2_{0}_{1}", _a_name, _l_type_name)
                  ))
             {
-                const auto& [_l_enum, _l_enum_limit, _l_error_msg]{_l_data};
-                _l_error_tests += _BLOCK_CHECK(
+                _l_error_tests << _CHECK(
                     _MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
                         abc::unreachable_exception_t,
                         _l_error_msg,
@@ -667,7 +635,7 @@ _TEST_CASE(
                 return _l_helper.decrement(_l_enum, _l_size, _a_enum_limit);
             }
         );
-        _END_BBA_CHECK(_l_error_tests);
+        _CHECK(_l_error_tests);
     };
 
     manual_data_generator_t _l_mdg;
@@ -695,21 +663,18 @@ _TEST_CASE(
     {
         auto                          _l_type_name{typeid(Enum).name()};
         enumerate_enum_helper_t<Enum> _l_helper(get_enum_list<Enum>());
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_unit_tests,
+        auto _l_unit_tests = _MULTI_MATCHER(
             fmt::format(
                 "Unit testing print and parse for the enum {0}", _l_type_name
             )
         );
         using unit_test_type_print = std::
             tuple<Enum, u8string, vector<optional<enum_helper_string_type_e>>>;
-        for (auto& _l_data : read_data_from_file<unit_test_type_print>(
+        for (auto& [_l_enum, _l_expected, _l_str_types] : read_data_from_file<unit_test_type_print>(
                  fmt::format("unit_test_print_{0}", _l_type_name)
              ))
         {
-            _TVLOG(_l_data);
-            auto& [_l_enum, _l_expected, _l_str_types]{_l_data};
-            for (auto& _l_str_type : _l_str_types)
+            for (auto& _l_str_type :  _l_str_types)
             {
                 _TVLOG(_l_str_type);
                 u8string _l_result_print;
@@ -723,7 +688,7 @@ _TEST_CASE(
                     _l_result_print = _l_helper.print(_l_enum);
                 }
                 _l_unit_tests
-                    += _BLOCK_CHECK(_EXPR(_l_result_print == _l_expected));
+                    << _CHECK(_EXPR(_l_result_print == _l_expected));
             }
         }
         using unit_test_type_parse = std::tuple<
@@ -731,14 +696,10 @@ _TEST_CASE(
             size_t,
             u8string,
             vector<optional<enum_helper_string_type_e>>>;
-        for (auto& _l_data : read_data_from_file<unit_test_type_parse>(
+        for (auto& [_l_expected_enum, _l_expected_elements_remaining, _l_str, _l_str_types] : read_data_from_file<unit_test_type_parse>(
                  fmt::format("unit_test_parse_{0}", _l_type_name)
              ))
         {
-            _TVLOG(_l_data);
-            auto& [_l_expected_enum, _l_expected_elements_remaining, _l_str, _l_str_types]{
-                _l_data
-            };
             for (auto& _l_str_type : _l_str_types)
             {
                 _TVLOG(_l_str_type);
@@ -753,7 +714,7 @@ _TEST_CASE(
                 {
                     _l_result_parse = _l_helper.parse_enum(_l_pi);
                 }
-                _l_unit_tests += _BLOCK_CHECK(
+                _l_unit_tests << _CHECK(
                     _EXPR(_l_result_parse == _l_expected_enum)
                     && _EXPR(
                         _l_pi.elements_processed()
@@ -762,20 +723,17 @@ _TEST_CASE(
                 );
             }
         }
-        _END_BBA_CHECK(_l_unit_tests);
+        _CHECK(_l_unit_tests);
 
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_fuzzy_tests,
+        auto _l_fuzzy_tests = _MULTI_MATCHER(
             fmt::format(
                 "Fuzzy testing print and parse for the enum {0}", _l_type_name
             )
         );
         using fuzzy_test_type_print
             = std::tuple<Enum, optional<enum_helper_string_type_e>>;
-        for (auto& _l_data : enumerate_data<fuzzy_test_type_print>())
+        for (auto& [_l_enum, _l_str_type] : enumerate_data<fuzzy_test_type_print>())
         {
-            _TVLOG(_l_data);
-            auto& [_l_enum, _l_str_type]{_l_data};
             u8string  _l_result_print;
             matcher_t _l_matcher;
             _BEGIN_NO_THROW_MATCHER(_l_matcher);
@@ -789,15 +747,13 @@ _TEST_CASE(
             }
             do_not_optimise(_l_result_print);
             _END_NO_THROW_MATCHER(_l_matcher);
-            _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
+            _l_fuzzy_tests << _CHECK(_l_matcher);
         }
         using fuzzy_test_type_parse = tuple<
             variant<Enum, u8string>,
             optional<enum_helper_string_type_e>>;
-        for (auto& _l_data : generate_data_randomly<fuzzy_test_type_parse>())
+        for (auto& [_l_input, _l_str_type] : generate_data_randomly<fuzzy_test_type_parse>())
         {
-            _TVLOG(_l_data);
-            auto& [_l_input, _l_str_type]{_l_data};
             result_t<Enum> _l_result_parse;
             u8string       _l_str_input;
             matcher_t      _l_matcher;
@@ -834,12 +790,10 @@ _TEST_CASE(
             }
             do_not_optimise(_l_result_parse);
             _END_NO_THROW_MATCHER(_l_matcher);
-            _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
+            _l_fuzzy_tests << _CHECK(_l_matcher);
         }
-        _END_BBA_CHECK(_l_fuzzy_tests);
-
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_property_tests,
+        _CHECK(_l_fuzzy_tests);
+        auto _l_property_tests = _MULTI_MATCHER(
             fmt::format(
                 "Property testing print and parse for the enum {0}",
                 _l_type_name
@@ -847,10 +801,8 @@ _TEST_CASE(
         );
         using property_test_type
             = std::tuple<Enum, optional<enum_helper_string_type_e>>;
-        for (auto& _l_data : enumerate_data<property_test_type>())
+        for (auto& [_l_enum, _l_str_type] : enumerate_data<property_test_type>())
         {
-            _TVLOG(_l_data);
-            auto& [_l_enum, _l_str_type]{_l_data};
             result_t<Enum> _l_enum_result;
             if (_l_str_type.has_value())
             {
@@ -865,12 +817,11 @@ _TEST_CASE(
                 parser::parser_input_t _l_pi(_l_helper.print(_l_enum));
                 _l_enum_result = _l_helper.parse_enum(_l_pi);
             }
-            _l_property_tests += _BLOCK_CHECK(_EXPR(_l_enum_result == _l_enum));
+            _l_property_tests << _CHECK(_EXPR(_l_enum_result == _l_enum));
         }
-        _END_BBA_CHECK(_l_property_tests);
+        _CHECK(_l_property_tests);
 
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_error_tests,
+        auto _l_error_tests = _MULTI_MATCHER(
             fmt::format(
                 "Error testing print and parse for the enum {0}", _l_type_name
             )
@@ -882,20 +833,16 @@ _TEST_CASE(
             enum_underlying_e,
             enum_helper_string_type_underlying_e,
             u8string>;
-        for (auto& _l_data : read_data_from_file<error_test_type_print>(
+        for (auto& [_l_enum_underlying, _l_str_type_underlying, _l_expected_error] : read_data_from_file<error_test_type_print>(
                  fmt::format("error_test_print_{0}", _l_type_name)
              ))
         {
-            _TVLOG(_l_data);
-            auto& [_l_enum_underlying, _l_str_type_underlying, _l_expected_error]{
-                _l_data
-            };
             Enum _l_enum{static_cast<Enum>(_l_enum_underlying)};
             enum_helper_string_type_e _l_str_type{
                 static_cast<enum_helper_string_type_e>(_l_str_type_underlying)
             };
             _l_error_tests
-                += _BLOCK_CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
+                << _CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
                     abc::unreachable_exception_t,
                     _l_expected_error,
                     [&]()
@@ -906,19 +853,16 @@ _TEST_CASE(
         }
         using error_test_type_parse = std::
             tuple<u8string, enum_helper_string_type_underlying_e, u8string>;
-        for (auto& _l_data : read_data_from_file<error_test_type_parse>(
+        for (auto& [_l_str, _l_str_type_as_underlying, _l_expected_error] : read_data_from_file<error_test_type_parse>(
                  fmt::format("error_test_parse_{0}", _l_type_name)
              ))
         {
-            _TVLOG(_l_data);
-            auto& [_l_str, _l_str_type_as_underlying, _l_expected_error]{_l_data
-            };
             enum_helper_string_type_e _l_str_type{
                 static_cast<enum_helper_string_type_e>(_l_str_type_as_underlying
                 )
             };
             _l_error_tests
-                += _BLOCK_CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
+                << _CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
                     abc::unreachable_exception_t,
                     _l_expected_error,
                     [&]()
@@ -929,7 +873,7 @@ _TEST_CASE(
                     }
                 ));
         }
-        _END_BBA_CHECK(_l_error_tests);
+        _CHECK(_l_error_tests);
     };
 
     manual_data_generator_t _l_mdg;
@@ -957,29 +901,25 @@ _TEST_CASE(
     {
         auto                          _l_type_name{typeid(Enum).name()};
         enumerate_enum_helper_t<Enum> _l_helper(get_enum_list<Enum>());
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_unit_tests,
+        auto _l_unit_tests = _MULTI_MATCHER(
             fmt::format(
                 "Unit testing enums_idx and idxs_enum for the enum {0}",
                 _l_type_name
             )
         );
         using unit_test_type = std::tuple<Enum, std::size_t>;
-        for (auto& _l_data : read_data_from_file<unit_test_type>(
+        for (auto& [_l_enum, _l_idx] : read_data_from_file<unit_test_type>(
                  fmt::format("unit_tests_{0}", _l_type_name)
              ))
         {
-            _TVLOG(_l_data);
-            auto& [_l_enum, _l_idx]{_l_data};
-            _l_unit_tests += _BLOCK_CHECK(
+            _l_unit_tests << _CHECK(
                 _EXPR(_l_helper.enums_idx(_l_enum) == _l_idx)
                 && _EXPR(_l_helper.idxs_enum(_l_idx) == _l_enum)
             );
         }
-        _END_BBA_CHECK(_l_unit_tests);
+        _CHECK(_l_unit_tests);
 
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_fuzzy_tests,
+        auto _l_fuzzy_tests = _MULTI_MATCHER(
             fmt::format(
                 "Fuzzy testing enums_idx and idxs_enum for the enum {0}",
                 _l_type_name
@@ -988,13 +928,12 @@ _TEST_CASE(
         using fuzzy_test_type_enums_idx = Enum;
         for (auto& _l_data : enumerate_data<fuzzy_test_type_enums_idx>())
         {
-            _TVLOG(_l_data);
             matcher_t _l_matcher;
             _BEGIN_NO_THROW_MATCHER(_l_matcher);
             auto _l_result{_l_helper.enums_idx(_l_data)};
             do_not_optimise(_l_result);
             _END_NO_THROW_MATCHER(_l_matcher);
-            _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
+            _l_fuzzy_tests << _CHECK(_l_matcher);
         }
 
         using fuzzy_test_type_idxs_enum = size_t;
@@ -1002,18 +941,16 @@ _TEST_CASE(
                  from_min_to_val(_l_helper.size() - 1)
              ))
         {
-            _TVLOG(_l_data);
             matcher_t _l_matcher;
             _BEGIN_NO_THROW_MATCHER(_l_matcher);
             auto _l_result{_l_helper.idxs_enum(_l_data)};
             do_not_optimise(_l_result);
             _END_NO_THROW_MATCHER(_l_matcher);
-            _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
+            _l_fuzzy_tests << _CHECK(_l_matcher);
         }
-        _END_BBA_CHECK(_l_fuzzy_tests);
+        _CHECK(_l_fuzzy_tests);
 
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_property_tests,
+        auto _l_property_tests = _MULTI_MATCHER(
             fmt::format(
                 "Property testing enums_idx and idxs_enum for the enum {0}",
                 _l_type_name
@@ -1022,15 +959,13 @@ _TEST_CASE(
         using property_test_type = Enum;
         for (auto& _l_data : enumerate_data<property_test_type>())
         {
-            _TVLOG(_l_data);
-            _l_property_tests += _BLOCK_CHECK(_EXPR(
+            _l_property_tests << _CHECK(_EXPR(
                 _l_helper.idxs_enum(_l_helper.enums_idx(_l_data)) == _l_data
             ));
         }
-        _END_BBA_CHECK(_l_property_tests);
+        _CHECK(_l_property_tests);
 
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_error_tests,
+        auto _l_error_tests = _MULTI_MATCHER(
             fmt::format(
                 "Error testing enums_idx and idxs_enum for the enum {0}",
                 _l_type_name
@@ -1039,15 +974,14 @@ _TEST_CASE(
         using enum_underlying_e = std::underlying_type_t<Enum>;
         using error_test_type_enums_idx
             = std::tuple<enum_underlying_e, u8string>;
-        for (auto& _l_data : read_data_from_file<error_test_type_enums_idx>(
+        for (auto& [_l_enum_underlying, _l_expected_error] : read_data_from_file<error_test_type_enums_idx>(
                  fmt::format("error_test_enums_idx_{0}", _l_type_name)
              ))
         {
-            _TVLOG(_l_data);
-            auto& [_l_enum_underlying, _l_expected_error]{_l_data};
+
             Enum _l_enum{static_cast<Enum>(_l_enum_underlying)};
             _l_error_tests
-                += _BLOCK_CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
+                << _CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
                     abc::unreachable_exception_t,
                     _l_expected_error,
                     [&]()
@@ -1057,14 +991,12 @@ _TEST_CASE(
                 ));
         }
         using error_test_type_idxs_enum = std::tuple<size_t, u8string>;
-        for (auto& _l_data : read_data_from_file<error_test_type_idxs_enum>(
+        for (auto& [_l_size, _l_expected_error] : read_data_from_file<error_test_type_idxs_enum>(
                  fmt::format("error_test_idxs_enum_{0}", _l_type_name)
              ))
         {
-            _TVLOG(_l_data);
-            auto& [_l_size, _l_expected_error]{_l_data};
             _l_error_tests
-                += _BLOCK_CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
+                << _CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
                     abc::unreachable_exception_t,
                     _l_expected_error,
                     [&]()
@@ -1073,7 +1005,7 @@ _TEST_CASE(
                     }
                 ));
         }
-        _END_BBA_CHECK(_l_error_tests);
+        _CHECK(_l_error_tests);
     };
 
     manual_data_generator_t _l_mdg;
@@ -1100,8 +1032,7 @@ _TEST_CASE(
     auto _l_test_func = [&]<typename Enum>()
     {
         auto _l_type_name{typeid(Enum).name()};
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_unit_tests,
+        auto _l_unit_tests = _MULTI_MATCHER(
             fmt::format(
                 "Unit testing enumerate_enum_helper_t using valid enum_list "
                 "for {0}",
@@ -1113,10 +1044,10 @@ _TEST_CASE(
         enumerate_enum_helper_t<Enum> _l_helper(get_enum_list<Enum>());
         do_not_optimise(_l_helper);
         _END_NO_THROW_MATCHER(_l_matcher);
-        _l_unit_tests += _BLOCK_CHECK(_l_matcher);
-        _END_BBA_CHECK(_l_unit_tests);
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_error_tests,
+        _l_unit_tests << _CHECK(_l_matcher);
+        _CHECK(_l_unit_tests);
+
+        auto _l_error_tests = _MULTI_MATCHER(
             fmt::format(
                 "Error testing invalid enumerate_enum_helper_t constructors "
                 "for {0}",
@@ -1126,13 +1057,11 @@ _TEST_CASE(
         using enum_underlying_e = std::underlying_type_t<Enum>;
         using error_test_type_constructor
             = tuple<vector<pair<enum_underlying_e, u8string>>, u8string>;
-        for (auto& _l_data :
+        for (auto& [_l_enum_list, _l_error] :
              read_data_from_file<error_test_type_constructor>(fmt::format(
                  "error_enumerate_enum_helper_t_constructor_{0}", _l_type_name
              )))
         {
-            _TVLOG(_l_data);
-            auto& [_l_enum_list, _l_error]{_l_data};
             enum_list_t<Enum> _l_arg;
             ranges::transform(
                 _l_enum_list,
@@ -1146,7 +1075,7 @@ _TEST_CASE(
                 }
             );
             _l_error_tests
-                += _BLOCK_CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
+                << _CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
                     abc::errors::test_library_exception_t,
                     _l_error,
                     [&]()
@@ -1156,7 +1085,7 @@ _TEST_CASE(
                     }
                 ));
         }
-        _END_BBA_CHECK(_l_error_tests);
+        _CHECK(_l_error_tests);
     };
 
     using type_list = abc::utility::type_list<enum_with_enum_list_4>;
@@ -1168,4 +1097,3 @@ _TEST_CASE(
         }
     );
 }
-#endif

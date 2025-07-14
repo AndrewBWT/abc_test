@@ -1,5 +1,4 @@
 #pragma once
-#if 0
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
 #include "abc_test/utility/rng.hpp"
@@ -22,7 +21,7 @@ namespace
         using namespace std;
         using namespace utility;
         rng_t     _l_bad_rng{ rng_t::make_default_rng<T>() };
-        _a_metb += _BLOCK_CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
+        _a_metb << _CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
             abc::unreachable_exception_t,
             u8"rng_t's inner random generator contains a nullptr. This is an "
             u8"invalid state for the rng_t object, and is undefined behaviour.",
@@ -51,35 +50,28 @@ _TEST_CASE(
     {
         if constexpr (same_as<T, simple_rng_t>)
         {
-            _BEGIN_MULTI_ELEMENT_BBA(
-                _l_unit_tests,
+            auto _l_unit_tests = _MULTI_MATCHER(
                 "Unit tests for make_rng functions and rng_t constructors"
             );
             using unit_test_1 = std::tuple<seed_t, size_t>;
-            for (const auto& _l_data :
+            for (const auto& [_l_seed, _l_state] :
                 read_data_from_file<unit_test_1>("unit_test_1"))
             {
-                _TVLOG_(_l_data);
-                const auto& [_l_seed, _l_state] {_l_data};
                 rng_t _l_rng{ rng_t::make_rng<T>(_l_seed) };
-                _l_unit_tests += _BLOCK_CHECK(
+                _l_unit_tests << _CHECK(
                     _EXPR(_l_rng.calls() == 0) && _EXPR(_l_rng() == _l_state)
                 );
             }
             using unit_test_2 = tuple<seed_t, size_t, size_t>;
-            for (const auto& _l_data :
+            for (const auto& [_l_seed, _l_values_used_to_create_new_seed, _l_first_value_from_new_seed] :
                 read_data_from_file<unit_test_2>("unit_test_2"))
             {
-                _TVLOG_(_l_data);
-                const auto& [_l_seed, _l_values_used_to_create_new_seed, _l_first_value_from_new_seed] {
-                    _l_data
-                    };
                 rng_t _l_rng{ rng_t::make_rng<T>(_l_seed) };
                 rng_t _l_new_rng{
                     _l_rng.make_rng(_l_values_used_to_create_new_seed)
                 };
 
-                _l_unit_tests += _BLOCK_CHECK(
+                _l_unit_tests << _CHECK(
                     // New rng has zero calls
                     _EXPR(_l_new_rng.calls() == 0)
                     // New rng's first value is as specified.
@@ -92,12 +84,10 @@ _TEST_CASE(
             }
 
             using unit_test_3 = tuple<seed_t, size_t>;
-            for (const auto& _l_data :
+            for (const auto& [_l_seed, _l_progress] :
                 read_data_from_file<unit_test_3>("unit_test_3")
                 & generate_data_randomly<unit_test_3>())
             {
-                _TVLOG_(_l_data);
-                const auto& [_l_seed, _l_progress] {_l_data};
                 rng_t _l_rng{ rng_t::make_rng<T>(_l_seed) };
                 vector<std::mt19937_64::result_type> _l_values, _l_cmp_values;
                 _l_rng.progress(_l_progress);
@@ -115,7 +105,7 @@ _TEST_CASE(
                 {
                     _l_cmp_values.push_back(_l_new_rng());
                 }
-                _l_unit_tests += _BLOCK_CHECK(
+                _l_unit_tests << _CHECK(
                     _EXPR(_l_new_rng.calls() == _l_calls)
                     && _EXPR(_l_new_rng() == _l_next_rng)
                     && _EXPR(_l_cmp_values == _l_values)
@@ -128,17 +118,16 @@ _TEST_CASE(
                 {
                     _l_cmp_values.push_back(_l_rng_2());
                 }
-                _l_unit_tests += _BLOCK_CHECK(
+                _l_unit_tests << _CHECK(
                     _EXPR(_l_rng_2.calls() == _l_calls)
                     && _EXPR(_l_rng_2() == _l_next_rng)
                     && _EXPR(_l_cmp_values == _l_values)
                 );
             }
 
-            _END_BBA_CHECK(_l_unit_tests);
+            _CHECK(_l_unit_tests);
         }
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_fuzzy_tests,
+        auto _l_fuzzy_tests = _MULTI_MATCHER(
             fmt::format(
                 "Fuzzy tests for constructors of rng_t<{0}> objects",
                 typeid(T).name()
@@ -147,65 +136,56 @@ _TEST_CASE(
         using test_1 = std::tuple<seed_t>;
         // for make_rng using a seed_t
         matcher_t _l_matcher;
-        for (const auto& _l_data : generate_data_randomly<test_1>())
+        for (const auto& [_l_seed] : generate_data_randomly<test_1>())
         {
-            _TVLOG_(_l_data);
-            const auto& [_l_seed] {_l_data};
             _BEGIN_NO_THROW_MATCHER(_l_matcher);
             do_not_optimise(rng_t::make_rng<T>(_l_seed));
             _END_NO_THROW_MATCHER(_l_matcher);
-            _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
+            _l_fuzzy_tests << _CHECK(_l_matcher);
         }
         using test_2 = std::tuple<unsigned int, size_t>;
         // For static make_rng using an unsigned int and the number of values to
         // take.
-        for (const auto& _l_data :
+        for (const auto& [_l_seed, _l_n_values_to_take] :
             generate_data_randomly<test_2>(default_random_generator<test_2>(
                 default_random_generator<unsigned int>(),
                 default_random_generator<size_t>(0, 100'000)
             )))
         {
-            _TVLOG_(_l_data);
-            const auto& [_l_seed, _l_n_values_to_take] {_l_data};
             _BEGIN_NO_THROW_MATCHER(_l_matcher);
             do_not_optimise(rng_t::make_rng<T>(_l_seed, _l_n_values_to_take));
             _END_NO_THROW_MATCHER(_l_matcher);
-            _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
+            _l_fuzzy_tests << _CHECK(_l_matcher);
         }
         using test_3 = std::tuple<seed_t, size_t>;
         // For the make_rng constructor which uses a currently existing rng to
         // create a new rng.
-        for (const auto& _l_data :
+        for (const auto& [_l_seed, _l_n_values_to_take_for_new_rng] :
             generate_data_randomly<test_3>(default_random_generator<test_3>(
                 default_random_generator<seed_t>(),
                 default_random_generator<size_t>(0, 100'000)
             )))
         {
-            _TVLOG_(_l_data);
-            const auto& [_l_seed, _l_n_values_to_take_for_new_rng] {_l_data};
             _BEGIN_NO_THROW_MATCHER(_l_matcher);
             auto _l_rng{ rng_t::make_rng<T>(_l_seed) };
             do_not_optimise(_l_rng.make_rng(_l_n_values_to_take_for_new_rng));
             _END_NO_THROW_MATCHER(_l_matcher);
-            _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
+            _l_fuzzy_tests << _CHECK(_l_matcher);
         }
         using test_4 = std::tuple<seed_t>;
         // The constructors which take an lvalue and rvalue of a rng_t object.
-        for (const auto& _l_data : generate_data_randomly<test_4>())
+        for (const auto& [_l_seed] : generate_data_randomly<test_4>())
         {
-            _TVLOG_(_l_data);
-            const auto& [_l_seed] {_l_data};
             _BEGIN_NO_THROW_MATCHER(_l_matcher);
             auto _l_rng{ rng_t::make_rng<T>(_l_seed) };
             do_not_optimise(rng_t(_l_rng));
             do_not_optimise(rng_t(rng_t::make_rng<T>(_l_seed)));
             _END_NO_THROW_MATCHER(_l_matcher);
-            _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
+            _l_fuzzy_tests << _CHECK(_l_matcher);
         }
-        _END_BBA_CHECK(_l_fuzzy_tests);
-
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_error_tests, "Error tests checking unreachable behaviour"
+        _CHECK(_l_fuzzy_tests);
+        auto _l_error_tests = _MULTI_MATCHER(
+            "Error tests checking unreachable behaviour"
         );
         erorr_tests<T>(
             _l_error_tests,
@@ -249,7 +229,7 @@ _TEST_CASE(
                 return _l_cpy;
             }
         );
-        _END_BBA_CHECK(_l_error_tests);
+        _CHECK(_l_error_tests);
     };
 
     manual_data_generator_t _l_mdg;
@@ -282,30 +262,26 @@ _TEST_CASE(
     {
         if constexpr (same_as<T, simple_rng_t>)
         {
-            _BEGIN_MULTI_ELEMENT_BBA(
-                _l_unit_tests, "Unit tests for operator() and progress"
+            auto _l_unit_tests = _MULTI_MATCHER(
+                "Unit tests for operator() and progress"
             );
             using unit_test_1 = tuple<seed_t, size_t, size_t>;
-            for (const auto& _l_data :
+            for (const auto& [_l_seed, _l_progress, _l_expected_val] :
                 read_data_from_file<unit_test_1>("unit_test_1"))
             {
-                _TVLOG_(_l_data);
-                const auto& [_l_seed, _l_progress, _l_expected_val] {_l_data};
                 rng_t _l_rng{ rng_t::make_rng<T>(_l_seed) };
                 _l_rng.progress(_l_progress);
                 auto _l_rv{ _l_rng() };
-                _l_unit_tests += _BLOCK_CHECK(
+                _l_unit_tests << _CHECK(
                     _EXPR(_l_rng.calls() == (_l_progress + 1))
                     && _EXPR(_l_rv == _l_expected_val)
                 );
             }
             using unit_test_2
                 = tuple<seed_t, std::vector<std::pair<size_t, size_t>>>;
-            for (const auto& _l_data :
+            for (const auto& [_l_seed, _l_vect_progress_and_vals] :
                 read_data_from_file<unit_test_2>("unit_test_2"))
             {
-                _TVLOG_(_l_data);
-                const auto& [_l_seed, _l_vect_progress_and_vals] {_l_data};
                 rng_t _l_rng{ rng_t::make_rng<T>(_l_seed) };
                 vector<pair<size_t, size_t>> _l_results, _l_expected_results;
                 for (const auto& [_l_progress, _l_expected_val] :
@@ -318,25 +294,23 @@ _TEST_CASE(
                     _l_results.push_back({ _l_rng(), _l_rng.calls() });
                 }
                 _l_unit_tests
-                    += _BLOCK_CHECK(_EXPR(_l_expected_results == _l_results));
+                    << _CHECK(_EXPR(_l_expected_results == _l_results));
             }
 
-            _END_BBA_CHECK(_l_unit_tests);
+            _CHECK(_l_unit_tests);
         }
 
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_property_tests, "Property tests for progress and operator ()"
+        auto _l_property_tests = _MULTI_MATCHER(
+            "Property tests for progress and operator ()"
         );
         using unit_test_1 = tuple<seed_t, size_t>;
         auto _l_rnd_generator{ default_random_generator_t<unit_test_1>() };
         get<1>(_l_rnd_generator.get_ref_to_inner_rngs())
             = default_random_generator<size_t>(0, _a_maximum_progress_allowed);
-        for (const auto& _l_data : generate_data_randomly<unit_test_1>(
+        for (const auto& [_l_seed, _l_progress_to_make] : generate_data_randomly<unit_test_1>(
             mk_random_generator(_l_rnd_generator)
         ))
         {
-            _TVLOG_(_l_data);
-            const auto& [_l_seed, _l_progress_to_make] {_l_data};
             rng_t _l_rng{ rng_t::make_rng<simple_rng_t>(_l_seed) };
             rng_t _l_rng_2{ _l_rng };
             _l_rng.progress(_l_progress_to_make);
@@ -344,15 +318,14 @@ _TEST_CASE(
             {
                 _l_rng_2();
             }
-            _l_property_tests += _BLOCK_CHECK(
+            _l_property_tests << _CHECK(
                 _EXPR(_l_rng() == _l_rng_2())
                 && _EXPR(_l_rng.calls() == _l_rng_2.calls())
             );
         }
-        _END_BBA_CHECK(_l_property_tests);
+        _CHECK(_l_property_tests);
 
-        _BEGIN_MULTI_ELEMENT_BBA(
-            _l_error_tests, "Error tests checking unreachable behaviour"
+        auto _l_error_tests = _MULTI_MATCHER("Error tests checking unreachable behaviour"
         );
         erorr_tests<T>(
             _l_error_tests,
@@ -371,7 +344,7 @@ _TEST_CASE(
                 return _a_rng;
             }
         );
-        _END_BBA_CHECK(_l_error_tests);
+        _CHECK(_l_error_tests);
     };
 
     manual_data_generator_t _l_mdg;
@@ -395,7 +368,7 @@ _TEST_CASE(
         = std::numeric_limits<size_t>::max()
         )
     {
-        _BEGIN_MULTI_ELEMENT_BBA(_l_fuzzy_tests, "Fuzzy rng_t tests");
+        auto _l_fuzzy_tests = _MULTI_MATCHER( "Fuzzy rng_t tests");
         // The first element represents the constructor.
         //  The second element represents a list of instructions.
         // size_t (1st) represents "progress".
@@ -424,11 +397,9 @@ _TEST_CASE(
             )
         ) };
         matcher_t _l_matcher;
-        for (const auto& _l_data :
+        for (const auto& [_l_init, _l_actions] :
             generate_data_randomly<unit_test_1>(_l_rnd_generator))
         {
-            _TVLOG_(_l_data);
-            const auto& [_l_init, _l_actions] {_l_data};
             rng_t _l_rng = rng_t::make_rng<T>(seed_t());
             _BEGIN_NO_THROW_MATCHER(_l_matcher);
             if (auto _l_ptr{ get_if<pair<unsigned int, size_t>>(&_l_init) };
@@ -455,13 +426,11 @@ _TEST_CASE(
             }
             do_not_optimise(_l_rng());
             _END_NO_THROW_MATCHER(_l_matcher);
-            _l_fuzzy_tests += _BLOCK_CHECK(_l_matcher);
+            _l_fuzzy_tests << _CHECK(_l_matcher);
         }
-        _END_BBA_CHECK(_l_fuzzy_tests);
+        _CHECK(_l_fuzzy_tests);
     };
     manual_data_generator_t _l_mdg;
     RUN(_l_mdg, (_l_func.operator() < simple_rng_t > ()));
     RUN(_l_mdg, _l_func.operator() < inner_rng_mt19937_64_t > (100'000));
 }
-
-#endif
