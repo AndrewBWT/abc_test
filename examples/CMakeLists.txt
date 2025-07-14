@@ -22,6 +22,7 @@ if(NOT DEFINED ABC_TEST_EXAMPLES_INCLUDED)
     include/abc_test_examples/enumeration.hpp
     include/abc_test_examples/enumeration/enum_enumeration_examples.hpp
     include/abc_test_examples/basic_examples.hpp
+    include/abc_test_examples/readme.hpp
     include/abc_test_examples/basic_examples/01_assertions.hpp
     include/abc_test_examples/basic_examples/02_basic_matchers.hpp
     include/abc_test_examples/basic_examples/03_matchers_and_logical_operators.hpp

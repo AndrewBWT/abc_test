@@ -109,32 +109,6 @@ __constexpr bool
         const _ABC_NS_DS::single_source_t& _a_source,
         test_runner_t&                     _a_test_runner
     ) noexcept(not std::same_as<T, _ABC_NS_REPORTS::terminate_t>);
-/*!
- * @brief Creates an assertion block in the test. Should be used with the macros
- * described in abc_test/core/test_assertions/macros.h.
- *
- * @tparam T The assertion status. Must be derived from
- * reports::dynamic_status_t.
- * @param _a_test_block The test_block object being used to create the
- * assertion.
- * @param _a_test_runner The test_runner_t used to report the test.
- */
-template <typename T>
-requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
-__constexpr void
-    create_assertion_block(
-        const single_element_test_block_t& _a_test_block,
-        test_runner_t&                     _a_test_runner,
-        const std::string_view             _a_source_representation,
-        const std::source_location&        _a_source_location
-    ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>);
-template <typename T>
-requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
-__constexpr void
-    create_assertion_block(
-        const single_element_test_block_t& _a_test_block,
-        test_runner_t&                     _a_test_runner
-    ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>);
 template <typename T>
 requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
 __constexpr_imp void
@@ -211,25 +185,25 @@ create_assertion(
     using namespace _ABC_NS_MATCHER;
     using namespace std;
     assertion_ptr_t<true, T> _l_gur;
-    bool                     _l_passed{ true };
-    optional<u8string>         _l_matcher_annotation{};
+    bool                     _l_passed{true};
+    optional<u8string>       _l_matcher_annotation{};
     ds::single_source_t      _l_source
         = _a_matcher.add_source_info(_a_macro_str, _a_matcher_str, _a_sl);
     if constexpr (Has_Annotation)
     {
         _l_matcher_annotation = optional<u8string>(_a_matcher.annotation());
     }
-    matcher_result_t     _l_mr{ _a_matcher.matcher_result() };
+    matcher_result_t     _l_mr{_a_matcher.matcher_result()};
     matcher_source_map_t _l_msm;
     _a_matcher.gather_map_source(_l_msm);
     _l_passed = _l_mr.passed();
-    auto ki = _a_test_runner.get_log_infos(false);
-    _l_gur = make_unique<const matcher_based_assertion_single_line_t<T>>(
+    auto ki   = _a_test_runner.get_log_infos(false);
+    _l_gur    = make_unique<const matcher_based_assertion_single_line_t<T>>(
         _l_source,
         _a_test_runner.get_log_infos(false),
         bba_inner_assertion_type_t(
-            (std::same_as<T, _ABC_NS_REPORTS::terminate_t>
-                || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t>),
+            ( std::same_as<T, _ABC_NS_REPORTS::terminate_t>
+              || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t> ),
             _l_mr,
             ki,
             _l_source,
@@ -262,7 +236,7 @@ create_assertion(
     using namespace std;
     assertion_ptr_t<true, T> _l_gur;
     bool                     _l_passed{true};
-    optional<u8string>         _l_matcher_annotation{};
+    optional<u8string>       _l_matcher_annotation{};
     ds::single_source_t      _l_source
         = _a_matcher.add_source_info(_a_macro_str, _a_matcher_str, _a_sl);
     if constexpr (Has_Annotation)
@@ -273,7 +247,7 @@ create_assertion(
     matcher_source_map_t _l_msm;
     _a_matcher.gather_map_source(_l_msm);
     _l_passed = _l_mr.passed();
-    auto ki = _a_test_runner.get_log_infos(false);
+    auto ki   = _a_test_runner.get_log_infos(false);
     _l_gur    = make_unique<const matcher_based_assertion_single_line_t<T>>(
         _l_source,
         _a_test_runner.get_log_infos(false),
@@ -350,69 +324,6 @@ create_static_assertion(
     {
         __STATIC_ASSERT(T, "create_static_assertion_Failure")
     }
-}
-
-template<
-    typename T
->
-    requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
-__constexpr_imp
-void
-create_assertion_block(
-    single_element_test_block_t& _a_test_block,
-    test_runner_t& _a_test_runner,
-    const std::string_view _a_source_representation,
-    const std::source_location& _a_source_location
-) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>)
-{
-    using namespace _ABC_NS_REPORTS;
-    using namespace _ABC_NS_MATCHER;
-    using namespace _ABC_NS_ERRORS;
-    _a_test_block.register_end(_ABC_NS_DS::single_source_t(
-        _a_source_representation, _a_source_location
-    ));
-    _a_test_block.set_processed();
-    assertion_ptr_t<false, T> _l_gur;
-    bool _l_passed{_a_test_block.get_matcher().matcher_result().passed()};
-    bba_inner_assertion_type_t _l_mtr{_a_test_block.get_matcher()};
-    _l_gur = make_unique<matcher_based_assertion_block_t<T>>(
-        _l_passed,
-        _a_test_block.source(),
-        _a_test_runner.get_log_infos(false),
-        _l_mtr,
-        _a_test_block.test_annotation()
-    );
-    _a_test_runner.add_assertion(_l_gur);
-    return_result<T>(_l_passed);
-}
-
-template<
-    typename T
->
-    requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
-__constexpr_imp
-void
-create_assertion_block(
-    const single_element_test_block_t& _a_test_block,
-    test_runner_t& _a_test_runner
-) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>)
-{
-    using namespace _ABC_NS_REPORTS;
-    using namespace _ABC_NS_MATCHER;
-    using namespace _ABC_NS_ERRORS;
-    using namespace std;
-    assertion_ptr_t<false, T> _l_gur;
-    bool _l_passed{_a_test_block.get_matcher().matcher_result().passed()};
-    bba_inner_assertion_type_t _l_mtr{_a_test_block.get_matcher()};
-    _l_gur = make_unique<matcher_based_assertion_block_t<T>>(
-        _l_passed,
-        _a_test_block.source(),
-        _a_test_runner.get_log_infos(false),
-        _l_mtr,
-        _a_test_block.test_annotation()
-    );
-    _a_test_runner.add_assertion(_l_gur);
-    return_result<T>(_l_passed);
 }
 
 template<
@@ -551,5 +462,97 @@ template<
     }
 }
 } // namespace
+
+/*template <typename T, bool Has_Annotation>
+requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
+struct MacroAProxy
+{
+    abc::matcher::matcher_wrapper_t<Has_Annotation> _m_matcher;
+    std::source_location                            _m_source;
+    std::string                                     _m_matcher_str;
+    std::string                                     _m_macro_str;
+
+    MacroAProxy(
+        const abc::matcher::matcher_wrapper_t<Has_Annotation>& _a_matcher,
+        const std::source_location&                            _a_source,
+        const std::string_view                                 _a_matcher_str,
+        const std::string_view                                 _a_macro_str
+    )
+        : _m_matcher(_a_matcher), _m_source(_a_source), _m_macro_str(_a_macro_str), _m_matcher_str(_a_matcher_str)
+    {}
+    ~MacroAProxy()
+    {
+        abc::create_assertion<T>(
+            _m_matcher,
+            _m_macro_str,
+            _m_matcher_str,
+            _m_source,
+            _ABC_NS_GLOBAL::get_this_threads_test_runner_ref()
+        );
+    }
+
+    // Implicit conversion to multi_matcher_t
+    operator assertion_wp_t<T>() const
+    {
+        return abc::make_entity_bba_compatable<T>(
+            _m_matcher, _m_macro_str, _m_source
+        );
+    }
+
+    std::string
+        info() const
+    {
+        return "added via _MACRO_A";
+    }
+};
+template<typename T, bool Has_Annotation>
+static auto make_macroAProxy(
+    const abc::matcher::matcher_wrapper_t<Has_Annotation>& _a_matcher,
+    const std::source_location& _a_source,
+    const std::string_view                                 _a_matcher_str,
+    const std::string_view                                 _a_macro_str
+) -> MacroAProxy<T, Has_Annotation>
+{
+    return MacroAProxy<T,Has_Annotation>(_a_matcher, _a_source, _a_matcher_str, _a_macro_str);
+}
+template <typename T, bool Has_Annotation>
+requires std::derived_from<T, _ABC_NS_REPORTS::static_status_t>
+struct MacroAProxy2
+{
+    std::optional<std::string> _m_msg;
+    ds::single_source_t        _m_source;
+
+    MacroAProxy2(
+        const std::optional<std::string>& _a_msg,
+        const ds::single_source_t&        _a_source
+    )
+        : _m_msg(_a_msg), _m_source(_a_source)
+    {}
+
+    ~MacroAProxy2()
+    {
+        create_static_assertion<T>(
+            _m_msg,
+            _m_source,
+            _ABC_NS_GLOBAL::get_this_threads_test_runner_ref()
+        );
+    }
+
+    // Implicit conversion to multi_matcher_t
+    operator assertion_wp_t<T>() const
+    {
+        return make_entity_bba_compatable<T>(
+            _m_msg,
+            _m_source.source_code_representation(),
+            _m_source.source_location()
+        );
+    }
+
+    std::string
+        info() const
+    {
+        return "added via _MACRO_A";
+    }
+};*/
 
 _END_ABC_NS

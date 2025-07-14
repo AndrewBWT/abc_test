@@ -8,6 +8,7 @@ G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/test_runne
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/logging/macros.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/logging/log_msg.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/test_assertions/test_block.hpp
+G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/test_assertions/macro_objects.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/test_assertions/macros.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/test_assertions/functions.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/ds/data_generator_memoization/indexed_data_generator_collection_memoized_element.hpp

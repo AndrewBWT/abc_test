@@ -9,7 +9,7 @@ int
         char* argv[]
     )
 {
-    // This code will process the arguments, and set up the testing enviornment.
+    // This code will process the command line arguments, and set up the testing enviornment.
     return abc::run_test_suite_using_command_line_args(argc, argv);
 }
 
@@ -27,7 +27,7 @@ inline int
 // test, while a test's path provides a way of organizing tests.
 _TEST_CASE(
     // Note the extra bracket after "abc::test_case_t". This ensures the commas
-    // used to separate test_case_t's member variables are processed correctly.
+    // used to separate test_case_t's member variables are not consumed by the macro.
     abc::test_case_t(
         {.name = "Testing Fibonacci function", .path = "tests::fib"}
     )

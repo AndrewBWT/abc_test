@@ -19,11 +19,23 @@ If any of these features have piqued your interest, `abc_test` may be of interes
 
 ## Examples ##
 
-Below we show a minimal example, which shows how easy it is to begin working with `abc_test`.
+Nearly all of the examples we show are taken from the `examples/include/abc_test_examples/readme.hpp` [file](examples/include/abc_test_examples/readme.hpp), unless stated otherwise. 
+
+### Minimal Example ###
+
+Below we show the simplest example, which illustrates how easy it is to begin working with `abc_test`.
 
 The source for this example can be found [here](scripts/script_to_use_library/main_to_cpy.cpp).
 
 <!-- inject:scripts/script_to_use_library/main_to_cpy.cpp:initial_example -->
+
+[Here]() the user can see the output from running this code.
+
+### Unit Testing Example ###
+
+Through the first example is valid testing code in `abc_test`, it relies on the user re-writing the same statement each time they want to test a new value, and would need to be re-compiled each time the user wants to test a new value.
+
+Below we show how easy it is to use a data generator to read files from a user-defined file. The data values can then be used to write assertions.
 
 This next example shows the user how to write assertions.
 

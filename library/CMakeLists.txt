@@ -24,6 +24,7 @@ if(NOT DEFINED ABC_TEST_LIBRARY_INCLUDED)
     include/abc_test/core/logging/macros.hpp 
     include/abc_test/core/logging/log_msg.hpp
     include/abc_test/core/test_assertions/test_block.hpp
+    include/abc_test/core/test_assertions/macro_objects.hpp
     include/abc_test/core/test_assertions/macros.hpp
     include/abc_test/core/test_assertions/functions.hpp
     # Subfolder contains objects and functions pertaining to how repetition data is stored.
