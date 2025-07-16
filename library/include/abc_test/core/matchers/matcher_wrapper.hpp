@@ -312,7 +312,7 @@ template <bool Has_Annotation>
 template <bool B, typename>
 __no_constexpr_imp
     matcher_wrapper_t<Has_Annotation>::matcher_wrapper_t() noexcept
-    : matcher_wrapper_t(mk_matcher_result<_ABC_NS_REPORTS::pass_t>())
+    : matcher_wrapper_t(true_matcher())
 {}
 
 template <bool Has_Annotation>

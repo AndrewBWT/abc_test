@@ -35,7 +35,7 @@ Unlike all the other examples in this section, this code comes from the `scripts
 
 Through the example above is valid testing code in `abc_test`, it relies on the user re-writing the same statement each time they want to test a new value, which in turn would require re-compilation.
 
-`abc_test` contains many different types of data generators which can be used to loop through data. One of these data generators is the file-based data generator. Below we show an example of its use.
+`abc_test` contains many different types of data generators which can be used to loop through data. One of these data generators is the file-based data generator. It can be used to write unit tests, where the values to test are taken from a file. Below we show an example of this.
 
 <!-- inject:examples/include/abc_test_examples/readme.hpp:unit_test_example -->
 
@@ -58,6 +58,12 @@ Property testing and fuzzy testing allow the user to either test some property a
 Below we show an example which tests a user-defined function `users_mid_point`. It performs unit testing, fuzzy testing and property testing.
 
 <!-- inject:examples/include/abc_test_examples/readme.hpp:property_test_example -->
+
+### Detailed Assertion Examples ###
+
+Data generators can be used to perform fuzzy testing. That it to say, a function can be tested to ensure that it doesn't throw any exceptions. 
+
+<!-- inject:examples/include/abc_test_examples/readme.hpp:assertion_examples -->
 
 ## Installation ##
 

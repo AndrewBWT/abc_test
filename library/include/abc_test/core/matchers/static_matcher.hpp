@@ -19,7 +19,8 @@ template <typename Assertion_Status>
 requires std::same_as<Assertion_Status, _ABC_NS_REPORTS::pass_t>
          || std::same_as<Assertion_Status, _ABC_NS_REPORTS::fail_t>
 __constexpr matcher_result_t
-    mk_matcher_result() noexcept;
+    mk_matcher_result(
+    const std::u8string_view _a_str) noexcept;
  // namespace
 
 _END_ABC_MATCHER_NS
@@ -31,6 +32,8 @@ _BEGIN_ABC_NS
  */
 __no_constexpr_or_inline matcher_t
     true_matcher() noexcept;
+__no_constexpr_or_inline matcher_t
+true_matcher(const std::u8string_view _a_msg) noexcept;
 /*!
  * @brief Function creates a matcher_t containing a failing static_matcher_t
  * object.
@@ -38,6 +41,8 @@ __no_constexpr_or_inline matcher_t
  */
 __no_constexpr_or_inline matcher_t
     false_matcher() noexcept;
+__no_constexpr_or_inline matcher_t
+false_matcher(const std::u8string_view _a_msg) noexcept;
 _END_ABC_NS
 
 _BEGIN_ABC_MATCHER_NS
@@ -45,16 +50,16 @@ template <typename Assertion_Status>
 requires std::same_as<Assertion_Status, _ABC_NS_REPORTS::pass_t>
          || std::same_as<Assertion_Status, _ABC_NS_REPORTS::fail_t>
 __constexpr_imp matcher_result_t
-    mk_matcher_result() noexcept
+    mk_matcher_result(const std::u8string_view _a_str) noexcept
 {
     using namespace reports;
     if constexpr (std::same_as<Assertion_Status, pass_t>)
     {
-        return matcher_result_t(true, matcher_result_infos_t(u8"true"));
+        return matcher_result_t(true, matcher_result_infos_t(_a_str));
     }
     else if constexpr (std::same_as<Assertion_Status, fail_t>)
     {
-        return matcher_result_t(false, matcher_result_infos_t(u8"false"));
+        return matcher_result_t(false, matcher_result_infos_t(_a_str));
     }
     else
     {
