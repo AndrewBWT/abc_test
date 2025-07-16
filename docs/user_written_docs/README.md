@@ -59,11 +59,12 @@ Below we show an example which tests a user-defined function `users_mid_point`. 
 
 <!-- inject:examples/include/abc_test_examples/readme.hpp:property_test_example -->
 
-### Detailed Assertion Examples ###
+### Fuzzy Testing Example ###
 
-Data generators can be used to perform fuzzy testing. That it to say, a function can be tested to ensure that it doesn't throw any exceptions. 
+Fuzzy testing is used to test functions with many different values, in essence trying to find examples where the code "breaks". In C++, this behaviour is typically accompanied by an exception being thrown. Below we show an example which performs fuzzy testing on the `users_average` function.
 
-<!-- inject:examples/include/abc_test_examples/readme.hpp:assertion_examples -->
+<!-- inject:examples/include/abc_test_examples/readme.hpp:fuzzy_test_example -->
+
 
 ## Installation ##
 

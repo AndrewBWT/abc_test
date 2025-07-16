@@ -68,8 +68,9 @@ _TEST_CASE(
     using namespace abc;
     auto property_tests
         = _MULTI_MATCHER("Property tests for users_midpoint function");
-    // We are testing thatusers_midpoint returns the same result as
-    // std::midpoint.
+    // We are testing that users_midpoint returns the same result as
+    // std::midpoint, and that reversing the arguments to users_midpoint
+    // produces the same result.
 
     // This for loop uses two generators. They are chained together using the &
     // operator. The first generator creates random data. By default it creates
@@ -81,77 +82,77 @@ _TEST_CASE(
                  from_m_to_n(std::make_pair(-2, -2), std::make_pair(2, 2))
              ))
     {
-        // This streams the result of checking that the result of users_midpoint
-        // is the same as std::midpoint.
-        property_tests << _CHECK_EXPR(
-            users_midpoint(arg1, arg2) == std::midpoint(arg1, arg2)
+        auto result = users_midpoint(arg1, arg2);
+        // In abc_test, a matcher represents an assertion, and the _CHECK macro
+        // is used to register it with the testing framework.
+        // The _EXPR macro allows comparison operators to be used to construct a
+        // matcher. Matchers can also be used with the boolean operators &&, ||
+        // and ! to express logical relationships between assertions.
+        property_tests << _CHECK(
+            _EXPR(result == std::midpoint(arg1, arg2))
+            && _EXPR(result == users_midpoint(arg2, arg1))
         );
     }
     _CHECK(property_tests);
 }
 
 // </property_test_example>
-// <assertion_examples>
+
+// <fuzzy_test_example>
+inline float
+    users_average(
+        const std::vector<float>& elements
+    )
+{
+    float sum{0.0};
+    for (auto&& element : elements)
+    {
+        sum += element;
+    }
+    return sum / static_cast<float>(elements.size());
+}
+
 _TEST_CASE(
-    abc::test_case_t({.name = "Assertion examples", .path = "tests::matchers"})
+    abc::test_case_t(
+        {.name = "Testing users_average function", .path = "tests::average"}
+    )
 )
 {
     using namespace abc;
-    // Previously we used the macro _CHECK_EXPR to write assertions.
-    _CHECK_EXPR(1 == 2);
-    // This is shorthand, which combines the _CHECK and _EXPR macros. The above
-    // could be written as
-    _CHECK(_EXPR(1 == 2));
-    // abc_test is a matcher-based testing library. Matchers on their own encode
-    // an assertion, however they do not report their result to the testing
-    // framework. This expression on its own wouldn't report anything.
-    matcher_t matcher1 = _EXPR(2 == 2);
-    // However, the user can then write the following expression so that the
-    // matcher is processed by the testing framework.
-    _CHECK(matcher1);
-    // There is another macro, _REQUIRE, which will terminate the currently
-    // running test case if it fails.
-    _REQUIRE(matcher1);
+    auto fuzzy_tests = _MULTI_MATCHER("Fuzzy tests for users_average function");
+    // We are testing that users_average works with a range of values.
 
-    // The _EXPR macro allows the comparison operators to be used to write
-    // assertions. It does this using some macro trickery, which we will not
-    // describe here - though it is very similar to how the Catch2 testing
-    // framework works.
-
-    // The user can write their own matchers, or use the
-    // matchers included with abc_test. For example, the matcher "contains"
-    // checks if a range includes a specified element.
-    std::vector<int> to_check = {1, 2, 3};
-    _CHECK(contains(to_check, 4));
-
-    // Matchers can also be annotated.
-    _CHECK(annotate(contains(to_check, 4), u8"Testing that {1,2,3} contains 4")
-    );
-
-    // Matchers can also be used with the logic operators &&, || and ! to encode
-    // more verbose tests into a single assertion. The binary logic operators &&
-    // and || will always evaluate both subexpressions, so the user may find
-    // their logic has to be split up in some circumstances.
-    _CHECK(_EXPR(1 == 2) && _EXPR(2 == 3) || _EXPR(4 == 5) && ! _EXPR(1 == 2));
-
-    // As matchers are objects which can be manipulated and reassigned before
-    // being processed by the underlying test framework, the user is able to
-    // write tests for segments of code where the control flow may not be
-    // sequential - for example, when working with exceptions.
-
-    // The functions true_matcher and false_matcher encode a matcher which
-    // passes or fails respectively. A string can be provided as an argument,
-    // serving as a message for the matcher's output.
-    matcher_t        matcher3 = true_matcher(u8"No exception was thrown");
-    std::vector<int> to_check_2;
-    try
+    for (auto& vect :
+         generate_data_randomly<std::vector<float>>()
+             & enumerate_data(from_m_to_n(
+                 std::vector<float>{}, std::vector<float>(1, 100.0f)
+             )))
     {
-        int x = to_check_2.at(0);
+        // matcher_t is the object which contains an assertion. Until it is put
+        // into the _CHECK or _REQUIRE macro, the test framework will not
+        // process it.
+
+        // Prevoiusly we have used the macro _EXPR to encode a matcher using a
+        // comparison operator, however abc_test also comes with functions that
+        // can be used to build matchers.
+
+        // true_matcher encodes an assertion which passes. Its string argument
+        // can be used to encode a message associated with the matcher.
+        matcher_t exception_matcher = true_matcher(u8"No exception was thrown");
+        try
+        {
+            do_not_optimise(users_average(vect));
+        }
+        catch (const std::exception& exception)
+        {
+            // The false_matcher function is similar to the true_matcher
+            // exception, except it encodes a false assertion.
+            exception_matcher
+                = false_matcher(u8"An unexpected exception was thrown");
+        }
+        fuzzy_tests << _CHECK(exception_matcher);
     }
-    catch (const std::exception& exception)
-    {
-        matcher3 = false_matcher(u8"Exception encountered");
-    }
-    _CHECK(matcher3);
+    _CHECK(fuzzy_tests);
 }
-// </assertion_examples>
+
+// </property_test_example>
