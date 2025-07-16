@@ -117,15 +117,19 @@ _TEST_CASE(
 // (7, 14)
 ```
 
-If re-running the test suite.
+If the user runs the following command (replace `executable.exe` with the path to the executable of `abc_test_examples`).
 
-Below we show the output from running the `examples` test executable using the following command line arguments. In essence, it will only run the above test case.
+```
+data
+```
 
+The following output is produced.
 
+```
+hi
+```
 
-The user can re-run the test using the following command line arguments. 
-
-The repetition information is taken from the results above. By running the test suite like this, only the values which issued a test assertion failure are re-ran from the file "unit_tests". Below we show the output from this re-running of the test code.
+Here, the only assertions which are re-ran are those which fail the test. `abc_test` tracks information about what data generators are currently being iterated through and which assertions failed, and can produce a "seed" which can be used to re-run the test, but with the data generators only re-producing those values which caused an assertion to fail. In the command line arguments shown above, this "seed" is the long string of hex digits.
 
 All data generators in `abc_test` have this functionality. It can allow the user to configure their test executable in such a manner so that only values which fail an assertion are re-generated from a data generator.
 
@@ -258,23 +262,44 @@ _TEST_CASE(
 
 ```
 
+If the reader would like to see more examples of `abc_test`, we recommend reading the hand-written documentation and the documentation generated using Doxygen. 
+
 ## Installation ##
 
-`abc_test` targets C++23. It has been built using `cmake` and, for now at-least, we recommend using `cmake` to install it.
+`abc_test` targets C++23. Currently `abc_test` requires the `fmt` library. `abc_test` is designed to be built using `cmake`. Below is an example `CMakeLists.txt` file, which builds `abc_test` as part of a user's project.
 
-Given a 
+```
+cmake_minimum_required(VERSION 3.14)
+set(CMAKE_CXX_STANDARD 23)
+project(my_executable)
+include(FetchContent)
+FetchContent_Declare(
+  fmt
+  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+  GIT_TAG 11.2.0
+)
+FetchContent_MakeAvailable(fmt)
+FetchContent_Declare(
+  abc_test
+  GIT_REPOSITORY https://github.com/abc_test/abc_test.git
+  GIT_TAG 0.0.1
+)
+FetchContent_MakeAvailable(abc_test)
 
-See above for the environments it has been tested in. To install it run the following from the main folder.
+add_executable(my_executable main.cpp)
+target_link_libraries(my_executable PRIVATE abc_test)
+```
+
+Then, navigating to the root directory of `my_executable`, run the following commands.
 
 ```
 mkdir build && cd build
 cmake ..
 ```
 
-`abc_test` has been compiled under Windows using the MSVC and Clang compilers. The MSVC compiler in question is that which ships with 17.13.5. The Clang compiler used is version 18.1.8.
+We have tested the above script in Windows using the MSVC and Clang compilers, built using Visual Studio 17.13.5. The Clang compiler version used was 18.1.8. So it should be buildable, and atleast the minimal example should compile and run.
 
-`abc_test` has also been built under Linux, specifically Ubuntu 24. It was compiled using the GNU compiler on that platform.
-
+We have also tested it under Ubuntu 24.04 using the GNU and Clang compilers. The GNU compiler version used was 13.3.0, and the Clang compiler version used was 20.1.7. 
 
 ## Roadmap ##
 
@@ -283,3 +308,10 @@ As stated in the introduction, `abc_test` is currently a personal project. It wa
 Some of the code is quite "hacky", and could do with being re-written. I am currently in the process of writing tests for `abc_test` in `abc_test`, which has spurred on adding new features, while also allowing me to fix bugs that I find.
 
 ## Licence ##
+
+`abc_test` is distributed with the MIT licence. In the `licences` subfolder, we include licences shipped with other source code we have included and/or modified.
+
+Specifically:
+
+- `abc_test` uses the biginteger library [found here](https://github.com/benlau/biginteger/tree/master). We have augmented the code somewhat by adding constructors for the `long long` and `unsigned long long` types. We have also changed the names of the headers and cpp files, to better suit our naming convention.
+- `abc_test` includes a version of the `DoNotOptimize` function, included in Google Benchmark library [found here](https://github.com/google/benchmark/tree/main). We have augmented the code for our needs, however the original code was copied from their work.
