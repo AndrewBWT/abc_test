@@ -21,15 +21,17 @@ public:
         equal(const T& _a_l, const T& _a_r) const noexcept;
     __constexpr virtual bool
         increment(
-            T&                      _a_element,
-            enumerate_index_t&      _a_n_times_to_increment,
-            const std::optional<T>& _a_max_value
+            T&                 _a_element,
+            enumerate_index_t& _a_n_times_to_increment,
+            const T&           _a_min_value,
+            const T&           _a_max_value
         );
     __constexpr virtual bool
         decrement(
-            T&                      _a_element,
-            enumerate_index_t&      _a_n_times_to_increment,
-            const std::optional<T>& _a_max_value
+            T&                 _a_element,
+            enumerate_index_t& _a_n_times_to_increment,
+            const T&           _a_min_value,
+            const T&           _a_max_value
         );
     __constexpr virtual enumeration_diff_t
         difference(const T& _a_arg1, const T& _a_arg2) noexcept;
@@ -90,9 +92,10 @@ __constexpr_imp bool
 template <typename T>
 __constexpr bool
     default_enumeration_t<T>::increment(
-        T&                      _a_element,
-        enumerate_index_t&      _a_n_times_to_increment,
-        const std::optional<T>& _a_max_value
+        T&                 _a_element,
+        enumerate_index_t& _a_n_times_to_increment,
+        const T&           _a_min_value,
+        const T&           _a_max_value
     )
 {
     __STATIC_ASSERT(
@@ -106,9 +109,10 @@ __constexpr bool
 template <typename T>
 __constexpr bool
     default_enumeration_t<T>::decrement(
-        T&                      _a_element,
-        enumerate_index_t&      _a_n_times_to_increment,
-        const std::optional<T>& _a_max_value
+        T&                 _a_element,
+        enumerate_index_t& _a_n_times_to_increment,
+        const T&           _a_min_value,
+        const T&           _a_max_value
     )
 {
     __STATIC_ASSERT(
@@ -204,36 +208,27 @@ struct default_enumeration_t<T> : public enumeration_base_t<T>
 
     __constexpr bool
         increment(
-            T&                      _a_element,
-            enumerate_index_t&      _a_times_called,
-            const std::optional<T>& _a_max_value = std::optional<T>{}
+            T&                 _a_element,
+            enumerate_index_t& _a_times_called,
+            const T&           _a_min_value,
+            const T&           _a_max_value
         )
     {
         using namespace std;
         const T _l_current_idx{_a_element};
-        if (_a_max_value.has_value())
+        const T _l_max_times_called{
+            static_cast<T>((_a_max_value - _l_current_idx) / _m_difference)
+        };
+        if (_a_times_called > _l_max_times_called)
         {
-            const T _l_max_times_called{static_cast<T>(
-                (_a_max_value.value() - _l_current_idx) / _m_difference
-            )};
-            if (_a_times_called > _l_max_times_called)
+            if (_l_max_times_called == 0)
             {
-                if (_l_max_times_called == 0)
-                {
-                    return false;
-                }
-                else
-                {
-                    _a_element
-                        = _a_element + _m_difference * _l_max_times_called;
-                    _a_times_called -= _l_max_times_called;
-                    return true;
-                }
+                return false;
             }
             else
             {
-                _a_element      = _a_element + _m_difference * _a_times_called;
-                _a_times_called = 0;
+                _a_element = _a_element + _m_difference * _l_max_times_called;
+                _a_times_called -= _l_max_times_called;
                 return true;
             }
         }
@@ -247,36 +242,27 @@ struct default_enumeration_t<T> : public enumeration_base_t<T>
 
     __constexpr bool
         decrement(
-            T&                      _a_element,
-            enumerate_index_t&      _a_times_called,
-            const std::optional<T>& _a_max_value = std::optional<T>{}
+            T&                 _a_element,
+            enumerate_index_t& _a_times_called,
+            const T&           _a_min_value,
+            const T&           _a_max_value
         )
     {
         using namespace std;
         const T _l_current_idx{_a_element};
-        if (_a_max_value.has_value())
+        const T _l_max_times_called{
+            static_cast<T>((_l_current_idx - _a_max_value) / _m_difference)
+        };
+        if (_a_times_called > _l_max_times_called)
         {
-            const T _l_max_times_called{static_cast<T>(
-                (_l_current_idx - _a_max_value.value()) / _m_difference
-            )};
-            if (_a_times_called > _l_max_times_called)
+            if (_l_max_times_called == 0)
             {
-                if (_l_max_times_called == 0)
-                {
-                    return false;
-                }
-                else
-                {
-                    _a_element
-                        = _a_element - _m_difference * _l_max_times_called;
-                    _a_times_called += _l_max_times_called;
-                    return true;
-                }
+                return false;
             }
             else
             {
-                _a_element      = _a_element - _m_difference * _a_times_called;
-                _a_times_called = 0;
+                _a_element = _a_element - _m_difference * _l_max_times_called;
+                _a_times_called += _l_max_times_called;
                 return true;
             }
         }
@@ -541,9 +527,10 @@ struct default_enumeration_t<T> : public enumeration_base_t<T>
 
     __constexpr bool
         increment(
-            T&                      _a_element,
-            enumerate_index_t&      _a_times_called,
-            const std::optional<T>& _a_max_value = std::optional<T>{}
+            T&                 _a_element,
+            enumerate_index_t& _a_times_called,
+            const T&           _a_min_value,
+            const T&           _a_max_value
         )
     {
         using namespace std;
@@ -644,9 +631,10 @@ struct default_enumeration_t<T> : public enumeration_base_t<T>
 
     __constexpr bool
         decrement(
-            T&                      _a_element,
-            enumerate_index_t&      _a_times_called,
-            const std::optional<T>& _a_max_value = std::optional<T>{}
+            T&                 _a_element,
+            enumerate_index_t& _a_times_called,
+            const T&           _a_min_value,
+            const T&           _a_max_value
         )
     {
         using namespace std;
@@ -795,15 +783,17 @@ struct default_enumeration_t<bool> : public enumeration_base_t<bool>
         equal(const bool& _a_l, const bool& _a_r) const noexcept;
     __no_constexpr bool
         increment(
-            bool&                      _a_element,
-            enumerate_index_t&         _a_n_times_to_increment,
-            const std::optional<bool>& _a_max_value
+            bool&              _a_element,
+            enumerate_index_t& _a_n_times_to_increment,
+            const bool&        _a_min_value,
+            const bool&        _a_max_value
         );
     __no_constexpr bool
         decrement(
-            bool&                      _a_element,
-            enumerate_index_t&         _a_n_times_to_increment,
-            const std::optional<bool>& _a_max_value
+            bool&              _a_element,
+            enumerate_index_t& _a_n_times_to_increment,
+            const bool&        _a_min_value,
+            const bool&        _a_max_value
         );
 
     __no_constexpr_imp enumeration_diff_t
@@ -830,6 +820,7 @@ struct default_enumeration_t<std::array<T, N>>
 private:
     enumeration_schema_t<T> _m_enumerate;
     std::size_t             _m_n_jumps;
+    using value_type_t = std::array<T, N>;
 public:
     __constexpr_imp
         default_enumeration_t(
@@ -837,28 +828,30 @@ public:
             const enumeration_schema_t<T>& _a_enumerate = all_values<T>()
         );
     __constexpr_imp virtual bool
-        less_than(const std::array<T, N>& _a_l, const std::array<T, N>& _a_r)
+        less_than(const value_type_t& _a_l, const value_type_t& _a_r)
             const noexcept;
     __constexpr_imp virtual bool
-        equal(const std::array<T, N>& _a_l, const std::array<T, N>& _a_r)
+        equal(const value_type_t& _a_l, const value_type_t& _a_r)
             const noexcept;
     __constexpr_imp bool
         increment(
-            std::array<T, N>&                      _a_array,
-            enumerate_index_t&                     _a_n_times_to_increment,
-            const std::optional<std::array<T, N>>& _a_max_value
+            value_type_t&       _a_array,
+            enumerate_index_t&  _a_n_times_to_increment,
+            const value_type_t& _a_min_value,
+            const value_type_t& _a_max_value
         );
     __constexpr_imp bool
         decrement(
-            std::array<T, N>&                      _a_array,
-            enumerate_index_t&                     _a_n_times_to_increment,
-            const std::optional<std::array<T, N>>& _a_max_value
+            value_type_t&       _a_array,
+            enumerate_index_t&  _a_n_times_to_increment,
+            const value_type_t& _a_min_value,
+            const value_type_t& _a_max_value
         );
 
     __constexpr virtual enumeration_diff_t
         difference(
-            const std::array<T, N>& _a_arg1,
-            const std::array<T, N>& _a_arg2
+            const value_type_t& _a_arg1,
+            const value_type_t& _a_arg2
         ) noexcept
     {
         return {0, 0};
@@ -879,8 +872,7 @@ public:
             const enumeration_schema_t<T>& _a_enumerate
             = all_values<T>(default_enumeration<T>())
         )
-        : _m_enumerate(_a_enumerate)
-        , _m_n_jumps(_a_n_jumps)
+        : _m_enumerate(_a_enumerate), _m_n_jumps(_a_n_jumps)
     {}
 
     __constexpr_imp virtual bool
@@ -935,9 +927,10 @@ public:
 
     __constexpr_imp bool
         increment(
-            std::optional<T>&                      _a_opt,
-            enumerate_index_t&                     _a_n_times_to_increment,
-            const std::optional<std::optional<T>>& _a_max_value
+            std::optional<T>&  _a_opt,
+            enumerate_index_t& _a_n_times_to_increment,
+            const T&           _a_min_value,
+            const T&           _a_max_value
         )
     {
         using namespace std;
@@ -968,9 +961,10 @@ public:
 
     __constexpr_imp bool
         decrement(
-            std::optional<T>&                      _a_opt,
-            enumerate_index_t&                     _a_n_times_to_increment,
-            const std::optional<std::optional<T>>& _a_min_value
+            std::optional<T>&  _a_opt,
+            enumerate_index_t& _a_n_times_to_increment,
+            const T&           _a_min_value,
+            const T&           _a_max_value
         )
     {
         using namespace std;
@@ -1037,6 +1031,7 @@ struct default_enumeration_t<std::vector<T>>
 private:
     enumeration_schema_t<T> _m_enumerate;
     std::size_t             _m_n_jumps;
+    using value_type_t = std::vector<T>;
 public:
     __constexpr_imp
         default_enumeration_t(const enumeration_schema_t<T>& _a_enumerate);
@@ -1046,7 +1041,7 @@ public:
             const enumeration_schema_t<T>& _a_schema  = all_values<T>()
         );
     __constexpr_imp virtual bool
-        less_than(const std::vector<T>& _a_l, const std::vector<T>& _a_r)
+        less_than(const value_type_t& _a_l, const value_type_t& _a_r)
             const noexcept;
     __constexpr_imp bool
         is_return_value_within_range(
@@ -1059,26 +1054,28 @@ public:
             enumerate_index_t& _a_n_times_to_increment
         ) const noexcept;
     __constexpr_imp virtual bool
-        equal(const std::vector<T>& _a_l, const std::vector<T>& _a_r)
+        equal(const value_type_t& _a_l, const value_type_t& _a_r)
             const noexcept;
 
     __constexpr_imp bool
         increment(
-            std::vector<T>&                      _a_array,
-            enumerate_index_t&                   _a_n_times_to_increment,
-            const std::optional<std::vector<T>>& _a_max_value
+            value_type_t&       _a_array,
+            enumerate_index_t&  _a_n_times_to_increment,
+            const value_type_t& _a_min_value,
+            const value_type_t& _a_max_value
         );
     __constexpr_imp bool
         decrement(
-            std::vector<T>&                      _a_array,
-            enumerate_index_t&                   _a_n_times_to_increment,
-            const std::optional<std::vector<T>>& _a_max_value
+            value_type_t&       _a_array,
+            enumerate_index_t&  _a_n_times_to_increment,
+            const value_type_t& _a_min_value,
+            const value_type_t& _a_max_value
         );
 
     __constexpr virtual enumeration_diff_t
         difference(
-            const std::vector<T>& _a_arg1,
-            const std::vector<T>& _a_arg2
+            const value_type_t& _a_arg1,
+            const value_type_t& _a_arg2
         ) noexcept
     {
         using namespace std;
@@ -1191,9 +1188,10 @@ public:
 
     __constexpr virtual bool
         increment(
-            T&                      _a_element,
-            enumerate_index_t&      _a_n_times_to_increment,
-            const std::optional<T>& _a_max_value
+            T&                 _a_element,
+            enumerate_index_t& _a_n_times_to_increment,
+            const T&           _a_min_value,
+            const T&           _a_max_value
         )
     {
         const auto& _l_ti{utility::get_thread_local_enumerate_enum_helper<T>()};
@@ -1204,9 +1202,10 @@ public:
 
     __constexpr virtual bool
         decrement(
-            T&                      _a_element,
-            enumerate_index_t&      _a_n_times_to_increment,
-            const std::optional<T>& _a_max_value
+            T&                 _a_element,
+            enumerate_index_t& _a_n_times_to_increment,
+            const T&           _a_min_value,
+            const T&           _a_max_value
         )
     {
         const auto& _l_ti{utility::get_thread_local_enumerate_enum_helper<T>()};
@@ -1391,9 +1390,10 @@ __constexpr_imp bool
 
 __no_constexpr_imp bool
     default_enumeration_t<bool>::increment(
-        bool&                      _a_element,
-        enumerate_index_t&         _a_n_times_to_increment,
-        const std::optional<bool>& _a_max_value
+        bool&              _a_element,
+        enumerate_index_t& _a_n_times_to_increment,
+        const bool&        _a_min_value,
+        const bool&        _a_max_value
     )
 {
     if (_a_n_times_to_increment > 0 && _a_element == false
@@ -1411,9 +1411,10 @@ __no_constexpr_imp bool
 
 __no_constexpr_imp bool
     default_enumeration_t<bool>::decrement(
-        bool&                      _a_element,
-        enumerate_index_t&         _a_n_times_to_increment,
-        const std::optional<bool>& _a_max_value
+        bool&              _a_element,
+        enumerate_index_t& _a_n_times_to_increment,
+        const bool&        _a_min_value,
+        const bool&        _a_max_value
     )
 {
     if (_a_n_times_to_increment > 0 && _a_element == true
@@ -1441,8 +1442,8 @@ __constexpr_imp
 template <typename T, std::size_t N>
 __constexpr_imp bool
     default_enumeration_t<std::array<T, N>>::less_than(
-        const std::array<T, N>& _a_l,
-        const std::array<T, N>& _a_r
+        const value_type_t& _a_l,
+        const value_type_t& _a_r
     ) const noexcept
 {
     for (size_t _l_idx{N}; _l_idx > 0; --_l_idx)
@@ -1462,8 +1463,8 @@ __constexpr_imp bool
 template <typename T, std::size_t N>
 __constexpr_imp bool
     default_enumeration_t<std::array<T, N>>::equal(
-        const std::array<T, N>& _a_l,
-        const std::array<T, N>& _a_r
+        const value_type_t& _a_l,
+        const value_type_t& _a_r
     ) const noexcept
 {
     for (size_t _l_idx{N}; _l_idx > 0; --_l_idx)
@@ -1483,9 +1484,10 @@ __constexpr_imp bool
 template <typename T, std::size_t N>
 __constexpr_imp bool
     default_enumeration_t<std::array<T, N>>::increment(
-        std::array<T, N>&                      _a_array,
-        enumerate_index_t&                     _a_n_times_to_increment,
-        const std::optional<std::array<T, N>>& _a_max_value
+        value_type_t&       _a_array,
+        enumerate_index_t&  _a_n_times_to_increment,
+        const value_type_t& _a_min_value,
+        const value_type_t& _a_max_value
     )
 {
     while (_a_n_times_to_increment > 0)
@@ -1549,9 +1551,10 @@ __constexpr_imp bool
 template <typename T, std::size_t N>
 __constexpr_imp bool
     default_enumeration_t<std::array<T, N>>::decrement(
-        std::array<T, N>&                      _a_array,
-        enumerate_index_t&                     _a_n_times_to_increment,
-        const std::optional<std::array<T, N>>& _a_max_value
+        value_type_t&       _a_array,
+        enumerate_index_t&  _a_n_times_to_increment,
+        const value_type_t& _a_min_value,
+        const value_type_t& _a_max_value
     )
 {
     while (_a_n_times_to_increment > 0)
@@ -1633,8 +1636,8 @@ __constexpr_imp
 template <typename T>
 __constexpr_imp bool
     default_enumeration_t<std::vector<T>>::less_than(
-        const std::vector<T>& _a_l,
-        const std::vector<T>& _a_r
+        const value_type_t& _a_l,
+        const value_type_t& _a_r
     ) const noexcept
 {
     if (_a_l.size() < _a_r.size())
@@ -1723,8 +1726,8 @@ __constexpr_imp void
 template <typename T>
 __constexpr_imp bool
     default_enumeration_t<std::vector<T>>::equal(
-        const std::vector<T>& _a_l,
-        const std::vector<T>& _a_r
+        const value_type_t& _a_l,
+        const value_type_t& _a_r
     ) const noexcept
 {
     if (_a_l.size() < _a_r.size())
@@ -1755,9 +1758,10 @@ __constexpr_imp bool
 template <typename T>
 __constexpr_imp bool
     default_enumeration_t<std::vector<T>>::increment(
-        std::vector<T>&                      _a_array,
-        enumerate_index_t&                   _a_n_times_to_increment,
-        const std::optional<std::vector<T>>& _a_max_value
+        value_type_t&       _a_array,
+        enumerate_index_t&  _a_n_times_to_increment,
+        const value_type_t& _a_min_value,
+        const value_type_t& _a_max_value
     )
 {
     // Each "increment" contains "_m_n_jumps" in it. Multiply by this amount.
@@ -1811,9 +1815,10 @@ __constexpr_imp bool
 template <typename T>
 __constexpr_imp bool
     default_enumeration_t<std::vector<T>>::decrement(
-        std::vector<T>&                      _a_array,
-        enumerate_index_t&                   _a_n_times_to_increment,
-        const std::optional<std::vector<T>>& _a_max_value
+        value_type_t&       _a_array,
+        enumerate_index_t&  _a_n_times_to_increment,
+        const value_type_t& _a_min_value,
+        const value_type_t& _a_max_value
     )
 {
     while (_a_n_times_to_increment > 0)
@@ -1932,15 +1937,17 @@ public:
             const noexcept;
     __constexpr virtual bool
         increment(
-            value_type_t&                      _a_element,
-            enumerate_index_t&                 _a_n_times_to_increment,
-            const std::optional<value_type_t>& _a_max_value
+            value_type_t&       _a_element,
+            enumerate_index_t&  _a_n_times_to_increment,
+            const value_type_t& _a_min_value,
+            const value_type_t& _a_max_value
         );
     __constexpr virtual bool
         decrement(
-            value_type_t&                      _a_element,
-            enumerate_index_t&                 _a_n_times_to_increment,
-            const std::optional<value_type_t>& _a_max_value
+            value_type_t&       _a_element,
+            enumerate_index_t&  _a_n_times_to_increment,
+            const value_type_t& _a_min_value,
+            const value_type_t& _a_max_value
         );
     __constexpr virtual enumeration_diff_t
         difference(const value_type_t& _a_arg1, const value_type_t& _a_arg2)
@@ -1981,6 +1988,142 @@ private:
             std::array<enumerate_index_t, std::tuple_size<value_type_t>{}>&
                 _a_divisors
         ) const noexcept;
+};
+
+template <typename T, typename U>
+struct default_enumeration_t<std::pair<T, U>>
+    : public enumeration_base_t<std::pair<T, U>>
+{
+public:
+    using value_type_t = std::pair<T, U>;
+
+    __constexpr
+    default_enumeration_t(
+        enumeration_schema_t<T>        _a_enumerator_t,
+        const enumeration_schema_t<U>& _a_enumerator_u
+    ) noexcept
+        : _m_enumeration_schemas(make_pair(_a_enumerator_t, _a_enumerator_u))
+    {}
+
+    __constexpr
+    default_enumeration_t() noexcept
+        : _m_enumeration_schemas(std::make_pair(
+              all_values<T>(default_enumeration<T>()),
+              all_values<U>(default_enumeration<U>())
+          ))
+    {}
+
+    __constexpr_imp virtual bool
+        less_than(
+            const value_type_t& _a_l,
+            const value_type_t& _a_r
+        ) const noexcept
+    {
+        if (_m_enumeration_schemas.first->less_than(_a_l.first, _a_r.first))
+        {
+            return true;
+        }
+        else if (_m_enumeration_schemas.first->equal(_a_l.first, _a_r.first))
+        {
+            return _m_enumeration_schemas.second->less_than(
+                _a_l.second, _a_r.second
+            );
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    __constexpr_imp virtual bool
+        equal(
+            const value_type_t& _a_l,
+            const value_type_t& _a_r
+        ) const noexcept
+    {
+        if (_m_enumeration_schemas.first->equal(_a_l.first, _a_r.first))
+        {
+            return _m_enumeration_schemas.second->equal(
+                _a_l.second, _a_r.second
+            );
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    __constexpr virtual bool
+        increment(
+            value_type_t&       _a_element,
+            enumerate_index_t&  _a_n_times_to_increment,
+            const value_type_t& _a_min_value,
+            const value_type_t& _a_max_value
+        )
+    {
+        while (_a_n_times_to_increment > 0)
+        {
+            T& _l_elem{_a_element.first};
+            if (_m_enumeration_schemas.first->increment(
+                    _l_elem,
+                    _a_n_times_to_increment,
+                    _a_min_value.first,
+                    _a_max_value.first
+                ))
+            {
+                if (_a_n_times_to_increment == 0)
+                {
+                    return less_than(_a_element, _a_max_value);
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
+            else
+            {
+                _l_elem = _a_min_value.first;
+                U&   _l_elem_2{_a_element.second};
+                auto ki = size_t{1};
+                if (_m_enumeration_schemas.second->increment(
+                        _l_elem_2, ki, _a_min_value.second, _a_max_value.second
+                    ))
+                {
+                    --_a_n_times_to_increment;
+                    continue;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        return less_than(_a_element, _a_max_value);
+    }
+
+    __constexpr virtual bool
+        decrement(
+            value_type_t&       _a_element,
+            enumerate_index_t&  _a_n_times_to_increment,
+            const value_type_t& _a_min_value,
+            const value_type_t& _a_max_value
+        )
+    {
+        return true;
+    }
+
+    __constexpr virtual enumeration_diff_t
+        difference(
+            const value_type_t& _a_arg1,
+            const value_type_t& _a_arg2
+        ) noexcept
+    {
+        return enumeration_diff_t{};
+    }
+private:
+    std::pair<enumeration_schema_t<T>, enumeration_schema_t<U>>
+        _m_enumeration_schemas;
 };
 
 _END_ABC_DG_NS
@@ -2026,9 +2169,10 @@ __constexpr_imp bool
 template <typename... Ts>
 __constexpr bool
     default_enumeration_t<std::tuple<Ts...>>::increment(
-        value_type_t&                      _a_element,
-        enumerate_index_t&                 _a_n_times_to_increment,
-        const std::optional<value_type_t>& _a_max_value
+        value_type_t&       _a_element,
+        enumerate_index_t&  _a_n_times_to_increment,
+        const value_type_t& _a_min_value,
+        const value_type_t& _a_max_value
     )
 {
     using namespace std;
@@ -2051,9 +2195,10 @@ __constexpr bool
 template <typename... Ts>
 __constexpr bool
     default_enumeration_t<std::tuple<Ts...>>::decrement(
-        value_type_t&                      _a_element,
-        enumerate_index_t&                 _a_n_times_to_increment,
-        const std::optional<value_type_t>& _a_min_value
+        value_type_t&       _a_element,
+        enumerate_index_t&  _a_n_times_to_increment,
+        const value_type_t& _a_min_value,
+        const value_type_t& _a_max_value
     )
 {
     using namespace std;

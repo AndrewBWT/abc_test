@@ -156,10 +156,10 @@ __constexpr_imp bool
 {
     return _m_forward_direction
                ? _m_enum_schema->increment(
-                     _m_current_element, _a_times_called, _m_end_value
+                     _m_current_element, _a_times_called, _m_start_value, _m_end_value
                  )
                : _m_enum_schema->decrement(
-                     _m_current_element, _a_times_called, _m_end_value
+                     _m_current_element, _a_times_called, _m_start_value, _m_end_value
                  );
 }
 

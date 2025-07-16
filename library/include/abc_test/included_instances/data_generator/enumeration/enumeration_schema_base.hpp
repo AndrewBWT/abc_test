@@ -57,29 +57,35 @@ public:
 
     __constexpr bool
         increment(
-            T&                      _a_element,
-            enumerate_index_t&      _a_n_times_to_increment,
-            const std::optional<T>& _a_max_value
+            T&                 _a_element,
+            enumerate_index_t& _a_n_times_to_increment,
+            const T&           _a_min_value,
+            const T&           _a_max_value
         )
     {
         return _m_enumeration->increment(
-            _a_element, _a_n_times_to_increment, _a_max_value
+            _a_element, _a_n_times_to_increment, _a_min_value, _a_max_value
         );
     }
 
     __constexpr virtual bool
         decrement(
-            T&                      _a_element,
-            enumerate_index_t&      _a_n_times_to_increment,
-            const std::optional<T>& _a_max_value
+            T&                 _a_element,
+            enumerate_index_t& _a_n_times_to_increment,
+            const T&           _a_min_value,
+            const T&           _a_max_value
         )
     {
         return _m_enumeration->decrement(
-            _a_element, _a_n_times_to_increment, _a_max_value
+            _a_element, _a_n_times_to_increment, _a_min_value, _a_max_value
         );
     }
+
     __constexpr virtual enumeration_diff_t
-        difference(const T& _a_arg1, const T& _a_arg2) noexcept
+        difference(
+            const T& _a_arg1,
+            const T& _a_arg2
+        ) noexcept
     {
         return _m_enumeration->difference(_a_arg1, _a_arg2);
     }

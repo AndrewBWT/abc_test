@@ -1,6 +1,7 @@
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
 #include "abc_test_examples/documentation.hpp"
+#include "abc_test_examples/readme.hpp"
 int
     main(
         int   argc,

@@ -45,13 +45,15 @@ public:
         increment(
             T& _a_element,
             enumerate_index_t& _a_n_times_to_increment,
-            const std::optional<T>& _a_max_value
+            const T& _a_min_value,
+            const T& _a_max_value
         ) = 0;
     __constexpr virtual bool
         decrement(
             T& _a_element,
             enumerate_index_t& _a_n_times_to_increment,
-            const std::optional<T>& _a_max_value
+            const T& _a_min_value,
+            const T& _a_max_value
         ) = 0;
     __constexpr virtual enumeration_diff_t difference(
         const T& _a_arg1,

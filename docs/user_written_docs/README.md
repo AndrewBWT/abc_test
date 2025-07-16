@@ -25,7 +25,7 @@ Nearly all of the examples we show are taken from the `examples/include/abc_test
 
 Below we show the simplest example, which illustrates how easy it is to begin working with `abc_test`.
 
-The source for this example can be found [here](scripts/script_to_use_library/main_to_cpy.cpp).
+Unlike all the other examples in this section, this code comes from the `scripts/script_to_use_library/main_to_cpy.cpp` [file](scripts/script_to_use_library/main_to_cpy.cpp).
 
 <!-- inject:scripts/script_to_use_library/main_to_cpy.cpp:initial_example -->
 
@@ -39,9 +39,25 @@ Through the example above is valid testing code in `abc_test`, it relies on the 
 
 <!-- inject:examples/include/abc_test_examples/readme.hpp:unit_test_example -->
 
-This next example shows the user how to write assertions.
+If re-running the test suite.
 
-This example shows how to use data generators to write a test case which performs unit tests, fuzzy tests, property tests and regression tests.
+Below we show the output from running the `examples` test executable using the following command line arguments. In essence, it will only run the above test case.
+
+
+
+The user can re-run the test using the following command line arguments. 
+
+The repetition information is taken from the results above. By running the test suite like this, only the values which issued a test assertion failure are re-ran from the file "unit_tests". Below we show the output from this re-running of the test code.
+
+All data generators in `abc_test` have this functionality. It can allow the user to configure their test executable in such a manner so that only values which fail an assertion are re-generated from a data generator.
+
+### Property Testing Example ###
+
+Property testing and fuzzy testing allow the user to either test some property about their code, or to test their code with many different values. `abc_test`'s generators can be used to add such functionality to a user's test suite.
+
+Below we show an example which tests a user-defined function `users_mid_point`. It performs unit testing, fuzzy testing and property testing.
+
+<!-- inject:examples/include/abc_test_examples/readme.hpp:property_test_example -->
 
 ## Installation ##
 

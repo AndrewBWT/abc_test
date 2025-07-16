@@ -25,7 +25,7 @@ Nearly all of the examples we show are taken from the `examples/include/abc_test
 
 Below we show the simplest example, which illustrates how easy it is to begin working with `abc_test`.
 
-The source for this example can be found [here](scripts/script_to_use_library/main_to_cpy.cpp).
+Unlike all the other examples in this section, this code comes from the `scripts/script_to_use_library/main_to_cpy.cpp` [file](scripts/script_to_use_library/main_to_cpy.cpp).
 
 ```cpp
 // Only these two includes are needed.
@@ -91,22 +91,23 @@ _TEST_CASE(
     using namespace abc;
     // This macro creates an object which can have assertions passed into it.
     // The string argument represents an annotation.
-    auto _l_unit_tests = _MULTI_MATCHER("Unit tests for Fibonacci function");
-    // This for loop gathers the values from the file.
-    // The type identifies what is being read from the file. The string
-    // represents the name of the file. The file is in the folder tests/fib,
-    // with the root file being set by either the system or the user.
-    for (auto& [_l_input, _l_expected_output] :
+    auto unit_tester = _MULTI_MATCHER("Unit tests for Fibonacci function");
+    // This for loop iterates over the values taken from the file.
+    // The type "pair<int,int>" identifies what values being read from the file,
+    // and the string argument represents the name of the file. The file is in
+    // the folder tests/fib, with the root file being set by either the system
+    // or the user.
+    for (auto& [input, expected_output] :
          read_data_from_file<std::pair<int, int>>("unit_tests"))
     {
-        // At this point, each line is read from the file, and its contents are
-        // available to the user.
-        // The result of the assertion is streamed to the multi matcher.
-        _l_unit_tests << _CHECK_EXPR(fib(_l_input) == _l_expected_output);
+        // The values input and expected_output are taken from each lne of the
+        // file. The result of the assertion _CHECK_EXPR is
+        //  streamed to the multi matcher.
+        unit_tester << _CHECK_EXPR(fib(input) == expected_output);
     }
-    // The multi matcher is then checked. It is this line which sneds the
+    // The multi matcher is then checked. It is this line which sends the
     // information to the testing framework.
-    _CHECK(_l_unit_tests);
+    _CHECK(unit_tester);
 }
 
 // tests/fib/unit_tests.gd
@@ -116,9 +117,65 @@ _TEST_CASE(
 
 ```
 
-This next example shows the user how to write assertions.
+If re-running the test suite.
 
-This example shows how to use data generators to write a test case which performs unit tests, fuzzy tests, property tests and regression tests.
+Below we show the output from running the `examples` test executable using the following command line arguments. In essence, it will only run the above test case.
+
+
+
+The user can re-run the test using the following command line arguments. 
+
+The repetition information is taken from the results above. By running the test suite like this, only the values which issued a test assertion failure are re-ran from the file "unit_tests". Below we show the output from this re-running of the test code.
+
+All data generators in `abc_test` have this functionality. It can allow the user to configure their test executable in such a manner so that only values which fail an assertion are re-generated from a data generator.
+
+### Property Testing Example ###
+
+Property testing and fuzzy testing allow the user to either test some property about their code, or to test their code with many different values. `abc_test`'s generators can be used to add such functionality to a user's test suite.
+
+Below we show an example which tests a user-defined function `users_mid_point`. It performs unit testing, fuzzy testing and property testing.
+
+```cpp
+inline int
+    users_midpoint(
+        const int arg1,
+        const int arg2
+    )
+{
+    return (arg1 + arg2) / 2;
+}
+
+_TEST_CASE(
+    abc::test_case_t(
+        {.name = "Testing users_midpoint function", .path = "tests::midpoint"}
+    )
+)
+{
+    using namespace abc;
+    using namespace std;
+    auto property_tests
+        = _MULTI_MATCHER("Property tests for users_midpoint function");
+    // We are testing that our midpoint function returns the same result as
+    // std::midpoint.
+
+    // This for loop uses two generators. They are chained together using the &
+    // operator. The first generator creates random data. The second generator
+    // enumerates over all values from (-2,-2) to (2,2).
+    for (auto& [arg1, arg2] :
+         generate_data_randomly<std::pair<int, int>>()
+             & enumerate_data(from_m_to_n(make_pair(-2, -2), make_pair(2, 2))))
+    {
+        // This streams the result of checking that the result of users_midpoint
+        // is the same as std::midpoint.
+        property_tests << _CHECK_EXPR(
+            users_midpoint(arg1, arg2) == std::midpoint(arg1, arg2)
+        );
+    }
+    // The multi matcher is then checked. It is this line which sends the
+    // information to the testing framework.
+    _CHECK(property_tests);
+}
+```
 
 ## Installation ##
 

@@ -14,7 +14,7 @@ requires std::is_invocable_r_v<bool, Compare_Func, const T&, const T&>
              Increment_Or_Decrement_Func,
              T&,
              enumerate_index_t,
-             std::optional<T>&>
+             const T&,const T&>
          && std::
              is_invocable_r_v<enumeration_diff_t, Difference_Func, const T&, const T&>
 struct enumeration_from_functions_t : public enumeration_base_t<T>
@@ -47,13 +47,15 @@ public:
         increment(
             T&                      _a_element,
             enumerate_index_t&      _a_n_times_to_increment,
-            const std::optional<T>& _a_max_value
+            const T& _a_min_value,
+            const T& _a_max_value
         );
     __constexpr virtual bool
         decrement(
             T&                      _a_element,
             enumerate_index_t&      _a_n_times_to_increment,
-            const std::optional<T>& _a_max_value
+            const T& _a_min_value,
+            const T& _a_max_value
         );
 
     __constexpr virtual enumeration_diff_t difference(
@@ -76,7 +78,7 @@ requires std::is_invocable_r_v<bool, Compare_Func, const T&, const T&>
              Increment_Or_Decrement_Func,
              T&,
              data_gen::enumerate_index_t,
-             std::optional<T>&>
+             const T&,const T&>
          && std::
              is_invocable_r_v<std::pair<std::size_t, std::size_t>, Difference_Func, const T&, const T&>
 __constexpr data_gen::enumeration_t<T>
@@ -101,7 +103,7 @@ requires std::is_invocable_r_v<bool, Compare_Func, const T&, const T&>
              Increment_Or_Decrement_Func,
              T&,
              data_gen::enumerate_index_t,
-             std::optional<T>&>
+             const T&, const T&>
          && std::
              is_invocable_r_v<std::size_t, Difference_Func, const T&, const T&>
 __constexpr
@@ -173,7 +175,7 @@ requires std::is_invocable_r_v<bool, Compare_Func, const T&, const T&>
              Increment_Or_Decrement_Func,
              T&,
              enumerate_index_t,
-             std::optional<T>&>
+             const T&, const T&>
          && std::
              is_invocable_r_v<std::size_t, Difference_Func, const T&, const T&>
 __constexpr_imp bool
@@ -204,7 +206,7 @@ requires std::is_invocable_r_v<bool, Compare_Func, const T&, const T&>
              Increment_Or_Decrement_Func,
              T&,
              enumerate_index_t,
-             std::optional<T>&>
+             const T&, const T&>
          && std::
              is_invocable_r_v<std::size_t, Difference_Func, const T&, const T&>
 __constexpr_imp bool
@@ -257,7 +259,7 @@ requires std::is_invocable_r_v<bool, Compare_Func, const T&, const T&>
              Increment_Or_Decrement_Func,
              T&,
              data_gen::enumerate_index_t,
-             std::optional<T>&>
+             const T&, const T&>
          && std::
              is_invocable_r_v<std::size_t, Difference_Func, const T&, const T&>
 __constexpr data_gen::enumeration_t<T>
