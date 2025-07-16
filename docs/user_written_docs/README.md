@@ -65,7 +65,6 @@ Fuzzy testing is used to test functions with many different values, in essence t
 
 <!-- inject:examples/include/abc_test_examples/readme.hpp:fuzzy_test_example -->
 
-
 ## Installation ##
 
 `abc_test` targets C++23. It has been built using `cmake` and, for now at-least, we recommend using `cmake` to install it.

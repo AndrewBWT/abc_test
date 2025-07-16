@@ -115,7 +115,6 @@ _TEST_CASE(
 // (0, 0)
 // (6, 8)
 // (7, 14)
-
 ```
 
 If re-running the test suite.
@@ -214,10 +213,15 @@ _TEST_CASE(
     // We are testing that users_average works with a range of values.
 
     for (auto& vect :
-         generate_data_randomly<std::vector<float>>()
-             & enumerate_data(from_m_to_n(
-                 std::vector<float>{}, std::vector<float>(1, 100.0f)
-             )))
+         // Here, generate_data_randomly takes an argument called a
+         // "general_data_file", signified by the function "gdf". Using this
+         // GDF, values which trigger a test assertion failure are written to
+         // the file "random_data". Every time the test is re-ran, the values
+         // from this file are tested first. This allows problematic test values
+         // to be retained easily, and helps the user quickly identify whether
+         // there has been a test regression.
+         generate_data_randomly<std::vector<float>>(gdf("random_data"))
+             & enumerate_data(from_min_to_val(std::vector<float>(1, 100.0f))))
     {
         // matcher_t is the object which contains an assertion. Until it is put
         // into the _CHECK or _REQUIRE macro, the test framework will not
@@ -241,14 +245,18 @@ _TEST_CASE(
             exception_matcher
                 = false_matcher(u8"An unexpected exception was thrown");
         }
-        fuzzy_tests << _CHECK(exception_matcher);
+        // abc_test includes macros which can reduce the need for boiler-place
+        // code to to check exceptions.
+        matcher_t exception_matcher_2;
+        _BEGIN_NO_THROW_MATCHER(exception_matcher_2);
+        do_not_optimise(users_average(vect));
+        _END_NO_THROW_MATCHER(exception_matcher_2);
+        fuzzy_tests << _CHECK(exception_matcher && exception_matcher_2);
     }
     _CHECK(fuzzy_tests);
 }
 
-// </property_test_example>
 ```
-
 
 ## Installation ##
 
