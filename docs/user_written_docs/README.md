@@ -73,12 +73,12 @@ If the reader would like to see more examples of `abc_test`, we recommend readin
 
 ## Installation ##
 
-`abc_test` targets C++23. Currently `abc_test` requires the `fmt` library. `abc_test` is designed to be built using `cmake`. Below is an example `CMakeLists.txt` file, which builds `abc_test` as part of a user's project.
+`abc_test` targets C++23. Currently `abc_test` requires the `fmt` library. `abc_test` is designed to be built using `cmake`. Below is an example `CMakeLists.txt` file, which builds `abc_test` as part of the project `test_library`. It assumes that `abc_test` has been downloaded and placed in the `abc_test_dir` directory.
 
 ```
 cmake_minimum_required(VERSION 3.14)
 set(CMAKE_CXX_STANDARD 23)
-project(my_executable)
+project(test_library)
 include(FetchContent)
 FetchContent_Declare(
   fmt
@@ -86,25 +86,20 @@ FetchContent_Declare(
   GIT_TAG 11.2.0
 )
 FetchContent_MakeAvailable(fmt)
-FetchContent_Declare(
-  abc_test
-  GIT_REPOSITORY https://github.com/abc_test/abc_test.git
-  GIT_TAG 0.0.1
-)
-FetchContent_MakeAvailable(abc_test)
+add_subdirectory(abc_test_dir)
 
-add_executable(my_executable main.cpp)
-target_link_libraries(my_executable PRIVATE abc_test)
+add_executable(test_library main.cpp)
+target_link_libraries(test_library PRIVATE abc_test)
 ```
 
-Then, navigating to the root directory of `my_executable`, run the following commands.
+Then run the following commands in the same directory as the above `CMakeLists.txt`.
 
 ```
 mkdir build && cd build
 cmake ..
 ```
 
-We have tested the above script in Windows using the MSVC and Clang compilers, built using Visual Studio 17.13.5. The Clang compiler version used was 18.1.8. So it should be buildable, and atleast the minimal example should compile and run.
+We have tested the above script in Windows using the MSVC and Clang compilers, built using Visual Studio 17.13.5. The Clang compiler version used was 18.1.8.
 
 We have also tested it under Ubuntu 24.04 using the GNU and Clang compilers. The GNU compiler version used was 13.3.0, and the Clang compiler version used was 20.1.7. 
 
