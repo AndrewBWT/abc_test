@@ -117,9 +117,7 @@ _TEST_CASE(
 // (7, 14)
 ```
 
-If the user runs the `abc_test_examples` executable from the root directory with the command line options `--root_path examples/data/test_data --test_paths_to_run readme::fib` then the following output is produced.
-
-Then the following output is produced.
+If the user runs the `abc_test_examples` executable from the root directory with the options `--root_path examples/data/test_data --test_paths_to_run readme::fib` then the following output is produced.
 
 ```sh
 ==========================================================================================
@@ -134,7 +132,7 @@ Comment used:                       "#"
 general data extension used:        "gd"
 Number of values used to seed RNGs: 100
 Repetition config:                  No repetition config given.
-Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1752749268
+Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1752749419
 Force run all tests used?           No
 test paths to run:                  readme::fib.
 ==========================================================================================
@@ -156,7 +154,7 @@ Assertions passed:          0
 Assertions failed:          1
 Assertion information:      0 / 1 assertions passed. All assertion failed.
 Termination status:         Function exited normally with a failed status.
-Time taken:                 5922 microseconds
+Time taken:                 490 microseconds
 ==========================================================================================
 ASSERTION INFO
 ==========================================================================================
@@ -202,7 +200,83 @@ Total tests which threw unexpected exception: 0
 Total assertions ran:                         1
 Total assertions passed:                      0
 Total assertions failed:                      1
-Global random seed:                           "1752749268"
+Global random seed:                           "1752749419"
+Repetition loop stack seed:                   "54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c653a3a726561646d653a3a666962:5b5b28302c302c2228302c203329222c5b5d295d5d"
+==========================================================================================
+```
+
+If the user then runs the same executable from the same location with the options `--root_path ../../examples/data/test_data --test_paths_to_run readme::fib --repetition_config 54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c653a3a726561646d653a3a666962:5b5b28302c302c2228302c203329222c5b5d295d5d --write_data_to_files false` the this output is produced.
+
+```sh
+==========================================================================================
+TEST SUITE CONFIGURATION
+==========================================================================================
+Global test list used?              Yes
+Write data to files:                No
+Path delimiter used:                "::"
+Root path used:                     examples/data/test_data
+Threads used:                       24
+Comment used:                       "#"
+general data extension used:        "gd"
+Number of values used to seed RNGs: 100
+Repetition config:                  {"Testing Fibonacci function using data from a file::readme::fib":class abc::ds::typeless_data_generator_collection_stack_trie_t {for_loop_data = struct abc::ds::data_generator_collection_memoized_element_t {generation_collection_index = 0, flied = struct abc::ds::data_generator_memoized_element_t {mode = 0, additional_data = ""}}, children = [[class std::shared_ptr<class abc::ds::typeless_data_generator_collection_stack_trie_t> {address = 2581012698176, data = class abc::ds::typeless_data_generator_collection_stack_trie_t {for_loop_data = struct abc::ds::data_generator_collection_memoized_element_t {generation_collection_index = 0, flied = struct abc::ds::data_generator_memoized_element_t {mode = 0, additional_data = "(0, 3)"}}, children = []}}]]}}
+Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1752749419
+Force run all tests used?           No
+test paths to run:                  readme::fib.
+==========================================================================================
+TEST INFO
+==========================================================================================
+Test result:                TEST FAILED
+Test passed:                No
+Test name:                  "Testing Fibonacci function using data from a file"
+Source location:            G:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples/readme.hpp:13
+Source code representation: "_TEST_CASE(abc::test_case_t( {.name = "Testing Fibonacci function using data from a file", .path = "readme::fib"} ))"
+Test Path:                  "readme::fib"
+Seed used:                  [[(0,0,"(0, 3)",[])]]
+Seed used (hex):            "5b5b28302c302c2228302c203329222c5b5d295d5d"
+Seed to re-run test:        [[(0,0,"(0, 3)",[])]]
+Seed to re-run test (hex):  "5b5b28302c302c2228302c203329222c5b5d295d5d"
+Warnings:                   0
+Assertions evaluated:       1
+Assertions passed:          0
+Assertions failed:          1
+Assertion information:      0 / 1 assertions passed. All assertion failed.
+Termination status:         Function exited normally with a failed status.
+Time taken:                 357 microseconds
+==========================================================================================
+ASSERTION INFO
+==========================================================================================
+  1)  Multi-element block-based assertion failed. 0/1 assertions passed. Assertion terminated function.
+      Assertion's annotation:  "Unit tests for Fibonacci function"
+      Source block begin:
+        Source location:
+          G:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples/readme.hpp:25
+        Source code representation:
+          "_MULTI_MATCHER("Unit tests for Fibonacci function")"
+        Source location:
+          G:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples/readme.hpp:42
+        Source code representation:
+          "_CHECK"
+      Assertion data (grouped by source):
+        1)  Matcher-based assertion failed with output:
+              Primary output from matcher:
+                13 != 14
+            Logged information:
+              data generator's value = (7, 14)
+==========================================================================================
+==========================================================================================
+TEST SUITE RESULTS
+==========================================================================================
+Total tests ran:                              1
+Total tests passed:                           0
+Total tests failed:                           1
+Total tests failed and terminated:            0
+Total tests failed (but not terminated):      1
+Total tests which threw unexpected exception: 0
+Total assertions ran:                         1
+Total assertions passed:                      0
+Total assertions failed:                      1
+Global random seed:                           "1752749419"
 Repetition loop stack seed:                   "54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c653a3a726561646d653a3a666962:5b5b28302c302c2228302c203329222c5b5d295d5d"
 ==========================================================================================
 ```

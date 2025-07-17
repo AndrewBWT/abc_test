@@ -39,11 +39,13 @@ Through the example above is valid testing code in `abc_test`, it relies on the 
 
 <!-- inject:examples/include/abc_test_examples/readme.hpp:unit_test_example -->
 
-If the user runs the `abc_test_examples` executable from the root directory with the command line options `--root_path examples/data/test_data --test_paths_to_run readme::fib` then the following output is produced.
-
-Then the following output is produced.
+If the user runs the `abc_test_examples` executable from the root directory with the options `--root_path examples/data/test_data --test_paths_to_run readme::fib` then the following output is produced.
 
 <!-- run:build/examples/Debug/abc_test_examples.exe --root_path examples/data/test_data --test_paths_to_run readme::fib:sh -->
+
+If the user then runs the same executable from the same location with the options `--root_path ../../examples/data/test_data --test_paths_to_run readme::fib --repetition_config 54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c653a3a726561646d653a3a666962:5b5b28302c302c2228302c203329222c5b5d295d5d --write_data_to_files false` the this output is produced.
+
+<!-- run:build/examples/Debug/abc_test_examples.exe --root_path examples/data/test_data --test_paths_to_run readme::fib --repetition_config 54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c653a3a726561646d653a3a666962:5b5b28302c302c2228302c203329222c5b5d295d5d --write_data_to_files false:sh -->
 
 In the second set of output, the only assertions which are ran are those which failed the first test. More specifically, the data generator only produced values which failed an assertion. By providing the executable with the `repetition_config` given as output from the first test, we essentially encoded instructions into the executable to only have the data generator produce those values which previously produced failed assertions. 
 
