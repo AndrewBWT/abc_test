@@ -56,13 +56,17 @@ def extract_block_by_marker(file_path, marker):
         raise ValueError(f"Marker <{marker}> not found in {file_path}")
 
     return ''.join(collected), language
-
+        
 def run_command_and_capture(command):
     try:
-        result = subprocess.run(command, shell=True, text=True, capture_output=True, check=True)
+        # Split into args safely (handles quotes, spaces, etc.)
+        args = shlex.split(command, posix=os.name != 'nt')
+        result = subprocess.run(args, capture_output=True, text=True, check=True)
         return result.stdout
     except subprocess.CalledProcessError as e:
         return f"**Error running command `{command}`: {e.stderr or str(e)}**"
+    except FileNotFoundError:
+        return f"**Executable not found: `{args[0]}`**"
 
 def inject_code_blocks(input_path, output_path=None):
     with open(input_path, 'r') as f:
