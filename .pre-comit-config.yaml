@@ -1,8 +1,0 @@
-repos:
-  - repo: local
-    hooks:
-      - id: check_docs
-        name: Check all documents are generated
-        entry: scripts/pre_comit_check_docs.sh
-        language: system
-        types: [text]
