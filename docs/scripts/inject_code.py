@@ -1,5 +1,6 @@
 import re
 import os
+import subprocess
 
 COMMENT_SYMBOLS = {
     '.py': '#',
@@ -35,8 +36,7 @@ def extract_block_by_marker(file_path, marker):
     language, comment = detect_language_and_comment(file_path)
     start_tag = f"{comment} <{marker}>"
     end_tag = f"{comment} </{marker}>"
-    print(language)
-    print(comment)
+
     with open(file_path, 'r') as f:
         lines = f.readlines()
 
@@ -57,13 +57,24 @@ def extract_block_by_marker(file_path, marker):
 
     return ''.join(collected), language
 
+def run_command_and_capture(command):
+    try:
+        result = subprocess.run(command, shell=True, text=True, capture_output=True, check=True)
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        return f"**Error running command `{command}`: {e.stderr or str(e)}**"
+
 def inject_code_blocks(input_path, output_path=None):
     with open(input_path, 'r') as f:
         content = f.read()
 
-    pattern = r'<!--\s*inject:(.+?):([a-zA-Z0-9_]+)\s*-->'
+    # Pattern 1: Inject from file
+    file_marker_pattern = r'<!--\s*inject:(.+?):([a-zA-Z0-9_]+)\s*-->'
 
-    def replacer(match):
+    # Pattern 2: Run command (optionally with language)
+    run_cmd_pattern = r'<!--\s*run:(.+?)(?::([a-zA-Z0-9_]+))?\s*-->'
+
+    def inject_replacer(match):
         file_path, marker = match.groups()
         try:
             code, lang = extract_block_by_marker(file_path.strip(), marker.strip())
@@ -71,17 +82,27 @@ def inject_code_blocks(input_path, output_path=None):
         except Exception as e:
             return f"**Error including `{file_path}` marker `<{marker}>`: {e}**"
 
-    new_content = re.sub(pattern, replacer, content)
+    def run_replacer(match):
+        command, lang = match.groups()
+        output = run_command_and_capture(command.strip())
+        if lang:
+            return f"```{lang}\n{output}```"
+        else:
+            return output.strip()
+
+    # Apply both patterns
+    content = re.sub(file_marker_pattern, inject_replacer, content)
+    content = re.sub(run_cmd_pattern, run_replacer, content)
 
     if output_path:
         with open(output_path, 'w') as f:
-            f.write(new_content)
+            f.write(content)
     else:
-        print(new_content)
+        print(content)
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="Inject code snippets into a markdown file by marker.")
+    parser = argparse.ArgumentParser(description="Inject code snippets and command outputs into a markdown file.")
     parser.add_argument("markdown_file", help="Path to your source Markdown file")
     parser.add_argument("--out", help="Path to output file (optional)")
     args = parser.parse_args()

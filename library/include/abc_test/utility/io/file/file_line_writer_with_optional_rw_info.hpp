@@ -14,7 +14,7 @@ public:
     __no_constexpr
         file_line_writer_with_optional_rw_info_t(
             const utility::io::file_name_t<T>& _a_frw,
-            const std::string_view _a_comment_if_new_file
+            const std::u8string_view _a_comment_if_new_file
         );
     __constexpr bool
         has_printer_parser() const noexcept;
@@ -37,7 +37,7 @@ template <typename T>
 __no_constexpr_imp
 file_line_writer_with_optional_rw_info_t<T>::file_line_writer_with_optional_rw_info_t(
     const utility::io::file_name_t<T>& _a_frw,
-    const std::string_view _a_comment_if_new_file
+    const std::u8string_view _a_comment_if_new_file
 )
     : file_line_writer_with_optional_rw_info_t(_a_frw,std::filesystem::exists(path(_a_frw)),_a_comment_if_new_file)
 {}

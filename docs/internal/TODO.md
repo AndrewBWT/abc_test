@@ -2,10 +2,10 @@
 
 ## Current Focus ##
 
-- Code documentation. See docs/internal/documentation.md for details.
-- Tutorials and examples. See docs/internal/tutorials_and_examples.md for details.
-- Tests. See docs/internal/tests.md for details.
-- README. See docs/internal/readme.md for details.
+1 - Code documentation. See docs/internal/documentation.md for details.
+2 - Tutorials and examples. See docs/internal/tutorials_and_examples.md for details.
+3 - Tests. See docs/internal/tests.md for details.
+4 - README. See docs/internal/readme.md for details.
 
 ## Not Currently a Focus ##
 
@@ -45,7 +45,7 @@
 26 - The way that data generators work currently, they automatically add their data to the log stack. We want to make it so that there are three additional features; 1) The user can turn this off either for an individual generator, or across all generators. 2) We provide data concerning the current stack of for loops - e.g. the index in the stack, as well as the iteration in the generator's for loop. 3) The source currently used is a placeholder. data generator's constructor should take a std::source_location = current_location(), so that we can use this ias the location from where the logged data comes from.
 29 - When using CTest for testing construction of library, consider using FetchContent. We are unsure of how it will work with the private project, so this may not be possible..
 30 - Some check is needed in CMake to ensure the correct c++ version is being used (c++23). 
-31 - When using CTEst for testing construction of library, consider making a more verbose executable - one with actual tests in.
+31 - When using CTEst for testing construction of library, consider making a more verbose executable - one with actual tests in, instead of just a minimal example as we currently have.
 32 - Try making fmt private again.
 33 - CTest executable build location is incorrect. Needs to be in a different build directory.
 34 - CTest executable creates list of clang tidy files, which it should not.

@@ -46,9 +46,9 @@ using enum_list_t = std::vector<std::pair<T, enum_list_str_t>>;
  * @return
  */
 template <typename T>
-    requires std::is_enum_v<T>
+requires std::is_enum_v<T>
 __constexpr enum_list_t<T>
-get_enum_list() noexcept = delete;
+            get_enum_list() noexcept = delete;
 /*!
  * @brief A concept for enums that have a get_enum_list function associated with
  * them.
@@ -186,9 +186,9 @@ struct enumerate_enum_helper_t
      */
     __constexpr bool
         increment(
-            T&                      _a_element,
-            std::size_t&            _a_times_called,
-            const std::optional<T>& _a_max_value
+            T&           _a_element,
+            std::size_t& _a_times_called,
+            const T&     _a_max_value
         ) const noexcept(unreachable_does_not_throw_exception);
     /*!
      * @brief Decrements the given enum.
@@ -213,9 +213,9 @@ struct enumerate_enum_helper_t
      */
     __constexpr bool
         decrement(
-            T&                      _a_element,
-            std::size_t&            _a_times_called,
-            const std::optional<T>& _a_max_value
+            T&           _a_element,
+            std::size_t& _a_times_called,
+            const T&     _a_max_value
         ) const noexcept(unreachable_does_not_throw_exception);
     /*!
      * @brief Calculates the difference between two enums. The ordering of the
@@ -375,11 +375,11 @@ __constexpr const enumerate_enum_helper_t<T>&
                   get_thread_local_enumerate_enum_helper() noexcept;
 _END_ABC_UTILITY_NS
 /*!
-* Helper macro for creating u8 concatenated with the enum's name.
-* 
-* Required so that clang does not throw an error.
-*/
-#define _ENUM_U8_STR(x) u8###x
+ * Helper macro for creating u8 concatenated with the enum's name.
+ *
+ * Required so that clang does not throw an error.
+ */
+#define _ENUM_U8_STR(x)     u8## #x
 /*!
  * @brief Enum for creating list of entries for an enum_list_t object.
  *
@@ -527,9 +527,9 @@ template <typename T>
 requires enum_has_list_c<T>
 __constexpr_imp bool
     enumerate_enum_helper_t<T>::increment(
-        T&                      _a_element,
-        std::size_t&            _a_times_called,
-        const std::optional<T>& _a_max_value
+        T&           _a_element,
+        std::size_t& _a_times_called,
+        const T&     _a_max_value
     ) const
     noexcept(
         unreachable_does_not_throw_exception
@@ -538,10 +538,7 @@ __constexpr_imp bool
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
     const size_t _l_current_idx{enums_idx(_a_element)};
-    const size_t _l_max_value{
-        _a_max_value.has_value() ? enums_idx(_a_max_value.value())
-                                 : (_m_elements_to_idx.size() - 1)
-    };
+    const size_t _l_max_value{enums_idx(_a_max_value)};
     if (_l_max_value < _l_current_idx)
     {
         _ABC_UNREACHABLE(fmt::format(
@@ -554,7 +551,7 @@ __constexpr_imp bool
             "text representation of \"{2}\".",
             type_id<T>(),
             print(_a_element),
-            print(_a_max_value.value())
+            print(_a_max_value)
         ));
     }
     else
@@ -582,7 +579,7 @@ __constexpr_imp bool
     enumerate_enum_helper_t<T>::decrement(
         T&                      _a_element,
         std::size_t&            _a_times_called,
-        const std::optional<T>& _a_min_value
+        const T& _a_min_value
     ) const
     noexcept(
         unreachable_does_not_throw_exception
@@ -591,9 +588,7 @@ __constexpr_imp bool
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
     const size_t _l_current_idx{enums_idx(_a_element)};
-    const size_t _l_min_value{
-        _a_min_value.has_value() ? enums_idx(_a_min_value.value()) : 0
-    };
+    const size_t _l_min_value{enums_idx(_a_min_value)};
     if (_l_min_value > _l_current_idx)
     {
         _ABC_UNREACHABLE(fmt::format(
@@ -606,7 +601,7 @@ __constexpr_imp bool
             "text representation of \"{2}\".",
             type_id<T>(),
             print(_a_element),
-            print(_a_min_value.value())
+            print(_a_min_value)
         ));
     }
     else

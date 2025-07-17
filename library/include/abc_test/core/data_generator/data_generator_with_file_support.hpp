@@ -355,7 +355,7 @@ __constexpr ds::dg_memoized_element_t
         else
         {
             u8string _l_rv;
-            size_t _l_mode = _m_mode;
+            size_t   _l_mode = _m_mode;
             switch (_m_mode)
             {
             case 0:
@@ -410,7 +410,8 @@ __constexpr ds::dg_memoized_element_t
     {
         return dg_memoized_element_t{
             _m_mode,
-            _m_tertiary_rw_info.internal_printer->run_printer(_m_object.tertiary_data()
+            _m_tertiary_rw_info.internal_printer->run_printer(
+                _m_object.tertiary_data()
             )
         };
     }

@@ -10,9 +10,10 @@ using file_name_t = std::
     variant<general_data_with_rw_info_t<T>, general_data_t, tertiary_data_t>;
 template <typename T>
 using file_names_t = std::vector<file_name_t<T>>;
-template<typename T>
-using file_data_name_t = std::variant< general_data_with_rw_info_t<T>, general_data_t,std::string>;
-template<typename T>
+template <typename T>
+using file_data_name_t
+    = std::variant<general_data_with_rw_info_t<T>, general_data_t, std::string>;
+template <typename T>
 using file_data_names_t = std::vector<file_data_name_t<T>>;
 template <typename T>
 __constexpr const std::filesystem::path&
@@ -22,7 +23,7 @@ template <typename T>
 __constexpr std::optional<abc::utility::str::rw_info_t<T>>
             opt_rw_info(const file_name_t<T>& _a_file_name);
 template <typename T>
-__constexpr std::string
+__constexpr std::u8string
             generate_comment_str(
                 const file_name_t<T>& _a_file_name,
                 const std::type_info& _a_type_info
@@ -89,7 +90,7 @@ __constexpr_imp std::optional<abc::utility::str::rw_info_t<T>>
 }
 
 template <typename T>
-__constexpr_imp std::string
+__constexpr_imp std::u8string
                 generate_comment_str(
                     const file_name_t<T>& _a_file_name,
                     const std::type_info& _a_type_info
@@ -100,17 +101,17 @@ __constexpr_imp std::string
     if (auto _l_ptr{get_if<general_data_with_rw_info_t<T>>(&_a_file_name)};
         _l_ptr != nullptr)
     {
-        return typeid(T).name();
+        return abc::utility::str::type_id<T>();
     }
     else if (auto _l_ptr{get_if<general_data_t>(&_a_file_name)};
              _l_ptr != nullptr)
     {
-        return typeid(T).name();
+        return abc::utility::str::type_id<T>();
     }
     else if (auto _l_ptr{get_if<tertiary_data_t>(&_a_file_name)};
              _l_ptr != nullptr)
     {
-        return _a_type_info.name();
+        return abc::utility::str::cast_string_to_u8string(_a_type_info.name());
     }
     else
     {

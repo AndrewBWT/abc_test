@@ -539,13 +539,10 @@ struct default_enumeration_t<T> : public enumeration_base_t<T>
         {
             // This says we're gonna have to exit if we're not done moving
             // through the current range.
-            bool _l_hard_limit{
-                _a_max_value.has_value()
-                && _a_max_value.value() <= _m_neg_add_barrier
-            };
+            bool _l_hard_limit{_a_max_value <= _m_neg_add_barrier};
             // What is the limit we're approaching for this if statmenet?
             T _l_below_neg_add_barrier_limit{
-                _l_hard_limit ? _a_max_value.value() : _m_neg_add_barrier
+                _l_hard_limit ? _a_max_value : _m_neg_add_barrier
             };
             while (_a_times_called > 0)
             {
@@ -574,13 +571,10 @@ struct default_enumeration_t<T> : public enumeration_base_t<T>
         {
             // This says we're gonna have to exit if we're not done moving
             // through the current range.
-            bool _l_hard_limit{
-                _a_max_value.has_value()
-                && _a_max_value.value() <= _m_pos_add_barrier
-            };
+            bool _l_hard_limit{_a_max_value <= _m_pos_add_barrier};
             // What is the limit we're approaching for this if statmenet?
             T _l_below_pos_add_barrier_limit{
-                _l_hard_limit ? _a_max_value.value() : _m_pos_add_barrier
+                _l_hard_limit ? _a_max_value : _m_pos_add_barrier
             };
             const enumerate_index_t _l_n_increments_to_get_to_max_value{
                 static_cast<size_t>(
@@ -610,10 +604,10 @@ struct default_enumeration_t<T> : public enumeration_base_t<T>
         {
             // This says we're gonna have to exit if we're not done moving
             // through the current range.
-            bool _l_hard_limit{_a_max_value.has_value()};
+            bool _l_hard_limit{true};
             // What is the limit we're approaching for this if statmenet?
             T _l_below_max_numb_limit{
-                _l_hard_limit ? _a_max_value.value() : numeric_limits<T>::max()
+                _l_hard_limit ? _a_max_value : numeric_limits<T>::max()
             };
             while (_a_times_called > 0)
             {
@@ -643,13 +637,10 @@ struct default_enumeration_t<T> : public enumeration_base_t<T>
         {
             // This says we're gonna have to exit if we're not done moving
             // through the current range.
-            bool _l_hard_limit{
-                _a_max_value.has_value()
-                && _a_max_value.value() >= _m_pos_add_barrier
-            };
+            bool _l_hard_limit{_a_max_value >= _m_pos_add_barrier};
             // What is the limit we're approaching for this if statmenet?
             T _l_above_pos_add_barrier_limit{
-                _l_hard_limit ? _a_max_value.value() : _m_pos_add_barrier
+                _l_hard_limit ? _a_max_value : _m_pos_add_barrier
             };
             while (_a_times_called > 0)
             {
@@ -678,13 +669,10 @@ struct default_enumeration_t<T> : public enumeration_base_t<T>
         {
             // This says we're gonna have to exit if we're not done moving
             // through the current range.
-            bool _l_hard_limit{
-                _a_max_value.has_value()
-                && _a_max_value.value() >= _m_neg_add_barrier
-            };
+            bool _l_hard_limit{_a_max_value >= _m_neg_add_barrier};
             // What is the limit we're approaching for this if statmenet?
             T _l_above_neg_add_barrier_limit{
-                _l_hard_limit ? _a_max_value.value() : _m_neg_add_barrier
+                _l_hard_limit ? _a_max_value : _m_neg_add_barrier
             };
             const enumerate_index_t _l_n_decrements_to_get_to_max_value{
                 static_cast<size_t>(
@@ -714,11 +702,10 @@ struct default_enumeration_t<T> : public enumeration_base_t<T>
         {
             // This says we're gonna have to exit if we're not done moving
             // through the current range.
-            bool _l_hard_limit{_a_max_value.has_value()};
+            bool _l_hard_limit{true};
             // What is the limit we're approaching for this if statmenet?
             T _l_below_min_numb_limit{
-                _l_hard_limit ? _a_max_value.value()
-                              : numeric_limits<T>::lowest()
+                _l_hard_limit ? _a_max_value : numeric_limits<T>::lowest()
             };
             while (_a_times_called > 0)
             {
@@ -1699,7 +1686,7 @@ __constexpr_imp void
         {
             enumerate_index_t _l_arg{1};
             if (_m_enumerate->increment(
-                    _a_vector[_l_idx - 1], _l_arg, _m_enumerate->end_value()
+                    _a_vector[_l_idx - 1], _l_arg, T{}, T{}
                 ))
             {
                 --_a_n_times_to_increment;
@@ -1787,7 +1774,10 @@ __constexpr_imp bool
         {
             T& _l_elem{_a_array.back()};
             if (_m_enumerate->increment(
-                    _l_elem, _a_n_times_to_increment, _m_enumerate->end_value()
+                    _l_elem,
+                    _a_n_times_to_increment,
+                    _a_min_value.back(),
+                    _a_max_value.back()
                 ))
             {
                 if (_a_n_times_to_increment == 0)
@@ -1829,20 +1819,16 @@ __constexpr_imp bool
         }
         T& _l_elem{_a_array[_a_array.size() - 1]};
         if (_m_enumerate->decrement(
-                _l_elem, _a_n_times_to_increment, std::optional<T>()
+                _l_elem,
+                _a_n_times_to_increment,
+                _a_min_value.back(),
+                _a_max_value.back()
             ))
         {
             if (_a_n_times_to_increment == 0)
             {
-                if (_a_max_value.has_value())
-                {
-                    return (not less_than(_a_array, _a_max_value.value()))
-                           && equal(_a_array, _a_max_value.value());
-                }
-                else
-                {
-                    return true;
-                }
+                return (not less_than(_a_array, _a_max_value))
+                       && equal(_a_array, _a_max_value);
             }
             else
             {
@@ -1852,7 +1838,10 @@ __constexpr_imp bool
                 {
                     enumerate_index_t _l_arg{1};
                     if (_m_enumerate->decrement(
-                            _a_array[_l_idx - 1], _l_arg, std::optional<T>()
+                            _a_array[_l_idx - 1],
+                            _l_arg,
+                            _a_min_value[_l_idx - 1],
+                            _a_max_value[_l_idx - 1]
                         ))
                     {
                         --_a_n_times_to_increment;
@@ -1883,7 +1872,10 @@ __constexpr_imp bool
             {
                 enumerate_index_t _l_arg{1};
                 if (_m_enumerate->decrement(
-                        _a_array[_l_idx - 1], _l_arg, std::optional<T>{}
+                        _a_array[_l_idx - 1],
+                        _l_arg,
+                        _a_min_value[_l_idx - 1],
+                        _a_max_value[_l_idx - 1]
                     ))
                 {
                     --_a_n_times_to_increment;
@@ -1907,15 +1899,8 @@ __constexpr_imp bool
             }
         }
     }
-    if (_a_max_value.has_value())
-    {
-        return (not less_than(_a_array, _a_max_value.value()))
-               && equal(_a_array, _a_max_value.value());
-    }
-    else
-    {
-        return true;
-    }
+    return (not less_than(_a_array, _a_max_value))
+           && equal(_a_array, _a_max_value);
 }
 
 template <typename... Ts>
@@ -2312,7 +2297,10 @@ __constexpr bool
     auto&       _l_elem{get<I>(_a_element)};
     size_t      _l_n_times_to_increment{1};
     if (_l_enum->increment(
-            _l_elem, _l_n_times_to_increment, _l_enum->end_value()
+            _l_elem,
+            _l_n_times_to_increment,
+            _l_enum->end_value(),
+            _l_enum->end_value()
         ))
     {
         --_a_n_times_to_increment;
@@ -2345,7 +2333,10 @@ __constexpr bool
     auto&       _l_elem{get<I>(_a_element)};
     size_t      _l_n_times_to_increment{1};
     if (_l_enum->decrement(
-            _l_elem, _l_n_times_to_increment, _l_enum->start_value()
+            _l_elem,
+            _l_n_times_to_increment,
+            _l_enum->start_value(),
+            _l_enum->start_value()
         ))
     {
         --_a_n_times_to_increment;

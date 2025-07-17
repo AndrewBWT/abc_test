@@ -232,9 +232,9 @@ __no_constexpr_imp std::u8string
         }
         _l_rv.append(fmt::format(
             u8"{0}:{1}:",
-            _l_key_compressed,
+            _l_key_compressed_2,
             compressed_typless_data_generator_collection_stack_trie_printer_t<
-                false>{}
+                true>{}
                 .run_printer(_l_element.second)
         ));
     }

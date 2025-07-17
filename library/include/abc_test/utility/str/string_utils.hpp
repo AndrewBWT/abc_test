@@ -264,7 +264,8 @@ __constexpr_imp result_t<std::u8string>
             vector<char8_t>   _l_chars;
             for (size_t _l_idx{0}; _l_idx < (_l_str.size() / 2); ++_l_idx)
             {
-                unsigned char value;
+                unsigned char value{ 0 };
+                string _l_str_to_process(_l_position, _l_position + 2);
                 auto [_l_ptr, _l_ec]
                     = from_chars(_l_position, _l_position + 2, value, 16);
                 _l_position += 2;

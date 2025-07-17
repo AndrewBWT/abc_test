@@ -464,6 +464,7 @@ __constexpr_imp void
     {
         _m_line_reader.get_next_line();
     }
+    _m_position_data.element_index += _a_idx;
 }
 
 template <typename T>

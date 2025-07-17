@@ -305,7 +305,8 @@ public:
                 _l_process_okay)
             {
                 _a_cli_results.add_error(fmt::format(
-                    u8"Some post-parsing processing error encountered. "
+                    u8"Some post-parsing processing error encountered. Specifically \"{0}\".",
+                    _l_process_okay.value()
                 ));
                 return true;
             }

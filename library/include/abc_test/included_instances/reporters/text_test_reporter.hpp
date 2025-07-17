@@ -83,7 +83,7 @@ __no_constexpr_imp
     text_test_reporter_t::text_test_reporter_t() noexcept
     : threated_text_output_reporter_t(std::cout)
     , _m_has_colour_output(false)
-    , _m_print_config(print_config_t(true))
+    , _m_print_config(print_config_t(false))
 {}
 
 __no_constexpr_imp
@@ -91,7 +91,7 @@ __no_constexpr_imp
         const std::filesystem::path& _a_file_output
     ) noexcept
     : threated_text_output_reporter_t(_a_file_output)
-    , _m_has_colour_output(true)
+    , _m_has_colour_output(false)
     , _m_print_config(print_config_t(false))
 {}
 

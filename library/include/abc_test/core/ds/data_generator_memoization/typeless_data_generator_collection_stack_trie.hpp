@@ -282,7 +282,7 @@ struct compressed_typless_data_generator_collection_stack_trie_printer_t
                      typeless_data_generator_collection_stack_trie_t>>(
                     mk_printer(
                         compressed_typless_data_generator_collection_stack_trie_printer_t<
-                             To_Hex,
+                             false,
                              false>{}
                     ),
                     enum_pointer_print_parse_type_t::JUST_DATA
@@ -307,15 +307,7 @@ struct compressed_typless_data_generator_collection_stack_trie_printer_t
             };
             auto _l_printer{default_printer_t<node_type_t>()};
             get<3>(_l_printer.get_printers_ref()) = _l_child_printer;
-            if constexpr (To_Hex)
-            {
-                return hex_printer<node_type_t>{mk_printer(_l_printer)}
-                    .run_printer(_l_node_data);
-            }
-            else
-            {
-                return _l_printer.run_printer(_l_node_data);
-            }
+            return _l_printer.run_printer(_l_node_data);
         }
         else
         {

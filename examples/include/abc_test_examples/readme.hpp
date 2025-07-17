@@ -13,7 +13,7 @@ inline int
 _TEST_CASE(
     abc::test_case_t(
         {.name = "Testing Fibonacci function using data from a file",
-         .path = "tests::fib"}
+         .path = "readme::fib"}
     )
 )
 {
@@ -42,7 +42,7 @@ _TEST_CASE(
     _CHECK(unit_tester);
 }
 
-// tests/fib/unit_tests.gd
+// readme/fib/unit_tests.gd
 // (0, 0)
 // (6, 8)
 // (7, 14)
@@ -60,7 +60,7 @@ inline int
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name = "Testing users_midpoint function", .path = "tests::midpoint"}
+        {.name = "Testing users_midpoint function", .path = "readme::midpoint"}
     )
 )
 {
@@ -100,20 +100,20 @@ _TEST_CASE(
 // <fuzzy_test_example>
 inline float
     users_average(
-        const std::vector<float>& elements
+        const std::vector<int>& elements
     )
 {
-    float sum{0.0};
+    int sum{ 0 };
     for (auto&& element : elements)
     {
         sum += element;
     }
-    return sum / static_cast<float>(elements.size());
+    return static_cast<float>(sum) / static_cast<float>(elements.size());
 }
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name = "Testing users_average function", .path = "tests::average"}
+        {.name = "Testing users_average function", .path = "readme::average"}
     )
 )
 {
@@ -124,13 +124,12 @@ _TEST_CASE(
     for (auto& vect :
          // Here, generate_data_randomly takes an argument called a
          // "general_data_file", signified by the function "gdf". Using this
-         // GDF, values which trigger a test assertion failure are written to
-         // the file "random_data". Every time the test is re-ran, the values
-         // from this file are tested first. This allows problematic test values
+         // file "random_data", values which trigger a test assertion failure
+         // are written to it. Every time the test is re-ran, the values from
+         // "random_data" are tested first. This allows problematic test values
          // to be retained easily, and helps the user quickly identify whether
          // there has been a test regression.
-         generate_data_randomly<std::vector<float>>(gdf("random_data"))
-             & enumerate_data(from_min_to_val(std::vector<float>(1, 100.0f))))
+         generate_data_randomly<std::vector<int>>(gdf("random_data")))
     {
         // matcher_t is the object which contains an assertion. Until it is put
         // into the _CHECK or _REQUIRE macro, the test framework will not
@@ -154,13 +153,15 @@ _TEST_CASE(
             exception_matcher
                 = false_matcher(u8"An unexpected exception was thrown");
         }
+        fuzzy_tests << _CHECK(exception_matcher);
         // abc_test includes macros which can reduce the need for boiler-place
-        // code to to check exceptions.
+        // code to to check exceptions. All of the above could be written using
+        // the following five lines of code.
         matcher_t exception_matcher_2;
         _BEGIN_NO_THROW_MATCHER(exception_matcher_2);
         do_not_optimise(users_average(vect));
         _END_NO_THROW_MATCHER(exception_matcher_2);
-        fuzzy_tests << _CHECK(exception_matcher && exception_matcher_2);
+        fuzzy_tests << _CHECK(exception_matcher_2);
     }
     _CHECK(fuzzy_tests);
 }
