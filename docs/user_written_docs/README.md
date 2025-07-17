@@ -41,9 +41,9 @@ Through the example above is valid testing code in `abc_test`, it relies on the 
 
 If the user runs the `abc_test_examples` executable from the root directory with the command line options `--root_path examples/data/test_data --test_paths_to_run readme::fib` then the following output is produced.
 
-<!-- run:build/examples/Debug/abc_test_examples.exe:sh -->
-
 Then the following output is produced.
+
+<!-- run:build/examples/Debug/abc_test_examples.exe --root_path examples/data/test_data --test_paths_to_run readme::fib --repetition_config:sh -->
 
 In the second set of output, the only assertions which are ran are those which failed the first test. More specifically, the data generator only produced values which failed an assertion. By providing the executable with the `repetition_config` given as output from the first test, we essentially encoded instructions into the executable to only have the data generator produce those values which previously produced failed assertions. 
 
