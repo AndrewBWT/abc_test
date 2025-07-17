@@ -132,7 +132,7 @@ Comment used:                       "#"
 general data extension used:        "gd"
 Number of values used to seed RNGs: 100
 Repetition config:                  No repetition config given.
-Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1752749419
+Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1752749547
 Force run all tests used?           No
 test paths to run:                  readme::fib.
 ==========================================================================================
@@ -154,7 +154,7 @@ Assertions passed:          0
 Assertions failed:          1
 Assertion information:      0 / 1 assertions passed. All assertion failed.
 Termination status:         Function exited normally with a failed status.
-Time taken:                 490 microseconds
+Time taken:                 498 microseconds
 ==========================================================================================
 ASSERTION INFO
 ==========================================================================================
@@ -200,7 +200,7 @@ Total tests which threw unexpected exception: 0
 Total assertions ran:                         1
 Total assertions passed:                      0
 Total assertions failed:                      1
-Global random seed:                           "1752749419"
+Global random seed:                           "1752749547"
 Repetition loop stack seed:                   "54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c653a3a726561646d653a3a666962:5b5b28302c302c2228302c203329222c5b5d295d5d"
 ==========================================================================================
 ```
@@ -219,8 +219,8 @@ Threads used:                       24
 Comment used:                       "#"
 general data extension used:        "gd"
 Number of values used to seed RNGs: 100
-Repetition config:                  {"Testing Fibonacci function using data from a file::readme::fib":class abc::ds::typeless_data_generator_collection_stack_trie_t {for_loop_data = struct abc::ds::data_generator_collection_memoized_element_t {generation_collection_index = 0, flied = struct abc::ds::data_generator_memoized_element_t {mode = 0, additional_data = ""}}, children = [[class std::shared_ptr<class abc::ds::typeless_data_generator_collection_stack_trie_t> {address = 2581012698176, data = class abc::ds::typeless_data_generator_collection_stack_trie_t {for_loop_data = struct abc::ds::data_generator_collection_memoized_element_t {generation_collection_index = 0, flied = struct abc::ds::data_generator_memoized_element_t {mode = 0, additional_data = "(0, 3)"}}, children = []}}]]}}
-Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1752749419
+Repetition config:                  {"Testing Fibonacci function using data from a file::readme::fib":class abc::ds::typeless_data_generator_collection_stack_trie_t {for_loop_data = struct abc::ds::data_generator_collection_memoized_element_t {generation_collection_index = 0, flied = struct abc::ds::data_generator_memoized_element_t {mode = 0, additional_data = ""}}, children = [[class std::shared_ptr<class abc::ds::typeless_data_generator_collection_stack_trie_t> {address = 1191426411712, data = class abc::ds::typeless_data_generator_collection_stack_trie_t {for_loop_data = struct abc::ds::data_generator_collection_memoized_element_t {generation_collection_index = 0, flied = struct abc::ds::data_generator_memoized_element_t {mode = 0, additional_data = "(0, 3)"}}, children = []}}]]}}
+Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1752749547
 Force run all tests used?           No
 test paths to run:                  readme::fib.
 ==========================================================================================
@@ -242,7 +242,7 @@ Assertions passed:          0
 Assertions failed:          1
 Assertion information:      0 / 1 assertions passed. All assertion failed.
 Termination status:         Function exited normally with a failed status.
-Time taken:                 357 microseconds
+Time taken:                 359 microseconds
 ==========================================================================================
 ASSERTION INFO
 ==========================================================================================
@@ -276,16 +276,16 @@ Total tests which threw unexpected exception: 0
 Total assertions ran:                         1
 Total assertions passed:                      0
 Total assertions failed:                      1
-Global random seed:                           "1752749419"
+Global random seed:                           "1752749547"
 Repetition loop stack seed:                   "54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c653a3a726561646d653a3a666962:5b5b28302c302c2228302c203329222c5b5d295d5d"
 ==========================================================================================
 ```
 
 In the second set of output, the only assertions which are ran are those which failed the first test. More specifically, the data generator only produced values which failed an assertion. By providing the executable with the `repetition_config` given as output from the first test, we essentially encoded instructions into the executable to only have the data generator produce those values which previously produced failed assertions. 
 
-This is one of the core features in `abc_test`. It allows the user to hone in on failing test assertions, skipping generated values which only produced passed assertions. To be clear, all data generators in `abc_test` have this functionality.
+This is one of the core features in `abc_test`. It allows the user to hone in on failing test assertions, skipping generated values which did not produce failed assertions. To be clear, all data generators in `abc_test` have this functionality.
 
-This functionality works by tracking information about what data generators are currently being iterated through when an assertion fails, and that information is retained. When the test has finished running, a `repetition_config` is produced, which can then be fed back to the test suite when it is re-ran.
+This functionality works by tracking information about what data generators are currently being iterated through when an assertion fails, and that information is retained. When the test has finished running, a `repetition_config` is produced, which can then be fed back to the test suite when it is re-ran, which will tell the generators which values to produce.
 
 ### Property Testing Example ###
 

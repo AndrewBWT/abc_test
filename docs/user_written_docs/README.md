@@ -49,9 +49,9 @@ If the user then runs the same executable from the same location with the option
 
 In the second set of output, the only assertions which are ran are those which failed the first test. More specifically, the data generator only produced values which failed an assertion. By providing the executable with the `repetition_config` given as output from the first test, we essentially encoded instructions into the executable to only have the data generator produce those values which previously produced failed assertions. 
 
-This is one of the core features in `abc_test`. It allows the user to hone in on failing test assertions, skipping generated values which only produced passed assertions. To be clear, all data generators in `abc_test` have this functionality.
+This is one of the core features in `abc_test`. It allows the user to hone in on failing test assertions, skipping generated values which did not produce failed assertions. To be clear, all data generators in `abc_test` have this functionality.
 
-This functionality works by tracking information about what data generators are currently being iterated through when an assertion fails, and that information is retained. When the test has finished running, a `repetition_config` is produced, which can then be fed back to the test suite when it is re-ran.
+This functionality works by tracking information about what data generators are currently being iterated through when an assertion fails, and that information is retained. When the test has finished running, a `repetition_config` is produced, which can then be fed back to the test suite when it is re-ran, which will tell the generators which values to produce.
 
 ### Property Testing Example ###
 
