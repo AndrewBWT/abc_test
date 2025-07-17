@@ -122,7 +122,90 @@ If the user runs the `abc_test_examples` executable from the root directory with
 Then the following output is produced.
 
 ```sh
-**Error running command `build/examples/Debug/abc_test_examples.exe --root_path examples/data/test_data --test_paths_to_run readme::fib --repetition_config`: Command '['build/examples/Debug/abc_test_examples.exe', '--root_path', 'examples/data/test_data', '--test_paths_to_run', 'readme::fib', '--repetition_config']' returned non-zero exit status 4294967295.**```
+==========================================================================================
+TEST SUITE CONFIGURATION
+==========================================================================================
+Global test list used?              Yes
+Write data to files:                Yes
+Path delimiter used:                "::"
+Root path used:                     examples/data/test_data
+Threads used:                       24
+Comment used:                       "#"
+general data extension used:        "gd"
+Number of values used to seed RNGs: 100
+Repetition config:                  No repetition config given.
+Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1752749268
+Force run all tests used?           No
+test paths to run:                  readme::fib.
+==========================================================================================
+TEST INFO
+==========================================================================================
+Test result:                TEST FAILED
+Test passed:                No
+Test name:                  "Testing Fibonacci function using data from a file"
+Source location:            G:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples/readme.hpp:13
+Source code representation: "_TEST_CASE(abc::test_case_t( {.name = "Testing Fibonacci function using data from a file", .path = "readme::fib"} ))"
+Test Path:                  "readme::fib"
+Seed used:                  <no seed used>
+Seed used (hex):            <no seed used>
+Seed to re-run test:        [[(0,0,"(0, 3)",[])]]
+Seed to re-run test (hex):  "5b5b28302c302c2228302c203329222c5b5d295d5d"
+Warnings:                   0
+Assertions evaluated:       1
+Assertions passed:          0
+Assertions failed:          1
+Assertion information:      0 / 1 assertions passed. All assertion failed.
+Termination status:         Function exited normally with a failed status.
+Time taken:                 5922 microseconds
+==========================================================================================
+ASSERTION INFO
+==========================================================================================
+  1)  Multi-element block-based assertion failed. 2/3 assertions passed. Assertion terminated function.
+      Assertion's annotation:  "Unit tests for Fibonacci function"
+      Source block begin:
+        Source location:
+          G:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples/readme.hpp:25
+        Source code representation:
+          "_MULTI_MATCHER("Unit tests for Fibonacci function")"
+        Source location:
+          G:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples/readme.hpp:42
+        Source code representation:
+          "_CHECK"
+      Assertion data (grouped by source):
+        The following 3 matcher-based assertions have the same source data, which is as follows:
+        The data of the 3 matcher-based assertions:
+        1)  Matcher-based assertion passed with output:
+              Primary output from matcher:
+                0 == 0
+            Logged information:
+              data generator's value = (0, 0)
+        2)  Matcher-based assertion passed with output:
+              Primary output from matcher:
+                8 == 8
+            Logged information:
+              data generator's value = (6, 8)
+        3)  Matcher-based assertion failed with output:
+              Primary output from matcher:
+                13 != 14
+            Logged information:
+              data generator's value = (7, 14)
+==========================================================================================
+==========================================================================================
+TEST SUITE RESULTS
+==========================================================================================
+Total tests ran:                              1
+Total tests passed:                           0
+Total tests failed:                           1
+Total tests failed and terminated:            0
+Total tests failed (but not terminated):      1
+Total tests which threw unexpected exception: 0
+Total assertions ran:                         1
+Total assertions passed:                      0
+Total assertions failed:                      1
+Global random seed:                           "1752749268"
+Repetition loop stack seed:                   "54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c653a3a726561646d653a3a666962:5b5b28302c302c2228302c203329222c5b5d295d5d"
+==========================================================================================
+```
 
 In the second set of output, the only assertions which are ran are those which failed the first test. More specifically, the data generator only produced values which failed an assertion. By providing the executable with the `repetition_config` given as output from the first test, we essentially encoded instructions into the executable to only have the data generator produce those values which previously produced failed assertions. 
 
