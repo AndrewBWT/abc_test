@@ -28,12 +28,10 @@ inline void
         size_t _l_tmp_size_t{_l_idx + 1};
         T      _l_value2{0};
         _l_size_t = 1;
-       
-            _l_enumerator.increment(_l_value, _l_size_t, optional<T>{})
-        ;
-        
-            _l_enumerator.increment(_l_value2, _l_tmp_size_t, optional<T>{})
-        ;
+
+        _l_enumerator.increment(_l_value, _l_size_t, optional<T>{});
+
+        _l_enumerator.increment(_l_value2, _l_tmp_size_t, optional<T>{});
         _REQUIRE(_EXPR(_l_value == _l_value2));
     }
 }
@@ -90,8 +88,8 @@ _TEST_CASE(
         {.name = "Testing default_enumerator_t for floating point types",
          .description
          = "Checks default_enumerator_t functions for floating point numbers",
-         .path
-         = "abc_test_test::included_instances::data_generator::enumeration::default_enumeration",
+         .path = "abc_test_test::included_instances::data_generator::"
+                 "enumeration::default_enumeration",
          .threads_required = 1}
     )
 )
@@ -108,8 +106,8 @@ _TEST_CASE(
         {.name = "Testing default_enumerator_t for std::vector",
          .description
          = "Checks default_enumerator_t functions for std::vector objects",
-         .path
-         = "abc_test_test::included_instances::data_generator::enumeration::default_enumeration",
+         .path = "abc_test_test::included_instances::data_generator::"
+                 "enumeration::default_enumeration",
          .threads_required = 1}
     )
 )

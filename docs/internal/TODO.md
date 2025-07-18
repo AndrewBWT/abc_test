@@ -5,7 +5,6 @@
 1 - Code documentation. See docs/internal/documentation.md for details.
 2 - Tutorials and examples. See docs/internal/tutorials_and_examples.md for details.
 3 - Tests. See docs/internal/tests.md for details.
-4 - README. See docs/internal/readme.md for details.
 
 ## Not Currently a Focus ##
 

@@ -1,5 +1,5 @@
 #pragma once
-#if 0
+
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
 #include "abc_test/included_instances/data_generator/enumeration/default_enumeration.hpp"
@@ -137,7 +137,7 @@ _TEST_CASE(
 _TEST_CASE(
     abc::test_case_t(
         {.name
-         = "Tests enumerate_enum_helper_t::less_than, equal and difference",
+         = "Tests ence",
          .path             = "abc_test_test::utility::enum",
          .threads_required = 1}
     )
@@ -263,7 +263,7 @@ _TEST_CASE(
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name = "Tests for enumerate_enum_helper_t::min, max and size",
+        {.name = "Tests for ize",
          .path = "abc_test_test::utility::enum",
          .threads_required = 1}
     )
@@ -1066,4 +1066,3 @@ _TEST_CASE(
         }
     );
 }
-#endif

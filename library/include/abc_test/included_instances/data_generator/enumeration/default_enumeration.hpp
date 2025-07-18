@@ -853,6 +853,8 @@ private:
     enumeration_schema_t<T> _m_enumerate;
     std::size_t             _m_n_jumps;
 public:
+    using value_type_t = std::optional<T>;
+
     __constexpr_imp
         default_enumeration_t(
             const std::size_t              _a_n_jumps = std::size_t{1},
@@ -864,8 +866,8 @@ public:
 
     __constexpr_imp virtual bool
         less_than(
-            const std::optional<T>& _a_l,
-            const std::optional<T>& _a_r
+            const value_type_t& _a_l,
+            const value_type_t& _a_r
         ) const noexcept
     {
         if (_a_l.has_value() && _a_r.has_value())
@@ -891,8 +893,8 @@ public:
 
     __constexpr_imp virtual bool
         equal(
-            const std::optional<T>& _a_l,
-            const std::optional<T>& _a_r
+            const value_type_t& _a_l,
+            const value_type_t& _a_r
         ) const noexcept
     {
         if (_a_l.has_value() && _a_r.has_value())
@@ -914,10 +916,10 @@ public:
 
     __constexpr_imp bool
         increment(
-            std::optional<T>&  _a_opt,
-            enumerate_index_t& _a_n_times_to_increment,
-            const T&           _a_min_value,
-            const T&           _a_max_value
+            value_type_t&       _a_opt,
+            enumerate_index_t&  _a_n_times_to_increment,
+            const value_type_t& _a_min_value,
+            const value_type_t& _a_max_value
         )
     {
         using namespace std;
@@ -941,37 +943,37 @@ public:
                 --_a_n_times_to_increment;
             }
             return _m_enumerate->increment(
-                _a_opt.value(), _a_n_times_to_increment, _l_max_value.value()
+                _a_opt.value(),
+                _a_n_times_to_increment,
+                _a_min_value.value(),
+                _a_max_value.value()
             );
         }
     }
 
     __constexpr_imp bool
         decrement(
-            std::optional<T>&  _a_opt,
-            enumerate_index_t& _a_n_times_to_increment,
-            const T&           _a_min_value,
-            const T&           _a_max_value
+            value_type_t&       _a_opt,
+            enumerate_index_t&  _a_n_times_to_increment,
+            const value_type_t& _a_min_value,
+            const value_type_t& _a_max_value
         )
     {
         using namespace std;
-        const optional<T> _l_min_value{
-            _a_min_value.has_value() ? _a_min_value.value() : std::nullopt
-        };
-        if (less_than(_a_opt, _l_min_value))
+        if (less_than(_a_opt, _a_min_value))
         {
             _ABC_UNREACHABLE(u8"couldn't reach");
         }
         else
         {
-            if (equal(_l_min_value, _a_opt) || _a_n_times_to_increment == 0)
+            if (equal(_a_min_value, _a_opt) || _a_n_times_to_increment == 0)
             {
                 return _a_n_times_to_increment == 0;
             }
             if (_a_opt.has_value())
             {
                 // bool _l_opt_result;
-                if (_l_min_value.has_value())
+                // if (_l_min_value.has_value())
                 {
                     // _l_opt_result = _m_enumerate->decrement(
                     //     _a_opt.value(),
@@ -979,7 +981,7 @@ public:
                     //     _l_min_value.value()
                     // );
                 }
-                else
+                // else
                 {
                     // _l_opt_result = _m_enumerate->decrement(
                     //     _a_opt.value(),
@@ -992,7 +994,7 @@ public:
                     return true;
                 }
             }
-            if (_a_n_times_to_increment > 0 && _l_min_value == std::nullopt)
+            if (_a_n_times_to_increment > 0 && _a_min_value == std::nullopt)
             {
                 --_a_n_times_to_increment;
                 _a_opt = std::nullopt;
@@ -1003,8 +1005,8 @@ public:
 
     __constexpr virtual enumeration_diff_t
         difference(
-            const std::optional<T>& _a_arg1,
-            const std::optional<T>& _a_arg2
+            const value_type_t& _a_arg1,
+            const value_type_t& _a_arg2
         ) noexcept
     {
         return {0, 0};
