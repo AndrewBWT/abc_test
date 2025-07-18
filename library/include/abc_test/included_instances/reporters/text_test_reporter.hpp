@@ -43,6 +43,8 @@ public:
     */
     __no_constexpr
         text_test_reporter_t() noexcept;
+    __no_constexpr
+        text_test_reporter_t(const bool _a_coloured) noexcept;
     /*!
     Constructor whcih allows a file to be where the output is posted.
     */
@@ -85,7 +87,13 @@ __no_constexpr_imp
     , _m_has_colour_output(false)
     , _m_print_config(print_config_t(false))
 {}
-
+__no_constexpr_imp
+text_test_reporter_t::text_test_reporter_t(const bool _a_coloured) noexcept
+    : threated_text_output_reporter_t(std::cout)
+    , _m_has_colour_output(_a_coloured)
+    , _m_print_config(print_config_t(_a_coloured))
+{
+}
 __no_constexpr_imp
     text_test_reporter_t::text_test_reporter_t(
         const std::filesystem::path& _a_file_output

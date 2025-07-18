@@ -339,6 +339,13 @@ __no_constexpr_imp void
         _a_cli_results
     );
     _a_cli.add_auto_configuration();
+    _a_cli.add_option(
+        _s_default_cout_text_test_reporter,
+        static_cast<console_output_e included_instances_test_options_t::*>(
+            &included_instances_test_options_t::use_text_test_reporter_to_cout
+        ),
+        _a_cli_results
+    );
     _a_cli.add_multi_element_option<vector<u8string>, u8string>(
         _c_test_paths_to_run,
         static_cast<vector<u8string> included_instances_test_options_t::*>(

@@ -21,7 +21,7 @@ public:
     Constructor for std::cerr to be where the output is posted.
     */
     __no_constexpr
-        text_error_reporter_t() noexcept;
+        text_error_reporter_t(const bool _a_coloured) noexcept;
     /*!
     Constructor whcih allows a file to be where the output is posted.
     */
@@ -50,7 +50,8 @@ _END_ABC_REPORTERS_NS
 
 _BEGIN_ABC_REPORTERS_NS
 __no_constexpr_imp
-    text_error_reporter_t::text_error_reporter_t() noexcept
+    text_error_reporter_t::text_error_reporter_t(
+    const bool _a_coloured) noexcept
     : threated_text_output_reporter_t(std::cerr)
 {}
 

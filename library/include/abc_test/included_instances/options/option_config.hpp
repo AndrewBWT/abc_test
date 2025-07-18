@@ -42,6 +42,9 @@ static constexpr cli_option_config_t _s_tertiary_data_file_extension
     = {u8"tertiary_data_file_extension",
        u8"The extension used for tertiary data files",
        {}};
+static constexpr cli_option_config_t _s_default_cout_text_test_reporter
+    = {u8"default_console_test_reporter",
+       u8"The setting given for the default console test reporter. ",{} };
 static constexpr cli_option_config_t _s_retain_passed_assertions
     = {u8"retain_passed_assertions",
        u8"Whether to retain passed assertions in test suite output",

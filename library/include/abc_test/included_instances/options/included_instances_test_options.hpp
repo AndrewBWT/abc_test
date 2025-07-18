@@ -1,17 +1,37 @@
 #pragma once
 
+#include "abc_test/core/options/test_options_base.hpp"
 #include "abc_test/included_instances/reporters/text_error_reporter.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter.hpp"
-#include "abc_test/core/options/test_options_base.hpp"
 
 _BEGIN_ABC_NS
+
+enum class console_output_e
+{
+    no_output,
+    coloured_output,
+    monochrome_output
+};
+template <>
+inline auto
+utility::get_enum_list() noexcept -> utility::enum_list_t<
+    console_output_e>
+{
+    using enum console_output_e;
+    return {
+        _ENUM_LIST_ENTRY(no_output),
+        _ENUM_LIST_ENTRY(coloured_output),
+        _ENUM_LIST_ENTRY(monochrome_output)
+    };
+}
 
 struct included_instances_test_options_t : public test_options_base_t
 {
 public:
-
-    bool use_text_test_reporter_to_cout  = true;
-    bool use_text_error_reporter_to_cout = true;
+    console_output_e use_text_test_reporter_to_cout
+        = console_output_e::coloured_output;
+    console_output_e use_text_error_reporter_to_cout
+        = console_output_e::coloured_output;
     std::vector<std::pair<std::filesystem::path, bool>>
         text_test_reporter_file_names;
     std::vector<std::pair<std::filesystem::path, bool>>
@@ -58,13 +78,28 @@ __no_constexpr_imp void
     using namespace _ABC_NS_REPORTERS;
     using namespace std;
     using namespace std::filesystem;
-    if (use_text_test_reporter_to_cout)
+    using enum console_output_e;
+    switch (use_text_error_reporter_to_cout)
     {
-        this->test_reporters.push_back(make_shared<text_test_reporter_t>());
+    case no_output:
+        break;
+    case coloured_output:
+        this->error_reporters.push_back(make_shared<text_error_reporter_t>(true));
+        break;
+    case monochrome_output:
+        this->error_reporters.push_back(make_shared<text_error_reporter_t>(false));
+        break;
     }
-    if (use_text_error_reporter_to_cout)
+    switch (use_text_test_reporter_to_cout)
     {
-        this->error_reporters.push_back(make_shared<text_error_reporter_t>());
+    case no_output:
+        break;
+    case coloured_output:
+        this->test_reporters.push_back(make_shared<text_test_reporter_t>(true));
+        break;
+    case monochrome_output:
+        this->test_reporters.push_back(make_shared<text_test_reporter_t>(false));
+        break;
     }
     vector<path> _l_error_files{check_files(
         _a_error_ref,
@@ -132,7 +167,8 @@ __no_constexpr_imp std::vector<std::filesystem::path>
         else if (_l_duplicates_allowed == false && exists(_l_file_to_be_made))
         {
             _a_error_ref.push_back(fmt::format(
-                u8"File for {0} \"{1}\" unable to be created because it already "
+                u8"File for {0} \"{1}\" unable to be created because it "
+                u8"already "
                 u8"exists",
                 u8"hello",
                 _l_file_to_be_made
@@ -193,9 +229,11 @@ __no_constexpr_imp auto
         typeid(_a_rtd).name(),
         make_test_options_base_member_variables_fmt(_a_rtd),
         "use_text_test_reporter_to_cout",
-        _a_rtd.use_text_test_reporter_to_cout,
+        "hi",
+       // _a_rtd.use_text_test_reporter_to_cout,
         "use_text_error_reporter_to_cout",
-        _a_rtd.use_text_error_reporter_to_cout,
+        "hi",
+        //_a_rtd.use_text_error_reporter_to_cout,
         "text_test_reporter_file_names",
         _a_rtd.text_test_reporter_file_names,
         "text_error_reporter_file_names",
