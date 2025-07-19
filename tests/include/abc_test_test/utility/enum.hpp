@@ -137,7 +137,7 @@ _TEST_CASE(
 _TEST_CASE(
     abc::test_case_t(
         {.name
-         = "Tests ence",
+         = "Tests enumerate_enum_helper_t::less_than, equal and difference",
          .path             = "abc_test_test::utility::enum",
          .threads_required = 1}
     )
@@ -263,7 +263,7 @@ _TEST_CASE(
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name = "Tests for ize",
+        { .name = "Tests for enumerate_enum_helper_t::min, max and size",
          .path = "abc_test_test::utility::enum",
          .threads_required = 1}
     )
@@ -306,7 +306,7 @@ _TEST_CASE(
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name = "Tests enumerate_enum_helper_t::increment and decrement",
+        { .name = "Tests enumerate_enum_helper_t::increment and decrement",
          .path = "abc_test_test::utility::enum",
          .threads_required = 1}
     )

@@ -65,7 +65,6 @@ inline void
              ))
         {
             ++_l_idx;
-            std::cout << _l_vector.size() << std::endl;
         }
         if (_l_diff.second != 0)
         {

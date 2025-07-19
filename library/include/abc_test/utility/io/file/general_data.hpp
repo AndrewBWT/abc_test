@@ -3,8 +3,8 @@
 #include "abc_test/core/ds/test_data/invoked_test_data.hpp"
 #include "abc_test/core/options/test_options_base.hpp"
 #include "abc_test/utility/internal/macros.hpp"
-#include "abc_test/utility/str/rw_info.hpp"
 #include "abc_test/utility/io/io_utilities.hpp"
+#include "abc_test/utility/str/rw_info.hpp"
 
 #include <filesystem>
 
@@ -31,6 +31,11 @@ __no_constexpr abc::utility::io::general_data_t
                    const std::string_view _a_str) noexcept;
 __no_constexpr abc::utility::io::general_data_t
                gdf_from_path(const std::filesystem::path& _a_path) noexcept;
+__no_constexpr abc::utility::io::general_data_t
+               gdf_from_path(
+                   const std::filesystem::path& _a_path,
+                   const bool                   _a_has_drive_letter
+               ) noexcept;
 _END_ABC_NS
 
 _BEGIN_ABC_UTILITY_IO_NS
@@ -56,8 +61,12 @@ __no_constexpr_imp abc::utility::io::general_data_t
                    ) noexcept
 {
     return gdf_from_path(
-        (std::filesystem::absolute(global::get_this_threads_current_test().path()) / _a_str)
-            .concat(".").concat(global::get_global_test_options().general_data_extension)
+        (std::filesystem::absolute(global::get_this_threads_current_test().path(
+         ))
+         / _a_str)
+            .concat(".")
+            .concat(global::get_global_test_options().general_data_extension),
+        true
     );
 }
 
@@ -70,9 +79,11 @@ __no_constexpr_imp abc::utility::io::general_data_t
     using namespace std;
     using namespace std::filesystem;
     return gdf_from_path(
-        (absolute(global::get_global_test_options().root_path) / _a_folder / _a_str)
+        (absolute(global::get_global_test_options().root_path) / _a_folder
+         / _a_str)
             .concat(".")
-            .concat(global::get_global_test_options().general_data_extension)
+            .concat(global::get_global_test_options().general_data_extension),
+        true
     );
 }
 
@@ -83,8 +94,20 @@ __no_constexpr_imp abc::utility::io::general_data_t
 {
     using namespace abc::utility::io;
     return general_data_t(
-        abc::utility::io::normalise_for_file_use(
-        _a_path.u8string()));
+        abc::utility::io::normalise_for_file_use(_a_path.u8string(), true)
+    );
+}
+
+__no_constexpr_imp abc::utility::io::general_data_t
+               gdf_from_path(
+                   const std::filesystem::path& _a_path,
+                   const bool                   _a_has_drive_letter
+               ) noexcept
+{
+    using namespace abc::utility::io;
+    return general_data_t(abc::utility::io::normalise_for_file_use(
+        _a_path.u8string(), _a_has_drive_letter
+    ));
 }
 
 _END_ABC_NS

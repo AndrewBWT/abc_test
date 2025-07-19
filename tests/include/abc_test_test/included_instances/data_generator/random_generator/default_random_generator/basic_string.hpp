@@ -2,8 +2,8 @@
 #include "abc_test/core.hpp"
 #include "abc_test/core/errors/test_assertion_exception.hpp"
 #include "abc_test/included_instances.hpp"
-#include "abc_test_test/testing_utilities/simple_random_generator.hpp"
 #include "abc_test_test/testing_utilities/functions.hpp"
+#include "abc_test_test/testing_utilities/simple_random_generator.hpp"
 
 // basic_string<T> tests.
 
@@ -32,8 +32,8 @@ _TEST_CASE(
         u16string,
         u32string,
         wstring
-    //    basic_string<int>
-    >;
+        // basic_string<int>
+        >;
     using data_types_2_t = abc::utility::
         type_list<utility::simple_rng_t, utility::inner_rng_mt19937_64_t>;
     auto _l_test_func = [&]<typename T, typename Rng>(
@@ -111,8 +111,9 @@ _TEST_CASE(
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name = "Unit testing random_data_generator_t",
-         .path = "abc_test_test::random_"
+        {.name = "Unit testing random_data_generator_t for std::basic_string "
+                 "type, using user-supplied vectors of signed integers",
+         .path = "abc_test_test::included_instances::data_generator::random_"
                  "generator::default_random_generator::basic_string",
          .threads_required = 1}
     )
@@ -130,8 +131,8 @@ _TEST_CASE(
         u16string,
         u32string,
         wstring
-     //   basic_string<int>
-     >;
+        // basic_string<int>
+        >;
     manual_data_generator_t _l_mdg;
     auto                    _l_test_func = [&]<typename T>()
     {
@@ -176,9 +177,11 @@ _TEST_CASE(
 
 _TEST_CASE(
     abc::test_case_t(
-        {.name = "Unit testing random_dat",
-         .path = "abc_test_string",
-         .threads_required = 1}
+        { .name = "Unit testing random_data_generator_t for std::basic_string "
+                 "type, using user-supplied ASCII strings",
+         .path = "abc_test_test::included_instances::data_generator::random_"
+                 "generator::default_random_generator::basic_string",
+         .threads_required = 1 }
     )
 )
 {
@@ -193,7 +196,7 @@ _TEST_CASE(
         u16string,
         u32string,
         wstring
-        //basic_string<int>
+        // basic_string<int>
         >;
     auto _l_test_func = [&]<typename T>()
     {

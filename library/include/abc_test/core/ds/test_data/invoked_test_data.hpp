@@ -677,12 +677,12 @@ __no_constexpr_imp std::filesystem::path
          _a_test_info.test_path_hierarchy())
     {
         _l_path
-            /= abc::utility::io::normalise_for_file_use(_a_test_path_component);
+            /= abc::utility::io::normalise_for_file_use(_a_test_path_component, false);
     }
     _l_path /= abc::utility::io::normalise_for_file_use(
         cast_string_to_u8string(
             _a_test_info.registered_test_data()._m_user_data.name
-        )
+        ),false
     );
     if (not exists(_l_path))
     {
