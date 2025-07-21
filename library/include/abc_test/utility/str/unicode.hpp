@@ -8,6 +8,8 @@
 
 #include <array>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
 
 _BEGIN_ABC_UTILITY_STR_NS
 /*!
@@ -275,7 +277,10 @@ __constexpr std::u8string
 template <typename CharT>
 __constexpr std::u8string
             unicode_char_to_u8string(const CharT _a_char) noexcept;
-
+__constexpr std::u8string
+            ascii_string_to_u8string(const std::string& _a_str) noexcept;
+__constexpr std::u8string
+            ascii_char_to_u8string(const char _a_char) noexcept;
 /*!
  * @brief Gets the specified constant.
  *
@@ -464,6 +469,9 @@ __constexpr std::u8string
                 const size_t             _a_index,
                 const std::u8string_view _a_char
             ) noexcept;
+template <typename CharT>
+__constexpr std::optional<std::u8string>
+            special_char_as_string(const CharT _a_char) noexcept;
 } // namespace detail
 
 _END_ABC_UTILITY_STR_NS
@@ -907,9 +915,17 @@ __constexpr std::u8string
         };
         if (_l_char_opt.has_value())
         {
-            detail::add_char32_to_u8string(
-                _l_char_opt.value(), _l_back_inserter
-            );
+            if (auto _l_special_char_str{ detail::special_char_as_string(_l_char_opt.value()) };
+                _l_special_char_str.has_value())
+            {
+                _l_rv.append(_l_special_char_str.value());
+            }
+            else
+            {
+                detail::add_char32_to_u8string(
+                    _l_char_opt.value(), _l_back_inserter
+                );
+            }
         }
         else
         {
@@ -938,6 +954,41 @@ __constexpr_imp std::u8string
 {
     using namespace std;
     return unicode_string_to_u8string(basic_string<CharT>(1, _a_char));
+}
+
+__constexpr std::u8string
+            ascii_string_to_u8string(
+                const std::string& _a_str
+            ) noexcept
+{
+    using namespace std;
+    u8string _l_rv{};
+    auto     _l_end{std::end(_a_str)};
+    auto     _l_back_inserter{std::back_inserter(_l_rv)};
+    for (auto _l_itt{std::begin(_a_str)}; _l_itt != _l_end; ++_l_itt)
+    {
+        const char _l_char{*_l_itt};
+        if (auto _l_special_char_str{detail::special_char_as_string(_l_char)};
+            _l_special_char_str.has_value())
+        {
+            _l_rv.append(_l_special_char_str.value());
+        }
+        else
+        {
+            _l_rv.push_back(static_cast<char8_t>(_l_char));
+        }
+    }
+
+    return _l_rv;
+}
+
+__constexpr std::u8string
+            ascii_char_to_u8string(
+                const char _a_char
+            ) noexcept
+{
+    using namespace std;
+    return ascii_string_to_u8string(string(1, _a_char));
 }
 
 template <typename T>
@@ -2363,6 +2414,94 @@ __constexpr std::u8string
         _a_char,
         detail::unicode_error_description<CharT, false>()
     );
+}
+
+template <typename CharT>
+__constexpr_imp std::optional<std::u8string>
+                special_char_as_string(
+                    const CharT _a_char
+                ) noexcept
+{
+    using namespace std;
+    unordered_map<CharT, u8string> _l_special_escape_chars = {
+        {static_cast<CharT>(0x00), u8"\\0" }, // NULL
+        {static_cast<CharT>(0x07), u8"\\a" }, // Bell
+        {static_cast<CharT>(0x08), u8"\\b" }, // Backspace
+        {static_cast<CharT>(0x09), u8"\\t" }, // Horizontal Tab
+        {static_cast<CharT>(0x0A), u8"\\n" }, // Line Feed
+        {static_cast<CharT>(0x0B), u8"\\v" }, // Vertical Tab
+        {static_cast<CharT>(0x0C), u8"\\f" }, // Form Feed
+        {static_cast<CharT>(0x0D), u8"\\r" }, // Carriage Return
+        {static_cast<CharT>(0x5C), u8"\\\\"}, // Backslash
+        {static_cast<CharT>(0x27), u8"\\\'"}, // Single Quote
+        {static_cast<CharT>(0x22), u8"\\\""}, // Double quote
+    };
+    if (auto _l_find{_l_special_escape_chars.find(_a_char)};
+        _l_find != _l_special_escape_chars.end())
+    {
+        return _l_find->second;
+    }
+    else if (_a_char < static_cast<CharT>(0x20))
+    {
+        return represent_char_as_hex_for_printing(_a_char);
+    }
+    else
+    {
+        if constexpr (same_as<char, CharT>)
+        {
+            return _a_char > ascii_limit<CharT>()
+                       ? make_optional(
+                             represent_char_as_hex_for_printing(_a_char)
+                         )
+                       : nullopt;
+        }
+        else
+        {
+            unordered_set<CharT> _l_special_unicode_chars = {
+                static_cast<CharT>(0x00A0), // non-breaking space
+                static_cast<CharT>(0x1680), // ogham space mark
+                static_cast<CharT>(0x180E), // mongolian vowel separator
+                static_cast<CharT>(0x2000), // en quad
+                static_cast<CharT>(0x2001), // em quad
+                static_cast<CharT>(0x2002), // en space
+                static_cast<CharT>(0x2003), // em space
+                static_cast<CharT>(0x2004), // three-per-em space
+                static_cast<CharT>(0x2005), // four-per-em space
+                static_cast<CharT>(0x2006), // six-per-em space
+                static_cast<CharT>(0x2007), // figure space
+                static_cast<CharT>(0x2008), // punctuation space
+                static_cast<CharT>(0x2009), // thin space
+                static_cast<CharT>(0x200A), // hair space
+                static_cast<CharT>(0x200B), // zero width space
+                static_cast<CharT>(0x200C), // zero width non-joiner
+                static_cast<CharT>(0x200D), // zero width joiner
+                static_cast<CharT>(0x2028), // line separator
+                static_cast<CharT>(0x2029), // paragraph separator
+                static_cast<CharT>(0x202F), // narrow no-break space
+                static_cast<CharT>(0x205F), // medium mathematical space
+                static_cast<CharT>(0x2060), // word joiner
+                static_cast<CharT>(0x2061), // function application
+                static_cast<CharT>(0x2062), // invisible times
+                static_cast<CharT>(0x2063), // invisible separator
+                static_cast<CharT>(0x2064), // invisible plus
+                static_cast<CharT>(0x2066), // left-to-right isolate
+                static_cast<CharT>(0x2067), // right-to-left isolate
+                static_cast<CharT>(0x2068), // first strong isolate
+                static_cast<CharT>(0x2069), // pop directional isolate
+                static_cast<CharT>(0x3000), // ideographic space
+                static_cast<CharT>(0xFEFF), // byte order mark
+                static_cast<CharT>(0xFFF9), // interlinear annotation anchor
+                static_cast<CharT>(0xFFFA), // interlinear annotation separator
+                static_cast<CharT>(0xFFFB), // interlinear annotation terminator
+                static_cast<CharT>(0xFFFD), // replacement character
+            };
+            return _l_special_unicode_chars.contains(_a_char)
+                       ? make_optional(
+                             represent_char_as_hex_for_printing(_a_char)
+                         )
+                       : nullopt;
+        }
+    }
 }
 } // namespace detail
 

@@ -276,7 +276,7 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
                 return {false, _l_explanation_strs};
             }
         }
-        else if (not _l_left_at_end)
+        else if (_l_left_at_end)
         {
             if constexpr (Cmp == matcher::comparison_enum_t::LT
                           || Cmp == matcher::comparison_enum_t::LEQ
@@ -288,7 +288,7 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
             {
                 _l_func_add_types_to_explanation_str();
                 _l_explanation_strs.push_back(fmt::format(
-                    u8"TThe {0} argument is smaller than the "
+                    u8"TThe {0} argument is smaller in size than the "
                     u8"{1} argument, causing the matcher's test to fail.",
                     positive_integer_to_placement<1>(),
                     positive_integer_to_placement<2>()
@@ -308,7 +308,7 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
             {
                 _l_func_add_types_to_explanation_str();
                 _l_explanation_strs.push_back(fmt::format(
-                    u8"TThe {0} argument is bigger than the "
+                    u8"TThe {0} argument is bigger in size than the "
                     u8"{1} argument, causing the matcher's test to fail.",
                     positive_integer_to_placement<1>(),
                     positive_integer_to_placement<2>()

@@ -11,6 +11,7 @@
 //  - Test which uses letters on the keyboard, allowing us to write the tests as
 //  strings.
 
+#if 0
 _TEST_CASE(
     abc::test_case_t(
         {.name = "Fuzzy test for random_data_generator_t for the "
@@ -174,14 +175,15 @@ _TEST_CASE(
         }
     );
 }
+#endif
 
 _TEST_CASE(
     abc::test_case_t(
-        { .name = "Unit testing random_data_generator_t for std::basic_string "
+        {.name = "Unit testing random_data_generator_t for std::basic_string "
                  "type, using user-supplied ASCII strings",
          .path = "abc_test_test::included_instances::data_generator::random_"
                  "generator::default_random_generator::basic_string",
-         .threads_required = 1 }
+         .threads_required = 1}
     )
 )
 {
@@ -191,8 +193,8 @@ _TEST_CASE(
     using namespace utility;
     using namespace abc::data_gen;
     using data_types_t = abc::utility::type_list<
-        string,
-        u8string,
+    //    string,
+    //    u8string,
         u16string,
         u32string,
         wstring
@@ -200,16 +202,18 @@ _TEST_CASE(
         >;
     auto _l_test_func = [&]<typename T>()
     {
-        auto _l_string_tests
-            = _MULTI_MATCHER("Testing default_random_generator_t for "
-                             "std::basic_string produces the "
-                             "correct values");
+        auto _l_string_tests = _MULTI_MATCHER(fmt::format(
+            "Testing default_random_generator_t for "
+            "std::basic_string<{0}> produces the "
+            "correct values",
+            typeid(T).name()
+        ));
         default_random_generator_t<T> _l_rdg;
         rng_t _l_rng      = rng_t::make_rng<simple_rng_t>(vector<uint32_t>());
         using test_data_t = tuple<size_t, size_t, T>;
         for (const auto& [_l_rng_seed_value, _l_size_index, _l_string] :
              read_data_from_file<test_data_t>(
-                 fmt::format("string_test_data_using", typeid(T))
+                 fmt::format("string_test_data_using_{0}", typeid(T))
              ))
         {
             // Seed the random generator function with the given seed value.

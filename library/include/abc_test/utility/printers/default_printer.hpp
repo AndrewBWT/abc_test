@@ -6,12 +6,13 @@
 #include "abc_test/utility/printers/printer_base.hpp"
 #include "abc_test/utility/str/string_utils.hpp"
 
+#include <cctype>
 #include <deque>
 #include <filesystem>
+#include <forward_list>
 #include <random>
 #include <set>
 #include <unordered_set>
-#include <forward_list>
 
 _BEGIN_ABC_UTILITY_PRINTER_NS
 
@@ -87,16 +88,6 @@ protected:
     {
         return fmt::format(u8"{0}{1}{0}", _m_surrounding_str, _a_str);
     }
-
-    template <typename Type_To_Cast_To>
-    __constexpr std::u8string
-                make_hex_from_char(
-                    const T _a_char
-                ) const noexcept
-    {
-        Type_To_Cast_To _l_char_as_uint{static_cast<Type_To_Cast_To>(_a_char)};
-        return fmt::format(u8"\\x{:x}", _l_char_as_uint);
-    }
 private:
     std::u8string _m_surrounding_str;
     bool          _m_as_hex;
@@ -116,11 +107,7 @@ public:
     {
         using namespace std;
         using namespace _ABC_NS_UTILITY_STR;
-        return surround_str(
-            is_valid_ascii_char(_a_object)
-                ? fmt::format(u8"{0}", u8string(1, _a_object))
-                : make_hex_from_char<uint8_t>(_a_object)
-        );
+        return surround_str(ascii_char_to_u8string(_a_object));
     }
 private:
     std::optional<char> _m_surrounding_char;
@@ -140,11 +127,7 @@ public:
     {
         using namespace std;
         using namespace _ABC_NS_UTILITY_STR;
-        return surround_str(
-            is_valid_char(_a_object)
-                ? fmt::format(u8"{0}", u8string(1, _a_object))
-                : make_hex_from_char<uint8_t>(_a_object)
-        );
+        return surround_str(unicode_char_to_u8string(_a_object));
     }
 };
 
@@ -162,11 +145,7 @@ public:
     {
         using namespace std;
         using namespace _ABC_NS_UTILITY_STR;
-        return surround_str(
-            is_valid_char(_a_object)
-                ? fmt::format(u8"{0}", unicode_char_to_u8string(_a_object))
-                : make_hex_from_char<uint8_t>(_a_object)
-        );
+        return surround_str(unicode_char_to_u8string(_a_object));
     }
 };
 
@@ -184,11 +163,7 @@ public:
     {
         using namespace std;
         using namespace _ABC_NS_UTILITY_STR;
-        return surround_str(
-            is_valid_char(_a_object)
-            ? fmt::format(u8"{0}", unicode_char_to_u8string(_a_object))
-                : make_hex_from_char<uint8_t>(_a_object)
-        );
+        return surround_str(unicode_char_to_u8string(_a_object));
     }
 };
 
@@ -272,7 +247,8 @@ struct default_printer_t<T> : public printer_base_t<T>
 {
     static constexpr bool is_specialized{true};
 
-    __constexpr default_printer_t(
+    __constexpr
+    default_printer_t(
         const enum_helper_string_type_e _a_enum_helper_string_case
         = enum_helper_string_type_e::lower
     )
@@ -833,6 +809,44 @@ _END_ABC_UTILITY_PRINTER_NS
 
 _BEGIN_ABC_UTILITY_PRINTER_NS
 
+namespace detail
+{
+template <typename CharT>
+__constexpr std::u8string
+            print_str(
+                const std::basic_string_view<CharT> _a_str
+            )
+{
+    using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
+    if constexpr (same_as<CharT, char>)
+    {
+        u8string                _l_rv{};
+        default_printer_t<char> _l_printer;
+        for (const char _l_char : _a_str)
+        {
+            _l_rv.append(_l_printer.run_printer(_l_char));
+        }
+        return _l_rv;
+    }
+    else if constexpr (same_as<CharT, char8_t>
+                       || same_as<CharT, char16_t>
+                       || same_as<CharT, char32_t>
+                       || same_as<CharT, wchar_t>)
+    {
+        return unicode_string_to_u8string(_a_str);
+    }
+    else
+    {
+        __STATIC_ASSERT(
+            CharT,
+            "default_printer_t for basic_string type only allows certain "
+            "types"
+        );
+    }
+}
+} // namespace detail
+
 template <typename T>
 requires (std::same_as<std::basic_string<T>, std::string> || std::same_as<std::basic_string<T>, std::wstring> || std::same_as<std::basic_string<T>, std::u8string> || std::same_as<std::basic_string<T>, std::u16string> || std::same_as<std::basic_string<T>, std::u32string>)
 struct default_printer_t<std::basic_string<T>>
@@ -857,39 +871,11 @@ struct default_printer_t<std::basic_string<T>>
                     const std::basic_string<T>& _a_object
                 ) const
     {
-        using namespace std;
-        using namespace _ABC_NS_UTILITY_STR;
-        using arg_type_t = basic_string<T>;
-        if constexpr (same_as<arg_type_t, string>)
-        {
-            u8string                _l_rv{_m_surrounding_str};
-            default_printer_t<char> _l_printer;
-            for (const char _l_char : _a_object)
-            {
-                _l_rv.append(_l_printer.run_printer(_l_char));
-            }
-            _l_rv.append(_m_surrounding_str);
-            return _l_rv;
-        }
-        else if constexpr (same_as<arg_type_t, u8string>
-                           || same_as<arg_type_t, u16string>
-                           || same_as<arg_type_t, u32string>
-                           || same_as<arg_type_t, wstring>)
-        {
-            return fmt::format(
-                u8"{0}{1}{0}",
-                _m_surrounding_str,
-                unicode_string_to_u8string(_a_object)
-            );
-        }
-        else
-        {
-            __STATIC_ASSERT(
-                T,
-                "default_printer_t for basic_string type only allows certain "
-                "types"
-            );
-        }
+        return fmt::format(
+            u8"{0}{1}{0}",
+            _m_surrounding_str,
+            detail::print_str<T>(_a_object)
+        );
     }
 private:
     std::u8string _m_surrounding_str;
@@ -919,58 +905,11 @@ struct default_printer_t<std::basic_string_view<T>>
                     const std::basic_string_view<T>& _a_object
                 ) const
     {
-        using namespace std;
-        using namespace _ABC_NS_UTILITY_STR;
-        using arg_type_t = basic_string_view<T>;
-        if constexpr (same_as<arg_type_t, string_view>)
-        {
-            u8string                _l_rv{_m_surrounding_str};
-            default_printer_t<char> _l_printer;
-            for (const char _l_char : _a_object)
-            {
-                _l_rv.append(_l_printer.run_printer(_l_char));
-            }
-            _l_rv.append(_m_surrounding_str);
-            return _l_rv;
-        }
-        else if constexpr (same_as<arg_type_t, u8string_view>)
-        {
-            return fmt::format(u8"{0}{1}{0}", _m_surrounding_str, _a_object);
-        }
-        else if constexpr (same_as<arg_type_t, u16string_view>)
-        {
-            return fmt::format(
-                u8"{0}{1}{0}",
-                _m_surrounding_str,
-                unicode_string_to_u8string(_a_object)
-            );
-        }
-        else if constexpr (same_as<arg_type_t, u32string_view>)
-        {
-            return fmt::format(
-                u8"{0}{1}{0}",
-                _m_surrounding_str,
-                unicode_string_to_u8string(_a_object)
-            );
-        }
-        else if constexpr (same_as<arg_type_t, wstring_view>)
-        {
-            return fmt::format(
-                u8"{0}{1}{0}",
-                _m_surrounding_str,
-                unicode_string_to_u8string(
-                    cast_wstring_to_unicode_string(_a_object)
-                )
-            );
-        }
-        else
-        {
-            __STATIC_ASSERT(
-                T,
-                "default_printer_t for basic_string type only allows certain "
-                "types"
-            );
-        }
+        return fmt::format(
+            u8"{0}{1}{0}",
+            _m_surrounding_str,
+            detail::print_str(_a_object)
+        );
     }
 private:
     std::u8string _m_surrounding_str;

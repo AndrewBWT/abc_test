@@ -183,7 +183,7 @@ __constexpr char32_t
     else
     {
         constexpr char32_t _l_surrogate_diff{
-            _l_high_surrogate - _l_low_surrogate
+            (_l_high_surrogate - _l_low_surrogate) + 1
         };
         const char32_t _l_limit{
             _a_limit - _l_surrogate_diff
@@ -192,9 +192,8 @@ __constexpr char32_t
         };
         uint64_t _l_rnd_val{_a_rng()};
         char32_t _l_rnd{static_cast<char32_t>(_l_rnd_val) % (_l_limit + 1)};
-        _l_rv = (_l_rnd >= _l_low_surrogate && _l_rnd <= _l_high_surrogate)
-                    ? (_l_rnd + _l_surrogate_diff)
-                    : _l_rnd;
+        _l_rv = (_l_rnd >= _l_low_surrogate) ? (_l_rnd + _l_surrogate_diff)
+                                             : _l_rnd;
     }
     return _l_rv;
 }

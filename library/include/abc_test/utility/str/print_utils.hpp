@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/utility/internal/macros.hpp"
-#include "abc_test/utility/str/string_cast.hpp"
 #include "abc_test/utility/str/concepts.hpp"
+#include "abc_test/utility/str/string_cast.hpp"
 
 #include <fmt/xchar.h>
 #include <string>
@@ -89,9 +89,11 @@ requires has_string_like_underlying_type_c<FuncName>
                      std::basic_string_view<
                          string_like_underlying_char_type_t<FuncName>>>
                  && ...))
-__constexpr std::basic_string<string_like_underlying_char_type_t<
-    FuncName>> mk_str_representing_function_call(FuncName&& _a_function_name, Args&&... _a_args)
-    noexcept;
+__constexpr std::
+    basic_string<string_like_underlying_char_type_t<FuncName>> mk_str_representing_function_call(
+        FuncName&& _a_function_name,
+        Args&&... _a_args
+    ) noexcept;
 
 /*!
  * @brief Given a list of string-like objects, will create one string from them,
@@ -203,7 +205,28 @@ __constexpr std::u8string
                 const T _a_char
             ) noexcept
 {
-    return detail::make_hex_from_char_with_prefix(_a_char, u8"\\x");
+    auto _f_prefix_func = [&]()
+    {
+        if constexpr (sizeof(T) == 1)
+        {
+            return u8"\\x";
+        }
+        else if constexpr (sizeof(T) == 2)
+        {
+            return u8"\\u";
+        }
+        else if constexpr (sizeof(T) == 4)
+        {
+            return u8"\\U";
+        }
+        else
+        {
+            __STATIC_ASSERT(
+                T, "_f_prefix_func undefined for this size of type"
+            );
+        }
+    };
+    return detail::make_hex_from_char_with_prefix(_a_char, _f_prefix_func());
 }
 
 template <typename T>
@@ -269,7 +292,8 @@ __constexpr std::basic_string<
             _l_result.push_back(_l_comma);
         }
         _l_first_arg = false;
-        _l_result.append(basic_string_view<T>(std::forward<decltype(arg)>(arg)));
+        _l_result.append(basic_string_view<T>(std::forward<decltype(arg)>(arg))
+        );
     };
     (_l_append_func(std::forward<Args>(_a_args)), ...);
     return _l_result;
