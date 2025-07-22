@@ -1,2 +1,2 @@
 #class std::tuple<class std::basic_string<wchar_t,struct std::char_traits<wchar_t>,class std::allocator<wchar_t> >,class std::basic_string<char8_t,struct std::char_traits<char8_t>,class std::allocator<char8_t> > >
-("\xDC02","\\xDC02")
+("\xDC02","\\uDC02")

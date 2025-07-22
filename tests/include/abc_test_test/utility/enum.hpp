@@ -501,7 +501,7 @@ _TEST_CASE(
                     = _l_helper.increment(_a_enum, _a_size1, _a_max_val);
                 _a_size2 -= _a_size1;
                 _l_rv.second
-                    = _l_helper.decrement(_a_enum, _a_size2, _a_max_val);
+                    = _l_helper.decrement(_a_enum, _a_size2, _a_min_val);
                 return _l_rv;
             }
         );
@@ -518,7 +518,7 @@ _TEST_CASE(
                     = _l_helper.decrement(_a_enum, _a_size1, _a_min_val);
                 _a_size2 -= _a_size1;
                 _l_rv.second
-                    = _l_helper.increment(_a_enum, _a_size2, _a_min_val);
+                    = _l_helper.increment(_a_enum, _a_size2, _a_max_val);
                 return _l_rv;
             }
         );

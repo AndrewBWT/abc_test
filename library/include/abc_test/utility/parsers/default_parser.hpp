@@ -394,7 +394,7 @@ struct default_parser_t<T> : public parser_base_t<T>
         using namespace _ABC_NS_UTILITY_STR;
         T               result{};
         const u32string _l_u32str{
-            _a_parse_input.take_string_containing(U"0123456789-")
+            _a_parse_input.take_string_containing(U"0123456789-.")
         };
         const result_t<string> _l_str_opt{convert_unicode_to_ascii(_l_u32str)};
         if (_l_str_opt.has_value())

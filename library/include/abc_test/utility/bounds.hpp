@@ -102,15 +102,16 @@ struct default_printer_t<bounds_t<T>> : public printer_base_t<bounds_t<T>>
 {
     static constexpr bool is_specialized{true};
 
-    __constexpr           std::string
+    __constexpr           std::u8string
                           run_printer(
                               const bounds_t<T>& _a_object
                           ) const
     {
+        using namespace _ABC_NS_UTILITY_STR;
         return object_printer_with_field_names(
             object_printer_parser_t{},
-            _ABC_NS_UTILITY_STR::type_id<decltype(_a_object)>(),
-            {"lower", "higher", "difference"},
+            type_id<bounds_t<T>>(),
+            {u8"lower", u8"higher", u8"difference"},
             _a_object.lower(),
             _a_object.higher(),
             _a_object.difference()

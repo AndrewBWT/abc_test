@@ -16,17 +16,14 @@ inline void
     using namespace std;
     using namespace abc;
     using namespace utility;
-    using test_data_t = tuple<size_t, T, T>;
-    _BEGIN_MULTI_ELEMENT_BBA(
-        _l_fuzz_tests,
-        fmt::format(
-            "Fuzzy testing generate_rng_value_between_bounds "
-            "for {0}, using RNG {1}",
-            typeid(T),
-            typeid(Rng)
-        )
-    );
-    for (auto& _l_tuple :
+    using test_data_t  = tuple<size_t, T, T>;
+    auto _l_fuzz_tests = _MULTI_MATCHER(fmt::format(
+        "Fuzzy testing generate_rng_value_between_bounds "
+        "for {0}, using RNG {1}",
+        typeid(T),
+        typeid(Rng)
+    ));
+    for (auto& [_l_rng_counter, _l_lower_bound, _l_higher_bound] :
          generate_data_randomly<test_data_t>()
              & enumerate_data<test_data_t>(
                  all_values<test_data_t>(default_enumeration<test_data_t>(
@@ -38,7 +35,7 @@ inline void
                  ))
              ))
     {
-        const auto& [_l_rng_counter, _l_lower_bound, _l_higher_bound]{_l_tuple};
+        matcher_t _l_matcher;
         _BEGIN_NO_THROW_MATCHER(_l_matcher);
         rng_t       _l_rng = rng_t::make_rng<Rng>(vector<uint32_t>());
         bounds_t<T> _l_bounds(_l_lower_bound, _l_higher_bound);
@@ -49,9 +46,9 @@ inline void
         do_not_optimise(_l_result);
         // End the checks for an exception being thrown.
         _END_NO_THROW_MATCHER(_l_matcher);
-        _l_fuzz_tests += _BLOCK_CHECK(_l_matcher);
+        _l_fuzz_tests << _CHECK(_l_matcher);
     }
-    _END_BBA_CHECK(_l_fuzz_tests);
+    _CHECK(_l_fuzz_tests);
 }
 
 template <typename T>
@@ -70,7 +67,7 @@ inline void
             T,
             utility::inner_rng_mt19937_64_t>()));
 }
-} // namespace test::detail
+} // namespace test
 
 _TEST_CASE(
     abc::test_case_t(
@@ -105,23 +102,17 @@ inline void
     using namespace std;
     using namespace abc;
     using namespace utility;
-    using test_data_t = tuple<size_t, size_t, T, T, size_t, T>;
-    _BEGIN_MULTI_ELEMENT_BBA(
-        _l_unit_tests,
-        fmt::format(
-            "Unit test generate_rng_value_between_bounds "
-            "for {0}, using RNG simple_rng_t",
-            typeid(T)
-        )
-    );
-    for (auto& _l_tuple : read_data_from_file<test_data_t>(
+    using test_data_t  = tuple<size_t, size_t, T, T, size_t, T>;
+    auto _l_unit_tests = _MULTI_MATCHER(fmt::format(
+        "Unit test generate_rng_value_between_bounds "
+        "for {0}, using RNG simple_rng_t",
+        typeid(T)
+    ));
+    for (auto& [_l_rng_counter, _l_rng_progress_to, _l_lower_bound, _l_higher_bound, _l_rng_after_running, _l_expected_result] :
+         read_data_from_file<test_data_t>(
              fmt::format("generate_rng_value_between_bounds_{0}", typeid(T))
          ))
     {
-        const auto& [_l_rng_counter, _l_rng_progress_to, _l_lower_bound, _l_higher_bound, _l_rng_after_running, _l_expected_result]{
-            _l_tuple
-        };
-        _TVLOG_(_l_tuple);
         rng_t       _l_rng = rng_t::make_rng<simple_rng_t>(vector<uint32_t>());
         bounds_t<T> _l_bounds(_l_lower_bound, _l_higher_bound);
         _l_rng.progress(_l_rng_progress_to);
@@ -130,17 +121,17 @@ inline void
             = abc::data_gen::detail::generate_rng_value_between_bounds(
                 _l_bounds, _l_rng_counter, _l_rng
             );
-        _l_unit_tests += _BLOCK_CHECK(
+        _l_unit_tests << _CHECK(
             _EXPR(_l_expected_result == _l_result)
             && _EXPR(
                 _l_rng_after_running == (_l_rng.calls() - _l_rng_progress_to)
             )
         );
     }
-    _END_BBA_CHECK(_l_unit_tests);
+    _CHECK(_l_unit_tests);
 }
 
-} // namespace test::detail
+} // namespace test
 
 _TEST_CASE(
     abc::test_case_t(

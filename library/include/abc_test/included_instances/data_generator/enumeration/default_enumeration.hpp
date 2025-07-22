@@ -298,8 +298,12 @@ __constexpr T
             return numeric_limits<T>::max();
         }
         const T _l_midpoint{midpoint(_l_lower, _l_higher)};
+        auto    kt  = _l_midpoint + _a_add_val;
+        auto    kt2 = _l_midpoint - _a_add_val;
+        auto    kt3 = _l_midpoint + _a_add_val;
         if (_l_midpoint + _a_add_val == _l_midpoint
-            && _l_midpoint - _a_add_val != _l_midpoint)
+            // && _l_midpoint - _a_add_val != _l_midpoint
+        )
         {
             return _l_midpoint;
         }
@@ -1073,7 +1077,8 @@ public:
         const bool _l_arg_1_lesser{less_than(_a_arg1, _a_arg2)};
         auto&      _l_lesser{_l_arg_1_lesser ? _a_arg1 : _a_arg2};
         auto&      _l_greater{_l_arg_1_lesser ? _a_arg2 : _a_arg1};
-        // Find out how many advancements per "increment".
+        // Find out how many advancements per "increment". So each time we
+        // increment by 1 here, how many times will that increment the T type.
         const enumerate_index_t _l_divisor{
             _m_enumerate->n_advancements_per_advancement()
         };
@@ -1086,6 +1091,13 @@ public:
         // ten elements would have a biggest_difference of 10. It is like the
         // arity of the entity.
         _l_biggest_difference.second += 1;
+        if ((_l_biggest_difference.second / _l_divisor) > 0)
+        {
+            _l_biggest_difference.first
+                += (_l_biggest_difference.second / _l_divisor);
+            _l_biggest_difference.second
+                = _l_biggest_difference.second % _l_divisor;
+        }
         for (size_t _l_idx{_l_lesser.size()}; _l_idx > 0; --_l_idx)
         {
             size_t _l_idx_offset{_l_idx - 1};
@@ -1688,7 +1700,10 @@ __constexpr_imp void
         {
             enumerate_index_t _l_arg{1};
             if (_m_enumerate->increment(
-                    _a_vector[_l_idx - 1], _l_arg, T{}, T{}
+                    _a_vector[_l_idx - 1],
+                    _l_arg,
+                    _m_enumerate->start_value(),
+                    _m_enumerate->end_value()
                 ))
             {
                 --_a_n_times_to_increment;
@@ -1778,8 +1793,8 @@ __constexpr_imp bool
             if (_m_enumerate->increment(
                     _l_elem,
                     _a_n_times_to_increment,
-                    _a_min_value.back(),
-                    _a_max_value.back()
+                    _m_enumerate->start_value(),
+                    _m_enumerate->end_value()
                 ))
             {
                 if (_a_n_times_to_increment == 0)

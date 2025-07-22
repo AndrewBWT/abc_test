@@ -1,3 +1,2 @@
 #class std::tuple<signed char,class std::optional<signed char>,class std::basic_string<char8_t,struct std::char_traits<char8_t>,class std::allocator<char8_t> > >
-(5, {},"enumerate_enum_helper_t<enum `anonymous namespace'::enum_with_enum_list_3> does not contain the given enum. The enum's value has no known text representation. The enum, represented in its underlying type \"signed char\", has a value of 5")
-(0, {10},"enumerate_enum_helper_t<enum `anonymous namespace'::enum_with_enum_list_3> does not contain the given enum. The enum's value has no known text representation. The enum, represented in its underlying type \"signed char\", has a value of 10")
+(0, 10,"enumerate_enum_helper_t<enum `anonymous namespace'::enum_with_enum_list_3> does not contain the given enum. The enum's value has no known text representation. The enum, represented in its underlying type \"signed char\", has a value of 10.")

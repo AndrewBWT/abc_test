@@ -854,7 +854,7 @@ __constexpr void
                 u8"text representation to the \"{3}\" enum represented by "
                 u8"the underlying \"{4}\" value {6}. Doing so would "
                 u8"introduce ambiguity when parsing enums, and is "
-                u8"therefore not allowed.",
+                u8"therefore not allowed",
                 _a_string_to_insert,
                 type_id<enum_helper_string_type_e>(),
                 utility::detail::simple_enum_helper_string_type_to_string(

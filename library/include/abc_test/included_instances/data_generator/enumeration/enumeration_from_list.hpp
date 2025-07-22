@@ -30,15 +30,17 @@ public:
 
     __constexpr virtual bool
         increment(
-            T&                      _a_element,
-            enumerate_index_t&      _a_n_times_to_increment,
-            const std::optional<T>& _a_max_value
+            T&                 _a_element,
+            enumerate_index_t& _a_n_times_to_increment,
+            const T&           _a_min_value,
+            const T&           _a_max_value
         );
     __constexpr virtual bool
         decrement(
-            T&                      _a_element,
-            enumerate_index_t&      _a_n_times_to_increment,
-            const std::optional<T>& _a_max_value
+            T&                 _a_element,
+            enumerate_index_t& _a_n_times_to_increment,
+            const T&           _a_min_value,
+            const T&           _a_max_value
         );
 
     __constexpr virtual enumeration_diff_t
@@ -104,23 +106,17 @@ __constexpr_imp bool
 template <typename T>
 __constexpr bool
     enumeration_from_list<T>::increment(
-        T&                      _a_element,
-        enumerate_index_t&      _a_n_times_to_increment,
-        const std::optional<T>& _a_max_value
+        T&                 _a_element,
+        enumerate_index_t& _a_n_times_to_increment,
+        const T&           _a_min_value,
+        const T&           _a_max_value
     )
 {
     T      _l_max_value{};
     size_t _l_current_index{_m_indexes[_a_element]};
-    if (_a_max_value.has_value())
+    if (_m_indexes.contains(_a_max_value))
     {
-        if (_m_indexes.contains(_a_max_value.value()))
-        {
-            _l_max_value = _a_max_value.value();
-        }
-        else
-        {
-            _l_max_value = _m_max_value;
-        }
+        _l_max_value = _a_max_value;
     }
     else
     {
@@ -145,23 +141,17 @@ __constexpr bool
 template <typename T>
 __constexpr bool
     enumeration_from_list<T>::decrement(
-        T&                      _a_element,
-        enumerate_index_t&      _a_n_times_to_increment,
-        const std::optional<T>& _a_min_value
+        T&                 _a_element,
+        enumerate_index_t& _a_n_times_to_increment,
+        const T&           _a_min_value,
+        const T&           _a_max_value
     )
 {
     T      _l_min_value{};
     size_t _l_current_index{_m_indexes[_a_element]};
-    if (_a_min_value.has_value())
+    if (_m_indexes.contains(_a_min_value))
     {
-        if (_m_indexes.contains(_a_min_value.value()))
-        {
-            _l_min_value = _a_min_value.value();
-        }
-        else
-        {
-            _l_min_value = _m_min_value;
-        }
+        _l_min_value = _a_min_value;
     }
     else
     {

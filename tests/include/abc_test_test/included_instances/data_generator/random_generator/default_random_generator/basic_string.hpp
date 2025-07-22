@@ -11,7 +11,6 @@
 //  - Test which uses letters on the keyboard, allowing us to write the tests as
 //  strings.
 
-#if 0
 _TEST_CASE(
     abc::test_case_t(
         {.name = "Fuzzy test for random_data_generator_t for the "
@@ -113,73 +112,6 @@ _TEST_CASE(
 _TEST_CASE(
     abc::test_case_t(
         {.name = "Unit testing random_data_generator_t for std::basic_string "
-                 "type, using user-supplied vectors of signed integers",
-         .path = "abc_test_test::included_instances::data_generator::random_"
-                 "generator::default_random_generator::basic_string",
-         .threads_required = 1}
-    )
-)
-{
-    using namespace abc;
-    using namespace std;
-    using namespace test;
-    using namespace abc::data_gen;
-    using namespace abc::utility;
-    using namespace abc_test::utility;
-    using data_types_t = abc::utility::type_list<
-        string,
-        u8string,
-        u16string,
-        u32string,
-        wstring
-        // basic_string<int>
-        >;
-    manual_data_generator_t _l_mdg;
-    auto                    _l_test_func = [&]<typename T>()
-    {
-        auto _l_string_tests
-            = _MULTI_MATCHER("Testing default_random_generator_t for "
-                             "std::basic_string produces the "
-                             "correct values");
-        default_random_generator_t<T> _l_rdg;
-        rng_t _l_rng = rng_t::make_rng<simple_rng_t>(vector<uint32_t>());
-        using test_data_t
-            = tuple<size_t, size_t, vector<typename T::value_type>>;
-        for (const auto& [_l_rng_seed_value, _l_size_index, _l_result_as_signed_chars] :
-             read_data_from_file<test_data_t>(
-                 fmt::format("string_test_data_using_vect", typeid(T))
-             ))
-        {
-            // Convert signed char vector to a string
-            T _l_str_result = static_cast_range<T>(_l_result_as_signed_chars);
-            // Seed the random generator function with the given seed value.
-            _l_rng.progress(_l_rng_seed_value);
-            // Generate the string.
-            T _l_rv{
-                _l_rdg.operator()(_l_rng, utility::rng_counter_t(_l_size_index))
-            };
-            // Convert the gotten string to a vector of signed chars.
-            auto _l_str_gotten{
-                static_cast_range<vector<typename T::value_type>>(_l_rv)
-            };
-            _TVLOG_(_l_str_gotten);
-            // Run the test.
-            _l_string_tests << _CHECK(_EXPR(_l_str_result == _l_rv));
-        }
-        _CHECK(_l_string_tests);
-    };
-    for_each_type<data_types_t>(
-        [&]<typename T>()
-        {
-            RUN(_l_mdg, (_l_test_func.operator()<T>()));
-        }
-    );
-}
-#endif
-
-_TEST_CASE(
-    abc::test_case_t(
-        {.name = "Unit testing random_data_generator_t for std::basic_string "
                  "type, using user-supplied ASCII strings",
          .path = "abc_test_test::included_instances::data_generator::random_"
                  "generator::default_random_generator::basic_string",
@@ -193,8 +125,8 @@ _TEST_CASE(
     using namespace utility;
     using namespace abc::data_gen;
     using data_types_t = abc::utility::type_list<
-    //    string,
-    //    u8string,
+        string,
+        u8string,
         u16string,
         u32string,
         wstring

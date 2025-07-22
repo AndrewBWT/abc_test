@@ -555,7 +555,16 @@ __no_constexpr_imp matcher_t
                         u8"are "
                         u8"shown below. This was not the expected behaviour."
                     ),
-                    _l_str_result.str().get_vector()
+                    std::vector<std::u8string>{},
+                    std::vector<matcher_result_infos_t::tree_structure_t>(
+                        1,
+                        make_tuple(
+                            u8"Child",
+                            u8"C",
+                            make_shared<matcher_result_infos_t>(_l_str_result
+                                                                    .str())
+                        )
+                    )
                 )
             ));
         }
@@ -684,4 +693,3 @@ _END_ABC_NS
             incorrect_exception<_a_exception_type>(_a_msg)               \
         );                                                               \
     }
-

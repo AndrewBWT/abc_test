@@ -26,7 +26,9 @@ __no_constexpr_or_inline_imp void
     default:
         break;
     }
-    const bool _l_test_passed{test_passed(_l_test_status)};
+    const bool _l_test_passed{
+        test_passed(_l_test_status, _a_invoked_test.assertions_recieved())
+    };
     _m_total_tests_ran    += 1;
     _m_total_tests_passed += _l_test_passed ? 1 : 0;
     _m_total_tests_failed += (not _l_test_passed) ? 1 : 0;

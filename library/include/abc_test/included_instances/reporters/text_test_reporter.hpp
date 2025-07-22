@@ -128,8 +128,9 @@ __no_constexpr_imp void
         const unexpected_report_t<true>& _l_unexpected_termination{
             *_a_itd.unexpected_termination()
         };
+        u8string _l_warning_str;
         write_line(fmt::format(
-            u8"{1}{0}{0}", _l_line_break, u8"UNEXPECTED TERMINATION INFORMATION\n"
+            u8"{2}{0}{1}{0}", _l_line_break, _l_warning_str, u8"UNEXPECTED TERMINATION INFORMATION\n"
         ));
         process_termination(_l_unexpected_termination);
     }

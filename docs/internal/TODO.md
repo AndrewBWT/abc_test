@@ -1,6 +1,16 @@
 # To-do List for abc_test #
 
-## Current Focus ##
+## Focus for Version 0.0.2 ##
+
+1 - Testing. A lot of the core features in abc_test lack testing. Without tests, code changes can (and have) broken features - it is in essence a case-study as to why testing is necessary. We are adding tests to abc_test, the tests themselves written using abc_test - in effect, test bootstrapping. However, to write tests for every part of abc_test will take some time. For the next release, we want to have in place some basic tests for data generators, repetition configurations, assertions, macros and logging. These tests will provide us with a safety-net when making further changes to the code.
+2 - Lack of documentation. We have some Doxygen generated documentation and some user-written documentation. However the Doxygen documentation is incomplete for many functions, and the user-written documentation is for an older version of abc_test. We have kept it as we believe it will be helpful when writing the new documentation, and could help users wanting to learn more about abc_test. For version 0.0.2, we would like the core documentation regarding test declarations, assertions and data generators to be written to a high quality.
+3 - Code clean-up. While we are happy with a lot of the code, there are some portions which are of a lower quality, written with little regard for maintainability or readability. We make no promises for version 0.0.2 regarding how this will be improved, however it will be something we will make an attempt to tackle.
+4 - abc_test makes heavy use of generics and template specializations - for example, default_printer_t and default_parser_t specializations are necessary when working with the file-reading data generator, default_enumeration_t specializations are necessary when working with the enumeration data generator, and default_random_generator_t specializations are necessary when working with the random data generator. In version 0.0.1, many of these specializations are inconsistent, missing, or defined incorrectly. For version 0.0.2 we want to have addressed this, and hopefully have specializations defined for all of the core types in the C++ standard library.
+5 - The default console and file output requires some improvement. Specifically, some output is poorly labelled, some fields are not being printed correctly, and some fields are missing. For version 0.0.2 we want to have much clearer default output for abc_test.
+6 - In abc_test many of the functions which work with strings use a mixture of std::string and std::u8string. For version 0.0.2 we want to provide the user with overloads for each function and type of string.
+
+
+## Longer Term Focus ##
 
 1 - Code documentation. See docs/internal/documentation.md for details.
 2 - Tutorials and examples. See docs/internal/tutorials_and_examples.md for details.

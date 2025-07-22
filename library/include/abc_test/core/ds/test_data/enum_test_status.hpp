@@ -42,7 +42,8 @@ enum class enum_test_status_t
  * @return True if _a_test_status is considered a pass; false if a failure.
  */
 __constexpr bool
-    test_passed(const enum_test_status_t _a_test_status);
+    test_passed(const enum_test_status_t _a_test_status,
+        const std::size_t _a_assertions_recieved);
 /*!
  * @brief Function which returns a bool signifying if the enum_test_status_t
  * argument signifies a termination.
@@ -70,14 +71,15 @@ struct fmt::formatter<_ABC_NS_DS::enum_test_status_t> : formatter<string_view>
 _BEGIN_ABC_DS_NS
 __constexpr_imp bool
     test_passed(
-        const enum_test_status_t _a_test_status
+        const enum_test_status_t _a_test_status,
+        const std::size_t _a_assertions_recieved
     )
 {
     using enum enum_test_status_t;
     switch (_a_test_status)
     {
     case NO_TERMINATION_TEST_PASSED:
-        return true;
+        return (_a_assertions_recieved > 0);
     case NO_TERMINATION_TEST_FAILED:
     case TERMINATION_OCCOURED_TEST_FAILED:
     case TERMINATION_OCCOURED_UNEXPECTED_THROW:

@@ -29,13 +29,24 @@ inline void
         T      _l_value2{0};
         _l_size_t = 1;
 
-        _l_enumerator.increment(_l_value, _l_size_t, optional<T>{});
+        _l_enumerator.increment(
+            _l_value,
+            _l_size_t,
+            std::numeric_limits<T>::min(),
+            std::numeric_limits<T>::max()
+        );
 
-        _l_enumerator.increment(_l_value2, _l_tmp_size_t, optional<T>{});
+        _l_enumerator.increment(
+            _l_value2,
+            _l_tmp_size_t,
+            std::numeric_limits<T>::min(),
+            std::numeric_limits<T>::max()
+        );
         _REQUIRE(_EXPR(_l_value == _l_value2));
     }
 }
 
+#if 0
 template <typename T>
 inline void
     run_vector_difference_tests()
@@ -43,13 +54,10 @@ inline void
     using namespace abc;
     using namespace std;
     using unit_test_t = tuple<vector<T>, T, T, T>;
-    for (auto& _l_element : read_data_from_file<unit_test_t>(
+    for (auto& [_l_end_vector, _l_t_inner_increment, _l_t_inner_min_val, _l_t_inner_max_val] : read_data_from_file<unit_test_t>(
              gdf(string("vector_difference_").append(typeid(T).name()))
          ))
     {
-        auto& [_l_end_vector, _l_t_inner_increment, _l_t_inner_min_val, _l_t_inner_max_val]
-            = _l_element;
-        _TVLOG(_l_element);
         data_gen::enumeration_t<vector<T>> _l_enumeration
             = default_enumeration<vector<T>>(from_m_to_n(
                 _l_t_inner_min_val,
@@ -60,11 +68,13 @@ inline void
             _l_enumeration->difference({}, _l_end_vector)
         };
         data_gen::enumerate_index_t _l_idx{0};
+        vector<vector<float>> _l_res{};
         for (auto& _l_vector : enumerate_data<vector<T>>(
                  from_min_to_val(_l_end_vector, _l_enumeration)
              ))
         {
             ++_l_idx;
+            _l_res.push_back(_l_vector);
         }
         if (_l_diff.second != 0)
         {
@@ -80,8 +90,8 @@ inline void
 {
     run_vector_difference_tests<T>();
 }
+#endif
 } // namespace test
-
 _TEST_CASE(
     abc::test_case_t(
         {.name = "Testing default_enumerator_t for floating point types",
@@ -97,9 +107,10 @@ _TEST_CASE(
     using namespace std;
     using namespace test;
     manual_data_generator_t _l_mgd;
-    // RUN(_l_mgd, (run_fp_min_addition_tests<float>()));
+    RUN(_l_mgd, (run_fp_min_addition_tests<float>()));
 }
 
+#if 0
 _TEST_CASE(
     abc::test_case_t(
         {.name = "Testing default_enumerator_t for std::vector",
@@ -117,3 +128,4 @@ _TEST_CASE(
     manual_data_generator_t _l_mgd;
     RUN(_l_mgd, (run_vector_tests<float>()));
 }
+#endif

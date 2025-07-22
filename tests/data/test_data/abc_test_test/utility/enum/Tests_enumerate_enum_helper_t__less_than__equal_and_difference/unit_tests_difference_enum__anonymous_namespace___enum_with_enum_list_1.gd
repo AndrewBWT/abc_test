@@ -1,0 +1,10 @@
+#class std::tuple<enum `anonymous namespace'::enum_with_enum_list_1,enum A0xe1c13721::enum_with_enum_list_1,unsigned __int64>
+(one,one,0)
+(one,two,1)
+(two,one,1)
+(one,three,2)
+(three, one,2)
+(two,two,0)
+(two,three,1)
+(three,two,1)
+(three,three,0)
