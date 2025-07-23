@@ -34,9 +34,9 @@ __no_constexpr_or_inline_imp reporters::test_reporter_controller_t&
 }
 
 __no_constexpr_or_inline_imp test_evaluator_t&
-    get_this_threads_test_runner_ref() noexcept
+    get_this_threads_test_evaluator_ref() noexcept
 {
-    return *get_this_threads_test_runner_ptr();
+    return *detail::get_inner_threads_test_evaluator_set().back();
 }
 
 __no_constexpr_or_inline_imp void
@@ -44,40 +44,21 @@ __no_constexpr_or_inline_imp void
         test_evaluator_t* _a_test_runner_t
     ) noexcept
 {
-    test_evaluator_t*& _l_tr{get_this_threads_test_runner_ptr()};
-    _l_tr = _a_test_runner_t;
+    detail::get_inner_threads_test_evaluator_set().push_back(_a_test_runner_t);
 }
 
 __no_constexpr_or_inline_imp const test_options_base_t&
     get_global_test_options() noexcept
 {
-    return detail::get_inner_global_variable_set()
-        .back()
-        .test_options();
-}
-
-__no_constexpr_or_inline_imp test_evaluator_t*&
-    get_this_threads_test_runner_ptr() noexcept
-{
-    thread_local test_evaluator_t* _tl_tr = nullptr;
-    return _tl_tr;
+    return detail::get_inner_global_variable_set().back().test_options();
 }
 
 __no_constexpr_or_inline_imp ds::invoked_test_data_t&
                              get_this_threads_current_test()
 {
     using namespace errors;
-    test_evaluator_t* _l_tr{get_this_threads_test_runner_ptr()};
-    if (_l_tr == nullptr)
-    {
-        throw test_library_exception_t(
-            u8"This threads test_runner_t is a nullptr"
-        );
-    }
-    else
-    {
-        return _l_tr->current_test();
-    }
+    test_evaluator_t& _l_tr{get_this_threads_test_evaluator_ref()};
+    return _l_tr.current_test();
 }
 
 __no_constexpr_or_inline_imp const test_options_base_t*
@@ -101,6 +82,13 @@ __no_constexpr_or_inline_imp std::list<test_framework_global_variable_set_t>&
 {
     static std::list<test_framework_global_variable_set_t> _s_tfgvs{};
     return _s_tfgvs;
+}
+
+__no_constexpr_or_inline_imp std::list<test_evaluator_t*>&
+                             get_inner_threads_test_evaluator_set() noexcept
+{
+    thread_local std::list<test_evaluator_t*> _s_test_evaluators{};
+    return _s_test_evaluators;
 }
 } // namespace detail
 

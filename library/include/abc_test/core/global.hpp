@@ -48,9 +48,9 @@ struct test_framework_global_variable_set_t;
  */
 __no_constexpr_or_inline const test_framework_global_variable_set_t&
     setup_global_variable_set(
-        const test_options_base_t& _a_options,
+        const test_options_base_t&            _a_options,
         _ABC_NS_REPORTERS::error_reporters_t& _a_error_reporters,
-        _ABC_NS_REPORTERS::test_reporters_t& _a_test_reporters
+        _ABC_NS_REPORTERS::test_reporters_t&  _a_test_reporters
     ) noexcept;
 /*!
  * Gets a reference to the global test_reporter_controller_t object.
@@ -63,25 +63,16 @@ __no_constexpr_or_inline reporters::test_reporter_controller_t&
  *
  */
 __no_constexpr_or_inline test_evaluator_t&
-    get_this_threads_test_runner_ref() noexcept;
+    get_this_threads_test_evaluator_ref() noexcept;
 __no_constexpr_or_inline void
-    set_this_threads_test_runner(test_evaluator_t* _a_test_runner_t) noexcept;
+    set_this_threads_test_runner(test_evaluator_t* _a_test_runner_t
+    ) noexcept;
 /*!
  * Gets a const reference to the global test_options_base_t object.
  *
  */
 __no_constexpr_or_inline const test_options_base_t&
     get_global_test_options() noexcept;
-/*!
- * Gets a pointer to this threads test_runner_t object.
- *
- * This can be useful when initialising a pointer which is part of an object.
- * The default constructor could then use nullptr, whereas if it was a reference
- * this wouldn't be possible.
- *
- */
-__no_constexpr_or_inline test_evaluator_t*&
-    get_this_threads_test_runner_ptr() noexcept;
 /*!
  * Gets a reference to this threads current invoked_test_info. That is, the
  * current test that is running.
@@ -127,7 +118,9 @@ namespace detail
 __no_constexpr_or_inline ds::test_list_t&
                          get_mutable_test_list() noexcept;
 __no_constexpr_or_inline std::list<test_framework_global_variable_set_t>&
-    get_inner_global_variable_set() noexcept;
+                         get_inner_global_variable_set() noexcept;
+__no_constexpr_or_inline std::list<test_evaluator_t*>&
+                         get_inner_threads_test_evaluator_set() noexcept;
 } // namespace detail
 
 _END_ABC_GLOBAL_NS

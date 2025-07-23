@@ -54,7 +54,7 @@ public:
             const log_msg_t& _a_arg
         )
         : _m_str(_a_arg._m_str)
-        , _m_iterator(global::get_this_threads_test_runner_ref().add_log_msg(
+        , _m_iterator(global::get_this_threads_test_evaluator_ref().add_log_msg(
               std::ref(*this),
               _a_arg._m_single_source
           ))
@@ -72,9 +72,9 @@ public:
 
         if (not _m_delete_after_use)
         {
-            get_this_threads_test_runner_ref().remove_log_msg(_m_iterator);
+            get_this_threads_test_evaluator_ref().remove_log_msg(_m_iterator);
         }
-        _m_iterator = global::get_this_threads_test_runner_ref().add_log_msg(
+        _m_iterator = global::get_this_threads_test_evaluator_ref().add_log_msg(
             std::ref(*this), _a_arg._m_single_source
         );
         _m_delete_after_use = _a_arg._m_delete_after_use;
@@ -131,7 +131,7 @@ __no_constexpr_imp
         const bool                 _a_delete_after_use
     ) noexcept
     : _m_str(_a_str)
-    , _m_iterator(global::get_this_threads_test_runner_ref()
+    , _m_iterator(global::get_this_threads_test_evaluator_ref()
                       .add_log_msg(std::ref(*this), _a_single_source))
     , _m_delete_after_use(_a_delete_after_use)
     , _m_single_source(_a_single_source)
@@ -143,11 +143,11 @@ __no_constexpr_imp log_msg_t::~log_msg_t() noexcept
     using namespace global;
     if (uncaught_exceptions() > 0)
     {
-        get_this_threads_test_runner_ref().add_cached_log_msg(_m_str);
+        get_this_threads_test_evaluator_ref().add_cached_log_msg(_m_str);
     }
     if (not _m_delete_after_use)
     {
-        get_this_threads_test_runner_ref().remove_log_msg(_m_iterator);
+        get_this_threads_test_evaluator_ref().remove_log_msg(_m_iterator);
     }
 }
 

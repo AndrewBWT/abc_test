@@ -314,7 +314,7 @@ __no_constexpr_imp void
     using enum _ABC_NS_UTILITY::internal::internal_log_enum_t;
     // Get the thread runner
     set_this_threads_test_runner(&_a_test_runner);
-    test_evaluator_t& _l_threads_runner{get_this_threads_test_runner_ref()};
+    test_evaluator_t& _l_threads_runner{ get_this_threads_test_evaluator_ref()};
     // run in try
     try
     {

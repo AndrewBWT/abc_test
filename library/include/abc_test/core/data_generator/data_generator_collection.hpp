@@ -82,17 +82,18 @@ public:
     requires (std::same_as<Args, data_generator_collection_t<T>> && ...)
     __constexpr
                 data_generator_collection_t(Args... _a_elements) noexcept;
+
     __constexpr data_generator_collection_t<T>
                 operator&(
             const data_generator_collection_t<T>& _a_arg
         ) const noexcept
     {
-        dgc_internal_t<T> _l_elements{ get_elements()};
+        dgc_internal_t<T> _l_elements{get_elements()};
         for (auto& _l_element : _a_arg.get_elements())
         {
-			_l_elements.push_back(_l_element);
-	    }
-     //   _l_elements.append_range(_a_arg.get_elements());
+            _l_elements.push_back(_l_element);
+        }
+        // _l_elements.append_range(_a_arg.get_elements());
         return data_generator_collection_t<T>(_l_elements);
     }
 
@@ -140,12 +141,13 @@ public:
      */
     __constexpr const dgc_internal_t<T>&
                       get_elements() const noexcept;
-    __constexpr
-        data_generator_collection_t(const dgc_internal_t<T>& _a_elements) noexcept
-        : _m_elements(_a_elements)
-    {
 
-    }
+    __constexpr
+    data_generator_collection_t(
+        const dgc_internal_t<T>& _a_elements
+    ) noexcept
+        : _m_elements(_a_elements)
+    {}
 private:
     dgc_internal_t<T> _m_elements;
     __constexpr iterator
@@ -206,7 +208,7 @@ template <typename T, typename... Args>
 requires (std::same_as<Args, data_generator_collection_t<T>> && ...)
 __constexpr void
     process_all_data_generator_elements_with_result(
-        std::vector<data_generator_ptr_t<T>>&       _l_vect,
+        std::vector<data_generator_ptr_t<T>>& _l_vect,
         const data_generator_collection_t<T>& _a_gdc,
         Args... _a_elements
     ) noexcept;
@@ -216,7 +218,7 @@ __constexpr void
 template <typename T>
 __constexpr void
     process_all_data_generator_elements_with_result(
-        std::vector<data_generator_ptr_t<T>>&       _l_vect,
+        std::vector<data_generator_ptr_t<T>>& _l_vect,
         const data_generator_collection_t<T>& _a_gdc
     ) noexcept;
 } // namespace
@@ -278,8 +280,7 @@ __constexpr_imp data_generator_collection_t<T>::const_sentinel_t
 
 template <typename T>
 __constexpr_imp const dgc_internal_t<T>&
-    data_generator_collection_t<T>::get_elements(
-    ) const noexcept
+    data_generator_collection_t<T>::get_elements() const noexcept
 {
     return _m_elements;
 }
@@ -298,12 +299,11 @@ __constexpr_imp
 
 template <typename T>
 __constexpr_imp data_generator_collection_t<T>::iterator
-    data_generator_collection_t<T>::gen_iterator_begin()
+                data_generator_collection_t<T>::gen_iterator_begin()
 {
     return iterator(
         _m_elements.begin(),
-        std::distance(_m_elements.begin(), _m_elements.end()),
-        global::get_this_threads_test_runner_ptr()
+        std::distance(_m_elements.begin(), _m_elements.end())
     );
 }
 
@@ -346,7 +346,7 @@ template <typename T, typename... Args>
 requires (std::same_as<Args, data_generator_collection_t<T>> && ...)
 __constexpr_imp void
     process_all_data_generator_elements_with_result(
-        std::vector<data_generator_ptr_t<T>>&       _l_vect,
+        std::vector<data_generator_ptr_t<T>>& _l_vect,
         const data_generator_collection_t<T>& _a_gdc,
         Args... _a_elements
     ) noexcept
@@ -358,7 +358,7 @@ __constexpr_imp void
 template <typename T>
 __constexpr_imp void
     process_all_data_generator_elements_with_result(
-        std::vector<data_generator_ptr_t<T>>&       _l_vect,
+        std::vector<data_generator_ptr_t<T>>& _l_vect,
         const data_generator_collection_t<T>& _a_gdc
     ) noexcept
 {

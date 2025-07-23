@@ -89,7 +89,7 @@ __constexpr assertion_wp_t<T>
     global::get_this_threads_current_test().add_current_for_loop_stack_to_trie(
         not _l_pass
     );
-    auto ki = global::get_this_threads_test_runner_ref().get_log_infos(false);
+    auto ki = global::get_this_threads_test_evaluator_ref().get_log_infos(false);
     bba_inner_assertion_type_t _l_tuple(
         ( std::same_as<T, _ABC_NS_REPORTS::terminate_t>
           || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t> ),
@@ -115,7 +115,7 @@ __constexpr assertion_wp_t<T>
     global::get_this_threads_current_test().add_current_for_loop_stack_to_trie(
         not _a_matcher.matcher_result().passed()
     );
-    auto ki = global::get_this_threads_test_runner_ref().get_log_infos(false);
+    auto ki = global::get_this_threads_test_evaluator_ref().get_log_infos(false);
     _a_matcher.gather_map_source(_l_msm);
     if constexpr (Annotated)
     {
@@ -232,13 +232,13 @@ public:
                 _l_gur = std::make_unique<multi_element_assertion_block_t<T2>>(
                     _l_matcher_info.matcher_result().passed(),
                     source(),
-                    global::get_this_threads_test_runner_ref().get_log_infos(
+                    global::get_this_threads_test_evaluator_ref().get_log_infos(
                         false
                     ),
                     _l_mtr,
                     test_annotation()
                 );
-                global::get_this_threads_test_runner_ref().add_assertion(_l_gur
+                global::get_this_threads_test_evaluator_ref().add_assertion(_l_gur
                 );
                 throw _ABC_NS_ERRORS::test_assertion_exception_t();
             }
@@ -252,11 +252,11 @@ public:
             _l_gur = std::make_unique<multi_element_assertion_block_t<T2>>(
                 std::monostate(),
                 source(),
-                global::get_this_threads_test_runner_ref().get_log_infos(false),
+                global::get_this_threads_test_evaluator_ref().get_log_infos(false),
                 _l_mtr,
                 test_annotation()
             );
-            global::get_this_threads_test_runner_ref().add_assertion(_l_gur);
+            global::get_this_threads_test_evaluator_ref().add_assertion(_l_gur);
             throw _ABC_NS_ERRORS::test_assertion_exception_t();
         }
         return *this;
@@ -349,7 +349,7 @@ struct MacroAProxy3
     {
         using namespace _ABC_NS_REPORTS;
         using namespace _ABC_NS_MATCHER;
-        auto _l_test_runner{ _ABC_NS_GLOBAL::get_this_threads_test_runner_ref() };
+        auto _l_test_runner{ _ABC_NS_GLOBAL::get_this_threads_test_evaluator_ref() };
         _m_matcher.register_end(_ABC_NS_DS::single_source_t(
             _m_macro_str, _m_source
         ));

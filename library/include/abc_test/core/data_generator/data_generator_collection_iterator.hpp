@@ -44,8 +44,7 @@ public:
     __constexpr
     data_generator_collection_iterator_t(
         dgc_internal_itt_t<T> _a_begin_iterator,
-        const std::size_t     _a_iterator_length,
-        test_evaluator_t*        _a_test_runner
+        const std::size_t     _a_iterator_length
     );
     /*!
      * @brief Destructor.
@@ -89,10 +88,8 @@ private:
     ds::opt_idgc_memoized_element_t           _m_repetition_data;
     size_t                                    _m_this_iterators_index;
     bool                                      _m_add_repeatable_test_config;
-    test_evaluator_t*                            _m_test_runner;
     std::size_t                               _m_iterator_length;
     mutable std::optional<logging::log_msg_t> _m_log_msg;
-    // std::size_t                     _m_iterator_index;
     /*!
      * Increment iterator using an optional set of repetition data.
      */
@@ -116,19 +113,16 @@ __constexpr_imp
     data_generator_collection_iterator_t<T>::
         data_generator_collection_iterator_t(
             dgc_internal_itt_t<T> _a_begin_iterator,
-            const std::size_t     _a_iterator_length,
-            test_evaluator_t*        _a_test_runner
+            const std::size_t     _a_iterator_length
         )
     : _m_this_iterator(_a_begin_iterator)
-    // , _m_iterator_index(0)
     , _m_this_iterators_index{0}
-    , _m_test_runner(_a_test_runner)
     , _m_iterator_length(_a_iterator_length)
 {
     using namespace std;
     using namespace ds;
     using namespace errors;
-    invoked_test_data_t& _l_current_test{_m_test_runner->current_test()};
+    invoked_test_data_t& _l_current_test{global::get_this_threads_current_test()};
     // If this is a repetition.
     if (_l_current_test.post_setup_test_data().has_for_loop_stack_trie())
     {
