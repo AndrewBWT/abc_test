@@ -23,9 +23,11 @@ public:
      */
     __no_constexpr
         test_collection_t(
-            const test_options_base_t& _a_test_options,
+            const test_options_base_t& _a_test_options =
+            global::get_global_test_options(),
             const reporters::error_reporter_controller_t&
-                _a_error_reporter_controller
+                _a_error_reporter_controller =
+            global::get_global_error_reporter_controller()
         ) noexcept;
     /*!
      * @brief Adds tests to the object.

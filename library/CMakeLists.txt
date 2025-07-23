@@ -13,6 +13,7 @@ if(NOT DEFINED ABC_TEST_LIBRARY_INCLUDED)
   set(ABC_INTERNAL_HEADERS
     # Global file
     include/abc_test/core/global.hpp
+	include/abc_test/core/global/test_framework_global_variable_set.hpp
     # The core subfolder; contains the core logic for how the library works.
     include/abc_test/core.hpp
     include/abc_test/included_instances.hpp

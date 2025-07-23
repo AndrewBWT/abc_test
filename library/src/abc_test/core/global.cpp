@@ -1,5 +1,6 @@
 #include "abc_test/core/global.hpp"
 
+#include "abc_test/core/global/test_framework_global_variable_set.hpp"
 #include "abc_test/core/options/test_options_base.hpp"
 #include "abc_test/core/test_runner.hpp"
 
@@ -7,23 +8,29 @@
 
 // Implementation
 _BEGIN_ABC_GLOBAL_NS
-__no_constexpr_or_inline_imp test_options_base_t&
-    setup_global_variables(
-        const test_options_base_t& _a_options
+
+__no_constexpr_or_inline const test_framework_global_variable_set_t&
+    setup_global_variable_set(
+        const test_options_base_t&            _a_options,
+        _ABC_NS_REPORTERS::error_reporters_t& _a_error_reporters,
+        _ABC_NS_REPORTERS::test_reporters_t&  _a_test_reporters
     ) noexcept
 {
     using namespace reporters;
-    test_options_base_t& _l_to{detail::get_inner_global_test_options()};
-    _l_to = _a_options;
-    return _l_to;
+    using namespace std;
+    list<test_framework_global_variable_set_t>& _l_tfgvs{
+        detail::get_inner_global_variable_set()
+    };
+    _l_tfgvs.emplace_back(_a_options, _a_error_reporters, _a_test_reporters);
+    return _l_tfgvs.back();
 }
 
 __no_constexpr_or_inline_imp reporters::test_reporter_controller_t&
                              get_global_test_reporter_controller() noexcept
 {
-    using namespace reporters;
-    static test_reporter_controller_t _s_gtrc;
-    return _s_gtrc;
+    return detail::get_inner_global_variable_set()
+        .back()
+        .test_reporter_controller();
 }
 
 __no_constexpr_or_inline_imp test_runner_t&
@@ -44,7 +51,9 @@ __no_constexpr_or_inline_imp void
 __no_constexpr_or_inline_imp const test_options_base_t&
     get_global_test_options() noexcept
 {
-    return detail::get_inner_global_test_options();
+    return detail::get_inner_global_variable_set()
+        .back()
+        .test_options();
 }
 
 __no_constexpr_or_inline_imp test_runner_t*&
@@ -80,34 +89,20 @@ __no_constexpr_or_inline_imp const test_options_base_t*
 __no_constexpr_or_inline_imp reporters::error_reporter_controller_t&
                              get_global_error_reporter_controller() noexcept
 {
-    return detail::get_inner_global_error_reporter_controller();
+    return detail::get_inner_global_variable_set()
+        .back()
+        .error_reporter_controller();
 }
 
 namespace detail
 {
-__no_constexpr_or_inline_imp test_options_base_t&
-    get_inner_global_test_options() noexcept
+__no_constexpr_or_inline_imp std::list<test_framework_global_variable_set_t>&
+                             get_inner_global_variable_set() noexcept
 {
-    static test_options_base_t _s_to;
-    return _s_to;
+    static std::list<test_framework_global_variable_set_t> _s_tfgvs{};
+    return _s_tfgvs;
 }
-
-__no_constexpr_or_inline_imp reporters::error_reporter_controller_t&
-    get_inner_global_error_reporter_controller() noexcept
-{
-    using namespace reporters;
-    static error_reporter_controller_t _s_erc;
-    return _s_erc;
-}
-
-__no_constexpr_or_inline_imp utility::complete_global_seed_t&
-                             get_inner_global_seed() noexcept
-{
-    using namespace utility;
-    static complete_global_seed_t _s_complete_global_seed;
-    return _s_complete_global_seed;
-}
-} // namespace
+} // namespace detail
 
 __no_constexpr_or_inline_imp const ds::test_list_t&
                                    get_global_test_list() noexcept
@@ -134,18 +129,10 @@ __no_constexpr_or_inline_imp void
     _l_test_list.clear();
 }
 
-__no_constexpr_or_inline_imp void
-    set_global_seed()
-{
-    using namespace std;
-    using namespace utility;
-    detail::get_inner_global_seed() = set_complete_global_seed(global::get_global_test_options().global_seed);
-}
-
 __no_constexpr_or_inline_imp const utility::complete_global_seed_t&
                                    get_global_seed()
 {
-    return detail::get_inner_global_seed();
+    return detail::get_inner_global_variable_set().back().global_seed();
 }
 
 __no_constexpr_or_inline_imp _ABC_NS_UTILITY::volatilte_volatile_void_ptr_t&
@@ -166,6 +153,6 @@ __no_constexpr_or_inline_imp ds::test_list_t&
     static test_list_t _static_test_list;
     return _static_test_list;
 }
-} // namespace
+} // namespace detail
 
 _END_ABC_GLOBAL_NS

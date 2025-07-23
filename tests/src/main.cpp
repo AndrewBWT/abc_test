@@ -4,6 +4,7 @@
  #include "abc_test_test/core.hpp"
  #include "abc_test_test/included_instances.hpp"
  #include "abc_test_test/utility.hpp"
+#include "abc_test_test/component_tests.hpp"
  #if defined(_WIN32)
 #include "windows.h"
 #endif

@@ -1,4 +1,5 @@
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/global.hpp
+G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/global/test_framework_global_variable_set.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/included_instances.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/test_main.hpp

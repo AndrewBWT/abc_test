@@ -14,6 +14,12 @@ _END_ABC_NS
 _BEGIN_ABC_REPORTERS_NS
 struct test_reporter_controller_t;
 struct error_reporter_controller_t;
+struct error_reporter_t;
+using error_reporters_t
+    = std::vector<std::reference_wrapper<const error_reporter_t>>;
+struct test_reporter_t;
+using test_reporters_t
+    = std::vector<std::reference_wrapper<const test_reporter_t>>;
 _END_ABC_REPORTERS_NS
 
 /*!
@@ -33,13 +39,25 @@ _END_ABC_REPORTERS_NS
  */
 // Definitions
 _BEGIN_ABC_GLOBAL_NS
+struct test_framework_global_variable_set_t;
+
 /*!
  * Sets up the global test options (GTO). It also links the
  * global error_reporter_controller_t to the GTO.
  *
  */
-__no_constexpr_or_inline test_options_base_t&
-    setup_global_variables(const test_options_base_t& _a_options) noexcept;
+/*__no_constexpr_or_inline const test_options_base_t&
+    setup_global_variables(
+        const test_options_base_t&            _a_options,
+        _ABC_NS_REPORTERS::error_reporters_t& _a_error_reporters,
+        _ABC_NS_REPORTERS::test_reporters_t&  _a_test_reporters
+    ) noexcept;*/
+__no_constexpr_or_inline const test_framework_global_variable_set_t&
+    setup_global_variable_set(
+        const test_options_base_t& _a_options,
+        _ABC_NS_REPORTERS::error_reporters_t& _a_error_reporters,
+        _ABC_NS_REPORTERS::test_reporters_t& _a_test_reporters
+    ) noexcept;
 /*!
  * Gets a reference to the global test_reporter_controller_t object.
  *
@@ -103,22 +121,20 @@ __no_constexpr_or_inline std::size_t
 __no_constexpr_or_inline void
     clear_test_list() noexcept;
 __no_constexpr_or_inline void
-set_global_seed();
+                               set_global_seed();
 __no_constexpr_or_inline const utility::complete_global_seed_t&
-get_global_seed();
-__no_constexpr_or_inline _ABC_NS_UTILITY::volatilte_volatile_void_ptr_t&
-get_threads_volatie_ptr_ref();
+                               get_global_seed();
+__no_constexpr_or_inline       _ABC_NS_UTILITY::volatilte_volatile_void_ptr_t&
+                               get_threads_volatie_ptr_ref();
+
 namespace detail
 {
 // Can't be constexpr due to use of static var.
 __no_constexpr_or_inline ds::test_list_t&
                          get_mutable_test_list() noexcept;
-__no_constexpr_or_inline test_options_base_t&
-                         get_inner_global_test_options() noexcept;
-__no_constexpr_or_inline reporters::error_reporter_controller_t&
-                         get_inner_global_error_reporter_controller() noexcept;
-__no_constexpr_or_inline utility::complete_global_seed_t& get_inner_global_seed() noexcept;
-}
+__no_constexpr_or_inline std::list<test_framework_global_variable_set_t>&
+    get_inner_global_variable_set() noexcept;
+} // namespace detail
 
 _END_ABC_GLOBAL_NS
 #endif

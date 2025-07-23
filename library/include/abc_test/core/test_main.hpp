@@ -10,11 +10,11 @@
 #include "abc_test/included_instances/reporters/text_test_reporter.hpp"
 #include "abc_test/utility/cli.hpp"
 
+#include <condition_variable>
 #include <memory>
 #include <set>
 #include <syncstream>
 #include <thread>
-#include <condition_variable>
 
 
 _BEGIN_ABC_NS
@@ -118,6 +118,7 @@ __no_constexpr_imp
     ) noexcept
     : test_main_t<T>(_a_validated_test_options.get_options(), _a_cli)
 {}
+
 template <typename T>
 __no_constexpr_imp
     test_main_t<T>::test_main_t(
@@ -136,7 +137,6 @@ __no_constexpr_imp
     , _m_current_thread_pool(_a_to.threads)
     , _m_threads(std::vector<std::jthread>(_a_to.threads))
     , _m_threads_free(set_from_min_to_n(_a_to.threads))
-//, _m_test_set_data(std::vector<_ABC_NS_DS::test_set_data_t>(_a_to.threads))
 {}
 
 template <typename T>
@@ -151,22 +151,28 @@ __no_constexpr_imp void
     using namespace _ABC_NS_GLOBAL;
     using enum _ABC_NS_UTILITY::internal::internal_log_enum_t;
     _LIBRARY_LOG(
-        MAIN_INFO, "run_tests() beginning.\nSetting up global test options..."
+        MAIN_INFO,
+        "run_tests() beginning.\nSetting up global and thread local "
+        "variables..."
     );
 
-    const test_options_base_t& _l_global_test_options{get_global_test_options()
+    const test_framework_global_variable_set_t& _l_tfgvs{
+        setup_global_variable_set(
+            _m_options, _m_error_reporters, _m_test_reporters
+        )
     };
-    setup_global_variables(_m_options);
-    set_global_seed();
-    _LIBRARY_LOG(MAIN_INFO, "Setting up global error reporter controller...");
+    // set_global_seed();
+    // _LIBRARY_LOG(MAIN_INFO, "Setting up global error reporter
+    // controller...");
     error_reporter_controller_t& _l_erc{get_global_error_reporter_controller()};
-    _l_erc.add_reporters(_m_error_reporters);
+    // _l_erc.add_reporters(_m_error_reporters);
 
-    _LIBRARY_LOG(MAIN_INFO, "Setting up global test reporter controller...");
+    // _LIBRARY_LOG(MAIN_INFO, "Setting up global test reporter
+    // controller...");
     test_reporter_controller_t& _l_trc{get_global_test_reporter_controller()};
-    _l_trc.add_reporters(_m_test_reporters);
+    // _l_trc.add_reporters(_m_test_reporters);
     _LIBRARY_LOG(MAIN_INFO, "Adding test sets to local test_collection_t...");
-    test_collection_t _l_tc(_l_global_test_options, _l_erc);
+    test_collection_t _l_tc;
     _l_tc.add_tests(_m_test_list_collection);
     if (_l_erc.soft_exit())
     {
@@ -184,7 +190,8 @@ __no_constexpr_imp void
     _a_test_set_data.report_all_tests(_l_pstd.size());
     post_setup_test_list_itt_t       _l_pstd_itt{_l_pstd.begin()};
     const post_setup_test_list_itt_t _l_pstd_end{_l_pstd.end()};
-
+    test_options_base_t _l_global_test_options{global::get_global_test_options()
+    };
     _m_test_runners = vector<test_runner_t>(
         _l_global_test_options.threads,
         test_runner_t(
@@ -224,8 +231,8 @@ __no_constexpr_imp void
                 }
             );
         }
-        // Check we actually have the resourses... should we lock it here before
-        // doing this?
+        // Check we actually have the resourses... should we lock it here
+        // before doing this?
         if (_l_erc.should_exit() == false && _m_threads_free.size() > 0)
         {
             // Otherwise, get a lock for the threads, remove the
@@ -345,9 +352,9 @@ __no_constexpr_imp void
         error_reporter_controller_t& _l_erc{
             get_global_error_reporter_controller()
         };
-        _l_erc.report_error(
-            setup_error_t(u8"Unknown exception thrown from test_runner_t.", true)
-        );
+        _l_erc.report_error(setup_error_t(
+            u8"Unknown exception thrown from test_runner_t.", true
+        ));
     }
     _LIBRARY_LOG(MAIN_INFO, "Test finished.");
     _LIBRARY_LOG(MAIN_INFO, "Freeing thread resourses.");
