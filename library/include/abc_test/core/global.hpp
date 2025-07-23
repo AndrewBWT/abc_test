@@ -8,7 +8,7 @@ struct registered_test_data_t;
 struct invoked_test_data_t;
 _END_ABC_DS_NS
 _BEGIN_ABC_NS
-struct test_runner_t;
+struct test_evaluator_t;
 _END_ABC_NS
 
 _BEGIN_ABC_REPORTERS_NS
@@ -46,12 +46,6 @@ struct test_framework_global_variable_set_t;
  * global error_reporter_controller_t to the GTO.
  *
  */
-/*__no_constexpr_or_inline const test_options_base_t&
-    setup_global_variables(
-        const test_options_base_t&            _a_options,
-        _ABC_NS_REPORTERS::error_reporters_t& _a_error_reporters,
-        _ABC_NS_REPORTERS::test_reporters_t&  _a_test_reporters
-    ) noexcept;*/
 __no_constexpr_or_inline const test_framework_global_variable_set_t&
     setup_global_variable_set(
         const test_options_base_t& _a_options,
@@ -68,10 +62,10 @@ __no_constexpr_or_inline reporters::test_reporter_controller_t&
  * Gets a reference to this threads test_runner_t object.
  *
  */
-__no_constexpr_or_inline test_runner_t&
+__no_constexpr_or_inline test_evaluator_t&
     get_this_threads_test_runner_ref() noexcept;
 __no_constexpr_or_inline void
-    set_this_threads_test_runner(test_runner_t* _a_test_runner_t) noexcept;
+    set_this_threads_test_runner(test_evaluator_t* _a_test_runner_t) noexcept;
 /*!
  * Gets a const reference to the global test_options_base_t object.
  *
@@ -86,7 +80,7 @@ __no_constexpr_or_inline const test_options_base_t&
  * this wouldn't be possible.
  *
  */
-__no_constexpr_or_inline test_runner_t*&
+__no_constexpr_or_inline test_evaluator_t*&
     get_this_threads_test_runner_ptr() noexcept;
 /*!
  * Gets a reference to this threads current invoked_test_info. That is, the

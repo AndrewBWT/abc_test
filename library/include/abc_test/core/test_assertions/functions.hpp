@@ -14,7 +14,7 @@
 #include "abc_test/core/test_reports/matcher_based_assertion_single_line.hpp"
 #include "abc_test/core/test_reports/multi_element_assertion_block.hpp"
 #include "abc_test/core/test_reports/static_assertion.hpp"
-#include "abc_test/core/test_runner.hpp"
+#include "abc_test/core/test_evaluator.hpp"
 #include "abc_test/utility/str/string_utils.hpp"
 
 #include <concepts>
@@ -69,7 +69,7 @@ __constexpr bool
         const std::string_view                              _a_macro_str,
         const std::string_view                              _a_matcher_str,
         const std::source_location&                         _a_sl,
-        test_runner_t&                                      _a_test_runner
+        test_evaluator_t&                                      _a_test_runner
     ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>);
 template <typename T, bool Has_Annotation>
 requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
@@ -79,7 +79,7 @@ __constexpr bool
         const std::string_view                               _a_macro_str,
         const std::string_view                               _a_matcher_str,
         const std::source_location&                          _a_sl,
-        test_runner_t&                                       _a_test_runner
+        test_evaluator_t&                                       _a_test_runner
     ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>);
 template <typename T, _ABC_NS_MATCHER::logic_enum_t Logic_Enum>
 requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
@@ -89,7 +89,7 @@ __constexpr bool
         const std::string_view                               _a_macro_str,
         const std::string_view                               _a_matcher_str,
         const std::source_location&                          _a_sl,
-        test_runner_t&                                       _a_test_runner
+        test_evaluator_t&                                       _a_test_runner
     ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>);
 /*!
  * @brief Creates a static assertion in the test function.
@@ -107,14 +107,14 @@ __constexpr bool
     create_static_assertion(
         const std::optional<std::string>&  _a_str_to_print,
         const _ABC_NS_DS::single_source_t& _a_source,
-        test_runner_t&                     _a_test_runner
+        test_evaluator_t&                     _a_test_runner
     ) noexcept(not std::same_as<T, _ABC_NS_REPORTS::terminate_t>);
 template <typename T>
 requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
 __constexpr_imp void
     create_assertion_block(
         const multi_element_test_block_t& _a_test_block,
-        test_runner_t&                    _a_test_runner,
+        test_evaluator_t&                    _a_test_runner,
         const std::string_view            _a_source_representation,
         const std::source_location&       _a_source_location
     ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>);
@@ -123,7 +123,7 @@ requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
 __constexpr_imp void
     create_assertion_block(
         const multi_element_test_block_t& _a_test_block,
-        test_runner_t&                    _a_test_runner
+        test_evaluator_t&                    _a_test_runner
     ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>);
 
 namespace
@@ -178,7 +178,7 @@ create_assertion(
     const std::string_view _a_macro_str,
     const std::string_view _a_matcher_str,
     const std::source_location& _a_sl,
-    test_runner_t& _a_test_runner
+    test_evaluator_t& _a_test_runner
 ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>)
 {
     using namespace _ABC_NS_REPORTS;
@@ -228,7 +228,7 @@ create_assertion(
     const std::string_view _a_macro_str,
     const std::string_view _a_matcher_str,
     const std::source_location& _a_sl,
-    test_runner_t& _a_test_runner
+    test_evaluator_t& _a_test_runner
 ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>)
 {
     using namespace _ABC_NS_REPORTS;
@@ -275,7 +275,7 @@ create_assertion(
     const std::string_view                               _a_macro_str,
     const std::string_view                               _a_matcher_str,
     const std::source_location& _a_sl,
-    test_runner_t& _a_test_runner
+    test_evaluator_t& _a_test_runner
 ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>)
 {
     using namespace _ABC_NS_MATCHER;
@@ -298,7 +298,7 @@ bool
 create_static_assertion(
     const std::optional<std::string>& _a_str_to_print,
     const _ABC_NS_DS::single_source_t& _a_source,
-    test_runner_t& _a_test_runner
+    test_evaluator_t& _a_test_runner
 ) noexcept(not std::same_as<T, _ABC_NS_REPORTS::terminate_t>)
 {
     using namespace std;
@@ -334,7 +334,7 @@ __constexpr_imp
 void
 create_assertion_block(
     multi_element_test_block_t& _a_test_block,
-    test_runner_t& _a_test_runner,
+    test_evaluator_t& _a_test_runner,
     const std::string_view _a_source_representation,
     const std::source_location& _a_source_location
 ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>)
@@ -379,7 +379,7 @@ __constexpr_imp
 void
 create_assertion_block(
     const multi_element_test_block_t& _a_test_block,
-    test_runner_t& _a_test_runner
+    test_evaluator_t& _a_test_runner
 ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>)
 {
     using namespace _ABC_NS_REPORTS;
@@ -408,7 +408,7 @@ matcher_based_assertion_block(
     const _ABC_NS_MATCHER::matcher_wrapper_t<false>& _a_matcher,
     const std::optional<std::string_view>& _a_str_to_print,
     const _ABC_NS_DS::single_source_t& _a_source,
-    test_runner_t& _a_test_runner
+    test_evaluator_t& _a_test_runner
 ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>)
 {
     using namespace _ABC_NS_REPORTS;

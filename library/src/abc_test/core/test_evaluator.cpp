@@ -1,4 +1,4 @@
-#include "abc_test/core/test_runner.hpp"
+#include "abc_test/core/test_evaluator.hpp"
 
 #include "abc_test/core/errors/test_assertion_exception.hpp"
 #include "abc_test/core/errors/test_library_exception.hpp"
@@ -10,7 +10,7 @@
 
 _BEGIN_ABC_NS
 __no_constexpr_or_inline_imp void
-    test_runner_t::run_test(
+    test_evaluator_t::run_test(
         const _ABC_NS_DS::post_setup_test_data_t& _a_post_setup_test_data,
         const std::size_t                         _a_order_ran_id
     )
@@ -76,13 +76,13 @@ __no_constexpr_or_inline_imp void
     _l_current_test.set_time_taken(
         _l_clock_begin, _l_clock_end
     );
-    _m_trc.get().report_test(_l_current_test);
+    global::get_global_test_reporter_controller().report_test(_l_current_test);
     _m_current_log_msgs.clear();
     //++_m_tests_ran;
 }
 
 __no_constexpr_or_inline_imp void
-    test_runner_t::remove_log_msg(
+    test_evaluator_t::remove_log_msg(
         _ABC_NS_LOGGING::log_msg_itt_t _a_itt
     ) noexcept
 {
@@ -91,7 +91,7 @@ __no_constexpr_or_inline_imp void
 }
 
 __no_constexpr_or_inline_imp _ABC_NS_DS::log_infos_t
-                             test_runner_t::get_log_infos(
+                             test_evaluator_t::get_log_infos(
         const bool _a_get_cached_results
     ) noexcept
 {

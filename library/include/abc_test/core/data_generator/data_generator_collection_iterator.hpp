@@ -5,7 +5,7 @@
 #include "abc_test/core/data_generator/data_generator_collection_sentinel.hpp"
 #include "abc_test/core/data_generator/typeless_data_generator_collection_iterator.hpp"
 _BEGIN_ABC_NS
-struct test_runner_t;
+struct test_evaluator_t;
 _END_ABC_NS
 _BEGIN_ABC_DG_NS
 // Forward declarations
@@ -45,7 +45,7 @@ public:
     data_generator_collection_iterator_t(
         dgc_internal_itt_t<T> _a_begin_iterator,
         const std::size_t     _a_iterator_length,
-        test_runner_t*        _a_test_runner
+        test_evaluator_t*        _a_test_runner
     );
     /*!
      * @brief Destructor.
@@ -89,7 +89,7 @@ private:
     ds::opt_idgc_memoized_element_t           _m_repetition_data;
     size_t                                    _m_this_iterators_index;
     bool                                      _m_add_repeatable_test_config;
-    test_runner_t*                            _m_test_runner;
+    test_evaluator_t*                            _m_test_runner;
     std::size_t                               _m_iterator_length;
     mutable std::optional<logging::log_msg_t> _m_log_msg;
     // std::size_t                     _m_iterator_index;
@@ -117,7 +117,7 @@ __constexpr_imp
         data_generator_collection_iterator_t(
             dgc_internal_itt_t<T> _a_begin_iterator,
             const std::size_t     _a_iterator_length,
-            test_runner_t*        _a_test_runner
+            test_evaluator_t*        _a_test_runner
         )
     : _m_this_iterator(_a_begin_iterator)
     // , _m_iterator_index(0)

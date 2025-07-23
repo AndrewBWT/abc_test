@@ -2,7 +2,7 @@
 
 #include "abc_test/core/data_generator/data_generator_collection.hpp"
 #include "abc_test/core/data_generator/data_generator_with_file_support.hpp"
-#include "abc_test/core/test_runner.hpp"
+#include "abc_test/core/test_evaluator.hpp"
 
 #include <initializer_list>
 #include <vector>

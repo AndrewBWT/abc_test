@@ -20,7 +20,7 @@ if(NOT DEFINED ABC_TEST_LIBRARY_INCLUDED)
     include/abc_test/core/test_main.hpp
     include/abc_test/core/options/test_options_base.hpp
     include/abc_test/core/options/validated_test_options.hpp
-    include/abc_test/core/test_runner.hpp
+    include/abc_test/core/test_evaluator.hpp
     # Logging messages, associated with tests
     include/abc_test/core/logging/macros.hpp 
     include/abc_test/core/logging/log_msg.hpp
@@ -246,7 +246,7 @@ if(NOT DEFINED ABC_TEST_LIBRARY_INCLUDED)
   # Set the cpp files variable. This is a list of all the cpp files.
   set(ABC_INTERNAL_SOURCES
         src/abc_test/core/global.cpp
-        src/abc_test/core/test_runner.cpp
+        src/abc_test/core/test_evaluator.cpp
         src/abc_test/core/ds/test_data/invoked_test_data.cpp
         src/abc_test/core/ds/test_data/test_set_data.cpp
   	    src/abc_test/core/ds/test_collections/test_tree.cpp

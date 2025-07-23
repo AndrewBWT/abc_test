@@ -27,24 +27,11 @@ _BEGIN_ABC_NS
  * when doing things such as logging messages, or writing assertion data to the
  * correct data structures.
  */
-struct test_runner_t
+struct test_evaluator_t
 {
 public:
-    __constexpr
-    test_runner_t()
-        = delete;
-    /*!
-     * @brief Constructor.
-     * @param _a_trc The test_reporter_controller_t uased with this
-     * test_runner_t.
-     * @param _a_test_options The test_options_base_t used with this object.
-     */
     __no_constexpr
-        test_runner_t(
-            _ABC_NS_REPORTERS::test_reporter_controller_t& _a_trc,
-            const test_options_base_t&                     _a_test_options,
-            utility::rng_t&& _a_rng
-        ) noexcept;
+    test_evaluator_t() noexcept;
     /*!
      * @brief Adds a log message to the current set of log messages.
      *
@@ -173,17 +160,15 @@ public:
             const std::string_view _a_warning
         ) noexcept;
     __no_constexpr void
-        set_data_process_test() noexcept;
+                set_data_process_test() noexcept;
     __constexpr std::size_t
-        current_assertion_index() const noexcept;
+                current_assertion_index() const noexcept;
 private:
-    _ABC_NS_LOGGING::log_msg_ptrs_t _m_current_log_msgs;
-    std::vector<std::u8string>        _m_cached_log_msgs;
-    std::reference_wrapper<_ABC_NS_REPORTERS::test_reporter_controller_t>
-        _m_trc;
+    _ABC_NS_LOGGING::log_msg_ptrs_t                  _m_current_log_msgs;
+    std::vector<std::u8string>                       _m_cached_log_msgs;
     std::shared_ptr<_ABC_NS_DS::invoked_test_data_t> _m_current_test;
-    _ABC_NS_UTILITY::rng_t                             _m_random_generator;
-    _ABC_NS_DS::test_set_data_t _m_test_data;
+    _ABC_NS_UTILITY::rng_t                           _m_random_generator;
+    _ABC_NS_DS::test_set_data_t                      _m_test_data;
     std::optional<_ABC_NS_DS::single_source_t> _m_tests_most_recent_source;
     template <bool Single_Source, typename Assertion_Status>
     __constexpr void
@@ -206,19 +191,15 @@ _END_ABC_NS
 
 _BEGIN_ABC_NS
 __no_constexpr_imp
-    test_runner_t::test_runner_t(
-        _ABC_NS_REPORTERS::test_reporter_controller_t& _a_trc,
-        const test_options_base_t&                     _a_test_options,
-        utility::rng_t&& _a_rng
-    ) noexcept
-    : _m_trc(_a_trc)
-    , _m_current_test(nullptr)
-    , _m_random_generator(std::move(_a_rng))
+    test_evaluator_t::test_evaluator_t() noexcept
+    : _m_current_test(nullptr)
+    , _m_random_generator(std::move(global::get_global_test_options().make_rng()
+      ))
     , _m_tests_most_recent_source(_ABC_NS_DS::single_source_t())
 {}
 
 __constexpr_imp void
-    test_runner_t::register_tests_most_recent_source(
+    test_evaluator_t::register_tests_most_recent_source(
         const _ABC_NS_DS::single_source_t& _a_source_location
     ) noexcept
 {
@@ -226,7 +207,7 @@ __constexpr_imp void
 }
 
 __constexpr_imp void
-    test_runner_t::register_tests_most_recent_source(
+    test_evaluator_t::register_tests_most_recent_source(
         const _ABC_NS_DS::source_pair_t& _a_source_locations
     ) noexcept
 {
@@ -241,7 +222,7 @@ __constexpr_imp void
 }
 
 __no_constexpr_imp _ABC_NS_LOGGING::log_msg_itt_t
-                   test_runner_t::add_log_msg(
+                   test_evaluator_t::add_log_msg(
         _ABC_NS_LOGGING::log_msg_ref_t     _a_log,
         const _ABC_NS_DS::single_source_t& _a_source
     ) noexcept
@@ -253,19 +234,19 @@ __no_constexpr_imp _ABC_NS_LOGGING::log_msg_itt_t
 }
 
 __constexpr_imp const ds::test_set_data_t&
-                      test_runner_t::test_set_data() const noexcept
+                      test_evaluator_t::test_set_data() const noexcept
 {
     return _m_test_data;
 }
 
 __no_constexpr_imp _ABC_NS_DS::invoked_test_data_t&
-                   test_runner_t::current_test() noexcept
+                   test_evaluator_t::current_test() noexcept
 {
     return *_m_current_test;
 }
 
 __no_constexpr_imp _ABC_NS_UTILITY::rng_t
-                   test_runner_t::generate_random_seeds(
+                   test_evaluator_t::generate_random_seeds(
         const std::size_t _a_order_ran_id
     ) noexcept
 {
@@ -277,18 +258,20 @@ __no_constexpr_imp _ABC_NS_UTILITY::rng_t
     _m_random_generator.progress(
         _a_order_ran_id * _l_n_elements_used_to_seed_random_generators
     );
-    return _m_random_generator.make_rng(_l_n_elements_used_to_seed_random_generators);
+    return _m_random_generator.make_rng(
+        _l_n_elements_used_to_seed_random_generators
+    );
 }
 
 __constexpr_imp const std::optional<_ABC_NS_DS::single_source_t>&
-                      test_runner_t::most_recent_source() const noexcept
+                      test_evaluator_t::most_recent_source() const noexcept
 {
     return _m_tests_most_recent_source;
 }
 
 template <bool Single_Source, typename Assertion_Status>
 __constexpr_imp void
-    test_runner_t::add_assertion(
+    test_evaluator_t::add_assertion(
         _ABC_NS_REPORTS::assertion_ptr_t<Single_Source, Assertion_Status>&
             _a_ptr
     ) noexcept
@@ -299,7 +282,7 @@ __constexpr_imp void
 
 template <bool Single_Source, typename Assertion_Status>
 __constexpr_imp void
-    test_runner_t::add_assertion_and_warning(
+    test_evaluator_t::add_assertion_and_warning(
         _ABC_NS_REPORTS::assertion_ptr_t<Single_Source, Assertion_Status>&
                                _a_ptr,
         const std::string_view _a_warning
@@ -312,18 +295,20 @@ __constexpr_imp void
 }
 
 __no_constexpr_imp void
-    test_runner_t::set_data_process_test() noexcept
+    test_evaluator_t::set_data_process_test() noexcept
 {
     _m_test_data.process_invoked_test(*_m_current_test);
 }
+
 __constexpr_imp std::size_t
-test_runner_t::current_assertion_index() const noexcept
+                test_evaluator_t::current_assertion_index() const noexcept
 {
-    return _m_current_test.get()->assertions_recieved()+1;
+    return _m_current_test.get()->assertions_recieved() + 1;
 }
+
 template <bool Single_Source, typename Assertion_Status>
 __constexpr_imp void
-    test_runner_t::add_assertion_and_optional_warning(
+    test_evaluator_t::add_assertion_and_optional_warning(
         _ABC_NS_REPORTS::assertion_ptr_t<Single_Source, Assertion_Status>&
                                                _a_ptr,
         const std::optional<std::string_view>& _a_optional_warning
@@ -338,12 +323,14 @@ __constexpr_imp void
             _a_optional_warning.value(), _a_ptr->last_source()
         );
     }
-    _m_current_test->add_current_for_loop_stack_to_trie(not _a_ptr->get_pass_status());
+    _m_current_test->add_current_for_loop_stack_to_trie(
+        not _a_ptr->get_pass_status()
+    );
     _m_current_test->add_assertion(_a_ptr);
 }
 
 __constexpr_imp void
-    test_runner_t::add_text_warning(
+    test_evaluator_t::add_text_warning(
         const std::string_view _a_str
     ) noexcept
 {
@@ -355,7 +342,7 @@ __constexpr_imp void
 }
 
 __constexpr_imp void
-    test_runner_t::add_test_warning_with_source(
+    test_evaluator_t::add_test_warning_with_source(
         const std::string_view             _a_str,
         const _ABC_NS_DS::single_source_t& _a_source
     ) noexcept
@@ -368,7 +355,7 @@ __constexpr_imp void
 }
 
 __constexpr_imp void
-    test_runner_t::add_cached_log_msg(
+    test_evaluator_t::add_cached_log_msg(
         const std::u8string_view _a_str
     ) noexcept
 {

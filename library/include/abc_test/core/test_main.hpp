@@ -5,7 +5,7 @@
 #include "abc_test/core/options/validated_test_options.hpp"
 #include "abc_test/core/reporters/test_reporter.hpp"
 #include "abc_test/core/reporters/test_reporter_controller.hpp"
-#include "abc_test/core/test_runner.hpp"
+#include "abc_test/core/test_evaluator.hpp"
 #include "abc_test/included_instances/reporters/text_error_reporter.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter.hpp"
 #include "abc_test/utility/cli.hpp"
@@ -63,8 +63,8 @@ private:
     std::mutex                           _m_threads_mutex;
     std::vector<std::jthread>            _m_threads;
     // std::vector<_ABC_NS_DS::test_set_data_t> _m_test_set_data;
-    std::vector<test_runner_t> _m_test_runners;
-    std::set<std::size_t>      _m_threads_free;
+    std::vector<test_evaluator_t> _m_test_runners;
+    std::set<std::size_t>         _m_threads_free;
     /*!
      * @brief Inner constructor. Protected so it can't be used outside of this
      * class.
@@ -85,7 +85,7 @@ private:
         run_individual_test(
             const _ABC_NS_DS::post_setup_test_data_t& _a_prtd,
             const size_t                              _a_thread_idx,
-            test_runner_t&                            _a_test_runner,
+            test_evaluator_t&                         _a_test_runner,
             const std::size_t                         _a_order_ran_id
             //_ABC_NS_DS::test_set_data_t&              _a_test_set_data
         );
@@ -161,16 +161,8 @@ __no_constexpr_imp void
             _m_options, _m_error_reporters, _m_test_reporters
         )
     };
-    // set_global_seed();
-    // _LIBRARY_LOG(MAIN_INFO, "Setting up global error reporter
-    // controller...");
     error_reporter_controller_t& _l_erc{get_global_error_reporter_controller()};
-    // _l_erc.add_reporters(_m_error_reporters);
-
-    // _LIBRARY_LOG(MAIN_INFO, "Setting up global test reporter
-    // controller...");
-    test_reporter_controller_t& _l_trc{get_global_test_reporter_controller()};
-    // _l_trc.add_reporters(_m_test_reporters);
+    test_reporter_controller_t&  _l_trc{get_global_test_reporter_controller()};
     _LIBRARY_LOG(MAIN_INFO, "Adding test sets to local test_collection_t...");
     test_collection_t _l_tc;
     _l_tc.add_tests(_m_test_list_collection);
@@ -192,11 +184,8 @@ __no_constexpr_imp void
     const post_setup_test_list_itt_t _l_pstd_end{_l_pstd.end()};
     test_options_base_t _l_global_test_options{global::get_global_test_options()
     };
-    _m_test_runners = vector<test_runner_t>(
-        _l_global_test_options.threads,
-        test_runner_t(
-            _l_trc, _l_global_test_options, _l_global_test_options.make_rng()
-        )
+    _m_test_runners = vector<test_evaluator_t>(
+        _l_global_test_options.threads, test_evaluator_t()
     );
     size_t _l_order_ran_id_counter{0};
     _l_trc.report_pre_test_data(_a_test_set_data);
@@ -313,7 +302,7 @@ __no_constexpr_imp void
     test_main_t<T>::run_individual_test(
         const _ABC_NS_DS::post_setup_test_data_t& _a_prtd,
         const size_t                              _a_thread_idx,
-        test_runner_t&                            _a_test_runner,
+        test_evaluator_t&                         _a_test_runner,
         const std::size_t                         _a_order_ran_id
         // _ABC_NS_DS::test_set_data_t&              _a_test_set_data
     )
@@ -325,7 +314,7 @@ __no_constexpr_imp void
     using enum _ABC_NS_UTILITY::internal::internal_log_enum_t;
     // Get the thread runner
     set_this_threads_test_runner(&_a_test_runner);
-    test_runner_t& _l_threads_runner{get_this_threads_test_runner_ref()};
+    test_evaluator_t& _l_threads_runner{get_this_threads_test_runner_ref()};
     // run in try
     try
     {

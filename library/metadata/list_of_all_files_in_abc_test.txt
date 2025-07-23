@@ -5,7 +5,7 @@ G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/included_instan
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/test_main.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/options/test_options_base.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/options/validated_test_options.hpp
-G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/test_runner.hpp
+G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/test_evaluator.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/logging/macros.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/logging/log_msg.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/test_assertions/test_block.hpp
@@ -199,7 +199,7 @@ G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/included_instan
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/included_instances/options/included_instances_test_options.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/included_instances/options/option_config.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/src/abc_test/core/global.cpp
-G:/MyProjects/cpp/git_projects/abc_test/library/src/abc_test/core/test_runner.cpp
+G:/MyProjects/cpp/git_projects/abc_test/library/src/abc_test/core/test_evaluator.cpp
 G:/MyProjects/cpp/git_projects/abc_test/library/src/abc_test/core/ds/test_data/invoked_test_data.cpp
 G:/MyProjects/cpp/git_projects/abc_test/library/src/abc_test/core/ds/test_data/test_set_data.cpp
 G:/MyProjects/cpp/git_projects/abc_test/library/src/abc_test/core/ds/test_collections/test_tree.cpp

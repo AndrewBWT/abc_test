@@ -2,7 +2,7 @@
 
 #include "abc_test/core/global/test_framework_global_variable_set.hpp"
 #include "abc_test/core/options/test_options_base.hpp"
-#include "abc_test/core/test_runner.hpp"
+#include "abc_test/core/test_evaluator.hpp"
 
 #include <variant>
 
@@ -33,7 +33,7 @@ __no_constexpr_or_inline_imp reporters::test_reporter_controller_t&
         .test_reporter_controller();
 }
 
-__no_constexpr_or_inline_imp test_runner_t&
+__no_constexpr_or_inline_imp test_evaluator_t&
     get_this_threads_test_runner_ref() noexcept
 {
     return *get_this_threads_test_runner_ptr();
@@ -41,10 +41,10 @@ __no_constexpr_or_inline_imp test_runner_t&
 
 __no_constexpr_or_inline_imp void
     set_this_threads_test_runner(
-        test_runner_t* _a_test_runner_t
+        test_evaluator_t* _a_test_runner_t
     ) noexcept
 {
-    test_runner_t*& _l_tr{get_this_threads_test_runner_ptr()};
+    test_evaluator_t*& _l_tr{get_this_threads_test_runner_ptr()};
     _l_tr = _a_test_runner_t;
 }
 
@@ -56,10 +56,10 @@ __no_constexpr_or_inline_imp const test_options_base_t&
         .test_options();
 }
 
-__no_constexpr_or_inline_imp test_runner_t*&
+__no_constexpr_or_inline_imp test_evaluator_t*&
     get_this_threads_test_runner_ptr() noexcept
 {
-    thread_local test_runner_t* _tl_tr = nullptr;
+    thread_local test_evaluator_t* _tl_tr = nullptr;
     return _tl_tr;
 }
 
@@ -67,7 +67,7 @@ __no_constexpr_or_inline_imp ds::invoked_test_data_t&
                              get_this_threads_current_test()
 {
     using namespace errors;
-    test_runner_t* _l_tr{get_this_threads_test_runner_ptr()};
+    test_evaluator_t* _l_tr{get_this_threads_test_runner_ptr()};
     if (_l_tr == nullptr)
     {
         throw test_library_exception_t(
