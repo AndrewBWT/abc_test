@@ -10,11 +10,18 @@
 #include "abc_test/utility/rng.hpp"
 #include "abc_test/utility/rng/inner_rng_mt19937_64.hpp"
 
+
+
 #include <filesystem>
 #include <fmt/color.h>
 #include <fstream>
 #include <map>
 #include <vector>
+
+_BEGIN_ABC_UTILITY_CLI_NS
+template <typename Option_Class>
+class cli_t;
+_END_ABC_UTILITY_CLI_NS
 
 _BEGIN_ABC_NS
 
@@ -152,6 +159,7 @@ public:
     std::u8string              autofile_metadata_string = u8"metadata";
     std::size_t maximum_individual_alloctable_memory    = 2'147; // 483'648;
     bool        retain_passed_assertions                = false;
+    //std::shared_ptr<_ABC_NS_CLI::cli_t< test_options_base_t>> _m_cli;
     /*!
      * @brief Function to validate the input.
      *
@@ -161,8 +169,8 @@ public:
      * of the error.
      */
     __no_constexpr     std::optional<std::vector<std::u8string>>
-                       validate_and_pre_process() noexcept;
-
+                       validate() const noexcept;
+    __no_constexpr virtual void pre_process() noexcept;
     __no_constexpr_imp utility::rng_t
                        make_rng() const noexcept
     {
@@ -193,9 +201,9 @@ public:
         }
     }
 protected:
-    __no_constexpr void virtual validate_and_pre_process_(
+    __no_constexpr void virtual validate_(
         std::vector<std::u8string>& _a_error_ref
-    ) noexcept;
+    ) const noexcept;
     std::optional<std::filesystem::path> _m_file_to_write_to;
 };
 
@@ -227,11 +235,11 @@ struct fmt::formatter<abc::test_options_base_t> : formatter<string_view>
 
 _BEGIN_ABC_NS
 __no_constexpr_imp std::optional<std::vector<std::u8string>>
-                   test_options_base_t::validate_and_pre_process() noexcept
+                   test_options_base_t::validate() const noexcept
 {
     using namespace std;
     vector<u8string> _l_rv{};
-    validate_and_pre_process_(_l_rv);
+    validate_(_l_rv);
     if (_l_rv.size() == 0)
     {
         return optional<vector<u8string>>{};
@@ -243,9 +251,9 @@ __no_constexpr_imp std::optional<std::vector<std::u8string>>
 }
 
 __no_constexpr_imp void
-    test_options_base_t::validate_and_pre_process_(
+    test_options_base_t::validate_(
         std::vector<std::u8string>& _a_error_ref
-    ) noexcept
+    ) const noexcept
 {
     using namespace std;
     using namespace _ABC_NS_REPORTERS;
@@ -371,18 +379,16 @@ __no_constexpr_imp void
             fmt::format(u8"Root folder \"{0}\" does not exist", root_path)
         );
     }
-    /*if (automatic_file_line_index.has_value()
-        && not automatic_repetition_data_folder.has_value())
-
-    {
-    }*/
+}
+__no_constexpr_imp void test_options_base_t::pre_process() noexcept
+{
+    using namespace std;
     if (test_paths_to_run.size() == 0)
     {
         using namespace ds;
         test_paths_to_run = vector<u8string>(1, u8string{});
     }
 }
-
 namespace
 {
 template <typename T>

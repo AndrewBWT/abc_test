@@ -17,9 +17,9 @@ if(NOT DEFINED ABC_TEST_LIBRARY_INCLUDED)
     # The core subfolder; contains the core logic for how the library works.
     include/abc_test/core.hpp
     include/abc_test/included_instances.hpp
+	include/abc_test/core/test_harness.hpp
     include/abc_test/core/test_main.hpp
     include/abc_test/core/options/test_options_base.hpp
-    include/abc_test/core/options/validated_test_options.hpp
     include/abc_test/core/test_evaluator.hpp
     # Logging messages, associated with tests
     include/abc_test/core/logging/macros.hpp 
@@ -136,6 +136,9 @@ if(NOT DEFINED ABC_TEST_LIBRARY_INCLUDED)
     include/abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_to_n_inner.hpp
     include/abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_to_n.hpp
     include/abc_test/included_instances/data_generator/enumeration/enumeration_schema/from_m_move_k_elements.hpp
+	include/abc_test/included_instances/test_harness/simple_reporter.hpp
+	include/abc_test/included_instances/test_harness/simple_console_reporter.hpp
+	include/abc_test/included_instances/test_harness/simple_text_reporter.hpp
     # utility subfolder. Contains axillary helper classes and functions not necessary
     # related to the core testing framework.
     include/abc_test/utility/do_not_optimise.hpp

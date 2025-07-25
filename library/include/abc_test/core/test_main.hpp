@@ -2,12 +2,12 @@
 
 #include "abc_test/core/ds/test_collections/test_collection.hpp"
 #include "abc_test/core/global.hpp"
-#include "abc_test/core/options/validated_test_options.hpp"
 #include "abc_test/core/reporters/test_reporter.hpp"
 #include "abc_test/core/reporters/test_reporter_controller.hpp"
 #include "abc_test/core/test_evaluator.hpp"
 #include "abc_test/included_instances/reporters/text_error_reporter.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter.hpp"
+#include "abc_test/included_instances/test_harness/simple_reporter.hpp"
 #include "abc_test/utility/cli.hpp"
 
 #include <condition_variable>
@@ -30,13 +30,13 @@ public:
     test_main_t()
         = delete;
     /*!
-     * @brief Constructor
-     * @param _a_validated_test_options The validated test options used for
-     * running the tests.
+     * @brief Inner constructor. Protected so it can't be used outside of this
+     * class.
+     * @param _a_test_opts The test_options_base_t object.
      */
     __no_constexpr
         test_main_t(
-            const validated_test_options_t<T>&   _a_validated_test_options,
+            const T& _a_test_opts,
             const _ABC_NS_UTILITY_CLI::cli_t<T>& _a_cli
         ) noexcept;
     /*!
@@ -47,15 +47,18 @@ public:
      * assumes it is the only entity (as well as those threads it spawns) which
      * can access those variables.
      */
-    __no_constexpr void
-        run_tests(ds::pre_test_run_report_t& _a_test_set_data) noexcept;
+    __no_constexpr int
+        run_tests(
+            T&                         _a_options,
+            ds::pre_test_run_report_t& _a_test_set_data,
+            simple_reporter_t&         _a_simple_reporter
+        ) noexcept;
 private:
     _ABC_NS_UTILITY_CLI::cli_t<T>        _m_cli;
     _ABC_NS_DS::test_lists_t             _m_test_list_collection;
     T                                    _m_options;
     _ABC_NS_REPORTERS::test_reporters_t  _m_test_reporters;
     _ABC_NS_REPORTERS::error_reporters_t _m_error_reporters;
-    std::mutex                           _m_mutex;
     size_t                               _m_thread_pool;
     std::mutex                           _m_thread_pool_mutex;
     std::condition_variable              _m_cv;
@@ -65,16 +68,6 @@ private:
     // std::vector<_ABC_NS_DS::test_set_data_t> _m_test_set_data;
     std::vector<test_evaluator_t> _m_test_runners;
     std::set<std::size_t>         _m_threads_free;
-    /*!
-     * @brief Inner constructor. Protected so it can't be used outside of this
-     * class.
-     * @param _a_test_opts The test_options_base_t object.
-     */
-    __no_constexpr
-        test_main_t(
-            const T&                             _a_test_opts,
-            const _ABC_NS_UTILITY_CLI::cli_t<T>& _a_cli
-        ) noexcept;
     /*!
      * @brief Runs an individual test in an individual thread.
      * @param _a_prtd The post_setup_test_data_t to run.
@@ -87,9 +80,13 @@ private:
             const size_t                              _a_thread_idx,
             test_evaluator_t&                         _a_test_runner,
             const std::size_t                         _a_order_ran_id
-            //_ABC_NS_DS::test_set_data_t&              _a_test_set_data
         );
 };
+
+namespace detail
+{
+
+}
 
 namespace
 {
@@ -110,14 +107,6 @@ __constexpr std::set<T>
 _END_ABC_NS
 
 _BEGIN_ABC_NS
-template <typename T>
-__no_constexpr_imp
-    test_main_t<T>::test_main_t(
-        const validated_test_options_t<T>&   _a_validated_test_options,
-        const _ABC_NS_UTILITY_CLI::cli_t<T>& _a_cli
-    ) noexcept
-    : test_main_t<T>(_a_validated_test_options.get_options(), _a_cli)
-{}
 
 template <typename T>
 __no_constexpr_imp
@@ -140,9 +129,11 @@ __no_constexpr_imp
 {}
 
 template <typename T>
-__no_constexpr_imp void
+__no_constexpr_imp int
     test_main_t<T>::run_tests(
-        ds::pre_test_run_report_t& _a_test_set_data
+        T&                         _a_options,
+        ds::pre_test_run_report_t& _a_test_set_data,
+        simple_reporter_t&         _a_simple_reporter
     ) noexcept
 {
     using namespace std;
@@ -150,151 +141,174 @@ __no_constexpr_imp void
     using namespace _ABC_NS_REPORTERS;
     using namespace _ABC_NS_GLOBAL;
     using enum _ABC_NS_UTILITY::internal::internal_log_enum_t;
-    _LIBRARY_LOG(
-        MAIN_INFO,
-        "run_tests() beginning.\nSetting up global and thread local "
-        "variables..."
-    );
-
-    const test_framework_global_variable_set_t& _l_tfgvs{
-        setup_global_variable_set(
-            _m_options, _m_error_reporters, _m_test_reporters
-        )
-    };
-    error_reporter_controller_t& _l_erc{get_global_error_reporter_controller()};
-    test_reporter_controller_t&  _l_trc{get_global_test_reporter_controller()};
-    _LIBRARY_LOG(MAIN_INFO, "Adding test sets to local test_collection_t...");
-    test_collection_t _l_tc;
-    _l_tc.add_tests(_m_test_list_collection);
-    if (_l_erc.soft_exit())
+    if (auto _l_validation_errors{_a_options.validate()};
+        _l_validation_errors.has_value())
     {
+        _a_simple_reporter.write_error_lines(_l_validation_errors.value());
+        return -1;
+    }
+    else
+    {
+        _a_options.pre_process();
         _LIBRARY_LOG(
             MAIN_INFO,
-            "Exiting due to error when adding tests to test_collection_t"
-            "object."
+            "run_tests() beginning.\nSetting up global and thread local "
+            "variables..."
         );
-        return;
-    }
-    _LIBRARY_LOG(MAIN_INFO, "Getting final set of tests in execution order");
-    const post_setup_test_list_t _l_pstd{
-        _l_tc.make_finalied_post_setup_test_list_in_run_order()
-    };
-    _a_test_set_data.report_all_tests(_l_pstd.size());
-    post_setup_test_list_itt_t       _l_pstd_itt{_l_pstd.begin()};
-    const post_setup_test_list_itt_t _l_pstd_end{_l_pstd.end()};
-    test_options_base_t _l_global_test_options{global::get_global_test_options()
-    };
-    _m_test_runners = vector<test_evaluator_t>(
-        _l_global_test_options.threads, test_evaluator_t()
-    );
-    size_t _l_order_ran_id_counter{0};
-    _l_trc.report_pre_test_data(_a_test_set_data);
-    _LIBRARY_LOG(MAIN_INFO, "Beginning running of tests...");
-    while (_l_pstd_itt != _l_pstd_end && _l_erc.should_exit() == false)
-    {
-        // Get the current element in the list.
-        const post_setup_test_data_t& _l_test{(*_l_pstd_itt++).get()};
-        const size_t _l_order_ran_id{_l_order_ran_id_counter++};
-        _LIBRARY_LOG(MAIN_INFO, fmt::format("Loaded test {0}.", _l_test));
-        // Find out the resourses required for this test;
-        const size_t _l_next_thread_size{_l_test.thread_resourses_required()};
-        // If we are unable to allocate the required resourses
-        if (_m_current_thread_pool < _l_next_thread_size)
+
+        const test_framework_global_variable_set_t& _l_tfgvs{
+            push_global_variable_set(
+                _a_options, _m_error_reporters, _m_test_reporters
+            )
+        };
+        error_reporter_controller_t& _l_erc{
+            get_global_error_reporter_controller()
+        };
+        test_reporter_controller_t& _l_trc{get_global_test_reporter_controller()
+        };
+        _LIBRARY_LOG(
+            MAIN_INFO, "Adding test sets to local test_collection_t..."
+        );
+        test_collection_t _l_tc;
+        _l_tc.add_tests(_m_test_list_collection);
+        if (_l_erc.soft_exit())
         {
             _LIBRARY_LOG(
                 MAIN_INFO,
-                fmt::format(
-                    "Waiting as _m_current_thread_pool ({0}) < "
-                    "_l_thread_next_size ({1}).",
-                    _m_current_thread_pool,
-                    _l_next_thread_size
-                )
+                "Exiting due to error when adding tests to test_collection_t"
+                "object."
             );
-            // Wait until we do have the resourses.
-            unique_lock _l_thread_pool_lock(_m_thread_pool_mutex);
-            _m_cv.wait(
-                _l_thread_pool_lock,
-                [_l_next_thread_size, this]
-                {
-                    return _m_current_thread_pool >= _l_next_thread_size;
-                }
-            );
+            return -1;
         }
-        // Check we actually have the resourses... should we lock it here
-        // before doing this?
-        if (_l_erc.should_exit() == false && _m_threads_free.size() > 0)
+        _LIBRARY_LOG(
+            MAIN_INFO, "Getting final set of tests in execution order"
+        );
+        const post_setup_test_list_t _l_pstd{
+            _l_tc.make_finalied_post_setup_test_list_in_run_order()
+        };
+        _a_test_set_data.report_all_tests(_l_pstd.size());
+        post_setup_test_list_itt_t       _l_pstd_itt{_l_pstd.begin()};
+        const post_setup_test_list_itt_t _l_pstd_end{_l_pstd.end()};
+        test_options_base_t              _l_global_test_options{
+            global::get_global_test_options()
+        };
+        _m_test_runners = vector<test_evaluator_t>(
+            _l_global_test_options.threads, test_evaluator_t()
+        );
+        size_t _l_order_ran_id_counter{0};
+        _l_trc.report_pre_test_data(_a_test_set_data);
+        _LIBRARY_LOG(MAIN_INFO, "Beginning running of tests...");
+        while (_l_pstd_itt != _l_pstd_end && _l_erc.should_exit() == false)
         {
-            // Otherwise, get a lock for the threads, remove the
-            // resousrses...
-            unique_lock  _l_thread_lock(_m_threads_mutex);
-            const size_t _l_thread_idx{*_m_threads_free.begin()};
-            _m_threads_free.erase(_l_thread_idx);
-            _m_current_thread_pool -= _l_test.thread_resourses_required();
-            _l_thread_lock.unlock();
-            // Then run the thread
-            _LIBRARY_LOG(MAIN_INFO, "Starting new thread to run test.");
-            _m_threads[_l_thread_idx] = jthread(
-                &test_main_t::run_individual_test,
-                this,
-                _l_test,
-                _l_thread_idx,
-                std::ref(_m_test_runners[_l_thread_idx]),
-                _l_order_ran_id
-                // std::ref(_m_test_set_data[_l_thread_idx])
-            );
+            // Get the current element in the list.
+            const post_setup_test_data_t& _l_test{(*_l_pstd_itt++).get()};
+            const size_t _l_order_ran_id{_l_order_ran_id_counter++};
+            _LIBRARY_LOG(MAIN_INFO, fmt::format("Loaded test {0}.", _l_test));
+            // Find out the resourses required for this test;
+            const size_t _l_next_thread_size{_l_test.thread_resourses_required()
+            };
+            // If we are unable to allocate the required resourses
+            if (_m_current_thread_pool < _l_next_thread_size)
+            {
+                _LIBRARY_LOG(
+                    MAIN_INFO,
+                    fmt::format(
+                        "Waiting as _m_current_thread_pool ({0}) < "
+                        "_l_thread_next_size ({1}).",
+                        _m_current_thread_pool,
+                        _l_next_thread_size
+                    )
+                );
+                // Wait until we do have the resourses.
+                unique_lock _l_thread_pool_lock(_m_thread_pool_mutex);
+                _m_cv.wait(
+                    _l_thread_pool_lock,
+                    [_l_next_thread_size, this]
+                    {
+                        return _m_current_thread_pool >= _l_next_thread_size;
+                    }
+                );
+            }
+            // Check we actually have the resourses... should we lock it here
+            // before doing this?
+            if (_l_erc.should_exit() == false && _m_threads_free.size() > 0)
+            {
+                // Otherwise, get a lock for the threads, remove the
+                // resousrses...
+                unique_lock  _l_thread_lock(_m_threads_mutex);
+                const size_t _l_thread_idx{*_m_threads_free.begin()};
+                _m_threads_free.erase(_l_thread_idx);
+                _m_current_thread_pool -= _l_test.thread_resourses_required();
+                _l_thread_lock.unlock();
+                // Then run the thread
+                _LIBRARY_LOG(MAIN_INFO, "Starting new thread to run test.");
+                _m_threads[_l_thread_idx] = jthread(
+                    &test_main_t::run_individual_test,
+                    this,
+                    _l_test,
+                    _l_thread_idx,
+                    std::ref(_m_test_runners[_l_thread_idx]),
+                    _l_order_ran_id
+                    // std::ref(_m_test_set_data[_l_thread_idx])
+                );
+            }
+            else
+            {
+                _LIBRARY_LOG(
+                    MAIN_INFO, "_l_erc == false, we are terminating this loop."
+                );
+            }
         }
-        else
+        // Wait for all the threads to finish
+        _LIBRARY_LOG(MAIN_INFO, "Waiting for all threads to finish.");
+        for (jthread& _l_thread : _m_threads)
+        {
+            if (_l_thread.joinable())
+            {
+                _l_thread.join();
+            }
+        }
+        _LIBRARY_LOG(MAIN_INFO, "All threads finished.");
+        if (_l_erc.should_exit())
         {
             _LIBRARY_LOG(
-                MAIN_INFO, "_l_erc == false, we are terminating this loop."
+                MAIN_INFO, "Catastrophic error found when running tests."
+            );
+            _l_erc.report_information(fmt::format(
+                "One (or more) of thre tests reported a catastrophic error "
+                "which "
+                "could not be recovered from. "
+                "The entire testing harness was terminated. There were {0} "
+                "tests "
+                "which were not run at all, and "
+                "{1} terminated due to catastrophic error(s). "
+                "We would highly suggest either checking your program, or "
+                "contacting the developer of this library.",
+                std::distance(_l_pstd_itt, _l_pstd_end),
+                _l_erc.catastrophic_errors()
+            ));
+            _l_erc.hard_exit();
+        }
+        _LIBRARY_LOG(MAIN_INFO, "Setting up auto configuration");
+        finalised_test_set_data_t _l_final_report;
+        for (auto& _l_test_runner : _m_test_runners)
+        {
+            _l_final_report.process_final_report(_l_test_runner.test_set_data()
             );
         }
-    }
-    // Wait for all the threads to finish
-    _LIBRARY_LOG(MAIN_INFO, "Waiting for all threads to finish.");
-    for (jthread& _l_thread : _m_threads)
-    {
-        if (_l_thread.joinable())
+        if (_m_cli.auto_configuration().has_value())
         {
-            _l_thread.join();
+            _m_cli.setup_next_file(
+                _a_options.autofile_name,
+                _a_options.autofile_size,
+                _l_final_report.get_re_run_test_options<T>(),
+                _l_final_report.total_tests_failed() == 0
+            );
         }
+        _LIBRARY_LOG(MAIN_INFO, "Finalising reports.");
+        _l_trc.finalise_reports(_l_final_report);
+        return 0;
     }
-    _LIBRARY_LOG(MAIN_INFO, "All threads finished.");
-    if (_l_erc.should_exit())
-    {
-        _LIBRARY_LOG(MAIN_INFO, "Catastrophic error found when running tests.");
-        _l_erc.report_information(fmt::format(
-            "One (or more) of thre tests reported a catastrophic error "
-            "which "
-            "could not be recovered from. "
-            "The entire testing harness was terminated. There were {0} "
-            "tests "
-            "which were not run at all, and "
-            "{1} terminated due to catastrophic error(s). "
-            "We would highly suggest either checking your program, or "
-            "contacting the developer of this library.",
-            std::distance(_l_pstd_itt, _l_pstd_end),
-            _l_erc.catastrophic_errors()
-        ));
-        _l_erc.hard_exit();
-    }
-    _LIBRARY_LOG(MAIN_INFO, "Setting up auto configuration");
-    finalised_test_set_data_t _l_final_report;
-    for (auto& _l_test_runner : _m_test_runners)
-    {
-        _l_final_report.process_final_report(_l_test_runner.test_set_data());
-    }
-    if (_m_cli.auto_configuration().has_value())
-    {
-        _m_cli.setup_next_file(
-            _m_options.autofile_name,
-            _m_options.autofile_size,
-            _l_final_report.get_re_run_test_options<T>(),
-            _l_final_report.total_tests_failed() == 0
-        );
-    }
-    _LIBRARY_LOG(MAIN_INFO, "Finalising reports.");
-    _l_trc.finalise_reports(_l_final_report);
 }
 
 template <typename T>
@@ -313,8 +327,8 @@ __no_constexpr_imp void
     using namespace _ABC_NS_REPORTERS;
     using enum _ABC_NS_UTILITY::internal::internal_log_enum_t;
     // Get the thread runner
-    set_this_threads_test_runner(&_a_test_runner);
-    test_evaluator_t& _l_threads_runner{ get_this_threads_test_evaluator_ref()};
+    push_this_threads_test_runner(&_a_test_runner);
+    test_evaluator_t& _l_threads_runner{get_this_threads_test_evaluator_ref()};
     // run in try
     try
     {
@@ -353,6 +367,7 @@ __no_constexpr_imp void
     _m_current_thread_pool += _a_prtd.thread_resourses_required();
     _m_cv.notify_one();
     _l_threads_runner.set_data_process_test();
+    pop_this_threads_test_runner();
     return;
 }
 

@@ -6,12 +6,27 @@
 
 _BEGIN_ABC_UTILITY_CLI_NS
 
+enum class cli_results_status_t
+{
+    can_continue,
+    //! Has errors which do not allow the program to continue.
+    has_errors,
+    //! Text output which must be shown. Continuing the program is not an option
+    has_text_output,
+};
+
 /*!
  * @brief Structure which holds result information about a cli_t object.
  */
 class cli_results_t
 {
 public:
+    __constexpr cli_results_status_t
+        status() const noexcept
+    {
+        return cli_results_status_t::can_continue;
+    }
+
     __constexpr bool
         terminate_early() const noexcept
     {
@@ -28,18 +43,6 @@ public:
         has_warnings() const noexcept
     {
         return false;
-    }
-
-    __constexpr bool
-        show_log() const noexcept
-    {
-        return false;
-    }
-
-    __constexpr void
-        log_msg() const noexcept
-    {
-        // std::cout << "log" << std::endl;
     }
 
     __constexpr bool
@@ -87,6 +90,18 @@ public:
     }
 
     __constexpr std::u8string
+                warnings() const noexcept
+    {
+        return u8"";
+    }
+
+    __constexpr std::u8string
+                log() const noexcept
+    {
+        return u8"";
+    }
+
+    __constexpr std::u8string
                 errors() const noexcept
     {
         using namespace std;
@@ -101,7 +116,7 @@ public:
 
     __no_constexpr_imp void
         add_memoized_data(
-            const bool             _a_retain_previous_results,
+            const bool               _a_retain_previous_results,
             const std::u8string_view _a_flag,
             const std::u8string_view _a_printed_value,
             const std::u8string_view _a_source
@@ -131,7 +146,7 @@ public:
         else
         {
             _m_memoized_processed_flags.insert(
-                { u8string(_a_flag),
+                {u8string(_a_flag),
                  {{u8string(_a_printed_value),
                    vector<u8string>(1, u8string(_a_source))}}}
             );
@@ -139,9 +154,9 @@ public:
     }
 
     ds::memoized_cli_history_t _m_memoized_processed_flags;
-    std::vector<std::u8string>   _m_output;
+    std::vector<std::u8string> _m_output;
     bool                       _m_terminate_early = false;
-    std::vector<std::u8string>   _m_errors;
+    std::vector<std::u8string> _m_errors;
 
     __constexpr const          ds::memoized_cli_history_t&
                                memoized_data() const noexcept

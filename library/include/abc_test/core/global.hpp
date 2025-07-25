@@ -2,6 +2,7 @@
 #define GLOBAL_HPP
 #include "abc_test/core/ds/type_synonyms.hpp"
 #include "abc_test/utility/rng.hpp"
+// #include "abc_test/utility/cli.hpp"
 
 _BEGIN_ABC_DS_NS
 struct registered_test_data_t;
@@ -47,11 +48,14 @@ struct test_framework_global_variable_set_t;
  *
  */
 __no_constexpr_or_inline const test_framework_global_variable_set_t&
-    setup_global_variable_set(
+    push_global_variable_set(
         const test_options_base_t&            _a_options,
         _ABC_NS_REPORTERS::error_reporters_t& _a_error_reporters,
         _ABC_NS_REPORTERS::test_reporters_t&  _a_test_reporters
     ) noexcept;
+__no_constexpr_or_inline void
+pop_global_variable_set(
+) noexcept;
 /*!
  * Gets a reference to the global test_reporter_controller_t object.
  *
@@ -65,8 +69,9 @@ __no_constexpr_or_inline reporters::test_reporter_controller_t&
 __no_constexpr_or_inline test_evaluator_t&
     get_this_threads_test_evaluator_ref() noexcept;
 __no_constexpr_or_inline void
-    set_this_threads_test_runner(test_evaluator_t* _a_test_runner_t
-    ) noexcept;
+    push_this_threads_test_runner(test_evaluator_t* _a_test_runner_t) noexcept;
+__no_constexpr_or_inline void
+    pop_this_threads_test_runner() noexcept;
 /*!
  * Gets a const reference to the global test_options_base_t object.
  *
@@ -122,6 +127,10 @@ __no_constexpr_or_inline std::list<test_framework_global_variable_set_t>&
 __no_constexpr_or_inline std::list<test_evaluator_t*>&
                          get_inner_threads_test_evaluator_set() noexcept;
 } // namespace detail
+
+_END_ABC_GLOBAL_NS
+
+_BEGIN_ABC_GLOBAL_NS
 
 _END_ABC_GLOBAL_NS
 #endif

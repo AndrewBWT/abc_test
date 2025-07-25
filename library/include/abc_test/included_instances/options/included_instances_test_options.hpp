@@ -132,7 +132,7 @@ __no_constexpr_imp void
             );
         }
     }
-    test_options_base_t::validate_and_pre_process_(_a_error_ref);
+    test_options_base_t::validate_(_a_error_ref);
 }
 
 namespace

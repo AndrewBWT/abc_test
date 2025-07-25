@@ -2,6 +2,7 @@
 #include "abc_test/core/options/test_options_base.hpp"
 #include "abc_test/included_instances/options/included_instances_test_options.hpp"
 #include "abc_test/included_instances/options/option_config.hpp"
+#include "abc_test/included_instances/test_harness/simple_console_reporter.hpp"
 #include "abc_test/utility/cli.hpp"
 
 _BEGIN_ABC_NS
@@ -16,6 +17,18 @@ __no_constexpr void
         _ABC_NS_UTILITY_CLI::cli_t<included_instances_test_options_t>& _a_cli,
         _ABC_NS_UTILITY_CLI::cli_results_t& _a_cli_results
     ) noexcept;
+
+template <typename T>
+__no_constexpr_imp int
+    run_test_suite(
+        const ds::memoized_cli_history_t&    _a_memoized_cli_history,
+        const T&                             _a_test_options,
+        const _ABC_NS_UTILITY_CLI::cli_t<T>& _a_cli,
+        const simple_console_reporter_t&     _a_scr
+    ) noexcept
+{
+    return 0;
+}
 } // namespace detail
 
 _END_ABC_NS
@@ -34,91 +47,48 @@ __no_constexpr_imp int
     using namespace _ABC_NS_UTILITY;
     using namespace _ABC_NS_UTILITY_CLI;
     using namespace _ABC_NS_UTILITY_STR;
+    simple_console_reporter_t                          _l_sco;
     included_instances_test_options_t                  _l_iito;
     cli_results_t                                      _l_cli_results;
     result_t<cli_t<included_instances_test_options_t>> _l_cli_res{
         make_cli<included_instances_test_options_t>()
     };
-    if (_l_cli_res.has_value())
+    if (not _l_cli_res.has_value())
     {
-        cli_t<included_instances_test_options_t>& _l_cli{_l_cli_res.value()};
-        _ABC_NS::detail::add_all_options(_l_iito, _l_cli, _l_cli_results);
-        _l_cli.parse_arguments(_l_iito, argc, argv, _l_cli_results);
-        if (_l_cli_results.has_errors())
-        {
-            std::cout
-                << "Errors encountered when parsing command line parameters. "
-                   "These are as follows:"
-                << std::endl;
-            const u8string _l_errors{_l_cli_results.errors()};
-            std::cout << "\t" << string(_l_errors.begin(), _l_errors.end());
-            return -1;
-        }
-        if (_l_cli_results.has_warnings())
-        {
-        }
-        if (_l_cli_results.show_log())
-        {
-            _l_cli_results.log_msg();
-            return -1;
-        }
-        if (_l_cli_results.has_text_output())
-        {
-            for (auto& k : _l_cli_results.text_output())
-            {
-                string _l_str{k.begin(), k.end()};
-                std::cout << _l_str << std::endl;
-            }
-            return -1;
-        }
-        if (_l_cli_results.can_continue())
-        {
-            ds::pre_test_run_report_t _l_ptrr(
-                _l_cli_results.memoized_data(), _l_iito
-            );
-            auto _l_validated_test_options{
-                validated_test_options_t<included_instances_test_options_t>::
-                    validate_test_options(_l_iito)
-            };
-            if (_l_validated_test_options.has_value())
-            {
-                test_main_t _l_test_main(
-                    _l_validated_test_options.value(), _l_cli
-                );
-                _l_test_main.run_tests(_l_ptrr);
-                return 0;
-            }
-            else
-            {
-                std::u8string _l_st;
-                for (size_t _l_idx{0};
-                     u8string & _l_error : _l_validated_test_options.error())
-                {
-                    _l_st.append(fmt::format(u8" {0})  ", ++_l_idx));
-                    _l_st.append(_l_error);
-                    _l_st.append(u8"\n");
-                }
-                const u8string _l_rv{fmt::format(
-                    u8"Error(s) encountered when validating test_options_t. "
-                    u8"The following errors were returned from the validation "
-                    u8"function:\n{0}\nThe program will now terminate. "
-                    u8"included_instances_test_options_t = {1}",
-                    _l_st,
-                    cast_string_to_u8string(fmt::format("{}", _l_iito))
-                )};
-                std::cout << string(_l_rv.begin(), _l_rv.end()) << std::endl;
-                return -1;
-            }
-        }
-        else
-        {
-            return -1;
-        }
+        _l_sco.write_line(u8"Error encountered when setting up command line "
+                          u8"interface object. Error is as follows:");
+        _l_sco.write_line(_l_cli_res.error());
     }
     else
     {
-        return -1;
+        using enum cli_results_status_t;
+        cli_t<included_instances_test_options_t>& _l_cli{_l_cli_res.value()};
+        _ABC_NS::detail::add_all_options(_l_iito, _l_cli, _l_cli_results);
+        _l_cli.parse_arguments(_l_iito, argc, argv, _l_cli_results);
+        switch (_l_cli_results.status())
+        {
+        case has_errors:
+            _l_sco.write_error_line(
+                u8"Errors encountered when parsing command line parameters. "
+                "These are as follows:"
+            );
+            _l_sco.write_error_line(_l_cli_results.errors());
+            break;
+        case has_text_output:
+            _l_sco.write_lines(_l_cli_results.text_output());
+            break;
+        default:
+            abc::detail::run_test_suite(
+                _l_cli_results.memoized_data(), _l_iito, _l_cli, _l_sco
+            );
+            ds::pre_test_run_report_t _l_ptrr(
+                _l_cli_results.memoized_data(), _l_iito
+            );
+            test_main_t<included_instances_test_options_t> _l_test_main(_l_iito, _l_cli);
+            return _l_test_main.run_tests(_l_iito, _l_ptrr, _l_sco);
+        }
     }
+    return -1;
 }
 
 namespace detail

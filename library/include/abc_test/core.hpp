@@ -6,7 +6,6 @@
 #include "abc_test/core/matchers/comparison/macros.hpp"
 #include "abc_test/core/matchers/bool_matcher.hpp"
 #include "abc_test/core/matchers/matcher_wrapper.hpp"
-#include "abc_test/core/options/validated_test_options.hpp"
 #include "abc_test/core/reporters/error_reporter_controller.hpp"
 #include "abc_test/core/reporters/test_reporter_controller.hpp"
 #include "abc_test/core/test_assertions/macros.hpp"

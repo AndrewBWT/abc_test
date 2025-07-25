@@ -9,8 +9,8 @@
 // Implementation
 _BEGIN_ABC_GLOBAL_NS
 
-__no_constexpr_or_inline const test_framework_global_variable_set_t&
-    setup_global_variable_set(
+__no_constexpr_or_inline_imp const test_framework_global_variable_set_t&
+    push_global_variable_set(
         const test_options_base_t&            _a_options,
         _ABC_NS_REPORTERS::error_reporters_t& _a_error_reporters,
         _ABC_NS_REPORTERS::test_reporters_t&  _a_test_reporters
@@ -23,6 +23,14 @@ __no_constexpr_or_inline const test_framework_global_variable_set_t&
     };
     _l_tfgvs.emplace_back(_a_options, _a_error_reporters, _a_test_reporters);
     return _l_tfgvs.back();
+}
+
+__no_constexpr_or_inline_imp void
+    pop_global_variable_set() noexcept
+{
+    using namespace reporters;
+    using namespace std;
+    detail::get_inner_global_variable_set().pop_back();
 }
 
 __no_constexpr_or_inline_imp reporters::test_reporter_controller_t&
@@ -40,11 +48,17 @@ __no_constexpr_or_inline_imp test_evaluator_t&
 }
 
 __no_constexpr_or_inline_imp void
-    set_this_threads_test_runner(
+    push_this_threads_test_runner(
         test_evaluator_t* _a_test_runner_t
     ) noexcept
 {
     detail::get_inner_threads_test_evaluator_set().push_back(_a_test_runner_t);
+}
+
+__no_constexpr_or_inline_imp void
+    pop_this_threads_test_runner() noexcept
+{
+    detail::get_inner_threads_test_evaluator_set().pop_back();
 }
 
 __no_constexpr_or_inline_imp const test_options_base_t&
