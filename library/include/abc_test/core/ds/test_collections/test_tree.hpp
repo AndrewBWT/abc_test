@@ -161,7 +161,7 @@ __no_constexpr_imp errors::opt_setup_error_t
     using namespace errors;
     using namespace _ABC_NS_UTILITY_STR;
     const post_setup_test_data_t& _l_test{_a_test.get()};
-    if (_l_test.thread_resourses_required() > _a_options.threads)
+    if (_l_test.thread_resourses_required() > _a_options.group_test_options.threads)
     {
         return opt_setup_error_t(setup_error_t(
             fmt::format(
@@ -172,7 +172,7 @@ __no_constexpr_imp errors::opt_setup_error_t
                 u8"has {1} threads available. "
                 u8"post_setup_test_data_t = {2}",
                 _l_test.thread_resourses_required(),
-                _a_options.threads,
+                _a_options.group_test_options.threads,
                 cast_string_to_u8string(fmt::format("{0}", _l_test))
             ),
             false

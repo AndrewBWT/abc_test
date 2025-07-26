@@ -44,7 +44,7 @@ __no_constexpr_imp
 {
     _m_erc.add_reporters(_a_error_reporters);
     _m_trc.add_reporters(_a_test_reporters);
-    _m_cgs = _ABC_NS_UTILITY::set_complete_global_seed(_m_tob.global_seed);
+    _m_cgs = _ABC_NS_UTILITY::set_complete_global_seed(_m_tob.group_test_options.global_seed);
 }
 __constexpr _ABC_NS_REPORTERS::error_reporter_controller_t&
 test_framework_global_variable_set_t::error_reporter_controller() noexcept

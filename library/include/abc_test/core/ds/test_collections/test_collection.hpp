@@ -23,11 +23,11 @@ public:
      */
     __no_constexpr
         test_collection_t(
-            const test_options_base_t& _a_test_options =
-            global::get_global_test_options(),
+            const test_options_base_t& _a_test_options
+            = global::get_global_test_options(),
             const reporters::error_reporter_controller_t&
-                _a_error_reporter_controller =
-            global::get_global_error_reporter_controller()
+                _a_error_reporter_controller
+            = global::get_global_error_reporter_controller()
         ) noexcept;
     /*!
      * @brief Adds tests to the object.
@@ -102,11 +102,13 @@ __no_constexpr_imp void
     using namespace errors;
     using namespace _ABC_NS_UTILITY_STR;
     const map<key_t, tdg_collection_stack_trie_t>& _l_map{
-        _m_options.map_of_unique_ids_and_for_loop_stack_tries.map()
+        _m_options.group_test_options.map_of_unique_ids_and_for_loop_stack_tries
+            .map()
     };
     std::vector<test_path_hierarchy_t> _l_test_paths_to_use
         = process_test_path_hierarchies(
-            _m_options.test_paths_to_run, _m_options.path_delimiter
+            _m_options.group_test_options.test_paths_to_run,
+            _m_options.group_test_options.path_delimiter
         );
     for (std::reference_wrapper<const test_list_t> _l_test_list_element :
          _a_test_list_collection)
@@ -115,21 +117,21 @@ __no_constexpr_imp void
              _l_test_list_element.get())
         {
             const u8string _l_id{
-                _l_test_element._m_user_data.make_uid(_m_options.path_delimiter)
+                _l_test_element._m_user_data.make_uid(_m_options.group_test_options.path_delimiter)
             };
             const tdg_collection_stack_trie_t* _l_reps{
                 _l_map.contains(_l_id) ? &_l_map.at(_l_id) : nullptr
             };
             // If size zero or force running, set to true.
             const bool _l_test_ran_override{
-                _m_options.map_of_unique_ids_and_for_loop_stack_tries.size()
+                _m_options.group_test_options.map_of_unique_ids_and_for_loop_stack_tries.size()
                     == 0
-                || global::get_global_test_options().force_run_all_tests
+                || global::get_global_test_options().group_test_options.force_run_all_tests
             };
             const test_path_hierarchy_t _l_test_path_hierarchy{
                 abc::utility::str::split_string<char8_t>(
                     cast_string_to_u8string(_l_test_element._m_user_data.path),
-                    _m_options.path_delimiter
+                    _m_options.group_test_options.path_delimiter
                 )
             };
             const bool _l_test_in_path_set{check_if_element_in_path_set(
@@ -142,7 +144,7 @@ __no_constexpr_imp void
                 _l_test_in_path_set
                     && (_l_test_ran_override || (_l_reps != nullptr)),
                 _l_reps,
-                _m_options.threads,
+                _m_options.group_test_options.threads,
                 _l_id
             ));
             const opt_setup_error_t _l_res{_m_test_tree.add_test(

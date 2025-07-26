@@ -93,7 +93,7 @@ __no_constexpr_imp void
 {
     write_line(fmt::format(
         u8"{0}{1}",
-        global::get_global_test_options().comment_str,
+        global::get_global_test_options().individual_io_based_test_options.comment_str,
         _a_str_to_write
     ));
 }
@@ -104,7 +104,7 @@ __no_constexpr_imp void
     ) noexcept
 {
     using namespace std;
-    if (global::get_global_test_options().write_data_to_files)
+    if (global::get_global_test_options().individual_io_based_test_options.write_data_to_files)
     {
         wofstream& _l_out{*_m_file_handler.get()};
         auto _l_wstring{ abc::utility::str::unicode_conversion<wchar_t>(_a_str_to_write) };

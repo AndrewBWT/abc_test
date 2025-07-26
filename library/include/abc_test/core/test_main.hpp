@@ -36,7 +36,7 @@ public:
      */
     __no_constexpr
         test_main_t(
-            const T& _a_test_opts,
+            const T&                             _a_test_opts,
             const _ABC_NS_UTILITY_CLI::cli_t<T>& _a_cli
         ) noexcept;
     /*!
@@ -116,16 +116,20 @@ __no_constexpr_imp
     ) noexcept
     : _m_cli(_a_cli)
     , _m_test_list_collection(make_test_list_collection(
-          _a_to.test_lists,
-          _a_to.use_global_test_list
+          _a_to.group_test_options.test_lists,
+          _a_to.glot_aware_test_options.use_global_test_list
       ))
     , _m_options(_a_to)
-    , _m_test_reporters(make_ref_collection(_a_to.test_reporters))
-    , _m_error_reporters(make_ref_collection(_a_to.error_reporters))
-    , _m_thread_pool(_a_to.threads)
-    , _m_current_thread_pool(_a_to.threads)
-    , _m_threads(std::vector<std::jthread>(_a_to.threads))
-    , _m_threads_free(set_from_min_to_n(_a_to.threads))
+    , _m_test_reporters(
+          make_ref_collection(_a_to.group_test_options.test_reporters)
+      )
+    , _m_error_reporters(
+          make_ref_collection(_a_to.group_test_options.error_reporters)
+      )
+    , _m_thread_pool(_a_to.group_test_options.threads)
+    , _m_current_thread_pool(_a_to.group_test_options.threads)
+    , _m_threads(std::vector<std::jthread>(_a_to.group_test_options.threads))
+    , _m_threads_free(set_from_min_to_n(_a_to.group_test_options.threads))
 {}
 
 template <typename T>
@@ -141,6 +145,7 @@ __no_constexpr_imp int
     using namespace _ABC_NS_REPORTERS;
     using namespace _ABC_NS_GLOBAL;
     using enum _ABC_NS_UTILITY::internal::internal_log_enum_t;
+    _a_options.pre_validation_process();
     if (auto _l_validation_errors{_a_options.validate()};
         _l_validation_errors.has_value())
     {
@@ -149,7 +154,11 @@ __no_constexpr_imp int
     }
     else
     {
-        _a_options.pre_process();
+        _a_options.post_validation_process();
+        _m_test_reporters
+            = make_ref_collection(_a_options.group_test_options.test_reporters);
+        _m_error_reporters
+            = make_ref_collection(_a_options.group_test_options.error_reporters);
         _LIBRARY_LOG(
             MAIN_INFO,
             "run_tests() beginning.\nSetting up global and thread local "
@@ -193,7 +202,8 @@ __no_constexpr_imp int
             global::get_global_test_options()
         };
         _m_test_runners = vector<test_evaluator_t>(
-            _l_global_test_options.threads, test_evaluator_t()
+            _l_global_test_options.group_test_options.threads,
+            test_evaluator_t()
         );
         size_t _l_order_ran_id_counter{0};
         _l_trc.report_pre_test_data(_a_test_set_data);
@@ -299,8 +309,8 @@ __no_constexpr_imp int
         if (_m_cli.auto_configuration().has_value())
         {
             _m_cli.setup_next_file(
-                _a_options.autofile_name,
-                _a_options.autofile_size,
+                _a_options.cli_test_options.autofile_name,
+                _a_options.cli_test_options.autofile_size,
                 _l_final_report.get_re_run_test_options<T>(),
                 _l_final_report.total_tests_failed() == 0
             );

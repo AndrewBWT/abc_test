@@ -50,8 +50,8 @@ public:
     template <typename T, typename U = T>
     __no_constexpr void
         add_option(
-            const cli_option_config_t& _a_option,
-            T Option_Class::*                           _a_member_var,
+            const cli_option_config_t&                  _a_option,
+            std::function<T&(Option_Class&)>                                           _a_member_var,
             cli_results_t&                              _a_cli_results,
             const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs
             = cli_argument_processing_info_t<T, U>{}
@@ -60,7 +60,7 @@ public:
     __no_constexpr void
         add_multi_element_option(
             const cli_option_config_t& _a_cli_option,
-            T Option_Class::*                           _a_member_var,
+            std::function<T&(Option_Class&)>                           _a_member_var,
             cli_results_t&                              _a_cli_results,
             const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs
             = cli_argument_processing_info_t<T, U>{}
@@ -270,8 +270,8 @@ template <typename Option_Class>
 template <typename T, typename U>
 __no_constexpr_imp void
     cli_t<Option_Class>::add_option(
-        const cli_option_config_t& _a_option,
-        T Option_Class::*                           _a_member_var,
+        const cli_option_config_t&                  _a_option,
+        std::function<T& (Option_Class&)>                                           _a_member_var,
         cli_results_t&                              _a_cli_results,
         const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs
 
@@ -288,7 +288,7 @@ template <typename T, typename U>
 __no_constexpr_imp void
     cli_t<Option_Class>::add_multi_element_option(
         const cli_option_config_t& _a_cli_option,
-        T Option_Class::*                           _a_member_var,
+        std::function<T&(Option_Class&)>                           _a_member_var,
         cli_results_t&                              _a_cli_results,
         const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs
 
@@ -747,7 +747,9 @@ __constexpr_imp result_t<std::u8string_view>
                 _l_options.push_back(u8string(_l_option.first));
             }
             return unexpected(fmt::format(
-                u8"Could not find multi-character option \"{0}\". All options available are: {1}", _l_str,
+                u8"Could not find multi-character option \"{0}\". All options "
+                u8"available are: {1}",
+                _l_str,
                 _l_options
             ));
         }
@@ -947,7 +949,7 @@ __no_constexpr_imp void
             .run_printer(make_pair(_a_test_success, _l_next_index))
     };
     _l_output << cast_u8string_to_string(
-        _a_option_class.autofile_metadata_string
+        _a_option_class.cli_test_options.autofile_metadata_string
     ) << "_" << string(_l_printed_str.begin(), _l_printed_str.end())
               << std::endl;
     for (const auto& [_l_field, _l_data] :

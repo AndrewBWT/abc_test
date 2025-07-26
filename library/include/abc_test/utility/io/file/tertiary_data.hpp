@@ -53,7 +53,7 @@ __no_constexpr_imp abc::utility::io::tertiary_data_t
     using namespace abc::utility::io;
     return (global::get_this_threads_current_test().path() / _a_str)
         .concat(".")
-        .concat(global::get_global_test_options().tertiary_data_file_extension);
+        .concat(global::get_global_test_options().individual_io_based_test_options.tertiary_data_file_extension);
     return tertiary_data_t(_a_str);
 }
 

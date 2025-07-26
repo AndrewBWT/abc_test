@@ -4,6 +4,6 @@
 _BEGIN_ABC_DS_NS
 __no_constexpr_or_inline_imp bool get_global_retain_passed_assertions() noexcept
 {
-    return global::get_global_test_options().retain_passed_assertions;
+    return global::get_global_test_options().individual_test_options.retain_passed_assertions;
 }
 _END_ABC_DS_NS

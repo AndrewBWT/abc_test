@@ -253,7 +253,7 @@ __no_constexpr_imp _ABC_NS_UTILITY::rng_t
     using namespace _ABC_NS_UTILITY;
     const size_t _l_n_elements_used_to_seed_random_generators{
         global::get_global_test_options()
-            .number_of_integers_used_to_seed_random_generators
+            .group_test_options.number_of_integers_used_to_seed_random_generators
     };
     _m_random_generator.progress(
         _a_order_ran_id * _l_n_elements_used_to_seed_random_generators

@@ -17,7 +17,7 @@ __no_constexpr_or_inline_imp std::optional<std::u8string>
 {
     using namespace std;
     using enum enum_pre_test_set_data_fields_t;
-    if (_a_element.get_options().show_configuration_explanations)
+    if (_a_element.get_options().cli_test_options.show_configuration_explanations)
     {
         switch (_a_fid)
         {
@@ -115,43 +115,43 @@ __no_constexpr_or_inline_imp std::optional<std::u8string>
 {
     using namespace std;
     using enum enum_pre_test_set_data_fields_t;
-    if (_a_element.get_options().show_configuration_explanations)
+    if (_a_element.get_options().cli_test_options.show_configuration_explanations)
     {
         switch (_a_fid)
         {
         case USE_GLOBAL_TEST_LIST:
             return _a_pc.highlight(_a_pc.use_global_test_list_info(
-                _a_element.get_options().use_global_test_list
+                _a_element.get_options().glot_aware_test_options.use_global_test_list
             ));
         case WRITE_DATA_TO_FILES:
             return _a_pc.highlight(_a_pc.write_data_to_files_info(
-                _a_element.get_options().write_data_to_files
+                _a_element.get_options().individual_io_based_test_options.write_data_to_files
             ));
         case PATH_DELIMITER:
             return _a_pc.highlight(_a_pc.path_delimiter_used_info(
-                _a_element.get_options().path_delimiter
+                _a_element.get_options().group_test_options.path_delimiter
             ));
         case ROOT_PATH:
             return _a_pc.highlight(
-                _a_pc.root_path_info(_a_element.get_options().root_path)
+                _a_pc.root_path_info(_a_element.get_options().individual_io_based_test_options.root_path)
             );
         case THREADS:
             return _a_pc.highlight(
-                _a_pc.threads_used_info(_a_element.get_options().threads)
+                _a_pc.threads_used_info(_a_element.get_options().group_test_options.threads)
             );
         case COMMENT_STR:
             return _a_pc.highlight(
-                _a_pc.comment_str_info(_a_element.get_options().comment_str)
+                _a_pc.comment_str_info(_a_element.get_options().individual_io_based_test_options.comment_str)
             );
         case GENERAL_DATA_FILE_EXTENSION:
             return _a_pc.highlight(_a_pc.general_data_file_extension_info(
-                _a_element.get_options().general_data_extension
+                _a_element.get_options().individual_io_based_test_options.general_data_extension
             ));
         case N_INTEGERS_USED_FOR_CREATION_OF_RNG:
             return _a_pc.highlight(
                 _a_pc.n_integers_used_for_creation_of_rng_info(
                     _a_element.get_options()
-                        .number_of_integers_used_to_seed_random_generators
+                        .group_test_options.number_of_integers_used_to_seed_random_generators
                 )
             );
         case REPETITION_CONFIG_USED:
@@ -159,15 +159,15 @@ __no_constexpr_or_inline_imp std::optional<std::u8string>
         case GLOBAL_SEED:
 
             return _a_pc.highlight(
-                _a_pc.global_seed_info(_a_element.get_options().global_seed)
+                _a_pc.global_seed_info(_a_element.get_options().group_test_options.global_seed)
             );
         case FORCE_RUN_ALL_TESTS:
             return _a_pc.highlight(_a_pc.force_run_all_tests_info(
-                _a_element.get_options().force_run_all_tests
+                _a_element.get_options().group_test_options.force_run_all_tests
             ));
         case TEST_PATHS_TO_RUN:
             return _a_pc.highlight(_a_pc.test_paths_to_run_info(
-                _a_element.get_options().test_paths_to_run
+                _a_element.get_options().group_test_options.test_paths_to_run
             ));
         default:
             throw errors::unaccounted_for_enum_exception(_a_fid);
@@ -193,37 +193,37 @@ __no_constexpr_or_inline_imp std::pair<std::u8string, std::u8string>
     case USE_GLOBAL_TEST_LIST:
         return {
             _a_pc.space(_a_pc.question(_a_pc.global_test_list_used())),
-            _a_pc.passed(_a_element.get_options().use_global_test_list)
+            _a_pc.passed(_a_element.get_options().glot_aware_test_options.use_global_test_list)
         };
     case WRITE_DATA_TO_FILES:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.write_data_to_files())),
-            _a_pc.passed(_a_element.get_options().write_data_to_files)
+            _a_pc.passed(_a_element.get_options().individual_io_based_test_options.write_data_to_files)
         };
     case PATH_DELIMITER:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.path_delimiter_used())),
-            _a_pc.quote(_a_element.get_options().path_delimiter)
+            _a_pc.quote(_a_element.get_options().group_test_options.path_delimiter)
         };
     case ROOT_PATH:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.root_path_used())),
-            _a_pc.show_path(_a_element.get_options().root_path)
+            _a_pc.show_path(_a_element.get_options().individual_io_based_test_options.root_path)
         };
     case THREADS:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.threads_used())),
-            _a_pc.print_integer(_a_element.get_options().threads)
+            _a_pc.print_integer(_a_element.get_options().group_test_options.threads)
         };
     case COMMENT_STR:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.comment_str_used())),
-            _a_pc.quote(_a_element.get_options().comment_str)
+            _a_pc.quote(_a_element.get_options().individual_io_based_test_options.comment_str)
         };
     case GENERAL_DATA_FILE_EXTENSION:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.general_data_file_extension_used())),
-            _a_pc.quote(_a_element.get_options().general_data_extension)
+            _a_pc.quote(_a_element.get_options().individual_io_based_test_options.general_data_extension)
         };
     case N_INTEGERS_USED_FOR_CREATION_OF_RNG:
         return {
@@ -232,7 +232,7 @@ __no_constexpr_or_inline_imp std::pair<std::u8string, std::u8string>
             ),
             _a_pc.print_integer(
                 _a_element.get_options()
-                    .number_of_integers_used_to_seed_random_generators
+                    .group_test_options.number_of_integers_used_to_seed_random_generators
             )
         };
     case REPETITION_CONFIG_USED:
@@ -240,7 +240,7 @@ __no_constexpr_or_inline_imp std::pair<std::u8string, std::u8string>
             _a_pc.space(_a_pc.colon(_a_pc.repetition_config_used())),
             _a_pc.show_repetition_config(
                 _a_element.get_options()
-                    .map_of_unique_ids_and_for_loop_stack_tries
+                    .group_test_options.map_of_unique_ids_and_for_loop_stack_tries
             )
         };
     case GLOBAL_SEED:
@@ -248,19 +248,19 @@ __no_constexpr_or_inline_imp std::pair<std::u8string, std::u8string>
         return {
             _a_pc.space(_a_pc.colon(_a_pc.global_seed_used())),
             _a_pc.print_global_seed(
-                _a_element.get_options().global_seed, global::get_global_seed()
+                _a_element.get_options().group_test_options.global_seed, global::get_global_seed()
             )
         };
     case FORCE_RUN_ALL_TESTS:
         return {
             _a_pc.space(_a_pc.question(_a_pc.force_run_all_tests_used())),
-            _a_pc.passed(_a_element.get_options().force_run_all_tests)
+            _a_pc.passed(_a_element.get_options().group_test_options.force_run_all_tests)
         };
     case TEST_PATHS_TO_RUN:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.test_paths_to_run_used())),
             _a_pc.show_test_paths_to_run(
-                _a_element.get_options().test_paths_to_run
+                _a_element.get_options().group_test_options.test_paths_to_run
             )
         };
     default:

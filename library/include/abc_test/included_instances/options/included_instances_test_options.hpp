@@ -36,10 +36,13 @@ public:
         text_test_reporter_file_names;
     std::vector<std::pair<std::filesystem::path, bool>>
         text_error_reporter_file_names;
+public:
+    __no_constexpr virtual void pre_validation_process() noexcept override;
+    __no_constexpr virtual void post_validation_process() noexcept override;
 protected:
-    __no_constexpr virtual void
-        validate_and_pre_process_(std::vector<std::u8string>& _a_error_ref
-        ) noexcept;
+    __no_constexpr virtual void validate_(
+        std::vector<std::u8string>& _a_error_ref
+    ) const noexcept override;
 };
 
 namespace
@@ -70,10 +73,7 @@ struct fmt::formatter<abc::included_instances_test_options_t>
 };
 
 _BEGIN_ABC_NS
-__no_constexpr_imp void
-    included_instances_test_options_t::validate_and_pre_process_(
-        std::vector<std::u8string>& _a_error_ref
-    ) noexcept
+__no_constexpr_imp void included_instances_test_options_t::pre_validation_process() noexcept
 {
     using namespace _ABC_NS_REPORTERS;
     using namespace std;
@@ -84,10 +84,10 @@ __no_constexpr_imp void
     case no_output:
         break;
     case coloured_output:
-        this->error_reporters.push_back(make_shared<text_error_reporter_t>(true));
+        group_test_options.error_reporters.push_back(make_shared<text_error_reporter_t>(true));
         break;
     case monochrome_output:
-        this->error_reporters.push_back(make_shared<text_error_reporter_t>(false));
+        group_test_options.error_reporters.push_back(make_shared<text_error_reporter_t>(false));
         break;
     }
     switch (use_text_test_reporter_to_cout)
@@ -95,43 +95,36 @@ __no_constexpr_imp void
     case no_output:
         break;
     case coloured_output:
-        this->test_reporters.push_back(make_shared<text_test_reporter_t>(true));
+        group_test_options.test_reporters.push_back(make_shared<text_test_reporter_t>(true));
         break;
     case monochrome_output:
-        this->test_reporters.push_back(make_shared<text_test_reporter_t>(false));
+        group_test_options.test_reporters.push_back(make_shared<text_test_reporter_t>(false));
         break;
     }
-    vector<path> _l_error_files{check_files(
-        _a_error_ref,
-        text_error_reporter_file_names,
-        root_path,
-        "text_error_reporter_t"
-    )};
-    vector<path> _l_test_files{check_files(
+    test_options_base_t::pre_validation_process();
+}
+__no_constexpr_imp void included_instances_test_options_t::post_validation_process() noexcept
+{
+    test_options_base_t::post_validation_process();
+}
+__no_constexpr_imp void included_instances_test_options_t::validate_(
+    std::vector<std::u8string>& _a_error_ref
+) const noexcept
+{
+    using namespace std;
+    using namespace std::filesystem;
+    vector<path> _l_error_files{ check_files(
+    _a_error_ref,
+    text_error_reporter_file_names,
+    group_test_options.error_root_path,
+    "text_error_reporter_t"
+) };
+    vector<path> _l_test_files{ check_files(
         _a_error_ref,
         text_test_reporter_file_names,
-        root_path,
+        group_test_options.reports_root_path,
         "text_test_reporter_t"
-    )};
-    // No errors in the system. We can continue.
-    if (_a_error_ref.size() == 0)
-    {
-        for (const path& _l_path : _l_error_files)
-        {
-            this->error_reporters.push_back(
-                make_shared<text_error_reporter_t>(_l_path)
-            );
-        }
-    }
-    if (_a_error_ref.size() == 0)
-    {
-        for (const path& _l_path : _l_test_files)
-        {
-            this->test_reporters.push_back(
-                make_shared<text_test_reporter_t>(_l_path)
-            );
-        }
-    }
+    ) };
     test_options_base_t::validate_(_a_error_ref);
 }
 

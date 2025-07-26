@@ -32,7 +32,7 @@ __no_constexpr_or_inline_imp void
         generate_random_seeds(_a_order_ran_id),
         _a_post_setup_test_data,
         _a_order_ran_id,
-        global::get_global_test_options().root_path
+        global::get_global_test_options().individual_io_based_test_options.root_path
     );
     invoked_test_data_t&          _l_current_test{*_m_current_test};
     const registered_test_data_t& _l_rtd{

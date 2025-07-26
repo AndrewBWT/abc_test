@@ -251,8 +251,8 @@ public:
         return false;
     }
 private:
-    std::u8string_view             _m_positive_set;
-    std::u8string_view             _m_negative_set;
+    std::u8string_view           _m_positive_set;
+    std::u8string_view           _m_negative_set;
     std::reference_wrapper<bool> _m_element_to_set;
 };
 
@@ -262,8 +262,8 @@ class cli_one_arg_t : public cli_info_t<Option_Class>
 public:
     __constexpr
     cli_one_arg_t(
-        const cli_option_config_t& _a_cli_option_config,
-        T Option_Class::*                           _a_member_var,
+        const cli_option_config_t&                  _a_cli_option_config,
+        std::function<T&(Option_Class&)>                                           _a_member_var,
         const cli_argument_processing_info_t<T, U>& _a_processing_info
     ) noexcept
         : cli_info_t<Option_Class>(_a_cli_option_config, 1, 1)
@@ -277,7 +277,9 @@ public:
         ) const noexcept
     {
         using namespace abc::utility::printer;
-        return _m_processing_info.print_func(_a_option_class.*_m_member_var);
+        return _m_processing_info.print_func(
+            _m_member_var(const_cast<Option_Class&>(_a_option_class))
+        );
     }
 
     __no_constexpr_imp virtual bool
@@ -299,13 +301,14 @@ public:
         {
             if (const optional<u8string> _l_process_okay{
                     _m_processing_info.process_parsed_value_func(
-                        _a_option_class.*_m_member_var, _l_parse_result.value()
+                        _m_member_var(_a_option_class), _l_parse_result.value()
                     )
                 };
                 _l_process_okay)
             {
                 _a_cli_results.add_error(fmt::format(
-                    u8"Some post-parsing processing error encountered. Specifically \"{0}\".",
+                    u8"Some post-parsing processing error encountered. "
+                    u8"Specifically \"{0}\".",
                     _l_process_okay.value()
                 ));
                 return true;
@@ -328,7 +331,7 @@ public:
         }
     }
 private:
-    T Option_Class::*                    _m_member_var;
+    std::function<T& (Option_Class&)>                                    _m_member_var;
     cli_argument_processing_info_t<T, U> _m_processing_info;
 };
 
@@ -339,7 +342,7 @@ public:
     __constexpr
     cli_multi_args(
         const cli_option_config_t& _a_cli_option_config,
-        T Option_Class::*                           _a_member_var,
+        std::function<T&(Option_Class&)>                           _a_member_var,
         const cli_argument_processing_info_t<T, U>& _a_processing_info
     ) noexcept
         : cli_info_t<Option_Class>(
@@ -357,7 +360,8 @@ public:
         ) const noexcept
     {
         using namespace abc::utility::printer;
-        return _m_processing_info.print_func(_a_option_class.*_m_member_var);
+        return _m_processing_info.print_func(_m_member_var(
+            const_cast<Option_Class&>(_a_option_class)));
     }
 
     __no_constexpr_imp virtual bool
@@ -381,7 +385,7 @@ public:
             {
                 if (const bool _l_process_okay{
                         _m_processing_info.process_parsed_value_func(
-                            _a_option_class.*_m_member_var,
+                            _m_member_var(_a_option_class),
                             _l_parse_result.value()
                         )
                     };
@@ -412,7 +416,7 @@ public:
         return false;
     }
 private:
-    T Option_Class::*                    _m_member_var;
+    std::function<T&(Option_Class&)>                    _m_member_var;
     cli_argument_processing_info_t<T, U> _m_processing_info;
 };
 

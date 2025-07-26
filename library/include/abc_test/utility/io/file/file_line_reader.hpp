@@ -147,7 +147,7 @@ __constexpr_imp bool
             ));
         }
         else if (_m_current_line.starts_with(
-                     global::get_global_test_options().comment_str
+                     global::get_global_test_options().individual_io_based_test_options.comment_str
                  ))
         {
             if (_m_finished_reading)

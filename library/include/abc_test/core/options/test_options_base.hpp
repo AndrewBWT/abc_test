@@ -10,8 +10,6 @@
 #include "abc_test/utility/rng.hpp"
 #include "abc_test/utility/rng/inner_rng_mt19937_64.hpp"
 
-
-
 #include <filesystem>
 #include <fmt/color.h>
 #include <fstream>
@@ -25,15 +23,104 @@ _END_ABC_UTILITY_CLI_NS
 
 _BEGIN_ABC_NS
 
+struct cli_test_options_t
+{
+    std::size_t   autofile_size                   = 1'000;
+    std::u8string autofile_name                   = u8"autofile";
+    bool          show_configuration_explanations = false;
+    std::u8string              autofile_metadata_string = u8"metadata";
+};
 
-using rep_data_fields_t    = std::vector<std::pair<std::string, std::string>>;
-using rep_data_file_info_t = std::tuple<
-    bool,
-    rep_data_fields_t,
-    std::filesystem::path,
-    std::size_t,
-    std::size_t>;
+struct group_test_options_t
+{
+    _ABC_NS_DS::test_path_delimiter path_delimiter = u8"::";
+    _ABC_NS_UTILITY::global_seed_t  global_seed = abc::utility::global_seed_t();
+    size_t      number_of_integers_used_to_seed_random_generators = 100;
+    std::size_t threads = std::thread::hardware_concurrency();
+    _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t
+        map_of_unique_ids_and_for_loop_stack_tries;
+    std::vector<std::shared_ptr<_ABC_NS_REPORTERS::test_reporter_t>>
+        test_reporters;
+    std::vector<std::shared_ptr<_ABC_NS_REPORTERS::error_reporter_t>>
+                                                          error_reporters;
+    std::vector<std::u8string>                            test_paths_to_run;
+    std::vector<std::shared_ptr<_ABC_NS_DS::test_list_t>> test_lists;
+    bool force_run_all_tests = false;
+    std::filesystem::path error_root_path = std::filesystem::current_path();
+    std::filesystem::path reports_root_path = std::filesystem::current_path();
+};
 
+struct individual_test_options_t
+{
+    bool        retain_passed_assertions             = false;
+    std::size_t maximum_individual_alloctable_memory = 2'147; // 483'648;
+};
+
+struct individual_io_based_test_options_t
+{
+    std::filesystem::path root_path = std::filesystem::current_path();
+    std::u8string         general_data_extension       = u8"gd";
+    std::u8string         tertiary_data_file_extension = u8"td";
+    std::u8string         comment_str                  = u8"#";
+    bool                  write_data_to_files          = true;
+};
+
+struct glot_aware_test_options_t
+{
+    bool use_global_test_list = true;
+};
+
+struct test_options_base_t
+{
+    cli_test_options_t                 cli_test_options;
+    group_test_options_t               group_test_options;
+    individual_test_options_t          individual_test_options;
+    individual_io_based_test_options_t individual_io_based_test_options;
+    glot_aware_test_options_t          glot_aware_test_options;
+    __no_constexpr                     std::optional<std::vector<std::u8string>>
+                                       validate() const noexcept;
+    __no_constexpr virtual void
+                       pre_validation_process() noexcept;
+    __no_constexpr virtual void post_validation_process() noexcept;
+    __no_constexpr_imp utility::rng_t
+                       make_rng() const noexcept
+    {
+        return utility::rng_t::make_rng<utility::inner_rng_mt19937_64_t>(
+            global::get_global_seed(),
+            group_test_options.number_of_integers_used_to_seed_random_generators
+        );
+    }
+
+    template <typename T>
+    __constexpr std::size_t
+                maximum_individual_allocatable_memory() const
+    {
+        if constexpr (sizeof(T) == 0)
+        {
+            __STATIC_ASSERT(T, "Cannot allocate to T, as T has sizeof 0");
+            return 0;
+        }
+        else if (individual_test_options.maximum_individual_alloctable_memory
+                 == 0)
+        {
+            throw abc::errors::test_library_exception_t(
+                u8"Cannot determine allocation as size == 0"
+            );
+        }
+        else
+        {
+            return individual_test_options.maximum_individual_alloctable_memory
+                   / sizeof(T);
+        }
+    }
+protected:
+    __no_constexpr void virtual validate_(
+        std::vector<std::u8string>& _a_error_ref
+    ) const noexcept;
+    std::optional<std::filesystem::path> _m_file_to_write_to;
+};
+
+#if 0
 /*!
  * @brief Strcutre which holds the basic options for the library.
  *
@@ -206,6 +293,7 @@ protected:
     ) const noexcept;
     std::optional<std::filesystem::path> _m_file_to_write_to;
 };
+#endif
 
 namespace
 {
@@ -222,16 +310,6 @@ __no_constexpr std::string
                    const test_options_base_t& _a_opts
                ) noexcept;
 _END_ABC_NS
-
-template <>
-struct fmt::formatter<abc::test_options_base_t> : formatter<string_view>
-{
-    // parse is inherited from formatter<string_view>.
-    // Can'tbe constexpr due to use of fmt::format
-    __no_constexpr auto
-        format(abc::test_options_base_t _a_rtd, format_context& _a_ctx) const
-        -> format_context::iterator;
-};
 
 _BEGIN_ABC_NS
 __no_constexpr_imp std::optional<std::vector<std::u8string>>
@@ -258,7 +336,7 @@ __no_constexpr_imp void
     using namespace std;
     using namespace _ABC_NS_REPORTERS;
     vector<string> _l_rv;
-    if (error_reporters.size() == 0)
+    if (group_test_options.error_reporters.size() == 0)
     {
         _a_error_ref.push_back(fmt::format(
             u8"Error reporters must have atleast one element. Otherwise errors "
@@ -271,7 +349,7 @@ __no_constexpr_imp void
     else
     {
         vector<size_t> _l_indexes_of_nullptrs{
-            get_indexes_of_nullptrs(error_reporters)
+            get_indexes_of_nullptrs(group_test_options.error_reporters)
         };
         if (_l_indexes_of_nullptrs.size() > 0)
         {
@@ -282,7 +360,7 @@ __no_constexpr_imp void
             ));
         }
     }
-    if (test_reporters.size() == 0)
+    if (group_test_options.test_reporters.size() == 0)
     {
         _a_error_ref.push_back(fmt::format(
             u8"test_reporters must have atleast one element. Otherwise tests "
@@ -295,7 +373,7 @@ __no_constexpr_imp void
     else
     {
         vector<size_t> _l_indexes_of_nullptrs{
-            get_indexes_of_nullptrs(error_reporters)
+            get_indexes_of_nullptrs(group_test_options.error_reporters)
         };
         if (_l_indexes_of_nullptrs.size() > 0)
         {
@@ -306,19 +384,21 @@ __no_constexpr_imp void
             ));
         }
     }
-    if (test_lists.size() == 0 && use_global_test_list == false)
+    if (group_test_options.test_lists.size() == 0
+        && glot_aware_test_options.use_global_test_list == false)
     {
         _a_error_ref.push_back(fmt::format(
             u8"test_lists must have atleast one element or "
             u8"use_global_test_list "
             u8"must be set to true. use_global_test_list = {0}",
-            use_global_test_list
+            glot_aware_test_options.use_global_test_list
         ));
     }
-    else if (test_lists.size() > 0)
+    else if (group_test_options.test_lists.size() > 0)
     {
-        vector<size_t> _l_indexes_of_nullptrs{get_indexes_of_nullptrs(test_lists
-        )};
+        vector<size_t> _l_indexes_of_nullptrs{
+            get_indexes_of_nullptrs(group_test_options.test_lists)
+        };
         if (_l_indexes_of_nullptrs.size() > 0)
         {
             _a_error_ref.push_back(fmt::format(
@@ -329,8 +409,8 @@ __no_constexpr_imp void
         }
     }
 
-    if (map_of_unique_ids_and_for_loop_stack_tries.size() > 0
-        && write_data_to_files)
+    if (group_test_options.map_of_unique_ids_and_for_loop_stack_tries.size() > 0
+        && individual_io_based_test_options.write_data_to_files)
     {
         _a_error_ref.push_back(fmt::format(
             u8"map_of_unique_ids_and_for_loop_stack_tries has elements in it - "
@@ -340,55 +420,73 @@ __no_constexpr_imp void
             u8"written test data to be re-written to files."
         ));
     }
-    if (threads == 0 || threads > std::thread::hardware_concurrency())
+    if (group_test_options.threads == 0
+        || group_test_options.threads > std::thread::hardware_concurrency())
     {
         _a_error_ref.push_back(fmt::format(
             u8"threads = {0}. This value must be between 1 and the number of "
             u8"threads available on the system ({1}",
-            threads,
+            group_test_options.threads,
             std::thread::hardware_concurrency()
         ));
     }
-    if (comment_str.empty() || comment_str == u8"\\n")
+    if (individual_io_based_test_options.comment_str.empty()
+        || individual_io_based_test_options.comment_str == u8"\\n")
     {
         _a_error_ref.push_back(fmt::format(
             u8"comment_str = \"{0}\". It cannot be empty or equal to \"\\n\"",
-            comment_str
+            individual_io_based_test_options.comment_str
         ));
     }
-    if (general_data_extension.empty()
-        || general_data_extension.contains(u8"\n")
-        || general_data_extension.contains(u8"."))
+    if (individual_io_based_test_options.general_data_extension.empty()
+        || individual_io_based_test_options.general_data_extension.contains(
+            u8"\n"
+        )
+        || individual_io_based_test_options.general_data_extension.contains(
+            u8"."
+        ))
     {
         _a_error_ref.push_back(fmt::format(
             u8"Invalid general_data_extension ({0}). Cannot be empty or "
             u8"contain "
             u8"any of the following: {{\\n,'.'",
-            general_data_extension
+            individual_io_based_test_options.general_data_extension
         ));
     }
-    if (path_delimiter.empty())
+    if (group_test_options.path_delimiter.empty())
     {
         _a_error_ref.push_back(fmt::format(
-            u8"Invalid path_delimiter ({0}). Cannot be empty", path_delimiter
+            u8"Invalid path_delimiter ({0}). Cannot be empty",
+            group_test_options.path_delimiter
         ));
     }
-    if (not filesystem::is_directory(root_path))
+    if (not filesystem::is_directory(individual_io_based_test_options.root_path
+        ))
     {
-        _a_error_ref.push_back(
-            fmt::format(u8"Root folder \"{0}\" does not exist", root_path)
-        );
+        _a_error_ref.push_back(fmt::format(
+            u8"Root folder \"{0}\" does not exist",
+            individual_io_based_test_options.root_path
+        ));
     }
 }
-__no_constexpr_imp void test_options_base_t::pre_process() noexcept
+
+__no_constexpr_imp void
+test_options_base_t::pre_validation_process() noexcept
+{
+
+}
+
+__no_constexpr_imp void
+    test_options_base_t::post_validation_process() noexcept
 {
     using namespace std;
-    if (test_paths_to_run.size() == 0)
+    if (group_test_options.test_paths_to_run.size() == 0)
     {
         using namespace ds;
-        test_paths_to_run = vector<u8string>(1, u8string{});
+        group_test_options.test_paths_to_run = vector<u8string>(1, u8string{});
     }
 }
+
 namespace
 {
 template <typename T>
@@ -414,68 +512,4 @@ __constexpr_imp std::vector<std::size_t>
 }
 } // namespace
 
-__no_constexpr_imp std::string
-                   make_test_options_base_member_variables_fmt(
-                       const test_options_base_t& _a_opts
-                   ) noexcept
-{
-    using namespace std;
-    using namespace utility;
-    using namespace utility::printer;
-    using namespace _ABC_NS_UTILITY_STR;
-    const string _l_rv{fmt::format(
-        "{0} = {1}"
-        ", {2} = {3}"
-        ", {4} = {5}"
-        ", {6} = {7}"
-        ", {8} = {9}"
-        ", {10} = {11}"
-        ", {12} = {13}"
-        ", {14} = {15}"
-        ", {16} = {17}",
-        // ", {19} = {20}"
-        // ", {21} = {22}"
-        // ", {23} = {24}",
-        "root_path",
-        _a_opts.root_path,
-        "global_seed",
-        cast_u8string_to_string(
-            default_printer_t<global_seed_t>{}.run_printer(_a_opts.global_seed)
-        ),
-        "number_of_integers_used_to_seed_random_generators",
-        _a_opts.number_of_integers_used_to_seed_random_generators,
-        "general_data_extension",
-        cast_u8string_to_string(_a_opts.general_data_extension),
-        "comment_str",
-        cast_u8string_to_string(_a_opts.comment_str),
-        "write_data_to_files",
-        _a_opts.write_data_to_files,
-        "threads",
-        _a_opts.threads,
-        "map_of_unique_ids_and_for_loop_stack_tries",
-        _a_opts.map_of_unique_ids_and_for_loop_stack_tries,
-        "use_global_test_list",
-        _a_opts.use_global_test_list
-        //"test_reporters", _a_rtd.test_reporters,
-        // "error_reporters", _a_rtd.error_reporters,
-        // "test_lists", _a_rtd.test_lists
-    )};
-    return _l_rv;
-}
-
 _END_ABC_NS
-
-__no_constexpr_imp auto
-    fmt::formatter<abc::test_options_base_t>::format(
-        abc::test_options_base_t _a_rtd,
-        format_context&          _a_ctx
-    ) const -> format_context::iterator
-{
-    using namespace std;
-    const string _l_rv{fmt::format(
-        "{0}{{{1}}}",
-        typeid(_a_rtd).name(),
-        make_test_options_base_member_variables_fmt(_a_rtd)
-    )};
-    return formatter<string_view>::format(_l_rv, _a_ctx);
-}
