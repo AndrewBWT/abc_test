@@ -11,7 +11,7 @@ _BEGIN_ABC_GLOBAL_NS
 
 __no_constexpr_or_inline_imp const test_framework_global_variable_set_t&
     push_global_variable_set(
-        const test_options_base_t&            _a_options,
+        const test_options_base_t*                  _a_options,
         const _ABC_NS_REPORTERS::error_reporters_t& _a_error_reporters,
         const _ABC_NS_REPORTERS::test_reporters_t&  _a_test_reporters
     ) noexcept
@@ -64,7 +64,7 @@ __no_constexpr_or_inline_imp void
 __no_constexpr_or_inline_imp const test_options_base_t&
     get_global_test_options() noexcept
 {
-    return detail::get_inner_global_variable_set().back().test_options();
+    return *(detail::get_inner_global_variable_set().back().test_options());
 }
 
 __no_constexpr_or_inline_imp ds::invoked_test_data_t&

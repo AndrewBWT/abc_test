@@ -2,6 +2,7 @@
 
 #include "abc_test/core/ds/test_collections/test_collection.hpp"
 #include "abc_test/core/global.hpp"
+#include "abc_test/core/global/test_framework_global_variable_set.hpp"
 #include "abc_test/core/reporters/test_reporter.hpp"
 #include "abc_test/core/reporters/test_reporter_controller.hpp"
 #include "abc_test/core/test_evaluator.hpp"
@@ -15,8 +16,6 @@
 #include <set>
 #include <syncstream>
 #include <thread>
-
-#include "abc_test/core/global/test_framework_global_variable_set.hpp"
 
 
 _BEGIN_ABC_NS
@@ -164,7 +163,7 @@ __no_constexpr_imp int
         };
         const test_framework_global_variable_set_t& _l_tfgvs{
             push_global_variable_set(
-                _a_options,
+                &_a_options,
                 _l_make_ref_collection(
                     _a_options.group_test_options.error_reporters
                 ),
@@ -173,7 +172,9 @@ __no_constexpr_imp int
                 )
             )
         };
-        const test_options_base_t& _l_global_test_options{_l_tfgvs.test_options()};
+        const T& _l_global_test_options{
+            *(static_cast<const T*>(_l_tfgvs.test_options()))
+        };
         error_reporter_controller_t& _l_erc{
             get_global_error_reporter_controller()
         };
@@ -189,14 +190,14 @@ __no_constexpr_imp int
                 test_lists_t _l_rv{};
                 if constexpr (GLOT_Available)
                 {
-                    if (_l_global_test_options
-                            .glot_aware_test_options.use_global_test_list)
+                    if (_l_global_test_options.glot_aware_test_options
+                            .use_global_test_list)
                     {
                         _l_rv.push_back(std::ref(get_global_test_list()));
                     }
                 }
                 for (const shared_ptr<test_list_t>& _l_ptr :
-                    _l_global_test_options.group_test_options.test_lists)
+                     _l_global_test_options.group_test_options.test_lists)
                 {
                     _l_rv.push_back(std::ref(*_l_ptr));
                 }
@@ -219,7 +220,7 @@ __no_constexpr_imp int
             _l_tc.make_finalied_post_setup_test_list_in_run_order()
         };
         ds::pre_test_run_report_t _l_pre_test_run_report(
-            _a_cli_history, _a_options
+            _a_cli_history, _l_global_test_options
         );
         _l_pre_test_run_report.report_all_tests(_l_pstd.size());
         post_setup_test_list_itt_t       _l_pstd_itt{_l_pstd.begin()};

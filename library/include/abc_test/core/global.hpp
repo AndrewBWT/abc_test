@@ -49,7 +49,7 @@ struct test_framework_global_variable_set_t;
  */
 __no_constexpr_or_inline const test_framework_global_variable_set_t&
     push_global_variable_set(
-        const test_options_base_t&            _a_options,
+        const test_options_base_t* _a_options,
         const _ABC_NS_REPORTERS::error_reporters_t& _a_error_reporters,
         const _ABC_NS_REPORTERS::test_reporters_t&  _a_test_reporters
     ) noexcept;

@@ -125,7 +125,7 @@ Threads used:                       24
 Comment used:                       "#"
 general data extension used:        "gd"
 Number of values used to seed RNGs: 100
-Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1753539801
+Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1753541227
 Force run all tests used?           No
 test paths to run:                  readme::fib.
 ==========================================================================================
@@ -147,7 +147,7 @@ Assertions passed:          0
 Assertions failed:          1
 Assertion information:      0 / 1 assertions passed. All assertion failed.
 Termination status:         Function exited normally with a failed status.
-Time taken:                 4921 microseconds
+Time taken:                 488 microseconds
 ==========================================================================================
 ASSERTION INFO
 ==========================================================================================
@@ -193,7 +193,7 @@ Total tests which threw unexpected exception: 0
 Total assertions ran:                         1
 Total assertions passed:                      0
 Total assertions failed:                      1
-Global random seed:                           "1753539801"
+Global random seed:                           "1753541227"
 Repetition loop stack seed:                   "54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c653a3a726561646d653a3a666962:5b5b28302c302c2228302c203329222c5b5d295d5d"
 ==========================================================================================
 ```
@@ -212,7 +212,7 @@ Threads used:                       24
 Comment used:                       "#"
 general data extension used:        "gd"
 Number of values used to seed RNGs: 100
-Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1753539801
+Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1753541227
 Force run all tests used?           No
 test paths to run:                  readme::fib.
 ==========================================================================================
@@ -234,7 +234,7 @@ Assertions passed:          0
 Assertions failed:          1
 Assertion information:      0 / 1 assertions passed. All assertion failed.
 Termination status:         Function exited normally with a failed status.
-Time taken:                 476 microseconds
+Time taken:                 370 microseconds
 ==========================================================================================
 ASSERTION INFO
 ==========================================================================================
@@ -268,7 +268,7 @@ Total tests which threw unexpected exception: 0
 Total assertions ran:                         1
 Total assertions passed:                      0
 Total assertions failed:                      1
-Global random seed:                           "1753539801"
+Global random seed:                           "1753541227"
 Repetition loop stack seed:                   "54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c653a3a726561646d653a3a666962:5b5b28302c302c2228302c203329222c5b5d295d5d"
 ==========================================================================================
 ```
