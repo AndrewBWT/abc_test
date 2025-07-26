@@ -49,6 +49,7 @@ To complete item 13 and 14 above, how the testing framework is ran needs to be l
 	- Strategy 1 appears best.
 - Even then, test frameworks needs to know which global/thread local variables to point at.
 - On creation of a test case, note down the current global/local element we are using. That way, we can use vectors/lists to navigate through the sets, and ensure we don't read the incorrect one.
+- Our idea about a stack of global states will not work. Consider threads A and B running. Thread A creates a "mini test main" inside itself, setting the new global options. Test B will now see that global options. The solution appears to be have a pool of current test options, and have each thread contain a stack of pointers to its current test options. When a mini-test harness finishes, it pops its current one, allowing the thread to re-load the previous one.
 
 ## Longer Term Focus ##
 

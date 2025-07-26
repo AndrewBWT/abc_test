@@ -13,8 +13,8 @@ public:
     __no_constexpr
     test_framework_global_variable_set_t(
         const test_options_base_t&            _a_options,
-        _ABC_NS_REPORTERS::error_reporters_t& _a_error_reporters,
-        _ABC_NS_REPORTERS::test_reporters_t&  _a_test_reporters
+        const _ABC_NS_REPORTERS::error_reporters_t& _a_error_reporters,
+        const _ABC_NS_REPORTERS::test_reporters_t&  _a_test_reporters
     ) noexcept;
     __constexpr _ABC_NS_REPORTERS::error_reporter_controller_t&
         error_reporter_controller() noexcept;
@@ -37,8 +37,8 @@ _BEGIN_ABC_GLOBAL_NS
 __no_constexpr_imp
     test_framework_global_variable_set_t::test_framework_global_variable_set_t(
         const test_options_base_t&            _a_options,
-        _ABC_NS_REPORTERS::error_reporters_t& _a_error_reporters,
-        _ABC_NS_REPORTERS::test_reporters_t&  _a_test_reporters
+        const _ABC_NS_REPORTERS::error_reporters_t& _a_error_reporters,
+        const _ABC_NS_REPORTERS::test_reporters_t&  _a_test_reporters
     ) noexcept
     : _m_tob(_a_options)
 {

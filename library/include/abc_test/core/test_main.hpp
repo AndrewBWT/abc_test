@@ -16,135 +16,64 @@
 #include <syncstream>
 #include <thread>
 
+#include "abc_test/core/global/test_framework_global_variable_set.hpp"
+
 
 _BEGIN_ABC_NS
 
 /*!
- * @brief This class controls the core logic of the test suite.
+ * @brief This function runs the tests.
+ *
+ * On the use of the GLOT.
+ *
+ * Most use cases of this function assume it is only called once to create a
+ * test suite.
+ *
+ * However, abc_test bootstraps its testing aparatus, using it to test itself.
+ * We use it internally to run tests in a isolated enviornment.
+ *
+ * Using the GLOT in such an enviornment would create an infinite loop of test
+ * harnesses.
+ *
+ * The bool tempalte argument dictates whether running run_tests can access the
+ * GLOT.
  */
-template <typename T>
-struct test_main_t
-{
-public:
-    __constexpr
-    test_main_t()
-        = delete;
-    /*!
-     * @brief Inner constructor. Protected so it can't be used outside of this
-     * class.
-     * @param _a_test_opts The test_options_base_t object.
-     */
-    __no_constexpr
-        test_main_t(
-            const T&                             _a_test_opts,
-            const _ABC_NS_UTILITY_CLI::cli_t<T>& _a_cli
-        ) noexcept;
-    /*!
-     * @brief This function runs the tests.
-     *
-     * We would not recomend running other code in a multi-threaded enviornment
-     * which accesses the global variables described in global.h. This class
-     * assumes it is the only entity (as well as those threads it spawns) which
-     * can access those variables.
-     */
-    __no_constexpr int
-        run_tests(
-            T&                         _a_options,
-            ds::pre_test_run_report_t& _a_test_set_data,
-            simple_reporter_t&         _a_simple_reporter
-        ) noexcept;
-private:
-    _ABC_NS_UTILITY_CLI::cli_t<T>        _m_cli;
-    _ABC_NS_DS::test_lists_t             _m_test_list_collection;
-    T                                    _m_options;
-    _ABC_NS_REPORTERS::test_reporters_t  _m_test_reporters;
-    _ABC_NS_REPORTERS::error_reporters_t _m_error_reporters;
-    size_t                               _m_thread_pool;
-    std::mutex                           _m_thread_pool_mutex;
-    std::condition_variable              _m_cv;
-    size_t                               _m_current_thread_pool;
-    std::mutex                           _m_threads_mutex;
-    std::vector<std::jthread>            _m_threads;
-    // std::vector<_ABC_NS_DS::test_set_data_t> _m_test_set_data;
-    std::vector<test_evaluator_t> _m_test_runners;
-    std::set<std::size_t>         _m_threads_free;
-    /*!
-     * @brief Runs an individual test in an individual thread.
-     * @param _a_prtd The post_setup_test_data_t to run.
-     * @param _a_thread_idx The thread index.
-     * @param _a_test_set_data The test_set_data_t element to write data to.
-     */
-    __no_constexpr void
-        run_individual_test(
-            const _ABC_NS_DS::post_setup_test_data_t& _a_prtd,
-            const size_t                              _a_thread_idx,
-            test_evaluator_t&                         _a_test_runner,
-            const std::size_t                         _a_order_ran_id
-        );
-};
-
-namespace detail
-{
-
-}
-
-namespace
-{
-__constexpr _ABC_NS_DS::test_lists_t
-            make_test_list_collection(
-                const std::vector<std::shared_ptr<_ABC_NS_DS::test_list_t>>&
-                           _a_ptrs_of_test_list,
-                const bool _a_use_global_test_list
-            ) noexcept;
-template <typename T>
-__constexpr std::vector<std::reference_wrapper<const T>>
-    make_ref_collection(std::vector<std::shared_ptr<T>> _a_ptrs) noexcept;
-template <typename T>
-__constexpr std::set<T>
-            set_from_min_to_n(const T _a_max) noexcept;
-} // namespace
+template <typename T, bool GLOT_Available = false>
+__no_constexpr int
+    run_tests(
+        T&                                            _a_options,
+        simple_reporter_t&                            _a_simple_reporter,
+        std::optional<_ABC_NS_UTILITY_CLI::cli_t<T>>& _a_cli = std::nullopt,
+        const ds::memoized_cli_history_t&             _a_cli_history
+        = ds::memoized_cli_history_t()
+    ) noexcept;
 
 _END_ABC_NS
 
 _BEGIN_ABC_NS
 
-template <typename T>
-__no_constexpr_imp
-    test_main_t<T>::test_main_t(
-        const T&                             _a_to,
-        const _ABC_NS_UTILITY_CLI::cli_t<T>& _a_cli
-    ) noexcept
-    : _m_cli(_a_cli)
-    , _m_test_list_collection(make_test_list_collection(
-          _a_to.group_test_options.test_lists,
-          _a_to.glot_aware_test_options.use_global_test_list
-      ))
-    , _m_options(_a_to)
-    , _m_test_reporters(
-          make_ref_collection(_a_to.group_test_options.test_reporters)
-      )
-    , _m_error_reporters(
-          make_ref_collection(_a_to.group_test_options.error_reporters)
-      )
-    , _m_thread_pool(_a_to.group_test_options.threads)
-    , _m_current_thread_pool(_a_to.group_test_options.threads)
-    , _m_threads(std::vector<std::jthread>(_a_to.group_test_options.threads))
-    , _m_threads_free(set_from_min_to_n(_a_to.group_test_options.threads))
-{}
-
-template <typename T>
+template <typename T, bool GLOT_Available>
 __no_constexpr_imp int
-    test_main_t<T>::run_tests(
-        T&                         _a_options,
-        ds::pre_test_run_report_t& _a_test_set_data,
-        simple_reporter_t&         _a_simple_reporter
+    run_tests(
+        T&                                                  _a_options,
+        simple_reporter_t&                                  _a_simple_reporter,
+        const std::optional<_ABC_NS_UTILITY_CLI::cli_t<T>>& _a_opt_cli,
+        const ds::memoized_cli_history_t&                   _a_cli_history
     ) noexcept
 {
     using namespace std;
     using namespace _ABC_NS_DS;
     using namespace _ABC_NS_REPORTERS;
     using namespace _ABC_NS_GLOBAL;
+    using namespace _ABC_NS_ERRORS;
     using enum _ABC_NS_UTILITY::internal::internal_log_enum_t;
+    // The function which runs an individual test.
+    mutex                    _l_thread_pool_mutex;
+    mutex                    _l_threads_mutex;
+    condition_variable       _l_cv;
+    vector<jthread>          _l_threads;
+    vector<test_evaluator_t> _l_test_runners;
+    set<size_t>              _l_threads_free;
     _a_options.pre_validation_process();
     if (auto _l_validation_errors{_a_options.validate()};
         _l_validation_errors.has_value())
@@ -155,21 +84,96 @@ __no_constexpr_imp int
     else
     {
         _a_options.post_validation_process();
-        _m_test_reporters
-            = make_ref_collection(_a_options.group_test_options.test_reporters);
-        _m_error_reporters
-            = make_ref_collection(_a_options.group_test_options.error_reporters);
+        for (size_t _l_idx{numeric_limits<size_t>::min()};
+             _l_idx < _a_options.group_test_options.threads;
+             ++_l_idx)
+        {
+            _l_threads_free.insert(_l_idx);
+        }
+        _l_threads.resize(_a_options.group_test_options.threads);
+        size_t _l_current_thread_pool{_a_options.group_test_options.threads};
+        auto   _l_run_individual_test
+            = [&](const _ABC_NS_DS::post_setup_test_data_t& _a_prtd,
+                  const size_t                              _a_thread_idx,
+                  test_evaluator_t&                         _a_test_runner,
+                  const std::size_t                         _a_order_ran_id)
+        {
+            // Get the thread runner
+            push_this_threads_test_runner(&_a_test_runner);
+            test_evaluator_t& _l_threads_runner{
+                get_this_threads_test_evaluator_ref()
+            };
+            // run in try
+            try
+            {
+                _LIBRARY_LOG(MAIN_INFO, u8"Running test.");
+                _l_threads_runner.run_test(_a_prtd, _a_order_ran_id);
+            }
+            // Catch if its a library error.
+            catch (test_library_exception_t& _l_the)
+            {
+                _LIBRARY_LOG(
+                    MAIN_INFO, u8"Exception encountered when running test."
+                );
+                error_reporter_controller_t& _l_erc{
+                    get_global_error_reporter_controller()
+                };
+                const string_view _l_error{_l_the.what()};
+                _l_erc.report_error(setup_error_t(
+                    u8string(_l_error.begin(), _l_error.end()),
+                    true,
+                    _l_the.stacktrace()
+                ));
+            }
+            catch (...)
+            {
+                _LIBRARY_LOG(
+                    MAIN_INFO, "Unknown exception caught when running test."
+                );
+                error_reporter_controller_t& _l_erc{
+                    get_global_error_reporter_controller()
+                };
+                _l_erc.report_error(setup_error_t(
+                    u8"Unknown exception thrown from test_runner_t.", true
+                ));
+            }
+            _LIBRARY_LOG(MAIN_INFO, "Test finished.");
+            _LIBRARY_LOG(MAIN_INFO, "Freeing thread resourses.");
+            unique_lock _l_thread_lock(_l_threads_mutex);
+            _l_threads_free.insert(_a_thread_idx);
+            unique_lock _l_thread_pool_lock(_l_thread_pool_mutex);
+            _l_current_thread_pool += _a_prtd.thread_resourses_required();
+            _l_cv.notify_one();
+            _l_threads_runner.set_data_process_test();
+            pop_this_threads_test_runner();
+        };
         _LIBRARY_LOG(
             MAIN_INFO,
             "run_tests() beginning.\nSetting up global and thread local "
             "variables..."
         );
-
+        auto _l_make_ref_collection
+            = []<typename T>(const std::vector<std::shared_ptr<T>>& _a_ptrs)
+        {
+            vector<reference_wrapper<const T>> _l_rv{};
+            for (const shared_ptr<T>& _l_ptr : _a_ptrs)
+            {
+                _l_rv.push_back(std::ref(*_l_ptr));
+            }
+            return _l_rv;
+        };
         const test_framework_global_variable_set_t& _l_tfgvs{
             push_global_variable_set(
-                _a_options, _m_error_reporters, _m_test_reporters
+                _a_options,
+                _l_make_ref_collection(
+                    _a_options.group_test_options.error_reporters
+                ),
+                _l_make_ref_collection(
+                    _a_options.group_test_options.test_reporters
+                )
             )
         };
+        const test_options_base_t& _l_global_test_options{_l_tfgvs.test_options()};
         error_reporter_controller_t& _l_erc{
             get_global_error_reporter_controller()
         };
@@ -179,7 +183,26 @@ __no_constexpr_imp int
             MAIN_INFO, "Adding test sets to local test_collection_t..."
         );
         test_collection_t _l_tc;
-        _l_tc.add_tests(_m_test_list_collection);
+        _l_tc.add_tests(
+            [&]()
+            {
+                test_lists_t _l_rv{};
+                if constexpr (GLOT_Available)
+                {
+                    if (_l_global_test_options
+                            .glot_aware_test_options.use_global_test_list)
+                    {
+                        _l_rv.push_back(std::ref(get_global_test_list()));
+                    }
+                }
+                for (const shared_ptr<test_list_t>& _l_ptr :
+                    _l_global_test_options.group_test_options.test_lists)
+                {
+                    _l_rv.push_back(std::ref(*_l_ptr));
+                }
+                return _l_rv;
+            }()
+        );
         if (_l_erc.soft_exit())
         {
             _LIBRARY_LOG(
@@ -195,18 +218,18 @@ __no_constexpr_imp int
         const post_setup_test_list_t _l_pstd{
             _l_tc.make_finalied_post_setup_test_list_in_run_order()
         };
-        _a_test_set_data.report_all_tests(_l_pstd.size());
+        ds::pre_test_run_report_t _l_pre_test_run_report(
+            _a_cli_history, _a_options
+        );
+        _l_pre_test_run_report.report_all_tests(_l_pstd.size());
         post_setup_test_list_itt_t       _l_pstd_itt{_l_pstd.begin()};
         const post_setup_test_list_itt_t _l_pstd_end{_l_pstd.end()};
-        test_options_base_t              _l_global_test_options{
-            global::get_global_test_options()
-        };
-        _m_test_runners = vector<test_evaluator_t>(
+        _l_test_runners = vector<test_evaluator_t>(
             _l_global_test_options.group_test_options.threads,
             test_evaluator_t()
         );
         size_t _l_order_ran_id_counter{0};
-        _l_trc.report_pre_test_data(_a_test_set_data);
+        _l_trc.report_pre_test_data(_l_pre_test_run_report);
         _LIBRARY_LOG(MAIN_INFO, "Beginning running of tests...");
         while (_l_pstd_itt != _l_pstd_end && _l_erc.should_exit() == false)
         {
@@ -218,48 +241,46 @@ __no_constexpr_imp int
             const size_t _l_next_thread_size{_l_test.thread_resourses_required()
             };
             // If we are unable to allocate the required resourses
-            if (_m_current_thread_pool < _l_next_thread_size)
+            if (_l_current_thread_pool < _l_next_thread_size)
             {
                 _LIBRARY_LOG(
                     MAIN_INFO,
                     fmt::format(
-                        "Waiting as _m_current_thread_pool ({0}) < "
+                        "Waiting as _l_current_thread_pool ({0}) < "
                         "_l_thread_next_size ({1}).",
-                        _m_current_thread_pool,
+                        _l_current_thread_pool,
                         _l_next_thread_size
                     )
                 );
                 // Wait until we do have the resourses.
-                unique_lock _l_thread_pool_lock(_m_thread_pool_mutex);
-                _m_cv.wait(
+                unique_lock _l_thread_pool_lock(_l_thread_pool_mutex);
+                _l_cv.wait(
                     _l_thread_pool_lock,
-                    [_l_next_thread_size, this]
+                    [&]
                     {
-                        return _m_current_thread_pool >= _l_next_thread_size;
+                        return _l_current_thread_pool >= _l_next_thread_size;
                     }
                 );
             }
             // Check we actually have the resourses... should we lock it here
             // before doing this?
-            if (_l_erc.should_exit() == false && _m_threads_free.size() > 0)
+            if (_l_erc.should_exit() == false && _l_threads_free.size() > 0)
             {
                 // Otherwise, get a lock for the threads, remove the
                 // resousrses...
-                unique_lock  _l_thread_lock(_m_threads_mutex);
-                const size_t _l_thread_idx{*_m_threads_free.begin()};
-                _m_threads_free.erase(_l_thread_idx);
-                _m_current_thread_pool -= _l_test.thread_resourses_required();
+                unique_lock  _l_thread_lock(_l_threads_mutex);
+                const size_t _l_thread_idx{*_l_threads_free.begin()};
+                _l_threads_free.erase(_l_thread_idx);
+                _l_current_thread_pool -= _l_test.thread_resourses_required();
                 _l_thread_lock.unlock();
                 // Then run the thread
                 _LIBRARY_LOG(MAIN_INFO, "Starting new thread to run test.");
-                _m_threads[_l_thread_idx] = jthread(
-                    &test_main_t::run_individual_test,
-                    this,
+                _l_threads[_l_thread_idx] = jthread(
+                    _l_run_individual_test,
                     _l_test,
                     _l_thread_idx,
-                    std::ref(_m_test_runners[_l_thread_idx]),
+                    std::ref(_l_test_runners[_l_thread_idx]),
                     _l_order_ran_id
-                    // std::ref(_m_test_set_data[_l_thread_idx])
                 );
             }
             else
@@ -271,7 +292,7 @@ __no_constexpr_imp int
         }
         // Wait for all the threads to finish
         _LIBRARY_LOG(MAIN_INFO, "Waiting for all threads to finish.");
-        for (jthread& _l_thread : _m_threads)
+        for (jthread& _l_thread : _l_threads)
         {
             if (_l_thread.joinable())
             {
@@ -301,139 +322,28 @@ __no_constexpr_imp int
         }
         _LIBRARY_LOG(MAIN_INFO, "Setting up auto configuration");
         finalised_test_set_data_t _l_final_report;
-        for (auto& _l_test_runner : _m_test_runners)
+        for (auto& _l_test_runner : _l_test_runners)
         {
             _l_final_report.process_final_report(_l_test_runner.test_set_data()
             );
         }
-        if (_m_cli.auto_configuration().has_value())
+        if (_a_opt_cli.has_value())
         {
-            _m_cli.setup_next_file(
-                _a_options.cli_test_options.autofile_name,
-                _a_options.cli_test_options.autofile_size,
-                _l_final_report.get_re_run_test_options<T>(),
-                _l_final_report.total_tests_failed() == 0
-            );
+            auto _l_cli{_a_opt_cli.value()};
+            if (_l_cli.auto_configuration().has_value())
+            {
+                _l_cli.setup_next_file(
+                    _a_options.cli_test_options.autofile_name,
+                    _a_options.cli_test_options.autofile_size,
+                    _l_final_report.get_re_run_test_options<T>(),
+                    _l_final_report.total_tests_failed() == 0
+                );
+            }
         }
         _LIBRARY_LOG(MAIN_INFO, "Finalising reports.");
         _l_trc.finalise_reports(_l_final_report);
         return 0;
     }
 }
-
-template <typename T>
-__no_constexpr_imp void
-    test_main_t<T>::run_individual_test(
-        const _ABC_NS_DS::post_setup_test_data_t& _a_prtd,
-        const size_t                              _a_thread_idx,
-        test_evaluator_t&                         _a_test_runner,
-        const std::size_t                         _a_order_ran_id
-        // _ABC_NS_DS::test_set_data_t&              _a_test_set_data
-    )
-{
-    using namespace std;
-    using namespace _ABC_NS_ERRORS;
-    using namespace _ABC_NS_GLOBAL;
-    using namespace _ABC_NS_REPORTERS;
-    using enum _ABC_NS_UTILITY::internal::internal_log_enum_t;
-    // Get the thread runner
-    push_this_threads_test_runner(&_a_test_runner);
-    test_evaluator_t& _l_threads_runner{get_this_threads_test_evaluator_ref()};
-    // run in try
-    try
-    {
-        _LIBRARY_LOG(MAIN_INFO, u8"Running test.");
-        _l_threads_runner.run_test(_a_prtd, _a_order_ran_id);
-    }
-    // Catch if its a library error.
-    catch (test_library_exception_t& _l_the)
-    {
-        _LIBRARY_LOG(MAIN_INFO, u8"Exception encountered when running test.");
-        error_reporter_controller_t& _l_erc{
-            get_global_error_reporter_controller()
-        };
-        const string_view _l_error{_l_the.what()};
-        _l_erc.report_error(setup_error_t(
-            u8string(_l_error.begin(), _l_error.end()),
-            true,
-            _l_the.stacktrace()
-        ));
-    }
-    catch (...)
-    {
-        _LIBRARY_LOG(MAIN_INFO, "Unknown exception caught when running test.");
-        error_reporter_controller_t& _l_erc{
-            get_global_error_reporter_controller()
-        };
-        _l_erc.report_error(setup_error_t(
-            u8"Unknown exception thrown from test_runner_t.", true
-        ));
-    }
-    _LIBRARY_LOG(MAIN_INFO, "Test finished.");
-    _LIBRARY_LOG(MAIN_INFO, "Freeing thread resourses.");
-    unique_lock _l_thread_lock(_m_threads_mutex);
-    _m_threads_free.insert(_a_thread_idx);
-    unique_lock _l_thread_pool_lock(_m_thread_pool_mutex);
-    _m_current_thread_pool += _a_prtd.thread_resourses_required();
-    _m_cv.notify_one();
-    _l_threads_runner.set_data_process_test();
-    pop_this_threads_test_runner();
-    return;
-}
-
-namespace
-{
-__constexpr_imp _ABC_NS_DS::test_lists_t
-                make_test_list_collection(
-                    const std::vector<std::shared_ptr<_ABC_NS_DS::test_list_t>>&
-                               _a_ptrs_of_test_list,
-                    const bool _a_use_global_test_list
-                ) noexcept
-{
-    using namespace _ABC_NS_DS;
-    using namespace _ABC_NS_GLOBAL;
-    using namespace std;
-    test_lists_t _l_rv{};
-    if (_a_use_global_test_list)
-    {
-        _l_rv.push_back(std::ref(get_global_test_list()));
-    }
-    for (const shared_ptr<test_list_t>& _l_ptr : _a_ptrs_of_test_list)
-    {
-        _l_rv.push_back(std::ref(*_l_ptr));
-    }
-    return _l_rv;
-}
-
-template <typename T>
-__constexpr_imp std::vector<std::reference_wrapper<const T>>
-                make_ref_collection(
-                    std::vector<std::shared_ptr<T>> _a_ptrs
-                ) noexcept
-{
-    using namespace std;
-    std::vector<std::reference_wrapper<const T>> _l_rv{};
-    for (const shared_ptr<T>& _l_ptr : _a_ptrs)
-    {
-        _l_rv.push_back(std::ref(*_l_ptr));
-    }
-    return _l_rv;
-}
-
-template <typename T>
-__constexpr_imp std::set<T>
-                set_from_min_to_n(
-                    const T _a_max
-                ) noexcept
-{
-    using namespace std;
-    set<T> _l_set{};
-    for (T _l_idx{numeric_limits<T>::min()}; _l_idx < _a_max; ++_l_idx)
-    {
-        _l_set.insert(_l_idx);
-    }
-    return _l_set;
-}
-} // namespace
 
 _END_ABC_NS

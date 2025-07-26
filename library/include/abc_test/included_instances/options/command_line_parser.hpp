@@ -17,18 +17,6 @@ __no_constexpr void
         _ABC_NS_UTILITY_CLI::cli_t<included_instances_test_options_t>& _a_cli,
         _ABC_NS_UTILITY_CLI::cli_results_t& _a_cli_results
     ) noexcept;
-
-template <typename T>
-__no_constexpr_imp int
-    run_test_suite(
-        const ds::memoized_cli_history_t&    _a_memoized_cli_history,
-        const T&                             _a_test_options,
-        const _ABC_NS_UTILITY_CLI::cli_t<T>& _a_cli,
-        const simple_console_reporter_t&     _a_scr
-    ) noexcept
-{
-    return 0;
-}
 } // namespace detail
 
 _END_ABC_NS
@@ -78,16 +66,9 @@ __no_constexpr_imp int
             _l_sco.write_lines(_l_cli_results.text_output());
             break;
         default:
-            abc::detail::run_test_suite(
-                _l_cli_results.memoized_data(), _l_iito, _l_cli, _l_sco
+            return run_tests<included_instances_test_options_t, true>(
+                _l_iito, _l_sco, _l_cli, _l_cli_results.memoized_data()
             );
-            ds::pre_test_run_report_t _l_ptrr(
-                _l_cli_results.memoized_data(), _l_iito
-            );
-            test_main_t<included_instances_test_options_t> _l_test_main(
-                _l_iito, _l_cli
-            );
-            return _l_test_main.run_tests(_l_iito, _l_ptrr, _l_sco);
         }
     }
     return -1;
@@ -202,11 +183,12 @@ __no_constexpr_imp void
         _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t,
         u8string>(
         _s_repetition_config,
-            [](included_instances_test_options_t& _a_to) -> _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t&
-            {
-                return _a_to.group_test_options
-                    .map_of_unique_ids_and_for_loop_stack_tries;
-            },
+        [](included_instances_test_options_t& _a_to
+        ) -> _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t&
+        {
+            return _a_to.group_test_options
+                .map_of_unique_ids_and_for_loop_stack_tries;
+        },
         _a_cli_results,
         cli_argument_processing_info_t<
             _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t,
@@ -247,8 +229,7 @@ __no_constexpr_imp void
         _s_global_seed,
         [](included_instances_test_options_t& _a_to) -> global_seed_t&
         {
-            return _a_to.group_test_options
-                .global_seed;
+            return _a_to.group_test_options.global_seed;
         },
         _a_cli_results,
         cli_argument_processing_info_t<
@@ -293,8 +274,7 @@ __no_constexpr_imp void
         _s_force_run_all_tests,
         [](included_instances_test_options_t& _a_to) -> bool&
         {
-            return _a_to.group_test_options
-                .force_run_all_tests;
+            return _a_to.group_test_options.force_run_all_tests;
         },
         _a_cli_results
     );
@@ -326,7 +306,8 @@ __no_constexpr_imp void
         _s_tertiary_data_file_extension,
         [](included_instances_test_options_t& _a_to) -> u8string&
         {
-            return _a_to.individual_io_based_test_options.tertiary_data_file_extension;
+            return _a_to.individual_io_based_test_options
+                .tertiary_data_file_extension;
         },
         _a_cli_results
     );

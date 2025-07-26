@@ -12,8 +12,8 @@ _BEGIN_ABC_GLOBAL_NS
 __no_constexpr_or_inline_imp const test_framework_global_variable_set_t&
     push_global_variable_set(
         const test_options_base_t&            _a_options,
-        _ABC_NS_REPORTERS::error_reporters_t& _a_error_reporters,
-        _ABC_NS_REPORTERS::test_reporters_t&  _a_test_reporters
+        const _ABC_NS_REPORTERS::error_reporters_t& _a_error_reporters,
+        const _ABC_NS_REPORTERS::test_reporters_t&  _a_test_reporters
     ) noexcept
 {
     using namespace reporters;
