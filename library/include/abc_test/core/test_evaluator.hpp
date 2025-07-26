@@ -193,7 +193,7 @@ _BEGIN_ABC_NS
 __no_constexpr_imp
     test_evaluator_t::test_evaluator_t() noexcept
     : _m_current_test(nullptr)
-    , _m_random_generator(std::move(global::get_global_test_options().make_rng()
+    , _m_random_generator(std::move(global::get_this_threads_test_options().make_rng()
       ))
     , _m_tests_most_recent_source(_ABC_NS_DS::single_source_t())
 {}
@@ -252,7 +252,7 @@ __no_constexpr_imp _ABC_NS_UTILITY::rng_t
 {
     using namespace _ABC_NS_UTILITY;
     const size_t _l_n_elements_used_to_seed_random_generators{
-        global::get_global_test_options()
+        global::get_this_threads_test_options()
             .group_test_options.number_of_integers_used_to_seed_random_generators
     };
     _m_random_generator.progress(

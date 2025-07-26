@@ -65,7 +65,7 @@ __no_constexpr_imp abc::utility::io::general_data_t
          ))
          / _a_str)
             .concat(".")
-            .concat(global::get_global_test_options()
+            .concat(global::get_this_threads_test_options()
                         .individual_io_based_test_options.general_data_extension
             ),
         true
@@ -81,10 +81,10 @@ __no_constexpr_imp abc::utility::io::general_data_t
     using namespace std;
     using namespace std::filesystem;
     return gdf_from_path(
-        (absolute(global::get_global_test_options().individual_io_based_test_options.root_path) / _a_folder
+        (absolute(global::get_this_threads_test_options().individual_io_based_test_options.root_path) / _a_folder
          / _a_str)
             .concat(".")
-            .concat(global::get_global_test_options().individual_io_based_test_options.general_data_extension),
+            .concat(global::get_this_threads_test_options().individual_io_based_test_options.general_data_extension),
         true
     );
 }

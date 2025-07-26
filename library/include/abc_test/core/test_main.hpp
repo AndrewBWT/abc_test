@@ -95,10 +95,11 @@ __no_constexpr_imp int
             = [&](const _ABC_NS_DS::post_setup_test_data_t& _a_prtd,
                   const size_t                              _a_thread_idx,
                   test_evaluator_t&                         _a_test_runner,
-                  const std::size_t                         _a_order_ran_id)
+                  const std::size_t                         _a_order_ran_id,
+                test_framework_global_variable_set_t* _a_global_var_set_to_use)
         {
             // Get the thread runner
-            push_this_threads_test_runner(&_a_test_runner);
+            push_this_threads_test_runner_and_global_var_set(&_a_test_runner, _a_global_var_set_to_use);
             test_evaluator_t& _l_threads_runner{
                 get_this_threads_test_evaluator_ref()
             };
@@ -115,7 +116,7 @@ __no_constexpr_imp int
                     MAIN_INFO, u8"Exception encountered when running test."
                 );
                 error_reporter_controller_t& _l_erc{
-                    get_global_error_reporter_controller()
+                    get_this_threads_error_reporter_controller()
                 };
                 const string_view _l_error{_l_the.what()};
                 _l_erc.report_error(setup_error_t(
@@ -130,7 +131,7 @@ __no_constexpr_imp int
                     MAIN_INFO, "Unknown exception caught when running test."
                 );
                 error_reporter_controller_t& _l_erc{
-                    get_global_error_reporter_controller()
+                    get_this_threads_error_reporter_controller()
                 };
                 _l_erc.report_error(setup_error_t(
                     u8"Unknown exception thrown from test_runner_t.", true
@@ -144,7 +145,7 @@ __no_constexpr_imp int
             _l_current_thread_pool += _a_prtd.thread_resourses_required();
             _l_cv.notify_one();
             _l_threads_runner.set_data_process_test();
-            pop_this_threads_test_runner();
+            pop_this_threads_test_runner_and_global_var_set();
         };
         _LIBRARY_LOG(
             MAIN_INFO,
@@ -161,24 +162,22 @@ __no_constexpr_imp int
             }
             return _l_rv;
         };
+        test_framework_global_variable_set_t _l_local_lfgvs(
+            &_a_options,
+            _l_make_ref_collection(_a_options.group_test_options.error_reporters
+            ),
+            _l_make_ref_collection(_a_options.group_test_options.test_reporters)
+        );
         const test_framework_global_variable_set_t& _l_tfgvs{
-            push_global_variable_set(
-                &_a_options,
-                _l_make_ref_collection(
-                    _a_options.group_test_options.error_reporters
-                ),
-                _l_make_ref_collection(
-                    _a_options.group_test_options.test_reporters
-                )
-            )
+            push_this_threads_variable_set(&_l_local_lfgvs)
         };
         const T& _l_global_test_options{
             *(static_cast<const T*>(_l_tfgvs.test_options()))
         };
         error_reporter_controller_t& _l_erc{
-            get_global_error_reporter_controller()
+            get_this_threads_error_reporter_controller()
         };
-        test_reporter_controller_t& _l_trc{get_global_test_reporter_controller()
+        test_reporter_controller_t& _l_trc{get_this_threads_test_reporter_controller()
         };
         _LIBRARY_LOG(
             MAIN_INFO, "Adding test sets to local test_collection_t..."
@@ -281,7 +280,8 @@ __no_constexpr_imp int
                     _l_test,
                     _l_thread_idx,
                     std::ref(_l_test_runners[_l_thread_idx]),
-                    _l_order_ran_id
+                    _l_order_ran_id,
+                    &_l_local_lfgvs
                 );
             }
             else

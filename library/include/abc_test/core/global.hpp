@@ -47,21 +47,21 @@ struct test_framework_global_variable_set_t;
  * global error_reporter_controller_t to the GTO.
  *
  */
-__no_constexpr_or_inline const test_framework_global_variable_set_t&
-    push_global_variable_set(
-        const test_options_base_t* _a_options,
-        const _ABC_NS_REPORTERS::error_reporters_t& _a_error_reporters,
-        const _ABC_NS_REPORTERS::test_reporters_t&  _a_test_reporters
+__no_constexpr_or_inline test_framework_global_variable_set_t&
+    push_this_threads_variable_set(
+        test_framework_global_variable_set_t* _a_tfgvs
     ) noexcept;
 __no_constexpr_or_inline void
-pop_global_variable_set(
+pop_this_threads_global_variable_set(
 ) noexcept;
+__no_constexpr_or_inline test_framework_global_variable_set_t*
+get_this_threads_global_variable_set() noexcept;
 /*!
  * Gets a reference to the global test_reporter_controller_t object.
  *
  */
 __no_constexpr_or_inline reporters::test_reporter_controller_t&
-                         get_global_test_reporter_controller() noexcept;
+                         get_this_threads_test_reporter_controller() noexcept;
 /*!
  * Gets a reference to this threads test_runner_t object.
  *
@@ -69,15 +69,16 @@ __no_constexpr_or_inline reporters::test_reporter_controller_t&
 __no_constexpr_or_inline test_evaluator_t&
     get_this_threads_test_evaluator_ref() noexcept;
 __no_constexpr_or_inline void
-    push_this_threads_test_runner(test_evaluator_t* _a_test_runner_t) noexcept;
+push_this_threads_test_runner_and_global_var_set(test_evaluator_t* _a_test_runner_t,
+    test_framework_global_variable_set_t* _a_tfgvs) noexcept;
 __no_constexpr_or_inline void
-    pop_this_threads_test_runner() noexcept;
+pop_this_threads_test_runner_and_global_var_set() noexcept;
 /*!
  * Gets a const reference to the global test_options_base_t object.
  *
  */
 __no_constexpr_or_inline const test_options_base_t&
-    get_global_test_options() noexcept;
+    get_this_threads_test_options() noexcept;
 /*!
  * Gets a reference to this threads current invoked_test_info. That is, the
  * current test that is running.
@@ -91,7 +92,7 @@ __no_constexpr_or_inline const test_options_base_t&
 __no_constexpr_or_inline ds::invoked_test_data_t&
                          get_this_threads_current_test();
 __no_constexpr_or_inline reporters::error_reporter_controller_t&
-                         get_global_error_reporter_controller() noexcept;
+                         get_this_threads_error_reporter_controller() noexcept;
 /*!
  * Get the global test_list.
  */
@@ -122,10 +123,10 @@ namespace detail
 // Can't be constexpr due to use of static var.
 __no_constexpr_or_inline ds::test_list_t&
                          get_mutable_test_list() noexcept;
-__no_constexpr_or_inline std::list<test_framework_global_variable_set_t>&
-                         get_inner_global_variable_set() noexcept;
 __no_constexpr_or_inline std::list<test_evaluator_t*>&
                          get_inner_threads_test_evaluator_set() noexcept;
+__no_constexpr_or_inline std::list<test_framework_global_variable_set_t*>&
+get_inner_threads_global_variable_set() noexcept;
 } // namespace detail
 
 _END_ABC_GLOBAL_NS

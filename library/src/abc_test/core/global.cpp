@@ -9,36 +9,33 @@
 // Implementation
 _BEGIN_ABC_GLOBAL_NS
 
-__no_constexpr_or_inline_imp const test_framework_global_variable_set_t&
-    push_global_variable_set(
-        const test_options_base_t*                  _a_options,
-        const _ABC_NS_REPORTERS::error_reporters_t& _a_error_reporters,
-        const _ABC_NS_REPORTERS::test_reporters_t&  _a_test_reporters
+__no_constexpr_or_inline_imp test_framework_global_variable_set_t&
+push_this_threads_variable_set(
+        test_framework_global_variable_set_t* _a_tfgvs
     ) noexcept
 {
-    using namespace reporters;
-    using namespace std;
-    list<test_framework_global_variable_set_t>& _l_tfgvs{
-        detail::get_inner_global_variable_set()
-    };
-    _l_tfgvs.emplace_back(_a_options, _a_error_reporters, _a_test_reporters);
-    return _l_tfgvs.back();
+    detail::get_inner_threads_global_variable_set().push_back(_a_tfgvs);
+    return *(detail::get_inner_threads_global_variable_set().back());
+}
+
+__no_constexpr_or_inline_imp test_framework_global_variable_set_t*
+    get_this_threads_global_variable_set() noexcept
+{
+    return detail::get_inner_threads_global_variable_set().back();
 }
 
 __no_constexpr_or_inline_imp void
-    pop_global_variable_set() noexcept
+    pop_this_threads_global_variable_set() noexcept
 {
-    using namespace reporters;
-    using namespace std;
-    detail::get_inner_global_variable_set().pop_back();
+    detail::get_inner_threads_global_variable_set().pop_back();
 }
 
 __no_constexpr_or_inline_imp reporters::test_reporter_controller_t&
-                             get_global_test_reporter_controller() noexcept
+                             get_this_threads_test_reporter_controller() noexcept
 {
-    return detail::get_inner_global_variable_set()
+    return detail::get_inner_threads_global_variable_set()
         .back()
-        .test_reporter_controller();
+        ->test_reporter_controller();
 }
 
 __no_constexpr_or_inline_imp test_evaluator_t&
@@ -48,61 +45,62 @@ __no_constexpr_or_inline_imp test_evaluator_t&
 }
 
 __no_constexpr_or_inline_imp void
-    push_this_threads_test_runner(
-        test_evaluator_t* _a_test_runner_t
+    push_this_threads_test_runner_and_global_var_set(
+        test_evaluator_t*                     _a_test_runner_t,
+        test_framework_global_variable_set_t* _a_tfgvs
     ) noexcept
 {
     detail::get_inner_threads_test_evaluator_set().push_back(_a_test_runner_t);
+    detail::get_inner_threads_global_variable_set().push_back(_a_tfgvs);
 }
 
 __no_constexpr_or_inline_imp void
-    pop_this_threads_test_runner() noexcept
+pop_this_threads_test_runner_and_global_var_set() noexcept
 {
     detail::get_inner_threads_test_evaluator_set().pop_back();
+    detail::get_inner_threads_global_variable_set().pop_back();
 }
 
 __no_constexpr_or_inline_imp const test_options_base_t&
-    get_global_test_options() noexcept
+    get_this_threads_test_options() noexcept
 {
-    return *(detail::get_inner_global_variable_set().back().test_options());
+    return *(detail::get_inner_threads_global_variable_set().back()->test_options());
 }
 
 __no_constexpr_or_inline_imp ds::invoked_test_data_t&
                              get_this_threads_current_test()
 {
-    using namespace errors;
-    test_evaluator_t& _l_tr{get_this_threads_test_evaluator_ref()};
-    return _l_tr.current_test();
+    return get_this_threads_test_evaluator_ref().current_test();
 }
 
 __no_constexpr_or_inline_imp const test_options_base_t*
-    get_global_test_options_ptr() noexcept
+    get_this_threads_test_options_ptr() noexcept
 {
-    return &get_global_test_options();
+    return &get_this_threads_test_options();
 }
 
 __no_constexpr_or_inline_imp reporters::error_reporter_controller_t&
-                             get_global_error_reporter_controller() noexcept
+                             get_this_threads_error_reporter_controller() noexcept
 {
-    return detail::get_inner_global_variable_set()
+    return detail::get_inner_threads_global_variable_set()
         .back()
-        .error_reporter_controller();
+        ->error_reporter_controller();
 }
 
 namespace detail
 {
-__no_constexpr_or_inline_imp std::list<test_framework_global_variable_set_t>&
-                             get_inner_global_variable_set() noexcept
-{
-    static std::list<test_framework_global_variable_set_t> _s_tfgvs{};
-    return _s_tfgvs;
-}
 
 __no_constexpr_or_inline_imp std::list<test_evaluator_t*>&
                              get_inner_threads_test_evaluator_set() noexcept
 {
     thread_local std::list<test_evaluator_t*> _s_test_evaluators{};
     return _s_test_evaluators;
+}
+__no_constexpr_or_inline_imp std::list<test_framework_global_variable_set_t*>&
+get_inner_threads_global_variable_set() noexcept
+{
+    thread_local std::list<test_framework_global_variable_set_t*> _l_global_var_sets{};
+    return _l_global_var_sets;
 }
 } // namespace detail
 
@@ -134,7 +132,7 @@ __no_constexpr_or_inline_imp void
 __no_constexpr_or_inline_imp const utility::complete_global_seed_t&
                                    get_global_seed()
 {
-    return detail::get_inner_global_variable_set().back().global_seed();
+    return detail::get_inner_threads_global_variable_set().back()->global_seed();
 }
 
 __no_constexpr_or_inline_imp _ABC_NS_UTILITY::volatilte_volatile_void_ptr_t&

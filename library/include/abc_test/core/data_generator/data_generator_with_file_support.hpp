@@ -364,7 +364,7 @@ __constexpr ds::dg_memoized_element_t
                 );
                 break;
             case 1:
-                if (global::get_global_test_options().write_data_to_files)
+                if (global::get_this_threads_test_options().write_data_to_files)
                 {
                     _l_mode = 0;
                     _l_rv   = utility::printer::print<size_t>(

@@ -49,10 +49,10 @@ void
                 filesystem::path(_m_repetition_folder)
                     .append(fmt::format(
                         "{0}_{1}_{2}",
-                        global::get_global_test_options().autofile_name,
+                        global::get_this_threads_test_options().autofile_name,
                         _m_last_config_info.value().max_index + 1,
                         _m_last_config_info.value().max_index
-                            + global::get_global_test_options().autofile_size
+                            + global::get_this_threads_test_options().autofile_size
                     ))
             };
             _l_output.open(_l_new_path, ios::app);
@@ -70,9 +70,9 @@ void
             filesystem::path(_m_repetition_folder)
                 .append(fmt::format(
                     "{0}_{1}_{2}",
-                    global::get_global_test_options().autofile_name,
+                    global::get_this_threads_test_options().autofile_name,
                     1,
-                    +global::get_global_test_options().autofile_size
+                    +global::get_this_threads_test_options().autofile_size
                 ))
         };
         _l_output.open(_l_new_path, ios::app);

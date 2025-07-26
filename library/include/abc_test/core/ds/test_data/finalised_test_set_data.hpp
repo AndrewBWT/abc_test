@@ -43,7 +43,7 @@ public:
     __no_constexpr_imp T
         get_re_run_test_options() const noexcept
     {
-        T _l_opt = *(static_cast<const T*>(&global::get_global_test_options()));
+        T _l_opt = *(static_cast<const T*>(&global::get_this_threads_test_options()));
         _l_opt.group_test_options.force_run_all_tests = false;
         _l_opt.group_test_options.global_seed = global::get_global_seed();
         _l_opt.group_test_options.map_of_unique_ids_and_for_loop_stack_tries = this->_m_map_ids_to_tdg_collection_stack_tries;

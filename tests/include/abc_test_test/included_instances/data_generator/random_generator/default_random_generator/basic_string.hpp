@@ -52,7 +52,7 @@ _TEST_CASE(
             default_random_generator<typename T::value_type>(),
             bounds_t<typename T::size_type>(
                 0,
-                abc::global::get_global_test_options()
+                abc::global::get_this_threads_test_options()
                     .maximum_individual_allocatable_memory<
                         typename T::value_type>()
             )

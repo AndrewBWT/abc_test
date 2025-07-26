@@ -527,7 +527,7 @@ __constexpr_imp void
         // This has to be the last thing, or accessing _a_ptr would be invalid.
         if (_l_ref.get_pass_status() == false
             || get_global_retain_passed_assertions())
-  //          || global::get_global_test_options().retain_passed_assertions)
+  //          || global::get_this_threads_test_options().retain_passed_assertions)
         {
             _m_largest_assertion_index_added = _l_ref.assertion_index();
             _m_assertions.push_back(assertion_base_ptr_t(std::move(_a_ptr)));

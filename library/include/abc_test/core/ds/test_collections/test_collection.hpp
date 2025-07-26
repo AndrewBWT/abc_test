@@ -24,10 +24,10 @@ public:
     __no_constexpr
         test_collection_t(
             const test_options_base_t& _a_test_options
-            = global::get_global_test_options(),
+            = global::get_this_threads_test_options(),
             const reporters::error_reporter_controller_t&
                 _a_error_reporter_controller
-            = global::get_global_error_reporter_controller()
+            = global::get_this_threads_error_reporter_controller()
         ) noexcept;
     /*!
      * @brief Adds tests to the object.
@@ -126,7 +126,7 @@ __no_constexpr_imp void
             const bool _l_test_ran_override{
                 _m_options.group_test_options.map_of_unique_ids_and_for_loop_stack_tries.size()
                     == 0
-                || global::get_global_test_options().group_test_options.force_run_all_tests
+                || global::get_this_threads_test_options().group_test_options.force_run_all_tests
             };
             const test_path_hierarchy_t _l_test_path_hierarchy{
                 abc::utility::str::split_string<char8_t>(
