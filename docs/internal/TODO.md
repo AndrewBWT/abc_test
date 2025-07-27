@@ -11,14 +11,12 @@
 
 ### Specific Long-form List of todo's for 0.0.2 ###
 
-7 - Write an example of a basic test for a static data generator. Specifically decipher which values are to be extracted. Write a test that checks thoes values match exactly what is pulled out of the static data generator.
 8 - Write a basic test for a file data generator. Ensure that what comes out of the file data generator matches exactly what is in the file.
 9 - Write a test for when the file does not exist.
 10 - Write a test for when a file exists, but it cannot be parsed correctly.
 11 - Write a test for an enumerator, specifically using from m_to_n. Ensure that what comes out of the enumerator matches exactly to the test.
 12 - Write a test for a random data generator.
-13 - Write a test which uses a simple data generator to create a repetition config. Ensure that it matches what the output should be exactly.
-14 - Ensure that the repetition configuration is read correctly, and processed correctly.
+14 - Write a test for checking that repetition configuration is read correctly, and processed correctly. By this we mean, that the parsing works correctly. Also check a hex-encoded repetition configuration string.
 15 - Write a test for what happens if an incorrect repetition configuration is read for a test. Ensure it fails gracefully, but doesn't crash the executable.
 16 - Brainstorm writing tests for the different assertion types.
 17 - Brainstorm writing tests for the macros.
@@ -32,24 +30,9 @@
 25 - Write list of all types of specialization which we would require. From here, we should have a 2d matrix of all specizliations that need to be written. And adding them to a big todo list should be the next step.
 26 - Perform an overview of the output from a generic run of abc_test, and come up with a list of changes and improvements which need to be made. From there, add them to the todo list.
 27 - Go through each of our examples and test files. Make a note of where strings are used, and determine whether there are u8string overloads for them. Once that is done, come up with a list of all functions which require a u8string or std::string overload. Add those functions which need to be written to the todo list.
-
-## Re-imagining how test framework is ran ###
-
-To complete item 13 and 14 above, how the testing framework is ran needs to be looked at again. The core issue with how it currently works is that:
-
-- It assumes the following model; a main process is started, which contains a list of tests to be ran. The tests are split amoung a set of threads, all tests ran, then the results collected together in the main thread. 
-- This specifically has an effect on the use of global variables. Some are thread_local, others are static.
-- We want to bea able to run a test instance inside a test instance, using a bespoke repetition_config on that inner test instance. It should not interfere with the running of the outer-test case when it is ran.
-- We have considered a number of changes to abc_test to facilitate this. We have decided on the following
-- One idea is that there will now be an abstract class (name to be determined, but for now it is test_set_runner_t). It will take in an options object, and set all the global/thread local variables up accordingly. Its destruction will unset all the global variables. This way, we should be able to run a test instance inside a test instance.
-- If going down this route, we will have to be careful as a test framework starting another test framework could really cause issues. For example, if thread M creates thread A,B,C,D. C and D run tests in that test framework. A and B create their own instance of test, which in turn need additional threads to run. It becomes a bit of a mess at this point.
-	- Two strategies: 1) test frameworks created in a test case can AT MOST use the same number of threads allocated to that thread. 
-	- 2) Test framework can "borrow" threads from master test thread... 
-	- But then we have the potential issue of infinite test cases.
-	- Strategy 1 appears best.
-- Even then, test frameworks needs to know which global/thread local variables to point at.
-- On creation of a test case, note down the current global/local element we are using. That way, we can use vectors/lists to navigate through the sets, and ensure we don't read the incorrect one.
-- Our idea about a stack of global states will not work. Consider threads A and B running. Thread A creates a "mini test main" inside itself, setting the new global options. Test B will now see that global options. The solution appears to be have a pool of current test options, and have each thread contain a stack of pointers to its current test options. When a mini-test harness finishes, it pops its current one, allowing the thread to re-load the previous one.
+28 - Write repetition config test for file_generator.
+29 - Write repetition config test for enum generator.
+30 - Write repetition config test for random generator.
 
 ## Longer Term Focus ##
 
@@ -106,13 +89,15 @@ To complete item 13 and 14 above, how the testing framework is ran needs to be l
 37 - Consider functionality for "install" being viable for abc_test from cmake.
 38 - Consider new data generator for writing tests. It would be int he form
 
-for (auto&& [validator, input] : data_validator<int,int>(gdf("hello"), random_generator<int>()))
+for (auto&& [validator, input] : data_validator<char,int>(gdf("hello"), random_generator<int>()))
 {
-	//validator would be an object in the form validator<int>
-	int data; // do something to generate the correct value from the input parameter.
+	//validator would be an object in the form validator<char>
+	char data; // do something to generate the correct value from the input parameter int.
 	//validaotr would have a member function validate. If the entry exists in the file hello, it checks that the entry matches data.
 	// otherwise, it writes that value to the file.
 	_CHECK(validator.validate(data));
+	
+39 - Write comparison checks for generic ranges - so expressions like _CHECK_EXPR(vect == {1,2,3}) can be written.
 
 ## Information
 

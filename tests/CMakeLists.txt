@@ -47,10 +47,12 @@ if(NOT DEFINED ABC_TEST_TESTS_INCLUDED)
     # Contains simple random generator for testing randomly generated data.
     include/abc_test_test/testing_utilities/simple_random_generator.hpp
     include/abc_test_test/testing_utilities/functions.hpp
+	include/abc_test_test/testing_utilities/bootstrapped_testing_utilities.hpp
 	
 	include/abc_test_test/component_tests.hpp
     include/abc_test_test/component_tests/data_generators.hpp
     include/abc_test_test/component_tests/data_generators/static_data_generator.hpp
+	include/abc_test_test/component_tests/data_generators/file_data_generator.hpp
   )
   
   # Sets how the IDE organises the files.

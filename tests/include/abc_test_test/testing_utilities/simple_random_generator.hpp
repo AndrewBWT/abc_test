@@ -1,5 +1,4 @@
 #pragma once
-
 #include "abc_test/utility/rng.hpp"
 
 namespace abc::utility
