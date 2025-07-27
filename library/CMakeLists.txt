@@ -237,8 +237,10 @@ if(NOT DEFINED ABC_TEST_LIBRARY_INCLUDED)
     include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_thrown_non_descript_entity.hpp
     include/abc_test/included_instances/reporters/text_test_reporter/list_formatter/unexpected_thrown_exception.hpp
     include/abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_thrown_exception.hpp
+	include/abc_test/included_instances/reporters/memoized_test_reporter.hpp
     # Error reporter
     include/abc_test/included_instances/reporters/text_error_reporter.hpp
+	include/abc_test/included_instances/reporters/memoized_error_reporter.hpp
     include/abc_test/included_instances/test_assertions/macros.hpp
     # Command line parsing
     include/abc_test/included_instances/options/command_line_parser.hpp

@@ -14,18 +14,18 @@ public:
     __no_constexpr
         pre_test_run_report_t(
             const memoized_cli_history_t&            _a_memoized_data,
-            const included_instances_test_options_t& _a_test_options
+            const test_options_base_t* _a_test_options
         ) noexcept;
     __constexpr const std::vector<std::u8string>&
                       get_option_data(const _ABC_NS_CLI::cli_option_config_t& _a_element
                       ) const noexcept;
-    __constexpr const included_instances_test_options_t&
+    __constexpr const test_options_base_t&
         get_options() const noexcept;
     __constexpr void
         report_all_tests(const std::size_t _a_size) noexcept;
 private:
     memoized_cli_history_t _m_memoized_option_data;
-    std::reference_wrapper<const included_instances_test_options_t> _m_options;
+    const test_options_base_t* _m_options;
     std::size_t _m_n_tests{0};
 };
 
@@ -35,16 +35,16 @@ _BEGIN_ABC_DS_NS
 __no_constexpr_imp
     pre_test_run_report_t::pre_test_run_report_t(
         const memoized_cli_history_t&            _a_memoized_option_data,
-        const included_instances_test_options_t& _a_test_options
+        const test_options_base_t* _a_test_options
     ) noexcept
     : _m_memoized_option_data(_a_memoized_option_data)
-    , _m_options(std::reference_wrapper(_a_test_options))
+    , _m_options(_a_test_options)
 {}
 
-__constexpr const included_instances_test_options_t&
+__constexpr const test_options_base_t&
     pre_test_run_report_t::get_options() const noexcept
 {
-    return _m_options.get();
+    return *_m_options;
 }
 
 __constexpr void
@@ -54,7 +54,6 @@ __constexpr void
 {
     _m_n_tests = _a_size;
 }
-
 __constexpr const std::vector<std::u8string>&
                   pre_test_run_report_t::get_option_data(
                       const _ABC_NS_UTILITY_CLI::cli_option_config_t& _a_element

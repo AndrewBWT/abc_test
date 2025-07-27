@@ -42,7 +42,7 @@ __no_constexpr int
     run_tests(
         T&                                            _a_options,
         simple_reporter_t&                            _a_simple_reporter,
-        std::optional<_ABC_NS_UTILITY_CLI::cli_t<T>>& _a_cli = std::nullopt,
+        const std::optional<_ABC_NS_UTILITY_CLI::cli_t<T>>& _a_cli = std::optional<_ABC_NS_UTILITY_CLI::cli_t<T>>{},
         const ds::memoized_cli_history_t&             _a_cli_history
         = ds::memoized_cli_history_t()
     ) noexcept;
@@ -219,7 +219,7 @@ __no_constexpr_imp int
             _l_tc.make_finalied_post_setup_test_list_in_run_order()
         };
         ds::pre_test_run_report_t _l_pre_test_run_report(
-            _a_cli_history, _l_global_test_options
+            _a_cli_history, &_l_global_test_options
         );
         _l_pre_test_run_report.report_all_tests(_l_pstd.size());
         post_setup_test_list_itt_t       _l_pstd_itt{_l_pstd.begin()};
@@ -343,6 +343,7 @@ __no_constexpr_imp int
         }
         _LIBRARY_LOG(MAIN_INFO, "Finalising reports.");
         _l_trc.finalise_reports(_l_final_report);
+        global::pop_this_threads_global_variable_set();
         return 0;
     }
 }

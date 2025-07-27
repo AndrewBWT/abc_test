@@ -94,9 +94,9 @@ __constexpr std::u8string
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
     return u8string{}
-        .append(cast_string_to_u8string(this->name))
+        .append(cast_string_to_u8string(this->path))
         .append(_a_delimiter)
-        .append(cast_string_to_u8string(this->path));
+        .append(cast_string_to_u8string(this->name));
 }
 
 _END_ABC_DS_NS

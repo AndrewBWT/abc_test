@@ -57,8 +57,10 @@ __no_constexpr_or_inline_imp void
 __no_constexpr_or_inline_imp void
 pop_this_threads_test_runner_and_global_var_set() noexcept
 {
+    auto& ki1 { detail::get_inner_threads_global_variable_set() };
+    ki1.pop_back();
     detail::get_inner_threads_test_evaluator_set().pop_back();
-    detail::get_inner_threads_global_variable_set().pop_back();
+   // detail::get_inner_threads_global_variable_set().pop_back();
 }
 
 __no_constexpr_or_inline_imp const test_options_base_t&

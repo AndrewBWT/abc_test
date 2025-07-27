@@ -78,7 +78,7 @@ __constexpr_imp void
     ) noexcept
 {
     using namespace std;
-    unique_lock _l_report_test_unique_lokc(_m_reporters_mutex);
+    lock_guard _l_report_test_unique_lokc(_m_reporters_mutex);
     for (reference_wrapper<const test_reporter_t> _l_reporter : _m_reporters)
     {
         _l_reporter.get().report_test(_a_itd);

@@ -373,7 +373,7 @@ __no_constexpr_imp void
     else
     {
         vector<size_t> _l_indexes_of_nullptrs{
-            get_indexes_of_nullptrs(group_test_options.error_reporters)
+            get_indexes_of_nullptrs(group_test_options.test_reporters)
         };
         if (_l_indexes_of_nullptrs.size() > 0)
         {
