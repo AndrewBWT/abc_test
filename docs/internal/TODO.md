@@ -11,8 +11,6 @@
 
 ### Specific Long-form List of todo's for 0.0.2 ###
 
-8 - Write a basic test for a file data generator. Ensure that what comes out of the file data generator matches exactly what is in the file.
-9 - Write a test for when the file does not exist.
 10 - Write a test for when a file exists, but it cannot be parsed correctly.
 11 - Write a test for an enumerator, specifically using from m_to_n. Ensure that what comes out of the enumerator matches exactly to the test.
 12 - Write a test for a random data generator.
@@ -30,7 +28,6 @@
 25 - Write list of all types of specialization which we would require. From here, we should have a 2d matrix of all specizliations that need to be written. And adding them to a big todo list should be the next step.
 26 - Perform an overview of the output from a generic run of abc_test, and come up with a list of changes and improvements which need to be made. From there, add them to the todo list.
 27 - Go through each of our examples and test files. Make a note of where strings are used, and determine whether there are u8string overloads for them. Once that is done, come up with a list of all functions which require a u8string or std::string overload. Add those functions which need to be written to the todo list.
-28 - Write repetition config test for file_generator.
 29 - Write repetition config test for enum generator.
 30 - Write repetition config test for random generator.
 
@@ -98,6 +95,8 @@ for (auto&& [validator, input] : data_validator<char,int>(gdf("hello"), random_g
 	_CHECK(validator.validate(data));
 	
 39 - Write comparison checks for generic ranges - so expressions like _CHECK_EXPR(vect == {1,2,3}) can be written.
+40 - File tests with bootstrapped abc_test pose an issue. We want to ensure that any temporary files are deleted after they are created. We can either link every created file to a run of abc_test, and have an option which allows them to be deleted when the test_main is exited. Such an option could be useful for those running abc_test in production code; e.g. to check the changes that a run would make before the run is made.
+41 - data generator's tertiary data needs to match exactly to what the internal printer will produce. For example, if we manually set the tertiary data of a file_data_generator to "(0,0)" it will be read correctly. But as it sets its current teritary data value using the print function for that data generator, "(0, 0)" will be produced. As they do not match, the linear search will fail to find the correct value, resulting in incorrect results. This should be addressed. Either normalization, or a "strict" version of the printer/parser combo which won't allow "(0,0)", only allowing "(0, 0"). The former is easier (parse then print again). The latter is less computationally expensive.
 
 ## Information
 

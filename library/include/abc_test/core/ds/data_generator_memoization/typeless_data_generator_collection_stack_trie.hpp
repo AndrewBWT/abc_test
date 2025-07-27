@@ -521,7 +521,10 @@ __constexpr_imp opt_idgc_memoized_element_t
         {
             return opt_idgc_memoized_element_t{
                 idgc_memoized_element_t{
-                                        _a_current_for_loop_index, _m_children[_a_current_for_loop_index][0]->_m_for_loop_data
+                                        .for_loop_index = _a_current_for_loop_index,
+                                        .for_loop_iteration_data
+                    = _m_children[_a_current_for_loop_index][0]
+                          ->_m_for_loop_data
                 }
             };
         }

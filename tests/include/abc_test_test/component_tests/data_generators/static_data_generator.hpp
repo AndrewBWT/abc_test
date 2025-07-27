@@ -56,7 +56,7 @@ _TEST_CASE(
         std::tuple<std::function<void()>, std::string, std::string,
         abc::ds::tdg_collection_stack_trie_t>> _l_funcs_to_run;
     _l_funcs_to_run.push_back(make_tuple(_l_test_func, "hello", "hi", _l_stack));
-    abc_test::utility::abc_test_tests_internal_test_runner(1, _l_funcs_to_run);
+    abc_test::utility::abc_test_tests_internal_test_runner(1, false, _l_funcs_to_run);
     matcher_t _l_matcher{ false_matcher(u8"_l_vector is empty") };
     if (_l_read_results.size() > 0)
     {

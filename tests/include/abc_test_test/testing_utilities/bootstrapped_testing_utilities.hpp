@@ -13,6 +13,7 @@ namespace abc_test::utility
     __no_constexpr_imp void
         abc_test_tests_internal_test_runner(
             const std::size_t _a_n_threads,
+            const bool _a_write_data_to_files,
             const std::vector<
             std::tuple<std::function<void()>, std::string, std::string,
             abc::ds::tdg_collection_stack_trie_t>>&_a_functions_to_run
@@ -37,7 +38,7 @@ namespace abc_test::utility
             make_shared<reporters::memoized_test_reporter_t>()
         );
         _l_running_options.individual_io_based_test_options.write_data_to_files
-            = false;
+            = _a_write_data_to_files;
 
         for (auto&& [_l_function, _l_name, _l_path, _l_repetition_info] : _a_functions_to_run)
         {
@@ -58,10 +59,13 @@ namespace abc_test::utility
             _l_uuid.append(cast_string_to_u8string(_l_path))
                 .append(_l_running_options.group_test_options.path_delimiter)
                 .append(cast_string_to_u8string(_l_name));
-            _l_running_options.group_test_options
-                .map_of_unique_ids_and_for_loop_stack_tries.insert(
-                    _l_uuid, _l_repetition_info
-                );
+            if (not _a_write_data_to_files)
+            {
+                _l_running_options.group_test_options
+                    .map_of_unique_ids_and_for_loop_stack_tries.insert(
+                        _l_uuid, _l_repetition_info
+                    );
+            }
         }
         simple_console_reporter_t _l_sco;
         abc::run_tests<test_options_base_t>(_l_running_options, _l_sco);
