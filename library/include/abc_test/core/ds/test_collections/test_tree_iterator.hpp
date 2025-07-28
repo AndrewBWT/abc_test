@@ -90,8 +90,10 @@ __no_constexpr_imp test_tree_iterator_t&
     using namespace errors;
     if (_m_stack.size() == 0)
     {
-        throw test_library_exception_t(
-            u8"Could not increment tree_iterator_t as internal stack is empty"
+        throw abc_test_exception_t(
+            {u8"Could not increment tree_iterator_t as internal stack is empty"
+            },
+            false
         );
     }
     else
@@ -108,11 +110,11 @@ __no_constexpr_imp test_tree_iterator_t&
                 };
                 for (test_tree_child_nodes::const_reverse_iterator _l_itt{
                          std::rbegin(_l_element._m_nodes_child_nodes)
-                    };
-                    _l_itt != _l_end;
-                    ++_l_itt)
+                     };
+                     _l_itt != _l_end;
+                     ++_l_itt)
                 {
-                    _m_stack.push({ *_l_itt->get() });
+                    _m_stack.push({*_l_itt->get()});
                 }
                 if (_m_stack.size() > 0)
                 {
@@ -195,7 +197,9 @@ __no_constexpr_imp const post_setup_test_data_t&
     if (_m_stack.size() == 0
         || _m_current_text_itt == _m_stack.top().get()._m_nodes_tests.end())
     {
-        throw test_library_exception_t(u8"Could not dereference tree_iterator.");
+        throw abc_test_exception_t(
+            {u8"Could not dereference tree_iterator."}, false
+        );
     }
     else
     {

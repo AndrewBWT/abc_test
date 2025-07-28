@@ -1,7 +1,6 @@
 #include "abc_test/core/test_evaluator.hpp"
 
 #include "abc_test/core/errors/test_assertion_exception.hpp"
-#include "abc_test/core/errors/test_library_exception.hpp"
 #include "abc_test/core/logging/log_msg.hpp"
 #include "abc_test/core/test_reports//unexpected_thrown_exception.hpp"
 #include "abc_test/utility/internal/log.hpp"
@@ -47,7 +46,7 @@ __no_constexpr_or_inline_imp void
     }
     catch (const test_assertion_exception_t& _l_assertion)
     {}
-    catch (const test_library_exception_t& _l_internal_logic_error)
+    catch (const abc_test_exception_t& _l_internal_logic_error)
     {
         throw _l_internal_logic_error;
     }

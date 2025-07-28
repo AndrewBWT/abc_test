@@ -11,7 +11,7 @@
 
 ### Specific Long-form List of todo's for 0.0.2 ###
 
-10 - Write a test for when a file exists, but it cannot be parsed correctly.
+10 - Write a test for when a file exists, but it cannot be parsed correctly. This is for a file data generator.
 11 - Write a test for an enumerator, specifically using from m_to_n. Ensure that what comes out of the enumerator matches exactly to the test.
 12 - Write a test for a random data generator.
 14 - Write a test for checking that repetition configuration is read correctly, and processed correctly. By this we mean, that the parsing works correctly. Also check a hex-encoded repetition configuration string.

@@ -1,10 +1,9 @@
 ﻿#pragma once
-
-#include "abc_test/core/errors/test_library_exception.hpp"
 #include "abc_test/utility/internal/unreachable.hpp"
 #include "abc_test/utility/str/concepts.hpp"
 #include "abc_test/utility/str/print_utils.hpp"
 #include "abc_test/utility/types.hpp"
+#include "abc_test/core/errors/abc_test_exception.hpp"
 
 #include <array>
 #include <string>
@@ -687,14 +686,18 @@ __constexpr_imp std::basic_string<T>
     }
     else
     {
-        throw test_library_exception_t(fmt::format(
-            u8"The function unicode_conversion_with_exception threw an "
-            u8"exception due to an error encountered when processing the "
-            u8"unicode input \"{0}\". The error encountered is as "
-            u8"follows; {1}",
-            unicode_string_to_u8string(_a_str),
-            _l_result.error()
-        ));
+        using namespace _ABC_NS_ERRORS;
+        throw abc_test_exception_t(
+            {fmt::format(
+                 u8"The function unicode_conversion_with_exception threw an "
+                 u8"exception due to an error encountered when processing the "
+                 u8"unicode input \"{0}\". The error encountered is as "
+                 u8"follows:",
+                 unicode_string_to_u8string(_a_str)
+             ),
+             _l_result.error()},
+            false
+        );
     }
 }
 
@@ -915,7 +918,9 @@ __constexpr std::u8string
         };
         if (_l_char_opt.has_value())
         {
-            if (auto _l_special_char_str{ detail::special_char_as_string(_l_char_opt.value()) };
+            if (auto _l_special_char_str{
+                    detail::special_char_as_string(_l_char_opt.value())
+                };
                 _l_special_char_str.has_value())
             {
                 _l_rv.append(_l_special_char_str.value());

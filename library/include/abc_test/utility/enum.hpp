@@ -1,5 +1,4 @@
 #pragma once
-#include "abc_test/core/errors/test_library_exception.hpp"
 #include "abc_test/utility/internal/macros.hpp"
 #include "abc_test/utility/internal/unreachable.hpp"
 #include "abc_test/utility/parsers/parser_input.hpp"
@@ -577,9 +576,9 @@ template <typename T>
 requires enum_has_list_c<T>
 __constexpr_imp bool
     enumerate_enum_helper_t<T>::decrement(
-        T&                      _a_element,
-        std::size_t&            _a_times_called,
-        const T& _a_min_value
+        T&           _a_element,
+        std::size_t& _a_times_called,
+        const T&     _a_min_value
     ) const
     noexcept(
         unreachable_does_not_throw_exception
@@ -916,23 +915,27 @@ __constexpr void
         }
     );
     using namespace abc::utility::printer;
-    throw test_library_exception_t(fmt::format(
-        u8"An enumerate_enum_helper_t"
-        "<{0}> object cannot be "
-        "constructed using the enum_list_t argument \"{1}\". Note that in the "
-        "proceeding text representation of the enum_list_t argument, the "
-        "\"{0}\" "
-        "elements have been converted to the "
-        "enum's underlying integer type \"{2}\". "
-        "The reason the constructor failed is "
-        "that {3}.",
-        type_id<T>(),
-        default_printer_t<decltype(_l_underlying_enum_list)>{}.run_printer(
-            _l_underlying_enum_list
-        ),
-        type_id<underlying_type_t<T>>(),
-        _a_reason
-    ));
+    throw abc_test_exception_t(
+        {fmt::format(
+            u8"An enumerate_enum_helper_t"
+            "<{0}> object cannot be "
+            "constructed using the enum_list_t argument \"{1}\". Note that in "
+            "the "
+            "proceeding text representation of the enum_list_t argument, the "
+            "\"{0}\" "
+            "elements have been converted to the "
+            "enum's underlying integer type \"{2}\". "
+            "The reason the constructor failed is "
+            "that {3}.",
+            type_id<T>(),
+            default_printer_t<decltype(_l_underlying_enum_list)>{}.run_printer(
+                _l_underlying_enum_list
+            ),
+            type_id<underlying_type_t<T>>(),
+            _a_reason
+        )},
+        false
+    );
 }
 
 __constexpr_imp std::u8string_view

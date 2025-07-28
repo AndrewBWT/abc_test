@@ -2,6 +2,7 @@
 #include "abc_test/core/reporters/error_reporter.hpp"
 
 _BEGIN_ABC_REPORTERS_NS
+
 /*!
  * @brief This structure reports errors to all of the error reports. It also
  * contains logic pertaining to the termination of the testing suite, if erros
@@ -27,16 +28,10 @@ public:
      */
     __constexpr void
         add_reporters(error_reporters_t&& _a_reporters) noexcept;
-    /*!
-     * @brief Processes a single error.
-     *
-     * All the internal error_reporter_t objects are passed the setup_error_t
-     * argument, and allowed to process it.
-     *
-     * @param _a_error The setup_error_t object to be processed.
-     */
-    __no_constexpr void
-        report_error(const errors::setup_error_t& _a_error) noexcept;
+    __constexpr void
+        process_error(
+            const _ABC_NS_ERRORS::abc_test_error_t& _a_internal_error
+        ) noexcept;
     /*!
      * @brief Processes a string warning.
      *
@@ -58,7 +53,7 @@ public:
      * check has been performed.
      *
      */
-    __no_constexpr void
+    __no_constexpr int
         hard_exit() noexcept;
     /*!
      * @brief Tells the caller whether this object has recieved an error for
@@ -70,9 +65,9 @@ public:
     /*!
      * @brief Idnetical to hard_exit except it does not call std::exit. Thsi is
      * left to the user to do.
-     * 
+     *
      * It also only performs the soft exit if _m_should_exit is true.
-     * 
+     *
      * @return True if _m_should_exit is true; false otherwise.
      */
     __constexpr bool
@@ -140,27 +135,24 @@ __constexpr_imp void
 {
     add_reporters_internal(std::forward<error_reporters_t&&>(_a_reporters));
 }
-
-__no_constexpr_imp void
-    error_reporter_controller_t::report_error(
-        const errors::setup_error_t& _a_error
-    ) noexcept
+__constexpr_imp void error_reporter_controller_t::process_error(
+    const _ABC_NS_ERRORS::abc_test_error_t& _a_internal_error
+) noexcept
 {
     using namespace std;
-    using namespace utility;
+    using namespace _ABC_NS_UTILITY;
     unique_lock _l_error_reporter_unique_lock(_m_errors_mutex);
     for (reference_wrapper<const error_reporter_t> _l_reporter :
-         _m_error_reporters)
+        _m_error_reporters)
     {
-        _l_reporter.get().report_error(_a_error);
+        _l_reporter.get().process_error(_a_internal_error);
     }
-    if (_a_error.unrecoverable_error())
+    if (_a_internal_error.terminates_test_framework())
     {
         _m_catastrophic_errors++;
         _m_should_exit = true;
     }
 }
-
 __constexpr_imp void
     error_reporter_controller_t::report_information(
         const std::string_view _a_str
@@ -176,14 +168,14 @@ __constexpr_imp void
     }
 }
 
-__no_constexpr_imp void
+__no_constexpr_imp int
     error_reporter_controller_t::hard_exit() noexcept
 {
     using namespace std;
     unique_lock _l_error_reporter_unique_lock(_m_errors_mutex);
     exit_no_lock();
     _m_errors_mutex.unlock();
-    std::exit(-1);
+    return -1;
 }
 
 __constexpr_imp bool

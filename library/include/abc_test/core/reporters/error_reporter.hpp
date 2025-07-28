@@ -1,5 +1,4 @@
 #pragma once
-#include "abc_test/core/errors/test_library_setup_error.hpp"
 
 _BEGIN_ABC_REPORTERS_NS
 
@@ -10,13 +9,9 @@ _BEGIN_ABC_REPORTERS_NS
 struct error_reporter_t
 {
     __constexpr virtual ~error_reporter_t() = default;
-    /*!
-     * @brief Function to manage a setup_error_t being reported.
-     * @param _a_error The error being reported.
-     */
     __constexpr virtual void
-        report_error(const errors::setup_error_t& _a_error) const noexcept
-        = 0;
+        process_error(const _ABC_NS_ERRORS::abc_test_error_t& _a_error
+        ) const noexcept = 0;
     /*!
      * @brief Function to manage reporting information. This may be in the form
      * of a warning, or just something to log to the user.
@@ -33,10 +28,11 @@ struct error_reporter_t
         exit() const noexcept
         = 0;
 };
+
 /*!
  * @brief Type synonym for a collection of either shared or raw pointers of type
  * error_reproter_t.
  */
 using error_reporters_t
-= std::vector<std::reference_wrapper<const error_reporter_t>>;
+    = std::vector<std::reference_wrapper<const error_reporter_t>>;
 _END_ABC_REPORTERS_NS

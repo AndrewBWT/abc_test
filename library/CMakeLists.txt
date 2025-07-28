@@ -58,9 +58,9 @@ if(NOT DEFINED ABC_TEST_LIBRARY_INCLUDED)
     include/abc_test/core/ds/type_synonyms.hpp
     # Contains objects and functions pertaining to recoverable and unrecoverable errors,
     # as well as errors encountered when evaluating tests.
-    include/abc_test/core/errors/test_library_exception.hpp
-    include/abc_test/core/errors/test_library_setup_error.hpp
     include/abc_test/core/errors/test_assertion_exception.hpp
+	include/abc_test/core/errors/abc_test_error.hpp
+	include/abc_test/core/errors/abc_test_exception.hpp
     # Contains code for reporting errors and test results to the user.
     include/abc_test/core/reporters/error_reporter.hpp
     include/abc_test/core/reporters/error_reporter_controller.hpp

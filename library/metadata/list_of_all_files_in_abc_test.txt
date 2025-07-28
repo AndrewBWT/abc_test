@@ -37,9 +37,9 @@ G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/ds/test_co
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/ds/source/single_source.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/ds/source/source_pair.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/ds/type_synonyms.hpp
-G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/errors/test_library_exception.hpp
-G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/errors/test_library_setup_error.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/errors/test_assertion_exception.hpp
+G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/errors/abc_test_error.hpp
+G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/errors/abc_test_exception.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/reporters/error_reporter.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/reporters/error_reporter_controller.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/reporters/test_reporter.hpp

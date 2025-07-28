@@ -68,11 +68,14 @@ __no_constexpr_imp
         }
         std::wcout << L"Trying to read: " << fn.native() << std::endl;
         std::wcout << L"Length: " << fn.native().size() << std::endl;
-        throw test_library_exception_t(fmt::format(
-            u8"Unable to open file_line_writer_t object as file \"{0}\", "
-            u8"even though all checks suggest we should be able to.",
-            _m_file_name
-        ));
+        throw abc_test_exception_t(
+            {fmt::format(
+                u8"Unable to open file_line_writer_t object as file \"{0}\", "
+                u8"even though all checks suggest we should be able to.",
+                _m_file_name
+            )},
+            false
+        );
     }
 }
 
@@ -93,7 +96,8 @@ __no_constexpr_imp void
 {
     write_line(fmt::format(
         u8"{0}{1}",
-        global::get_this_threads_test_options().individual_io_based_test_options.comment_str,
+        global::get_this_threads_test_options()
+            .individual_io_based_test_options.comment_str,
         _a_str_to_write
     ));
 }
@@ -104,13 +108,17 @@ __no_constexpr_imp void
     ) noexcept
 {
     using namespace std;
-    if (global::get_this_threads_test_options().individual_io_based_test_options.write_data_to_files)
+    if (global::get_this_threads_test_options()
+            .individual_io_based_test_options.write_data_to_files)
     {
         wofstream& _l_out{*_m_file_handler.get()};
-        auto _l_wstring{ abc::utility::str::unicode_conversion<wchar_t>(_a_str_to_write) };
+        auto       _l_wstring{
+            abc::utility::str::unicode_conversion<wchar_t>(_a_str_to_write)
+        };
         if (_l_wstring.has_value())
         {
-            _l_out << _l_wstring.value() << std::endl;;
+            _l_out << _l_wstring.value() << std::endl;
+            ;
         }
         else
         {

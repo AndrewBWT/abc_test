@@ -1,5 +1,4 @@
 #pragma once
-#include "abc_test/core/errors/test_library_exception.hpp"
 #include "abc_test/core/global.hpp"
 #include "abc_test/core/matchers/logic_enum.hpp"
 #include "abc_test/core/matchers/static_matcher.hpp"

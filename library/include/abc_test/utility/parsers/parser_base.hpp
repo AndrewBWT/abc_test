@@ -1,9 +1,6 @@
 #pragma once
-
-#include "abc_test/core/errors/test_library_exception.hpp"
 #include "abc_test/utility/parsers/parser_input.hpp"
 #include "abc_test/utility/types.hpp"
-
 #include <memory>
 
 
@@ -13,7 +10,7 @@ template <typename T>
 struct parser_base_t
 {
 public:
-    using value_type_t = T;
+    using value_type_t                   = T;
     __constexpr virtual ~parser_base_t() = default;
     __constexpr virtual result_t<T>
         run_parser(parser_input_t& _a_parse_input) const = 0;
@@ -93,7 +90,7 @@ __constexpr_imp T
     )
 {
     using namespace std;
-    using namespace errors;
+    using namespace _ABC_NS_ERRORS;
     using namespace utility::parser;
     const result_t<T> _l_parse_result{parse(_a_str, _a_parser)};
     if (_l_parse_result.has_value())
@@ -102,7 +99,7 @@ __constexpr_imp T
     }
     else
     {
-        throw test_library_exception_t(_l_parse_result.error());
+        throw abc_test_exception_t({_l_parse_result.error()}, false);
     }
 }
 

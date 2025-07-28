@@ -59,7 +59,9 @@ public:
     __no_constexpr virtual void
         pre_test_run_report(ds::pre_test_run_report_t& _a_pre_test_run_report
         ) const noexcept override;
-    __constexpr bool has_colour_output() const noexcept
+
+    __constexpr bool
+        has_colour_output() const noexcept
     {
         return _m_has_colour_output;
     }
@@ -87,13 +89,16 @@ __no_constexpr_imp
     , _m_has_colour_output(false)
     , _m_print_config(print_config_t(false))
 {}
+
 __no_constexpr_imp
-text_test_reporter_t::text_test_reporter_t(const bool _a_coloured) noexcept
+    text_test_reporter_t::text_test_reporter_t(
+        const bool _a_coloured
+    ) noexcept
     : threated_text_output_reporter_t(std::cout)
     , _m_has_colour_output(_a_coloured)
     , _m_print_config(print_config_t(_a_coloured))
-{
-}
+{}
+
 __no_constexpr_imp
     text_test_reporter_t::text_test_reporter_t(
         const std::filesystem::path& _a_file_output
@@ -130,7 +135,10 @@ __no_constexpr_imp void
         };
         u8string _l_warning_str;
         write_line(fmt::format(
-            u8"{2}{0}{1}{0}", _l_line_break, _l_warning_str, u8"UNEXPECTED TERMINATION INFORMATION\n"
+            u8"{2}{0}{1}{0}",
+            _l_line_break,
+            _l_warning_str,
+            u8"UNEXPECTED TERMINATION INFORMATION\n"
         ));
         process_termination(_l_unexpected_termination);
     }
@@ -144,7 +152,9 @@ __no_constexpr_imp void
     const assertion_base_collection_t& _l_reports{_a_itd.assertions()};
     if (_l_reports.size() > 0)
     {
-        write_line(fmt::format(u8"{0}\n{1}\n{0}", _l_line_break, u8"ASSERTION INFO"));
+        write_line(
+            fmt::format(u8"{0}\n{1}\n{0}", _l_line_break, u8"ASSERTION INFO")
+        );
         for (const assertion_base_ptr_t& _l_report : _l_reports)
         {
             process_assertion(
@@ -169,7 +179,9 @@ __no_constexpr_imp void
     using namespace reporters;
     using namespace reports;
     const u8string _l_line_break{_m_print_config.line_break()};
-    write_line(fmt::format(u8"{0}\n{1}\n{0}", _l_line_break, u8"TEST SUITE RESULTS"));
+    write_line(
+        fmt::format(u8"{0}\n{1}\n{0}", _l_line_break, u8"TEST SUITE RESULTS")
+    );
     finalised_test_set_data_list_formatter().process_all_data(
         _m_print_config.finalised_test_set_data_fields(),
         _a_test_set_data,
@@ -191,9 +203,9 @@ __no_constexpr_imp void
     using namespace reporters;
     using namespace reports;
     const u8string _l_line_break{_m_print_config.line_break()};
-    write_line(
-        fmt::format(u8"{0}\n{1}\n{0}", _l_line_break, u8"TEST SUITE CONFIGURATION")
-    );
+    write_line(fmt::format(
+        u8"{0}\n{1}\n{0}", _l_line_break, u8"TEST SUITE CONFIGURATION"
+    ));
     pre_test_set_data_list_formatter().process_all_data(
         _m_print_config.pre_test_set_data_fields(),
         _a_pre_test_run_report,
@@ -248,10 +260,15 @@ __constexpr void
     }
     else
     {
-        throw errors::test_library_exception_t(fmt::format(
-            u8"Could not find function to format item of abstract class {0}. ",
-            type_id<decltype(_a_unexpected_report)>()
-        ));
+        using namespace _ABC_NS_ERRORS;
+        throw abc_test_exception_t(
+            {fmt::format(
+                u8"Could not find function to format item of abstract class "
+                u8"{0}. ",
+                type_id<decltype(_a_unexpected_report)>()
+            )},
+            true
+        );
     }
 }
 
@@ -432,10 +449,15 @@ __constexpr_imp void
     }
     else
     {
-        throw errors::test_library_exception_t(fmt::format(
-            u8"Could not find function to format item of abstract class {0}. ",
-            type_id<decltype(*_a_gur)>()
-        ));
+        using namespace _ABC_NS_ERRORS;
+        throw abc_test_exception_t(
+            {fmt::format(
+                u8"Could not find function to format item of abstract class "
+                u8"{0}. ",
+                type_id<decltype(*_a_gur)>()
+            )},
+            true
+        );
     }
 }
 

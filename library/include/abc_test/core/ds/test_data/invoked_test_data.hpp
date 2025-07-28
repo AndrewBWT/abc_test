@@ -13,6 +13,7 @@
 #include <functional>
 
 _BEGIN_ABC_DS_NS
+
 /*!
  * @brief Structure used to represent a test which is currently invoked.
  *
@@ -308,7 +309,9 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> _m_begin_time,
         _m_end_time;
 };
-__no_constexpr_or_inline bool get_global_retain_passed_assertions() noexcept;
+
+__no_constexpr_or_inline bool
+    get_global_retain_passed_assertions() noexcept;
 
 namespace
 {
@@ -483,13 +486,16 @@ __constexpr_imp void
     {
         // In the incorrect status; a termination has been thrown from this
         // test, why is it still running?
-        throw errors::test_library_exception_t(fmt::format(
-            u8"add_assertions function has been entered, however should have "
-            u8"already termianted. _m_test_status = {0}",
-            cast_string_to_u8string(
-                fmt::format("{}", _m_test_status)
-            )
-        ));
+        using namespace _ABC_NS_ERRORS;
+        throw abc_test_exception_t(
+            {fmt::format(
+                u8"add_assertions function has been entered, however should "
+                u8"have "
+                u8"already termianted. _m_test_status = {0}",
+                cast_string_to_u8string(fmt::format("{}", _m_test_status))
+            )},
+            false
+        );
     }
     else if (_a_ptr == nullptr)
     {
@@ -527,7 +533,7 @@ __constexpr_imp void
         // This has to be the last thing, or accessing _a_ptr would be invalid.
         if (_l_ref.get_pass_status() == false
             || get_global_retain_passed_assertions())
-  //          || global::get_this_threads_test_options().retain_passed_assertions)
+        // || global::get_this_threads_test_options().retain_passed_assertions)
         {
             _m_largest_assertion_index_added = _l_ref.assertion_index();
             _m_assertions.push_back(assertion_base_ptr_t(std::move(_a_ptr)));
@@ -542,24 +548,28 @@ __constexpr_imp void
 {
     using namespace reports;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace _ABC_NS_ERRORS;
     using enum enum_test_status_t;
     if (terminated(_m_test_status))
     {
         // In the incorrect status; a termination has been thrown from this
         // test, why is it still running?
-        throw errors::test_library_exception_t(fmt::format(
-            u8"set_unexpected_termination function has been entered, however "
-            u8"should have already termianted. _m_test_status = {0}",
-            cast_string_to_u8string(
-                fmt::format("{}", _m_test_status)
-            )
-        ));
+        throw abc_test_exception_t(
+            {fmt::format(
+                u8"set_unexpected_termination function has been entered, "
+                u8"however "
+                u8"should have already termianted. _m_test_status = {0}",
+                cast_string_to_u8string(fmt::format("{}", _m_test_status))
+            )},
+            false
+        );
     }
     else if (_m_termination_report != nullptr)
     {
-        throw errors::test_library_exception_t(
-            u8"Attempting to call set_unexpected_termination, however an "
-            u8"unexpected termination has already been registered."
+        throw abc_test_exception_t(
+            {u8"Attempting to call set_unexpected_termination, however an "
+             u8"unexpected termination has already been registered."},
+            false
         );
     }
     else if (_a_ur == nullptr)
@@ -666,23 +676,25 @@ __no_constexpr_imp std::filesystem::path
     using namespace utility;
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
-    path_t  _l_absolute_path{std::filesystem::absolute(_a_root_path).string()};
-    auto _l_wstr{_l_absolute_path.native()};
+    path_t _l_absolute_path{std::filesystem::absolute(_a_root_path).string()};
+    auto   _l_wstr{_l_absolute_path.native()};
 #if defined(_WIN32)
-    path_t  _l_path = path_t(L"\\\\?\\" + _l_wstr);
-    #else
+    path_t _l_path = path_t(L"\\\\?\\" + _l_wstr);
+#else
     path_t _l_path = _l_wstr;
-    #endif
+#endif
     for (const test_path_element_ref_t _a_test_path_component :
          _a_test_info.test_path_hierarchy())
     {
-        _l_path
-            /= abc::utility::io::normalise_for_file_use(_a_test_path_component, false);
+        _l_path /= abc::utility::io::normalise_for_file_use(
+            _a_test_path_component, false
+        );
     }
     _l_path /= abc::utility::io::normalise_for_file_use(
         cast_string_to_u8string(
             _a_test_info.registered_test_data()._m_user_data.name
-        ),false
+        ),
+        false
     );
     if (not exists(_l_path))
     {
@@ -691,9 +703,7 @@ __no_constexpr_imp std::filesystem::path
             create_directories(_l_path);
         }
         catch (const std::filesystem::filesystem_error& _a_exception)
-        {
-            
-        }
+        {}
     }
     return _l_path;
 }

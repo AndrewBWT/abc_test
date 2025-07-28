@@ -99,7 +99,7 @@ __no_constexpr_imp void
     using namespace std;
     using namespace ds;
     using namespace utility;
-    using namespace errors;
+    using namespace _ABC_NS_ERRORS;
     using namespace _ABC_NS_UTILITY_STR;
     const map<key_t, tdg_collection_stack_trie_t>& _l_map{
         _m_options.group_test_options.map_of_unique_ids_and_for_loop_stack_tries
@@ -116,17 +116,19 @@ __no_constexpr_imp void
         for (const test_list_element_t& _l_test_element :
              _l_test_list_element.get())
         {
-            const u8string _l_id{
-                _l_test_element._m_user_data.make_uid(_m_options.group_test_options.path_delimiter)
-            };
+            const u8string _l_id{_l_test_element._m_user_data.make_uid(
+                _m_options.group_test_options.path_delimiter
+            )};
             const tdg_collection_stack_trie_t* _l_reps{
                 _l_map.contains(_l_id) ? &_l_map.at(_l_id) : nullptr
             };
             // If size zero or force running, set to true.
             const bool _l_test_ran_override{
-                _m_options.group_test_options.map_of_unique_ids_and_for_loop_stack_tries.size()
+                _m_options.group_test_options
+                        .map_of_unique_ids_and_for_loop_stack_tries.size()
                     == 0
-                || global::get_this_threads_test_options().group_test_options.force_run_all_tests
+                || global::get_this_threads_test_options()
+                       .group_test_options.force_run_all_tests
             };
             const test_path_hierarchy_t _l_test_path_hierarchy{
                 abc::utility::str::split_string<char8_t>(
@@ -147,33 +149,18 @@ __no_constexpr_imp void
                 _m_options.group_test_options.threads,
                 _l_id
             ));
-            const opt_setup_error_t _l_res{_m_test_tree.add_test(
+            const opt_abc_test_error_t _l_res{_m_test_tree.add_test(
                 std::cref(_m_post_setup_tests.back()), _m_options
             )};
             if (_l_res.has_value())
             {
                 _m_post_setup_tests.pop_back();
-                _m_error_reporter_controller.report_error(_l_res.value());
+                _m_error_reporter_controller.process_error(_l_res.value());
             }
             _m_test_discovery_id++;
         }
     }
 }
-
-/*__no_constexpr_imp
-test_tree_iterator_t
-test_collection_t::begin(
-) const noexcept
-{
-    return std::begin(_m_test_tree);
-}
-__no_constexpr_imp
-    test_tree_iterator_t
-    test_collection_t::end(
-    ) const noexcept
-{
-    return std::end(_m_test_tree);
-}*/
 __no_constexpr_imp post_setup_test_list_t
     test_collection_t::make_finalied_post_setup_test_list_in_run_order(
     ) const noexcept

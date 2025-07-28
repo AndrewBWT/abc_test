@@ -1,4 +1,5 @@
 #pragma once
+#if 0
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
 
@@ -57,3 +58,4 @@ _TEST_CASE(
     }
     _CHECK(_l_test_lib);
 }
+#endif

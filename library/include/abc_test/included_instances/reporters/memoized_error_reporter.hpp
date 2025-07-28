@@ -10,12 +10,16 @@ _BEGIN_ABC_REPORTERS_NS
     struct memoized_error_reporter_t : public error_reporter_t
 {
 private:
-    mutable std::vector< errors::setup_error_t> _m_errors;
+    mutable std::vector<_ABC_NS_ERRORS::abc_test_error_t> _m_errors;
     mutable std::vector<std::string> _m_info_reports;
 public:
+    __constexpr const std::vector<_ABC_NS_ERRORS::abc_test_error_t>& errors() const noexcept
+    {
+        return _m_errors;
+    }
     __constexpr virtual void
-        report_error(const errors::setup_error_t& _a_error) const noexcept
-        override
+        process_error(const _ABC_NS_ERRORS::abc_test_error_t& _a_error
+        ) const noexcept
     {
         _m_errors.push_back(_a_error);
     }

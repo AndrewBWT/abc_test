@@ -1,5 +1,4 @@
 #pragma once
-#include "abc_test/core/errors/test_library_exception.hpp"
 #include "abc_test/utility/internal/macros.hpp"
 
 #include <functional>

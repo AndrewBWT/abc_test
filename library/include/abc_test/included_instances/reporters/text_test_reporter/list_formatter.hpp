@@ -1,6 +1,5 @@
 #pragma once
 #include "abc_test/core/ds/source/single_source.hpp"
-#include "abc_test/core/errors/test_library_exception.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_print_data.hpp"
 #include "abc_test/utility/internal/macros.hpp"
 

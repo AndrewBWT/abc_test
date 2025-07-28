@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abc_test/core/errors/test_library_exception.hpp"
+#include "abc_test/core/errors/abc_test_exception.hpp"
 #include "abc_test/utility/internal/macros.hpp"
 #include "abc_test/utility/str/unicode.hpp"
 #include "abc_test/utility/types.hpp"
@@ -57,9 +57,10 @@ __constexpr std::basic_string<T>
             ) noexcept
 {
     using namespace std;
-    auto will_overflow_unsigned = [&](size_t a, size_t b) -> size_t {
+    auto will_overflow_unsigned = [&](size_t a, size_t b) -> size_t
+    {
         return b > std::numeric_limits<size_t>::max() - a;
-        };
+    };
     if (_a_sv.empty())
     {
         return basic_string<T>();
@@ -68,9 +69,11 @@ __constexpr std::basic_string<T>
     {
         const size_t _l_idx{_a_idx >= _a_sv.size() ? _a_sv.size() - 1 : _a_idx};
         const size_t _l_before_offset{_a_limit};
-        const size_t _l_after_offset{_a_limit + (_a_limit == numeric_limits<size_t>::max() ? 0 : 1)};
+        const size_t _l_after_offset{
+            _a_limit + (_a_limit == numeric_limits<size_t>::max() ? 0 : 1)
+        };
         const bool _l_enough_elements_before{_l_idx > _l_before_offset};
-        bool _l_enough_elements_after;
+        bool       _l_enough_elements_after;
         if (will_overflow_unsigned(_l_idx, _l_after_offset))
         {
             _l_enough_elements_after = false;
@@ -264,8 +267,8 @@ __constexpr_imp result_t<std::u8string>
             vector<char8_t>   _l_chars;
             for (size_t _l_idx{0}; _l_idx < (_l_str.size() / 2); ++_l_idx)
             {
-                unsigned char value{ 0 };
-                string _l_str_to_process(_l_position, _l_position + 2);
+                unsigned char value{0};
+                string        _l_str_to_process(_l_position, _l_position + 2);
                 auto [_l_ptr, _l_ec]
                     = from_chars(_l_position, _l_position + 2, value, 16);
                 _l_position += 2;
@@ -306,10 +309,15 @@ __constexpr_imp std::u8string
     result_t<u8string> _l_res{from_hex(_a_str)};
     if (not _l_res.has_value())
     {
-        throw errors::test_library_exception_t(fmt::format(
-            u8"Could not parse \"{0}\" from hex. Reason given is \"{1}\".",
-            _a_str,
-            _l_res.error()
+        using namespace _ABC_NS_ERRORS;
+        throw abc_test_exception_t(abc_test_error_t(
+            {fmt::format(
+                 u8"Could not parse \"{0}\" from hex. Reason given is shown "
+                 u8"below.",
+                 _a_str
+             ),
+             _l_res.error()},
+            false
         ));
     }
     else

@@ -305,7 +305,7 @@ _TEST_CASE(
                 // If theres an error, let us check for the exception.
                 _l_unit_tests
                     << _CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
-                           errors::test_library_exception_t,
+                        _ABC_NS_ERRORS::abc_test_exception_t,
                            _l_expection_str,
                            [&]()
                            {
@@ -318,7 +318,7 @@ _TEST_CASE(
                        ));
                 _l_unit_tests
                     << _CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
-                           errors::test_library_exception_t,
+                        _ABC_NS_ERRORS::abc_test_exception_t,
                            _l_expection_str,
                            [&]()
                            {
@@ -389,7 +389,7 @@ _TEST_CASE(
             else
             {
                 _l_fuzzy_tests << _CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE(
-                    errors::test_library_exception_t,
+                    _ABC_NS_ERRORS::abc_test_exception_t,
                     [&]()
                     {
                         do_not_optimise(
@@ -400,7 +400,7 @@ _TEST_CASE(
                     }
                 ));
                 _l_fuzzy_tests << _CHECK(_MAKE_MATCHER_CHECKING_EXCEPTION_TYPE(
-                    errors::test_library_exception_t,
+                    _ABC_NS_ERRORS::abc_test_exception_t,
                     [&]()
                     {
                         do_not_optimise(

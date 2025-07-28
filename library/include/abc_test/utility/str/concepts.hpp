@@ -2,6 +2,7 @@
 #include "abc_test/utility/internal/macros.hpp"
 
 #include <concepts>
+#include <string>
 
 _BEGIN_ABC_UTILITY_STR_NS
 /*!

@@ -1,6 +1,5 @@
 #pragma once
 #include "abc_test/utility/internal/macros.hpp"
-#include "abc_test/core/errors/test_library_exception.hpp"
 
 _BEGIN_ABC_DS_NS
 // pass and no termination -> ok
@@ -33,7 +32,11 @@ enum class enum_test_status_t
     /*!
      * @brief The test has failed due to an uncaught exception being thrown.
      */
-    TERMINATION_OCCOURED_UNEXPECTED_THROW
+    TERMINATION_OCCOURED_UNEXPECTED_THROW,
+    /*!
+    * @brief the test has failed due to a abc_test_exception_t being thrown.
+    */
+    termination_occoured_abc_text_exception_thrown
 };
 /*!
  * @brief Test which returns a bool signifying if the enum_test_status_t
@@ -83,6 +86,7 @@ __constexpr_imp bool
     case NO_TERMINATION_TEST_FAILED:
     case TERMINATION_OCCOURED_TEST_FAILED:
     case TERMINATION_OCCOURED_UNEXPECTED_THROW:
+    case termination_occoured_abc_text_exception_thrown:
         return false;
     default:
         throw errors::unaccounted_for_enum_exception(_a_test_status);
@@ -102,6 +106,7 @@ __constexpr_imp bool
         return false;
     case TERMINATION_OCCOURED_TEST_FAILED:
     case TERMINATION_OCCOURED_UNEXPECTED_THROW:
+    case termination_occoured_abc_text_exception_thrown:
         return true;
     default:
         throw errors::unaccounted_for_enum_exception(_a_test_status);
@@ -132,6 +137,9 @@ __no_constexpr_imp auto
         break;
     case TERMINATION_OCCOURED_UNEXPECTED_THROW:
         _l_rv = "TERMINATION_OCCOURED_UNEXPECTED_THROW";
+        break;
+    case termination_occoured_abc_text_exception_thrown:
+        _l_rv = "termination_occoured_abc_text_exception_thrown";
         break;
     default:
         throw _ABC_NS_ERRORS::unaccounted_for_enum_exception(_a_iti);

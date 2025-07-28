@@ -303,12 +303,15 @@ public:
                       multi_element_collection_grouped_str() const noexcept;
     __constexpr const std::u8string_view
                       exception_type_str() const noexcept;
+
     __constexpr const std::u8string_view
-        explanation_str() const noexcept {
+                      explanation_str() const noexcept
+    {
         return u8"Explanation";
     }
-    __constexpr       std::u8string
-        exception_type(const std::u8string_view _a_str) const noexcept;
+
+    __constexpr std::u8string
+                exception_type(const std::u8string_view _a_str) const noexcept;
     __constexpr const std::u8string_view
                       exception_message_str() const noexcept;
     __constexpr       std::u8string
@@ -406,31 +409,31 @@ __constexpr_imp
     print_config_t::print_config_t(
         const bool _a_colours_enabled
     ) noexcept
-    
+
     : _m_after_execution_test_report_fields_t(
           default_after_execution_test_report_fields()
       )
     , _m_finalised_test_set_data_fields(default_finalised_test_set_data_fields()
-    )
+      )
     , _m_pre_test_set_data_fields(default_pre_test_set_data_fields())
     , _m_matcher_assertion_fields(default_matcher_based_assertion_fields())
     , _m_matcher_assertion_block_fields(
-        default_matcher_based_assertion_block_fields()
-    )
+          default_matcher_based_assertion_block_fields()
+      )
     , _m_multi_element_test_block_fields(
           default_multi_element_assertion_block_fields()
       )
     , _m_static_assertion_fields(default_static_fields())
     , _m_unexpected_thrown_non_descript_entity_fields(
-        default_unexpected_thrown_non_descript_entity_fields()
-    )
+          default_unexpected_thrown_non_descript_entity_fields()
+      )
     , _m_thrown_exception_fields(default_unexpected_exception_fields())
     , _m_matcher_assertion_single_block_assertion_list_fields(
-        default_matcher_based_assertion_single_block_assertion_fields()
-    )
+          default_matcher_based_assertion_single_block_assertion_fields()
+      )
     , _m_matcher_assertion_multi_block_assertion_list_fields(
-        default_matcher_based_assertion_multi_block_assertion_fields()
-    )
+          default_matcher_based_assertion_multi_block_assertion_fields()
+      )
     , _m_colours_enabled(_a_colours_enabled)
 {}
 
@@ -439,8 +442,7 @@ __constexpr_imp std::u8string
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
-    return cast_string_to_u8string(
-        string(_m_line_break_len, _m_line_break_char)
+    return cast_string_to_u8string(string(_m_line_break_len, _m_line_break_char)
     );
 }
 
@@ -817,6 +819,10 @@ __constexpr_imp std::u8string
         return highlight_fail(
             u8"Function terminated due to an unexpected thrown entity."
         );
+    case termination_occoured_abc_text_exception_thrown:
+        return highlight_fail(
+            u8"Function terminated due to an abc_test_exception being thrown"
+        );
     default:
         throw errors::unaccounted_for_enum_exception(_a_test_status);
     }
@@ -1022,8 +1028,7 @@ __constexpr_imp std::u8string
     {
         return highlight(fmt::format(
             u8"{0}:{1}",
-            cast_string_to_u8string(_a_sl.value().file_name(
-            )),
+            cast_string_to_u8string(_a_sl.value().file_name()),
             _a_sl.value().line()
         ));
     }
@@ -1173,7 +1178,9 @@ __constexpr std::u8string
 }
 
 __constexpr std::u8string
-print_config_t::test_description(const std::u8string_view _a_str) const noexcept
+            print_config_t::test_description(
+        const std::u8string_view _a_str
+    ) const noexcept
 {
     return slight_highlight(quote(_a_str));
 }

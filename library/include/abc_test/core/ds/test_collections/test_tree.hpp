@@ -73,7 +73,7 @@ public:
      * adding the test, this object will contain a string description of them.
      * If not, it contains a nullopt.
      */
-    __no_constexpr errors::opt_setup_error_t
+    __no_constexpr _ABC_NS_ERRORS::opt_abc_test_error_t
         add_test(const node_t& _a_test, const test_options_base_t& _a_options)
             noexcept;
     /*!
@@ -140,7 +140,7 @@ private:
      * @return opt_setup_error_t. Empty if there is no error, otherwise a text
      * description of the error.
      */
-    __no_constexpr friend errors::opt_setup_error_t
+    __no_constexpr friend _ABC_NS_ERRORS::opt_abc_test_error_t
         static_add_test(
             std::reference_wrapper<test_tree_t> _a_test_tree,
             const node_t&                       _a_test,
@@ -151,20 +151,21 @@ private:
 _END_ABC_DS_NS
 
 _BEGIN_ABC_DS_NS
-__no_constexpr_imp errors::opt_setup_error_t
+__no_constexpr_imp std::optional<_ABC_NS_ERRORS::abc_test_error_t>
                    test_tree_t::add_test(
         const node_t&              _a_test,
         const test_options_base_t& _a_options
     ) noexcept
 {
     using namespace std;
-    using namespace errors;
+    using namespace _ABC_NS_ERRORS;
     using namespace _ABC_NS_UTILITY_STR;
     const post_setup_test_data_t& _l_test{_a_test.get()};
-    if (_l_test.thread_resourses_required() > _a_options.group_test_options.threads)
+    if (_l_test.thread_resourses_required()
+        > _a_options.group_test_options.threads)
     {
-        return opt_setup_error_t(setup_error_t(
-            fmt::format(
+        return abc_test_error_t(
+            {fmt::format(
                 u8"setup_test_error: post_setup_test_data_t's required thread "
                 u8"resourses greater than those allocated to the system. "
                 u8"post_setup_test_data_t requires {0} threads, while the "
@@ -174,9 +175,9 @@ __no_constexpr_imp errors::opt_setup_error_t
                 _l_test.thread_resourses_required(),
                 _a_options.group_test_options.threads,
                 cast_string_to_u8string(fmt::format("{0}", _l_test))
-            ),
+            )},
             false
-        ));
+        );
     }
     else
     {
@@ -192,8 +193,8 @@ __no_constexpr_imp errors::opt_setup_error_t
         }
         if (_l_empty_indexes.size() > 0)
         {
-            return opt_setup_error_t(setup_error_t(
-                fmt::format(
+            return abc_test_error_t(
+                {fmt::format(
                     u8"setup_test_error: post_setup_test_data_t's "
                     u8"test_path_hierarchy contains empty strings. "
                     u8"Specifically "
@@ -202,9 +203,9 @@ __no_constexpr_imp errors::opt_setup_error_t
                     _l_empty_indexes,
                     _l_test.test_path_hierarchy(),
                     cast_string_to_u8string(fmt::format("{0}", _l_test))
-                ),
+                )},
                 false
-            ));
+            );
         }
         else
         {
@@ -279,7 +280,7 @@ __constexpr_imp test_tree_ref_t
     return _l_current_node_ref;
 }
 
-__no_constexpr_imp errors::opt_setup_error_t
+__no_constexpr_imp _ABC_NS_ERRORS::opt_abc_test_error_t
                    static_add_test(
                        std::reference_wrapper<test_tree_t> _a_test_tree,
                        const node_t&                       _a_test,
@@ -288,7 +289,7 @@ __no_constexpr_imp errors::opt_setup_error_t
 {
     // Find the node of the test hierarchy.
     using namespace std;
-    using namespace errors;
+    using namespace _ABC_NS_ERRORS;
     using namespace _ABC_NS_UTILITY_STR;
     test_tree_ref_t   _l_node{find_or_create_test_node(
         _a_test_tree, _a_test_ref.test_path_hierarchy()
@@ -299,7 +300,7 @@ __no_constexpr_imp errors::opt_setup_error_t
     if (_l_node.get()._m_nodes_tests.size() == 0)
     {
         _l_node.get()._m_nodes_tests.push_back(_a_test);
-        return opt_setup_error_t{};
+        return std::nullopt;
     }
     else
     {
@@ -322,8 +323,8 @@ __no_constexpr_imp errors::opt_setup_error_t
         {
             // There is a range of equal elements. Can't add, gotta throw an
             // error.
-            return opt_setup_error_t(setup_error_t(
-                fmt::format(
+            return abc_test_error_t(
+                {fmt::format(
                     u8"setup_test_error: post_setup_test_data_t's "
                     u8"registered_test_data has the same name as a "
                     u8"current entry in the test_tree_t object. "
@@ -335,9 +336,9 @@ __no_constexpr_imp errors::opt_setup_error_t
                     cast_string_to_u8string(
                         fmt::format("{0}", (_l_name_range_itts.begin()->get()))
                     )
-                ),
+                )},
                 false
-            ));
+            );
         }
         else
         {
@@ -345,7 +346,7 @@ __no_constexpr_imp errors::opt_setup_error_t
             _l_node.get()._m_nodes_tests.insert(
                 _l_name_range_itts.end(), _a_test
             );
-            return opt_setup_error_t{};
+            return std::nullopt;
         }
     }
 }

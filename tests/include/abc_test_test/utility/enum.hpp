@@ -1044,7 +1044,7 @@ _TEST_CASE(
             );
             _l_error_tests << _CHECK(
                 _MAKE_MATCHER_CHECKING_EXCEPTION_TYPE_AND_MSG(
-                    abc::errors::test_library_exception_t,
+                    _ABC_NS_ERRORS::abc_test_exception_t,
                     _l_error,
                     [&]()
                     {

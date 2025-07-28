@@ -1,6 +1,6 @@
 #pragma once
-#include "abc_test/core/ds/test_data/registered_test_data.hpp"
 #include "abc_test/core/ds/data_generator_memoization/typeless_data_generator_collection_stack_trie.hpp"
+#include "abc_test/core/ds/test_data/registered_test_data.hpp"
 #include "abc_test/core/ds/type_synonyms.hpp"
 #include "abc_test/utility/str/string_utils.hpp"
 
@@ -223,10 +223,12 @@ __constexpr_imp const ds::tdg_collection_stack_trie_t&
 {
     if (_m_for_loop_stack_trie == nullptr)
     {
-        throw errors::test_library_exception_t(
-            u8"Attempted to access post_setup_test_data_t's repetition data. "
-            u8"However, the for_loop_stack_trie contains a nullptr. "
-            u8"Use has_for_loop_stack_trie to check this."
+        using namespace _ABC_NS_ERRORS;
+        throw abc_test_exception_t(
+            {u8"Attempted to access post_setup_test_data_t's repetition data. "
+             u8"However, the for_loop_stack_trie contains a nullptr. "
+             u8"Use has_for_loop_stack_trie to check this."},
+            false
         );
     }
     else
@@ -313,13 +315,14 @@ __no_constexpr_imp auto
         _a_pstd.thread_resourses_required(),
         "_m_for_loop_stack_trie",
         _a_pstd.has_for_loop_stack_trie()
-        ? fmt::format("{0}", "not written")
+            ? fmt::format("{0}", "not written")
 
-        // abc::checkless_convert_unicode_to_ascii(
-        //     abc::utility::printer::default_printer<
-        //         decltype(_a_pstd.for_loop_stack_trie())>()
-        //         ->run_printer(_a_pstd.for_loop_stack_trie())
-        // )
-         : "nullptr")};
+            // abc::checkless_convert_unicode_to_ascii(
+            //     abc::utility::printer::default_printer<
+            //         decltype(_a_pstd.for_loop_stack_trie())>()
+            //         ->run_printer(_a_pstd.for_loop_stack_trie())
+            // )
+            : "nullptr"
+    )};
     return formatter<string_view>::format(_l_rv, _a_ctx);
 }

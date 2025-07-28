@@ -174,3 +174,70 @@ _TEST_CASE(
         u8"Checks values are correct", _EXPR(_l_values == _l_expected_elements)
     ));
 }
+
+_TEST_CASE(
+    abc::test_case_t(
+        { .name = "Checking file failed file reading is dealt with correctly",
+         .path = "abc_test_test::component_tests::data_generators::file_data_"
+                 "generator",
+         .threads_required = 1 }
+    )
+)
+{
+    using namespace abc;
+    using namespace abc::data_gen;
+    using namespace std;
+    using namespace utility;
+    using namespace abc::utility::io;
+    using namespace _ABC_NS_UTILITY_STR;
+    using namespace _ABC_NS_DS;
+    string           _l_name_1{ "name" };
+    string           _l_path{ "path" };
+    string           _l_file_name{ "test_file_1" };
+    filesystem::path _l_path_1{ string{std::filesystem::current_path().string()}
+                                   .append("\\")
+                                   .append(_l_path)
+                                   .append("\\")
+                                   .append(_l_name_1)
+                                   .append("\\")
+                                   .append(_l_file_name)
+                                   .append(".gd") };
+    if (std::filesystem::exists(_l_path_1))
+    {
+        std::filesystem::remove(_l_path_1);
+    }
+    ofstream    _l_out(_l_path_1);
+    vector<int> _l_elements = { 1, 2, 3, 54, 100 };
+    for (auto& _l_element : _l_elements)
+    {
+        _l_out << abc::utility::str::cast_u8string_to_string(
+            abc::utility::printer::default_printer_t<int>{}.run_printer(
+                _l_element
+            )
+        ) << std::endl;
+    }
+    _l_out.close();
+    vector<int>      _l_values;
+    function<void()> _l_test_func_1 = [&]()
+        {
+            for (auto&& _l_element : read_data_from_file<bool>(_l_file_name))
+            {
+                _l_values.push_back(_l_element);
+            }
+        };
+    std::vector<std::tuple<
+        std::function<void()>,
+        std::string,
+        std::string,
+        abc::ds::tdg_collection_stack_trie_t>>
+        _l_funcs_to_run;
+    tdg_collection_stack_trie_t _l_stack;
+    _l_funcs_to_run.push_back(
+        make_tuple(_l_test_func_1, _l_name_1, _l_path, _l_stack)
+    );
+    auto _l_result = abc_test::utility::abc_test_tests_internal_test_runner(1, true, _l_funcs_to_run);
+    // File has the correct values.
+    _CHECK(
+        _EXPR(_l_result.memoized_error_repoter.errors().at(0).errors().at(0) == u8"huh")
+    );
+}

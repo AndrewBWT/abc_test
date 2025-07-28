@@ -53,6 +53,7 @@ public:
             while (_l_flr.has_current_line())
             {
                 using namespace abc::utility::parser;
+                using namespace _ABC_NS_ERRORS;
                 const result_t<map_type_t> _l_read_element{
                     parse(_l_flr.current_line(), _m_element_parser)
                 };
@@ -67,34 +68,45 @@ public:
                     }
                     else
                     {
-                        throw abc::errors::test_library_exception_t(fmt::format(
-                            u8"{0} was able to successfully parse the {1} line "
-                            u8"of file {2}"
-                            u8"\"{3}\" to the the entity {4} of type {5}. "
-                            u8"However, it was found that the internal map "
-                            u8"already contains an element with this key. The "
-                            u8"current element is {6}.",
-                            type_id<decltype(*this)>(),
-                            positive_integer_to_placement(_l_line_idx),
-                            _m_file_name.u8string(),
-                            _l_flr.current_line(),
-                            _m_element_printer->run_printer(_l_parsed_element),
-                            type_id<map_type_t>(),
-                            _m_element_printer->run_printer(*_l_finder)
-                        ));
+                        throw abc_test_exception_t(
+                            {fmt::format(
+                                u8"{0} was able to successfully parse the {1} "
+                                u8"line "
+                                u8"of file {2}"
+                                u8"\"{3}\" to the the entity {4} of type {5}. "
+                                u8"However, it was found that the internal map "
+                                u8"already contains an element with this key. "
+                                u8"The "
+                                u8"current element is {6}.",
+                                type_id<decltype(*this)>(),
+                                positive_integer_to_placement(_l_line_idx),
+                                _m_file_name.u8string(),
+                                _l_flr.current_line(),
+                                _m_element_printer->run_printer(
+                                    _l_parsed_element
+                                ),
+                                type_id<map_type_t>(),
+                                _m_element_printer->run_printer(*_l_finder)
+                            )},
+                            false
+                        );
                     }
                 }
                 else
                 {
-                    throw abc::errors::test_library_exception_t(fmt::format(
-                        u8"{0} could not parse line \"{1}\" of file {2}, which "
-                        u8"should "
-                        u8"contain a parsable entity of type {3}.",
-                        type_id<decltype(*this)>(),
-                        _l_flr.current_line(),
-                        _m_file_name.u8string(),
-                        type_id<map_type_t>()
-                    ));
+                    throw abc_test_exception_t(
+                        {fmt::format(
+                            u8"{0} could not parse line \"{1}\" of file {2}, "
+                            u8"which "
+                            u8"should "
+                            u8"contain a parsable entity of type {3}.",
+                            type_id<decltype(*this)>(),
+                            _l_flr.current_line(),
+                            _m_file_name.u8string(),
+                            type_id<map_type_t>()
+                        )},
+                        false
+                    );
                 }
                 _l_flr.get_next_line();
                 ++_l_line_idx;
@@ -169,8 +181,8 @@ public:
                     default_printer_t<Key>{}.run_printer(_a_key),
                     type_id<value_t>(),
                     type_id<Val>()
-                )
-            )));
+                ))
+            ));
         }
     }
 private:

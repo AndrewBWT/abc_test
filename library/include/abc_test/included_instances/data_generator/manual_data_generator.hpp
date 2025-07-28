@@ -1,7 +1,6 @@
 #pragma once
 
 #include "abc_test/core/data_generator/data_generator_collection.hpp"
-#include "abc_test/core/errors/test_library_exception.hpp"
 #include "abc_test/utility/internal/macros.hpp"
 
 /*!

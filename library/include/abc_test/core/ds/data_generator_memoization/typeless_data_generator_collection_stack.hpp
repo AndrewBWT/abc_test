@@ -2,7 +2,7 @@
 
 #include "abc_test/core/data_generator/typeless_data_generator_collection_iterator.hpp"
 #include "abc_test/core/ds/data_generator_memoization/indexed_data_generator_collection_memoized_element.hpp"
-#include "abc_test/core/errors/test_library_exception.hpp"
+
 #include <fmt/base.h>
 #include <fmt/ranges.h>
 
@@ -180,9 +180,12 @@ __constexpr_imp void
     }
     else
     {
-        throw test_library_exception_t(fmt::format(
-            u8"decrement called when _m_for_loop_pointers.size() == 0"
-        ));
+        throw abc_test_exception_t(
+            {fmt::format(
+                u8"decrement called when _m_for_loop_pointers.size() == 0"
+            )},
+            false
+        );
     }
 }
 
@@ -198,8 +201,10 @@ __no_constexpr_imp void
     }
     else
     {
-        throw test_library_exception_t(
-            fmt::format(u8"update called when _m_for_loop_pointers.size() == 0")
+        throw abc_test_exception_t(
+            {fmt::format(u8"update called when _m_for_loop_pointers.size() == 0"
+            )},
+            false
         );
     }
 }

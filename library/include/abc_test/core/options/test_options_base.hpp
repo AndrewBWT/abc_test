@@ -28,7 +28,7 @@ struct cli_test_options_t
     std::size_t   autofile_size                   = 1'000;
     std::u8string autofile_name                   = u8"autofile";
     bool          show_configuration_explanations = false;
-    std::u8string              autofile_metadata_string = u8"metadata";
+    std::u8string autofile_metadata_string        = u8"metadata";
 };
 
 struct group_test_options_t
@@ -45,9 +45,9 @@ struct group_test_options_t
                                                           error_reporters;
     std::vector<std::u8string>                            test_paths_to_run;
     std::vector<std::shared_ptr<_ABC_NS_DS::test_list_t>> test_lists;
-    bool force_run_all_tests = false;
-    std::filesystem::path error_root_path = std::filesystem::current_path();
-    std::filesystem::path reports_root_path = std::filesystem::current_path();
+    bool                  force_run_all_tests = false;
+    std::filesystem::path error_root_path     = std::filesystem::current_path();
+    std::filesystem::path reports_root_path   = std::filesystem::current_path();
 };
 
 struct individual_test_options_t
@@ -80,8 +80,10 @@ struct test_options_base_t
     __no_constexpr                     std::optional<std::vector<std::u8string>>
                                        validate() const noexcept;
     __no_constexpr virtual void
-                       pre_validation_process() noexcept;
-    __no_constexpr virtual void post_validation_process() noexcept;
+        pre_validation_process() noexcept;
+    __no_constexpr virtual void
+                       post_validation_process() noexcept;
+
     __no_constexpr_imp utility::rng_t
                        make_rng() const noexcept
     {
@@ -103,8 +105,9 @@ struct test_options_base_t
         else if (individual_test_options.maximum_individual_alloctable_memory
                  == 0)
         {
-            throw abc::errors::test_library_exception_t(
-                u8"Cannot determine allocation as size == 0"
+            using namespace _ABC_NS_ERRORS;
+            throw abc_test_exception_t(
+                {u8"Cannot determine allocation as size == 0"}, true
             );
         }
         else
@@ -471,10 +474,8 @@ __no_constexpr_imp void
 }
 
 __no_constexpr_imp void
-test_options_base_t::pre_validation_process() noexcept
-{
-
-}
+    test_options_base_t::pre_validation_process() noexcept
+{}
 
 __no_constexpr_imp void
     test_options_base_t::post_validation_process() noexcept

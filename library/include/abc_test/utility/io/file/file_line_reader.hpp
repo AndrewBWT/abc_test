@@ -7,8 +7,10 @@
 #include <string>
 
 _BEGIN_ABC_UTILITY_IO_NS
+
 /*!
- * @brief Object used to encapsulate the logic required to read a file line by line.
+ * @brief Object used to encapsulate the logic required to read a file line by
+ * line.
  */
 struct file_line_reader_t
 {
@@ -23,14 +25,16 @@ public:
     __constexpr bool
         has_current_line() const noexcept;
     __constexpr bool
-        get_next_line();
-    __constexpr std::size_t line_number() const noexcept
+                get_next_line();
+
+    __constexpr std::size_t
+                line_number() const noexcept
     {
-        return _m_current_line_idx+1;
+        return _m_current_line_idx + 1;
     }
 private:
-    size_t                         _m_current_line_idx{ 0 };
-    std::u8string                    _m_current_line;
+    size_t                         _m_current_line_idx{0};
+    std::u8string                  _m_current_line;
     std::shared_ptr<std::ifstream> _m_file_handler;
     std::filesystem::path          _m_file_name;
     bool                           _m_finished_reading;
@@ -40,9 +44,9 @@ _END_ABC_UTILITY_IO_NS
 
 _BEGIN_ABC_UTILITY_IO_NS
 __no_constexpr_imp
-file_line_reader_t::file_line_reader_t(
-    const std::filesystem::path& _a_file_name
-)
+    file_line_reader_t::file_line_reader_t(
+        const std::filesystem::path& _a_file_name
+    )
     : _m_current_line_idx(0)
     , _m_current_line(u8"")
     , _m_file_handler(std::shared_ptr<std::ifstream>())
@@ -51,15 +55,19 @@ file_line_reader_t::file_line_reader_t(
 {
     using namespace std;
     using namespace std::filesystem;
-    using namespace errors;
+    using namespace _ABC_NS_ERRORS;
     using std::filesystem::path;
     if (not exists(_m_file_name))
     {
-        throw test_library_exception_t(fmt::format(
-            u8"Unable to open file_line_reader_t object as file \"{0}\" does "
-            u8"not exist",
-            _m_file_name.u8string()
-        ));
+        throw abc_test_exception_t(
+            {fmt::format(
+                u8"Unable to open file_line_reader_t object as file \"{0}\" "
+                u8"does "
+                u8"not exist",
+                _m_file_name.u8string()
+            )},
+            false
+        );
     }
     _m_file_handler = make_shared<ifstream>(_m_file_name);
     if (_m_file_handler.get()->is_open())
@@ -68,25 +76,17 @@ file_line_reader_t::file_line_reader_t(
     }
     else
     {
-        throw test_library_exception_t(fmt::format(
-            u8"Unable to open file_line_reader_t object as file \"{0}\", "
-            u8"even though file exists.",
-            _m_file_name.u8string()
-        ));
+        throw abc_test_exception_t(
+            {fmt::format(
+                u8"Unable to open file_line_reader_t object as file \"{0}\", "
+                u8"even though file exists.",
+                _m_file_name.u8string()
+            )},
+            false
+        );
     }
 }
 
-/*__no_constexpr_imp
-    file_line_reader_t::file_line_reader_t(
-    ) noexcept
-    : _m_current_line_idx(0)
-    , _m_current_line("")
-    , _m_file_handler(std::unique_ptr<std::ifstream>())
-    , _m_file_name(file_name_with_extension_t{})
-    , _m_finished_reading(true)
-{
-
-}*/
 __constexpr_imp const std::u8string
                       file_line_reader_t::current_line() noexcept
 {
@@ -102,7 +102,7 @@ __constexpr_imp bool
 __constexpr_imp bool
     file_line_reader_t::get_next_line()
 {
-    using namespace errors;
+    using namespace _ABC_NS_ERRORS;
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
     bool _l_exit{true};
@@ -133,21 +133,26 @@ __constexpr_imp bool
         else if (_l_error_reading_file)
         {
             // Some other reading error.
-            _m_current_line = u8"";
+            _m_current_line     = u8"";
             _m_current_line_idx = 0;
             _m_finished_reading = true;
-            throw test_library_exception_t(fmt::format(
-                u8"Error encountered reading line {0} in file \"{1}\". "
-                u8"The fail bit of the file was set to {2} and the bad_bit of "
-                u8"the file was set to {3}",
-                _m_current_line_idx,
-                _m_file_name,
-                _l_file_hander.fail(),
-                _l_file_hander.bad()
-            ));
+            throw abc_test_exception_t(
+                {fmt::format(
+                    u8"Error encountered reading line {0} in file \"{1}\". "
+                    u8"The fail bit of the file was set to {2} and the bad_bit "
+                    u8"of "
+                    u8"the file was set to {3}",
+                    _m_current_line_idx,
+                    _m_file_name,
+                    _l_file_hander.fail(),
+                    _l_file_hander.bad()
+                )},
+                false
+            );
         }
         else if (_m_current_line.starts_with(
-                     global::get_this_threads_test_options().individual_io_based_test_options.comment_str
+                     global::get_this_threads_test_options()
+                         .individual_io_based_test_options.comment_str
                  ))
         {
             if (_m_finished_reading)

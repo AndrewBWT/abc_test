@@ -145,19 +145,23 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
             }
             else
             {
-                throw errors::test_library_exception_t(fmt::format(
-                    u8"Error encountered in file_data_generator_t<{0}> "
-                    u8"when reading file \"{1}\" at line {2}. Parser "
-                    u8"reported "
-                    u8"error \"{3}\".",
-                    type_id<T>(),
-                    (*_m_current_file_data)
-                        .general_data_file()
-                        .path()
-                        .u8string(),
-                    _m_line_reader.line_number(),
-                    _l_parsed_result.error()
-                ));
+                using namespace _ABC_NS_ERRORS;
+                throw abc_test_exception_t(
+                    {fmt::format(
+                        u8"Error encountered in file_data_generator_t<{0}> "
+                        u8"when reading file \"{1}\" at line {2}. Parser "
+                        u8"reported "
+                        u8"error \"{3}\".",
+                        type_id<T>(),
+                        (*_m_current_file_data)
+                            .general_data_file()
+                            .path()
+                            .u8string(),
+                        _m_line_reader.line_number(),
+                        _l_parsed_result.error()
+                    )},
+                    false
+                );
             }
         }
     }
@@ -165,7 +169,7 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
     __constexpr file_data_generator_t&
         operator=(
             const file_data_generator_t& _a_arg
-        ) // III. copy assignment
+        )
     {
         _m_files             = _a_arg._m_files;
         _m_position_data     = _a_arg._m_position_data;
@@ -429,15 +433,20 @@ __constexpr_imp void
             }
             else
             {
-                throw errors::test_library_exception_t(fmt::format(
-                    u8"Error encountered in file_data_generator_t<{0}> "
-                    u8"when reading file \"{1}\" at line {2}. Parser reported "
-                    u8"error \"{3}\".",
-                    type_id<T>(),
-                    _l_path.u8string(),
-                    _m_line_reader.line_number(),
-                    _l_parsed_result.error()
-                ));
+                using namespace _ABC_NS_ERRORS;
+                throw abc_test_exception_t(
+                    {fmt::format(
+                        u8"Error encountered in file_data_generator_t<{0}> "
+                        u8"when reading file \"{1}\" at line {2}. Parser "
+                        u8"reported "
+                        u8"error \"{3}\".",
+                        type_id<T>(),
+                        _l_path.u8string(),
+                        _m_line_reader.line_number(),
+                        _l_parsed_result.error()
+                    )},
+                    false
+                );
             }
         }
         else
@@ -496,26 +505,27 @@ __constexpr_imp bool
             }
             else
             {
-                throw errors::test_library_exception_t(fmt::format(
-                    u8"Error encountered in file_data_generator_t<{0}> "
-                    u8"when reading file \"{1}\" at line {2}. Parser reported "
-                    u8"error \"{3}\".",
-                    type_id<T>(),
-                    (*_m_current_file_data)
-                        .general_data_file()
-                        .path()
-                        .u8string(),
-                    _m_line_reader.line_number(),
-                    _l_parsed_result.error()
-                ));
+                using namespace _ABC_NS_ERRORS;
+                throw abc_test_exception_t(
+                    {fmt::format(
+                        u8"Error encountered in file_data_generator_t<{0}> "
+                        u8"when reading file \"{1}\" at line {2}. Parser "
+                        u8"reported "
+                        u8"error \"{3}\".",
+                        type_id<T>(),
+                        (*_m_current_file_data)
+                            .general_data_file()
+                            .path()
+                            .u8string(),
+                        _m_line_reader.line_number(),
+                        _l_parsed_result.error()
+                    )},
+                    false
+                );
             }
         }
         else
         {
-            /*
-    abc::utility::io::file_line_reader_t          _m_line_reader;
-    T                                             _m_element;
-            */
             ++_m_current_file_data;
             _m_position_data.file_index++;
             _m_position_data.element_index = 0;
@@ -534,24 +544,28 @@ __constexpr_imp bool
                 )};
                 if (_l_parsed_result.has_value())
                 {
-                    _m_element = _l_parsed_result.value();
+                    _m_element       = _l_parsed_result.value();
                     _l_element_found = true;
                 }
                 else
                 {
-                    throw errors::test_library_exception_t(fmt::format(
-                        u8"Error encountered in file_data_generator_t<{0}> "
-                        u8"when reading file \"{1}\" at line {2}. Parser "
-                        u8"reported "
-                        u8"error \"{3}\".",
-                        type_id<T>(),
-                        (*_m_current_file_data)
-                            .general_data_file()
-                            .path()
-                            .u8string(),
-                        _m_line_reader.line_number(),
-                        _l_parsed_result.error()
-                    ));
+                    using namespace _ABC_NS_ERRORS;
+                    throw abc_test_exception_t(
+                        {fmt::format(
+                            u8"Error encountered in file_data_generator_t<{0}> "
+                            u8"when reading file \"{1}\" at line {2}. Parser "
+                            u8"reported "
+                            u8"error \"{3}\".",
+                            type_id<T>(),
+                            (*_m_current_file_data)
+                                .general_data_file()
+                                .path()
+                                .u8string(),
+                            _m_line_reader.line_number(),
+                            _l_parsed_result.error()
+                        )},
+                        false
+                    );
                 }
             }
         }
@@ -566,25 +580,9 @@ __constexpr_imp const T&
 {
     return _m_element;
 }
-
 _END_ABC_DG_NS
 
 _BEGIN_ABC_NS
-
-/*template <typename T, typename R>
-requires std::same_as<std::ranges::range_value_t<R>, T>
-__constexpr_imp
-    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
-    read_data_from_file(
-        const std::string_view& _a_data_file_name,
-        R&&                     _a_init_list
-    )
-{
-    return read_data_from_file<T, R>(
-        gdf(_a_data_file_name), std::forward<R>(_a_init_list)
-    );
-}*/
-
 template <typename T, typename R, typename... Args>
 requires std::same_as<std::ranges::range_value_t<R>, T>
          && (
@@ -626,7 +624,8 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T> read_data_from_file(
         T>(make_shared<
            data_generator_with_file_support_t<file_data_generator_t<T>, false>>(
         file_data_generator_t<T>(
-            std::forward<R>(_a_init_data), std::forward<decltype(_l_fdns)>(_l_fdns)
+            std::forward<R>(_a_init_data),
+            std::forward<decltype(_l_fdns)>(_l_fdns)
         )
     ));
 }

@@ -40,10 +40,11 @@ _BEGIN_ABC_NS
 template <typename T, bool GLOT_Available = false>
 __no_constexpr int
     run_tests(
-        T&                                            _a_options,
-        simple_reporter_t&                            _a_simple_reporter,
-        const std::optional<_ABC_NS_UTILITY_CLI::cli_t<T>>& _a_cli = std::optional<_ABC_NS_UTILITY_CLI::cli_t<T>>{},
-        const ds::memoized_cli_history_t&             _a_cli_history
+        T&                                                  _a_options,
+        simple_reporter_t&                                  _a_simple_reporter,
+        const std::optional<_ABC_NS_UTILITY_CLI::cli_t<T>>& _a_cli
+        = std::optional<_ABC_NS_UTILITY_CLI::cli_t<T>>{},
+        const ds::memoized_cli_history_t& _a_cli_history
         = ds::memoized_cli_history_t()
     ) noexcept;
 
@@ -91,15 +92,17 @@ __no_constexpr_imp int
         }
         _l_threads.resize(_a_options.group_test_options.threads);
         size_t _l_current_thread_pool{_a_options.group_test_options.threads};
-        auto   _l_run_individual_test
-            = [&](const _ABC_NS_DS::post_setup_test_data_t& _a_prtd,
-                  const size_t                              _a_thread_idx,
-                  test_evaluator_t&                         _a_test_runner,
-                  const std::size_t                         _a_order_ran_id,
+        auto   _l_run_individual_test =
+            [&](const _ABC_NS_DS::post_setup_test_data_t& _a_prtd,
+                const size_t                              _a_thread_idx,
+                test_evaluator_t&                         _a_test_runner,
+                const std::size_t                         _a_order_ran_id,
                 test_framework_global_variable_set_t* _a_global_var_set_to_use)
         {
             // Get the thread runner
-            push_this_threads_test_runner_and_global_var_set(&_a_test_runner, _a_global_var_set_to_use);
+            push_this_threads_test_runner_and_global_var_set(
+                &_a_test_runner, _a_global_var_set_to_use
+            );
             test_evaluator_t& _l_threads_runner{
                 get_this_threads_test_evaluator_ref()
             };
@@ -110,7 +113,7 @@ __no_constexpr_imp int
                 _l_threads_runner.run_test(_a_prtd, _a_order_ran_id);
             }
             // Catch if its a library error.
-            catch (test_library_exception_t& _l_the)
+            catch (const abc_test_exception_t& _l_the)
             {
                 _LIBRARY_LOG(
                     MAIN_INFO, u8"Exception encountered when running test."
@@ -118,12 +121,7 @@ __no_constexpr_imp int
                 error_reporter_controller_t& _l_erc{
                     get_this_threads_error_reporter_controller()
                 };
-                const string_view _l_error{_l_the.what()};
-                _l_erc.report_error(setup_error_t(
-                    u8string(_l_error.begin(), _l_error.end()),
-                    true,
-                    _l_the.stacktrace()
-                ));
+                _l_erc.process_error(_l_the.internal_error());
             }
             catch (...)
             {
@@ -133,8 +131,8 @@ __no_constexpr_imp int
                 error_reporter_controller_t& _l_erc{
                     get_this_threads_error_reporter_controller()
                 };
-                _l_erc.report_error(setup_error_t(
-                    u8"Unknown exception thrown from test_runner_t.", true
+                _l_erc.process_error(abc_test_error_t(
+                    {u8"Unknown exception thrown from test_runner_t."}, true
                 ));
             }
             _LIBRARY_LOG(MAIN_INFO, "Test finished.");
@@ -177,7 +175,8 @@ __no_constexpr_imp int
         error_reporter_controller_t& _l_erc{
             get_this_threads_error_reporter_controller()
         };
-        test_reporter_controller_t& _l_trc{get_this_threads_test_reporter_controller()
+        test_reporter_controller_t& _l_trc{
+            get_this_threads_test_reporter_controller()
         };
         _LIBRARY_LOG(
             MAIN_INFO, "Adding test sets to local test_collection_t..."
