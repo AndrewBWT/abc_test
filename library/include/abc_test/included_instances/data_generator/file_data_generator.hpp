@@ -78,6 +78,43 @@ public:
 _END_ABC_UTILITY_PARSER_NS
 _BEGIN_ABC_DG_NS
 
+namespace detail
+{
+template <typename T>
+__constexpr std::vector<std::u8string>
+            file_data_generator_failure(
+                const std::u8string_view          _a_file_name,
+                const std::size_t                 _a_line_no,
+                const std::vector<std::u8string>& _a_error,
+                const std::size_t                 _a_index_where_error_occoured,
+                const std::u8string_view          _a_complete_str
+            )
+{
+    using namespace std;
+    using namespace _ABC_NS_UTILITY_STR;
+    vector<u8string> _l_rv;
+    _l_rv.push_back(fmt::format(
+        u8"Parser error encountered in file_data_generator_t<{0}> when "
+        u8"reading general data file "
+        u8"\"{1}\" at line {2}. "
+        u8"The parser reported the following error:",
+        type_id<T>(),
+        _a_file_name,
+        _a_line_no
+    ));
+    _l_rv.append_range(_a_error);
+    _l_rv.push_back(fmt::format(
+        u8"The remaining unparsed UTF8 string was \"{0}\".",
+        _a_complete_str.substr(_a_index_where_error_occoured)
+    ));
+    _l_rv.push_back(fmt::format(
+        u8"The complete UTF8 string given to the parser was \"{0}\".",
+        _a_complete_str
+    ));
+    return _l_rv;
+}
+} // namespace detail
+
 template <typename T>
 class file_data_generator_t
 {
@@ -124,6 +161,7 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
         , _m_index_rw_info(_a_arg._m_index_rw_info)
     {
         using namespace _ABC_NS_UTILITY_STR;
+        using namespace _ABC_NS_UTILITY_PARSER;
         _m_current_file_data = begin(_m_files);
         advance(_m_current_file_data, _m_position_data.file_index);
         if (_m_current_file_data != std::end(_m_files))
@@ -135,7 +173,7 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
             {
                 skip_lines(_m_position_data.element_index - 1);
             }
-            const result_t<T> _l_parsed_result{abc::utility::parser::parse(
+            const parser_result_t<T> _l_parsed_result{parse(
                 _m_line_reader.current_line(),
                 (*_m_current_file_data).rw_info().internal_parser
             )};
@@ -147,19 +185,16 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
             {
                 using namespace _ABC_NS_ERRORS;
                 throw abc_test_exception_t(
-                    {fmt::format(
-                        u8"Error encountered in file_data_generator_t<{0}> "
-                        u8"when reading file \"{1}\" at line {2}. Parser "
-                        u8"reported "
-                        u8"error \"{3}\".",
-                        type_id<T>(),
+                    detail::file_data_generator_failure<T>(
                         (*_m_current_file_data)
                             .general_data_file()
                             .path()
                             .u8string(),
                         _m_line_reader.line_number(),
-                        _l_parsed_result.error()
-                    )},
+                        _l_parsed_result.error().errors,
+                        _l_parsed_result.error().index_of_failure,
+                        _m_line_reader.current_line()
+                    ),
                     false
                 );
             }
@@ -182,13 +217,6 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
         skip_lines(_m_position_data.element_index);
         return *this;
     }
-
-    /*template <typename R>
-    __constexpr
-    file_data_generator_t(
-        const utility::io::general_data_with_rw_info_t<T>& _a_gdf,
-        R&&                                                _a_elements
-    );*/
     __constexpr void
         reset();
     __constexpr void
@@ -225,15 +253,6 @@ concept general_data_with_rw_info_creatable_c
 _END_ABC_DG_NS
 
 _BEGIN_ABC_NS
-/*template <typename T, typename R = std::initializer_list<T>>
-requires std::same_as<std::ranges::range_value_t<R>, T>
-__constexpr
-    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
-    read_data_from_file(
-        const std::string_view& _a_data_file_name,
-        R&&                     _a_init_list = R{}
-    );*/
-
 template <typename T, typename R, typename... Args>
 requires std::same_as<std::ranges::range_value_t<R>, T>
          && (abc::data_gen::detail::
@@ -250,24 +269,6 @@ requires (
 )
 __constexpr _ABC_NS_DG::data_generator_collection_t<T>
             read_data_from_file(Args&&... _a_file_elements);
-
-/*template <typename T, typename R = std::initializer_list<T>>
-requires std::same_as<std::ranges::range_value_t<R>, T>
-__constexpr
-    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
-    read_data_from_file(
-        const utility::io::general_data_t& _a_general_data_file,
-        R&&                                _a_init_list = R{}
-    );
-template <typename T, typename R = std::initializer_list<T>>
-requires std::same_as<std::ranges::range_value_t<R>, T>
-__constexpr
-    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
-    read_data_from_file(
-        const utility::io::general_data_with_rw_info_t<T>& _a_general_data_file,
-        R&&                                                _a_init_list = R{}
-    );
-    */
 _END_ABC_NS
 
 _BEGIN_ABC_DG_NS
@@ -284,11 +285,11 @@ __constexpr_imp void
         const file_data_generator_t<T>::tertiary_type& _a_tertiary_data
     )
 {
-    if (_a_tertiary_data.file_index != _m_position_data.file_index)
+    // if (_a_tertiary_data.file_index != _m_position_data.file_index)
     {
         reset_file(_a_tertiary_data.file_index);
+        _m_position_data.element_index = 0;
     }
-    _m_position_data.element_index = 0;
     if (_a_tertiary_data.element_index != _m_position_data.element_index)
     {
         skip_lines(
@@ -304,33 +305,6 @@ __constexpr_imp void
         );
     }
 }
-
-/*template <typename T>
-template <typename R>
-__constexpr_imp
-    file_data_generator_t<T>::file_data_generator_t(
-        const utility::io::general_data_t& _a_gdf,
-        R&&                                _a_elements
-    )
-    : _m_path(abc::utility::io::normalise_for_file_use(_a_gdf.path().u8string())
-      )
-{
-    using namespace abc::utility::io;
-    using namespace std::filesystem;
-    std::error_code ec;
-    if (not std::filesystem::exists(_m_path, ec))
-    {
-        file_line_writer_t _l_flw(_m_path);
-        _l_flw.write_comment(type_id<T>());
-        for (auto&& _l_element : _a_elements)
-        {
-            _l_flw.write_line(
-                _m_element_rw_info.internal_printer->run_printer(_l_element)
-            );
-        }
-    }
-    reset_file();
-}*/
 template <typename T>
 template <typename R>
 __constexpr_imp
@@ -364,35 +338,6 @@ __constexpr_imp
     reset_file();
 }
 
-/*template <typename T>
-template <typename R>
-__constexpr_imp
-    file_data_generator_t<T>::file_data_generator_t(
-        const utility::io::general_data_with_rw_info_t<T>& _a_gdf,
-        R&&                                                _a_elements
-    )
-    : _m_files(_a_gdf)
-{
-    using namespace abc::utility::io;
-    using namespace std::filesystem;
-    for (auto& _l_element : _m_files)
-    {
-        auto& _l_path{ _l_element.general_data_file() };
-        if (not exists(_l_path))
-        {
-            file_line_writer_t _l_flw(_l_path);
-            _l_flw.write_comment(type_id<T>());
-            for (auto&& _l_element : _a_elements)
-            {
-                _l_flw.write_line(
-                    _m_element_rw_info.internal_printer->run_printer(_l_element)
-                );
-            }
-        }
-    }
-    reset_file();
-}*/
-
 template <typename T>
 __constexpr_imp void
     file_data_generator_t<T>::reset()
@@ -410,6 +355,7 @@ __constexpr_imp void
     using namespace std;
     using namespace abc::utility::io;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace _ABC_NS_UTILITY_PARSER;
     _m_current_file_data = begin(_m_files);
     std::advance(_m_current_file_data, _a_file_index);
     _m_position_data.file_index    = _a_file_index;
@@ -422,7 +368,7 @@ __constexpr_imp void
         if (_m_line_reader.has_current_line())
         {
             ++_m_position_data.element_index;
-            const result_t<T> _l_parsed_result{abc::utility::parser::parse(
+            const parser_result_t<T> _l_parsed_result{parse(
                 _m_line_reader.current_line(),
                 (*_m_current_file_data).rw_info().internal_parser
             )};
@@ -435,16 +381,16 @@ __constexpr_imp void
             {
                 using namespace _ABC_NS_ERRORS;
                 throw abc_test_exception_t(
-                    {fmt::format(
-                        u8"Error encountered in file_data_generator_t<{0}> "
-                        u8"when reading file \"{1}\" at line {2}. Parser "
-                        u8"reported "
-                        u8"error \"{3}\".",
-                        type_id<T>(),
-                        _l_path.u8string(),
+                    detail::file_data_generator_failure<T>(
+                        (*_m_current_file_data)
+                            .general_data_file()
+                            .path()
+                            .u8string(),
                         _m_line_reader.line_number(),
-                        _l_parsed_result.error()
-                    )},
+                        _l_parsed_result.error().errors,
+                        _l_parsed_result.error().index_of_failure,
+                        _m_line_reader.current_line()
+                    ),
                     false
                 );
             }
@@ -488,13 +434,14 @@ __constexpr_imp bool
     file_data_generator_t<T>::generate_next()
 {
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace _ABC_NS_UTILITY_PARSER;
     bool _l_element_found{false};
     do
     {
         if (_m_line_reader.get_next_line())
         {
             ++_m_position_data.element_index;
-            const result_t<T> _l_parsed_result{abc::utility::parser::parse(
+            const parser_result_t<T> _l_parsed_result{parse(
                 _m_line_reader.current_line(),
                 (*_m_current_file_data).rw_info().internal_parser
             )};
@@ -507,19 +454,16 @@ __constexpr_imp bool
             {
                 using namespace _ABC_NS_ERRORS;
                 throw abc_test_exception_t(
-                    {fmt::format(
-                        u8"Error encountered in file_data_generator_t<{0}> "
-                        u8"when reading file \"{1}\" at line {2}. Parser "
-                        u8"reported "
-                        u8"error \"{3}\".",
-                        type_id<T>(),
+                    detail::file_data_generator_failure<T>(
                         (*_m_current_file_data)
                             .general_data_file()
                             .path()
                             .u8string(),
                         _m_line_reader.line_number(),
-                        _l_parsed_result.error()
-                    )},
+                        _l_parsed_result.error().errors,
+                        _l_parsed_result.error().index_of_failure,
+                        _m_line_reader.current_line()
+                    ),
                     false
                 );
             }
@@ -538,7 +482,7 @@ __constexpr_imp bool
             );
             if (_m_line_reader.has_current_line())
             {
-                const result_t<T> _l_parsed_result{abc::utility::parser::parse(
+                const parser_result_t<T> _l_parsed_result{parse(
                     _m_line_reader.current_line(),
                     (*_m_current_file_data).rw_info().internal_parser
                 )};
@@ -551,19 +495,16 @@ __constexpr_imp bool
                 {
                     using namespace _ABC_NS_ERRORS;
                     throw abc_test_exception_t(
-                        {fmt::format(
-                            u8"Error encountered in file_data_generator_t<{0}> "
-                            u8"when reading file \"{1}\" at line {2}. Parser "
-                            u8"reported "
-                            u8"error \"{3}\".",
-                            type_id<T>(),
+                        detail::file_data_generator_failure<T>(
                             (*_m_current_file_data)
                                 .general_data_file()
                                 .path()
                                 .u8string(),
                             _m_line_reader.line_number(),
-                            _l_parsed_result.error()
-                        )},
+                            _l_parsed_result.error().errors,
+                            _l_parsed_result.error().index_of_failure,
+                            _m_line_reader.current_line()
+                        ),
                         false
                     );
                 }
@@ -580,6 +521,7 @@ __constexpr_imp const T&
 {
     return _m_element;
 }
+
 _END_ABC_DG_NS
 
 _BEGIN_ABC_NS
@@ -644,42 +586,4 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
         initializer_list<T>{}, _a_file_elements...
     );
 }
-
-/*template <typename T, typename R>
-requires std::same_as<std::ranges::range_value_t<R>, T>
-__constexpr_imp
-    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
-    read_data_from_file(
-        const utility::io::general_data_t& _a_general_data_file,
-        R&&                                _a_init_list
-    )
-{
-    using namespace std;
-    using namespace _ABC_NS_DG;
-    return read_data_from_file(
-        utility::io::general_data_with_rw_info_t(
-            _a_general_data_file, _ABC_NS_UTILITY::str::rw_info_t<T>()
-        ),
-        _a_init_list
-    );
-}
-
-template <typename T, typename R>
-requires std::same_as<std::ranges::range_value_t<R>, T>
-__constexpr_imp
-    _ABC_NS_DG::data_generator_collection_t<std::ranges::range_value_t<R>>
-    read_data_from_file(
-        const utility::io::general_data_with_rw_info_t<T>& _a_general_data_file,
-        R&&                                                _a_init_list
-    )
-{
-    using namespace std;
-    using namespace _ABC_NS_DG;
-    return unary_collection<
-        T>(make_shared<
-           data_generator_with_file_support_t<file_data_generator_t<T>, false>>(
-        file_data_generator_t<T>(_a_general_data_file, _a_init_list)
-    ));
-}*/
-
 _END_ABC_NS

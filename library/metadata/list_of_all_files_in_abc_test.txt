@@ -86,6 +86,7 @@ G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/matchers/l
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/core/matchers/source_map.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/included_instances/matchers/ranges.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/included_instances/matchers/str.hpp
+G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/included_instances/matchers/tuple.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/included_instances/matchers/source.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/included_instances/data_generator/manual_data_generator.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/included_instances/data_generator/file_data_generator.hpp

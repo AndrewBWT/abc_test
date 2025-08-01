@@ -246,23 +246,21 @@ public:
     {
         using namespace std;
         using namespace _ABC_NS_UTILITY_STR;
+        using namespace _ABC_NS_UTILITY_PARSER;
         tuple<
             u8string,
             auto_configuration_load_configuration_t,
             enum_auto_configuration_write_to_file_t>
             _l_rep_data{};
         get<0>(_l_rep_data) = _a_args[0];
-        abc::result_t<auto_configuration_load_configuration_t> _l_rfli{
-            abc::utility::parser::parse<
-                auto_configuration_load_configuration_t>(_a_args[1])
+        parser_result_t<auto_configuration_load_configuration_t> _l_rfli{
+            parse<auto_configuration_load_configuration_t>(_a_args[1])
         };
-        abc::result_t<enum_auto_configuration_write_to_file_t> _l_rf{
-            abc::utility::parser::parse<
-                enum_auto_configuration_write_to_file_t>(
+        parser_result_t<enum_auto_configuration_write_to_file_t> _l_rf{
+            parse<enum_auto_configuration_write_to_file_t>(
                 _a_args[2],
-                abc::utility::parser::mk_parser(
-                    utility::parser::default_parser_t<
-                        enum_auto_configuration_write_to_file_t>(
+                mk_parser(
+                    default_parser_t<enum_auto_configuration_write_to_file_t>(
                         enum_helper_string_type_e::lower
                     )
                 )
@@ -273,7 +271,7 @@ public:
             _a_cli_results.add_error(fmt::format(
                 u8"Error parsing {0}. Parser reported error: \"{1}\".",
                 type_id<auto_configuration_load_configuration_t>(),
-                _l_rfli.error()
+                _l_rfli.error().errors
             ));
             return true;
         }
@@ -282,7 +280,7 @@ public:
             _a_cli_results.add_error(fmt::format(
                 u8"Error parsing {0}. Parser reported error: \"{1}\".",
                 type_id<enum_auto_configuration_write_to_file_t>(),
-                _l_rf.error()
+                _l_rf.error().errors
             ));
             return true;
         }

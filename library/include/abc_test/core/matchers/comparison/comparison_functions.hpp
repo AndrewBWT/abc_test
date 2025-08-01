@@ -118,7 +118,7 @@ __constexpr matcher_result_t
     );
 }
 
-template <typename T1, typename T2, comparison_enum_t Cmp>
+template <comparison_enum_t Cmp, typename T1, typename T2>
 struct matcher_default_comparable_t
 {
 public:
@@ -129,11 +129,11 @@ public:
 
 template <typename T1, typename T2, comparison_enum_t Cmp>
 concept is_matcher_default_comparable_c
-    = (matcher_default_comparable_t<T1, T2, Cmp>::is_specialized == true);
+    = (matcher_default_comparable_t<Cmp, T1, T2>::is_specialized == true);
 
-template <typename T1, typename T2, comparison_enum_t Cmp>
+template <comparison_enum_t Cmp, typename T1, typename T2>
 __constexpr matcher_result_t
-    matcher_default_comparable_t<T1, T2, Cmp>::run(
+    matcher_default_comparable_t<Cmp, T1, T2>::run(
         const T1& _a_arg1,
         const T2& _a_arg2
     ) const
@@ -191,10 +191,13 @@ __constexpr_imp matcher_t
                       Cmp_Enum>)
     {
         _l_mr = matcher_default_comparable_t<
+                    Cmp_Enum,
                     Stripped_Type_T1,
-                    Stripped_Type_T2,
-                    Cmp_Enum>()
-                    .run(std::forward<T1>(_a_left_arg), std::forward<T2>(_a_right_arg));
+                    Stripped_Type_T2>()
+                    .run(
+                        std::forward<T1>(_a_left_arg),
+                        std::forward<T2>(_a_right_arg)
+                    );
     }
     else
     {

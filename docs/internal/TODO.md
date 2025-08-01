@@ -30,6 +30,7 @@
 27 - Go through each of our examples and test files. Make a note of where strings are used, and determine whether there are u8string overloads for them. Once that is done, come up with a list of all functions which require a u8string or std::string overload. Add those functions which need to be written to the todo list.
 29 - Write repetition config test for enum generator.
 30 - Write repetition config test for random generator.
+31 - matcher_default_comparable_t needs to be had a look at, and made consistent across all the data types we want to write instances for.
 
 ## Longer Term Focus ##
 
@@ -39,7 +40,7 @@
 
 ## Not Currently a Focus ##
 
-1 - Run clang-tidy on the code. Also consider other programs, and add warnings when building from the three major compilers. Tried this in VS, got some odd results - specifically results from the fmt library. Think we'll have to try it under Ubuntu.
+1 - Run clang-tidy on the code. Also consider other static analyzers, and add warnings when building from the three major compilers. Tried this in VS, got some odd results - specifically results from the fmt library. Think we'll have to try it under Ubuntu.
 	- One of the issues appears to be that our dependencies are publicly available. This causes clang-tidy to run on fmt. To fix this, it would be best to only use fmt privately - so not exposed outside of our code. This would mean moving all fmt code to a cpp file. Instead we think we'll just ignore the fmt results for now.
 	- We have a script which puts all the source files we use into a text file. A script is then run, running clang-tidy on all of the elements in that list. While a good start, we ran into issues running this on Windows - primarily the different clang-tidy versions in Cygwin and VS causes issues. We couldn't run clang-tidy directly from VS as it won't let us put our headers in.
 	- Our next effort was a VM, running Ubuntu. We got that working, however clang-tidy was then throwing errors complaining about files it could not find.
@@ -97,6 +98,7 @@ for (auto&& [validator, input] : data_validator<char,int>(gdf("hello"), random_g
 39 - Write comparison checks for generic ranges - so expressions like _CHECK_EXPR(vect == {1,2,3}) can be written.
 40 - File tests with bootstrapped abc_test pose an issue. We want to ensure that any temporary files are deleted after they are created. We can either link every created file to a run of abc_test, and have an option which allows them to be deleted when the test_main is exited. Such an option could be useful for those running abc_test in production code; e.g. to check the changes that a run would make before the run is made.
 41 - data generator's tertiary data needs to match exactly to what the internal printer will produce. For example, if we manually set the tertiary data of a file_data_generator to "(0,0)" it will be read correctly. But as it sets its current teritary data value using the print function for that data generator, "(0, 0)" will be produced. As they do not match, the linear search will fail to find the correct value, resulting in incorrect results. This should be addressed. Either normalization, or a "strict" version of the printer/parser combo which won't allow "(0,0)", only allowing "(0, 0"). The former is easier (parse then print again). The latter is less computationally expensive.
+42 - file_data_generator, when working with tertiary data, currently works as follows: re-loads the correct file, skips lines to that index. It can be more efficient. 
 
 ## Information
 

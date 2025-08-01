@@ -54,7 +54,7 @@ public:
             {
                 using namespace abc::utility::parser;
                 using namespace _ABC_NS_ERRORS;
-                const result_t<map_type_t> _l_read_element{
+                const parser_result_t<map_type_t> _l_read_element{
                     parse(_l_flr.current_line(), _m_element_parser)
                 };
                 if (_l_read_element.has_value())
@@ -94,19 +94,20 @@ public:
                 }
                 else
                 {
-                    throw abc_test_exception_t(
-                        {fmt::format(
-                            u8"{0} could not parse line \"{1}\" of file {2}, "
-                            u8"which "
-                            u8"should "
-                            u8"contain a parsable entity of type {3}.",
-                            type_id<decltype(*this)>(),
-                            _l_flr.current_line(),
-                            _m_file_name.u8string(),
-                            type_id<map_type_t>()
-                        )},
-                        false
-                    );
+                    vector<u8string> _l_errors;
+                    _l_errors.push_back(fmt::format(
+                        u8"{0} could not parse line \"{1}\" of file {2}, "
+                        u8"which "
+                        u8"should "
+                        u8"contain a parsable entity of type {3}. The "
+                        u8"parser gave the following error:",
+                        type_id<decltype(*this)>(),
+                        _l_flr.current_line(),
+                        _m_file_name.u8string(),
+                        type_id<map_type_t>()
+                    ));
+                    _l_errors.append_range(_l_read_element.error().errors);
+                    throw abc_test_exception_t(_l_errors, false);
                 }
                 _l_flr.get_next_line();
                 ++_l_line_idx;

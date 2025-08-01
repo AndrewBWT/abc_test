@@ -43,7 +43,7 @@ if(NOT DEFINED ABC_TEST_TESTS_INCLUDED)
     include/abc_test_test/core/ds/test_data/user_defined_test_data.hpp
         src/main.cpp
     include/abc_test_test/core.hpp
-    include/abc_test_test/core/errors/test_library_exception.hpp
+    include/abc_test_test/core/errors/abc_test_exception.hpp
     # Contains simple random generator for testing randomly generated data.
     include/abc_test_test/testing_utilities/simple_random_generator.hpp
     include/abc_test_test/testing_utilities/functions.hpp

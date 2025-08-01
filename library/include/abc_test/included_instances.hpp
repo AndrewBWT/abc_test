@@ -20,4 +20,5 @@
 #include "abc_test/included_instances/utility/limits/fundamental_types.hpp"
 #include "abc_test/included_instances/utility/limits/vector.hpp"
 #include "abc_test/included_instances/data_generator/random_generator/enumeration_based_random_generator_object.hpp"
+#include "abc_test/included_instances/matchers/tuple.hpp"
 #include "abc_test/included_instances/data_generator/random_generator/random_generator_function.hpp"

@@ -135,9 +135,9 @@ __constexpr matcher_t
         {
             auto _l_result{
                 abc::matcher::matcher_default_comparable_t<
+                    abc::matcher::comparison_enum_t::EQ,
                     T,
-                    T,
-                    abc::matcher::comparison_enum_t::EQ>{}
+                    T>{}
                     .run(_l_value_to_check_against.value(), _l_element)
             };
             if (not _l_result.passed())

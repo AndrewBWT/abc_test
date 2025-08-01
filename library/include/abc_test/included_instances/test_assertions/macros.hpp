@@ -524,9 +524,9 @@ __no_constexpr_imp matcher_t
     {
         auto _l_str_result{
             abc::matcher::matcher_default_comparable_t<
+                abc::matcher::comparison_enum_t::EQ,
                 u8string_view,
-                u8string_view,
-                abc::matcher::comparison_enum_t::EQ>{}
+                u8string_view>{}
                 .run(_a_msg, cast_string_to_u8string(_a_exception.what()))
         };
         if (_l_str_result.passed())
@@ -602,9 +602,9 @@ __no_constexpr_imp matcher_t
     using namespace _ABC_NS_UTILITY_STR;
     auto _l_str_result{
         abc::matcher::matcher_default_comparable_t<
+            abc::matcher::comparison_enum_t::EQ,
             u8string_view,
-            u8string_view,
-            abc::matcher::comparison_enum_t::EQ>{}
+            u8string_view>{}
             .run(_a_msg, cast_string_to_u8string(_a_exception.what()))
     };
     if (_l_str_result.passed())

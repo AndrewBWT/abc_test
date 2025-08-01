@@ -9,9 +9,9 @@
 #include <filesystem>
 #include <fmt/xchar.h>
 #include <functional>
-#include <variant>
-
 #include <random>
+#include <unordered_map>
+#include <variant>
 
 _BEGIN_ABC_UTILITY_PARSER_NS
 
@@ -65,18 +65,38 @@ struct default_parser_t<bool> : public parser_base_t<bool>
                     parser_input_t& _a_parse_input
                 ) const
     {
+        using namespace _ABC_NS_UTILITY_STR;
         using namespace std;
         if (_a_parse_input.check_and_advance(U"true"))
         {
-            return result_t<bool>(true);
+            return true;
         }
         else if (_a_parse_input.check_and_advance(U"false"))
         {
-            return result_t<bool>(false);
+            return false;
         }
         else
         {
-            return result_t<bool>(u8"Couldn't parse bool");
+            u8string _l_next_char;
+            if (_a_parse_input.at_end())
+            {
+                _l_next_char
+                    = u8"The parser was at the end of the UTF8 string.";
+            }
+            else
+            {
+                _l_next_char = fmt::format(
+                    u8"Instead, the next character the parser encountered was "
+                    u8"\"{0}\".",
+                    unicode_char_to_u8string(_a_parse_input.peek_char())
+                );
+            }
+            return unexpected(fmt::format(
+                u8"Parser expected to see either \"true\" or "
+                u8"\"false\", however "
+                u8"these UTF8 strings were not found. {0}",
+                _l_next_char
+            ));
         }
     }
 };
@@ -86,6 +106,7 @@ requires abc::utility::enum_has_list_c<T>
 struct default_parser_t<T> : public parser_base_t<T>
 {
     using value_type_t = T;
+
     default_parser_t(
         const enum_helper_string_type_e _a_enum_helper_string_case
         = enum_helper_string_type_e::unchanged
@@ -104,12 +125,17 @@ struct default_parser_t<T> : public parser_base_t<T>
             .parse_enum(_a_parse_input, _m_enum_helper_string_case);
     }
 };
+
 template <typename T>
-    requires enum_has_list_c<T>
+requires enum_has_list_c<T>
 __constexpr default_parser_t<T>
-make_default_parser(enum_helper_string_type_e case_type) {
+            make_default_parser(
+                enum_helper_string_type_e case_type
+            )
+{
     return default_parser_t<T>(case_type);
 }
+
 template <typename T>
 struct character_parser_t : public parser_base_t<T>
 {
@@ -910,6 +936,10 @@ struct default_parser_t<std::basic_string<T>>
                             }
                         }
                         break;
+                    case U'n':
+                        _a_parse_input.advance(2);
+                        _l_add_str_func(U"\n");
+                        break;
                     case U'"':
                     case U'\\':
                     {
@@ -1262,7 +1292,7 @@ struct default_parser_t<std::variant<Ts...>>
     )
         : _m_enum_variant_print_parse(_a_enum_variant_print_parse)
         , _m_parsers(std::make_tuple(mk_parser(default_parser_t<Ts>())...))
-        
+
     {}
 
     __constexpr
@@ -1276,7 +1306,8 @@ struct default_parser_t<std::variant<Ts...>>
 
     __constexpr
     default_parser_t()
-   // requires (std::is_default_constructible_v<default_parser_t<Ts>> && ...)
+        // requires (std::is_default_constructible_v<default_parser_t<Ts>> &&
+        // ...)
         : _m_parsers(std::make_tuple(mk_parser(default_parser_t<Ts>())...))
     {}
 
@@ -1365,8 +1396,7 @@ struct default_parser_t<std::shared_ptr<T>>
         const enum_pointer_print_parse_type_t _a_enum
         = enum_pointer_print_parse_type_t::AS_OBJECT
     )
-        : _m_enum(_a_enum)
-        , _m_parser(_a_parser)
+        : _m_enum(_a_enum), _m_parser(_a_parser)
     {}
 
     __constexpr
@@ -1411,7 +1441,9 @@ template <>
 struct default_parser_t<std::monostate> : public parser_base_t<std::monostate>
 {
     __constexpr virtual result_t<std::monostate>
-        run_parser(parser_input_t& _a_parse_input) const
+        run_parser(
+            parser_input_t& _a_parse_input
+        ) const
     {
         if (_a_parse_input.check_and_advance(u8"std::monostate"))
         {
@@ -1428,7 +1460,9 @@ template <>
 struct default_parser_t<std::mt19937_64> : public parser_base_t<std::mt19937_64>
 {
     __constexpr virtual result_t<std::mt19937_64>
-        run_parser(parser_input_t& _a_parse_input) const
+        run_parser(
+            parser_input_t& _a_parse_input
+        ) const
     {
         if (_a_parse_input.check_and_advance(u8"std::mt19937_64"))
         {

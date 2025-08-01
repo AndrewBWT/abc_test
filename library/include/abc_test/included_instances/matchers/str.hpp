@@ -457,11 +457,11 @@ __constexpr_imp matcher_t
 _END_ABC_NS
 _BEGIN_ABC_MATCHER_NS
 
-template <typename T, comparison_enum_t Cmp>
+template <comparison_enum_t Cmp, typename T>
 struct matcher_default_comparable_t<
+    Cmp,
     std::basic_string_view<T>,
-    std::basic_string_view<T>,
-    Cmp>
+    std::basic_string_view<T>>
 {
 public:
     static constexpr bool is_specialized{true};
@@ -488,11 +488,11 @@ public:
     }
 };
 
-template <typename T, comparison_enum_t Cmp>
+template <comparison_enum_t Cmp, typename T>
 struct matcher_default_comparable_t<
+    Cmp,
     std::basic_string<T>,
-    std::basic_string<T>,
-    Cmp>
+    std::basic_string<T>>
 {
 public:
     static constexpr bool is_specialized{true};
@@ -505,18 +505,18 @@ public:
     {
         using namespace std;
         return matcher_default_comparable_t<
+                   Cmp,
                    basic_string_view<T>,
-                   basic_string_view<T>,
-                   Cmp>{}
+                   basic_string_view<T>>{}
             .run(_a_arg1, _a_arg2);
     }
 };
 
-template <typename T, typename U, comparison_enum_t Cmp>
+template <comparison_enum_t Cmp, typename T, typename U>
 struct matcher_default_comparable_t<
+    Cmp,
     std::expected<T, U>,
-    std::expected<T, U>,
-    Cmp>
+    std::expected<T, U>>
 {
 public:
     static constexpr bool is_specialized{true};
@@ -545,14 +545,14 @@ public:
         };
         if (_a_arg1.has_value() && _a_arg2.has_value())
         {
-            _l_result = matcher_default_comparable_t<T, T, Cmp>().run(
+            _l_result = matcher_default_comparable_t<Cmp, T, T>().run(
                 _a_arg1.value(), _a_arg2.value()
             );
             _l_same_type_explanation_func(1);
         }
         else if (not (_a_arg1.has_value()) && not (_a_arg2.has_value()))
         {
-            _l_result = matcher_default_comparable_t<U, U, Cmp>().run(
+            _l_result = matcher_default_comparable_t<Cmp, U, U>().run(
                 _a_arg1.error(), _a_arg2.error()
             );
             _l_same_type_explanation_func(2);

@@ -40,7 +40,10 @@ public:
         u32string _l_str;
         while (_l_itt_cpy < _m_end_itt && _l_idx < _a_size)
         {
-            auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(_l_itt_cpy,_m_end_itt) };
+            auto _l_char_res{
+                _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<
+                    false>(_l_itt_cpy, _m_end_itt)
+            };
             if (_l_char_res.has_value())
             {
                 _l_str.push_back(_l_char_res.value());
@@ -60,9 +63,16 @@ public:
     __no_constexpr std::u32string
                    continue_until_char(const char32_t _a_char1) noexcept;
     __constexpr void
-                         advance(const std::size_t _a_new_itereator) noexcept;
-    __constexpr const    std::u8string_view
-                         get_u8string() const noexcept;
+                      advance(const std::size_t _a_new_itereator) noexcept;
+    __constexpr const std::u8string_view
+                      get_u8string() const noexcept;
+
+    __constexpr const std::u8string_view
+                      complete_string() const noexcept
+    {
+        return _m_complete_string;
+    }
+
     __constexpr const    std::u8string_view
                          get_u8string(const std::size_t _a_size) const noexcept;
     __no_constexpr const std::u32string
@@ -75,6 +85,13 @@ public:
         take_string_containing(const std::u32string_view _a_str) noexcept;
     __constexpr std::size_t
                 size() const noexcept;
+
+    __constexpr std::size_t
+                index() const noexcept
+    {
+        return std::distance(std::begin(_m_complete_string), _m_cur_itt);
+    }
+
     __no_constexpr char32_t
         operator*() const noexcept;
     __constexpr parser_input_t&
@@ -117,8 +134,6 @@ parser_input_t::parser_input_t(
     _m_cur_itt = _m_complete_string.begin();
     _m_end_itt = _m_complete_string.end();
 }
-
-
 
 __constexpr void
     parser_input_t::check_advance_and_throw(
@@ -187,7 +202,11 @@ __no_constexpr_imp std::u32string
     size_t    _l_idx{0};
     while (_m_cur_itt < _m_end_itt && _l_idx < _a_max_size)
     {
-        auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(_m_cur_itt,_m_end_itt) };
+        auto _l_char_res{
+            _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(
+                _m_cur_itt, _m_end_itt
+            )
+        };
         if (_l_char_res.has_value())
         {
             _l_str.push_back(_l_char_res.value());
@@ -204,9 +223,9 @@ __constexpr char32_t
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
-    const optional<pair<char32_t, size_t>> _l_char_opt{next_char32_t<false>(
-        (_m_cur_itt + _a_offset), _m_end_itt
-    )};
+    const optional<pair<char32_t, size_t>> _l_char_opt{
+        next_char32_t<false>((_m_cur_itt + _a_offset), _m_end_itt)
+    };
     return _l_char_opt.value().first;
 }
 
@@ -222,9 +241,7 @@ __no_constexpr_imp std::u32string
     vector<size_t> _l_sizes;
     while (_m_cur_itt < _m_end_itt)
     {
-        const auto _l_char_opt{next_char32_t<false>(
-            _m_cur_itt, _m_end_itt
-        )};
+        const auto _l_char_opt{next_char32_t<false>(_m_cur_itt, _m_end_itt)};
         if (_l_char_opt.has_value())
         {
             const auto& [_l_char, _l_size]{_l_char_opt.value()};
@@ -258,8 +275,12 @@ __no_constexpr_imp std::u32string
     size_t    _l_idx{0};
     while (_m_cur_itt < _m_end_itt)
     {
-        char32_t _l_char{ U'\0' };
-        auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(_m_cur_itt,_m_end_itt) };
+        char32_t _l_char{U'\0'};
+        auto     _l_char_res{
+            _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(
+                _m_cur_itt, _m_end_itt
+            )
+        };
         if (_l_char_res.has_value())
         {
             _l_char = _l_char_res.value();
@@ -315,8 +336,11 @@ __constexpr bool
     {
         if (_l_curr_itt_cpy < _m_end_itt)
         {
-            char32_t _l_char{ U'\0' };
-            auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(_l_curr_itt_cpy,_m_end_itt) };
+            char32_t _l_char{U'\0'};
+            auto     _l_char_res{
+                _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<
+                        false>(_l_curr_itt_cpy, _m_end_itt)
+            };
             if (_l_char_res.has_value())
             {
                 _l_char = _l_char_res.value();
@@ -349,14 +373,20 @@ __constexpr bool
     {
         if (_l_curr_itt_cpy < _m_end_itt)
         {
-            char32_t _l_char{ U'\0' };
-            auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(_l_curr_itt_cpy,_m_end_itt) };
+            char32_t _l_char{U'\0'};
+            auto     _l_char_res{
+                _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<
+                        false>(_l_curr_itt_cpy, _m_end_itt)
+            };
             if (_l_char_res.has_value())
             {
                 _l_char = _l_char_res.value();
             }
-            char32_t _l_char_to_check{ U'\0' };
-            auto _l_char_res_2{ _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(_l_itt,_l_end) };
+            char32_t _l_char_to_check{U'\0'};
+            auto     _l_char_res_2{
+                _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<
+                        false>(_l_itt, _l_end)
+            };
             if (_l_char_res_2.has_value())
             {
                 _l_char_to_check = _l_char_res_2.value();
@@ -383,11 +413,13 @@ __constexpr void
     size_t _l_idx{0};
     while (_m_cur_itt < _m_end_itt && _l_idx < _a_new_itereator)
     {
-
-        auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(_m_cur_itt,_m_end_itt) };
+        auto _l_char_res{
+            _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(
+                _m_cur_itt, _m_end_itt
+            )
+        };
         if (_l_char_res.has_value())
         {
-
         }
         ++_l_idx;
     }
@@ -439,10 +471,12 @@ __no_constexpr_imp const std::u32string
 
     while (_m_cur_itt < _m_end_itt)
     {
-        auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t<false>(_m_cur_itt,_m_end_itt) };
+        auto _l_char_res{
+            _ABC_NS_UTILITY_STR::next_char32_t<false>(_m_cur_itt, _m_end_itt)
+        };
         if (_l_char_res.has_value())
         {
-            char32_t _l_char{ _l_char_res.value().first };
+            char32_t _l_char{_l_char_res.value().first};
             if (_a_str.contains(_l_char))
             {
                 _l_rv.push_back(_l_char);
@@ -470,7 +504,9 @@ __constexpr std::size_t
 __no_constexpr_imp char32_t
     parser_input_t::operator*() const noexcept
 {
-    auto _l_char_res{ _ABC_NS_UTILITY_STR::next_char32_t<false>(_m_cur_itt,_m_end_itt) };
+    auto _l_char_res{
+        _ABC_NS_UTILITY_STR::next_char32_t<false>(_m_cur_itt, _m_end_itt)
+    };
     if (_l_char_res.has_value())
     {
         return _l_char_res.value().first;

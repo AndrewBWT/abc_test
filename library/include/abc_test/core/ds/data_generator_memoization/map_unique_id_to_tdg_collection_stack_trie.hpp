@@ -2,9 +2,9 @@
 #include "abc_test/core/ds/data_generator_memoization/typeless_data_generator_collection_stack_trie.hpp"
 #include "abc_test/utility/parsers/default_parser.hpp"
 #include "abc_test/utility/printers/default_printer.hpp"
+#include "abc_test/utility/types.hpp"
 
 #include <cuchar>
-#include "abc_test/utility/types.hpp"
 
 _BEGIN_ABC_DS_NS
 class map_unique_id_to_tdg_collection_stack_trie_t;
@@ -170,7 +170,7 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
         using namespace abc::utility::parser;
         using namespace abc::ds;
         auto& [_l_str_hex, _l_compressed_str]{_l_strs[_l_idx]};
-        const result_t<typeless_data_generator_collection_stack_trie_t>
+        const parser_result_t<typeless_data_generator_collection_stack_trie_t>
                  _l_compressed_scan_result{parse(
                 _l_compressed_str,
                 mk_parser(
@@ -204,7 +204,7 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
                 u8"internal parser returned error message \"{2}\".",
                 _l_compressed_str,
                 (_l_idx + 1),
-                _l_compressed_scan_result.error()
+                _l_compressed_scan_result.error().errors
             ));
         }
     }

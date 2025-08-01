@@ -112,6 +112,7 @@ if(NOT DEFINED ABC_TEST_LIBRARY_INCLUDED)
     # Matcher subfolder. Code contains logic for assertions written using the stl.
     include/abc_test/included_instances/matchers/ranges.hpp
     include/abc_test/included_instances/matchers/str.hpp
+	include/abc_test/included_instances/matchers/tuple.hpp
     include/abc_test/included_instances/matchers/source.hpp
     # gen_data subfolder. Contains the logic that allow the gen_data for loops to work.
     include/abc_test/included_instances/data_generator/manual_data_generator.hpp
