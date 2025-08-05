@@ -11,26 +11,50 @@
 
 ### Specific Long-form List of todo's for 0.0.2 ###
 
-10 - Write a test for when a file exists, but it cannot be parsed correctly. This is for a file data generator.
-11 - Write a test for an enumerator, specifically using from m_to_n. Ensure that what comes out of the enumerator matches exactly to the test.
-12 - Write a test for a random data generator.
+12 - Write a test for a random data generator. Specifically this is using the simple_rng. It should be predictable what is printed out.
 14 - Write a test for checking that repetition configuration is read correctly, and processed correctly. By this we mean, that the parsing works correctly. Also check a hex-encoded repetition configuration string.
 15 - Write a test for what happens if an incorrect repetition configuration is read for a test. Ensure it fails gracefully, but doesn't crash the executable.
-16 - Brainstorm writing tests for the different assertion types.
-17 - Brainstorm writing tests for the macros.
 18 - Brainstorm writing tests for the logging functions.
 19 - Organize inner documentation so there is a landing page for those looking for user-written documentation.
 20 - Work on organization of test declarations documentation.
 21 - Work on organization of test assertions documentation.
 22 - Work on organization of data generators documentation.
 23 - Write list of all objects for which we would like to have specizliations for in abc_test. 
-24 - Work out how we want to include/exclude specializations. Either we have specific files for each specialization. Or we have a compiler on/off switch which allows/disallows these entities to be compiled. 
+24 - Work out how we want to include/exclude specializations. Either we have specific files for each specialization. Or we have a compiler on/off switch which allows/disallows these entities to be compiled.
 25 - Write list of all types of specialization which we would require. From here, we should have a 2d matrix of all specizliations that need to be written. And adding them to a big todo list should be the next step.
 26 - Perform an overview of the output from a generic run of abc_test, and come up with a list of changes and improvements which need to be made. From there, add them to the todo list.
 27 - Go through each of our examples and test files. Make a note of where strings are used, and determine whether there are u8string overloads for them. Once that is done, come up with a list of all functions which require a u8string or std::string overload. Add those functions which need to be written to the todo list.
 29 - Write repetition config test for enum generator.
 30 - Write repetition config test for random generator.
 31 - matcher_default_comparable_t needs to be had a look at, and made consistent across all the data types we want to write instances for.
+32 - Write a test for a random generator function, showing that the printed out values are within the defined parameters. Probably use int.
+33 - Write a test for a _CHECK macro on its own. 
+34 - Write a test for a _CHECK_EXPR macro on its own.
+35 - Write a test for a _REQUIRE macro on its own.
+36 - Write a test for a _REQUIRE_EXPR macro on its own.
+37 - Write a test for an && in a _CHECK macro on its own.
+38 - Write a test for a || in a _CHECK macro on its own.
+39 - Write a test for a ! in a _CHECK macro on its own.
+40 - Write a test for an && in a _REQUIRE macro on its own.
+41 - Write a test for a || in a _REQUIRE macro on its own.
+42 - Write a test for a ! in a _REQUIRE macro on its own.
+43 - Write a test for a _CHECK macro as part of a multi matcher. 
+44 - Write a test for a _CHECK_EXPR macro on its own as part of a multi matcher. 
+45 - Write a test for a _REQUIRE macro on its own as part of a multi matcher. 
+46 - Write a test for a _REQUIRE_EXPR macro on its own as part of a multi matcher. 
+47 - Write a test for an && in a _CHECK macro on its own as part of a multi matcher. 
+48 - Write a test for a || in a _CHECK macro on its own as part of a multi matcher. 
+49 - Write a test for a ! in a _CHECK macro on its own as part of a multi matcher. 
+50 - Write a test for an && in a _REQUIRE macro on its own as part of a multi matcher. 
+51 - Write a test for a || in a _REQUIRE macro on its own as part of a multi matcher. 
+52 - Write a test for a ! in a _REQUIRE macro on its own as part of a multi matcher. 
+53 - Write test for the _EXPR type where the internal type only has a == and a printer speciailization. It should default to default behaviour.
+54 - Write a test for the _EXPR macro where the internal type has a specialised matcher_comparison specialization. Ensure it is followed.
+55 - Write a test for a bespoke matcher. Ensure that what is printed is as stipulated by the user.
+56 - Write a test for the true_matcher and false_matcher.
+57 - Brainstorm writing tests for the exception macros. 
+60 - Check incorrectly read data for GDF for EDG is dealt with correctly.
+62 - Check repetition configs are properly processed by data generators with file support.
 
 ## Longer Term Focus ##
 
@@ -70,7 +94,7 @@
 20 - We should have a way to "turn off" computationally expensive tests. By this, we mean a way of stating that "this test or these values should only be generated if the test is not in testing mode". This requires more thought.
 	- Perhaps _DEBUG can be level 1. All _RELEASE candidates are level 2 or above. Each test is defined with a number, we can then ensure that tests are only ran if the number is met. Or have some kind of way of querying what mode the test is in, so that in a test case values can be changed at run time. For example, we many enumerate all values at test level 2. But at test level 1, only randomly generate 100 values.
 21 - Investigate whether its possible to write random generators in a similar manner to how fmt::format is used. Specifically, write code such as abc::random_generator("({0},_)",default_random_generator<int>(0,100)). This would create a tuple generator, with the first default generator replaced by the argument above. This would be very clear syntax compared to what we currently have.
-22 - Have some user-defined file which defines a "type map" for logging. By this, we mean the file may be in the form of a map with one entry being "std::basic_string<char,allocator<char>>,std::string". Currently type_id<T> will just print a type. I'm proposing a second function called type_custom_id<T>. If it finds an entry for T in the type map file, it will use its value, otherwise its behaviour is just type_id. So type_custom_id<std::basic_string<char>>() returns "std::string". This can help with verbose types which have default type paramters we don't usually see. Using these will allow us to abbreviate logged message data.
+22 - Have some user-defined file which defines a "type map" for logging. By this, we mean the file may be in the form of a map with one entry being "std::basic_string<char,allocator<char>>,std::string". Currently type_id<T> will just print a type. I'm proposing a second function called type_custom_id<T>. If it finds an entry for T in the type map file, it will use its value, otherwise its behaviour is just type_id. So type_custom_id<std::basic_string<char>>() returns "std::string". This can help with verbose types which have default type parameters we don't usually see. Using these will allow us to abbreviate logged message data.
 23 - Give warning when empty file has been processed. e.g. when reading data from file that should contain unit tests, tell the user if a file has nothing in it. 
 	- To do this, we need to check the file_reader_generator_t, and any object which is derived from data_generator_with_file_support_t<T,true>. 
 24 - Consider a type of executable which tells the user when there are unused test files in a file hierarchy. By this we mean, scan the data folder a test executable points at, and run the test suite. Ignore test failures, only tick of files which are used (or not used), and report the results. It should have three modes; report, delete all unused, and delete empty files.
@@ -99,6 +123,7 @@ for (auto&& [validator, input] : data_validator<char,int>(gdf("hello"), random_g
 40 - File tests with bootstrapped abc_test pose an issue. We want to ensure that any temporary files are deleted after they are created. We can either link every created file to a run of abc_test, and have an option which allows them to be deleted when the test_main is exited. Such an option could be useful for those running abc_test in production code; e.g. to check the changes that a run would make before the run is made.
 41 - data generator's tertiary data needs to match exactly to what the internal printer will produce. For example, if we manually set the tertiary data of a file_data_generator to "(0,0)" it will be read correctly. But as it sets its current teritary data value using the print function for that data generator, "(0, 0)" will be produced. As they do not match, the linear search will fail to find the correct value, resulting in incorrect results. This should be addressed. Either normalization, or a "strict" version of the printer/parser combo which won't allow "(0,0)", only allowing "(0, 0"). The former is easier (parse then print again). The latter is less computationally expensive.
 42 - file_data_generator, when working with tertiary data, currently works as follows: re-loads the correct file, skips lines to that index. It can be more efficient. 
+43 - file_data_generator_with_file_support. Currently the list of files is processed like this; 1st file read and write to. All other files only write to. We should have the option to only read from too. We should NOT have the ability to read and write to the nth file. This is because doing so will just copy the initial file, causing an exponential increase in the number of entities each data generator creates each time its entered. 
 
 ## Information
 

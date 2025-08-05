@@ -92,6 +92,8 @@
 
 #define _ABC_NS_UTILITY_PARSER _ABC_NS_UTILITY::parser
 
+#define _ABC_NS_UTILITY_IO _ABC_NS_UTILITY::io
+
 #define _ABC_NS_REPORTERS _ABC_NS::reporters
 
 #define _ABC_NS_REPORTS   _ABC_NS::reports
@@ -99,6 +101,7 @@
 #define _ABC_NS_LOGGING   _ABC_NS::logging
 
 #define _ABC_NS_GLOBAL    _ABC_NS::global
+
 
 #define _BEGIN_ABC_ERRORS_NS \
     _BEGIN_ABC_INTERNAL_NS   \

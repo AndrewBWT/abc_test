@@ -130,6 +130,7 @@ G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/io/file
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/io/file/general_data_with_rw_info.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/io/file/general_data.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/io/file/tertiary_data.hpp
+G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/io/file/generic_data_file.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/io/file/file_line_writer_with_optional_rw_info.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/io/file/file_based_map.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/io/io_utilities.hpp

@@ -1,15 +1,16 @@
 #pragma once
 
-#include "abc_test/included_instances/data_generator/enumeration/enumeration_schema_base.hpp"
-#include "abc_test/utility/limits/max_value_concept.hpp"
-#include "abc_test/utility/limits/min_value_object.hpp"
-#include "abc_test/included_instances/utility/limits/fundamental_types.hpp"
-#include "abc_test/utility/limits/min_value_concept.hpp"
-
 #include "abc_test/included_instances/data_generator/enumeration/enumeration_base.hpp"
+#include "abc_test/included_instances/data_generator/enumeration/enumeration_schema_base.hpp"
+#include "abc_test/included_instances/utility/limits/fundamental_types.hpp"
+#include "abc_test/utility/limits/max_value_concept.hpp"
+#include "abc_test/utility/limits/min_value_concept.hpp"
+#include "abc_test/utility/limits/min_value_object.hpp"
+
 #include <optional>
 
 _BEGIN_ABC_DG_NS
+
 template <typename T>
 class enumeration_schema_from_m_to_n_t : public enumeration_schema_base_t<T>
 {
@@ -19,7 +20,7 @@ public:
         const T&                          _a_start_value,
         const T&                          _a_end_value,
         const std::optional<std::size_t>& _a_n_advancements,
-        const enumeration_t<T>& _a_enumeration
+        const enumeration_t<T>&           _a_enumeration
     ) noexcept;
     __constexpr
     enumeration_schema_from_m_to_n_t(
@@ -42,9 +43,7 @@ _BEGIN_ABC_NS
 template <typename T>
 requires _ABC_NS_UTILITY::max_value_c<T> && _ABC_NS_UTILITY::min_value_c<T>
 __constexpr _ABC_NS_DG::enumeration_schema_t<T>
-            all_values(
-                const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
-            ) noexcept;
+    all_values(const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base) noexcept;
 
 template <typename T, typename R = std::initializer_list<T>>
 __constexpr _ABC_NS_DG::enumeration_schema_t<T>
@@ -52,7 +51,11 @@ __constexpr _ABC_NS_DG::enumeration_schema_t<T>
                 const R&& _a_elements
             ) noexcept
 {
-    return all_values_moving_forward<T>(mk_enumeration_list<T>(_a_elements));
+    return from_m_to_n<T>(
+        *_a_elements.begin(),
+        *(_a_elements.end() - 1),
+        mk_enumeration_list<T>(_a_elements)
+    );
 }
 
 template <typename T>
@@ -84,7 +87,7 @@ __constexpr _ABC_NS_DG::enumeration_schema_t<T>
                 const _ABC_NS_DG::enumeration_t<T>& _a_enumerate_base
             ) noexcept;
 template <typename T>
-//requires _ABC_NS_UTILITY::min_value_c<T>
+// requires _ABC_NS_UTILITY::min_value_c<T>
 __constexpr _ABC_NS_DG::enumeration_schema_t<T>
             from_min_to_val(
                 const T&                            _a_value,
@@ -273,12 +276,14 @@ __constexpr_imp _ABC_NS_DG::enumeration_schema_t<T>
 {
     using namespace _ABC_NS_DG;
     using namespace _ABC_NS_UTILITY;
-    //static_assert(abc::utility::has_limits_c<T>, "has_limits<T> fails");
-    ///static_assert(std::is_same_v<T, size_t> || true, "min_value_t<size_t> seen");
-    //static_assert(has_min_value_expr<T>, "min_value() not callable");
-   //// static_assert(returns_exact_type<T>, "Return type mismatch");
-  //  static_assert(min_value_c<T>, "Concept still fails");
-   // static_assert(abc::utility::min_value_c<T>, "min_value_c<T> not satisfied for T");
+    // static_assert(abc::utility::has_limits_c<T>, "has_limits<T> fails");
+    /// static_assert(std::is_same_v<T, size_t> || true, "min_value_t<size_t>
+    /// seen");
+    // static_assert(has_min_value_expr<T>, "min_value() not callable");
+    //// static_assert(returns_exact_type<T>, "Return type mismatch");
+    // static_assert(min_value_c<T>, "Concept still fails");
+    // static_assert(abc::utility::min_value_c<T>, "min_value_c<T> not satisfied
+    // for T");
     return from_m_to_n(
         min_value_t<T>().min_value(), _a_value, _a_enumerate_base
     );

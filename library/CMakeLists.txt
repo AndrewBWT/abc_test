@@ -166,6 +166,7 @@ if(NOT DEFINED ABC_TEST_LIBRARY_INCLUDED)
     include/abc_test/utility/io/file/general_data_with_rw_info.hpp
     include/abc_test/utility/io/file/general_data.hpp
     include/abc_test/utility/io/file/tertiary_data.hpp
+	include/abc_test/utility/io/file/generic_data_file.hpp
     include/abc_test/utility/io/file/file_line_writer_with_optional_rw_info.hpp
     include/abc_test/utility/io/file/file_based_map.hpp
     include/abc_test/utility/io/io_utilities.hpp

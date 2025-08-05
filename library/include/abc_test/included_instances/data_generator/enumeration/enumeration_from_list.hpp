@@ -132,8 +132,8 @@ __constexpr bool
     }
     else
     {
+        _a_element = _m_values[_l_current_index + _a_n_times_to_increment];
         _a_n_times_to_increment = 0;
-        _a_element              = _m_values[_l_current_index + _l_difference];
         return true;
     }
 }

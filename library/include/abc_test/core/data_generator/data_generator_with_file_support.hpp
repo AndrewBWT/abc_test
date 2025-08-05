@@ -330,11 +330,13 @@ __constexpr ds::dg_memoized_element_t
     using namespace _ABC_NS_DS;
     using namespace std;
     using namespace abc::utility::io;
+    using namespace _ABC_NS_UTILITY_PRINTER;
     if constexpr (Has_File_Read_Writer)
     {
+        u8string _l_rv;
+        size_t   _l_mode = _m_mode;
         if (_a_get_original_dg_memoized_element_data)
         {
-            u8string _l_rv;
             switch (_m_mode)
             {
             case 0:
@@ -350,12 +352,9 @@ __constexpr ds::dg_memoized_element_t
             default:
                 throw std::runtime_error("Couldn't work");
             }
-            return dg_memoized_element_t{_m_mode, _l_rv};
         }
         else
         {
-            u8string _l_rv;
-            size_t   _l_mode = _m_mode;
             switch (_m_mode)
             {
             case 0:
@@ -364,7 +363,8 @@ __constexpr ds::dg_memoized_element_t
                 );
                 break;
             case 1:
-                if (global::get_this_threads_test_options().write_data_to_files)
+                if (global::get_this_threads_test_options()
+                        .individual_io_based_test_options.write_data_to_files)
                 {
                     _l_mode = 0;
                     _l_rv   = utility::printer::print<size_t>(
@@ -392,6 +392,9 @@ __constexpr ds::dg_memoized_element_t
                     }
                     else
                     {
+                        auto ki = _m_tertiary_rw_info.internal_printer->run_printer(
+                            _m_object.tertiary_data()
+                        );
                         _l_writer.write_line(
                             _m_tertiary_rw_info.internal_printer->run_printer(
                                 _m_object.tertiary_data()
@@ -403,8 +406,8 @@ __constexpr ds::dg_memoized_element_t
             default:
                 throw std::runtime_error("Couldn't work");
             }
-            return dg_memoized_element_t{_l_mode, _l_rv};
         }
+        return dg_memoized_element_t{ _l_mode, _l_rv };
     }
     else
     {
