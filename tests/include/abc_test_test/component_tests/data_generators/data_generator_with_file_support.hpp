@@ -179,25 +179,24 @@ _TEST_CASE(
               const std::function<data_generator_collection_t<
                   T>(const std::array<file_name_t<T>, N>&)>& _a_run_element,
               const std::array<
-                  std::tuple<
+            std::tuple<
                       file_name_info_t<T>,
                       std::string,
-                      std::vector<std::variant<T, U>>,
-                      std::vector<std::variant<T, U>>>,
-                  N>&               _a_files,
-              const std::vector<T>& _a_elements
+            std::vector<std::variant<T, U>>,
+            std::vector<std::variant<T, U>>>,
+                  N>&          _a_files,
+              const vector<T>& _a_elements
           )
     {
         // Create the file paths
-        vector<tuple<
+        std::vector<std::tuple<
             filesystem::path,
-            string,
+            std::string,
             std::vector<std::variant<T, U>>,
             std::vector<std::variant<T, U>>>>
              _l_paths;
-        auto ki
-            = std::filesystem::current_path().string().append("\\paths\\hello");
-        vector<vector<string>> _l_expected_files;
+        auto ki = filesystem::current_path().string().append("\\paths\\hello");
+        std::vector<std::vector<std::string>> _l_expected_files;
         for (const auto& [_l_file, _l_comment, _l_already_contained_elements, _l_file_contents_after] :
              _a_files)
         {
@@ -213,9 +212,9 @@ _TEST_CASE(
              _l_paths)
         {
             vector<u8string> _l_expected_file;
-            if (std::filesystem::exists(_l_path))
+            if (filesystem::exists(_l_path))
             {
-                std::filesystem::remove(_l_path);
+                filesystem::remove(_l_path);
             }
             _l_expected_file.push_back(
                 fmt::format(u8"#{0}", cast_string_to_u8string(_l_comment))
@@ -277,7 +276,7 @@ _TEST_CASE(
         function<void()> _l_test_func_1 = [&]()
         {
             // This has to be done in here to get the correct file names.
-            std::array<file_name_t<T>, N> arr2
+            array<file_name_t<T>, N> arr2
                 = abc_test::utility::transform_array(_a_files, wrapped);
             auto _l_generator{_a_run_element(arr2)};
             for (auto&& _l_element : _l_generator)
@@ -287,10 +286,10 @@ _TEST_CASE(
             }
         };
         // Run the function
-        std::vector<std::tuple<
-            std::function<void()>,
-            std::string,
-            std::string,
+        vector<tuple<
+            function<void()>,
+            string,
+            string,
             abc::ds::tdg_collection_stack_trie_t>>
                                     _l_funcs_to_run;
         tdg_collection_stack_trie_t _l_stack;
@@ -317,7 +316,7 @@ _TEST_CASE(
         _CHECK(unit_tests);
     };
     auto _l_func_maker = [&]<typename T, size_t N>()
-        -> std::function<data_generator_collection_t<
+        -> function<data_generator_collection_t<
             T>(const std::array<file_name_t<T>, N>&)>
     {
         return [](const std::array<file_name_t<T>, N>& _a_array)
@@ -336,26 +335,26 @@ _TEST_CASE(
         };
     };
     using u_type = size_t;
-    std::array<
-        std::tuple<
+    array<
+        tuple<
             file_name_info_t<int>,
-            std::string,
-            std::vector<std::variant<int, u_type>>,
-            std::vector<std::variant<int, u_type>>>,
+            string,
+            vector<variant<int, u_type>>,
+            vector<variant<int, u_type>>>,
         0>
-                     _l_arr      = {};
-    std::vector<int> _l_elements = {1, 2, 3};
+                _l_arr      = {};
+    vector<int> _l_elements = {1, 2, 3};
     _l_run_func.operator(
     )<int, u_type, 0>(_l_func_maker.operator()<int, 0>(), _l_arr, _l_elements);
 
-    std::array<
-        std::tuple<
+    array<
+        tuple<
             file_name_info_t<int>,
-            std::string,
-            std::vector<std::variant<int, u_type>>,
-            std::vector<std::variant<int, u_type>>>,
+            string,
+            vector<variant<int, u_type>>,
+            vector<variant<int, u_type>>>,
         1>
-                     _l_arr_1      = {make_tuple(
+                _l_arr_1      = {make_tuple(
             file_name_info_t<int>(
                 std::in_place_index<0>, file_name_basic_info_t(string("hello"))
             ),
@@ -363,16 +362,16 @@ _TEST_CASE(
             vector<variant<int, u_type>>({4, 5, 6}),
             vector<variant<int, u_type>>({1, 2, 3})
         )};
-    std::vector<int> _l_elements_1 = {4, 5, 6, 1, 2, 3};
+    vector<int> _l_elements_1 = {4, 5, 6, 1, 2, 3};
     _l_run_func.operator()<int, u_type, 1>(
         _l_func_maker.operator()<int, 1>(), _l_arr_1, _l_elements_1
     );
-    std::array<
-        std::tuple<
+    array<
+        tuple<
             file_name_info_t<int>,
-            std::string,
-            std::vector<std::variant<int, u_type>>,
-            std::vector<std::variant<int, u_type>>>,
+            string,
+            vector<variant<int, u_type>>,
+            vector<variant<int, u_type>>>,
         3>
         _l_arr_2
         = {make_tuple(
@@ -390,10 +389,8 @@ _TEST_CASE(
                    file_name_basic_info_t(string("hello2"))
                ),
                "unsigned __int64",
-               vector<variant<int, u_type>>(
-                   {0, 1, 2}
-               ),
-               vector<variant<int, u_type>>({0,1,2})
+               vector<variant<int, u_type>>({0, 1, 2}),
+               vector<variant<int, u_type>>({0, 1, 2})
            ),
            make_tuple(
                file_name_info_t<int>(
@@ -405,9 +402,9 @@ _TEST_CASE(
                ),
                "int",
                vector<variant<int, u_type>>({25, 23, 27}),
-               vector<variant<int, u_type>>({1,2,3})
+               vector<variant<int, u_type>>({1, 2, 3})
            )};
-    std::vector<int> _l_elements_2 = {4, 5, 6, 1, 2, 3};
+    vector<int> _l_elements_2 = {4, 5, 6, 1, 2, 3};
     _l_run_func.operator()<int, u_type, 3>(
         _l_func_maker.operator()<int, 3>(), _l_arr_2, _l_elements_2
     );

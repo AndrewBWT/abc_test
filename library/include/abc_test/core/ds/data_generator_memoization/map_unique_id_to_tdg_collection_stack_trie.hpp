@@ -28,6 +28,7 @@ public:
         parse_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
             const std::u8string_view _a_str
         ) noexcept;
+    template <bool To_Hex = true>
     friend __no_constexpr std::u8string
                           print_map_of_unique_ids_to_tdg_collection_stack_tries(
                               const map_unique_id_to_tdg_collection_stack_trie_t& _a_map
@@ -211,6 +212,7 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
     return _l_map;
 }
 
+template <bool To_Hex>
 __no_constexpr_imp std::u8string
                    print_map_of_unique_ids_to_tdg_collection_stack_tries(
                        const map_unique_id_to_tdg_collection_stack_trie_t& _a_map
@@ -226,15 +228,22 @@ __no_constexpr_imp std::u8string
         {
             _l_key_compressed.push_back(static_cast<unsigned char>(_l_char));
         }
-        for (unsigned char _l_char : _l_key_compressed)
+        if constexpr (To_Hex)
         {
-            _l_key_compressed_2.append(fmt::format(u8"{:x}", _l_char));
+            for (unsigned char _l_char : _l_key_compressed)
+            {
+                _l_key_compressed_2.append(fmt::format(u8"{:x}", _l_char));
+            }
+        }
+        else
+        {
+            _l_key_compressed_2 = _l_key_compressed;
         }
         _l_rv.append(fmt::format(
             u8"{0}:{1}:",
             _l_key_compressed_2,
             compressed_typless_data_generator_collection_stack_trie_printer_t<
-                true>{}
+                To_Hex>{}
                 .run_printer(_l_element.second)
         ));
     }

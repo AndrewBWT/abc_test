@@ -56,6 +56,8 @@ if(NOT DEFINED ABC_TEST_TESTS_INCLUDED)
 	include/abc_test_test/component_tests/data_generators/enumeration_data_generator.hpp
 	include/abc_test_test/component_tests/data_generators/random_data_generator.hpp
 	include/abc_test_test/component_tests/data_generators/data_generator_with_file_support.hpp
+	
+	include/abc_test_test/component_tests/repetition_config.hpp
   )
   
   # Sets how the IDE organises the files.
