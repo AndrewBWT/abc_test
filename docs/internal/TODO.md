@@ -11,7 +11,6 @@
 
 ### Specific Long-form List of to-do's for 0.0.2 ###
 
-15 - Write a test for what happens if an incorrect repetition configuration is read for a test. Ensure it fails gracefully, but doesn't crash the executable. By this we mean, the tertiary data read is of the incorrect type.
 18 - Brainstorm writing tests for the logging functions.
 19 - Organize inner documentation so there is a landing page for those looking for user-written documentation.
 20 - Work on organization of test declarations documentation.

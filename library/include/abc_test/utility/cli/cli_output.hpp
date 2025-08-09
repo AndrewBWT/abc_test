@@ -24,7 +24,7 @@ public:
     __constexpr cli_results_status_t
         status() const noexcept
     {
-        return cli_results_status_t::can_continue;
+        return _m_status;
     }
 
     __constexpr bool
@@ -85,6 +85,7 @@ public:
         ) noexcept
     {
         using namespace std;
+        _m_status = cli_results_status_t::has_errors;
         _m_errors.push_back(u8string(_a_str));
         _m_terminate_early = true;
     }
@@ -157,6 +158,7 @@ public:
     std::vector<std::u8string> _m_output;
     bool                       _m_terminate_early = false;
     std::vector<std::u8string> _m_errors;
+    cli_results_status_t _m_status = cli_results_status_t::can_continue;
 
     __constexpr const          ds::memoized_cli_history_t&
                                memoized_data() const noexcept

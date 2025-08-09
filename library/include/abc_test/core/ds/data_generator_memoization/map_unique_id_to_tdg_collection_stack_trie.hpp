@@ -126,6 +126,8 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
     ) noexcept
 {
     using namespace std;
+    using namespace abc::utility::parser;
+    using namespace abc::ds;
     vector<pair<u8string_view, u8string_view>> _l_strs;
     size_t                                     _l_idx{0};
     while (_l_idx < _a_u8_str.size())
@@ -168,8 +170,6 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
     map_unique_id_to_tdg_collection_stack_trie_t _l_map;
     for (size_t _l_idx{0}; _l_idx < _l_strs.size(); ++_l_idx)
     {
-        using namespace abc::utility::parser;
-        using namespace abc::ds;
         auto& [_l_str_hex, _l_compressed_str]{_l_strs[_l_idx]};
         const parser_result_t<typeless_data_generator_collection_stack_trie_t>
                  _l_compressed_scan_result{parse(
@@ -179,21 +179,35 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
                              true>{}
                 )
             )};
-        u8string _l_str
-            = abc::utility::str::from_hex_with_exception(_l_str_hex);
-        if (_l_compressed_scan_result.has_value())
+        result_t<u8string> _l_str_opt
+            = abc::utility::str::from_hex(_l_str_hex);
+        if (_l_str_opt.has_value())
         {
-            const bool _l_result{
-                _l_map.insert(_l_str, _l_compressed_scan_result.value())
-            };
-            if (not _l_result)
+            if (_l_compressed_scan_result.has_value())
+            {
+                const bool _l_result{
+                    _l_map.insert(_l_str_opt.value(), _l_compressed_scan_result.value())
+                };
+                if (not _l_result)
+                {
+                    return unexpected(fmt::format(
+                        u8"Could not add element {0} to internal map. This is "
+                        u8"because there is already an element with that unique ID "
+                        u8"in the map. Unique ID = {1}",
+                        (_l_idx + 1),
+                        _l_str_opt.value()
+                    ));
+                }
+            }
+            else
             {
                 return unexpected(fmt::format(
-                    u8"Could not add element {0} to internal map. This is "
-                    u8"because there is already an element with that unique ID "
-                    u8"in the map. Unique ID = {1}",
+                    u8"Could not parse compressed string \"{0}\", which is element "
+                    u8"{1}. "
+                    u8"internal parser returned error message \"{2}\".",
+                    _l_compressed_str,
                     (_l_idx + 1),
-                    _l_str
+                    _l_compressed_scan_result.error().errors
                 ));
             }
         }
@@ -203,9 +217,9 @@ __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
                 u8"Could not parse compressed string \"{0}\", which is element "
                 u8"{1}. "
                 u8"internal parser returned error message \"{2}\".",
-                _l_compressed_str,
+                _l_str_hex,
                 (_l_idx + 1),
-                _l_compressed_scan_result.error().errors
+                _l_str_opt.error()
             ));
         }
     }

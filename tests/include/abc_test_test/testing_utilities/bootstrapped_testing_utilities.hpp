@@ -78,7 +78,7 @@ __no_constexpr_imp test_result_t
                 );
         }
     }
-    simple_console_reporter_t _l_sco;
+    simple_text_reporter_t _l_sco;
     abc::run_tests<test_options_base_t>(_l_running_options, _l_sco);
     return test_result_t{
         .memoized_error_repoter
@@ -107,6 +107,8 @@ __no_constexpr_imp test_result_t
     test_result_t                     _l_tr;
     simple_text_reporter_t            _l_sco;
     included_instances_test_options_t _l_iito;
+    _l_iito.use_text_test_reporter_to_cout = console_output_e::no_output;
+    _l_iito.use_text_error_reporter_to_cout = console_output_e::no_output;
     _l_iito.group_test_options.error_reporters.push_back(
         make_shared<reporters::memoized_error_reporter_t>()
     );
@@ -146,7 +148,7 @@ __no_constexpr_imp test_result_t
             _l_sco.write_lines(_l_cli_results.text_output());
             break;
         default:
-            run_tests<included_instances_test_options_t, true>(
+            run_tests<included_instances_test_options_t>(
                 _l_iito, _l_sco, _l_cli, _l_cli_results.memoized_data()
             );
         }
@@ -156,12 +158,10 @@ __no_constexpr_imp test_result_t
         test_function_t ki = std::make_shared<
             test_function_callable_object_t<decltype(_l_function)>>(_l_function
         );
-        abc::ds::registered_test_data_t _l_rtd(
+        registered_test_data_t _l_rtd(
             ki,
-            abc::ds::checked_user_defined_test_data_t::test_data(
-                abc::ds::user_defined_test_data_t{
-                    .name = _l_name, .path = _l_path
-                }
+            checked_user_defined_test_data_t::test_data(
+                user_defined_test_data_t{.name = _l_name, .path = _l_path}
             )
         );
         _l_tests_to_run->push_back(_l_rtd);
