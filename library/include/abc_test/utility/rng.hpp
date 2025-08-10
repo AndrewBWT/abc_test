@@ -273,6 +273,7 @@ __constexpr_imp
         rng_t&& _a_rng
     ) noexcept
     : _m_rng(std::move(_a_rng._m_rng)), _m_calls(_a_rng._m_calls)
+    , _m_seed(std::move(_a_rng._m_seed))
 {}
 
 __constexpr_imp

@@ -39,7 +39,7 @@ private:
     tertiary_type          _m_random_calls_before_after;
     random_generator_t<T>  _m_random_generator;
     utility::rng_counter_t _m_elemnets_to_randomly_generate{
-        utility::rng_counter_t(10)
+        utility::rng_counter_t(5)
     };
     utility::rng_counter_t _m_elements_generated{utility::rng_counter_t(0)};
     T                      _m_element;
@@ -122,14 +122,14 @@ template <typename T>
 __constexpr bool
     random_data_generator_t<T>::has_current_element() const
 {
-    return _m_elements_generated < _m_elemnets_to_randomly_generate;
+    return _m_elements_generated <= _m_elemnets_to_randomly_generate;
 }
 
 template <typename T>
 __constexpr bool
     random_data_generator_t<T>::generate_next()
 {
-    if (_m_elements_generated + 1 < _m_elemnets_to_randomly_generate)
+    if (_m_elements_generated < _m_elemnets_to_randomly_generate)
     {
         get<0>(_m_random_calls_before_after)
             = global::get_this_threads_current_test()

@@ -125,8 +125,9 @@ __constexpr_imp void
         const tertiary_type& _a_tertiary_data
     )
 {
+    auto _l_next_elemnet{ _a_tertiary_data - _m_tertiary_data };
     _m_tertiary_data       = _a_tertiary_data;
-    _m_has_current_element = next_element(_a_tertiary_data);
+    _m_has_current_element = next_element(_l_next_elemnet);
 }
 
 template <typename T>

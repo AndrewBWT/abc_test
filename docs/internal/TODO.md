@@ -21,8 +21,6 @@
 25 - Write list of all types of specialization which we would require. From here, we should have a 2d matrix of all specialisations that need to be written. And adding them to a big to-do list should be the next step.
 26 - Perform an overview of the output from a generic run of abc_test, and come up with a list of changes and improvements which need to be made. From there, add them to the to-do list.
 27 - Go through each of our examples and test files. Make a note of where strings are used, and determine whether there are u8string overloads for them. Once that is done, come up with a list of all functions which require a u8string or std::string overload. Add those functions which need to be written to the to-do list.
-29 - Write repetition config test for enum generator.
-30 - Write repetition config test for random generator.
 31 - matcher_default_comparable_t needs to be had a look at, and made consistent across all the data types we want to write instances for.
 33 - Write a test for a _CHECK macro on its own. 
 34 - Write a test for a _CHECK_EXPR macro on its own.
@@ -51,7 +49,7 @@
 57 - Brainstorm writing tests for the exception macros. 
 60 - Check incorrectly read data for GDF for a DGWFS is processed correctly. By this we mean, it fails gracefully.
 62 - Check repetition configs are properly processed by data generators with file support. By this we mean, that a correct RC of mode 0 goes to the first file, then mode 1 to the underlying DG - and that it never goes to the other files (which are write-only currently).
-63 - Check incorrectly read data for TDF for a DGWFS is processed correctly. By this we mean, it fails gracefully.
+63 - Check incorrectly read data for TDF for a DGWFS is processed correctly. By this we mean, it fails gracefully. Test with both enumeration and random generators.
 
 ## Longer Term Focus ##
 

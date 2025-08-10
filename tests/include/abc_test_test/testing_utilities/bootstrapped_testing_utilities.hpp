@@ -15,6 +15,7 @@ struct test_result_t
 {
     abc::reporters::memoized_error_reporter_t memoized_error_repoter;
     abc::simple_text_reporter_t               simple_text_reporter;
+    abc::run_tests_result_t run_tests_result;
     // abc::reporters::memoized_test_reporter_t memoized_test_reporter;
 };
 
@@ -26,7 +27,9 @@ __no_constexpr_imp test_result_t
             std::function<void()>,
             std::string,
             std::string,
-            abc::ds::tdg_collection_stack_trie_t>>& _a_functions_to_run
+            abc::ds::tdg_collection_stack_trie_t>>& _a_functions_to_run,
+        const abc::utility::global_seed_t           _a_seed
+        = std::optional<abc::utility::complete_global_seed_t>{}
     )
 {
     using namespace abc;
@@ -39,7 +42,8 @@ __no_constexpr_imp test_result_t
     shared_ptr<_ABC_NS_DS::test_list_t> _l_tests_to_run
         = make_shared<_ABC_NS_DS::test_list_t>();
     test_options_base_t _l_running_options;
-    _l_running_options.group_test_options.threads = _a_n_threads;
+    _l_running_options.group_test_options.global_seed = _a_seed;
+    _l_running_options.group_test_options.threads     = _a_n_threads;
     _l_running_options.group_test_options.test_lists.push_back(_l_tests_to_run);
     _l_running_options.group_test_options.error_reporters.push_back(
         make_shared<reporters::memoized_error_reporter_t>()
@@ -79,12 +83,13 @@ __no_constexpr_imp test_result_t
         }
     }
     simple_text_reporter_t _l_sco;
-    abc::run_tests<test_options_base_t>(_l_running_options, _l_sco);
+    auto _l_rv = abc::run_tests_return_complete_result<test_options_base_t>(_l_running_options, _l_sco);
     return test_result_t{
         .memoized_error_repoter
         = *(static_cast<reporters::memoized_error_reporter_t*>(
             _l_running_options.group_test_options.error_reporters.at(0).get()
-        ))
+        )),
+        .run_tests_result = _l_rv
     };
 }
 
@@ -107,7 +112,7 @@ __no_constexpr_imp test_result_t
     test_result_t                     _l_tr;
     simple_text_reporter_t            _l_sco;
     included_instances_test_options_t _l_iito;
-    _l_iito.use_text_test_reporter_to_cout = console_output_e::no_output;
+    _l_iito.use_text_test_reporter_to_cout  = console_output_e::no_output;
     _l_iito.use_text_error_reporter_to_cout = console_output_e::no_output;
     _l_iito.group_test_options.error_reporters.push_back(
         make_shared<reporters::memoized_error_reporter_t>()

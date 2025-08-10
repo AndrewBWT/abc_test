@@ -20,6 +20,13 @@
 
 _BEGIN_ABC_NS
 
+struct run_tests_result_t
+{
+    int                                               return_code = 0;
+    std::optional<abc::ds::pre_test_run_report_t>     opt_pre_test_report;
+    std::optional<abc::ds::finalised_test_set_data_t> finalized_report;
+};
+
 /*!
  * @brief This function runs the tests.
  *
@@ -38,6 +45,16 @@ _BEGIN_ABC_NS
  * GLOT.
  */
 template <typename T, bool GLOT_Available = false>
+__no_constexpr run_tests_result_t
+    run_tests_return_complete_result(
+        T&                                                  _a_options,
+        simple_reporter_t&                                  _a_simple_reporter,
+        const std::optional<_ABC_NS_UTILITY_CLI::cli_t<T>>& _a_cli
+        = std::optional<_ABC_NS_UTILITY_CLI::cli_t<T>>{},
+        const ds::memoized_cli_history_t& _a_cli_history
+        = ds::memoized_cli_history_t()
+    ) noexcept;
+template <typename T, bool GLOT_Available = false>
 __no_constexpr int
     run_tests(
         T&                                                  _a_options,
@@ -47,14 +64,13 @@ __no_constexpr int
         const ds::memoized_cli_history_t& _a_cli_history
         = ds::memoized_cli_history_t()
     ) noexcept;
-
 _END_ABC_NS
 
 _BEGIN_ABC_NS
 
 template <typename T, bool GLOT_Available>
-__no_constexpr_imp int
-    run_tests(
+__no_constexpr_imp run_tests_result_t
+    run_tests_return_complete_result(
         T&                                                  _a_options,
         simple_reporter_t&                                  _a_simple_reporter,
         const std::optional<_ABC_NS_UTILITY_CLI::cli_t<T>>& _a_opt_cli,
@@ -75,11 +91,13 @@ __no_constexpr_imp int
     vector<test_evaluator_t> _l_test_runners;
     set<size_t>              _l_threads_free;
     _a_options.pre_validation_process();
+    run_tests_result_t _l_rv;
     if (auto _l_validation_errors{_a_options.validate()};
         _l_validation_errors.has_value())
     {
         _a_simple_reporter.write_error_lines(_l_validation_errors.value());
-        return -1;
+        _l_rv.return_code = -1;
+        return _l_rv;
     }
     else
     {
@@ -209,7 +227,8 @@ __no_constexpr_imp int
                 "Exiting due to error when adding tests to test_collection_t"
                 "object."
             );
-            return -1;
+            _l_rv.return_code = -1;
+            return _l_rv;
         }
         _LIBRARY_LOG(
             MAIN_INFO, "Getting final set of tests in execution order"
@@ -217,9 +236,10 @@ __no_constexpr_imp int
         const post_setup_test_list_t _l_pstd{
             _l_tc.make_finalied_post_setup_test_list_in_run_order()
         };
-        ds::pre_test_run_report_t _l_pre_test_run_report(
-            _a_cli_history, &_l_global_test_options
-        );
+        _l_rv.opt_pre_test_report
+            = pre_test_run_report_t(_a_cli_history, &_l_global_test_options);
+        ds::pre_test_run_report_t& _l_pre_test_run_report
+            = _l_rv.opt_pre_test_report.value();
         _l_pre_test_run_report.report_all_tests(_l_pstd.size());
         post_setup_test_list_itt_t       _l_pstd_itt{_l_pstd.begin()};
         const post_setup_test_list_itt_t _l_pstd_end{_l_pstd.end()};
@@ -318,10 +338,13 @@ __no_constexpr_imp int
                 std::distance(_l_pstd_itt, _l_pstd_end),
                 _l_erc.catastrophic_errors()
             ));
-            _l_erc.hard_exit();
+            _l_rv.return_code = _l_erc.hard_exit();
+            return _l_rv;
         }
         _LIBRARY_LOG(MAIN_INFO, "Setting up auto configuration");
-        finalised_test_set_data_t _l_final_report;
+        _l_rv.finalized_report = finalised_test_set_data_t();
+        finalised_test_set_data_t& _l_final_report
+            = _l_rv.finalized_report.value();
         for (auto& _l_test_runner : _l_test_runners)
         {
             _l_final_report.process_final_report(_l_test_runner.test_set_data()
@@ -343,8 +366,23 @@ __no_constexpr_imp int
         _LIBRARY_LOG(MAIN_INFO, "Finalising reports.");
         _l_trc.finalise_reports(_l_final_report);
         global::pop_this_threads_global_variable_set();
-        return 0;
+        return _l_rv;
     }
+}
+
+template <typename T, bool GLOT_Available>
+__no_constexpr int
+    run_tests(
+        T&                                                  _a_options,
+        simple_reporter_t&                                  _a_simple_reporter,
+        const std::optional<_ABC_NS_UTILITY_CLI::cli_t<T>>& _a_cli,
+        const ds::memoized_cli_history_t&                   _a_cli_history
+    ) noexcept
+{
+    auto _l_rv{run_tests_return_complete_result<T, GLOT_Available>(
+        _a_options, _a_simple_reporter, _a_cli, _a_cli_history
+    )};
+    return _l_rv.return_code;
 }
 
 _END_ABC_NS
