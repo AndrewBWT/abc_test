@@ -15,7 +15,7 @@
         std::source_location::current(),                        \
         _a_matcher_str,                                         \
         _a_macro_str                                            \
-    )
+    ); abc::check_for_termination()
 /*!
  * @brief The check macro.
  *

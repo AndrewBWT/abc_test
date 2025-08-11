@@ -64,7 +64,7 @@ __no_constexpr_or_inline_imp void
     catch (...)
     {
         _l_current_test.set_unexpected_termination(
-            make_unique<const unexpected_report_t<true>>(
+            make_unique<unexpected_thrown_not_derived_from_std_exception_t>(
                 unexpected_thrown_not_derived_from_std_exception_t(
                     most_recent_source()
                 )

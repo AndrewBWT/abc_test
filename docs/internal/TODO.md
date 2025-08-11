@@ -22,10 +22,6 @@
 26 - Perform an overview of the output from a generic run of abc_test, and come up with a list of changes and improvements which need to be made. From there, add them to the to-do list.
 27 - Go through each of our examples and test files. Make a note of where strings are used, and determine whether there are u8string overloads for them. Once that is done, come up with a list of all functions which require a u8string or std::string overload. Add those functions which need to be written to the to-do list.
 31 - matcher_default_comparable_t needs to be had a look at, and made consistent across all the data types we want to write instances for.
-33 - Write a test for a _CHECK macro on its own. 
-34 - Write a test for a _CHECK_EXPR macro on its own.
-35 - Write a test for a _REQUIRE macro on its own.
-36 - Write a test for a _REQUIRE_EXPR macro on its own.
 37 - Write a test for an && in a _CHECK macro on its own.
 38 - Write a test for a || in a _CHECK macro on its own.
 39 - Write a test for a ! in a _CHECK macro on its own.

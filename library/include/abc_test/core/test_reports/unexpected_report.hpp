@@ -48,6 +48,8 @@ public:
      */
     __constexpr bool
         exact_source() const noexcept;
+    __constexpr virtual std::unique_ptr<unexpected_report_t>
+        deep_copy() const noexcept = 0;
 protected:
     __constexpr
     unexpected_report_t() noexcept

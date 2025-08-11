@@ -33,6 +33,18 @@ public:
     ) noexcept;
     __constexpr const _ABC_NS_MATCHER::bba_inner_assertion_type_t&
                       matcher_info() const noexcept;
+
+    __constexpr virtual std::unique_ptr<assertion_base_t>
+        deep_copy() const noexcept
+    {
+        return std::make_unique<
+            matcher_based_assertion_single_line_t<Assertion_Status>>(
+            this->source(),
+            this->log_infos(),
+            this->matcher_info(),
+            this->assertion_index()
+        );
+    }
 private:
     _ABC_NS_MATCHER::bba_inner_assertion_type_t _m_matcher_info;
 };

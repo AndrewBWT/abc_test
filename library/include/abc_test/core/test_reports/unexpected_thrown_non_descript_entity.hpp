@@ -15,12 +15,20 @@ public:
     /*!
      * @brief Constructor
      * @param _a_source The closest known source of the exception.
-     * @return 
+     * @return
      */
     __constexpr
     unexpected_thrown_not_derived_from_std_exception_t(
         const std::optional<_ABC_NS_DS::single_source_t>& _a_source
     ) noexcept;
+
+    __constexpr virtual std::unique_ptr<unexpected_report_t>
+        deep_copy() const noexcept override
+    {
+        return make_unique<unexpected_thrown_not_derived_from_std_exception_t>(
+            source()
+        );
+    }
 };
 
 _END_ABC_REPORTS_NS

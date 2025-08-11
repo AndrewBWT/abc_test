@@ -8,25 +8,38 @@ _BEGIN_ABC_REPORTS_NS
  * @tparam Assertion_Status The status of the assertion block - must be derived
  * from dynamic_status_t.
  */
-    template <typename Assertion_Status>
-    requires std::derived_from<Assertion_Status, assertion_status_base_t>
+template <typename Assertion_Status>
+requires std::derived_from<Assertion_Status, assertion_status_base_t>
 struct multi_element_assertion_block_t
     : public assertion_t<false, Assertion_Status>
 
 {
 public:
     __constexpr
-        multi_element_assertion_block_t(
-            const status_t<Assertion_Status>& _a_status,
-            const user_initialised_report_t<false>::source_t& _a_source,
-            const ds::log_infos_t& _a_log_infos,
-            const _ABC_NS_MATCHER::matcher_res_infos_t& _a_matcher_info,
-            const opt_description_t<false>& _a_opt_description,
-            const std::size_t _a_index
-        ) noexcept;
-    __constexpr
-        const _ABC_NS_MATCHER::matcher_res_infos_t&
-        get_matcher() const noexcept;
+    multi_element_assertion_block_t(
+        const status_t<Assertion_Status>&                 _a_status,
+        const user_initialised_report_t<false>::source_t& _a_source,
+        const ds::log_infos_t&                            _a_log_infos,
+        const _ABC_NS_MATCHER::matcher_res_infos_t&       _a_matcher_info,
+        const opt_description_t<false>&                   _a_opt_description,
+        const std::size_t                                 _a_index
+    ) noexcept;
+    __constexpr const _ABC_NS_MATCHER::matcher_res_infos_t&
+                      get_matcher() const noexcept;
+
+    __constexpr virtual std::unique_ptr<assertion_base_t>
+        deep_copy() const noexcept
+    {
+        return std::make_unique<
+            multi_element_assertion_block_t<Assertion_Status>>(
+            this->status(),
+            this->source(),
+            this->log_infos(),
+            this->get_matcher(),
+            this->test_description(),
+            this->assertion_index()
+        );
+    }
 private:
     _ABC_NS_MATCHER::matcher_res_infos_t _m_matcher_info;
 };
@@ -35,32 +48,32 @@ _END_ABC_REPORTS_NS
 
 _BEGIN_ABC_REPORTS_NS
 template <typename Assertion_Status>
-    requires std::derived_from<Assertion_Status, assertion_status_base_t>
+requires std::derived_from<Assertion_Status, assertion_status_base_t>
 __constexpr_imp
-multi_element_assertion_block_t<Assertion_Status>::
-multi_element_assertion_block_t(
-    const status_t<Assertion_Status>& _a_status,
-    const user_initialised_report_t<false>::source_t&
-    _a_source,
-    const ds::log_infos_t& _a_log_infos,
-    const _ABC_NS_MATCHER::matcher_res_infos_t& _a_matcher_info,
-    const opt_description_t<false>& _a_opt_description,
-    const std::size_t _a_index
-) noexcept
+    multi_element_assertion_block_t<Assertion_Status>::
+        multi_element_assertion_block_t(
+            const status_t<Assertion_Status>&                 _a_status,
+            const user_initialised_report_t<false>::source_t& _a_source,
+            const ds::log_infos_t&                            _a_log_infos,
+            const _ABC_NS_MATCHER::matcher_res_infos_t&       _a_matcher_info,
+            const opt_description_t<false>& _a_opt_description,
+            const std::size_t               _a_index
+        ) noexcept
     : assertion_t<false, Assertion_Status>(
-        _a_status,
-        _a_source,
-        _a_log_infos,
-        _a_opt_description,
-        _a_index
-    )
+          _a_status,
+          _a_source,
+          _a_log_infos,
+          _a_opt_description,
+          _a_index
+      )
     , _m_matcher_info(_a_matcher_info)
 {}
+
 template <typename Assertion_Status>
-    requires std::derived_from<Assertion_Status, assertion_status_base_t>
-__constexpr_imp
-const _ABC_NS_MATCHER::matcher_res_infos_t&
-multi_element_assertion_block_t<Assertion_Status>::get_matcher() const noexcept
+requires std::derived_from<Assertion_Status, assertion_status_base_t>
+__constexpr_imp const _ABC_NS_MATCHER::matcher_res_infos_t&
+    multi_element_assertion_block_t<Assertion_Status>::get_matcher(
+    ) const noexcept
 {
     return _m_matcher_info;
 }

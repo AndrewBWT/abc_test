@@ -24,6 +24,15 @@ public:
         const bool                 _a_exact_source,
         const std::string_view     _a_str
     ) noexcept;
+    __constexpr virtual std::unique_ptr<unexpected_report_t>
+        deep_copy() const noexcept override
+    {
+        return make_unique<basic_text_warning_t>(
+            source(),
+            exact_source(),
+            _m_str
+        );
+    }
 private:
     std::string _m_str;
 };

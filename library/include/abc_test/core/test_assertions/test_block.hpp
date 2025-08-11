@@ -377,7 +377,7 @@ struct MacroAProxy3
             _l_test_runner.current_assertion_index()
         );
         _l_test_runner.add_assertion(_l_gur);
-        return_result<T>(_l_passed);
+        //return_result<T>(_l_passed);
     }
 };
 

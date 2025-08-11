@@ -14,8 +14,9 @@ namespace abc_test::utility
 struct test_result_t
 {
     abc::reporters::memoized_error_reporter_t memoized_error_repoter;
+    abc::reporters::memoized_test_reporter_t  memoized_test_reporter;
     abc::simple_text_reporter_t               simple_text_reporter;
-    abc::run_tests_result_t run_tests_result;
+    abc::run_tests_result_t                   run_tests_result;
     // abc::reporters::memoized_test_reporter_t memoized_test_reporter;
 };
 
@@ -42,6 +43,7 @@ __no_constexpr_imp test_result_t
     shared_ptr<_ABC_NS_DS::test_list_t> _l_tests_to_run
         = make_shared<_ABC_NS_DS::test_list_t>();
     test_options_base_t _l_running_options;
+    _l_running_options.individual_test_options.retain_passed_assertions = true;
     _l_running_options.group_test_options.global_seed = _a_seed;
     _l_running_options.group_test_options.threads     = _a_n_threads;
     _l_running_options.group_test_options.test_lists.push_back(_l_tests_to_run);
@@ -83,11 +85,17 @@ __no_constexpr_imp test_result_t
         }
     }
     simple_text_reporter_t _l_sco;
-    auto _l_rv = abc::run_tests_return_complete_result<test_options_base_t>(_l_running_options, _l_sco);
+    auto _l_rv = abc::run_tests_return_complete_result<test_options_base_t>(
+        _l_running_options, _l_sco
+    );
     return test_result_t{
         .memoized_error_repoter
         = *(static_cast<reporters::memoized_error_reporter_t*>(
             _l_running_options.group_test_options.error_reporters.at(0).get()
+        )),
+        .memoized_test_reporter
+        = *(static_cast<reporters::memoized_test_reporter_t*>(
+            _l_running_options.group_test_options.test_reporters.at(0).get()
         )),
         .run_tests_result = _l_rv
     };

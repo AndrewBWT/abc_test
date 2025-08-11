@@ -6,7 +6,7 @@
 #include "abc_test/utility/str/unicode.hpp"
 #include "abc_test_test/testing_utilities/bootstrapped_testing_utilities.hpp"
 
-/*_TEST_CASE(
+_TEST_CASE(
     abc::test_case_t(
         {.name = "Basic random generator testing values for int",
          .path = "abc_test_test::component_tests::data_generators::random_data"
@@ -47,7 +47,7 @@
         }
     }
     _CHECK(unit_tests);
-}*/
+}
 
 _TEST_CASE(
     abc::test_case_t(

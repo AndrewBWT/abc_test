@@ -130,8 +130,7 @@ namespace
 {
 template <typename T>
 __constexpr bool
-    return_result(const bool _a_pass)
-        noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>);
+return_result(const bool _a_pass);
 } // namespace
 
 _END_ABC_NS
@@ -430,6 +429,22 @@ matcher_based_assertion_block(
     return return_result<T>(_l_passed);
 }
 
+__no_constexpr_imp void check_for_termination()
+{
+    using namespace _ABC_NS_ERRORS;
+    using enum abc::ds::enum_test_status_t;
+    auto& _l_current_test{ global::get_this_threads_current_test() };
+    auto _l_x = _l_current_test.test_status();
+    if (_l_current_test.test_status() == TERMINATION_OCCOURED_TEST_FAILED)
+    {
+        throw test_assertion_exception_t{};
+    }
+    else
+    {
+
+    }
+}
+
 namespace
 {
 template<
@@ -439,7 +454,7 @@ template<
         bool
         return_result(
             const bool _a_pass
-        ) noexcept(std::same_as<T, _ABC_NS_REPORTS::pass_or_fail_t>)
+        ) 
 {
     using namespace std;
     using namespace _ABC_NS_ERRORS;

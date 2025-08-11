@@ -78,7 +78,7 @@ struct MacroAProxy
                 );
             _l_test_runner.add_assertion(_l_gur);
             _m_matcher.remove_primary_source();
-            // return return_result<T>(_l_passed);
+            //return_result<T>(_l_passed);
         }
     }
 
@@ -90,9 +90,12 @@ struct MacroAProxy
         matcher_source_map_t _l_msm;
         _m_matcher.gather_map_source(_l_msm);
         global::get_this_threads_current_test()
-            .add_current_for_loop_stack_to_trie(not _m_matcher.matcher_result().passed());
+            .add_current_for_loop_stack_to_trie(
+                not _m_matcher.matcher_result().passed()
+            );
         auto ki
-            = global::get_this_threads_test_evaluator_ref().get_log_infos(false);
+            = global::get_this_threads_test_evaluator_ref().get_log_infos(false
+            );
         if constexpr (Has_Annotation)
         {
             bba_inner_assertion_type_t _l_tuple(
@@ -155,7 +158,8 @@ struct MacroAProxy2
         using namespace std;
         using namespace _ABC_NS_REPORTS;
         using namespace _ABC_NS_ERRORS;
-        auto _l_test_runner{_ABC_NS_GLOBAL::get_this_threads_test_evaluator_ref()};
+        auto _l_test_runner{_ABC_NS_GLOBAL::get_this_threads_test_evaluator_ref(
+        )};
         assertion_ptr_t<true, T> _l_assertion{
             make_unique<static_assertion_t<T>>(
                 _m_source, _l_test_runner.get_log_infos(false), _m_msg
@@ -189,7 +193,8 @@ struct MacroAProxy2
         global::get_this_threads_current_test()
             .add_current_for_loop_stack_to_trie(not _l_pass);
         auto ki
-            = global::get_this_threads_test_evaluator_ref().get_log_infos(false);
+            = global::get_this_threads_test_evaluator_ref().get_log_infos(false
+            );
         bba_inner_assertion_type_t _l_tuple(
             ( std::same_as<T, _ABC_NS_REPORTS::terminate_t>
               || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t> ),
