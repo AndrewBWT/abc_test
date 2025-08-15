@@ -601,8 +601,8 @@ __no_constexpr_imp matcher_t
     using namespace _ABC_NS_MATCHER;
     using namespace _ABC_NS_UTILITY_STR;
     auto _l_str_result{
-        abc::matcher::matcher_default_comparable_t<
-            abc::matcher::comparison_enum_t::EQ,
+        matcher_default_comparable_t<
+            comparison_enum_t::EQ,
             u8string_view,
             u8string_view>{}
             .run(_a_msg, cast_string_to_u8string(_a_exception.what()))

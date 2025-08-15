@@ -1388,13 +1388,13 @@ struct default_parser_t<std::shared_ptr<T>>
 {
     using value_type = std::shared_ptr<T>;
     enum_pointer_print_parse_type_t _m_enum
-        = enum_pointer_print_parse_type_t::AS_OBJECT;
+        = enum_pointer_print_parse_type_t::JUST_DATA;
 
     __constexpr
     default_parser_t(
         parser_t<T>                           _a_parser,
         const enum_pointer_print_parse_type_t _a_enum
-        = enum_pointer_print_parse_type_t::AS_OBJECT
+        = enum_pointer_print_parse_type_t::JUST_DATA
     )
         : _m_enum(_a_enum), _m_parser(_a_parser)
     {}

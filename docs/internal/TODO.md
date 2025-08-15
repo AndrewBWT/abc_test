@@ -22,12 +22,6 @@
 26 - Perform an overview of the output from a generic run of abc_test, and come up with a list of changes and improvements which need to be made. From there, add them to the to-do list.
 27 - Go through each of our examples and test files. Make a note of where strings are used, and determine whether there are u8string overloads for them. Once that is done, come up with a list of all functions which require a u8string or std::string overload. Add those functions which need to be written to the to-do list.
 31 - matcher_default_comparable_t needs to be had a look at, and made consistent across all the data types we want to write instances for.
-37 - Write a test for an && in a _CHECK macro on its own.
-38 - Write a test for a || in a _CHECK macro on its own.
-39 - Write a test for a ! in a _CHECK macro on its own.
-40 - Write a test for an && in a _REQUIRE macro on its own.
-41 - Write a test for a || in a _REQUIRE macro on its own.
-42 - Write a test for a ! in a _REQUIRE macro on its own.
 43 - Write a test for a _CHECK macro as part of a multi matcher. 
 44 - Write a test for a _CHECK_EXPR macro on its own as part of a multi matcher. 
 45 - Write a test for a _REQUIRE macro on its own as part of a multi matcher. 
@@ -46,6 +40,8 @@
 60 - Check incorrectly read data for GDF for a DGWFS is processed correctly. By this we mean, it fails gracefully.
 62 - Check repetition configs are properly processed by data generators with file support. By this we mean, that a correct RC of mode 0 goes to the first file, then mode 1 to the underlying DG - and that it never goes to the other files (which are write-only currently).
 63 - Check incorrectly read data for TDF for a DGWFS is processed correctly. By this we mean, it fails gracefully. Test with both enumeration and random generators.
+64 - Write a check for a _CHECK, which is denoting a multi matcher's results should be passed to the test harness.
+65 - Write a test for a _REQUIRE macro, denoting a multi matcher's results should be passed to the test harness.
 
 ## Longer Term Focus ##
 
@@ -118,6 +114,9 @@ for (auto&& [validator, input] : data_validator<char,int>(gdf("hello"), random_g
 44 - Want to have a mechanism which defines the "maximum" number of threads an instance of the test harness can have. This isn't the number of threads on the system, or the number of threads defined by the user, but rather some abstract notino of what the system can conceivably have as a maximum value. Most of the time this would be set to std::numeric_limits<size_t>::max(), however when bootstrapping tests, it would be set to the maximum number of threads the parent running-test was assigned. Currently, we can set this value to be very high and the system will just accept it - potentially allowing us to write some code which would break the system. This safety check wouldn't eliminate that (we can always write a test which spawns a billion threads), but it would give us a bit more safety - never a bad thing.
 45 - Validation of rep configs needs to be looked at. Currently all we do is ensure it parses correctly. We could look at whether there exists a test which matches the repetition configuration's unique id. I don't think we can analyse a repetition configuration after its been ran on a test to discern whether its invalid. We can check for invalidly parsed tertiary data. We can also look at streamlining how the data is stored - e.g. we have whitespace characters in the string which aren't needed. Should we enforce an ordering on the rep config? e.g. for loop index 0 can't follow for loop index 1. But they would need an index, for when a rep config skips a for loop index.
 46 - Should the string printers report specific string types - e.g. a u8 prefix when checking std::u8string types?
+47 - The expression _CHECK(true_matcher() && true_matcher()) creates a matcher with a string of "(true) && (true)". I think this should be true && true. 
+48 - A multi_matcher should have its assertions removed after they are passed to the test harness.
+49 - A multi_matcher which has unprocessed assertions in it, and is then deleted, should either issue a warning, or have those assertions streamed to the test harness.
 
 ## Information
 

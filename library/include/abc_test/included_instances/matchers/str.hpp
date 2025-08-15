@@ -655,6 +655,128 @@ public:
     }
 };
 
+template <comparison_enum_t Cmp, typename T>
+struct matcher_default_comparable_t<Cmp, std::optional<T>, std::optional<T>>
+{
+public:
+    static constexpr bool is_specialized{true};
+
+    __constexpr virtual matcher_result_t
+        run(
+            const std::optional<T>& _a_arg1,
+            const std::optional<T>& _a_arg2
+        ) const
+    {
+        using namespace std;
+        using namespace _ABC_NS_UTILITY_STR;
+        matcher_result_t _l_result;
+        vector<u8string> _l_explanation_strs;
+        using arg_type_t                   = decltype(_a_arg1);
+        auto _l_same_type_explanation_func = [&]()
+        {
+            _l_explanation_strs.push_back(fmt::format(
+                u8"Both arguments, of type \"{0}\", have a value inhabiting "
+                u8"the "
+                u8"type \"{1}\". Due to the result from the sub-matcher "
+                u8"comparing these values, this matcher fails.",
+                type_id<decltype(_a_arg1)>(),
+                type_id<T>()
+            ));
+        };
+        if (_a_arg1.has_value() && _a_arg2.has_value())
+        {
+            _l_result = matcher_default_comparable_t<Cmp, T, T>().run(
+                _a_arg1.value(), _a_arg2.value()
+            );
+            _l_same_type_explanation_func();
+            return matcher_result_t(
+                false,
+                matcher_result_infos_t(
+                    comparison_expr_to_string<Cmp>(_a_arg1, _a_arg2, true),
+                    _l_explanation_strs,
+                    vector<matcher_result_infos_t::tree_structure_t>(
+                        1,
+                        make_tuple(
+                            u8"Child",
+                            u8"C",
+                            make_shared<matcher_result_infos_t>(_l_result.str())
+                        )
+                    )
+                )
+            );
+        }
+        else if (_a_arg1.has_value())
+        {
+            if constexpr (Cmp == matcher::comparison_enum_t::GT
+                          || Cmp == matcher::comparison_enum_t::GEQ
+                          || Cmp == matcher::comparison_enum_t::NEQ)
+            {
+                return matcher_result_t(
+                    true,
+                    matcher_result_infos_t(
+                        comparison_expr_to_string<Cmp>(_a_arg1, _a_arg2, true)
+                    )
+                );
+            }
+            else
+            {
+                return matcher_result_t(
+                    false,
+                    matcher_result_infos_t(
+                        comparison_expr_to_string<Cmp>(_a_arg1, _a_arg2, false)
+                    )
+                );
+            }
+        }
+        else if (_a_arg2.has_value())
+        {
+            if constexpr (Cmp == matcher::comparison_enum_t::LT
+                          || Cmp == matcher::comparison_enum_t::LEQ
+                          || Cmp == matcher::comparison_enum_t::NEQ)
+            {
+                return matcher_result_t(
+                    true,
+                    matcher_result_infos_t(
+                        comparison_expr_to_string<Cmp>(_a_arg1, _a_arg2, true)
+                    )
+                );
+            }
+            else
+            {
+                return matcher_result_t(
+                    false,
+                    matcher_result_infos_t(
+                        comparison_expr_to_string<Cmp>(_a_arg1, _a_arg2, false)
+                    )
+                );
+            }
+        }
+        else
+        {
+            if constexpr (Cmp == matcher::comparison_enum_t::LEQ
+                || Cmp == matcher::comparison_enum_t::GEQ
+                || Cmp == matcher::comparison_enum_t::EQ)
+            {
+                return matcher_result_t(
+                    true,
+                    matcher_result_infos_t(
+                        comparison_expr_to_string<Cmp>(_a_arg1, _a_arg2, true)
+                    )
+                );
+            }
+            else
+            {
+                return matcher_result_t(
+                    false,
+                    matcher_result_infos_t(
+                        comparison_expr_to_string<Cmp>(_a_arg1, _a_arg2, false)
+                    )
+                );
+            }
+        }
+    }
+};
+
 _END_ABC_MATCHER_NS
 
 _BEGIN_ABC_NS
