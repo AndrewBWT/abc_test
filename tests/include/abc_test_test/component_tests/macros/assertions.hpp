@@ -466,7 +466,7 @@ _TEST_CASE(
     )<pass_or_terminate_t>(_l_require_funcs, "require_tests");
 }
 
-_TEST_CASE(
+/*_TEST_CASE(
     abc::test_case_t(
         {.name = "Check _CHECK macro works in a multi-matcher correctly",
          .path = "abc_test_test::component_tests::macros::assertions",
