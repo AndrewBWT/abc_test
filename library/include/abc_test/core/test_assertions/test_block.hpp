@@ -89,7 +89,8 @@ __constexpr assertion_wp_t<T>
     global::get_this_threads_current_test().add_current_for_loop_stack_to_trie(
         not _l_pass
     );
-    auto ki = global::get_this_threads_test_evaluator_ref().get_log_infos(false);
+    auto ki
+        = global::get_this_threads_test_evaluator_ref().get_log_infos(false);
     bba_inner_assertion_type_t _l_tuple(
         ( std::same_as<T, _ABC_NS_REPORTS::terminate_t>
           || std::same_as<T, _ABC_NS_REPORTS::pass_or_terminate_t> ),
@@ -115,7 +116,8 @@ __constexpr assertion_wp_t<T>
     global::get_this_threads_current_test().add_current_for_loop_stack_to_trie(
         not _a_matcher.matcher_result().passed()
     );
-    auto ki = global::get_this_threads_test_evaluator_ref().get_log_infos(false);
+    auto ki
+        = global::get_this_threads_test_evaluator_ref().get_log_infos(false);
     _a_matcher.gather_map_source(_l_msm);
     if constexpr (Annotated)
     {
@@ -208,20 +210,75 @@ public:
         _m_processed = true;
     }
 
-
-
     template <typename T2, bool Has_Annotation>
     requires std::derived_from<T2, _ABC_NS_REPORTS::assertion_status_base_t>
     __no_constexpr_or_inline multi_element_test_block_t&
         operator<<(
             MacroAProxy<T2, Has_Annotation>&& _a_proxy
-        ) noexcept
+        )
     {
-        _ABC_NS_MATCHER::bba_inner_assertion_type_t _l_matcher_info{
+        using namespace _ABC_NS_MATCHER;
+        using namespace _ABC_NS_REPORTS;
+        using namespace _ABC_NS_GLOBAL;
+        using namespace _ABC_NS_DS;
+        using namespace std;
+        bba_inner_assertion_type_t _l_matcher_info{
             _a_proxy.make_bba_inner_assertion_type()
         };
         _m_assertions.push_back(_l_matcher_info);
-        if constexpr (std::same_as<T2, _ABC_NS_REPORTS::pass_or_terminate_t>)
+        if constexpr (same_as<T2, pass_or_terminate_t>)
+        {
+            if (_l_matcher_info.matcher_result().passed() == false)
+            {
+                assertion_ptr_t<false, T2> _l_gur;
+                auto _l_test_runner{get_this_threads_test_evaluator_ref()};
+                _l_gur = make_unique<multi_element_assertion_block_t<T2>>(
+                    false,
+                    source(),
+                    _l_test_runner.get_log_infos(false),
+                    get_matcher(),
+                    test_annotation(),
+                    _l_test_runner.current_assertion_index()
+                );
+                _l_test_runner.add_assertion(_l_gur);
+                set_processed();
+            }
+        }
+        /*
+                using namespace _ABC_NS_REPORTS;
+        using namespace _ABC_NS_MATCHER;
+        auto _l_test_runner{
+        _ABC_NS_GLOBAL::get_this_threads_test_evaluator_ref() };
+        _m_matcher.register_end(_ABC_NS_DS::single_source_t(
+            _m_macro_str, _m_source
+        ));
+        _m_matcher.set_processed();
+        assertion_ptr_t<false, T> _l_gur;
+        bool                      _l_passed{ true };
+        for (const bba_inner_assertion_type_t& _l_ki : _m_matcher.get_matcher())
+        {
+            if (not _l_ki.matcher_result().passed())
+            {
+                _l_passed = false;
+            }
+        }
+        if (_m_matcher.get_matcher().size() == 0)
+        {
+            _l_passed = false;
+        }
+        matcher_res_infos_t _l_mtr{ _m_matcher.get_matcher() };
+        _l_gur = make_unique<multi_element_assertion_block_t<T>>(
+            _l_passed,
+            _m_matcher.source(),
+            _l_test_runner.get_log_infos(false),
+            _l_mtr,
+            _m_matcher.test_annotation(),
+            _l_test_runner.current_assertion_index()
+        );
+        _l_test_runner.add_assertion(_l_gur);
+        */
+
+        /*if constexpr (std::same_as<T2, _ABC_NS_REPORTS::pass_or_terminate_t>)
         {
             if (_l_matcher_info.matcher_result().passed() == false)
             {
@@ -258,7 +315,7 @@ public:
             );
             global::get_this_threads_test_evaluator_ref().add_assertion(_l_gur);
             throw _ABC_NS_ERRORS::test_assertion_exception_t();
-        }
+        }*/
         return *this;
     }
 
@@ -323,39 +380,39 @@ private:
 _END_ABC_NS
 
 _BEGIN_ABC_NS
+
 template <typename T>
-    requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
+requires std::derived_from<T, _ABC_NS_REPORTS::dynamic_status_t>
 struct MacroAProxy3
 {
     abc::multi_element_test_block_t _m_matcher;
-    std::source_location                            _m_source;
-    std::string                                     _m_matcher_str;
-    std::string                                     _m_macro_str;
+    std::source_location            _m_source;
+    std::string                     _m_matcher_str;
+    std::string                     _m_macro_str;
 
     MacroAProxy3(
         const abc::multi_element_test_block_t& _a_matcher,
-        const std::source_location& _a_source,
-        const std::string_view                                 _a_matcher_str,
-        const std::string_view                                 _a_macro_str
+        const std::source_location&            _a_source,
+        const std::string_view                 _a_matcher_str,
+        const std::string_view                 _a_macro_str
     )
         : _m_matcher(_a_matcher)
         , _m_source(_a_source)
         , _m_macro_str(_a_macro_str)
         , _m_matcher_str(_a_matcher_str)
-    {
-    }
+    {}
 
     inline ~MacroAProxy3()
     {
         using namespace _ABC_NS_REPORTS;
         using namespace _ABC_NS_MATCHER;
-        auto _l_test_runner{ _ABC_NS_GLOBAL::get_this_threads_test_evaluator_ref() };
-        _m_matcher.register_end(_ABC_NS_DS::single_source_t(
-            _m_macro_str, _m_source
-        ));
+        using namespace _ABC_NS_GLOBAL;
+        using namespace _ABC_NS_DS;
+        auto _l_test_runner{get_this_threads_test_evaluator_ref()};
+        _m_matcher.register_end(single_source_t(_m_macro_str, _m_source));
         _m_matcher.set_processed();
         assertion_ptr_t<false, T> _l_gur;
-        bool                      _l_passed{ true };
+        bool                      _l_passed{true};
         for (const bba_inner_assertion_type_t& _l_ki : _m_matcher.get_matcher())
         {
             if (not _l_ki.matcher_result().passed())
@@ -367,7 +424,7 @@ struct MacroAProxy3
         {
             _l_passed = false;
         }
-        matcher_res_infos_t _l_mtr{ _m_matcher.get_matcher() };
+        matcher_res_infos_t _l_mtr{_m_matcher.get_matcher()};
         _l_gur = make_unique<multi_element_assertion_block_t<T>>(
             _l_passed,
             _m_matcher.source(),
@@ -377,22 +434,19 @@ struct MacroAProxy3
             _l_test_runner.current_assertion_index()
         );
         _l_test_runner.add_assertion(_l_gur);
-        //return_result<T>(_l_passed);
     }
 };
 
 template <typename T>
 static auto
-make_macroAProxy(
-    const abc::multi_element_test_block_t& _a_matcher,
-    const std::source_location& _a_source,
-    const std::string_view                                 _a_matcher_str,
-    const std::string_view                                 _a_macro_str
-) -> MacroAProxy3<T>
+    make_macroAProxy(
+        const abc::multi_element_test_block_t& _a_matcher,
+        const std::source_location&            _a_source,
+        const std::string_view                 _a_matcher_str,
+        const std::string_view                 _a_macro_str
+    ) -> MacroAProxy3<T>
 {
-    return MacroAProxy3<T>(
-        _a_matcher, _a_source, _a_matcher_str, _a_macro_str
-    );
+    return MacroAProxy3<T>(_a_matcher, _a_source, _a_matcher_str, _a_macro_str);
 }
 
 _END_ABC_NS

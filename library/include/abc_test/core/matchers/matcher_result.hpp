@@ -154,7 +154,7 @@ public:
 
     __no_constexpr_imp
         bba_inner_assertion_type_t(
-            const bool                                _a_terminate,
+            const bool                                _a_can_terminate,
             const bool                                _a_pass_or_failure,
             const std::optional<std::u8string>&       _a_opt_msg,
             const _ABC_NS_DS::log_infos_t&            _a_log_infos,
@@ -171,12 +171,12 @@ public:
         , _m_enum_bba_inner_assertion_type(
             enum_bba_inner_assertion_type_t::STATIC_ASSERTION
         )
-        , _m_terminate(_a_terminate)
+        , _m_can_terminate(_a_can_terminate)
     {}
 
     __no_constexpr_imp
         bba_inner_assertion_type_t(
-            const bool                                _a_terminate,
+            const bool                                _a_can_terminate,
             const matcher_result_t&                   _a_matcher_result,
             const _ABC_NS_DS::log_infos_t&            _a_log_infos,
             const std::optional<ds::single_source_t>& _a_source
@@ -194,13 +194,13 @@ public:
         , _m_enum_bba_inner_assertion_type(
             enum_bba_inner_assertion_type_t::MATCHER_BASED_ASSERTION
         )
-        , _m_terminate(_a_terminate)
+        , _m_can_terminate(_a_can_terminate)
     {}
 
     __no_constexpr_imp
         bba_inner_assertion_type_t(
             const _ABC_NS_DS::log_infos_t&            _a_log_infos,
-            const bool                                _a_terminate,
+            const bool                                _a_can_terminate,
             const matcher_result_t&                   _a_matcher_result,
             const std::optional<ds::single_source_t>& _a_source,
             const std::optional<std::u8string>&       _a_annotation,
@@ -214,7 +214,7 @@ public:
         , _m_source_map(_a_matcher_source_map)
         , _m_source(_a_source)
         , _m_enum_bba_inner_assertion_type(_a_enum_bba_inner_assertion_type)
-        , _m_terminate(_a_terminate)
+        , _m_can_terminate(_a_can_terminate)
     {}
 
     __constexpr_imp const matcher_result_t&
@@ -248,9 +248,9 @@ public:
     }
 
     __constexpr_imp bool
-        terminate() const noexcept
+        can_terminate() const noexcept
     {
-        return _m_terminate;
+        return _m_can_terminate;
     }
 
     __constexpr_imp const _ABC_NS_DS::log_infos_t&
@@ -265,7 +265,7 @@ private:
     matcher_source_map_t               _m_source_map;
     std::optional<ds::single_source_t> _m_source;
     enum_bba_inner_assertion_type_t    _m_enum_bba_inner_assertion_type;
-    bool                               _m_terminate;
+    bool                               _m_can_terminate;
 };
 
 // using matcher_result_with_annotation_and_source_info_t = std::tuple<

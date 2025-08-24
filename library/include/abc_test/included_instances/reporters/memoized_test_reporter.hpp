@@ -149,14 +149,23 @@ struct memoized_test_reporter_t : public test_reporter_t
 public:
     mutable std::optional<ds::pre_test_run_report_t>     _m_prrr;
     mutable std::optional<ds::finalised_test_set_data_t> _m_test_set_data;
-    mutable std::vector<memoized_test_result_t>          _m_tests;
+    mutable std::
+        map<std::pair<std::string, std::string>, memoized_test_result_t>
+            _m_tests;
 public:
-    __constexpr virtual void
+    __no_constexpr_imp virtual void
         report_test(
             const ds::invoked_test_data_t& _a_itd
         ) const override
     {
-        _m_tests.push_back(memoized_test_result_t(_a_itd));
+        using namespace std;
+        auto& _l_user_data{
+            _a_itd.post_setup_test_data().registered_test_data()._m_user_data
+        };
+        _m_tests.insert({
+            {string(_l_user_data.path), string(_l_user_data.name)},
+            memoized_test_result_t(_a_itd)
+        });
         // _m_itds = _a_itd;
     }
 

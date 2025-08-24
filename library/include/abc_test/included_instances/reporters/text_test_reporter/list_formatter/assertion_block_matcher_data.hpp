@@ -186,7 +186,7 @@ __no_constexpr_imp void
             _a_ttor.write(this->prefix(_a_idx));
             _a_ttor.write_line(_a_pc.indent(
                 _a_pc.matcher_output_str(
-                    _l_matcher_result.passed(), _a_element.terminate()
+                    _l_matcher_result.passed(), _a_element.can_terminate()
                 ),
                 _m_indent_offset
             ));

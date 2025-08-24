@@ -22,16 +22,6 @@
 26 - Perform an overview of the output from a generic run of abc_test, and come up with a list of changes and improvements which need to be made. From there, add them to the to-do list.
 27 - Go through each of our examples and test files. Make a note of where strings are used, and determine whether there are u8string overloads for them. Once that is done, come up with a list of all functions which require a u8string or std::string overload. Add those functions which need to be written to the to-do list.
 31 - matcher_default_comparable_t needs to be had a look at, and made consistent across all the data types we want to write instances for.
-43 - Write a test for a _CHECK macro as part of a multi matcher. 
-44 - Write a test for a _CHECK_EXPR macro on its own as part of a multi matcher. 
-45 - Write a test for a _REQUIRE macro on its own as part of a multi matcher. 
-46 - Write a test for a _REQUIRE_EXPR macro on its own as part of a multi matcher. 
-47 - Write a test for an && in a _CHECK macro on its own as part of a multi matcher. 
-48 - Write a test for a || in a _CHECK macro on its own as part of a multi matcher. 
-49 - Write a test for a ! in a _CHECK macro on its own as part of a multi matcher. 
-50 - Write a test for an && in a _REQUIRE macro on its own as part of a multi matcher. 
-51 - Write a test for a || in a _REQUIRE macro on its own as part of a multi matcher. 
-52 - Write a test for a ! in a _REQUIRE macro on its own as part of a multi matcher. 
 53 - Write test for the _EXPR type where the internal type only has a == and a printer speciailization. It should default to default behaviour.
 54 - Write a test for the _EXPR macro where the internal type has a specialised matcher_comparison specialization. Ensure it is followed.
 55 - Write a test for a bespoke matcher. Ensure that what is printed is as stipulated by the user.
@@ -40,8 +30,7 @@
 60 - Check incorrectly read data for GDF for a DGWFS is processed correctly. By this we mean, it fails gracefully.
 62 - Check repetition configs are properly processed by data generators with file support. By this we mean, that a correct RC of mode 0 goes to the first file, then mode 1 to the underlying DG - and that it never goes to the other files (which are write-only currently).
 63 - Check incorrectly read data for TDF for a DGWFS is processed correctly. By this we mean, it fails gracefully. Test with both enumeration and random generators.
-64 - Write a check for a _CHECK, which is denoting a multi matcher's results should be passed to the test harness.
-65 - Write a test for a _REQUIRE macro, denoting a multi matcher's results should be passed to the test harness.
+66 - Brainstorm writing tests for the static assertions - FAIL, PASS and TERMINATE. Remember to include tests for passing these results to multi-matchers too. Also include the annotated versions - _FAIL_WITH_MSG, PASS_WITH_MSG and _TERMINATE_WITH_MSG. 
 
 ## Longer Term Focus ##
 
@@ -117,6 +106,7 @@ for (auto&& [validator, input] : data_validator<char,int>(gdf("hello"), random_g
 47 - The expression _CHECK(true_matcher() && true_matcher()) creates a matcher with a string of "(true) && (true)". I think this should be true && true. 
 48 - A multi_matcher should have its assertions removed after they are passed to the test harness.
 49 - A multi_matcher which has unprocessed assertions in it, and is then deleted, should either issue a warning, or have those assertions streamed to the test harness.
+50 - Or expressions ("true || false") retain their failing sub-matchers. If the assertion passes, this information shouldn't be retained... usually. If its a more complicated expression - e.g. !(true || false), then it should be retained. The inner expression evaluates to true. It should evaluate its expression, then delete any retianed data appropriately - if the test harness says to. There are settings where all test data is retained, and therefore no data is deleted.
 
 ## Information
 

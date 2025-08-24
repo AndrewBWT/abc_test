@@ -690,9 +690,9 @@ public:
             );
             _l_same_type_explanation_func();
             return matcher_result_t(
-                false,
+                _l_result.passed(),
                 matcher_result_infos_t(
-                    comparison_expr_to_string<Cmp>(_a_arg1, _a_arg2, true),
+                    comparison_expr_to_string<Cmp>(_a_arg1, _a_arg2, _l_result.passed()),
                     _l_explanation_strs,
                     vector<matcher_result_infos_t::tree_structure_t>(
                         1,

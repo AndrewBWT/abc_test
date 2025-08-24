@@ -20,6 +20,16 @@ struct test_result_t
     // abc::reporters::memoized_test_reporter_t memoized_test_reporter;
 };
 
+__no_constexpr_imp std::pair<std::string, std::string>
+                   make_name_pair(
+                       const std::size_t _a_idx
+                   )
+{
+    return make_pair(
+        fmt::format("path{0}", _a_idx), fmt::format("name{0}", _a_idx)
+    );
+}
+
 __no_constexpr_imp test_result_t
     abc_test_tests_internal_test_runner(
         const std::size_t                           _a_n_threads,

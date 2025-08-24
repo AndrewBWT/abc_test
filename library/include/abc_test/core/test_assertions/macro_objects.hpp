@@ -4,7 +4,6 @@
 #include "abc_test/core/test_reports/matcher_based_assertion_single_line.hpp"
 #include "abc_test/core/test_reports/static_assertion.hpp"
 #include "abc_test/utility/internal/macros.hpp"
-
 #include <concepts>
 #include <source_location>
 

@@ -157,7 +157,7 @@ __constexpr_imp void
                     optional<ds::single_source_t>,
                     matcher_source_map_t>
                     _l_first = make_tuple(
-                        _l_matcher.terminate(),
+                        _l_matcher.can_terminate(),
                         _l_matcher.assertion_type(),
                         _l_matcher.source(),
                         _l_matcher.source_map()
