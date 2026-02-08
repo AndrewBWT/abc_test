@@ -1,6 +1,7 @@
 #pragma once
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
+#include "abc_test/std_specializations.hpp"
 
 _TEST_CASE(
     abc::test_case_t(

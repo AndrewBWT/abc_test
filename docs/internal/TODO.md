@@ -11,17 +11,13 @@
 
 ### Specific Long-form List of to-do's for 0.0.2 ###
 
-18 - Brainstorm writing tests for the logging functions.
 19 - Organize inner documentation so there is a landing page for those looking for user-written documentation.
 20 - Work on organization of test declarations documentation.
 21 - Work on organization of test assertions documentation.
 22 - Work on organization of data generators documentation.
-23 - Write list of all objects for which we would like to have specialisations for in abc_test. 
 24 - Work out how we want to include/exclude specializations. Either we have specific files for each specialization. Or we have a compiler on/off switch which allows/disallows these entities to be compiled.
-25 - Write list of all types of specialization which we would require. From here, we should have a 2d matrix of all specialisations that need to be written. And adding them to a big to-do list should be the next step.
 26 - Perform an overview of the output from a generic run of abc_test, and come up with a list of changes and improvements which need to be made. From there, add them to the to-do list.
 27 - Go through each of our examples and test files. Make a note of where strings are used, and determine whether there are u8string overloads for them. Once that is done, come up with a list of all functions which require a u8string or std::string overload. Add those functions which need to be written to the to-do list.
-31 - matcher_default_comparable_t needs to be had a look at, and made consistent across all the data types we want to write instances for.
 53 - Write test for the _EXPR type where the internal type only has a == and a printer speciailization. It should default to default behaviour.
 54 - Write a test for the _EXPR macro where the internal type has a specialised matcher_comparison specialization. Ensure it is followed.
 55 - Write a test for a bespoke matcher. Ensure that what is printed is as stipulated by the user.
@@ -31,6 +27,64 @@
 62 - Check repetition configs are properly processed by data generators with file support. By this we mean, that a correct RC of mode 0 goes to the first file, then mode 1 to the underlying DG - and that it never goes to the other files (which are write-only currently).
 63 - Check incorrectly read data for TDF for a DGWFS is processed correctly. By this we mean, it fails gracefully. Test with both enumeration and random generators.
 66 - Brainstorm writing tests for the static assertions - FAIL, PASS and TERMINATE. Remember to include tests for passing these results to multi-matchers too. Also include the annotated versions - _FAIL_WITH_MSG, PASS_WITH_MSG and _TERMINATE_WITH_MSG. 
+67 - Write test to ensure data generators automatically log their parsed contents. Also write a test which shows that, if its not possible to print data from a DG (no printable form), then it does not print that data. Ensure that the data persists until the log message goes out of scope.
+68 - Write test for _TLOG. The data persists until it goes out of scope.
+69 - Write test for _TLOG_. The data should only be printed once.
+70 - Write test for _TVLOG. The data should persist until it goes out of scope.
+71 - Write test for _TVLOG_. The data should only be printed once.
+72 - This is a list of all of the structs for which specializations are required. The key is as follows: N = Either not checked, or no implementation. I = Implementation defined. T = Implementation defined and test written for it.
+The list of structs is as follows:
+-- matcher_default_comparable_t (MDC) (in matchers/comparison/comparison_function.hpp)
+-- default_random_generator_t (RND) (in included_instances/data_generators/random_generator/default_random_generator.hpp)
+-- default_enumeration_t (ENUM) (in included_instances/data_generators/enum_generator/default_enum_generator.hpp)
+-- min_value_t (MIN)
+-- max_value_t (MAX)
+-- The two above need to be separate, as they are used in the random generator (producing min/max values, and in bounds_t. Still, it seems to be only used for fundamental types and the enum_list_t class. They could be part of default_enumeration_t. For now, we will leave it.
+-- default_printer_t (PRINT)
+-- default_parser_t. (PARSE)
+====================================================================
+Type                | MDC | RND | ENUM | MIN | MAX | PRINT | PARSE |
+====================================================================
+signed char         |  N  |  T  |  N   |  N  |  N  |   N   |   N   |
+unsigned char       |  N  |  T  |  N   |  N  |  N  |   N   |   N   |
+signed short        |  N  |  T  |  N   |  N  |  N  |   N   |   N   |
+unsigned short      |  N  |  T  |  N   |  N  |  N  |   N   |   N   |
+signed int          |  N  |  T  |  N   |  N  |  N  |   N   |   N   |
+unsigned int        |  N  |  T  |  N   |  N  |  N  |   N   |   N   |
+signed long         |  N  |  T  |  N   |  N  |  N  |   N   |   N   |
+unsigned long       |  N  |  T  |  N   |  N  |  N  |   N   |   N   |
+signed long long    |  N  |  T  |  N   |  N  |  N  |   N   |   N   |
+unsigned long long  |  N  |  T  |  N   |  N  |  N  |   N   |   N   |
+bool                |  N  |  T  |  N   |  N  |  N  |   N   |   N   |
+char                |  N  |  T  |  N   |  N  |  N  |   N   |   N   |
+wchar_t             |  N  |  T  |  N   |  N  |  N  |   N   |   N   |
+char8_t             |  N  |  T  |  N   |  N  |  N  |   N   |   N   |
+char16_t            |  N  |  T  |  N   |  N  |  N  |   N   |   N   |
+char32_t            |  N  |  T  |  N   |  N  |  N  |   N   |   N   |
+float               |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+double              |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+long double         |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+vector              |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+list                |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+deque               |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+array               |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+forward_list        |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+map                 |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+multi_map           |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+set                 |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+multi_set           |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+unorderd_map        |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+unordered_multi_map |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+unorderd_set        |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+unordered_multiset  |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+pair                |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+tuple               |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+expected            |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+variant             |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+bitset (?)          |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+generic objects     |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+enums               |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
+====================================================================
 
 ## Longer Term Focus ##
 
@@ -107,6 +161,8 @@ for (auto&& [validator, input] : data_validator<char,int>(gdf("hello"), random_g
 48 - A multi_matcher should have its assertions removed after they are passed to the test harness.
 49 - A multi_matcher which has unprocessed assertions in it, and is then deleted, should either issue a warning, or have those assertions streamed to the test harness.
 50 - Or expressions ("true || false") retain their failing sub-matchers. If the assertion passes, this information shouldn't be retained... usually. If its a more complicated expression - e.g. !(true || false), then it should be retained. The inner expression evaluates to true. It should evaluate its expression, then delete any retianed data appropriately - if the test harness says to. There are settings where all test data is retained, and therefore no data is deleted.
+51 - Consider moving min_value_t and max_value_t to be part of default_enumreation_t. Outside of enumeration, they are used for the bounds_t object, for the enum_list_t type, and the default random generator instantation for fundamental types. However we think we could remove the need for these classes, replacing them with calls to std::numeric_limits.
+52 - Consider adding some mechanism to deal with file names -- so that the user can see when the same file name has been used for files that contain different types.
 
 ## Information
 

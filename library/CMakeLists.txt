@@ -248,6 +248,10 @@ if(NOT DEFINED ABC_TEST_LIBRARY_INCLUDED)
     include/abc_test/included_instances/options/command_line_parser.hpp
     include/abc_test/included_instances/options/included_instances_test_options.hpp
     include/abc_test/included_instances/options/option_config.hpp
+	
+	include/abc_test/std_specializations.hpp
+	include/abc_test/std_specializations/default_random_generator.hpp
+	include/abc_test/std_specializations/default_random_generator/fundamental_types.hpp
   )
 
   # Set the cpp files variable. This is a list of all the cpp files.

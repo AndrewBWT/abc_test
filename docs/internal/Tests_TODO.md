@@ -15,3 +15,4 @@ This file contains a list of all the things we want to do in regards to testing 
   3 - Check both together.
   4 - Check RC works correctly.
 3 - Add rng test for rvalue constructor. There was a bug in it which we didn't catch - and our tests should have done.
+4 - Add checks for when tests use the same file names. We recently had to fix a bug that only occoured when using mult-threading, as the same file names were being used. This should be allowed behaviour that fails gracefully - currently it will throw a segmentation fault if the files contain unparsable types.

@@ -49,6 +49,10 @@ if(NOT DEFINED ABC_TEST_TESTS_INCLUDED)
     include/abc_test_test/testing_utilities/functions.hpp
 	include/abc_test_test/testing_utilities/bootstrapped_testing_utilities.hpp
 	
+	include/abc_test_test/std_specializations.hpp
+	include/abc_test_test/std_specializations/default_random_generator.hpp
+    include/abc_test_test/std_specializations/default_random_generator/fundamental_types.hpp
+	
 	include/abc_test_test/component_tests.hpp
     include/abc_test_test/component_tests/data_generators.hpp
     include/abc_test_test/component_tests/data_generators/static_data_generator.hpp

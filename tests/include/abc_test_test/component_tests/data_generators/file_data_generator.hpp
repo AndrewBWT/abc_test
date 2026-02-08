@@ -24,7 +24,7 @@ _TEST_CASE(
     using namespace _ABC_NS_DS;
     string           _l_name_1{"name"};
     string           _l_path{"path"};
-    string           _l_file_name{"test_file_1"};
+    string           _l_file_name{"test_file_2"};
     filesystem::path _l_path_1{string{std::filesystem::current_path().string()}
                                    .append("\\")
                                    .append(_l_path)
@@ -98,7 +98,7 @@ _TEST_CASE(
     using namespace _ABC_NS_DS;
     string           _l_name_1{"name"};
     string           _l_path{"path"};
-    string           _l_file_name{"test_file_1"};
+    string           _l_file_name{"test_file_3"};
     filesystem::path _l_path_1{string{std::filesystem::current_path().string()}
                                    .append("\\")
                                    .append(_l_path)
@@ -200,7 +200,7 @@ _TEST_CASE(
     using namespace _ABC_NS_DS;
     string           _l_name_1{"name"};
     string           _l_path{"path"};
-    string           _l_file_name{"test_file_1"};
+    string           _l_file_name{"test_file_4"};
     filesystem::path _l_path_1{string{std::filesystem::current_path().string()}
                                    .append("\\")
                                    .append(_l_path)
@@ -258,7 +258,7 @@ _TEST_CASE(
                u8"reading "
                u8"general data file "
                u8"\"\\\\?\\G:\\MyProjects\\cpp\\git_projects\\abc_"
-               "test\\build\\tests\\path\\name\\test_file_1.gd\" at line 2. "
+               "test\\build\\tests\\path\\name\\test_file_4.gd\" at line 2. "
                u8"The parser reported the following error:",
                u8"Parser expected to see either \"true\" or \"false\", however "
                u8"these UTF8 strings were not found. "

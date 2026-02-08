@@ -205,6 +205,9 @@ G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/included_instan
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/included_instances/options/command_line_parser.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/included_instances/options/included_instances_test_options.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/included_instances/options/option_config.hpp
+G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/std_specializations.hpp
+G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/std_specializations/default_random_generator.hpp
+G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/std_specializations/default_random_generator/fundamental_types.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/src/abc_test/core/global.cpp
 G:/MyProjects/cpp/git_projects/abc_test/library/src/abc_test/core/test_evaluator.cpp
 G:/MyProjects/cpp/git_projects/abc_test/library/src/abc_test/core/ds/test_data/invoked_test_data.cpp

@@ -76,6 +76,14 @@ public:
      */
     __constexpr const std::size_t&
                       difference() const noexcept;
+    __constexpr void set_upper(const T& _a_upper) noexcept
+    {
+        _m_max = _a_upper;
+    }
+    __constexpr bool contains_value(const T& _a_value)
+    {
+        return _a_value >= _m_min && _a_value <= _m_max;
+    }
 private:
     T           _m_min;
     T           _m_max;

@@ -359,7 +359,7 @@ private:
     utility::bounds_t<T> _m_bounds;
 };*/
 
-template <>
+/*template <>
 struct default_random_generator_t<bool> : public random_generator_base_t<bool>
 {
     __no_constexpr virtual bool
@@ -367,7 +367,7 @@ struct default_random_generator_t<bool> : public random_generator_base_t<bool>
             utility::rng_t&               _a_rnd_generator,
             const utility::rng_counter_t& _a_index
         );
-};
+};*/
 
 /*template <>
 struct default_random_generator_t<char8_t>
@@ -390,7 +390,7 @@ struct default_random_generator_t<char16_t>
     }
 };*/
 
-template <typename T>
+/*template <typename T>
 requires std::integral<T>
 struct default_random_generator_t<T> : public random_generator_base_t<T>
 {
@@ -426,7 +426,7 @@ public:
     }
 private:
     utility::bounds_t<T> _m_bounds;
-};
+};*/
 
 template <typename T>
 requires _ABC_NS_UTILITY::enum_has_list_c<T> && _ABC_NS_UTILITY::min_value_c<T>
@@ -1740,7 +1740,7 @@ __constexpr data_gen::random_generator_t<T>
 _END_ABC_NS
 
 _BEGIN_ABC_DG_NS
-__no_constexpr_imp bool
+/*__no_constexpr_imp bool
     default_random_generator_t<bool>::operator()(
         utility::rng_t&               _a_rnd_generator,
         const utility::rng_counter_t& _a_index
@@ -1749,7 +1749,7 @@ __no_constexpr_imp bool
     using namespace std;
     size_t _l_val{_a_rnd_generator() % 2};
     return _l_val == 0 ? false : true;
-}
+}*/
 
 /*template <typename T>
 requires std::integral<T>
