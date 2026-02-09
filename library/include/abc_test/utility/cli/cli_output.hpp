@@ -62,6 +62,7 @@ public:
             std::u8string&& _a_table
         ) noexcept
     {
+        _m_status = cli_results_status_t::has_text_output;
         _m_output.push_back(_a_table);
     }
 

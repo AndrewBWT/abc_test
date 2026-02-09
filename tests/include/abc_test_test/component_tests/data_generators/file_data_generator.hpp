@@ -258,7 +258,7 @@ _TEST_CASE(
                u8"reading "
                u8"general data file "
                u8"\"\\\\?\\G:\\MyProjects\\cpp\\git_projects\\abc_"
-               "test\\build\\tests\\path\\name\\test_file_4.gd\" at line 2. "
+               "test\\build\\vs2026-msvc\\tests\\path\\name\\test_file_4.gd\" at line 2. "
                u8"The parser reported the following error:",
                u8"Parser expected to see either \"true\" or \"false\", however "
                u8"these UTF8 strings were not found. "

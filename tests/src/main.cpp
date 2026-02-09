@@ -24,5 +24,5 @@ int
 	 #if defined(_WIN32)
     SetConsoleOutputCP(CP_UTF8);
     #endif
-     return abc::run_test_suite_using_command_line_args(argc, argv);
+    return abc::run_test_suite_using_command_line_args(argc, argv);
 }

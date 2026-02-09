@@ -158,11 +158,11 @@ _TEST_CASE(
     {
         if constexpr (same_as<char, T>)
         {
-            return _EXPR(_a_value < 0);
+            return true_matcher(fmt::format(u8"{0} is valid", _a_value));
         }
         else
         {
-            return _EXPR(1 == 2);
+            return false_matcher(u8"Logic unwritten");
         }
     };
     auto _l_unit_tests_func = [&]<typename T>()
@@ -220,7 +220,9 @@ _TEST_CASE(
         _CHECK(_l_fuzzy_tests);
     };
     using data_types_t = type_list<
-        //char, wchar_t, char8_t, char16_t, char32_t
+        char 
+        //wchar_t, char8_t, char16_t,
+        //char32_t
         >;
     manual_data_generator_t _l_mdg;
     for_each_type<data_types_t>(

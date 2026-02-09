@@ -57,7 +57,6 @@ __no_constexpr_or_inline_imp void
                 most_recent_source(),
                 typeid(_l_exception).name(),
                 _l_exception.what()
-
             )
         );
     }

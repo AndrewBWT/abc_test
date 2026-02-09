@@ -44,7 +44,7 @@ public:
         ) const noexcept
     {
         _a_cli_results.add_table_output(_a_cli.make_help_output());
-        return false;
+        return true;
     }
 };
 

@@ -169,7 +169,7 @@ __constexpr_imp std::u8string
     }
     else if constexpr (fmt::formattable<T>)
     {
-        _l_rv = fmt::format(u8"{}", _a_element);
+        _l_rv = fmt::format(u8"{} formattable", _a_element);
     }
     return _l_rv;
 }
