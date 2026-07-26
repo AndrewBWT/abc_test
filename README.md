@@ -125,7 +125,7 @@ Threads used:                       24
 Comment used:                       "#"
 general data extension used:        "gd"
 Number of values used to seed RNGs: 100
-Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1785065162
+Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1785065457
 Force run all tests used?           No
 test paths to run:                  readme::fib.
 ==========================================================================================
@@ -147,7 +147,7 @@ Assertions passed:          0
 Assertions failed:          1
 Assertion information:      0 / 1 assertions passed. All assertion failed.
 Termination status:         Function exited normally with a failed status.
-Time taken:                 544 microseconds
+Time taken:                 713 microseconds
 ==========================================================================================
 ASSERTION INFO
 ==========================================================================================
@@ -193,12 +193,12 @@ Total tests which threw unexpected exception: 0
 Total assertions ran:                         1
 Total assertions passed:                      0
 Total assertions failed:                      1
-Global random seed:                           "1785065162"
+Global random seed:                           "1785065457"
 Repetition loop stack seed:                   "726561646d653a3a6669623a3a54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c65:5b5b28302c302c2228302c203329222c5b5d295d5d"
 ==========================================================================================
 ```
 
-If the user were to then run the same executable from the same location with the options `--root_path ../../examples/data/test_data --test_paths_to_run readme::fib --repetition_config 54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c653a3a726561646d653a3a666962:5b5b28302c302c2228302c203329222c5b5d295d5d --write_data_to_files false`, then the following is an example of the output which could be produced.
+If the user were to then run the same executable from the same location with the options `--root_path ../../examples/data/test_data --test_paths_to_run readme::fib --repetition_config 726561646d653a3a6669623a3a54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c65:5b5b28302c302c2228302c203329222c5b5d295d5d --write_data_to_files false`, then the following is an example of the output which could be produced.
 
 ```sh
 ==========================================================================================
@@ -212,24 +212,64 @@ Threads used:                       24
 Comment used:                       "#"
 general data extension used:        "gd"
 Number of values used to seed RNGs: 100
-Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1785065162
+Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1785065457
 Force run all tests used?           No
 test paths to run:                  readme::fib.
+==========================================================================================
+TEST INFO
+==========================================================================================
+Test result:                TEST FAILED
+Test passed:                No
+Test name:                  "Testing Fibonacci function using data from a file"
+Source location:            G:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples/readme.hpp:13
+Source code representation: "_TEST_CASE(abc::test_case_t( {.name = "Testing Fibonacci function using data from a file", .path = "readme::fib"} ))"
+Test Path:                  "readme::fib"
+Seed used:                  [[(0,0,"(0, 3)",[])]]
+Seed used (hex):            "5b5b28302c302c2228302c203329222c5b5d295d5d"
+Seed to re-run test:        [[(0,0,"(0, 3)",[])]]
+Seed to re-run test (hex):  "5b5b28302c302c2228302c203329222c5b5d295d5d"
+Warnings:                   0
+Assertions evaluated:       1
+Assertions passed:          0
+Assertions failed:          1
+Assertion information:      0 / 1 assertions passed. All assertion failed.
+Termination status:         Function exited normally with a failed status.
+Time taken:                 806 microseconds
+==========================================================================================
+ASSERTION INFO
+==========================================================================================
+  1)  Multi-element block-based assertion failed. 0/1 assertions passed. Assertion terminated function.
+      Assertion's annotation:  "Unit tests for Fibonacci function"
+      Source block begin:
+        Source location:
+          G:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples/readme.hpp:26
+        Source code representation:
+          "_MULTI_MATCHER("Unit tests for Fibonacci function")"
+        Source location:
+          G:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples/readme.hpp:44
+        Source code representation:
+          "_CHECK"
+      Assertion data (grouped by source):
+        1)  Matcher-based assertion failed with output:
+              Primary output from matcher:
+                13 != 14
+            Logged information:
+              data generator's value = (7, 14)
 ==========================================================================================
 ==========================================================================================
 TEST SUITE RESULTS
 ==========================================================================================
-Total tests ran:                              0
+Total tests ran:                              1
 Total tests passed:                           0
-Total tests failed:                           0
+Total tests failed:                           1
 Total tests failed and terminated:            0
-Total tests failed (but not terminated):      0
+Total tests failed (but not terminated):      1
 Total tests which threw unexpected exception: 0
-Total assertions ran:                         0
+Total assertions ran:                         1
 Total assertions passed:                      0
-Total assertions failed:                      0
-Global random seed:                           "1785065162"
-Repetition loop stack seed:                   ""
+Total assertions failed:                      1
+Global random seed:                           "1785065457"
+Repetition loop stack seed:                   "726561646d653a3a6669623a3a54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c65:5b5b28302c302c2228302c203329222c5b5d295d5d"
 ==========================================================================================
 ```
 
