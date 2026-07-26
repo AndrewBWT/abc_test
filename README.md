@@ -114,12 +114,12 @@ _TEST_CASE(
 If the user runs the `abc_test_examples` executable from the project's root directory with the options `--root_path examples/data/test_data --test_paths_to_run readme::fib`, then the following is an example of the output which could be produced.
 
 ```sh
-**Executable not found: `build/examples/Debug/abc_test_examples.exe`**```
+**Executable not found: `build/vs2026-msvc/examples/Debug/abc_test_examples.exe`**```
 
 If the user were to then run the same executable from the same location with the options `--root_path ../../examples/data/test_data --test_paths_to_run readme::fib --repetition_config 54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c653a3a726561646d653a3a666962:5b5b28302c302c2228302c203329222c5b5d295d5d --write_data_to_files false`, then the following is an example of the output which could be produced.
 
 ```sh
-**Executable not found: `build/examples/Debug/abc_test_examples.exe`**```
+**Executable not found: `build/vs2026-msvc/examples/Debug/abc_test_examples.exe`**```
 
 In the second run, the only assertions which are evaluated are those which failed during the first run. `abc_test` configured the data generator so that it only produced values which had previously failed an assertion. By providing the executable with the `repetition_config` given as output from the first run, we encoded instructions into the executable to behave in this manner.
 

@@ -169,7 +169,7 @@ __no_constexpr_imp run_tests_result_t
             "variables..."
         );
         auto _l_make_ref_collection
-            = []<typename T>(const std::vector<std::shared_ptr<T>>& _a_ptrs)
+            = []<typename T>(const vector<shared_ptr<T>>& _a_ptrs)
         {
             vector<reference_wrapper<const T>> _l_rv{};
             for (const shared_ptr<T>& _l_ptr : _a_ptrs)
