@@ -117,84 +117,84 @@ If the user runs the `abc_test_examples` executable from the project's root dire
 ==========================================================================================
 TEST SUITE CONFIGURATION
 ==========================================================================================
-Global test list used?              [38;2;000;128;000mYes[0m
-Write data to files:                [38;2;000;128;000mYes[0m
+Global test list used?              Yes
+Write data to files:                Yes
 Path delimiter used:                "::"
 Root path used:                     examples/data/test_data
 Threads used:                       24
 Comment used:                       "#"
 general data extension used:        "gd"
 Number of values used to seed RNGs: 100
-Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1785064818
-Force run all tests used?           [38;2;255;000;000mNo[0m
+Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1785065121
+Force run all tests used?           No
 test paths to run:                  readme::fib.
 ==========================================================================================
 TEST INFO
 ==========================================================================================
-Test result:                [38;2;255;000;000mTEST FAILED[0m
-Test passed:                [38;2;255;000;000mNo[0m
-Test name:                  [38;2;000;128;128m"Testing Fibonacci function using data from a file"[0m
-Source location:            [38;2;000;128;128mG:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples/readme.hpp:13[0m
-Source code representation: [38;2;128;128;128m"_TEST_CASE(abc::test_case_t( {.name = "Testing Fibonacci function using data from a file", .path = "readme::fib"} ))"[0m
-Test Path:                  [38;2;000;128;128m"readme::fib"[0m
-Seed used:                  [38;2;128;128;128m<no seed used>[0m
-Seed used (hex):            [38;2;128;128;128m<no seed used>[0m
-Seed to re-run test:        [38;2;128;128;128m[[(0,0,"(0, 3)",[])]][0m
-Seed to re-run test (hex):  [38;2;128;128;128m"5b5b28302c302c2228302c203329222c5b5d295d5d"[0m
-Warnings:                   [38;2;000;128;000m0[0m
+Test result:                TEST FAILED
+Test passed:                No
+Test name:                  "Testing Fibonacci function using data from a file"
+Source location:            G:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples/readme.hpp:13
+Source code representation: "_TEST_CASE(abc::test_case_t( {.name = "Testing Fibonacci function using data from a file", .path = "readme::fib"} ))"
+Test Path:                  "readme::fib"
+Seed used:                  <no seed used>
+Seed used (hex):            <no seed used>
+Seed to re-run test:        [[(0,0,"(0, 3)",[])]]
+Seed to re-run test (hex):  "5b5b28302c302c2228302c203329222c5b5d295d5d"
+Warnings:                   0
 Assertions evaluated:       1
-Assertions passed:          [38;2;255;000;000m0[0m
-Assertions failed:          [38;2;255;000;000m1[0m
-Assertion information:      [38;2;255;000;000m0 / 1 assertions passed. All assertion failed.[0m
-Termination status:         [38;2;000;128;000mFunction exited normally with a failed status.[0m
-Time taken:                 [38;2;128;128;128m6196 microseconds[0m
+Assertions passed:          0
+Assertions failed:          1
+Assertion information:      0 / 1 assertions passed. All assertion failed.
+Termination status:         Function exited normally with a failed status.
+Time taken:                 554 microseconds
 ==========================================================================================
 ASSERTION INFO
 ==========================================================================================
-  1)  [38;2;255;000;000mMulti-element block-based assertion failed. 2/3 assertions passed. Assertion terminated function.[0m
-      Assertion's annotation:  [38;2;128;128;128m"Unit tests for Fibonacci function"[0m
+  1)  Multi-element block-based assertion failed. 2/3 assertions passed. Assertion terminated function.
+      Assertion's annotation:  "Unit tests for Fibonacci function"
       Source block begin:
         Source location:
-          [38;2;000;128;128mG:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples/readme.hpp:26[0m
+          G:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples/readme.hpp:26
         Source code representation:
-          [38;2;128;128;128m"_MULTI_MATCHER("Unit tests for Fibonacci function")"[0m
+          "_MULTI_MATCHER("Unit tests for Fibonacci function")"
         Source location:
-          [38;2;000;128;128mG:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples/readme.hpp:44[0m
+          G:\MyProjects\cpp\git_projects\abc_test\examples\include\abc_test_examples/readme.hpp:44
         Source code representation:
-          [38;2;128;128;128m"_CHECK"[0m
+          "_CHECK"
       Assertion data (grouped by source):
         The following 3 matcher-based assertions have the same source data, which is as follows:
         The data of the 3 matcher-based assertions:
-        1)  [38;2;000;128;000mMatcher-based assertion passed with output:[0m
+        1)  Matcher-based assertion passed with output:
               Primary output from matcher:
-                [38;2;128;128;128m0 == 0[0m
+                0 == 0
             Logged information:
-              [38;2;128;128;128mdata generator's value = (0, 0)[0m
-        2)  [38;2;000;128;000mMatcher-based assertion passed with output:[0m
+              data generator's value = (0, 0)
+        2)  Matcher-based assertion passed with output:
               Primary output from matcher:
-                [38;2;128;128;128m8 == 8[0m
+                8 == 8
             Logged information:
-              [38;2;128;128;128mdata generator's value = (6, 8)[0m
-        3)  [38;2;255;000;000mMatcher-based assertion failed with output:[0m
+              data generator's value = (6, 8)
+        3)  Matcher-based assertion failed with output:
               Primary output from matcher:
-                [38;2;128;128;128m13 != 14[0m
+                13 != 14
             Logged information:
-              [38;2;128;128;128mdata generator's value = (7, 14)[0m
+              data generator's value = (7, 14)
 ==========================================================================================
 ==========================================================================================
 TEST SUITE RESULTS
 ==========================================================================================
 Total tests ran:                              1
-Total tests passed:                           [38;2;000;128;000m0[0m
-Total tests failed:                           [38;2;255;000;000m1[0m
-Total tests failed and terminated:            [38;2;255;000;000m0[0m
-Total tests failed (but not terminated):      [38;2;255;000;000m1[0m
-Total tests which threw unexpected exception: [38;2;255;000;000m0[0m
-Total assertions ran:                         [38;2;128;128;128m1[0m
-Total assertions passed:                      [38;2;000;128;000m0[0m
-Total assertions failed:                      [38;2;255;000;000m1[0m
-Global random seed:                           [38;2;128;128;128m"1785064818"[0m
-Repetition loop stack seed:                   [38;2;128;128;128m"726561646d653a3a6669623a3a54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c65:5b5b28302c302c2228302c203329222c5b5d295d5d"[0m
+Total tests passed:                           0
+Total tests failed:                           1
+Total tests failed and terminated:            0
+Total tests failed (but not terminated):      1
+Total tests which threw unexpected exception: 0
+Total assertions ran:                         1
+Total assertions passed:                      0
+Total assertions failed:                      1
+Global random seed:                           "1785065121"
+Repetition loop stack seed:                   "726561646d653a3a6669623a3a54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c65:5b5b28302c302c2228302c203329222c5b5d295d5d"
 ==========================================================================================
 ```
 
@@ -212,7 +212,7 @@ Threads used:                       24
 Comment used:                       "#"
 general data extension used:        "gd"
 Number of values used to seed RNGs: 100
-Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1785064818
+Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1785065121
 Force run all tests used?           [38;2;255;000;000mNo[0m
 test paths to run:                  readme::fib.
 ==========================================================================================
@@ -228,7 +228,7 @@ Total tests which threw unexpected exception: [38;2;255;000;000m0[0m
 Total assertions ran:                         [38;2;128;128;128m0[0m
 Total assertions passed:                      [38;2;000;128;000m0[0m
 Total assertions failed:                      [38;2;255;000;000m0[0m
-Global random seed:                           [38;2;128;128;128m"1785064818"[0m
+Global random seed:                           [38;2;128;128;128m"1785065121"[0m
 Repetition loop stack seed:                   [38;2;128;128;128m""[0m
 ==========================================================================================
 ```

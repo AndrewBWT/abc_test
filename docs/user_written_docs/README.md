@@ -41,7 +41,7 @@ The example above could be considered a unit test for the `fib` function. Howeve
 
 If the user runs the `abc_test_examples` executable from the project's root directory with the options `--root_path examples/data/test_data --test_paths_to_run readme::fib`, then the following is an example of the output which could be produced.
 
-<!-- run:build/vs2026-msvc/examples/Debug/abc_test_examples.exe --root_path examples/data/test_data --test_paths_to_run readme::fib:sh -->
+<!-- run:build/vs2026-msvc/examples/Debug/abc_test_examples.exe --root_path examples/data/test_data --default_console_test_reporter monochrome_output --test_paths_to_run readme::fib:sh -->
 
 If the user were to then run the same executable from the same location with the options `--root_path ../../examples/data/test_data --test_paths_to_run readme::fib --repetition_config 54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c653a3a726561646d653a3a666962:5b5b28302c302c2228302c203329222c5b5d295d5d --write_data_to_files false`, then the following is an example of the output which could be produced.
 
