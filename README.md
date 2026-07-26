@@ -125,7 +125,7 @@ Threads used:                       24
 Comment used:                       "#"
 general data extension used:        "gd"
 Number of values used to seed RNGs: 100
-Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1785065121
+Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1785065162
 Force run all tests used?           No
 test paths to run:                  readme::fib.
 ==========================================================================================
@@ -147,7 +147,7 @@ Assertions passed:          0
 Assertions failed:          1
 Assertion information:      0 / 1 assertions passed. All assertion failed.
 Termination status:         Function exited normally with a failed status.
-Time taken:                 554 microseconds
+Time taken:                 544 microseconds
 ==========================================================================================
 ASSERTION INFO
 ==========================================================================================
@@ -193,7 +193,7 @@ Total tests which threw unexpected exception: 0
 Total assertions ran:                         1
 Total assertions passed:                      0
 Total assertions failed:                      1
-Global random seed:                           "1785065121"
+Global random seed:                           "1785065162"
 Repetition loop stack seed:                   "726561646d653a3a6669623a3a54657374696e67204669626f6e616363692066756e6374696f6e207573696e6720646174612066726f6d20612066696c65:5b5b28302c302c2228302c203329222c5b5d295d5d"
 ==========================================================================================
 ```
@@ -204,32 +204,32 @@ If the user were to then run the same executable from the same location with the
 ==========================================================================================
 TEST SUITE CONFIGURATION
 ==========================================================================================
-Global test list used?              [38;2;000;128;000mYes[0m
-Write data to files:                [38;2;255;000;000mNo[0m
+Global test list used?              Yes
+Write data to files:                No
 Path delimiter used:                "::"
 Root path used:                     examples/data/test_data
 Threads used:                       24
 Comment used:                       "#"
 general data extension used:        "gd"
 Number of values used to seed RNGs: 100
-Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1785065121
-Force run all tests used?           [38;2;255;000;000mNo[0m
+Global seed:                        Not set by user. Global seed has been set randomly by system to the integer 1785065162
+Force run all tests used?           No
 test paths to run:                  readme::fib.
 ==========================================================================================
 ==========================================================================================
 TEST SUITE RESULTS
 ==========================================================================================
 Total tests ran:                              0
-Total tests passed:                           [38;2;000;128;000m0[0m
-Total tests failed:                           [38;2;255;000;000m0[0m
-Total tests failed and terminated:            [38;2;255;000;000m0[0m
-Total tests failed (but not terminated):      [38;2;255;000;000m0[0m
-Total tests which threw unexpected exception: [38;2;255;000;000m0[0m
-Total assertions ran:                         [38;2;128;128;128m0[0m
-Total assertions passed:                      [38;2;000;128;000m0[0m
-Total assertions failed:                      [38;2;255;000;000m0[0m
-Global random seed:                           [38;2;128;128;128m"1785065121"[0m
-Repetition loop stack seed:                   [38;2;128;128;128m""[0m
+Total tests passed:                           0
+Total tests failed:                           0
+Total tests failed and terminated:            0
+Total tests failed (but not terminated):      0
+Total tests which threw unexpected exception: 0
+Total assertions ran:                         0
+Total assertions passed:                      0
+Total assertions failed:                      0
+Global random seed:                           "1785065162"
+Repetition loop stack seed:                   ""
 ==========================================================================================
 ```
 
