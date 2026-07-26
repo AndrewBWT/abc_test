@@ -86,6 +86,8 @@ generic objects     |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
 enums               |  N  |  N  |  N   |  N  |  N  |   N   |   N   |
 ====================================================================
 
+73 - Remove the Unicode conversion functions, and replace them with unicode_bridge.
+
 ## Longer Term Focus ##
 
 1 - Code documentation. See docs/internal/documentation.md for details.
