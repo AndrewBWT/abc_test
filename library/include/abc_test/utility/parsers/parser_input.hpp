@@ -449,6 +449,7 @@ __no_constexpr_imp const std::u32string
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     return unicode_conversion_with_exception<char32_t>(
         u8string_view(_m_cur_itt, _m_cur_itt + _a_size)
     );

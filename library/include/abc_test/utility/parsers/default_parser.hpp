@@ -276,6 +276,7 @@ public:
     {
         using namespace std;
         using namespace _ABC_NS_UTILITY_STR;
+        using namespace UNICODE_BRIDGE_NAMESPACE;
         T _l_char;
         if (const result_t<monostate> _l_result_1{
                 this->remove_surrounding_str(_a_parse_input)
@@ -304,7 +305,7 @@ public:
                 )};
                 if (not _l_result.has_value())
                 {
-                    return unexpected(_l_result.error());
+                    return unexpected(_l_result.error().message());
                 }
                 else
                 {
@@ -675,6 +676,7 @@ __constexpr result_t<T>
     using namespace std;
     using namespace abc::utility::str;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     tuple<Ts...> default_tuple;
     _a_parse_input.check_advance_and_throw(
         unicode_conversion_with_exception<char32_t>(_a_begin_str)

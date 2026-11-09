@@ -207,6 +207,7 @@ __constexpr std::optional<std::basic_string<T>>
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     if (_a_biggest_string == 0)
     {
         // Should always be > 0. This should be optimised away.

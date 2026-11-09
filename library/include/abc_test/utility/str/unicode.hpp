@@ -53,10 +53,10 @@ _BEGIN_ABC_UTILITY_STR_NS
  * @return Either a std::basic_string<T> representing _a_str, or an appropriate
  * error message.
  */
-template <typename T>
-requires char_type_is_unicode_c<T>
-__constexpr result_t<std::basic_string<T>>
-            convert_ascii_to_unicode(const std::string& _a_str) noexcept;
+//template <typename T>
+//requires char_type_is_unicode_c<T>
+//__constexpr result_t<std::basic_string<T>>
+//            convert_ascii_to_unicode(const std::string& _a_str) noexcept;
 /*!
  * @brief Converts an ASCII string to unicode.
  *
@@ -71,10 +71,10 @@ __constexpr result_t<std::basic_string<T>>
  * @return Either a std::basic_string<T> representing _a_str, or an appropriate
  * error message.
  */
-template <typename T>
-requires char_type_is_unicode_c<T>
-__constexpr result_t<std::basic_string<T>>
-            convert_ascii_to_unicode(const std::string_view _a_str) noexcept;
+//template <typename T>
+//requires char_type_is_unicode_c<T>
+//__constexpr result_t<std::basic_string<T>>
+//            convert_ascii_to_unicode(const std::string_view _a_str) noexcept;
 
 /*!
  * @brief Converts a unicode string from one format to another.
@@ -88,10 +88,10 @@ __constexpr result_t<std::basic_string<T>>
  * @return An expected value containing either the converted output, or an error
  * message.
  */
-template <typename T, typename U>
-requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
-__constexpr result_t<std::basic_string<T>>
-            unicode_conversion(const std::basic_string_view<U> _a_str) noexcept;
+//template <typename T, typename U>
+//requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
+//__constexpr result_t<std::basic_string<T>>
+//            unicode_conversion(const std::basic_string_view<U> _a_str) noexcept;
 /*!
  * @brief Converts a unicode string from one format to another.
  *
@@ -107,10 +107,10 @@ __constexpr result_t<std::basic_string<T>>
  * @return An expected value containing either the converted output, or an error
  * message.
  */
-template <typename T, typename U>
-requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
-__constexpr result_t<std::basic_string<T>>
-            unicode_conversion(const std::basic_string<U>& _a_str) noexcept;
+//template <typename T, typename U>
+//requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
+//__constexpr result_t<std::basic_string<T>>
+//            unicode_conversion(const std::basic_string<U>& _a_str) noexcept;
 /*!
  * @brief Converts a unicode string from one format to another.
  *
@@ -121,10 +121,10 @@ __constexpr result_t<std::basic_string<T>>
  * @param _a_str The string entity to convert.
  * @return The converted unicode string.
  */
-template <typename T, typename U>
-requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
-__constexpr std::basic_string<T>
-    unicode_conversion_with_exception(const std::basic_string_view<U> _a_str);
+//template <typename T, typename U>
+//requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
+//__constexpr std::basic_string<T>
+//    unicode_conversion_with_exception(const std::basic_string_view<U> _a_str);
 /*!
  * @brief Converts a unicode string from one format to another.
  *
@@ -135,10 +135,10 @@ __constexpr std::basic_string<T>
  * @param _a_str The string entity to convert.
  * @return The converted unicode string.
  */
-template <typename T, typename U>
-requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
-__constexpr std::basic_string<T>
-    unicode_conversion_with_exception(const std::basic_string<U>& _a_str);
+//template <typename T, typename U>
+//requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
+//__constexpr std::basic_string<T>
+//    unicode_conversion_with_exception(const std::basic_string<U>& _a_str);
 /*!
  * @brief Converts a unicode character from one format to another formatted
  * unicode string.
@@ -150,10 +150,10 @@ __constexpr std::basic_string<T>
  * @param _a_str The character entity to convert.
  * @return The converted unicode string.
  */
-template <typename T, typename U>
-requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
-__constexpr std::basic_string<T>
-            unicode_conversion_with_exception(const U _a_char);
+//template <typename T, typename U>
+//requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
+//__constexpr std::basic_string<T>
+//            unicode_conversion_with_exception(const U _a_char);
 /*!
  * @brief Checks if a unicode string is valid.
  *
@@ -561,7 +561,7 @@ __constexpr_imp result_t<std::string>
     return _l_output;
 }*/
 
-template <typename T>
+/*template <typename T>
 requires char_type_is_unicode_c<T>
 __constexpr result_t<std::basic_string<T>>
             convert_ascii_to_unicode(
@@ -635,9 +635,9 @@ __constexpr result_t<std::basic_string<T>>
         }
     }
     return _l_output;
-}
+}*/
 
-template <typename T, typename U>
+/*template <typename T, typename U>
 requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
 __constexpr result_t<std::basic_string<T>>
             unicode_conversion(
@@ -721,7 +721,7 @@ __constexpr_imp std::basic_string<T>
 {
     using namespace std;
     return unicode_conversion_with_exception<T>(basic_string<U>(1, _a_char));
-}
+}*/
 
 template <typename T>
 requires char_type_is_unicode_c<T>

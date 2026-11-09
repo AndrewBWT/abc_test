@@ -108,12 +108,13 @@ __no_constexpr_imp void
     ) noexcept
 {
     using namespace std;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     if (global::get_this_threads_test_options()
             .individual_io_based_test_options.write_data_to_files)
     {
         wofstream& _l_out{*_m_file_handler.get()};
         auto       _l_wstring{
-            abc::utility::str::unicode_conversion<wchar_t>(_a_str_to_write)
+            unicode_conversion<wchar_t>(_a_str_to_write)
         };
         if (_l_wstring.has_value())
         {
