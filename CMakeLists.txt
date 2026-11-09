@@ -50,6 +50,26 @@ option(ABC_TEST_ENABLE_EXAMPLES "Build abc_test examples" ${ABC_TOP_LEVEL_PROJEC
 
 # Fetch the fmt library if its the top level project
 # Only use FetchContent if fmt::fmt is not already provided
+if(NOT TARGET unicode_bridge::unicode_bridge)
+  include(FetchContent)
+  if(ABC_TOP_LEVEL_PROJECT)
+    FetchContent_Declare(
+      unicode_bridge
+      GIT_REPOSITORY https://github.com/AndrewBWT/unicode_bridge.git
+      GIT_TAG        main
+    )
+    FetchContent_MakeAvailable(unicode_bridge)
+  else()
+    FetchContent_GetProperties(unicode_bridge)
+    if(NOT unicode_bridge_POPULATED)
+      message(FATAL_ERROR "Required target unicode_bridge::unicode_bridge not found.
+Please make sure:
+  - unicode_bridge::unicode_bridge is available (e.g., via find_package(unicode_bridge CONFIG REQUIRED)),
+  - or build this project as a top-level project.")
+    endif()
+  endif()
+endif()
+
 if(NOT TARGET fmt::fmt)
   include(FetchContent)
 
