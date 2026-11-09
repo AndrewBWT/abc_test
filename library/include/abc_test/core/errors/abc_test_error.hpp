@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <ranges>
+#include <optional>
 
 _BEGIN_ABC_ERRORS_NS
 

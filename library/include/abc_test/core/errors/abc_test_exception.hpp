@@ -2,6 +2,7 @@
 #include "abc_test/core/errors/abc_test_error.hpp"
 
 #include <stdexcept>
+#include <fmt/xchar.h>
 
 _BEGIN_ABC_ERRORS_NS
 

@@ -1,15 +1,15 @@
 ﻿#pragma once
+#include "abc_test/core/errors/abc_test_exception.hpp"
 #include "abc_test/utility/internal/unreachable.hpp"
 #include "abc_test/utility/str/concepts.hpp"
 #include "abc_test/utility/str/print_utils.hpp"
 #include "abc_test/utility/types.hpp"
-#include "abc_test/core/errors/abc_test_exception.hpp"
 
 #include <array>
 #include <string>
+#include <unicode_bridge.hpp>
 #include <unordered_map>
 #include <unordered_set>
-#include <unicode_bridge.hpp>
 
 _BEGIN_ABC_UTILITY_STR_NS
 /*!
@@ -23,10 +23,10 @@ _BEGIN_ABC_UTILITY_STR_NS
  * @param _a_str The input string.
  * @return Eitehr the output string, or an appropriate failure message.
  */
-    //template <typename T>
-//requires char_type_is_unicode_c<T>
+// template <typename T>
+// requires char_type_is_unicode_c<T>
 //__constexpr result_t<std::string>
-//    convert_unicode_to_ascii(const std::basic_string<T>& _a_str) noexcept;
+//     convert_unicode_to_ascii(const std::basic_string<T>& _a_str) noexcept;
 /*!
  * @brief This function converts a unicode string to an ASCII string.
  *
@@ -39,10 +39,11 @@ _BEGIN_ABC_UTILITY_STR_NS
  * @param _a_str The input string.
  * @return Eitehr the output string, or an appropriate failure message.
  */
-//template <typename T>
-//requires char_type_is_unicode_c<T>
+// template <typename T>
+// requires char_type_is_unicode_c<T>
 //__constexpr result_t<std::string>
-//    convert_unicode_to_ascii(const std::basic_string_view<T> _a_str) noexcept;
+//     convert_unicode_to_ascii(const std::basic_string_view<T> _a_str)
+//     noexcept;
 /*!
  * @brief Converts an ASCII string to unicode.
  *
@@ -54,10 +55,10 @@ _BEGIN_ABC_UTILITY_STR_NS
  * @return Either a std::basic_string<T> representing _a_str, or an appropriate
  * error message.
  */
-//template <typename T>
-//requires char_type_is_unicode_c<T>
+// template <typename T>
+// requires char_type_is_unicode_c<T>
 //__constexpr result_t<std::basic_string<T>>
-//            convert_ascii_to_unicode(const std::string& _a_str) noexcept;
+//             convert_ascii_to_unicode(const std::string& _a_str) noexcept;
 /*!
  * @brief Converts an ASCII string to unicode.
  *
@@ -72,10 +73,10 @@ _BEGIN_ABC_UTILITY_STR_NS
  * @return Either a std::basic_string<T> representing _a_str, or an appropriate
  * error message.
  */
-//template <typename T>
-//requires char_type_is_unicode_c<T>
+// template <typename T>
+// requires char_type_is_unicode_c<T>
 //__constexpr result_t<std::basic_string<T>>
-//            convert_ascii_to_unicode(const std::string_view _a_str) noexcept;
+//             convert_ascii_to_unicode(const std::string_view _a_str) noexcept;
 
 /*!
  * @brief Converts a unicode string from one format to another.
@@ -89,10 +90,11 @@ _BEGIN_ABC_UTILITY_STR_NS
  * @return An expected value containing either the converted output, or an error
  * message.
  */
-//template <typename T, typename U>
-//requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
+// template <typename T, typename U>
+// requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
 //__constexpr result_t<std::basic_string<T>>
-//            unicode_conversion(const std::basic_string_view<U> _a_str) noexcept;
+//             unicode_conversion(const std::basic_string_view<U> _a_str)
+//             noexcept;
 /*!
  * @brief Converts a unicode string from one format to another.
  *
@@ -108,10 +110,10 @@ _BEGIN_ABC_UTILITY_STR_NS
  * @return An expected value containing either the converted output, or an error
  * message.
  */
-//template <typename T, typename U>
-//requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
+// template <typename T, typename U>
+// requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
 //__constexpr result_t<std::basic_string<T>>
-//            unicode_conversion(const std::basic_string<U>& _a_str) noexcept;
+//             unicode_conversion(const std::basic_string<U>& _a_str) noexcept;
 /*!
  * @brief Converts a unicode string from one format to another.
  *
@@ -122,10 +124,11 @@ _BEGIN_ABC_UTILITY_STR_NS
  * @param _a_str The string entity to convert.
  * @return The converted unicode string.
  */
-//template <typename T, typename U>
-//requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
+// template <typename T, typename U>
+// requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
 //__constexpr std::basic_string<T>
-//    unicode_conversion_with_exception(const std::basic_string_view<U> _a_str);
+//     unicode_conversion_with_exception(const std::basic_string_view<U>
+//     _a_str);
 /*!
  * @brief Converts a unicode string from one format to another.
  *
@@ -136,10 +139,10 @@ _BEGIN_ABC_UTILITY_STR_NS
  * @param _a_str The string entity to convert.
  * @return The converted unicode string.
  */
-//template <typename T, typename U>
-//requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
+// template <typename T, typename U>
+// requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
 //__constexpr std::basic_string<T>
-//    unicode_conversion_with_exception(const std::basic_string<U>& _a_str);
+//     unicode_conversion_with_exception(const std::basic_string<U>& _a_str);
 /*!
  * @brief Converts a unicode character from one format to another formatted
  * unicode string.
@@ -151,30 +154,30 @@ _BEGIN_ABC_UTILITY_STR_NS
  * @param _a_str The character entity to convert.
  * @return The converted unicode string.
  */
-//template <typename T, typename U>
-//requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
+// template <typename T, typename U>
+// requires char_type_is_unicode_c<T> && char_type_is_unicode_c<U>
 //__constexpr std::basic_string<T>
-//            unicode_conversion_with_exception(const U _a_char);
+//             unicode_conversion_with_exception(const U _a_char);
 /*!
  * @brief Checks if a unicode string is valid.
  *
  * @param _a_str The string to check.
  * @return True if _a_str is valid, false otherwise.
  */
-//template <typename T>
-//requires char_type_is_unicode_c<T>
+// template <typename T>
+// requires char_type_is_unicode_c<T>
 //__constexpr bool
-//    is_valid_unicode_string(const std::basic_string_view<T> _a_str) noexcept;
+//     is_valid_unicode_string(const std::basic_string_view<T> _a_str) noexcept;
 /*!
  * @brief Checks if a unicode string is valid.
  *
  * @param _a_str The string to check.
  * @return True if _a_str is valid, false otherwise.
  */
-//template <typename T>
-//requires char_type_is_unicode_c<T>
+// template <typename T>
+// requires char_type_is_unicode_c<T>
 //__constexpr bool
-//    is_valid_unicode_string(const std::basic_string<T>& _a_str) noexcept;
+//     is_valid_unicode_string(const std::basic_string<T>& _a_str) noexcept;
 /*!
  * @brief Checks if a character is valid unicode on its own.
  *
@@ -185,20 +188,20 @@ _BEGIN_ABC_UTILITY_STR_NS
  * @param _a_str The character to check
  * @return True if _a_char is valid, false otherwise.
  */
-//template <typename T>
-//requires char_type_is_unicode_c<T>
+// template <typename T>
+// requires char_type_is_unicode_c<T>
 //__constexpr bool
-//    is_valid_char(const T _a_char) noexcept;
+//     is_valid_char(const T _a_char) noexcept;
 /*!
  * @brief Checks if a character is valid ascii.
  *
  * @param _a_char The character to check.
  * @return True if _a_char is valid, false otherwise.
  */
-//template <typename T>
-//requires is_char_type_c<T>
+// template <typename T>
+// requires is_char_type_c<T>
 //__constexpr bool
-//    is_valid_ascii_char(const T _a_char) noexcept;
+//     is_valid_ascii_char(const T _a_char) noexcept;
 /*!
  * @brief Gets the next character from a stream of characters.
  *
@@ -214,13 +217,13 @@ _BEGIN_ABC_UTILITY_STR_NS
  * @param _a_end The end iterator.
  * @return See above.
  */
-template <bool Return_Reason, typename T>
-requires char_type_is_unicode_c<typename std::iterator_traits<T>::value_type>
-__constexpr std::conditional_t<
-    Return_Reason,
-    result_t<std::pair<char32_t, std::size_t>>,
-    std::optional<std::pair<char32_t, std::size_t>>>
-    next_char32_t(const T _a_itt, const T _a_end) noexcept;
+// template <bool Return_Reason, typename T>
+// requires char_type_is_unicode_c<typename std::iterator_traits<T>::value_type>
+//__constexpr std::conditional_t<
+//     Return_Reason,
+//     result_t<std::pair<char32_t, std::size_t>>,
+//     std::optional<std::pair<char32_t, std::size_t>>>
+//     next_char32_t(const T _a_itt, const T _a_end) noexcept;
 /*!
  * @brief Gets the next character from a stream of characters.
  *
@@ -235,11 +238,12 @@ __constexpr std::conditional_t<
  * @param _a_end The end iterator.
  * @return See above.
  */
-template <bool Return_Reason, typename T>
-requires char_type_is_unicode_c<typename std::iterator_traits<T>::value_type>
-__constexpr
-std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
-    next_char32_t_and_increment_iterator(T& _a_itt, const T _a_end) noexcept;
+// template <bool Return_Reason, typename T>
+// requires char_type_is_unicode_c<typename std::iterator_traits<T>::value_type>
+//__constexpr
+// std::conditional_t<Return_Reason, result_t<char32_t>,
+// std::optional<char32_t>>
+//     next_char32_t_and_increment_iterator(T& _a_itt, const T _a_end) noexcept;
 /*!
  * @brief Converts an arbitrary unicode string to a u8string.
  *
@@ -477,16 +481,17 @@ __constexpr std::optional<std::u8string>
 _END_ABC_UTILITY_STR_NS
 
 _BEGIN_ABC_UTILITY_STR_NS
-//template <typename T>
-//requires char_type_is_unicode_c<T>
+
+// template <typename T>
+// requires char_type_is_unicode_c<T>
 //__constexpr_imp result_t<std::string>
-//                convert_unicode_to_ascii(
-//                    const std::basic_string<T>& _a_str
-//                ) noexcept
+//                 convert_unicode_to_ascii(
+//                     const std::basic_string<T>& _a_str
+//                 ) noexcept
 //{
-//    using namespace std;
-//    return convert_unicode_to_ascii(basic_string_view<T>(_a_str));
-//}
+//     using namespace std;
+//     return convert_unicode_to_ascii(basic_string_view<T>(_a_str));
+// }
 
 /*template <typename T>
 requires char_type_is_unicode_c<T>
@@ -812,7 +817,7 @@ __constexpr bool
     {
         return _a_char <= ascii_limit<T>();
     }
-}*/
+}
 
 template <bool Return_Reason, typename T>
 requires char_type_is_unicode_c<typename std::iterator_traits<T>::value_type>
@@ -897,7 +902,7 @@ std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
     {
         return _l_rv;
     }
-}
+}*/
 
 template <typename CharT>
 __constexpr std::u8string
@@ -906,6 +911,7 @@ __constexpr std::u8string
             ) noexcept
 {
     using namespace std;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     u8string _l_rv{};
     auto     _l_itt{std::begin(_a_str)};
     auto     _l_end{std::end(_a_str)};
@@ -913,9 +919,7 @@ __constexpr std::u8string
     while (_l_itt != _l_end)
     {
         const optional<char32_t> _l_char_opt{
-            next_char32_t_and_increment_iterator<false, decltype(_l_itt)>(
-                _l_itt, _l_end
-            )
+            next_char32_and_increment_iterator_no_error(_l_itt, _l_end)
         };
         if (_l_char_opt.has_value())
         {

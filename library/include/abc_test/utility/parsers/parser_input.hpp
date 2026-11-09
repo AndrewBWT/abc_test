@@ -36,15 +36,15 @@ public:
                        ) const noexcept
     {
         using namespace std;
+        using namespace UNICODE_BRIDGE_NAMESPACE;
         auto      _l_itt_cpy{std::prev(_m_cur_itt, _a_start)};
         size_t    _l_idx{0};
         u32string _l_str;
         while (_l_itt_cpy < _m_end_itt && _l_idx < _a_size)
         {
-            auto _l_char_res{
-                _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<
-                    false>(_l_itt_cpy, _m_end_itt)
-            };
+            auto _l_char_res{next_char32_and_increment_iterator_no_error(
+                _l_itt_cpy, _m_end_itt
+            )};
             if (_l_char_res.has_value())
             {
                 _l_str.push_back(_l_char_res.value());
@@ -201,14 +201,13 @@ __no_constexpr_imp std::u32string
     ) noexcept
 {
     using namespace std;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     u32string _l_str;
     size_t    _l_idx{0};
     while (_m_cur_itt < _m_end_itt && _l_idx < _a_max_size)
     {
         auto _l_char_res{
-            _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(
-                _m_cur_itt, _m_end_itt
-            )
+            next_char32_and_increment_iterator_no_error(_m_cur_itt, _m_end_itt)
         };
         if (_l_char_res.has_value())
         {
@@ -226,8 +225,9 @@ __constexpr char32_t
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     const optional<pair<char32_t, size_t>> _l_char_opt{
-        next_char32_t<false>((_m_cur_itt + _a_offset), _m_end_itt)
+        next_char32_no_error((_m_cur_itt + _a_offset), _m_end_itt)
     };
     return _l_char_opt.value().first;
 }
@@ -239,12 +239,13 @@ __no_constexpr_imp std::u32string
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     u32string      _l_str;
     auto           _l_back_inserter{back_inserter(_l_str)};
     vector<size_t> _l_sizes;
     while (_m_cur_itt < _m_end_itt)
     {
-        const auto _l_char_opt{next_char32_t<false>(_m_cur_itt, _m_end_itt)};
+        const auto _l_char_opt{next_char32_no_error(_m_cur_itt, _m_end_itt)};
         if (_l_char_opt.has_value())
         {
             const auto& [_l_char, _l_size]{_l_char_opt.value()};
@@ -274,15 +275,14 @@ __no_constexpr_imp std::u32string
     ) noexcept
 {
     using namespace std;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     u32string _l_str;
     size_t    _l_idx{0};
     while (_m_cur_itt < _m_end_itt)
     {
         char32_t _l_char{U'\0'};
         auto     _l_char_res{
-            _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(
-                _m_cur_itt, _m_end_itt
-            )
+            next_char32_and_increment_iterator_no_error(_m_cur_itt, _m_end_itt)
         };
         if (_l_char_res.has_value())
         {
@@ -332,6 +332,7 @@ __constexpr bool
     ) noexcept
 {
     using namespace std;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     u32string_view::const_iterator _l_itt{_a_str_to_check_against.begin()};
     const u32string_view::const_iterator _l_end{_a_str_to_check_against.end()};
     u8string::const_iterator             _l_curr_itt_cpy{_m_cur_itt};
@@ -340,10 +341,9 @@ __constexpr bool
         if (_l_curr_itt_cpy < _m_end_itt)
         {
             char32_t _l_char{U'\0'};
-            auto     _l_char_res{
-                _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<
-                        false>(_l_curr_itt_cpy, _m_end_itt)
-            };
+            auto     _l_char_res{next_char32_and_increment_iterator_no_error(
+                _l_curr_itt_cpy, _m_end_itt
+            )};
             if (_l_char_res.has_value())
             {
                 _l_char = _l_char_res.value();
@@ -369,6 +369,7 @@ __constexpr bool
     ) noexcept
 {
     using namespace std;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     u8string_view::const_iterator       _l_itt{_a_str_to_check_against.begin()};
     const u8string_view::const_iterator _l_end{_a_str_to_check_against.end()};
     u8string::const_iterator            _l_curr_itt_cpy{_m_cur_itt};
@@ -377,18 +378,16 @@ __constexpr bool
         if (_l_curr_itt_cpy < _m_end_itt)
         {
             char32_t _l_char{U'\0'};
-            auto     _l_char_res{
-                _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<
-                        false>(_l_curr_itt_cpy, _m_end_itt)
-            };
+            auto     _l_char_res{next_char32_and_increment_iterator_no_error(
+                _l_curr_itt_cpy, _m_end_itt
+            )};
             if (_l_char_res.has_value())
             {
                 _l_char = _l_char_res.value();
             }
             char32_t _l_char_to_check{U'\0'};
             auto     _l_char_res_2{
-                _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<
-                        false>(_l_itt, _l_end)
+                next_char32_and_increment_iterator_no_error(_l_itt, _l_end)
             };
             if (_l_char_res_2.has_value())
             {
@@ -413,13 +412,12 @@ __constexpr void
         const std::size_t _a_new_itereator
     ) noexcept
 {
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     size_t _l_idx{0};
     while (_m_cur_itt < _m_end_itt && _l_idx < _a_new_itereator)
     {
         auto _l_char_res{
-            _ABC_NS_UTILITY_STR::next_char32_t_and_increment_iterator<false>(
-                _m_cur_itt, _m_end_itt
-            )
+            next_char32_and_increment_iterator_no_error(_m_cur_itt, _m_end_itt)
         };
         if (_l_char_res.has_value())
         {
@@ -482,12 +480,10 @@ __no_constexpr_imp const std::u32string
 {
     using namespace std;
     u32string _l_rv;
-
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     while (_m_cur_itt < _m_end_itt)
     {
-        auto _l_char_res{
-            _ABC_NS_UTILITY_STR::next_char32_t<false>(_m_cur_itt, _m_end_itt)
-        };
+        auto _l_char_res{next_char32_no_error(_m_cur_itt, _m_end_itt)};
         if (_l_char_res.has_value())
         {
             char32_t _l_char{_l_char_res.value().first};
@@ -518,9 +514,8 @@ __constexpr std::size_t
 __no_constexpr_imp char32_t
     parser_input_t::operator*() const noexcept
 {
-    auto _l_char_res{
-        _ABC_NS_UTILITY_STR::next_char32_t<false>(_m_cur_itt, _m_end_itt)
-    };
+    using namespace UNICODE_BRIDGE_NAMESPACE;
+    auto _l_char_res{next_char32_no_error(_m_cur_itt, _m_end_itt)};
     if (_l_char_res.has_value())
     {
         return _l_char_res.value().first;

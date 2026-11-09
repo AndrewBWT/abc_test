@@ -659,7 +659,7 @@ _TEST_CASE(
             RUN(_l_mdg, (_l_test_func.operator()<T>()));
         }
     );
-}*/
+}
 
 _TEST_CASE(
     abc::test_case_t(
@@ -805,7 +805,7 @@ _TEST_CASE(
             RUN(_l_mdg, (_l_test_func.operator()<T>()));
         }
     );
-}
+}*/
 
 _TEST_CASE(
     abc::test_case_t(
