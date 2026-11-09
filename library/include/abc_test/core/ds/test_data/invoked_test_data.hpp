@@ -480,7 +480,7 @@ __constexpr_imp void
     )
 {
     using namespace reports;
-    using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     using enum enum_test_status_t;
     if (terminated(_m_test_status))
     {
@@ -492,7 +492,7 @@ __constexpr_imp void
                 u8"add_assertions function has been entered, however should "
                 u8"have "
                 u8"already termianted. _m_test_status = {0}",
-                cast_string_to_u8string(fmt::format("{}", _m_test_status))
+                cast_string_view<char8_t>(fmt::format("{}", _m_test_status))
             )},
             false
         );
@@ -547,7 +547,7 @@ __constexpr_imp void
     )
 {
     using namespace reports;
-    using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     using namespace _ABC_NS_ERRORS;
     using enum enum_test_status_t;
     if (terminated(_m_test_status))
@@ -559,7 +559,7 @@ __constexpr_imp void
                 u8"set_unexpected_termination function has been entered, "
                 u8"however "
                 u8"should have already termianted. _m_test_status = {0}",
-                cast_string_to_u8string(fmt::format("{}", _m_test_status))
+                cast_string_view<char8_t>(fmt::format("{}", _m_test_status))
             )},
             false
         );
@@ -676,6 +676,7 @@ __no_constexpr_imp std::filesystem::path
     using namespace utility;
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     path_t _l_absolute_path{std::filesystem::absolute(_a_root_path).string()};
     auto   _l_wstr{_l_absolute_path.native()};
 #if defined(_WIN32)
@@ -691,7 +692,7 @@ __no_constexpr_imp std::filesystem::path
         );
     }
     _l_path /= abc::utility::io::normalise_for_file_use(
-        cast_string_to_u8string(
+        cast_string_view<char8_t>(
             _a_test_info.registered_test_data()._m_user_data.name
         ),
         false

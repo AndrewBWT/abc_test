@@ -173,6 +173,7 @@ _TEST_CASE(
     using namespace _ABC_NS_UTILITY_STR;
     using namespace _ABC_NS_DS;
     using namespace _ABC_NS_UTILITY_PRINTER;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     auto _l_run_func
         = [&]<typename T, typename U, size_t N>(
               const std::function<data_generator_collection_t<
@@ -216,7 +217,7 @@ _TEST_CASE(
                 filesystem::remove(_l_path);
             }
             _l_expected_file.push_back(
-                fmt::format(u8"#{0}", cast_string_to_u8string(_l_comment))
+                fmt::format(u8"#{0}", cast_string_view<char8_t>(_l_comment))
             );
             for (auto& _l_element : _l_already_contained_elements)
             {

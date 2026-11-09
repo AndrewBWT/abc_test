@@ -403,6 +403,7 @@ __no_constexpr_imp matcher_wrapper_t<Has_Annotation>
                    matcher_wrapper_t<Has_Annotation>::operator!() const noexcept
 {
     using namespace std;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     std::vector<matcher_result_infos_t::tree_structure_t> _l_children;
     bool                    _l_child_passed{false};
     bool                    _l_precdence_less_than_logic_enum{false};
@@ -431,9 +432,9 @@ __no_constexpr_imp matcher_wrapper_t<Has_Annotation>
             fmt::format(
                 u8"{0}{1}{2}{3}",
                 logic_str<logic_enum_t::NOT>(),
-                abc::utility::str::cast_string_to_u8string(_l_str_pair.first),
+                cast_string_view<char8_t>(_l_str_pair.first),
                 _l_child_res.str().primary_data(),
-                abc::utility::str::cast_string_to_u8string(_l_str_pair.second)
+                cast_string_view<char8_t>(_l_str_pair.second)
             ),
             {},
             _l_children
@@ -528,6 +529,7 @@ __constexpr_imp matcher_wrapper_t<false>
     using namespace std;
     using namespace abc::ds;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     std::vector<matcher_result_infos_t::tree_structure_t> _l_infos;
     abc::matcher::matcher_result_infos_t                  _l_left_str{
         _a_matcher_l.has_value()
@@ -595,13 +597,13 @@ __constexpr_imp matcher_wrapper_t<false>
         matcher_result_infos_t(
             fmt::format(
                 u8"{0}{1}{2} {3} {4}{5}{6}",
-                cast_string_to_u8string(_l_str_pair_l.first),
+                cast_string_view<char8_t>(_l_str_pair_l.first),
                 _l_left_str.primary_data(),
-                cast_string_to_u8string(_l_str_pair_l.second),
+                cast_string_view<char8_t>(_l_str_pair_l.second),
                 logic_str<Logic_Enum>(),
-                cast_string_to_u8string(_l_str_pair_r.first),
+                cast_string_view<char8_t>(_l_str_pair_r.first),
                 _l_right_str.primary_data(),
-                cast_string_to_u8string(_l_str_pair_r.second)
+                cast_string_view<char8_t>(_l_str_pair_r.second)
             ),
             {},
             _l_children

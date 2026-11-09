@@ -100,7 +100,7 @@ __no_constexpr_imp void
     using namespace ds;
     using namespace utility;
     using namespace _ABC_NS_ERRORS;
-    using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     const map<key_t, tdg_collection_stack_trie_t>& _l_map{
         _m_options.group_test_options.map_of_unique_ids_and_for_loop_stack_tries
             .map()
@@ -132,7 +132,7 @@ __no_constexpr_imp void
             };
             const test_path_hierarchy_t _l_test_path_hierarchy{
                 abc::utility::str::split_string<char8_t>(
-                    cast_string_to_u8string(_l_test_element._m_user_data.path),
+                    cast_string_view<char8_t>(_l_test_element._m_user_data.path),
                     _m_options.group_test_options.path_delimiter
                 )
             };

@@ -145,7 +145,6 @@ G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/printer
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/object_printer_parser.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/str/print_utils.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/str/string_utils.hpp
-G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/str/string_cast.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/ranges.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/str/rw_info.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/enum.hpp

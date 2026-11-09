@@ -50,6 +50,7 @@ __no_constexpr_imp test_result_t
     using namespace abc::utility::io;
     using namespace _ABC_NS_UTILITY_STR;
     using namespace _ABC_NS_DS;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     shared_ptr<_ABC_NS_DS::test_list_t> _l_tests_to_run
         = make_shared<_ABC_NS_DS::test_list_t>();
     test_options_base_t _l_running_options;
@@ -83,9 +84,9 @@ __no_constexpr_imp test_result_t
         _l_tests_to_run->push_back(_l_rtd);
         u8string _l_uuid;
 
-        _l_uuid.append(cast_string_to_u8string(_l_path))
+        _l_uuid.append(cast_string_view<char8_t>(_l_path))
             .append(_l_running_options.group_test_options.path_delimiter)
-            .append(cast_string_to_u8string(_l_name));
+            .append(cast_string_view<char8_t>(_l_name));
         if (not _a_write_data_to_files)
         {
             _l_running_options.group_test_options

@@ -64,6 +64,7 @@ _TEST_CASE(
     using namespace abc::utility::io;
     using namespace _ABC_NS_UTILITY_STR;
     using namespace _ABC_NS_DS;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     vector<int> _l_values;
     function<void()> _l_test_func_1 = [&]()
         {
@@ -98,9 +99,9 @@ _TEST_CASE(
     _l_funcs_to_run.clear();
     u8string _l_uuid;
 
-    _l_uuid.append(cast_string_to_u8string(_l_path))
+    _l_uuid.append(cast_string_view<char8_t>(_l_path))
         .append(u8"::")
-        .append(cast_string_to_u8string(_l_name_1));
+        .append(cast_string_view<char8_t>(_l_name_1));
      ds::idgc_memoized_element_sequence_t _l_element_sequence_1,
         _l_element_sequence_2, _l_element_sequence_3;
     _l_element_sequence_1.push_back(indexed_data_generator_collection_memoized_element_t{

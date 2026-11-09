@@ -85,13 +85,14 @@ __no_constexpr_imp matcher_t
     using namespace std;
     using namespace _ABC_NS_MATCHER;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     return mk_matcher_using_result(matcher_result_t(
         false,
         matcher_result_infos_t(fmt::format(
             u8"An unexpected exception, of a type derived from {0} was thrown. "
             u8"The exception's what() function returned \"{1}\".",
             type_id<std::exception>(),
-            cast_string_to_u8string(_a_exception.what())
+            cast_string_view<char8_t>(_a_exception.what())
         ))
     ));
 }
@@ -367,11 +368,12 @@ __no_constexpr_imp abc::matcher_t
     using namespace std;
     using namespace _ABC_NS_MATCHER;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     return mk_matcher_using_result(matcher_result_t(
         false,
         matcher_result_infos_t(fmt::format(
             u8"Expected an exception of type \"{0}\".",
-            cast_string_to_u8string(_a_exception.what())
+            cast_string_view<char8_t>(_a_exception.what())
         ))
     ));
 }
@@ -520,6 +522,7 @@ __no_constexpr_imp matcher_t
     using namespace std;
     using namespace _ABC_NS_MATCHER;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     if constexpr (derived_from<T, std::exception>)
     {
         auto _l_str_result{
@@ -527,7 +530,7 @@ __no_constexpr_imp matcher_t
                 abc::matcher::comparison_enum_t::EQ,
                 u8string_view,
                 u8string_view>{}
-                .run(_a_msg, cast_string_to_u8string(_a_exception.what()))
+                .run(_a_msg, cast_string_view<char8_t>(_a_exception.what()))
         };
         if (_l_str_result.passed())
         {
@@ -600,12 +603,13 @@ __no_constexpr_imp matcher_t
     using namespace std;
     using namespace _ABC_NS_MATCHER;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     auto _l_str_result{
         matcher_default_comparable_t<
             comparison_enum_t::EQ,
             u8string_view,
             u8string_view>{}
-            .run(_a_msg, cast_string_to_u8string(_a_exception.what()))
+            .run(_a_msg, cast_string_view<char8_t>(_a_exception.what()))
     };
     if (_l_str_result.passed())
     {

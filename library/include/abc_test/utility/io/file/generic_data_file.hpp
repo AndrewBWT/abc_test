@@ -151,7 +151,7 @@ inline generic_data_file_t<File_Type>
     ) noexcept
 {
     using namespace _ABC_NS_GLOBAL;
-    using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     using namespace std;
     auto _l_path{filesystem::absolute(get_this_threads_current_test().path())};
     if (_a_folder.has_value())
@@ -159,7 +159,7 @@ inline generic_data_file_t<File_Type>
         _l_path /= _a_folder.value();
     }
     _l_path /= _a_str;
-    _l_path.concat(fmt::format(".{0}", cast_u8string_to_string(_a_extension)));
+    _l_path.concat(fmt::format(".{0}", cast_string_view<char>(_a_extension)));
     return generic_data_file_t<File_Type>::mk_file_type(_l_path, true);
 }
 

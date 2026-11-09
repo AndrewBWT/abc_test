@@ -99,8 +99,8 @@ __no_constexpr_imp void
     ) const noexcept
 {
     using namespace std;
-    using namespace _ABC_NS_UTILITY_STR;
-    write_line(u8"WARNING: " + cast_string_to_u8string(_a_str));
+    using namespace UNICODE_BRIDGE_NAMESPACE;
+    write_line(u8"WARNING: " + u8string(cast_string_view<char8_t>(_a_str)));
 }
 
 __no_constexpr_imp void

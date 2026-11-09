@@ -69,6 +69,7 @@ __constexpr_imp parser_result_t<T>
     using namespace std;
     using namespace utility::parser;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     parser_input_t _l_pit(_a_str);
     try
     {
@@ -104,7 +105,7 @@ __constexpr_imp parser_result_t<T>
         return unexpected(parse_error_t{
             .errors           = {fmt::format(
                 u8"Parser threw unexpected exception: \"{0}\"",
-                cast_string_to_u8string(_a_exception.what())
+                cast_string_view<char8_t>(_a_exception.what())
             )},
             .index_of_failure = _l_pit.index()
         });

@@ -281,11 +281,12 @@ struct default_printer_t<T> : public printer_base_t<T>
     {
         using namespace std;
         using namespace _ABC_NS_UTILITY_STR;
+        using namespace UNICODE_BRIDGE_NAMESPACE;
         char* _l_holder = new char[1'000](0);
         to_chars(_l_holder, _l_holder + 1'000, _a_object);
         string _l_rv(_l_holder);
         delete[] _l_holder;
-        return cast_string_to_u8string(_l_rv);
+        return u8string(cast_string_view<char8_t>(_l_rv));
     }
 };
 
@@ -471,20 +472,21 @@ __constexpr std::u8string
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     u8string _l_rv{_a_begin_str};
     if (_a_object_print_parser.space_after_object_name)
     {
         _l_rv.append(u8" ");
     }
     _l_rv.append(
-        cast_string_to_u8string(string(1, _a_object_print_parser.begin_char))
+        cast_string_view<char8_t>(string(1, _a_object_print_parser.begin_char))
     );
     tuple<Ts...> _l_tuple{tie(_a_elements_to_print...)};
     object_printer_internal<0>(
         _a_object_print_parser, _l_rv, _a_object_names, _a_parsers, _l_tuple
     );
     _l_rv.append(
-        cast_string_to_u8string(string(1, _a_object_print_parser.end_char))
+        cast_string_view<char8_t>(string(1, _a_object_print_parser.end_char))
     );
     return _l_rv;
 }
@@ -509,19 +511,20 @@ __constexpr void
     */
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     if (_a_object_names.has_value())
     {
         _a_str.append(get<I>(_a_object_names.value()));
         if (_a_object_print_parser.space_before_field_name_and_field_separator)
         {
-            _a_str.append(cast_string_to_u8string(string(1, ' ')));
+            _a_str.append(cast_string_view<char8_t>(string(1, ' ')));
         }
-        _a_str.append(cast_string_to_u8string(string(
+        _a_str.append(cast_string_view<char8_t>(string(
             1, _a_object_print_parser.delimiter_between_field_name_and_field
         )));
         if (_a_object_print_parser.space_after_field_name_and_field_separator)
         {
-            _a_str.append(cast_string_to_u8string(string(1, ' ')));
+            _a_str.append(cast_string_view<char8_t>(string(1, ' ')));
         }
     }
     _a_str.append(
@@ -531,14 +534,14 @@ __constexpr void
     {
         if (_a_object_print_parser.space_before_field_delimiter)
         {
-            _a_str.append(cast_string_to_u8string(string(1, ' ')));
+            _a_str.append(cast_string_view<char8_t>(string(1, ' ')));
         }
-        _a_str.append(cast_string_to_u8string(
+        _a_str.append(cast_string_view<char8_t>(
             string(1, _a_object_print_parser.delimiter_between_fields)
         ));
         if (_a_object_print_parser.space_after_field_delimieter)
         {
-            _a_str.append(cast_string_to_u8string(string(1, ' ')));
+            _a_str.append(unicode_bridge::cast_ascii<char8_t>(string(1, ' ')));
         }
         object_printer_internal<I + 1>(
             _a_object_print_parser,

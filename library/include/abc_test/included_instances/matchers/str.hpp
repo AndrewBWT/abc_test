@@ -75,14 +75,7 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
         }
         auto _l_single_char_to_unicode_str = [&](const T _a_single_char)
         {
-            if constexpr (same_as<T, char>)
-            {
-                return cast_string_to_u8string(string(1, _a_single_char));
-            }
-            else
-            {
-                return to_formatted_unicode_string<char8_t>(_a_single_char);
-            }
+            return to_formatted_unicode_string<char8_t>(_a_single_char);
         };
         return fmt::format(
             u8"The {0} {1} element in the {2} argument {3}. "

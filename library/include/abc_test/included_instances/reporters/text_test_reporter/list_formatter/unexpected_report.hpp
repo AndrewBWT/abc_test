@@ -71,6 +71,7 @@ __constexpr_imp void
     /**/ using namespace std;
     using namespace errors;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     using enum enum_unexpected_report_fields_t;
     switch (_a_fid)
     {
@@ -95,7 +96,7 @@ __constexpr_imp void
             _a_pc.source_representation(
                 _a_element.source().has_value()
                     ? optional<
-                          u8string>{cast_string_to_u8string(_a_element.source()
+                          u8string>{cast_string_view<char8_t>(_a_element.source()
                                         .value()
                                         .source_code_representation())}
                     : optional<u8string>{}
@@ -105,9 +106,9 @@ __constexpr_imp void
         break;
     case STR_REPRESENTATION:
         _a_ttor.write_line(_a_pc.highlight_fail(
-            cast_string_to_u8string(
+            convert_ascii_to_unicode_no_error<char8_t>(
                 get_str_representation(_a_element, _a_pc)
-            )
+            ).value()
         ));
         break;
     default:

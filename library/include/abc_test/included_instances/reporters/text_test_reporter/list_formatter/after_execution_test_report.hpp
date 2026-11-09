@@ -74,6 +74,7 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
     using namespace _ABC_NS_DS;
     using namespace abc::utility::printer;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     using enum enum_after_execution_test_report_fields_t;
     pair<string, string> _l_pair;
     switch (_a_fid)
@@ -93,10 +94,11 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
                         .registered_test_data()
                         ._m_user_data.description.has_value()
                     ? optional<u8string>{}
-                    : cast_string_to_u8string(_a_element.post_setup_test_data()
-                                                  .registered_test_data()
-                                                  ._m_user_data.description
-                                                  .value())
+                    : make_optional(cast_string_view<char8_t>(
+                          _a_element.post_setup_test_data()
+                              .registered_test_data()
+                              ._m_user_data.description.value()
+                      ))
             ))}
         };
     case STR_STATUS:
@@ -116,10 +118,10 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
     case NAME:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.name_str())),
-            {_a_pc.name(cast_string_to_u8string(_a_element
-                                                    .post_setup_test_data()
-                                                    .registered_test_data()
-                                                    ._m_user_data.name))}
+            {_a_pc.name(cast_string_view<char8_t>(_a_element
+                                                      .post_setup_test_data()
+                                                      .registered_test_data()
+                                                      ._m_user_data.name))}
         };
     case SOURCE_LOCATION:
     {
@@ -145,7 +147,7 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
             _a_pc.space(_a_pc.colon(_a_pc.source_code_str())),
             {_a_pc.source_representation(
                 _l_opt.has_value()
-                    ? optional<u8string>{cast_string_to_u8string(
+                    ? optional<u8string>{cast_string_view<char8_t>(
                           _l_opt.value().source_code_representation()
                       )}
                     : optional<u8string>{}
@@ -156,10 +158,11 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
     case TEST_PATH:
         return {
             _a_pc.space(_a_pc.colon(_a_pc.test_path_str())),
-            {_a_pc.test_path(cast_string_to_u8string(_a_element
-                                                         .post_setup_test_data()
-                                                         .registered_test_data()
-                                                         ._m_user_data.path))}
+            {_a_pc.test_path(
+                cast_string_view<char8_t>(_a_element.post_setup_test_data()
+                                              .registered_test_data()
+                                              ._m_user_data.path)
+            )}
         };
     case SEED_USED:
         return {

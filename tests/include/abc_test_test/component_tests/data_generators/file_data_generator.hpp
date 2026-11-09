@@ -95,6 +95,7 @@ _TEST_CASE(
     using namespace abc::utility::io;
     using namespace _ABC_NS_UTILITY_STR;
     using namespace _ABC_NS_DS;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     string           _l_name_1{"name"};
     string           _l_path{"path"};
     string           _l_file_name{"test_file_3"};
@@ -114,7 +115,7 @@ _TEST_CASE(
     vector<int> _l_elements = {1, 2, 3, 54, 100};
     for (auto& _l_element : _l_elements)
     {
-        _l_out << abc::utility::str::cast_u8string_to_string(
+        _l_out << cast_string_view<char>(
             abc::utility::printer::default_printer_t<int>{}.run_printer(
                 _l_element
             )
@@ -197,6 +198,7 @@ _TEST_CASE(
     using namespace abc::utility::io;
     using namespace _ABC_NS_UTILITY_STR;
     using namespace _ABC_NS_DS;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     string           _l_name_1{"name"};
     string           _l_path{"path"};
     string           _l_file_name{"test_file_4"};
@@ -216,7 +218,7 @@ _TEST_CASE(
     vector<int> _l_elements = {1, 2, 3, 54, 100};
     for (auto& _l_element : _l_elements)
     {
-        _l_out << abc::utility::str::cast_u8string_to_string(
+        _l_out << cast_string_view<char>(
             abc::utility::printer::default_printer_t<int>{}.run_printer(
                 _l_element
             )

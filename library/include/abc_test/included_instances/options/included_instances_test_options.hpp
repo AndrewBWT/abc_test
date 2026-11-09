@@ -142,6 +142,7 @@ __no_constexpr_imp std::vector<std::filesystem::path>
     using namespace std::filesystem;
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     vector<path> _l_rv;
     for (const auto& [_l_path, _l_duplicates_allowed] : _a_potential_files)
     {
@@ -152,7 +153,7 @@ __no_constexpr_imp std::vector<std::filesystem::path>
             _a_error_ref.push_back(fmt::format(
                 u8"File for {0} \"{1}\" unable to be created because parent "
                 u8"path {2} does not exist",
-                cast_string_to_u8string(_a_identifier),
+                cast_string_view<char8_t>(_a_identifier),
                 _l_file_to_be_made,
                 _l_parent_folder
             ));

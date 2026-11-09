@@ -110,6 +110,7 @@ __constexpr_imp void
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     pair<u8string, u8string> _l_pair;
     if (auto _l_ptr{get_if<enum_user_initialised_report_fields_t>(&_a_fid)};
         _l_ptr != nullptr)
@@ -149,7 +150,7 @@ __constexpr_imp void
                 _l_pair = {
                     _a_pc.colon(_a_pc.test_description_str()),
                     _a_pc.indent(_a_pc.test_description(
-                        cast_string_to_u8string(_a_element.test_description())
+                        cast_string_view<char8_t>(_a_element.test_description())
                     ))
                 };
             }

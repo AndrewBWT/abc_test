@@ -51,7 +51,7 @@ public:
     __no_constexpr void
         add_option(
             const cli_option_config_t&                  _a_option,
-            std::function<T&(Option_Class&)>                                           _a_member_var,
+            std::function<T&(Option_Class&)>            _a_member_var,
             cli_results_t&                              _a_cli_results,
             const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs
             = cli_argument_processing_info_t<T, U>{}
@@ -59,8 +59,8 @@ public:
     template <typename T, typename U>
     __no_constexpr void
         add_multi_element_option(
-            const cli_option_config_t& _a_cli_option,
-            std::function<T&(Option_Class&)>                           _a_member_var,
+            const cli_option_config_t&                  _a_cli_option,
+            std::function<T&(Option_Class&)>            _a_member_var,
             cli_results_t&                              _a_cli_results,
             const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs
             = cli_argument_processing_info_t<T, U>{}
@@ -271,7 +271,7 @@ template <typename T, typename U>
 __no_constexpr_imp void
     cli_t<Option_Class>::add_option(
         const cli_option_config_t&                  _a_option,
-        std::function<T& (Option_Class&)>                                           _a_member_var,
+        std::function<T&(Option_Class&)>            _a_member_var,
         cli_results_t&                              _a_cli_results,
         const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs
 
@@ -287,8 +287,8 @@ template <typename Option_Class>
 template <typename T, typename U>
 __no_constexpr_imp void
     cli_t<Option_Class>::add_multi_element_option(
-        const cli_option_config_t& _a_cli_option,
-        std::function<T&(Option_Class&)>                           _a_member_var,
+        const cli_option_config_t&                  _a_cli_option,
+        std::function<T&(Option_Class&)>            _a_member_var,
         cli_results_t&                              _a_cli_results,
         const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs
 
@@ -905,6 +905,7 @@ __no_constexpr_imp void
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     auto&    _l_rep_data{_m_rep_data.value()};
     ofstream _l_output;
     size_t   _l_next_index;
@@ -948,7 +949,7 @@ __no_constexpr_imp void
         abc::utility::printer::default_printer_t<pair<bool, size_t>>{}
             .run_printer(make_pair(_a_test_success, _l_next_index))
     };
-    _l_output << cast_u8string_to_string(
+    _l_output << cast_string_view<char>(
         _a_option_class.cli_test_options.autofile_metadata_string
     ) << "_" << string(_l_printed_str.begin(), _l_printed_str.end())
               << std::endl;
@@ -993,10 +994,11 @@ __constexpr_imp std::vector<std::u8string>
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     vector<u8string> _l_strs(_a_argc > 1 ? (_a_argc - 1) : 0);
     for (size_t _l_idx{1}; _l_idx < _a_argc; ++_l_idx)
     {
-        _l_strs[_l_idx - 1] = cast_string_to_u8string(_a_argv[_l_idx]);
+        _l_strs[_l_idx - 1] = cast_string_view<char8_t>(_a_argv[_l_idx]);
     }
     return _l_strs;
 }
@@ -1009,10 +1011,11 @@ __no_constexpr_imp std::optional<std::string>
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     string _l_unprocessed_line;
     while (getline(_a_fstream, _l_unprocessed_line))
     {
-        u8string _l_line{cast_string_to_u8string(_l_unprocessed_line)};
+        u8string _l_line{ cast_string_view<char8_t>(_l_unprocessed_line)};
         if (_l_line.starts_with(_a_str_to_find))
         {
             return _l_unprocessed_line;
@@ -1033,6 +1036,7 @@ __constexpr_imp std::optional<found_data_t>
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     fstream                _l_file_input(_a_path);
     string                 _l_line;
     optional<found_data_t> _l_rv;
@@ -1044,7 +1048,7 @@ __constexpr_imp std::optional<found_data_t>
                                                    ? _l_unprocessed_line.value()
                                                    : _l_line;
         const u8string _l_line_to_get{
-            cast_string_to_u8string(_l_line_to_get_as_str)
+            cast_string_view<char8_t>(_l_line_to_get_as_str)
         };
         if (_l_unprocessed_line.has_value())
         {

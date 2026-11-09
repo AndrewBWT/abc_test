@@ -441,9 +441,11 @@ __constexpr_imp std::u8string
                 print_config_t::line_break() const noexcept
 {
     using namespace std;
-    using namespace _ABC_NS_UTILITY_STR;
-    return cast_string_to_u8string(string(_m_line_break_len, _m_line_break_char)
-    );
+    using namespace UNICODE_BRIDGE_NAMESPACE;
+    return convert_ascii_to_unicode_no_error<char8_t>(
+               string(_m_line_break_len, _m_line_break_char)
+    )
+        .value();
 }
 
 __constexpr_imp const std::u8string
@@ -1024,11 +1026,12 @@ __constexpr_imp std::u8string
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     if (_a_sl.has_value())
     {
         return highlight(fmt::format(
             u8"{0}:{1}",
-            cast_string_to_u8string(_a_sl.value().file_name()),
+            cast_string_view<char8_t>(_a_sl.value().file_name()),
             _a_sl.value().line()
         ));
     }

@@ -112,6 +112,7 @@ __constexpr_imp void
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     if (auto _l_ptr{
             get_if<enum_matcher_based_assertion_single_line_fields_t>(&_a_fid)
         };
@@ -147,7 +148,7 @@ __constexpr_imp void
                         this->prefix(_a_idx + 1)
                         + _a_pc.indent(
                             _a_pc.source_representation(
-                                cast_string_to_u8string(_l_str)
+                                cast_string_view<char8_t>(_l_str)
                             ),
                             2
                         )

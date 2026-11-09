@@ -105,6 +105,7 @@ __constexpr_imp bool
     using namespace _ABC_NS_ERRORS;
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     bool _l_exit{true};
     if (_m_finished_reading)
     {
@@ -116,7 +117,7 @@ __constexpr_imp bool
         ++_m_current_line_idx;
         string _l_unprocessed_line;
         std::getline(_l_file_hander, _l_unprocessed_line);
-        _m_current_line = cast_string_to_u8string(_l_unprocessed_line);
+        _m_current_line = cast_string_view<char8_t>(_l_unprocessed_line);
         const bool _l_error_reading_file{
             _l_file_hander.fail() || _l_file_hander.bad()
         };

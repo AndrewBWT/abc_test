@@ -1,12 +1,11 @@
 #pragma once
 
 #include "abc_test/utility/internal/macros.hpp"
-#include "abc_test/utility/str/string_cast.hpp"
 #include "abc_test/utility/str/print_utils.hpp"
 
+#include <fmt/xchar.h>
 #include <source_location>
 #include <stdexcept>
-#include <fmt/xchar.h>
 
 _BEGIN_ABC_NS
 
@@ -21,7 +20,9 @@ public:
         unreachable_exception_t(
             const std::u8string_view _a_error
         ) noexcept
-        : std::runtime_error(_ABC_NS_UTILITY_STR::cast_u8string_to_string(_a_error))
+        : std::runtime_error(std::string(
+              UNICODE_BRIDGE_NAMESPACE::cast_string_view<char>(_a_error)
+          ))
     {}
 };
 

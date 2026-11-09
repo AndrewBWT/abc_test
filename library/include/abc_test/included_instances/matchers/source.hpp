@@ -21,6 +21,7 @@ stacktraces_equal(
     using namespace std;
     using namespace _ABC_NS_MATCHER;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     bool _l_equal{ true };
     if (_a_st1.size() != _a_st2.size())
     {
@@ -43,9 +44,9 @@ stacktraces_equal(
         _l_equal,
         matcher_result_infos_t(fmt::format(
             u8"{0} {1} {2}",
-            cast_string_to_u8string(to_string(_a_st1)),
+            cast_string_view<char8_t>(to_string(_a_st1)),
             _l_equal ? u8"==" : u8"!=",
-            cast_string_to_u8string(to_string(_a_st2))
+            cast_string_view<char8_t>(to_string(_a_st2))
         )
     )));
 }

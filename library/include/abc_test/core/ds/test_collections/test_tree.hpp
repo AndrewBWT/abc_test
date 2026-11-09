@@ -159,7 +159,7 @@ __no_constexpr_imp std::optional<_ABC_NS_ERRORS::abc_test_error_t>
 {
     using namespace std;
     using namespace _ABC_NS_ERRORS;
-    using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     const post_setup_test_data_t& _l_test{_a_test.get()};
     if (_l_test.thread_resourses_required()
         > _a_options.group_test_options.threads)
@@ -174,7 +174,7 @@ __no_constexpr_imp std::optional<_ABC_NS_ERRORS::abc_test_error_t>
                 u8"post_setup_test_data_t = {2}",
                 _l_test.thread_resourses_required(),
                 _a_options.group_test_options.threads,
-                cast_string_to_u8string(fmt::format("{0}", _l_test))
+                cast_string_view<char8_t>(fmt::format("{0}", _l_test))
             )},
             false
         );
@@ -202,7 +202,7 @@ __no_constexpr_imp std::optional<_ABC_NS_ERRORS::abc_test_error_t>
                     u8"post_setup_test_data_t = {2}",
                     _l_empty_indexes,
                     _l_test.test_path_hierarchy(),
-                    cast_string_to_u8string(fmt::format("{0}", _l_test))
+                    cast_string_view<char8_t>(fmt::format("{0}", _l_test))
                 )},
                 false
             );
@@ -290,7 +290,7 @@ __no_constexpr_imp _ABC_NS_ERRORS::opt_abc_test_error_t
     // Find the node of the test hierarchy.
     using namespace std;
     using namespace _ABC_NS_ERRORS;
-    using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     test_tree_ref_t   _l_node{find_or_create_test_node(
         _a_test_tree, _a_test_ref.test_path_hierarchy()
     )};
@@ -332,8 +332,8 @@ __no_constexpr_imp _ABC_NS_ERRORS::opt_abc_test_error_t
                     u8"insert is {0}, "
                     u8"while the post_setup_test_data_t object blocking its "
                     u8"insertion is {1}. ",
-                    cast_string_to_u8string(fmt::format("{0}", _a_test.get())),
-                    cast_string_to_u8string(
+                    cast_string_view<char8_t>(fmt::format("{0}", _a_test.get())),
+                    cast_string_view<char8_t>(
                         fmt::format("{0}", (_l_name_range_itts.begin()->get()))
                     )
                 )},

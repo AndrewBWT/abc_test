@@ -1,6 +1,5 @@
 #pragma once
 #include "abc_test/utility/internal/macros.hpp"
-#include "abc_test/utility/str/string_cast.hpp"
 
 #include <fmt/xchar.h>
 #include <string>
@@ -168,8 +167,9 @@ __constexpr_imp std::u8string
                 type_id() noexcept
 {
     using namespace std;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     const string_view _l_str{typeid(T).name()};
-    return cast_string_to_u8string(_l_str);
+    return cast_ascii<char8_t>(_l_str);
 }
 
 template <typename T>

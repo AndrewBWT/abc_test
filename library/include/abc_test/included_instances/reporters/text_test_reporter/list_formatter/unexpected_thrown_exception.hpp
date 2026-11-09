@@ -88,6 +88,7 @@ __constexpr_imp void
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     if (auto _l_ptr{get_if<
             combined_enum_unexpected_thrown_non_descript_entity_fields_t>(
             &_a_fid
@@ -108,7 +109,7 @@ __constexpr_imp void
             _a_ttor.write_line(_a_pc.indent(_a_pc.exception_type_str()));
             _a_ttor.write_line(_a_pc.indent(
                 _a_pc.exception_type(
-                    cast_string_to_u8string(
+                    cast_string_view<char8_t>(
                         _a_element.exception_type()
                     )
                 ),
@@ -119,7 +120,7 @@ __constexpr_imp void
             _a_ttor.write_line(_a_pc.indent(_a_pc.exception_message_str()));
             _a_ttor.write_line(_a_pc.indent(
                 _a_pc.exception_message(
-                    cast_string_to_u8string(
+                    cast_string_view<char8_t>(
                         _a_element.exception_message()
                     )
                 ),

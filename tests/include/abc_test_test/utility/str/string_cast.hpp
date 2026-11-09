@@ -2,7 +2,7 @@
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
 
-_TEST_CASE(
+/*_TEST_CASE(
     abc::test_case_t(
         {.name             = "Tests for cast_u8string_to_string "
                              "and cast_string_to_u8string",
@@ -239,4 +239,4 @@ _TEST_CASE(
         );
     }
     _CHECK(_l_property_tests);
-}
+}*/

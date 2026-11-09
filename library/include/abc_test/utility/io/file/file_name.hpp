@@ -98,6 +98,7 @@ __constexpr_imp std::u8string
 {
     using namespace std;
     using namespace abc::utility::str;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     if (auto _l_ptr{get_if<general_data_with_rw_info_t<T>>(&_a_file_name)};
         _l_ptr != nullptr)
     {
@@ -111,7 +112,7 @@ __constexpr_imp std::u8string
     else if (auto _l_ptr{get_if<tertiary_data_t>(&_a_file_name)};
              _l_ptr != nullptr)
     {
-        return abc::utility::str::cast_string_to_u8string(_a_type_info.name());
+        return cast_char_ptr<char8_t>(_a_type_info.name());
     }
     else
     {
