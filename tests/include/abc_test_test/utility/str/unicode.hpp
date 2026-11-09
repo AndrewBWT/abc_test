@@ -37,7 +37,7 @@ constexpr auto
 }
 } // namespace
 
-_TEST_CASE(
+/*_TEST_CASE(
     abc::test_case_t(
         {.name             = "Tests for convert_unicode_to_ascii and "
                              "convert_ascii_to_unicode",
@@ -203,7 +203,7 @@ _TEST_CASE(
             RUN(_l_mdg, (_l_test_func.operator()<T>()));
         }
     );
-}
+}*/
 
 _TEST_CASE(
     abc::test_case_t(

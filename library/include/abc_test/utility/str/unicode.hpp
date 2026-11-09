@@ -22,10 +22,10 @@ _BEGIN_ABC_UTILITY_STR_NS
  * @param _a_str The input string.
  * @return Eitehr the output string, or an appropriate failure message.
  */
-template <typename T>
-requires char_type_is_unicode_c<T>
-__constexpr result_t<std::string>
-    convert_unicode_to_ascii(const std::basic_string<T>& _a_str) noexcept;
+    //template <typename T>
+//requires char_type_is_unicode_c<T>
+//__constexpr result_t<std::string>
+//    convert_unicode_to_ascii(const std::basic_string<T>& _a_str) noexcept;
 /*!
  * @brief This function converts a unicode string to an ASCII string.
  *
@@ -38,10 +38,10 @@ __constexpr result_t<std::string>
  * @param _a_str The input string.
  * @return Eitehr the output string, or an appropriate failure message.
  */
-template <typename T>
-requires char_type_is_unicode_c<T>
-__constexpr result_t<std::string>
-    convert_unicode_to_ascii(const std::basic_string_view<T> _a_str) noexcept;
+//template <typename T>
+//requires char_type_is_unicode_c<T>
+//__constexpr result_t<std::string>
+//    convert_unicode_to_ascii(const std::basic_string_view<T> _a_str) noexcept;
 /*!
  * @brief Converts an ASCII string to unicode.
  *
@@ -476,18 +476,18 @@ __constexpr std::optional<std::u8string>
 _END_ABC_UTILITY_STR_NS
 
 _BEGIN_ABC_UTILITY_STR_NS
-template <typename T>
-requires char_type_is_unicode_c<T>
-__constexpr_imp result_t<std::string>
-                convert_unicode_to_ascii(
-                    const std::basic_string<T>& _a_str
-                ) noexcept
-{
-    using namespace std;
-    return convert_unicode_to_ascii(basic_string_view<T>(_a_str));
-}
+//template <typename T>
+//requires char_type_is_unicode_c<T>
+//__constexpr_imp result_t<std::string>
+//                convert_unicode_to_ascii(
+//                    const std::basic_string<T>& _a_str
+//                ) noexcept
+//{
+//    using namespace std;
+//    return convert_unicode_to_ascii(basic_string_view<T>(_a_str));
+//}
 
-template <typename T>
+/*template <typename T>
 requires char_type_is_unicode_c<T>
 __constexpr_imp result_t<std::string>
                 convert_unicode_to_ascii(
@@ -559,7 +559,7 @@ __constexpr_imp result_t<std::string>
         }
     }
     return _l_output;
-}
+}*/
 
 template <typename T>
 requires char_type_is_unicode_c<T>

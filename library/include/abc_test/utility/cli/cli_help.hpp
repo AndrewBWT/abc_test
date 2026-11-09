@@ -82,10 +82,11 @@ public:
     {
         using namespace std;
         using namespace _ABC_NS_UTILITY_STR;
+        using namespace UNICODE_BRIDGE_NAMESPACE;
         // _a_cli.set_terminate_early(true);
         // Read the file.
         // Go thorugh the args and
-        const result_t<string> _l_result_file_name{
+        const unicode_to_ascii_result<string> _l_result_file_name{
             convert_unicode_to_ascii(_a_args[0])
         };
         if (_l_result_file_name.has_value())
@@ -158,7 +159,7 @@ public:
             _a_cli_results.add_error(fmt::format(
                 u8"Could not convert file name from std::u8string to "
                 u8"std::string. Conversion error was \"{0}\".",
-                _l_result_file_name.error()
+                _l_result_file_name.error().message()
             ));
             return true;
         }

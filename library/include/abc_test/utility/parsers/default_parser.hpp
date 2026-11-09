@@ -10,6 +10,7 @@
 #include <fmt/xchar.h>
 #include <functional>
 #include <random>
+#include <unicode_bridge.hpp>
 #include <unordered_map>
 #include <variant>
 
@@ -180,8 +181,11 @@ __constexpr result_t<T>
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     const u32string _l_sv{_a_parse_input.get_u32string(_a_characters_to_take)};
-    const result_t<string> _l_sv_as_str{convert_unicode_to_ascii(_l_sv)};
+    const unicode_to_ascii_result<string> _l_sv_as_str{
+        convert_unicode_to_ascii(_l_sv)
+    };
     if (_l_sv_as_str.has_value())
     {
         uint32_t _l_res;
@@ -195,7 +199,7 @@ __constexpr result_t<T>
     }
     else
     {
-        return unexpected(_l_sv_as_str.error());
+        return unexpected(_l_sv_as_str.error().message());
     }
 }
 } // namespace detail
@@ -418,11 +422,14 @@ struct default_parser_t<T> : public parser_base_t<T>
     {
         using namespace std;
         using namespace _ABC_NS_UTILITY_STR;
+        using namespace UNICODE_BRIDGE_NAMESPACE;
         T               result{};
         const u32string _l_u32str{
             _a_parse_input.take_string_containing(U"0123456789-.")
         };
-        const result_t<string> _l_str_opt{convert_unicode_to_ascii(_l_u32str)};
+        const unicode_to_ascii_result<string> _l_str_opt{
+            convert_unicode_to_ascii(_l_u32str)
+        };
         if (_l_str_opt.has_value())
         {
             auto& _l_str{_l_str_opt.value()};
@@ -473,7 +480,9 @@ struct default_parser_t<T> : public parser_base_t<T>
         }
         else
         {
-            return unexpected(u8"unknown");
+            return unexpected(
+                u8"Unexpected error: " + _l_str_opt.error().message()
+            );
         }
     }
 };
@@ -813,6 +822,7 @@ struct default_parser_t<std::basic_string<T>>
     {
         using namespace std;
         using namespace _ABC_NS_UTILITY_STR;
+        using namespace UNICODE_BRIDGE_NAMESPACE;
         using arg_type_t = basic_string<T>;
         char32_t   _l_char{U'"'};
         u32string  _l_str{};
@@ -821,8 +831,9 @@ struct default_parser_t<std::basic_string<T>>
         {
             if constexpr (same_as<arg_type_t, string>)
             {
-                const result_t<arg_type_t> _l_rv{convert_unicode_to_ascii(_a_str
-                )};
+                const unicode_to_ascii_result<arg_type_t> _l_rv{
+                    convert_unicode_to_ascii(_a_str)
+                };
                 if (_l_rv.has_value())
                 {
                     _l_rv_str.append(_l_rv.value());
@@ -846,7 +857,7 @@ struct default_parser_t<std::basic_string<T>>
             for (size_t _l_idx{0}; _l_idx < hex_size; ++_l_idx)
             {
                 const u32string _l_str{_a_parse_input.process_characters(2)};
-                const result_t<string> _l_str_as_ascii_opt{
+                const unicode_to_ascii_result<string> _l_str_as_ascii_opt{
                     convert_unicode_to_ascii(_l_str)
                 };
                 if (_l_str_as_ascii_opt.has_value())
@@ -898,7 +909,10 @@ struct default_parser_t<std::basic_string<T>>
                 }
                 else
                 {
-                    return std::unexpected(u8"whoah");
+                    return std::unexpected(
+                        u8"Unexpected error: "
+                        + _l_str_as_ascii_opt.error().message()
+                    );
                 }
             }
             return _l_result;

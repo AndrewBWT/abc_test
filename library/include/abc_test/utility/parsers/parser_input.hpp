@@ -2,6 +2,7 @@
 #include "abc_test/utility/parsers/parser_exceptions.hpp"
 #include "abc_test/utility/str/string_utils.hpp"
 
+#include <unicode_bridge.hpp>
 _BEGIN_ABC_UTILITY_PARSER_NS
 
 struct parser_input_t
@@ -458,7 +459,17 @@ __constexpr const result_t<std::string>
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
-    return convert_unicode_to_ascii(u8string_view(_m_cur_itt, _m_end_itt));
+    using namespace UNICODE_BRIDGE_NAMESPACE;
+    const unicode_to_ascii_result<string> res
+        = convert_unicode_to_ascii(u8string_view(_m_cur_itt, _m_end_itt));
+    if (res.has_value())
+    {
+        return res.value();
+    }
+    else
+    {
+        return unexpected(res.error().message());
+    }
 }
 
 __no_constexpr_imp const std::u32string

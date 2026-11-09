@@ -11,6 +11,7 @@
 #include <source_location>
 #include <string>
 #include <vector>
+#include <unicode_bridge.hpp>
 
 _BEGIN_ABC_UTILITY_STR_NS
 /*!
@@ -246,6 +247,7 @@ __constexpr_imp result_t<std::u8string>
 {
     using namespace utility::str;
     using namespace std;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     if ((_a_str.size() % 2) != 0)
     {
         return unexpected(
@@ -258,7 +260,7 @@ __constexpr_imp result_t<std::u8string>
     }
     else
     {
-        const result_t<string> _l_str_result{convert_unicode_to_ascii(_a_str)};
+        const auto _l_str_result{convert_unicode_to_ascii(_a_str)};
         if (_l_str_result.has_value())
         {
             // Parse the bytes.
@@ -294,7 +296,7 @@ __constexpr_imp result_t<std::u8string>
             return unexpected(fmt::format(
                 u8"Could not convert std::u8string to std::string. Error was "
                 u8"\"{0}\"",
-                _l_str_result.error()
+                _l_str_result.error().message()
             ));
         }
     }
