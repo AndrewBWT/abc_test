@@ -158,7 +158,7 @@ private:
 };
 
 template <typename T>
-requires std::integral<T> && (not abc::utility::str::is_char_type_c<T>)
+requires std::integral<T> && (not UNICODE_BRIDGE_NAMESPACE::is_char_type_c<T>)
 struct default_random_generator_t<T> : public integral_random_generator_t<T>
 {
 public:
@@ -166,7 +166,7 @@ public:
 };
 
 template <typename T>
-requires abc::utility::str::is_char_type_c<T>
+requires UNICODE_BRIDGE_NAMESPACE::is_char_type_c<T>
 struct default_random_generator_t<T> : public integral_random_generator_t<T>
 {
 public:

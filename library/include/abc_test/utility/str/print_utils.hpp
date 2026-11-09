@@ -5,6 +5,7 @@
 
 #include <fmt/xchar.h>
 #include <string>
+#include <unicode_bridge.hpp>
 
 _BEGIN_ABC_UTILITY_STR_NS
 
@@ -49,7 +50,7 @@ __no_constexpr std::u8string
  * @return A u8string representation the character in hex.
  */
 template <typename T>
-requires is_char_type_c<T>
+requires UNICODE_BRIDGE_NAMESPACE::is_char_type_c<T>
 __constexpr std::u8string
             represent_char_as_hex_for_printing(const T _a_char) noexcept;
 /*!
@@ -62,7 +63,7 @@ __constexpr std::u8string
  * @return A u8string representation the character in hex.
  */
 template <typename T>
-requires is_char_type_c<T>
+requires UNICODE_BRIDGE_NAMESPACE::is_char_type_c<T>
 __constexpr std::u8string
             represent_char_as_hex_for_output(const T _a_char) noexcept;
 /*!
@@ -138,7 +139,7 @@ __constexpr std::
 namespace detail
 {
 template <typename T, bool Use_Capitols = true>
-requires is_char_type_c<T>
+requires UNICODE_BRIDGE_NAMESPACE::is_char_type_c<T>
 __constexpr std::u8string
             make_hex_from_char_with_prefix(
                 const T                  _a_char,
@@ -199,7 +200,7 @@ __no_constexpr std::u8string
 }
 
 template <typename T>
-requires is_char_type_c<T>
+requires UNICODE_BRIDGE_NAMESPACE::is_char_type_c<T>
 __constexpr std::u8string
             represent_char_as_hex_for_printing(
                 const T _a_char
@@ -230,7 +231,7 @@ __constexpr std::u8string
 }
 
 template <typename T>
-requires is_char_type_c<T>
+requires UNICODE_BRIDGE_NAMESPACE::is_char_type_c<T>
 __constexpr std::u8string
             represent_char_as_hex_for_output(
                 const T _a_char
@@ -325,7 +326,7 @@ __constexpr std::basic_string<string_like_underlying_char_type_t<FuncName>>
 namespace detail
 {
 template <typename T, bool Use_Capitols>
-requires is_char_type_c<T>
+requires UNICODE_BRIDGE_NAMESPACE::is_char_type_c<T>
 __constexpr std::u8string
             make_hex_from_char_with_prefix(
                 const T                  _a_char,

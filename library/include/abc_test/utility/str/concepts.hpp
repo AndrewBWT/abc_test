@@ -4,34 +4,35 @@
 
 #include <concepts>
 #include <string>
+#include <unicode_bridge.hpp>
 
 _BEGIN_ABC_UTILITY_STR_NS
 /*!
  * @brief This concept identifies a wchar_t type which is 4 bytes long - 32
  * bits.
  */
-constexpr bool wchar_is_16_bit = (sizeof(wchar_t) == 2);
-constexpr bool wchar_is_32_bit = (sizeof(wchar_t) == 4);
-template <typename T>
-concept is_wchar_and_32_bit_c = std::same_as<T, wchar_t> && wchar_is_32_bit;
+//constexpr bool wchar_is_16_bit = (sizeof(wchar_t) == 2);
+//constexpr bool wchar_is_32_bit = (sizeof(wchar_t) == 4);
+//template <typename T>
+//concept is_wchar_and_32_bit_c = std::same_as<T, wchar_t> && wchar_is_32_bit;
 /*!
  * @brief This concept identifies a wchar_t type which is 2 bytes long - 16
  * bits.
  */
-template <typename T>
-concept is_wchar_and_16_bit_c = std::same_as<T, wchar_t> && wchar_is_16_bit;
+//template <typename T>
+//concept is_wchar_and_16_bit_c = std::same_as<T, wchar_t> && wchar_is_16_bit;
 /*!
  * @brief This concept identifies a unicode-like type - everything but char's.
  */
-template <typename T>
-concept char_type_is_unicode_c
-    = std::same_as<T, char8_t> || std::same_as<T, char16_t>
-      || std::same_as<T, char32_t> || std::same_as<wchar_t, T>;
+//template <typename T>
+//concept char_type_is_unicode_c
+//    = std::same_as<T, char8_t> || std::same_as<T, char16_t>
+//      || std::same_as<T, char32_t> || std::same_as<wchar_t, T>;
 /*!
  * @brief This concept identifies all character-like types.
  */
-template <typename T>
-concept is_char_type_c = char_type_is_unicode_c<T> || std::same_as<T, char>;
+//template <typename T>
+//concept is_char_type_c = UNICODE_BRIDGE_NAMESPACE::char_type_is_unicode_c<T> || std::same_as<T, char>;
 
 namespace detail
 {
@@ -39,27 +40,27 @@ template <typename T>
 struct string_like_underlying_char_type_object_t;
 
 template <typename CharT, std::size_t N>
-requires is_char_type_c<CharT>
+requires UNICODE_BRIDGE_NAMESPACE::is_char_type_c<CharT>
 struct string_like_underlying_char_type_object_t<CharT[N]>
 {
     using type = CharT;
 };
 
 template <typename CharT>
-requires is_char_type_c<CharT>
+requires UNICODE_BRIDGE_NAMESPACE::is_char_type_c<CharT>
 struct string_like_underlying_char_type_object_t<CharT*>
 {
     using type = CharT;
 };
 template <typename CharT>
-    requires is_char_type_c<CharT>
+    requires UNICODE_BRIDGE_NAMESPACE::is_char_type_c<CharT>
 struct string_like_underlying_char_type_object_t<const CharT*>
 {
     using type = CharT;
 };
 
 template <typename CharT, typename Traits, typename Alloc>
-requires is_char_type_c<CharT>
+requires UNICODE_BRIDGE_NAMESPACE::is_char_type_c<CharT>
 struct string_like_underlying_char_type_object_t<
     std::basic_string<CharT, Traits, Alloc>>
 {
@@ -67,7 +68,7 @@ struct string_like_underlying_char_type_object_t<
 };
 
 template <typename CharT, typename Traits>
-requires is_char_type_c<CharT>
+requires UNICODE_BRIDGE_NAMESPACE::is_char_type_c<CharT>
 struct string_like_underlying_char_type_object_t<
     std::basic_string_view<CharT, Traits>>
 {
@@ -139,14 +140,14 @@ struct char_underlying_type_object_t<char32_t>
 };
 
 template <typename T>
-requires is_wchar_and_16_bit_c<T>
+requires UNICODE_BRIDGE_NAMESPACE::internal::is_wchar_and_16_bit_c<T>
 struct char_underlying_type_object_t<T>
 {
     using type = uint16_t;
 };
 
 template <typename T>
-requires is_wchar_and_32_bit_c<T>
+requires UNICODE_BRIDGE_NAMESPACE::internal::is_wchar_and_32_bit_c<T>
 struct char_underlying_type_object_t<T>
 {
     using type = uint32_t;

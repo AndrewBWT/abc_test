@@ -1,6 +1,7 @@
 #pragma once
 #include "abc_test/utility/internal/macros.hpp"
 #include "abc_test/utility/str/concepts.hpp"
+#include <unicode_bridge.hpp>
 
 #include <string>
 
@@ -43,11 +44,12 @@ __constexpr auto
     ) noexcept
 {
     using namespace std;
-    if constexpr (wchar_is_16_bit)
+    using namespace UNICODE_BRIDGE_NAMESPACE;
+    if constexpr (unicode_bridge::internal::wchar_is_16_bit)
     {
         return u16string(_a_str.begin(), _a_str.end());
     }
-    else if constexpr (wchar_is_32_bit)
+    else if constexpr (unicode_bridge::internal::wchar_is_32_bit)
     {
         return u32string(_a_str.begin(), _a_str.end());
     }

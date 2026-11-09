@@ -3,7 +3,7 @@
 #include "abc_test/included_instances.hpp"
 #include "abc_test/utility/str/concepts.hpp"
 
-_TEST_CASE(
+/*_TEST_CASE(
     abc::test_case_t(
         {.name
          = "Tests for concepts is_wchar_and_32_bit_c, is_wchar_and_16_bit_c, "
@@ -49,7 +49,7 @@ _TEST_CASE(
             RUN(_l_mdg, (_l_test_func.operator()<T>()));
         }
     );
-}
+}*/
 
 _TEST_CASE(
     abc::test_case_t(

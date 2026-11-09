@@ -843,7 +843,7 @@ struct default_random_generator_t<std::basic_string<T>>
         : _m_bounds(_a_bounds)
     {
         using namespace _ABC_NS_UTILITY_STR;
-        if constexpr (is_char_type_c<T>)
+        if constexpr (UNICODE_BRIDGE_NAMESPACE::is_char_type_c<T>)
         {
             _m_rng = std::optional<
                 random_generator_t<typename std::basic_string<T>::value_type>>{
@@ -884,7 +884,7 @@ struct default_random_generator_t<std::basic_string<T>>
             )
         };
         basic_string<T> _l_rv(_l_size, T{});
-        if constexpr (is_char_type_c<T>)
+        if constexpr (UNICODE_BRIDGE_NAMESPACE::is_char_type_c<T>)
         {
             if (_m_rng.has_value())
             {
@@ -938,7 +938,7 @@ struct default_random_generator_t<std::basic_string<T>>
     }
 private:
     std::conditional_t<
-        _ABC_NS_UTILITY_STR::is_char_type_c<T>,
+        UNICODE_BRIDGE_NAMESPACE::is_char_type_c<T>,
         std::optional<
             random_generator_t<typename std::basic_string<T>::value_type>>,
         random_generator_t<typename std::basic_string<T>::value_type>>
