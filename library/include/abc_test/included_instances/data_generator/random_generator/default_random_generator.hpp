@@ -162,11 +162,13 @@ __constexpr std::size_t
 __constexpr char32_t
     generate_valid_unicode_char32_t(
         utility::rng_t& _a_rng,
-        const char32_t  _a_limit = _ABC_NS_UTILITY_STR::char32_limit<char32_t>()
+        const char32_t  _a_limit = UNICODE_BRIDGE_NAMESPACE::
+            UNICODE_BRIDGE_NAMESPACE_INTERNAL::char32_limit<char32_t>()
     )
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE::UNICODE_BRIDGE_NAMESPACE_INTERNAL;
     constexpr char32_t _l_low_surrogate{high_surrogate_lower_value<char32_t>()};
     constexpr char32_t _l_high_surrogate{low_surrogate_upper_value<char32_t>()};
     char32_t           _l_rv;
@@ -208,6 +210,7 @@ __constexpr std::optional<std::basic_string<T>>
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
     using namespace UNICODE_BRIDGE_NAMESPACE;
+    using namespace UNICODE_BRIDGE_NAMESPACE::UNICODE_BRIDGE_NAMESPACE_INTERNAL;
     if (_a_biggest_string == 0)
     {
         // Should always be > 0. This should be optimised away.
@@ -251,8 +254,8 @@ __constexpr std::optional<std::basic_string<T>>
                 switch (_a_biggest_string)
                 {
                 case 1:
-                    _l_limit
-                        = single_char16_limit_and_three_char8_limit<char32_t>();
+                    _l_limit = unicode_bridge::internal::
+                        single_char16_limit_and_three_char8_limit<char32_t>();
                     break;
                 default:
                     std::unreachable();
@@ -263,14 +266,20 @@ __constexpr std::optional<std::basic_string<T>>
                 switch (_a_biggest_string)
                 {
                 case 1:
-                    _l_limit = ascii_limit<char32_t>();
+                    _l_limit = UNICODE_BRIDGE_NAMESPACE::
+                        UNICODE_BRIDGE_NAMESPACE_INTERNAL::ascii_limit<
+                            char32_t>();
                     break;
                 case 2:
-                    _l_limit = two_char8_limit<char32_t>();
+                    _l_limit = UNICODE_BRIDGE_NAMESPACE::
+                        UNICODE_BRIDGE_NAMESPACE_INTERNAL::two_char8_limit<
+                            char32_t>();
                     break;
                 case 3:
-                    _l_limit
-                        = single_char16_limit_and_three_char8_limit<char32_t>();
+                    _l_limit = UNICODE_BRIDGE_NAMESPACE::
+                        UNICODE_BRIDGE_NAMESPACE_INTERNAL::
+                            single_char16_limit_and_three_char8_limit<char32_t>(
+                            );
                     break;
                 default:
                     std::unreachable();
@@ -1741,6 +1750,7 @@ __constexpr data_gen::random_generator_t<T>
 _END_ABC_NS
 
 _BEGIN_ABC_DG_NS
+
 /*__no_constexpr_imp bool
     default_random_generator_t<bool>::operator()(
         utility::rng_t&               _a_rnd_generator,

@@ -12,6 +12,7 @@
 #include <unordered_set>
 
 _BEGIN_ABC_UTILITY_STR_NS
+
 /*!
  * @brief This function converts a unicode string to an ASCII string.
  *
@@ -294,9 +295,9 @@ _BEGIN_ABC_UTILITY_STR_NS
  * @tparam T The return type paramter.
  * @return The encoded constant.
  */
-template <typename T>
-requires is_char_type_c<T> && (sizeof(T) >= 1)
-__constexpr T ascii_limit() noexcept;
+// template <typename T>
+// requires is_char_type_c<T> && (sizeof(T) >= 1)
+//__constexpr T ascii_limit() noexcept;
 /*!
  * @brief Gets the specified constant.
  *
@@ -305,9 +306,9 @@ __constexpr T ascii_limit() noexcept;
  * @return The encoded constant.
  */
 
-template <typename T>
-requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
-__constexpr T single_char16_limit_and_three_char8_limit() noexcept;
+// template <typename T>
+// requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
+//__constexpr T single_char16_limit_and_three_char8_limit() noexcept;
 /*!
  * @brief Gets the specified constant.
  *
@@ -316,9 +317,9 @@ __constexpr T single_char16_limit_and_three_char8_limit() noexcept;
  * @tparam T The return type paramter.
  * @return The encoded constant.
  */
-template <typename T>
-requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
-__constexpr T two_char8_limit() noexcept;
+// template <typename T>
+// requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
+//__constexpr T two_char8_limit() noexcept;
 /*!
  * @brief Gets the specified constant.
  *
@@ -327,9 +328,9 @@ __constexpr T two_char8_limit() noexcept;
  * @tparam T The return type paramter.
  * @return The encoded constant.
  */
-template <typename T>
-requires char_type_is_unicode_c<T> && (sizeof(T) >= 4)
-__constexpr T char32_limit() noexcept;
+// template <typename T>
+// requires char_type_is_unicode_c<T> && (sizeof(T) >= 4)
+//__constexpr T char32_limit() noexcept;
 /*!
  * @brief Gets the specified constant.
  *
@@ -338,9 +339,9 @@ __constexpr T char32_limit() noexcept;
  * @tparam T The return type paramter.
  * @return The encoded constant.
  */
-template <typename T>
-requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
-__constexpr T high_surrogate_lower_value() noexcept;
+// template <typename T>
+// requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
+//__constexpr T high_surrogate_lower_value() noexcept;
 /*!
  * @brief Gets the specified constant.
  *
@@ -349,9 +350,9 @@ __constexpr T high_surrogate_lower_value() noexcept;
  * @tparam T The return type paramter.
  * @return The encoded constant.
  */
-template <typename T>
-requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
-__constexpr T low_surrogate_upper_value() noexcept;
+// template <typename T>
+// requires char_type_is_unicode_c<T> && (sizeof(T) >= 2)
+//__constexpr T low_surrogate_upper_value() noexcept;
 
 namespace detail
 {
@@ -1002,7 +1003,7 @@ __constexpr std::u8string
     return ascii_string_to_u8string(string(1, _a_char));
 }*/
 
-template <typename T>
+/*template <typename T>
 requires is_char_type_c<T>
          && (
              sizeof(T) >= 1
@@ -1060,7 +1061,7 @@ requires char_type_is_unicode_c<T>
 __constexpr T low_surrogate_upper_value() noexcept
 {
     return T{0xDFFF};
-}
+}*/
 
 namespace detail
 {
@@ -1072,6 +1073,7 @@ __constexpr result_t<std::basic_string<T>>
             ) noexcept
 {
     using namespace std;
+    using namespace UNICODE_BRIDGE_NAMESPACE::UNICODE_BRIDGE_NAMESPACE_INTERNAL;
     // Function converts an already valid u32string to a u16string.
     auto _l_convert_u32string_to_u16string
         = [](const u32string_view _a_str_2) -> u16string
@@ -1473,7 +1475,8 @@ __constexpr bool
         const T _a_char
     ) noexcept
 {
-    return is_surrogate<T>(_a_char) || _a_char > char32_limit<T>();
+    return is_surrogate<T>(_a_char)
+           || _a_char > unicode_bridge::internal::char32_limit<T>();
 }
 
 template <typename T>
@@ -1497,7 +1500,9 @@ __constexpr std::optional<std::u8string>
             represent_char_as_hex_for_output<T>(
                 detail::one_above_low_surrogate_upper_value<T>()
             ),
-            represent_char_as_hex_for_output(char32_limit<T>()),
+            represent_char_as_hex_for_output(
+                unicode_bridge::internal::char32_limit<T>()
+            ),
             represent_char_as_hex_for_output(_a_char)
         );
     }
@@ -1523,7 +1528,7 @@ __constexpr void
         // 1-byte UTF-8
         _a_inserter = static_cast<char8_t>(_a_char);
     }
-    else if (_a_char <= two_char8_limit<char32_t>())
+    else if (_a_char <= unicode_bridge::internal::two_char8_limit<char32_t>())
     {
         // 2-byte UTF-8.
         // Isolate first 6 bits by rshift, then use binary or to set the
@@ -1535,7 +1540,8 @@ __constexpr void
             _l_first_bit_set | (_a_char & _l_final_six_bits_set)
         );
     }
-    else if (_a_char <= single_char16_limit_and_three_char8_limit<char32_t>())
+    else if (_a_char <= unicode_bridge::internal::
+                 single_char16_limit_and_three_char8_limit<char32_t>())
     {
         // 3-byte UTF-8
         _a_inserter
@@ -1547,7 +1553,7 @@ __constexpr void
             _l_first_bit_set | (_a_char & _l_final_six_bits_set)
         );
     }
-    else if (_a_char <= char32_limit<char32_t>())
+    else if (_a_char <= unicode_bridge::internal::char32_limit<char32_t>())
     {
         // 4-byte UTF-8
         _a_inserter
@@ -1587,6 +1593,7 @@ __constexpr std::conditional_t<
 {
     using namespace std;
     using namespace UNICODE_BRIDGE_NAMESPACE;
+    using namespace UNICODE_BRIDGE_NAMESPACE::UNICODE_BRIDGE_NAMESPACE_INTERNAL;
     using CharT = std::iterator_traits<T>::value_type;
     using rv_t  = conditional_t<
          Return_Reason,
@@ -2273,6 +2280,7 @@ requires char_type_is_unicode_c<T>
          )
 __constexpr T one_below_high_surrogate_lower_value() noexcept
 {
+    using namespace UNICODE_BRIDGE_NAMESPACE::UNICODE_BRIDGE_NAMESPACE_INTERNAL;
     return high_surrogate_lower_value<T>() - T(0x01);
 }
 
@@ -2283,6 +2291,7 @@ requires char_type_is_unicode_c<T>
          )
 __constexpr T one_above_low_surrogate_upper_value() noexcept
 {
+    using namespace UNICODE_BRIDGE_NAMESPACE::UNICODE_BRIDGE_NAMESPACE_INTERNAL;
     return low_surrogate_upper_value<T>() + T(0x01);
 }
 
@@ -2295,6 +2304,7 @@ __constexpr bool is_surrogate(
     const T _a_char
 ) noexcept
 {
+    using namespace UNICODE_BRIDGE_NAMESPACE::UNICODE_BRIDGE_NAMESPACE_INTERNAL;
     return _a_char >= high_surrogate_lower_value<T>()
            && _a_char <= low_surrogate_upper_value<T>();
 }
@@ -2308,6 +2318,7 @@ __constexpr bool is_high_surrogate(
     const T _a_char
 ) noexcept
 {
+    using namespace UNICODE_BRIDGE_NAMESPACE::UNICODE_BRIDGE_NAMESPACE_INTERNAL;
     return _a_char >= high_surrogate_lower_value<T>()
            && _a_char <= high_surrogate_upper_value<T>();
 }
@@ -2321,6 +2332,7 @@ __constexpr bool is_low_surrogate(
     const T _a_char
 ) noexcept
 {
+    using namespace UNICODE_BRIDGE_NAMESPACE::UNICODE_BRIDGE_NAMESPACE_INTERNAL;
     return _a_char >= low_surrogate_lower_value<T>()
            && _a_char <= low_surrogate_upper_value<T>();
 }
