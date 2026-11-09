@@ -1,7 +1,6 @@
 #pragma once
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
-#include "abc_test/utility/str/concepts.hpp"
 
 /*_TEST_CASE(
     abc::test_case_t(
@@ -49,7 +48,7 @@
             RUN(_l_mdg, (_l_test_func.operator()<T>()));
         }
     );
-}*/
+}
 
 _TEST_CASE(
     abc::test_case_t(
@@ -181,4 +180,4 @@ _TEST_CASE(
             string_view> )
         == true
     );
-}
+}*/

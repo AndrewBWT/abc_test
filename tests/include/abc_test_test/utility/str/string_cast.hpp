@@ -1,7 +1,6 @@
 #pragma once
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
-#include "abc_test/utility/str/concepts.hpp"
 
 _TEST_CASE(
     abc::test_case_t(

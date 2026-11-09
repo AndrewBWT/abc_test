@@ -1,6 +1,5 @@
 #pragma once
 #include "abc_test/utility/internal/macros.hpp"
-#include "abc_test/utility/str/concepts.hpp"
 #include <unicode_bridge.hpp>
 
 #include <string>

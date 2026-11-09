@@ -1,6 +1,5 @@
 #pragma once
 #include "abc_test/utility/internal/macros.hpp"
-#include "abc_test/utility/str/concepts.hpp"
 #include "abc_test/utility/str/string_cast.hpp"
 
 #include <fmt/xchar.h>
@@ -8,6 +7,16 @@
 #include <unicode_bridge.hpp>
 
 _BEGIN_ABC_UTILITY_STR_NS
+
+namespace detail
+{
+template <typename FuncName, typename Args>
+concept all_convertable_to_strings_c
+    = unicode_bridge::is_char_type_c<unicode_bridge::char_type_of_t<FuncName>>
+      && (std::convertible_to<
+          Args,
+          std::basic_string_view<unicode_bridge::char_type_of_t<FuncName>>>);
+} // namespace detail
 
 /*!
  * @brief Returns a u8string representing a type's name. Used instead of
@@ -73,8 +82,8 @@ __constexpr std::u8string
  * function_name(arg1,arg2,arg3)
  *
  * While the arguments can be different string types (as long as they are
- * convertable to basic_string_view), the itnernal types must be all the same -
- * e.g. char8_t, whcar_t or char.
+ * convertable to basic_string_view), the itnernal types must be all the
+ * same - e.g. char8_t, whcar_t or char.
  *
  * @tparam FuncName Type parameter of first argument.
  * @tparam ...Args Rest of arguments.
@@ -83,22 +92,23 @@ __constexpr std::u8string
  * @return A string in the format given by the arguments.
  */
 template <typename FuncName, typename... Args>
-requires has_string_like_underlying_type_c<FuncName>
+requires unicode_bridge::is_char_type_c<
+             unicode_bridge::char_type_of_t<FuncName>>
          && (sizeof...(Args) == 0
              || (std::convertible_to<
                      Args,
                      std::basic_string_view<
-                         string_like_underlying_char_type_t<FuncName>>>
+                         unicode_bridge::char_type_of_t<FuncName>>>
                  && ...))
 __constexpr std::
-    basic_string<string_like_underlying_char_type_t<FuncName>> mk_str_representing_function_call(
+    basic_string<unicode_bridge::char_type_of_t<FuncName>> mk_str_representing_function_call(
         FuncName&& _a_function_name,
         Args&&... _a_args
     ) noexcept;
 
 /*!
- * @brief Given a list of string-like objects, will create one string from them,
- * interlacing each element with a comma.
+ * @brief Given a list of string-like objects, will create one string from
+ * them, interlacing each element with a comma.
  *
  * This function cannot accpet no arguments. Must be atleast one.
  *
@@ -107,13 +117,15 @@ __constexpr std::
  * @return The string result.
  */
 template <typename... Args>
-requires (sizeof...(Args) > 0) && all_string_like_with_same_char_c<Args...>
+requires (sizeof...(Args) > 0) && requires {
+    typename std::common_type_t<unicode_bridge::char_type_of_t<Args>...>;
+} && (std::convertible_to<Args, std::basic_string_view<std::common_type_t<unicode_bridge::char_type_of_t<Args>...>>> && ...)
 __constexpr std::basic_string<
-    std::common_type_t<string_like_underlying_char_type_t<Args>...>>
+    std::common_type_t<unicode_bridge::char_type_of_t<Args>...>>
     mk_str_representing_function_args(Args&&... _a_args) noexcept;
 /*!
- * @brief Given two string-like objects, creates one string from it, surrounding
- * the second with brackets. Return value is in the form
+ * @brief Given two string-like objects, creates one string from it,
+ * surrounding the second with brackets. Return value is in the form
  *
  * _a_function_name(_a_args).
  *
@@ -125,13 +137,14 @@ __constexpr std::basic_string<
  * @return The created string.
  */
 template <typename FuncName, typename Args>
-requires has_string_like_underlying_type_c<FuncName>
+requires unicode_bridge::is_char_type_c<
+             unicode_bridge::char_type_of_t<FuncName>>
          && ( std::convertible_to<
               Args,
               std::basic_string_view<
-                  string_like_underlying_char_type_t<FuncName>>> )
+                  unicode_bridge::char_type_of_t<FuncName>>> )
 __constexpr std::
-    basic_string<string_like_underlying_char_type_t<FuncName>> mk_str_appending_function_name_and_function_args(
+    basic_string<unicode_bridge::char_type_of_t<FuncName>> mk_str_appending_function_name_and_function_args(
         FuncName&& _a_function_name,
         Args&&     _a_args
     ) noexcept;
@@ -241,23 +254,24 @@ __constexpr std::u8string
 }
 
 template <typename FuncName, typename... Args>
-requires has_string_like_underlying_type_c<FuncName>
+requires unicode_bridge::is_char_type_c<
+             unicode_bridge::char_type_of_t<FuncName>>
          && (
              sizeof...(Args) == 0
              || (std::convertible_to<
                      Args,
                      std::basic_string_view<
-                         string_like_underlying_char_type_t<FuncName>>>
+                         unicode_bridge::char_type_of_t<FuncName>>>
                  && ...)
          )
 __constexpr std::
-    basic_string<string_like_underlying_char_type_t<FuncName>> mk_str_representing_function_call(
+    basic_string<unicode_bridge::char_type_of_t<FuncName>> mk_str_representing_function_call(
         FuncName&& _a_function_name,
         Args&&... _a_args
     ) noexcept
 {
     using namespace std;
-    using CharT = string_like_underlying_char_type_t<FuncName>;
+    using CharT = unicode_bridge::char_type_of_t<FuncName>;
     if constexpr (sizeof...(Args) == 0)
     {
         return mk_str_appending_function_name_and_function_args(
@@ -274,15 +288,17 @@ __constexpr std::
 }
 
 template <typename... Args>
-requires (sizeof...(Args) > 0) && all_string_like_with_same_char_c<Args...>
-__constexpr std::basic_string<
-    std::common_type_t<string_like_underlying_char_type_t<Args>...>>
+    requires (sizeof...(Args) > 0) && requires {
+    typename std::common_type_t<unicode_bridge::char_type_of_t<Args>...>;
+} && (std::convertible_to<Args, std::basic_string_view<std::common_type_t<unicode_bridge::char_type_of_t<Args>...>>> && ...)
+__constexpr
+std::basic_string<std::common_type_t<unicode_bridge::char_type_of_t<Args>...>>
     mk_str_representing_function_args(
         Args&&... _a_args
     ) noexcept
 {
     using namespace std;
-    using T = std::common_type_t<string_like_underlying_char_type_t<Args>...>;
+    using T = std::common_type_t<unicode_bridge::char_type_of_t<Args>...>;
     auto            _l_comma{static_cast<T>(0x2C)};
     basic_string<T> _l_result{};
     bool            _l_first_arg{true};
@@ -301,18 +317,19 @@ __constexpr std::basic_string<
 }
 
 template <typename FuncName, typename Args>
-    requires has_string_like_underlying_type_c<FuncName>
+    requires unicode_bridge::is_char_type_c<
+        unicode_bridge::char_type_of_t<FuncName>>
 && (std::convertible_to<
     Args,
-    std::basic_string_view<string_like_underlying_char_type_t<FuncName>>>)
-__constexpr std::basic_string<string_like_underlying_char_type_t<FuncName>>
+    std::basic_string_view<unicode_bridge::char_type_of_t<FuncName>>>)
+__constexpr std::basic_string<unicode_bridge::char_type_of_t<FuncName>>
             mk_str_appending_function_name_and_function_args(
                 FuncName&& _a_function_name,
                 Args&&     _a_args
             ) noexcept
 {
     using namespace std;
-    using T = string_like_underlying_char_type_t<FuncName>;
+    using T = unicode_bridge::char_type_of_t<FuncName>;
     auto            _l_l_bracket{static_cast<T>(0x28)};
     auto            _l_r_bracket{static_cast<T>(0x29)};
     basic_string<T> _l_rv{};
@@ -334,7 +351,7 @@ __constexpr std::u8string
             ) noexcept
 {
     using namespace std;
-    using Type_To_Cast_To = char_underlying_type_t<T>;
+    using Type_To_Cast_To = unicode_bridge::internal::char_underlying_type_t<T>;
     u8string _l_format_specifier;
     if constexpr (Use_Capitols)
     {
