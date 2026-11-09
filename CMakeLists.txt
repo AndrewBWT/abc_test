@@ -69,6 +69,25 @@ Please make sure:
     endif()
   endif()
 endif()
+if(NOT TARGET print_and_parse)
+  include(FetchContent)
+  if(ABC_TOP_LEVEL_PROJECT)
+    FetchContent_Declare(
+      print_and_parse
+      GIT_REPOSITORY https://github.com/AndrewBWT/print_and_parse.git
+      GIT_TAG        main
+    )
+    FetchContent_MakeAvailable(print_and_parse)
+  else()
+    FetchContent_GetProperties(print_and_parse)
+    if(NOT unicode_bridge_POPULATED)
+      message(FATAL_ERROR "Required target print_and_parse not found.
+Please make sure:
+  - print_and_parse is available (e.g., via find_package(print_and_parse CONFIG REQUIRED)),
+  - or build this project as a top-level project.")
+    endif()
+  endif()
+endif()
 
 if(NOT TARGET fmt::fmt)
   include(FetchContent)
@@ -92,10 +111,10 @@ Please make sure:
 endif()
 
 # Show the user the status of the core variables.
-message(STATUS "Top level project: ${ABC_TOP_LEVEL_PROJECT}")
-message(STATUS "Building tests: ${ABC_TEST_ENABLE_TESTS}")
-message(STATUS "Building docs: ${ABC_TEST_ENABLE_DOCS}")
-message(STATUS "Building examples: ${ABC_TEST_ENABLE_EXAMPLES}")
+message(STATUS "abc_test - Top level project: ${ABC_TOP_LEVEL_PROJECT}")
+message(STATUS "abc_test - Building tests: ${ABC_TEST_ENABLE_TESTS}")
+message(STATUS "abc_test - Building docs: ${ABC_TEST_ENABLE_DOCS}")
+message(STATUS "abc_test - Building examples: ${ABC_TEST_ENABLE_EXAMPLES}")
   
 # Add the library folder.
 add_subdirectory(library)

@@ -8,6 +8,7 @@ if(NOT DEFINED ABC_TEST_LIBRARY_INCLUDED)
   set(ABC_LIBRARY_REQUIRED_LIBS
     fmt::fmt
     unicode_bridge::unicode_bridge
+    print_and_parse
   )
 
   # Set the header files variable. This is a list of all the header files.
