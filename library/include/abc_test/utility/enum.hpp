@@ -396,6 +396,7 @@ __constexpr_imp
 {
     using namespace _ABC_NS_ERRORS;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     using namespace std;
     for (auto& [_l_element, _l_str] : _a_enum_list)
     {
@@ -428,7 +429,7 @@ __constexpr_imp
             _l_str_cpy.begin(),
             [](enum_list_str_char_t _l_char)
             {
-                return is_valid_ascii_char(_l_char)
+                return is_valid_ascii(_l_char)
                            ? static_cast<enum_list_str_char_t>(
                                  std::tolower(static_cast<char>(_l_char))
                              )
@@ -451,7 +452,7 @@ __constexpr_imp
             _l_str_cpy.begin(),
             [](enum_list_str_char_t _l_char)
             {
-                return is_valid_ascii_char(_l_char)
+                return is_valid_ascii(_l_char)
                            ? static_cast<enum_list_str_char_t>(
                                  std::toupper(static_cast<char>(_l_char))
                              )

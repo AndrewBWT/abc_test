@@ -4,6 +4,7 @@
 #include "abc_test/core/matchers/matcher_wrapper.hpp"
 #include "abc_test/utility/printers/default_printer.hpp"
 #include "abc_test/utility/str/string_utils.hpp"
+#include <unicode_bridge.hpp>
 
 _BEGIN_ABC_NS
 __no_constexpr matcher_t
@@ -40,6 +41,7 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
     using namespace std;
     using namespace _ABC_NS_MATCHER;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     using namespace abc::utility::printer;
     using T            = ranges::range_value_t<R1>;
     using R1_const_itt = decltype(std::begin(_a_str1));
@@ -58,14 +60,14 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
         optional<T> _l_arg_as_single_char;
         if constexpr (same_as<char, T>)
         {
-            if (is_valid_ascii_char(_a_char))
+            if (is_valid_ascii(_a_char))
             {
                 _l_arg_as_single_char = _a_char;
             }
         }
         else
         {
-            if (is_valid_char(_a_char))
+            if (is_valid_unicode(_a_char))
             {
                 _l_arg_as_single_char = _a_char;
             }

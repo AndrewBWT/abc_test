@@ -143,7 +143,8 @@ __constexpr void
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
-    if (is_valid_char(_a_char_to_check_against))
+    using namespace UNICODE_BRIDGE_NAMESPACE;
+    if (is_valid_unicode(_a_char_to_check_against))
     {
         if (not check_and_advance(_a_char_to_check_against))
         {
@@ -167,7 +168,8 @@ __constexpr void
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
-    if (is_valid_unicode_string(_a_str_to_check_against))
+    using namespace UNICODE_BRIDGE_NAMESPACE;
+    if (is_valid_unicode(_a_str_to_check_against))
     {
         if (not check_and_advance(_a_str_to_check_against))
         {

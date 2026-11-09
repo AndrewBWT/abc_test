@@ -9,6 +9,7 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <unicode_bridge.hpp>
 
 _BEGIN_ABC_UTILITY_STR_NS
 /*!
@@ -160,20 +161,20 @@ _BEGIN_ABC_UTILITY_STR_NS
  * @param _a_str The string to check.
  * @return True if _a_str is valid, false otherwise.
  */
-template <typename T>
-requires char_type_is_unicode_c<T>
-__constexpr bool
-    is_valid_unicode_string(const std::basic_string_view<T> _a_str) noexcept;
+//template <typename T>
+//requires char_type_is_unicode_c<T>
+//__constexpr bool
+//    is_valid_unicode_string(const std::basic_string_view<T> _a_str) noexcept;
 /*!
  * @brief Checks if a unicode string is valid.
  *
  * @param _a_str The string to check.
  * @return True if _a_str is valid, false otherwise.
  */
-template <typename T>
-requires char_type_is_unicode_c<T>
-__constexpr bool
-    is_valid_unicode_string(const std::basic_string<T>& _a_str) noexcept;
+//template <typename T>
+//requires char_type_is_unicode_c<T>
+//__constexpr bool
+//    is_valid_unicode_string(const std::basic_string<T>& _a_str) noexcept;
 /*!
  * @brief Checks if a character is valid unicode on its own.
  *
@@ -184,20 +185,20 @@ __constexpr bool
  * @param _a_str The character to check
  * @return True if _a_char is valid, false otherwise.
  */
-template <typename T>
-requires char_type_is_unicode_c<T>
-__constexpr bool
-    is_valid_char(const T _a_char) noexcept;
+//template <typename T>
+//requires char_type_is_unicode_c<T>
+//__constexpr bool
+//    is_valid_char(const T _a_char) noexcept;
 /*!
  * @brief Checks if a character is valid ascii.
  *
  * @param _a_char The character to check.
  * @return True if _a_char is valid, false otherwise.
  */
-template <typename T>
-requires is_char_type_c<T>
-__constexpr bool
-    is_valid_ascii_char(const T _a_char) noexcept;
+//template <typename T>
+//requires is_char_type_c<T>
+//__constexpr bool
+//    is_valid_ascii_char(const T _a_char) noexcept;
 /*!
  * @brief Gets the next character from a stream of characters.
  *
@@ -721,7 +722,7 @@ __constexpr_imp std::basic_string<T>
 {
     using namespace std;
     return unicode_conversion_with_exception<T>(basic_string<U>(1, _a_char));
-}*/
+}
 
 template <typename T>
 requires char_type_is_unicode_c<T>
@@ -811,7 +812,7 @@ __constexpr bool
     {
         return _a_char <= ascii_limit<T>();
     }
-}
+}*/
 
 template <bool Return_Reason, typename T>
 requires char_type_is_unicode_c<typename std::iterator_traits<T>::value_type>
@@ -1507,11 +1508,12 @@ __constexpr void
         std::back_insert_iterator<std::basic_string<char8_t>>& _a_inserter
     ) noexcept
 {
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     constexpr char8_t _l_final_six_bits_set{0b0011'1111};
     constexpr char8_t _l_first_four_bits_set{0b1111'0000};
     constexpr char8_t _l_first_three_bits_set{0b1110'0000};
     constexpr char8_t _l_first_bit_set{0b1000'0000};
-    if (is_valid_ascii_char(_a_char))
+    if (is_valid_ascii(_a_char))
     {
         // 1-byte UTF-8
         _a_inserter = static_cast<char8_t>(_a_char);
@@ -1579,6 +1581,7 @@ __constexpr std::conditional_t<
     ) noexcept
 {
     using namespace std;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     using CharT = std::iterator_traits<T>::value_type;
     using rv_t  = conditional_t<
          Return_Reason,
@@ -1641,7 +1644,7 @@ __constexpr std::conditional_t<
     {
         auto       _l_itt{_a_itt};
         const auto _l_byte_1{*_l_itt};
-        if (not (is_valid_ascii_char(_l_byte_1)))
+        if (not (is_valid_ascii(_l_byte_1)))
         {
             constexpr array<char32_t, 3> _l_and_array{
                 static_cast<char32_t>(0b0001'1111),
