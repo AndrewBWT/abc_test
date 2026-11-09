@@ -5,7 +5,6 @@
 #include "abc_test/utility/enum.hpp"
 #include "abc_test/utility/limits/max_value_concept.hpp"
 #include "abc_test/utility/limits/min_value_concept.hpp"
-#include "abc_test/utility/str/unicode.hpp"
 #include "concepts"
 
 #include <memory>

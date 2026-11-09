@@ -3,7 +3,6 @@
 #include "abc_test/included_instances.hpp"
 #include "abc_test/included_instances/reporters/memoized_error_reporter.hpp"
 #include "abc_test/included_instances/reporters/memoized_test_reporter.hpp"
-#include "abc_test/utility/str/unicode.hpp"
 #include "abc_test_test/testing_utilities/bootstrapped_testing_utilities.hpp"
 
 _TEST_CASE(

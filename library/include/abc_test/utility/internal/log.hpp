@@ -1,12 +1,12 @@
 #pragma once
 #include "abc_test/utility/internal/log/params.hpp"
 #include "abc_test/utility/io/threaded_ostream_output_reporter.hpp"
-#include "abc_test/utility/str/unicode.hpp"
 
 #include <fmt/std.h>
 #include <fmt/xchar.h>
 #include <iostream>
 #include <map>
+#include <unicode_bridge.hpp>
 
 
 #ifndef __LOGGING_ON
@@ -127,14 +127,14 @@ __constexpr_imp void
     ) noexcept
 {
     using namespace std;
-    using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     if (_m_internal_logger_params.is_set(_a_internal_logger_enum))
     {
         threaded_ostream_output_reporter_t::write_line(fmt::format(
             u8"LOG: {0}: {1} - {2}",
             get_thread_id(),
             to_str(_a_internal_logger_enum),
-            cast_string_to_u8string(_a_str)
+            cast_string_view<char8_t>(_a_str)
         ));
     }
 }

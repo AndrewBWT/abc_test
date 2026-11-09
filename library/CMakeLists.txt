@@ -183,7 +183,6 @@ if(NOT DEFINED ABC_TEST_LIBRARY_INCLUDED)
     include/abc_test/utility/object_printer_parser.hpp
     include/abc_test/utility/str/print_utils.hpp
     include/abc_test/utility/str/concepts.hpp
-    include/abc_test/utility/str/unicode.hpp
     include/abc_test/utility/str/string_utils.hpp
     include/abc_test/utility/str/string_cast.hpp
     include/abc_test/utility/ranges.hpp

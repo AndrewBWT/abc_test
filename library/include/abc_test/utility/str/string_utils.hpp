@@ -2,7 +2,6 @@
 
 #include "abc_test/core/errors/abc_test_exception.hpp"
 #include "abc_test/utility/internal/macros.hpp"
-#include "abc_test/utility/str/unicode.hpp"
 #include "abc_test/utility/types.hpp"
 
 #include <charconv>

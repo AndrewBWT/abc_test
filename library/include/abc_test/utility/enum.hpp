@@ -2,7 +2,6 @@
 #include "abc_test/utility/internal/macros.hpp"
 #include "abc_test/utility/internal/unreachable.hpp"
 #include "abc_test/utility/parsers/parser_input.hpp"
-#include "abc_test/utility/str/unicode.hpp"
 #include "abc_test/utility/types.hpp"
 
 #include <algorithm>
