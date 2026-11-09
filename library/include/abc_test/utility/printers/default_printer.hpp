@@ -107,7 +107,8 @@ public:
     {
         using namespace std;
         using namespace _ABC_NS_UTILITY_STR;
-        return surround_str(ascii_char_to_u8string(_a_object));
+        using namespace UNICODE_BRIDGE_NAMESPACE;
+        return surround_str(to_formatted_unicode_string<char8_t>(_a_object));
     }
 private:
     std::optional<char> _m_surrounding_char;
@@ -126,8 +127,8 @@ public:
                           ) const
     {
         using namespace std;
-        using namespace _ABC_NS_UTILITY_STR;
-        return surround_str(unicode_char_to_u8string(_a_object));
+        using namespace UNICODE_BRIDGE_NAMESPACE;
+        return surround_str(to_formatted_unicode_string<char8_t>(_a_object));
     }
 };
 
@@ -144,8 +145,8 @@ public:
                           ) const
     {
         using namespace std;
-        using namespace _ABC_NS_UTILITY_STR;
-        return surround_str(unicode_char_to_u8string(_a_object));
+        using namespace UNICODE_BRIDGE_NAMESPACE;
+        return surround_str(to_formatted_unicode_string<char8_t>(_a_object));
     }
 };
 
@@ -162,8 +163,8 @@ public:
                           ) const
     {
         using namespace std;
-        using namespace _ABC_NS_UTILITY_STR;
-        return surround_str(unicode_char_to_u8string(_a_object));
+        using namespace UNICODE_BRIDGE_NAMESPACE;
+        return surround_str(to_formatted_unicode_string<char8_t>(_a_object));
     }
 };
 
@@ -819,6 +820,7 @@ __constexpr std::u8string
 {
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     if constexpr (same_as<CharT, char>)
     {
         u8string                _l_rv{};
@@ -834,7 +836,7 @@ __constexpr std::u8string
                        || same_as<CharT, char32_t>
                        || same_as<CharT, wchar_t>)
     {
-        return unicode_string_to_u8string(_a_str);
+        return to_formatted_unicode_string<char8_t>(_a_str);
     }
     else
     {

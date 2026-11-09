@@ -4,6 +4,7 @@
 #include "abc_test/core/matchers/matcher_wrapper.hpp"
 #include "abc_test/utility/printers/default_printer.hpp"
 #include "abc_test/utility/str/string_utils.hpp"
+
 #include <unicode_bridge.hpp>
 
 _BEGIN_ABC_NS
@@ -80,9 +81,7 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
             }
             else
             {
-                return unicode_string_to_u8string(
-                    basic_string<T>(1, _a_single_char)
-                );
+                return to_formatted_unicode_string<char8_t>(_a_single_char);
             }
         };
         return fmt::format(
@@ -694,7 +693,9 @@ public:
             return matcher_result_t(
                 _l_result.passed(),
                 matcher_result_infos_t(
-                    comparison_expr_to_string<Cmp>(_a_arg1, _a_arg2, _l_result.passed()),
+                    comparison_expr_to_string<Cmp>(
+                        _a_arg1, _a_arg2, _l_result.passed()
+                    ),
                     _l_explanation_strs,
                     vector<matcher_result_infos_t::tree_structure_t>(
                         1,
@@ -756,8 +757,8 @@ public:
         else
         {
             if constexpr (Cmp == matcher::comparison_enum_t::LEQ
-                || Cmp == matcher::comparison_enum_t::GEQ
-                || Cmp == matcher::comparison_enum_t::EQ)
+                          || Cmp == matcher::comparison_enum_t::GEQ
+                          || Cmp == matcher::comparison_enum_t::EQ)
             {
                 return matcher_result_t(
                     true,

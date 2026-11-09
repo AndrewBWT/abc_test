@@ -253,10 +253,10 @@ _BEGIN_ABC_UTILITY_STR_NS
  * @param _a_str The string to convert.
  * @return The converted string.
  */
-template <typename CharT>
-__constexpr std::u8string
-    unicode_string_to_u8string(const std::basic_string_view<CharT> _a_str
-    ) noexcept;
+// template <typename CharT>
+//__constexpr std::u8string
+//     unicode_string_to_u8string(const std::basic_string_view<CharT> _a_str
+//    ) noexcept;
 /*!
  * @brief Converts an arbitrary unicode string to a u8string.
  *
@@ -266,9 +266,10 @@ __constexpr std::u8string
  * @param _a_str The string to convert.
  * @return The converted string.
  */
-template <typename CharT>
-__constexpr std::u8string
-    unicode_string_to_u8string(const std::basic_string<CharT>& _a_str) noexcept;
+// template <typename CharT>
+//__constexpr std::u8string
+//     unicode_string_to_u8string(const std::basic_string<CharT>& _a_str)
+//     noexcept;
 /*!
  * @brief Converts an arbitrary unicode character to a u8string.
  *
@@ -278,13 +279,13 @@ __constexpr std::u8string
  * @param _a_str The character to convert.
  * @return The converted character in string form.
  */
-template <typename CharT>
-__constexpr std::u8string
-            unicode_char_to_u8string(const CharT _a_char) noexcept;
-__constexpr std::u8string
-            ascii_string_to_u8string(const std::string& _a_str) noexcept;
-__constexpr std::u8string
-            ascii_char_to_u8string(const char _a_char) noexcept;
+// template <typename CharT>
+//__constexpr std::u8string
+//             unicode_char_to_u8string(const CharT _a_char) noexcept;
+//__constexpr std::u8string
+//             ascii_string_to_u8string(const std::string& _a_str) noexcept;
+//__constexpr std::u8string
+//            ascii_char_to_u8string(const char _a_char) noexcept;
 /*!
  * @brief Gets the specified constant.
  *
@@ -902,7 +903,7 @@ std::conditional_t<Return_Reason, result_t<char32_t>, std::optional<char32_t>>
     {
         return _l_rv;
     }
-}*/
+}
 
 template <typename CharT>
 __constexpr std::u8string
@@ -999,7 +1000,7 @@ __constexpr std::u8string
 {
     using namespace std;
     return ascii_string_to_u8string(string(1, _a_char));
-}
+}*/
 
 template <typename T>
 requires is_char_type_c<T>
@@ -1867,7 +1868,7 @@ __constexpr std::conditional_t<
                 if constexpr (Return_Reason)
                 {
                     const u8string _l_smaller_char8_sequence{
-                        unicode_char_to_u8string(_l_code_point)
+                        to_formatted_unicode_string<char8_t>(_l_code_point)
                     };
                     return unexpected(fmt::format(
                         u8"{0}. After converting the sequence to the "
@@ -2173,6 +2174,7 @@ __no_constexpr_imp std::u8string
                        const std::u8string_view _a_str
                    ) noexcept
 {
+    using namespace UNICODE_BRIDGE_NAMESPACE;
     return fmt::format(
         u8"The function {0} was unable to get the next UTF32 "
         u8"code point from the unicide substring \"{1}\". This substring "
@@ -2181,8 +2183,7 @@ __no_constexpr_imp std::u8string
         u8"{0} was unable to get the next UF32 code point due to "
         u8"the following reason;",
         _a_func_name,
-        unicode_string_to_u8string(_a_str)
-
+        to_formatted_unicode_string<char8_t>(_a_str)
     );
 }
 

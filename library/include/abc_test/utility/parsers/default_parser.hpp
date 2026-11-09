@@ -67,6 +67,7 @@ struct default_parser_t<bool> : public parser_base_t<bool>
                 ) const
     {
         using namespace _ABC_NS_UTILITY_STR;
+        using namespace UNICODE_BRIDGE_NAMESPACE;
         using namespace std;
         if (_a_parse_input.check_and_advance(U"true"))
         {
@@ -89,7 +90,7 @@ struct default_parser_t<bool> : public parser_base_t<bool>
                 _l_next_char = fmt::format(
                     u8"Instead, the next character the parser encountered was "
                     u8"\"{0}\".",
-                    unicode_char_to_u8string(_a_parse_input.peek_char())
+                    to_formatted_unicode_string<char8_t>(_a_parse_input.peek_char())
                 );
             }
             return unexpected(fmt::format(
@@ -154,6 +155,7 @@ protected:
     {
         using namespace std;
         using namespace _ABC_NS_UTILITY_STR;
+        using namespace UNICODE_BRIDGE_NAMESPACE;
         if (_a_parse_input.check_and_advance(_m_surrounding_str))
         {
             return monostate{};
@@ -162,7 +164,7 @@ protected:
         {
             return unexpected(fmt::format(
                 u8"Could not find expected surrounding string \"{0}\".",
-                unicode_string_to_u8string(_m_surrounding_str)
+                to_formatted_unicode_string<char8_t>(_m_surrounding_str)
             ));
         }
     }
@@ -447,7 +449,7 @@ struct default_parser_t<T> : public parser_base_t<T>
                 return result_t<T>(unexpected(fmt::format(
                     u8"Could not parse \"{0}\" using std::from_chars, as the "
                     u8"std::string argument is invalid",
-                    unicode_string_to_u8string(_l_u32str)
+                    to_formatted_unicode_string<char8_t>(_l_u32str)
                 )));
             }
             else if (ec == errc::result_out_of_range)
@@ -457,7 +459,7 @@ struct default_parser_t<T> : public parser_base_t<T>
                     u8"conversion, number is out of range. Min and max value "
                     u8"of "
                     u8"{1} are {2} and {3}",
-                    unicode_string_to_u8string(_l_u32str),
+                    to_formatted_unicode_string<char8_t>(_l_u32str),
                     type_id<T>(),
                     numeric_limits<T>::min(),
                     numeric_limits<T>::max()
@@ -472,7 +474,7 @@ struct default_parser_t<T> : public parser_base_t<T>
                     u8"unknown reason. The error code returned was unexpected. "
                     u8"Its "
                     u8"integer represention is {1}",
-                    unicode_string_to_u8string(_l_u32str),
+                    to_formatted_unicode_string<char8_t>(_l_u32str),
                     std::to_underlying(ec)
                 )
 
@@ -982,7 +984,7 @@ struct default_parser_t<std::basic_string<T>>
                 u8"Expected {0} to have a prefix of the string \"{1}\". "
                 u8"Remaining string = {2}",
                 type_id<T>(),
-                unicode_char_to_u8string(_l_char),
+                to_formatted_unicode_string<char8_t>(_l_char),
                 _a_parse_input.get_u8string()
             ));
         }

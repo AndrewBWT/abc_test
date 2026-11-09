@@ -151,7 +151,7 @@ __constexpr void
             throw parser_could_not_match_string_t(
                 _m_complete_string,
                 u8string_view(_m_cur_itt, _m_end_itt),
-                unicode_char_to_u8string(_a_char_to_check_against)
+                to_formatted_unicode_string<char8_t>(_a_char_to_check_against)
             );
         }
     }
@@ -176,7 +176,7 @@ __constexpr void
             throw parser_could_not_match_string_t(
                 _m_complete_string,
                 u8string_view(_m_cur_itt, _m_end_itt),
-                unicode_string_to_u8string(_a_str_to_check_against)
+                to_formatted_unicode_string<char8_t>(_a_str_to_check_against)
             );
         }
     }
