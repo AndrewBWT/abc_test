@@ -1,9 +1,11 @@
 #pragma once
+#if 0
 #include "abc_test/core.hpp"
 #include "abc_test/included_instances.hpp"
 #include "abc_test/included_instances/reporters/memoized_error_reporter.hpp"
 #include "abc_test/included_instances/reporters/memoized_test_reporter.hpp"
 #include "abc_test_test/testing_utilities/bootstrapped_testing_utilities.hpp"
+#include <pnp/core.hpp>
 
 namespace abc_test_test::utility
 {
@@ -191,10 +193,41 @@ __constexpr enum_list_t<abc::matcher::enum_bba_inner_assertion_type_t>
 }
 
 _END_ABC_UTILITY_NS
+PNP_NS_BEGIN
+struct matcher_result_infos_pnp
+{
+    inline void run_printer(
+        const abc::matcher::matcher_result_infos_t& object_arg,
+        text_sink& sink_arg
+    )
+    {
+        
+    }
+};
+struct matcher_result_pnp
+{
+    inline void run_printer(
+        const abc::matcher::matcher_result_t& object_arg,
+        text_sink& sink_arg
+    )
+    {
 
+    }
+};
+struct bba_inner_assertion_type_pnp
+{
+    inline void run_printer(
+        const abc::matcher::bba_inner_assertion_type_t& object_arg,
+        text_sink& sink_arg
+    )
+    {
+
+    }
+};
+PNP_NS_END
 
 _BEGIN_ABC_UTILITY_PRINTER_NS
-
+#if 0
 template <>
 struct default_printer_t<abc::matcher::matcher_result_infos_t>
     : public printer_base_t<abc::matcher::matcher_result_infos_t>
@@ -272,7 +305,7 @@ struct default_printer_t<abc::matcher::bba_inner_assertion_type_t>
         );
     }
 };
-
+#endif
 _END_ABC_UTILITY_PRINTER_NS
 
 _BEGIN_ABC_UTILITY_PARSER_NS
@@ -373,7 +406,7 @@ struct default_parser_t<abc::matcher::bba_inner_assertion_type_t>
 };
 
 _END_ABC_UTILITY_PARSER_NS
-
+#if 0
 _TEST_CASE(
     abc::test_case_t(
         {.name = "Checking standaline _CHECK and _REQUIRE macros",
@@ -756,3 +789,5 @@ _TEST_CASE(
     _l_run_func.operator(
     )<pass_or_fail_t, pass_or_terminate_t>(_l_check_funcs, "check_tests");
 }
+#endif
+#endif

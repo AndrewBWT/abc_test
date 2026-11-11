@@ -60,7 +60,44 @@ public:
 
 using dgc_memoized_element_t = data_generator_collection_memoized_element_t;
 
+struct data_generator_collection_memoized_element_traits
+{
+    static constexpr std::u8string_view
+        consistent_name() noexcept
+    {
+        return u8"data_generator_collection_memoized_element_t";
+    }
+
+    static constexpr auto
+        to_tuple(
+            const abc::ds::data_generator_collection_memoized_element_t&
+                object_arg
+        ) noexcept
+    {
+        return std::tie(
+            object_arg.generation_collection_index, object_arg.flied
+        );
+    }
+};
+
+using data_generator_collection_memoized_element_fields_pnp
+= pnp::support::generic_tuple_pnp<
+    std::tuple<std::size_t, abc::ds::data_generator_memoized_element_t>,
+    std::tuple<
+    pnp::support::integer_pnp<std::size_t>,
+    data_generator_memoized_element_pnp>>;
+
+struct data_generator_collection_memoized_element_pnp
+    : public pnp::object_pnp<
+    abc::ds::data_generator_collection_memoized_element_t,
+    data_generator_collection_memoized_element_traits,
+    data_generator_collection_memoized_element_fields_pnp,
+    data_generator_collection_memoized_element_fields_pnp>
+{
+};
+
 _END_ABC_DS_NS
+#if 0
 _BEGIN_ABC_UTILITY_PRINTER_NS
 
 template <>
@@ -76,9 +113,10 @@ struct default_printer_t<abc::ds::data_generator_collection_memoized_element_t>
 };
 
 _END_ABC_UTILITY_PRINTER_NS
+#endif
 _BEGIN_ABC_DS_NS
 _END_ABC_DS_NS
-
+#if 0
 _BEGIN_ABC_UTILITY_PRINTER_NS
 
 __no_constexpr_imp std::u8string
@@ -99,3 +137,4 @@ __no_constexpr_imp std::u8string
 }
 
 _END_ABC_UTILITY_PRINTER_NS
+#endif

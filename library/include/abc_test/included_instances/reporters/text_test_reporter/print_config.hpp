@@ -20,6 +20,7 @@
 #include "abc_test/utility/rng.hpp"
 
 #include <fmt/color.h>
+#include <pnp/core.hpp>
 _BEGIN_ABC_REPORTERS_NS
 
 class print_config_t
@@ -1664,9 +1665,13 @@ __no_constexpr_imp std::u8string
     }
     else
     {
-        return default_printer_t<
-                   _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t>{}
-            .run_printer(_a_config);
+        return pnp::to_u8string<
+            abc::ds::map_unique_id_to_tdg_collection_stack_trie_printer>(
+            _a_config
+        );
+        // return default_printer_t<
+        //           _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t>{}
+        // .run_printer(_a_config);
     }
 }
 

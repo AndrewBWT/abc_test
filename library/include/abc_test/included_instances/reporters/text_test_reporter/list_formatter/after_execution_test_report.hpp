@@ -170,10 +170,10 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
             {_a_pc.seed_used(
                 _a_element.post_setup_test_data().has_for_loop_stack_trie()
                     ? optional<u8string>(
-                          compressed_typless_data_generator_collection_stack_trie_printer_t<
-                              false>{}
-                              .run_printer(_a_element.post_setup_test_data()
-                                               .for_loop_stack_trie())
+                          pnp::to_u8string<
+                              compressed_typless_data_generator_collection_stack_trie_pnp<
+                                  false>>(_a_element.post_setup_test_data()
+                                              .for_loop_stack_trie())
                       )
                     : optional<u8string>()
             )}
@@ -184,10 +184,10 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
             {_a_pc.seed_used_in_hex(
                 _a_element.post_setup_test_data().has_for_loop_stack_trie()
                     ? optional<u8string>(
-                          compressed_typless_data_generator_collection_stack_trie_printer_t<
-                              true>{}
-                              .run_printer(_a_element.post_setup_test_data()
-                                               .for_loop_stack_trie())
+                          pnp::to_u8string<
+                              compressed_typless_data_generator_collection_stack_trie_pnp<
+                                  true>>(_a_element.post_setup_test_data()
+                                             .for_loop_stack_trie())
                       )
                     : optional<u8string>()
             )}
@@ -196,9 +196,9 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
         return {
             _a_pc.space(_a_pc.colon(_a_pc.seed_to_use_to_re_run_test_str())),
             {_a_pc.seed_to_use_to_re_run_test(
-                compressed_typless_data_generator_collection_stack_trie_printer_t<
-                    false>{}
-                    .run_printer(_a_element.for_loop_stack_trie())
+                pnp::to_u8string<
+                    compressed_typless_data_generator_collection_stack_trie_pnp<
+                        false>>(_a_element.for_loop_stack_trie())
             )}
         };
     case SEED_TO_USE_TO_RE_RUN_TEST_IN_HEX:
@@ -206,9 +206,9 @@ __no_constexpr_imp std::pair<std::u8string, std::vector<std::u8string>>
             _a_pc.space(_a_pc.colon(_a_pc.seed_to_use_to_re_run_test_in_hex_str(
             ))),
             {_a_pc.seed_to_use_to_re_run_test_in_hex(
-                compressed_typless_data_generator_collection_stack_trie_printer_t<
-                    true>{}
-                    .run_printer(_a_element.for_loop_stack_trie())
+                pnp::to_u8string<
+                    compressed_typless_data_generator_collection_stack_trie_pnp<
+                        true>>(_a_element.for_loop_stack_trie())
             )}
         };
     case TEST_WARNINGS_RECIEVED:

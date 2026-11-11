@@ -101,11 +101,15 @@ __no_constexpr_imp auto
         "_m_for_loop_index",
         _a_rd.for_loop_index,
         "_m_flid",
-        cast_string_view<char>(
-            abc::utility::printer::default_printer<
-                decltype(_a_rd.for_loop_iteration_data)>()
-                ->run_printer(_a_rd.for_loop_iteration_data)
+        pnp::to_native_string<
+            abc::ds::data_generator_collection_memoized_element_pnp>(
+            _a_rd.for_loop_iteration_data
         )
+        // cast_string_view<char>(
+        //    abc::utility::printer::default_printer<
+        //       decltype(_a_rd.for_loop_iteration_data)>()
+        //      ->run_printer(_a_rd.for_loop_iteration_data)
+        // )
     )};
     return formatter<string_view>::format(_l_rv, _a_ctx);
 }

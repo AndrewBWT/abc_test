@@ -1,13 +1,20 @@
 #pragma once
 #include "abc_test/utility/internal/log.hpp"
 #include "abc_test/utility/internal/macros.hpp"
-#include <fmt/format.h>
 #include "abc_test/utility/printers/default_printer.hpp"
+#include "abc_test/utility/types.hpp"
 
+#include <array>
+#include <fmt/format.h>
+#include <pnp/core.hpp>
+#include <pnp/support/core_language.hpp>
+#include <pnp/support/std/string.hpp>
+#include <pnp/support/user_types/objects.hpp>
 #include <tuple>
 #include <vector>
-#include "abc_test/utility/types.hpp"
-#include <array>
+#include <pnp/support/internal/core_language/integers.hpp>
+#include <pnp/support/internal/tuple_like.hpp>
+#include <pnp/support/internal/std/string.hpp>
 
 _BEGIN_ABC_DS_NS
 
@@ -44,8 +51,8 @@ public:
     /*!
      * @brief The mode the gen_data_t element was in when the iteration data was
      * created. Classes derived from gen_data_t can have different modes -
-     * integers which change the behaviour of the class. This variable holds that
-     * data.
+     * integers which change the behaviour of the class. This variable holds
+     * that data.
      */
     std::size_t mode = 0;
     /*!
@@ -60,12 +67,42 @@ public:
 /*!
  * @brief Type synonym which shortens the name.
  */
-using dg_memoized_element_t = data_generator_memoized_element_t;
+using dg_memoized_element_t     = data_generator_memoized_element_t;
 
 using opt_dg_memoized_element_t = std::optional<dg_memoized_element_t>;
 
-_END_ABC_DS_NS
-_BEGIN_ABC_UTILITY_PRINTER_NS
+struct data_generator_memoized_element_traits
+{
+    static constexpr std::u8string_view
+        consistent_name() noexcept
+    {
+        return u8"data_generator_memoized_element_t";
+    }
+
+    static constexpr auto
+        to_tuple(
+            const abc::ds::data_generator_memoized_element_t& object_arg
+        ) noexcept
+    {
+        return std::tie(object_arg.mode, object_arg.additional_data);
+    }
+};
+
+using data_generator_memoized_element_fields_pnp = pnp::support::generic_tuple_pnp<
+    std::tuple<std::size_t, std::u8string>,
+    std::tuple<
+    pnp::support::integer_pnp<std::size_t>,
+    pnp::support::generic_string_pnp<std::u8string, pnp::support::string_pnp_default>>>;
+
+struct data_generator_memoized_element_pnp
+    : public pnp::object_pnp<
+    abc::ds::data_generator_memoized_element_t,
+    data_generator_memoized_element_traits,
+    data_generator_memoized_element_fields_pnp,
+    data_generator_memoized_element_fields_pnp>
+{
+};
+#if 0
 template <>
 struct default_printer_t<
     abc::ds::data_generator_memoized_element_t>
@@ -90,6 +127,5 @@ struct default_printer_t<
         );
     }
 };
-_END_ABC_UTILITY_PRINTER_NS
-_BEGIN_ABC_DS_NS
+#endif
 _END_ABC_DS_NS

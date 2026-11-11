@@ -5,6 +5,7 @@
 #include "abc_test/utility/types.hpp"
 
 #include <cuchar>
+#include <pnp/core.hpp>
 
 _BEGIN_ABC_DS_NS
 class map_unique_id_to_tdg_collection_stack_trie_t;
@@ -43,7 +44,165 @@ private:
     std::map<key_t, tdg_collection_stack_trie_t> _m_internal_map;
 };
 
-_END_ABC_DS_NS
+struct map_unique_id_to_tdg_collection_stack_trie_printer
+{
+    inline void
+        run_printer(
+            const map_unique_id_to_tdg_collection_stack_trie_t& object_arg,
+            pnp::text_sink&                                     sink_arg
+        ) const
+    {}
+};
+
+template <bool Hex = true>
+struct map_unique_id_to_tdg_collection_stack_trie_pnp
+{
+    inline void
+        run_printer(
+            const map_unique_id_to_tdg_collection_stack_trie_t& object_arg,
+            pnp::text_sink&                                     sink_arg
+        ) const
+    {
+        bool first{true};
+        for (const auto& [key, trie] : object_arg.map())
+        {
+            if (not first)
+            {
+                sink_arg.write(u8":");
+            }
+            first = false;
+            if constexpr (Hex)
+            {
+                sink_arg.write(abc::utility::str::to_hex(key));
+            }
+            else
+            {
+                sink_arg.write(key);
+            }
+            sink_arg.write(u8":");
+            compressed_typless_data_generator_collection_stack_trie_pnp<
+                Hex,
+                true>{}
+                .run_printer(trie, sink_arg);
+        }
+    }
+
+    inline pnp::basic_parser_return_value
+        run_parser(
+            pnp::parser_input&                                     input_arg,
+            abc::ds::map_unique_id_to_tdg_collection_stack_trie_t& object_arg,
+            pnp::parser_run_key                                    run_key_arg
+        ) const
+    {
+        using namespace std;
+        const auto element_str = [](const size_t element_arg)
+        {
+            const string str{to_string(element_arg)};
+            return u8string(str.begin(), str.end());
+        };
+        map_unique_id_to_tdg_collection_stack_trie_t result;
+        // Empty text is an empty map.
+        if (input_arg.at_end())
+        {
+            object_arg = std::move(result);
+            return {};
+        }
+        size_t element{0};
+        do
+        {
+            ++element;
+            // The key. Ends at the first non-hex character (Hex), or at the
+            // next
+            // ':' (plain).
+            const size_t key_start{input_arg.position()};
+            u8string     key_text;
+            {
+                const pnp::input_text text{input_arg.peek_while(
+                    [](const char8_t c)
+                    {
+                        if constexpr (Hex)
+                        {
+                            return (c >= u8'0' && c <= u8'9')
+                                   || (c >= u8'a' && c <= u8'f')
+                                   || (c >= u8'A' && c <= u8'F');
+                        }
+                        else
+                        {
+                            return c != u8':';
+                        }
+                    }
+                )};
+                key_text = text.get();
+            }
+            if (key_text.empty())
+            {
+                return input_arg.fail(
+                    u8"Expected the unique ID of element "
+                        + element_str(element) + u8", but found none.",
+                    key_start
+                );
+            }
+            input_arg.advance(key_text.size());
+            u8string key;
+            if constexpr (Hex)
+            {
+                result_t<u8string> decoded{abc::utility::str::from_hex(key_text)
+                };
+                if (not decoded.has_value())
+                {
+                    return input_arg.fail(
+                        u8"Could not decode the hex unique ID of element "
+                            + element_str(element) + u8": " + decoded.error(),
+                        key_start
+                    );
+                }
+                key = std::move(decoded.value());
+            }
+            else
+            {
+                key = std::move(key_text);
+            }
+            if (not input_arg.advance_if_starts_with(u8":"))
+            {
+                return input_arg.fail(
+                    u8"Expected ':' after the unique ID of element "
+                    + element_str(element) + u8"."
+                );
+            }
+            // The trie. Its own parser knows where it ends, so a ':' inside it
+            // (e.g. in a plain-text string) can't confuse the split.
+            tdg_collection_stack_trie_t trie;
+            if (auto parse_result{input_arg.run_parser(
+                    compressed_typless_data_generator_collection_stack_trie_pnp<
+                        Hex,
+                        true>{},
+                    trie
+                )};
+                parse_result.failed())
+            {
+                parse_result.add_msg(
+                    u8"while parsing the trie of element "
+                    + element_str(element)
+                );
+                return parse_result;
+            }
+            if (not result.insert(key, trie))
+            {
+                return input_arg.fail(
+                    u8"Element " + element_str(element)
+                        + u8" has the unique ID \"" + key
+                        + u8"\", which an earlier element already has.",
+                    key_start
+                );
+            }
+        }
+        while (input_arg.advance_if_starts_with(u8":"));
+        // Only stored once everything has parsed.
+        object_arg = std::move(result);
+        return {};
+    }
+};
+#if 0
 _BEGIN_ABC_UTILITY_PARSER_NS
 
 template <>
@@ -62,7 +221,6 @@ struct default_parser_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
 
 _END_ABC_UTILITY_PARSER_NS
 _BEGIN_ABC_UTILITY_PRINTER_NS
-
 template <>
 struct default_printer_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
     : public printer_base_t<
@@ -74,8 +232,9 @@ struct default_printer_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
         run_printer(const abc::ds::map_unique_id_to_tdg_collection_stack_trie_t&
                         _a_parse_input) const;
 };
-
 _END_ABC_UTILITY_PRINTER_NS
+#endif
+_END_ABC_DS_NS
 
 template <>
 struct fmt::formatter<_ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t>
@@ -122,189 +281,49 @@ __no_constexpr_imp std::size_t
 
 __no_constexpr_imp parse_map_unique_id_to_tdg_collection_stack_trie_result_t
     parse_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
-        const std::u8string_view _a_u8_str
+        const std::u8string_view str_arg
     ) noexcept
 {
-    using namespace std;
-    using namespace abc::utility::parser;
-    using namespace abc::ds;
-    vector<pair<u8string_view, u8string_view>> _l_strs;
-    size_t                                     _l_idx{0};
-    while (_l_idx < _a_u8_str.size())
+    const auto parse_result{pnp::try_parse<
+        map_unique_id_to_tdg_collection_stack_trie_t,
+        map_unique_id_to_tdg_collection_stack_trie_pnp<true>>(str_arg)};
+    if (parse_result.outcome.succeeded())
     {
-        size_t _l_next_colon{_a_u8_str.find(char8_t(':'), _l_idx)};
-        if (_l_next_colon == string::npos)
-        {
-            return unexpected(fmt::format(
-                u8"Failure to parse part of "
-                u8"map_unique_id_to_tdg_collection_stack_trie_t string. "
-                u8"Unable to find colon (':') in text, even though there "
-                u8"should "
-                u8"be atleast one in the string. "
-                u8"This error occoured after index {0}, containing the "
-                u8"subtring "
-                u8"\"{1}\".",
-                _l_idx,
-                _a_u8_str.substr(_l_idx)
-            ));
-        }
-        else
-        {
-            const u8string_view _l_number{
-                _a_u8_str.substr(_l_idx, _l_next_colon - _l_idx)
-            };
-            _l_idx = _l_next_colon + 1;
-            // Finding the next colon. This one doesn't have to exist.
-            size_t _l_next_colon{_a_u8_str.find(char8_t(':'), _l_idx)};
-            const u8string_view _l_hex_numbers{_a_u8_str.substr(
-                _l_idx,
-                _l_next_colon == u8string::npos ? _a_u8_str.size() - _l_idx
-                                                : _l_next_colon - _l_idx
-            )};
-            _l_strs.push_back({_l_number, _l_hex_numbers});
-            _l_idx = _l_next_colon == string::npos ? _a_u8_str.size()
-                                                   : _l_next_colon + 1;
-        }
+        return parse_result.value;
     }
-    // At this point got a vector of string_views.
-    map_unique_id_to_tdg_collection_stack_trie_t _l_map;
-    for (size_t _l_idx{0}; _l_idx < _l_strs.size(); ++_l_idx)
+    // Messages are lowest-level first; show the outermost first.
+    std::u8string message{
+        u8"Could not parse map_unique_id_to_tdg_collection_stack_trie_t"
+    };
+    const auto& messages{parse_result.outcome.parser_error_messages};
+    for (auto itt = messages.rbegin(); itt != messages.rend(); ++itt)
     {
-        auto& [_l_str_hex, _l_compressed_str]{_l_strs[_l_idx]};
-        const parser_result_t<typeless_data_generator_collection_stack_trie_t>
-                 _l_compressed_scan_result{parse(
-                _l_compressed_str,
-                mk_parser(
-                    compressed_typless_data_generator_collection_stack_trie_parser_t<
-                             true>{}
-                )
-            )};
-        result_t<u8string> _l_str_opt
-            = abc::utility::str::from_hex(_l_str_hex);
-        if (_l_str_opt.has_value())
-        {
-            if (_l_compressed_scan_result.has_value())
-            {
-                const bool _l_result{
-                    _l_map.insert(_l_str_opt.value(), _l_compressed_scan_result.value())
-                };
-                if (not _l_result)
-                {
-                    return unexpected(fmt::format(
-                        u8"Could not add element {0} to internal map. This is "
-                        u8"because there is already an element with that unique ID "
-                        u8"in the map. Unique ID = {1}",
-                        (_l_idx + 1),
-                        _l_str_opt.value()
-                    ));
-                }
-            }
-            else
-            {
-                return unexpected(fmt::format(
-                    u8"Could not parse compressed string \"{0}\", which is element "
-                    u8"{1}. "
-                    u8"internal parser returned error message \"{2}\".",
-                    _l_compressed_str,
-                    (_l_idx + 1),
-                    _l_compressed_scan_result.error().errors
-                ));
-            }
-        }
-        else
-        {
-            return unexpected(fmt::format(
-                u8"Could not parse compressed string \"{0}\", which is element "
-                u8"{1}. "
-                u8"internal parser returned error message \"{2}\".",
-                _l_str_hex,
-                (_l_idx + 1),
-                _l_str_opt.error()
-            ));
-        }
+        message.append(u8": ").append(*itt);
     }
-    return _l_map;
+    return std::unexpected(message);
 }
 
 template <bool To_Hex>
 __no_constexpr_imp std::u8string
                    print_map_of_unique_ids_to_tdg_collection_stack_tries(
-                       const map_unique_id_to_tdg_collection_stack_trie_t& _a_map
+                       const map_unique_id_to_tdg_collection_stack_trie_t& map_arg
                    ) noexcept
 {
-    using namespace std;
-    u8string _l_rv;
-    for (const pair<key_t, tdg_collection_stack_trie_t> _l_element :
-         _a_map.map())
-    {
-        u8string _l_key_compressed, _l_key_compressed_2;
-        for (char _l_char : _l_element.first)
-        {
-            _l_key_compressed.push_back(static_cast<unsigned char>(_l_char));
-        }
-        if constexpr (To_Hex)
-        {
-            for (unsigned char _l_char : _l_key_compressed)
-            {
-                _l_key_compressed_2.append(fmt::format(u8"{:x}", _l_char));
-            }
-        }
-        else
-        {
-            _l_key_compressed_2 = _l_key_compressed;
-        }
-        _l_rv.append(fmt::format(
-            u8"{0}:{1}:",
-            _l_key_compressed_2,
-            compressed_typless_data_generator_collection_stack_trie_printer_t<
-                To_Hex>{}
-                .run_printer(_l_element.second)
-        ));
-    }
-    if (_l_rv.size() > 0)
-    {
-        _l_rv.erase(_l_rv.end() - 1);
-    }
-    return _l_rv;
+    return pnp::to_u8string(
+        map_unique_id_to_tdg_collection_stack_trie_pnp<To_Hex>{}, map_arg
+    );
 }
 
 __no_constexpr_imp std::u8string
     print_compressed_map_of_unique_ids_to_tdg_collection_stack_tries(
-        const map_unique_id_to_tdg_collection_stack_trie_t& _a_map
+        const map_unique_id_to_tdg_collection_stack_trie_t& map_arg
     ) noexcept
 {
-    using namespace std;
-    using namespace abc::utility::printer;
-    u8string _l_rv;
-    for (const pair<key_t, tdg_collection_stack_trie_t> _l_element :
-         _a_map.map())
-    {
-        u8string _l_key_compressed, _l_key_compressed_2;
-        for (char _l_char : _l_element.first)
-        {
-            _l_key_compressed.push_back(static_cast<unsigned char>(_l_char));
-        }
-        for (unsigned char _l_char : _l_key_compressed)
-        {
-            _l_key_compressed_2.append(fmt::format(u8"{:x}", _l_char));
-        }
-        _l_rv.append(fmt::format(
-            u8"{0}:{1}:",
-            _l_key_compressed_2,
-            compressed_typless_data_generator_collection_stack_trie_printer_t<
-                true>{}
-                .run_printer(_l_element.second)
-        ));
-    }
-    if (_l_rv.size() > 0)
-    {
-        _l_rv.erase(_l_rv.end() - 1);
-    }
-    return _l_rv;
+    return pnp::to_u8string<map_unique_id_to_tdg_collection_stack_trie_pnp<true>>(map_arg);
 }
 
 _END_ABC_DS_NS
-
+#if 0
 _BEGIN_ABC_UTILITY_PRINTER_NS
 __no_constexpr_imp std::u8string
     default_printer_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>::
@@ -320,7 +339,7 @@ __no_constexpr_imp std::u8string
 }
 
 _END_ABC_UTILITY_PRINTER_NS
-
+#endif
 _BEGIN_ABC_UTILITY_PARSER_NS
 __no_constexpr_imp
     result_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>

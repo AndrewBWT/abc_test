@@ -142,6 +142,7 @@ G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/parsers
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/printers/function_printer.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/printers/printer_base.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/printers/default_printer.hpp
+G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/pnp/hex_pnp.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/object_printer_parser.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/str/print_utils.hpp
 G:/MyProjects/cpp/git_projects/abc_test/library/include/abc_test/utility/str/string_utils.hpp

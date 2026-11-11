@@ -2,6 +2,7 @@
 #include "abc_test/core/ds/data_generator_memoization/data_generator_memoized_element.hpp"
 #include "abc_test/core/ds/type_synonyms.hpp"
 #include "abc_test/utility/parsers/default_parser.hpp"
+#include "abc_test/utility/pnp/hex_pnp.hpp"
 #include "abc_test/utility/printers/default_printer.hpp"
 #include "abc_test/utility/printers/function_printer.hpp"
 #include "abc_test/utility/str/string_utils.hpp"
@@ -11,12 +12,17 @@
 #include <fmt/base.h>
 #include <fmt/ranges.h>
 #include <functional>
+#include <pnp/support/internal/std/smart_pointers.hpp>
+#include <pnp/support/internal/tuple_like.hpp>
 
 _BEGIN_ABC_DS_NS
 // Forward declare
 class typeless_data_generator_collection_stack_trie_t;
+struct tdg_collection_stack_trie_object_pnp;
 template <bool From_Hex, bool Head_Node>
 struct compressed_typless_data_generator_collection_stack_trie_parser_t;
+template <bool Hex, bool Head_Node>
+struct compressed_typless_data_generator_collection_stack_trie_pnp;
 
 namespace
 {
@@ -167,6 +173,9 @@ public:
     template <bool Is_Hex, bool Is_Head>
     friend struct
         compressed_typless_data_generator_collection_stack_trie_parser_t;
+    template <bool Hex, bool Head_Node>
+    friend struct compressed_typless_data_generator_collection_stack_trie_pnp;
+    friend struct tdg_collection_stack_trie_object_pnp;
 
     __constexpr const dgc_memoized_element_t&
         for_loop_data() const noexcept
@@ -227,7 +236,116 @@ private:
 
 using tdg_collection_stack_trie_t
     = typeless_data_generator_collection_stack_trie_t;
+
+struct tdg_collection_stack_trie_traits
+{
+    static constexpr std::u8string_view
+        consistent_name() noexcept
+    {
+        return u8"typeless_data_generator_collection_stack_trie_t";
+    }
+
+    static auto
+        to_tuple(
+            const typeless_data_generator_collection_stack_trie_t& object_arg
+        ) noexcept
+    {
+        return std::tie(object_arg.for_loop_data(), object_arg.children());
+    }
+};
+
+struct tdg_collection_stack_trie_object_pnp
+{
+    void
+        run_printer(
+            const typeless_data_generator_collection_stack_trie_t& object_arg,
+            pnp::text_sink&                                        sink_arg
+        ) const;
+
+    pnp::basic_parser_return_value
+        run_parser(
+            pnp::parser_input&                               input_arg,
+            typeless_data_generator_collection_stack_trie_t& object_arg,
+            pnp::parser_run_key                              run_key_arg
+        ) const;
+};
+
+namespace detail
+{
+// The pnps for the trie's fields. Must come after the definition of
+// tdg_collection_stack_trie_object_pnp: children are printed and parsed with
+// it, recursively, so it has to be a complete type here. The recursion is fine
+// because it has no data members.
+struct tdg_collection_stack_trie_object_parts
+{
+    using child_pnp = pnp::support::generic_smart_pointer_pnp<
+        for_loop_stack_trie_child_t,
+        tdg_collection_stack_trie_object_pnp>;
+    using children_pnp = pnp::support::
+        generic_sequence_pnp<for_loop_stack_trie_children_t, child_pnp>;
+    using indexed_children_pnp = pnp::support::generic_sequence_pnp<
+        for_loop_stack_trie_indexed_children_t,
+        children_pnp>;
+    using fields_t = std::
+        tuple<dgc_memoized_element_t, for_loop_stack_trie_indexed_children_t>;
+    using fields_pnp = pnp::support::generic_tuple_pnp<
+        fields_t,
+        std::tuple<
+            data_generator_collection_memoized_element_pnp,
+            indexed_children_pnp>>;
+};
+} // namespace detail
+static_assert(pnp::printer_c<data_generator_collection_memoized_element_pnp, dgc_memoized_element_t>);
+static_assert(pnp::parser_c<data_generator_collection_memoized_element_pnp, dgc_memoized_element_t>);
+static_assert(::pnp::printer_c<
+    detail::tdg_collection_stack_trie_object_parts::indexed_children_pnp,
+    for_loop_stack_trie_indexed_children_t>);
+inline void
+    tdg_collection_stack_trie_object_pnp::run_printer(
+        const typeless_data_generator_collection_stack_trie_t& object_arg,
+        pnp::text_sink&                                        sink_arg
+    ) const
+{
+    using parts = detail::tdg_collection_stack_trie_object_parts;
+    pnp::object_pnp<
+        typeless_data_generator_collection_stack_trie_t,
+        tdg_collection_stack_trie_traits,
+        parts::fields_pnp,
+        parts::fields_pnp>{}
+        .run_printer(object_arg, sink_arg);
+}
+
+inline pnp::basic_parser_return_value
+    tdg_collection_stack_trie_object_pnp::run_parser(
+        pnp::parser_input&                               input_arg,
+        typeless_data_generator_collection_stack_trie_t& object_arg,
+        [[maybe_unused]] pnp::parser_run_key             run_key_arg
+    ) const
+{
+    using parts = detail::tdg_collection_stack_trie_object_parts;
+    const std::u8string_view name{
+        tdg_collection_stack_trie_traits::consistent_name()
+    };
+    if (not input_arg.advance_if_starts_with(name))
+    {
+        return input_arg.fail(u8"Expected \"" + std::u8string(name) + u8"\".");
+    }
+    input_arg.skip_whitespace();
+    parts::fields_t fields;
+    if (auto result{input_arg.run_parser(parts::fields_pnp{}, fields)};
+        result.failed())
+    {
+        return result;
+    }
+    // Only stored once every field has parsed.
+    auto& [for_loop_data, children]{fields};
+    object_arg._m_for_loop_data = std::move(for_loop_data);
+    object_arg._m_children      = std::move(children);
+    return {};
+}
+
 _END_ABC_DS_NS
+#if 0
 _BEGIN_ABC_UTILITY_PRINTER_NS
 
 template <>
@@ -257,165 +375,160 @@ struct default_printer_t<
 };
 
 _END_ABC_UTILITY_PRINTER_NS
+#endif
 _BEGIN_ABC_DS_NS
 
 template <bool To_Hex, bool Head_Node = true>
-struct compressed_typless_data_generator_collection_stack_trie_printer_t
-    : public abc::utility::printer::printer_base_t<
-          abc::ds::typeless_data_generator_collection_stack_trie_t>
+struct compressed_typless_data_generator_collection_stack_trie_pnp
 {
-    __no_constexpr_imp std::u8string
-                       run_printer(
-                           const abc::ds::typeless_data_generator_collection_stack_trie_t&
-                               _a_object
-                       ) const
-    {
-        using namespace std;
-        using namespace abc::ds;
-        using namespace abc::utility::printer;
-        using namespace abc::utility;
-        const auto  _l_child_printer{default_printer<
-             vector<for_loop_stack_trie_children_t>>(
-            default_printer<vector<for_loop_stack_trie_child_t>>(
-                default_printer<shared_ptr<
-                     typeless_data_generator_collection_stack_trie_t>>(
-                    mk_printer(
-                        compressed_typless_data_generator_collection_stack_trie_printer_t<
-                             false,
-                             false>{}
-                    ),
-                    enum_pointer_print_parse_type_t::JUST_DATA
-                )
-            )
-        )};
-        const auto& _l_children{_a_object.children()};
-        if constexpr (Head_Node == false)
-        {
-            auto& _l_fld{_a_object.for_loop_data()};
-            auto& _l_flied{_l_fld.flied};
-            using node_type_t = tuple<
-                size_t,
-                size_t,
-                u8string,
-                for_loop_stack_trie_indexed_children_t>;
-            node_type_t _l_node_data{
-                _l_fld.generation_collection_index,
-                _l_flied.mode,
-                _l_flied.additional_data,
-                _l_children
-            };
-            auto _l_printer{default_printer_t<node_type_t>()};
-            get<3>(_l_printer.get_printers_ref()) = _l_child_printer;
-            return _l_printer.run_printer(_l_node_data);
-        }
-        else
-        {
-            if constexpr (To_Hex)
-            {
-                return hex_printer<vector<for_loop_stack_trie_children_t>>{
-                    _l_child_printer
-                }
-                    .run_printer(_l_children);
-            }
-            else
-            {
-                return _l_child_printer->run_printer(_l_children);
-            }
-        }
-    }
-};
+    void
+        run_printer(
+            const typeless_data_generator_collection_stack_trie_t& object_arg,
+            pnp::text_sink&                                        sink_arg
+        ) const;
 
-template <bool From_Hex, bool Head_Node = true>
-struct compressed_typless_data_generator_collection_stack_trie_parser_t
-    : public abc::utility::parser::parser_base_t<
-          abc::ds::typeless_data_generator_collection_stack_trie_t>
-{
-    __no_constexpr_imp
-        result_t<abc::ds::typeless_data_generator_collection_stack_trie_t>
+    pnp::basic_parser_return_value
         run_parser(
-            abc::utility::parser::parser_input_t& _a_parse_input
-        ) const
-
-    {
-        using namespace std;
-        using namespace abc::ds;
-        using namespace abc::utility::parser;
-        using namespace abc::utility;
-        auto _l_child_parser{default_parser<
-            vector<for_loop_stack_trie_children_t>>(
-            default_parser<vector<for_loop_stack_trie_child_t>>(
-                default_parser<shared_ptr<
-                    typeless_data_generator_collection_stack_trie_t>>(
-                    mk_parser(
-                        compressed_typless_data_generator_collection_stack_trie_parser_t<
-                            false,
-                            false>{}
-                    ),
-                    enum_pointer_print_parse_type_t::JUST_DATA
-                )
-            )
-        )};
-        if constexpr (Head_Node == false)
-        {
-            using tuple_type_t = tuple<
-                size_t,
-                size_t,
-                u8string,
-                for_loop_stack_trie_indexed_children_t>;
-            parser_t<tuple_type_t> _l_node_parser{default_parser<tuple_type_t>(
-                default_parser<size_t>(),
-                default_parser<size_t>(),
-                default_parser<u8string>(),
-                _l_child_parser
-            )};
-            if constexpr (From_Hex)
-            {
-                _l_node_parser
-                    = mk_parser(hex_parser_t<tuple_type_t>{_l_node_parser});
-            }
-            return _l_node_parser->run_parser(_a_parse_input)
-                .transform(
-                    [](const tuple_type_t& _l_node)
-                    {
-                        const auto& [_l_generation_collection_index, _l_mode, _l_additional_data, _l_children]{
-                            _l_node
-                        };
-                        dgc_memoized_element_t _l_dgc{
-                            _l_generation_collection_index,
-                            dg_memoized_element_t{_l_mode, _l_additional_data}
-                        };
-                        typeless_data_generator_collection_stack_trie_t _l_rv;
-                        _l_rv._m_for_loop_data = _l_dgc;
-                        _l_rv._m_children      = _l_children;
-                        return _l_rv;
-                    }
-                );
-        }
-        else
-        {
-            if constexpr (From_Hex)
-            {
-                _l_child_parser = mk_parser(
-                    hex_parser_t<vector<for_loop_stack_trie_children_t>>(
-                        _l_child_parser
-                    )
-                );
-            }
-            return _l_child_parser->run_parser(_a_parse_input)
-                .transform(
-                    [](const auto& _l_children)
-                    {
-                        typeless_data_generator_collection_stack_trie_t _l_rv;
-                        _l_rv._m_children = _l_children;
-                        return _l_rv;
-                    }
-                );
-        }
-    }
+            pnp::parser_input&                               input_arg,
+            typeless_data_generator_collection_stack_trie_t& value_arg,
+            pnp::parser_run_key                              run_key_arg
+        ) const;
 };
+
+namespace detail
+{
+// The data held by a non-head node, in the order it is printed.
+using trie_node_data_t = std::tuple<
+    std::size_t,
+    std::size_t,
+    std::u8string,
+    for_loop_stack_trie_indexed_children_t>;
+
+// The old JUST_DATA: a child pointer prints as just its pointee, with no
+// delimiters around it.
+struct trie_child_pointer_defaults : pnp::support::shared_ptr_pnp_default
+{
+    static constexpr std::u8string_view open_delimiter  = u8"";
+    static constexpr std::u8string_view close_delimiter = u8"";
+};
+
+// The pnps for the parts of the trie. Default is pnp::default_printer when
+// printing, pnp::default_parser when parsing.
+//
+// These are only named inside the member function bodies below, where the trie
+// pnp is a complete type. Naming them earlier would check pnp's constraints on
+// an incomplete type. The recursion (a node's children are nodes) is fine
+// because the trie pnp has no data members: nothing contains itself.
+template <template <typename> typename Default>
+struct trie_pnp_parts
+{
+    using node_pnp
+        = compressed_typless_data_generator_collection_stack_trie_pnp<
+            false,
+            false>;
+    using child_pnp = pnp::support::generic_smart_pointer_pnp<
+        for_loop_stack_trie_child_t,
+        node_pnp,
+        trie_child_pointer_defaults>;
+    using children_pnp = pnp::support::
+        generic_sequence_pnp<for_loop_stack_trie_children_t, child_pnp>;
+    using indexed_children_pnp = pnp::support::generic_sequence_pnp<
+        for_loop_stack_trie_indexed_children_t,
+        children_pnp>;
+    using node_data_pnp = pnp::support::generic_tuple_pnp<
+        trie_node_data_t,
+        std::tuple<
+            Default<std::size_t>,
+            Default<std::size_t>,
+            Default<std::u8string>,
+            indexed_children_pnp>>;
+};
+} // namespace detail
+
+template <bool Hex, bool Head_Node>
+inline void
+    compressed_typless_data_generator_collection_stack_trie_pnp<
+        Hex,
+        Head_Node>::
+        run_printer(
+            const typeless_data_generator_collection_stack_trie_t& object_arg,
+            pnp::text_sink&                                        sink_arg
+        ) const
+{
+    using namespace abc::utility;
+    using parts = detail::trie_pnp_parts<pnp::default_printer>;
+    if constexpr (Head_Node)
+    {
+        maybe_hex_pnp_t<Hex, typename parts::indexed_children_pnp>{}
+            .run_printer(object_arg.children(), sink_arg);
+    }
+    else
+    {
+        const dgc_memoized_element_t&  fld{object_arg.for_loop_data()};
+        const detail::trie_node_data_t node_data{
+            fld.generation_collection_index,
+            fld.flied.mode,
+            fld.flied.additional_data,
+            object_arg.children()
+        };
+        maybe_hex_pnp_t<Hex, typename parts::node_data_pnp>{}.run_printer(
+            node_data, sink_arg
+        );
+    }
+}
+
+template <bool Hex, bool Head_Node>
+inline pnp::basic_parser_return_value
+    compressed_typless_data_generator_collection_stack_trie_pnp<
+        Hex,
+        Head_Node>::
+        run_parser(
+            pnp::parser_input&                               input_arg,
+            typeless_data_generator_collection_stack_trie_t& value_arg,
+            [[maybe_unused]] pnp::parser_run_key             run_key_arg
+        ) const
+{
+    using namespace abc::utility;
+    using parts = detail::trie_pnp_parts<pnp::default_parser>;
+    if constexpr (Head_Node)
+    {
+        for_loop_stack_trie_indexed_children_t children;
+        if (auto result{input_arg.run_parser(
+                maybe_hex_pnp_t<Hex, typename parts::indexed_children_pnp>{},
+                children
+            )};
+            result.failed())
+        {
+            result.add_msg(u8"while parsing the children of a trie's head node"
+            );
+            return result;
+        }
+        value_arg._m_children = std::move(children);
+    }
+    else
+    {
+        detail::trie_node_data_t node_data;
+        if (auto result{input_arg.run_parser(
+                maybe_hex_pnp_t<Hex, typename parts::node_data_pnp>{}, node_data
+            )};
+            result.failed())
+        {
+            result.add_msg(u8"while parsing a trie node");
+            return result;
+        }
+        auto& [generation_collection_index, mode, additional_data, children]{
+            node_data
+        };
+        value_arg._m_for_loop_data = dgc_memoized_element_t{
+            generation_collection_index,
+            dg_memoized_element_t{mode, std::move(additional_data)}
+        };
+        value_arg._m_children = std::move(children);
+    }
+    return {};
+}
 
 _END_ABC_DS_NS
-
 _BEGIN_ABC_DS_NS
 
 __constexpr_imp opt_idgc_memoized_element_t
