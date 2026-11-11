@@ -1,6 +1,7 @@
 #pragma once
 #include "abc_test/core/logging/log_msg.hpp"
 #include "abc_test/utility/internal/macros.hpp"
+#include <pnp/core.hpp>
 
 /*!
  * @brief Internal macro, used to assign a random name to the annonymous
@@ -58,6 +59,34 @@
             "_TLOG_", #_a_str_to_log                            \
         )                                                       \
     )
+_BEGIN_ABC_UTILITY_NS
+
+/*!
+ * @brief Builds the text for a _VLOG: "<name> = <value>".
+ */
+template <typename T>
+[[nodiscard]]
+inline std::u8string
+    make_vlog_string(
+        const std::u8string_view name_arg,
+        const T&                 value_arg
+    )
+{
+    using namespace std;
+    u8string rv{name_arg};
+    rv.append(u8" = ");
+    if constexpr (pnp::default_printable_c<T>)
+    {
+        rv.append(pnp::to_u8string(value_arg));
+    }
+    else
+    {
+        rv.append(u8"[?]");
+    }
+    return rv;
+}
+
+_END_ABC_UTILITY_NS
 /*!
  * @brief Internal macro which processed a VLOG macro. Specifically it calls
  * fmt_format to format the string argument.
@@ -67,19 +96,11 @@
  * @param _a_delete_after_use Whether to delete this variable after its first
  * used.
  */
-#define __ABC_INTERNAL_VLOG(                                  \
-    _a_variable, _a_delete_after_use, _a_str_representation   \
-)                                                             \
-    __ABC_INTERNAL_LOG(                                       \
-        fmt::format(                                          \
-            u8"{0} = {1}",                                    \
-            u8###_a_variable,                                   \
-            abc::utility::printer::default_printer_t<         \
-                std::remove_cvref_t<decltype(_a_variable)>>() \
-                .run_printer(_a_variable)                     \
-        ),                                                    \
-        _a_delete_after_use,                                  \
-        _a_str_representation                                 \
+#define __ABC_INTERNAL_VLOG(variable_arg, delete_after_use_arg, str_rep_arg) \
+    __ABC_INTERNAL_LOG(                                                      \
+        abc::utility::make_vlog_string(u8## #variable_arg, variable_arg),    \
+        delete_after_use_arg,                                                \
+        str_rep_arg                                                          \
     )
 /*!
  * @brief Macro used to log a single variable to an assertion.
@@ -106,4 +127,3 @@
             "_TVLOG_", #_a_var                                  \
         )                                                       \
     )
-

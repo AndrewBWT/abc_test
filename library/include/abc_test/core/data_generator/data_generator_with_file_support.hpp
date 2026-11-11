@@ -61,8 +61,9 @@ private:
     std::size_t _m_mode{0};
     std::vector<utility::io::file_line_writer_with_optional_rw_info_t<
         typename T::generator_type>>
-                                                            _m_file_writers;
-    abc::utility::str::rw_info_t<typename T::tertiary_type> _m_tertiary_rw_info;
+        _m_file_writers;
+    using dg_pnp = typename T::tertiary_pnp;
+//    abc::utility::str::rw_info_t<typename T::tertiary_type> _m_tertiary_rw_info;
 };
 
 template <typename T, typename... Args>
@@ -194,12 +195,29 @@ __constexpr void
             );
             break;
         case 1:
-            _m_object.set_generator_using_tertiary_data(
-                abc::utility::parser::parse_with_exception(
-                    _a_dgme.additional_data, _m_tertiary_rw_info.internal_parser
-                )
-            );
-            break;
+        {
+            const pnp::parse_outcome_with_value<typename T::tertiary_type>
+                parse_result
+                = pnp::try_parse<typename T::tertiary_type, dg_pnp>(
+                    _a_dgme.additional_data
+                );
+            if (parse_result.outcome.succeeded())
+            {
+                _m_object.set_generator_using_tertiary_data(parse_result.value);
+            }
+            else
+            {
+                throw std::runtime_error("Couldn't parse");
+            }
+            // _m_object.set_generator_using_tertiary_data(
+            //    dg_pnp{}
+            //    abc::utility::parser::parse_with_exception(
+            //        _a_dgme.additional_data,
+            //        _m_tertiary_rw_info.internal_parser
+            // )
+            // );
+        }
+        break;
         default:
             throw std::runtime_error("Couldn't work");
         }
@@ -209,12 +227,27 @@ __constexpr void
         switch (_a_dgme.mode)
         {
         case 0:
-            _m_object.set_generator_using_tertiary_data(
-                abc::utility::parser::parse_with_exception(
-                    _a_dgme.additional_data, _m_tertiary_rw_info.internal_parser
-                )
-            );
-            break;
+        {
+            const pnp::parse_outcome_with_value<typename T::tertiary_type>
+                parse_result
+                = pnp::try_parse<typename T::tertiary_type, dg_pnp>(
+                    _a_dgme.additional_data
+                );
+            if (parse_result.outcome.succeeded())
+            {
+                _m_object.set_generator_using_tertiary_data(parse_result.value);
+            }
+            else
+            {
+                throw std::runtime_error("Couldn't parse");
+            }
+        }
+        // _m_object.set_generator_using_tertiary_data(
+        //   abc::utility::parser::parse_with_exception(
+        // _a_dgme.additional_data, _m_tertiary_rw_info.internal_parser
+        // )
+        // );
+        break;
         default:
             throw std::runtime_error("Couldn't work");
         }
@@ -345,9 +378,10 @@ __constexpr ds::dg_memoized_element_t
                 );
                 break;
             case 1:
-                _l_rv = _m_tertiary_rw_info.internal_printer->run_printer(
-                    _m_object.tertiary_data()
-                );
+                _l_rv = pnp::to_u8string<dg_pnp>(_m_object.tertiary_data());
+                // _l_rv = _m_tertiary_rw_info.internal_printer->run_printer(
+                //    _m_object.tertiary_data()
+                // );
                 break;
             default:
                 throw std::runtime_error("Couldn't work");
@@ -373,9 +407,11 @@ __constexpr ds::dg_memoized_element_t
                 }
                 else
                 {
-                    _l_rv = _m_tertiary_rw_info.internal_printer->run_printer(
-                        _m_object.tertiary_data()
-                    );
+                    _l_rv = pnp::to_u8string<dg_pnp>(_m_object.tertiary_data());
+                    // _l_rv =
+                    // _m_tertiary_rw_info.internal_printer->run_printer(
+                    //    _m_object.tertiary_data()
+                    // );
                 }
                 // file_writer_t<generator_type>
                 //_m_object. T.
@@ -392,14 +428,13 @@ __constexpr ds::dg_memoized_element_t
                     }
                     else
                     {
-                        auto ki = _m_tertiary_rw_info.internal_printer->run_printer(
-                            _m_object.tertiary_data()
-                        );
                         _l_writer.write_line(
-                            _m_tertiary_rw_info.internal_printer->run_printer(
-                                _m_object.tertiary_data()
-                            )
+                            pnp::to_u8string<dg_pnp>(_m_object.tertiary_data())
                         );
+                        // _m_tertiary_rw_info.internal_printer->run_printer(
+                        //     _m_object.tertiary_data()
+                        // )
+                        // );
                     }
                 }
                 break;
@@ -407,15 +442,15 @@ __constexpr ds::dg_memoized_element_t
                 throw std::runtime_error("Couldn't work");
             }
         }
-        return dg_memoized_element_t{ _l_mode, _l_rv };
+        return dg_memoized_element_t{_l_mode, _l_rv};
     }
     else
     {
         return dg_memoized_element_t{
-            _m_mode,
-            _m_tertiary_rw_info.internal_printer->run_printer(
-                _m_object.tertiary_data()
-            )
+            _m_mode, pnp::to_u8string<dg_pnp>(_m_object.tertiary_data())
+            // _m_tertiary_rw_info.internal_printer->run_printer(
+            //     _m_object.tertiary_data()
+            // )
         };
     }
 }

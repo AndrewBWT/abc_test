@@ -25,8 +25,40 @@ struct position_data_t
         operator==(const position_data_t&) const noexcept
         = default;
 };
+struct position_data_traits
+{
+    static constexpr std::u8string_view
+        consistent_name() noexcept
+    {
+        return u8"position_data";
+    }
+
+    static constexpr auto
+        to_tuple(
+            const position_data_t&
+            object_arg
+        ) noexcept
+    {
+        return std::tie(object_arg.file_index, object_arg.element_index);
+    }
+};
+
+using position_data_fields_pnp = pnp::support::generic_tuple_pnp<
+    std::tuple<std::size_t, std::size_t>,
+    std::tuple<
+        pnp::support::integer_pnp<std::size_t>,
+        pnp::support::integer_pnp<std::size_t>>>;
+
+struct position_data_pnp
+    : public pnp::object_pnp<
+          position_data_t,
+          position_data_traits,
+          position_data_fields_pnp,
+          position_data_fields_pnp>
+{};
 
 _END_ABC_DG_NS
+#if 0
 _BEGIN_ABC_UTILITY_PRINTER_NS
 
 template <>
@@ -76,6 +108,7 @@ public:
 };
 
 _END_ABC_UTILITY_PARSER_NS
+#endif
 _BEGIN_ABC_DG_NS
 
 namespace detail
@@ -122,6 +155,7 @@ public:
     using file_data_t = std::list<utility::io::general_data_with_rw_info_t<T>>;
     using generator_type = T;
     using tertiary_type  = position_data_t;
+    using tertiary_pnp = position_data_pnp;
     __constexpr const tertiary_type&
         tertiary_data() const;
     __constexpr void
@@ -158,7 +192,6 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
     ) // II. copy constructor
         : _m_files(_a_arg._m_files)
         , _m_position_data(_a_arg._m_position_data)
-        , _m_index_rw_info(_a_arg._m_index_rw_info)
     {
         using namespace _ABC_NS_UTILITY_STR;
         using namespace _ABC_NS_UTILITY_PARSER;
@@ -208,7 +241,6 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
     {
         _m_files             = _a_arg._m_files;
         _m_position_data     = _a_arg._m_position_data;
-        _m_index_rw_info     = _a_arg._m_index_rw_info;
         _m_current_file_data = begin(_m_files);
         advance(_m_current_file_data, _m_position_data.file_index);
         _m_line_reader = utility::io::file_line_reader_t(
@@ -217,6 +249,7 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
         skip_lines(_m_position_data.element_index);
         return *this;
     }
+
     __constexpr void
         reset();
     __constexpr void
@@ -234,7 +267,6 @@ private:
     file_data_t::iterator                         _m_current_file_data;
     position_data_t                               _m_position_data;
     abc::utility::io::file_line_reader_t          _m_line_reader;
-    abc::utility::str::rw_info_t<position_data_t> _m_index_rw_info;
     T                                             _m_element;
 };
 
@@ -305,6 +337,7 @@ __constexpr_imp void
         );
     }
 }
+
 template <typename T>
 template <typename R>
 __constexpr_imp
@@ -586,4 +619,5 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
         initializer_list<T>{}, _a_file_elements...
     );
 }
+
 _END_ABC_NS

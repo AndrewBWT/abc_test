@@ -20,6 +20,12 @@ public:
     using generator_type = T;
     using tertiary_type
         = std::tuple<std::size_t, std::size_t, utility::rng_counter_t>;
+    using tertiary_pnp = pnp::support::generic_tuple_pnp<
+        std::tuple<std::size_t, std::size_t, utility::rng_counter_t>,
+        std::tuple<
+            pnp::support::integer_pnp<std::size_t>,
+            pnp::support::integer_pnp<std::size_t>,
+            pnp::support::integer_pnp<utility::rng_counter_t>>>;
     __constexpr const tertiary_type&
         tertiary_data() const;
     __constexpr void

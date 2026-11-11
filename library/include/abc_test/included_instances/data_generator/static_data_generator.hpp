@@ -15,7 +15,7 @@ class static_data_generator_t
 public:
     using generator_type = T;
     using tertiary_type  = std::size_t;
-
+    using tertiary_pnp = pnp::support::integer_pnp<tertiary_type>;
     __constexpr ~static_data_generator_t();
     template <typename R>
     __constexpr

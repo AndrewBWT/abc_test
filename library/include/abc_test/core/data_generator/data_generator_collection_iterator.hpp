@@ -122,7 +122,8 @@ __constexpr_imp
     using namespace std;
     using namespace ds;
     using namespace errors;
-    invoked_test_data_t& _l_current_test{global::get_this_threads_current_test()};
+    invoked_test_data_t& _l_current_test{global::get_this_threads_current_test()
+    };
     // If this is a repetition.
     if (_l_current_test.post_setup_test_data().has_for_loop_stack_trie())
     {
@@ -249,27 +250,30 @@ template <typename T>
 __constexpr_imp data_generator_collection_iterator_t<T>::reference
                 data_generator_collection_iterator_t<T>::operator*() const
 {
-    if (at_end_of_iterator()
-        || (*_m_this_iterator)->has_current_element() == false)
+    using namespace std;
+    if (at_end_of_iterator() || not (*_m_this_iterator)->has_current_element())
     {
-        throw std::runtime_error("Could not deference iterator");
+        throw runtime_error("Could not deference iterator");
     }
     else
     {
-        auto&     _l_this_iterator_ref{*_m_this_iterator};
-        reference _l_current_element{_l_this_iterator_ref->current_element()};
+        auto&     this_itt_ref    = *_m_this_iterator;
+        reference current_element = this_itt_ref->current_element();
+        u8string  value_as_Str;
+        if constexpr (pnp::default_printable_c<T>)
+        {
+            value_as_Str = pnp::to_u8string(current_element);
+        }
+        else
+        {
+            value_as_Str = u8"<no default printer for this type>";
+        }
         _m_log_msg = logging::log_msg_t(
             ds::single_source_t(),
-            fmt::format(
-                u8"{0} = {1}",
-                u8"data generator's value",
-                abc::utility::printer::default_printer_t<
-                    std::remove_cvref_t<decltype(_l_current_element)>>()
-                    .run_printer(_l_current_element)
-            ),
+            u8"data generator's value = " + value_as_Str,
             false
         );
-        return _l_current_element;
+        return current_element;
     }
 }
 

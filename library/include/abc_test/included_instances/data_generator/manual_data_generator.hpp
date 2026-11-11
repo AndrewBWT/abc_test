@@ -22,6 +22,7 @@ struct manual_data_generator_t
 {
 public:
     using tertiary_type = std::size_t;
+    using tertiary_pnp = pnp::support::integer_pnp<tertiary_type>;
     /*!
      * Default constructor for the manual_for_loop_t object.
      */

@@ -5,6 +5,7 @@
 #include "abc_test/included_instances/data_generator/combinatorics_data_generator/permutations_generator.hpp"
 
 #include <unordered_set>
+#include <pnp/support/internal/core_language/integers.hpp>
 
 _BEGIN_ABC_DG_NS
 
@@ -24,6 +25,7 @@ class combinatorics_data_generator_t
 public:
     using generator_type = combinatorics_return_type<T>;
     using tertiary_type  = std::size_t;
+    using tertiary_pnp = pnp::support::integer_pnp<tertiary_type>;
     __constexpr
     combinatorics_data_generator_t(
         const std::vector<T>&         _a_elements,
