@@ -14,8 +14,7 @@
 #include <set>
 #include <unordered_set>
 
-_BEGIN_ABC_UTILITY_PRINTER_NS
-
+#if 0
 template <typename T>
 struct default_printer_t : public printer_base_t<T>
 {
@@ -1699,3 +1698,4 @@ struct hex_printer : public printer_base_t<T>
 };
 
 _END_ABC_UTILITY_PRINTER_NS
+#endif

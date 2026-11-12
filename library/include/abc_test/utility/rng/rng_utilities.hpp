@@ -8,11 +8,13 @@ _BEGIN_ABC_UTILITY_NS
 /*!
  * @brief Type synonym for a seed type in abc_test.
  */
-using seed_t                 = std::vector<uint32_t>;
+using seed_t   = std::vector<uint32_t>;
+using seed_pnp = pnp::support::
+    generic_sequence_pnp<seed_t, pnp::support::integer_pnp<uint32_t>>;
 /*!
  * @brief A type synonym for a random generator counter. This allows the
- * developer to base a random generaotr around this value. It will incrmeent by
- * 1 each time a RNG is called. By basing an RNG around this value, more
+ * developer to base a random generaotr around this value. It will incrmeent
+ * by 1 each time a RNG is called. By basing an RNG around this value, more
  * complicated objects can be created at higher counter values.
  */
 using rng_counter_t          = std::size_t;

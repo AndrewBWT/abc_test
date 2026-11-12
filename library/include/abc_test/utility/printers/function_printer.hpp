@@ -4,6 +4,7 @@
 
 _BEGIN_ABC_UTILITY_PRINTER_NS
 
+#if 0
 template <typename T, typename F>
 requires std::is_invocable_r_v<std::u8string, F, const T&>
 struct function_printer_t : public printer_base_t<T>
@@ -46,4 +47,5 @@ __constexpr std::u8string
 {
     return std::invoke_r<std::u8string>(_m_callable, _a_object);
 }
+#endif
 _END_ABC_UTILITY_PRINTER_NS

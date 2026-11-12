@@ -162,10 +162,9 @@ __constexpr_imp std::u8string
     using namespace std;
     u8string _l_rv{u8"[?]"};
     using Stripped_Type = typename std::remove_cvref<T>::type;
-    if constexpr (abc::utility::printer::default_printable<Stripped_Type>)
+    if constexpr (pnp::default_printable_c<Stripped_Type>)
     {
-        _l_rv = abc::utility::printer::default_printer<Stripped_Type>()
-                    ->run_printer(_a_element);
+        _l_rv = pnp::to_u8string(_a_element);
     }
     else if constexpr (fmt::formattable<T>)
     {

@@ -18,10 +18,10 @@
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_thrown_non_descript_entity.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter.hpp"
 #include "abc_test/utility/rng.hpp"
-#include <pnp/support/internal/std/variant.hpp>
 
 #include <fmt/color.h>
 #include <pnp/core.hpp>
+#include <pnp/support/internal/std/variant.hpp>
 _BEGIN_ABC_REPORTERS_NS
 
 class print_config_t
@@ -521,12 +521,17 @@ __no_constexpr_imp std::u8string
     using namespace abc::utility::printer;
     using namespace utility;
     using namespace std;
-    return quote(print(
-        _a_seed,
-        default_printer<variant<unsigned int, seed_t>>(
-            variant_print_parse_e::no_indexes
-        )
-    ));
+    using namespace pnp;
+    using namespace pnp::support;
+    using seed_variant_t = std::variant<unsigned int, seed_t>;
+    using seed_pnp_t     = pnp::support::generic_variant_pnp<
+            seed_variant_t,
+            std::tuple<
+                pnp::support::integer_pnp<unsigned int>,
+                pnp::support::generic_sequence_pnp<
+                    seed_t,
+                    pnp::support::integer_pnp<uint32_t>>>>;
+    return quote(pnp::to_u8string<seed_pnp_t>(_a_seed));
 }
 
 __no_constexpr_imp std::u8string
@@ -1532,12 +1537,14 @@ __no_constexpr_imp std::u8string
                 ? u8"single integer"
                 : u8"vector of integers",
             pnp::to_u8string<pnp::support::generic_variant_pnp<
-            variant<unsigned int, seed_t>,
-            std::tuple<
-            pnp::support::integer_pnp<unsigned int>,
-            pnp::support::generic_sequence_pnp<
-            seed_t,
-            pnp::support::integer_pnp<uint32_t>>>>>(_l_complete_global_seed)
+                variant<unsigned int, seed_t>,
+                std::tuple<
+                    pnp::support::integer_pnp<unsigned int>,
+                    pnp::support::generic_sequence_pnp<
+                        seed_t,
+                        pnp::support::integer_pnp<uint32_t>>>>>(
+                _l_complete_global_seed
+            )
         );
     }
 }

@@ -24,7 +24,7 @@ public:
         run_printer(const T& _a_parse_input) const
         = 0;
 };
-
+#if 0
 template <typename T>
 __constexpr_imp std::u8string
                 print(
@@ -36,9 +36,10 @@ __constexpr_imp std::u8string
 template <typename T>
 __constexpr abc::utility::printer::printer_t<typename T::value_type>
             mk_printer(const T& _a_printer_base) noexcept;
+#endif
 _END_ABC_UTILITY_PRINTER_NS
 _BEGIN_ABC_UTILITY_PRINTER_NS
-
+#if 0
 template <typename T>
 __constexpr_imp std::u8string
                 print(
@@ -48,7 +49,6 @@ __constexpr_imp std::u8string
 {
     return _a_printer->run_printer(_a_object);
 }
-
 template <typename T>
 __constexpr abc::utility::printer::printer_t<typename T::value_type>
             mk_printer(
@@ -58,5 +58,5 @@ __constexpr abc::utility::printer::printer_t<typename T::value_type>
     using namespace std;
     return make_shared<T>(_a_printer_base);
 }
-
+#endif
 _END_ABC_UTILITY_PRINTER_NS

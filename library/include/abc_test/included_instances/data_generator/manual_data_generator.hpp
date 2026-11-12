@@ -22,7 +22,7 @@ struct manual_data_generator_t
 {
 public:
     using tertiary_type = std::size_t;
-    using tertiary_pnp = pnp::support::integer_pnp<tertiary_type>;
+    using tertiary_pnp  = pnp::support::integer_pnp<tertiary_type>;
     /*!
      * Default constructor for the manual_for_loop_t object.
      */
@@ -68,12 +68,15 @@ __no_constexpr_imp
           0,
         ds::dgc_memoized_element_t{ 0,
           ds::dg_memoized_element_t{0,
-        abc::utility::printer::print(0) } }
-      ))
+                            pnp::to_u8string<pnp::support::integer_pnp<size_t>>(
+                        0uz
+                            )} }))
 {
     using namespace global;
     using namespace ds;
-    this->_m_flid = data_generator_memoized_element_t{ 0, abc::utility::printer::print(_m_idx) };
+    this->_m_flid = data_generator_memoized_element_t{
+        0, pnp::to_u8string<pnp::support::integer_pnp<size_t>>(_m_idx)
+    };
     this->_m_repeat_flid = this->_m_flid;
     invoked_test_data_t& _l_current_test{get_this_threads_current_test()};
     _l_current_test.increment_for_loop_stack(*this);
@@ -103,7 +106,9 @@ __no_constexpr_imp manual_data_generator_t&
     using namespace ds;
     typeless_data_generator_collection_iterator_t::reset();
     _m_idx++;
-    this->_m_flid = data_generator_memoized_element_t{ 0, abc::utility::printer::print(_m_idx) };
+    this->_m_flid = data_generator_memoized_element_t{
+        0, pnp::to_u8string<pnp::support::integer_pnp<size_t>>(_m_idx)
+    };
     this->_m_repeat_flid = this->_m_flid;
     invoked_test_data_t& _l_current_test{get_this_threads_current_test()};
     _l_current_test.update_for_loop_stack(*this);
@@ -129,7 +134,7 @@ __constexpr ds::dg_memoized_element_t
         const bool _a_get_data_for_repeating
     ) const noexcept
 {
-    return {0, abc::utility::printer::print(_m_idx)};
+    return {0, pnp::to_u8string<pnp::support::integer_pnp<size_t>>(_m_idx)};
 }
 
 _END_ABC_NS

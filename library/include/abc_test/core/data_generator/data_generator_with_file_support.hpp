@@ -63,7 +63,8 @@ private:
         typename T::generator_type>>
         _m_file_writers;
     using dg_pnp = typename T::tertiary_pnp;
-//    abc::utility::str::rw_info_t<typename T::tertiary_type> _m_tertiary_rw_info;
+    // abc::utility::str::rw_info_t<typename T::tertiary_type>
+    // _m_tertiary_rw_info;
 };
 
 template <typename T, typename... Args>
@@ -373,7 +374,7 @@ __constexpr ds::dg_memoized_element_t
             switch (_m_mode)
             {
             case 0:
-                _l_rv = utility::printer::print<size_t>(
+                _l_rv = pnp::to_u8string<pnp::support::integer_pnp<size_t>>(
                     _m_file_read_writer.get_file_position()
                 );
                 break;
@@ -392,7 +393,7 @@ __constexpr ds::dg_memoized_element_t
             switch (_m_mode)
             {
             case 0:
-                _l_rv = utility::printer::print<size_t>(
+                _l_rv = pnp::to_u8string<pnp::support::integer_pnp<size_t>>(
                     _m_file_read_writer.get_file_position()
                 );
                 break;
@@ -401,7 +402,7 @@ __constexpr ds::dg_memoized_element_t
                         .individual_io_based_test_options.write_data_to_files)
                 {
                     _l_mode = 0;
-                    _l_rv   = utility::printer::print<size_t>(
+                    _l_rv = pnp::to_u8string<pnp::support::integer_pnp<size_t>>(
                         _m_file_read_writer.write_data_to_file(_m_object)
                     );
                 }
