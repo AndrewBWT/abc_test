@@ -18,6 +18,7 @@
 #include "abc_test/included_instances/reporters/text_test_reporter/enum_fields/unexpected_thrown_non_descript_entity.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter/list_formatter.hpp"
 #include "abc_test/utility/rng.hpp"
+#include <pnp/support/internal/std/variant.hpp>
 
 #include <fmt/color.h>
 #include <pnp/core.hpp>
@@ -562,9 +563,13 @@ __no_constexpr_imp std::u8string
         using namespace abc::utility::printer;
         return fmt::format(
             u8"{0}",
-            default_printer_t<variant<unsigned int, seed_t>>().run_printer(
-                _a_seed.value()
-            )
+            pnp::to_u8string<pnp::support::generic_variant_pnp<
+                variant<unsigned int, seed_t>,
+                std::tuple<
+                    pnp::support::integer_pnp<unsigned int>,
+                    pnp::support::generic_sequence_pnp<
+                        seed_t,
+                        pnp::support::integer_pnp<uint32_t>>>>>(_a_seed.value())
         );
     }
 }
@@ -1526,9 +1531,13 @@ __no_constexpr_imp std::u8string
             holds_alternative<unsigned int>(_l_complete_global_seed)
                 ? u8"single integer"
                 : u8"vector of integers",
-            default_printer_t<variant<unsigned int, seed_t>>{}.run_printer(
-                _l_complete_global_seed
-            )
+            pnp::to_u8string<pnp::support::generic_variant_pnp<
+            variant<unsigned int, seed_t>,
+            std::tuple<
+            pnp::support::integer_pnp<unsigned int>,
+            pnp::support::generic_sequence_pnp<
+            seed_t,
+            pnp::support::integer_pnp<uint32_t>>>>>(_l_complete_global_seed)
         );
     }
 }

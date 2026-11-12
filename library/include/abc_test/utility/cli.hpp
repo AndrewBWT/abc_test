@@ -17,6 +17,7 @@
 #include <optional>
 #include <string>
 #include <variant>
+#include <pnp/support/internal/core_language/bool.hpp>
 
 _BEGIN_ABC_UTILITY_CLI_NS
 
@@ -54,7 +55,6 @@ public:
             std::function<T&(Option_Class&)>            _a_member_var,
             cli_results_t&                              _a_cli_results,
             const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs
-            = cli_argument_processing_info_t<T, U>{}
         ) noexcept;
     template <typename T, typename U>
     __no_constexpr void
@@ -63,7 +63,6 @@ public:
             std::function<T&(Option_Class&)>            _a_member_var,
             cli_results_t&                              _a_cli_results,
             const cli_argument_processing_info_t<T, U>& _a_cli_processing_funcs
-            = cli_argument_processing_info_t<T, U>{}
         ) noexcept;
     __no_constexpr void
         add_help_flag() noexcept;
@@ -945,10 +944,11 @@ __no_constexpr_imp void
         };
         _l_output.open(_l_new_path, ios::app);
     }
-    u8string _l_printed_str{
-        abc::utility::printer::default_printer_t<pair<bool, size_t>>{}
-            .run_printer(make_pair(_a_test_success, _l_next_index))
-    };
+    u8string _l_printed_str = pnp::to_u8string<pnp::support::generic_tuple_pnp<
+        pair<bool, size_t>,
+        tuple<pnp::support::bool_pnp<>, pnp::support::integer_pnp<std::size_t>>>>(
+        make_pair(_a_test_success, _l_next_index)
+    );
     _l_output << cast_string_view<char>(
         _a_option_class.cli_test_options.autofile_metadata_string
     ) << "_" << string(_l_printed_str.begin(), _l_printed_str.end())
@@ -1015,7 +1015,7 @@ __no_constexpr_imp std::optional<std::string>
     string _l_unprocessed_line;
     while (getline(_a_fstream, _l_unprocessed_line))
     {
-        u8string _l_line{ cast_string_view<char8_t>(_l_unprocessed_line)};
+        u8string _l_line{cast_string_view<char8_t>(_l_unprocessed_line)};
         if (_l_line.starts_with(_a_str_to_find))
         {
             return _l_unprocessed_line;

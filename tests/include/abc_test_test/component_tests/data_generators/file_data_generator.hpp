@@ -115,10 +115,8 @@ _TEST_CASE(
     vector<int> _l_elements = {1, 2, 3, 54, 100};
     for (auto& _l_element : _l_elements)
     {
-        _l_out << cast_string_view<char>(
-            abc::utility::printer::default_printer_t<int>{}.run_printer(
-                _l_element
-            )
+        _l_out << pnp::to_native_string<pnp::support::integer_pnp<int>>(
+            _l_element
         ) << std::endl;
     }
     _l_out.close();
@@ -218,10 +216,8 @@ _TEST_CASE(
     vector<int> _l_elements = {1, 2, 3, 54, 100};
     for (auto& _l_element : _l_elements)
     {
-        _l_out << cast_string_view<char>(
-            abc::utility::printer::default_printer_t<int>{}.run_printer(
-                _l_element
-            )
+        _l_out << pnp::to_native_string<pnp::support::integer_pnp<int>>(
+            _l_element
         ) << std::endl;
     }
     _l_out.close();
@@ -259,7 +255,8 @@ _TEST_CASE(
                u8"reading "
                u8"general data file "
                u8"\"\\\\?\\G:\\MyProjects\\cpp\\git_projects\\abc_"
-               "test\\build\\vs2026-msvc\\tests\\path\\name\\test_file_4.gd\" at line 2. "
+               "test\\build\\vs2026-msvc\\tests\\path\\name\\test_file_4.gd\" "
+               "at line 2. "
                u8"The parser reported the following error:",
                u8"Parser expected to see either \"true\" or \"false\", however "
                u8"these UTF8 strings were not found. "

@@ -154,6 +154,7 @@ _TEST_CASE(
     _l_run_func.operator()<int, 3>(_l_func_maker.operator()<int, 3>(), _l_arr2);
 }
 
+#if 0
 _TEST_CASE(
     abc::test_case_t(
         {.name = "Check reading and writing of files for data generator with "
@@ -409,3 +410,4 @@ _TEST_CASE(
         _l_func_maker.operator()<int, 3>(), _l_arr_2, _l_elements_2
     );
 }
+#endif

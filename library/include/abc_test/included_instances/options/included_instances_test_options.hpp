@@ -4,6 +4,8 @@
 #include "abc_test/included_instances/reporters/text_error_reporter.hpp"
 #include "abc_test/included_instances/reporters/text_test_reporter.hpp"
 
+#include <pnp/support/user_types/enum.hpp>
+
 _BEGIN_ABC_NS
 
 enum class console_output_e
@@ -12,10 +14,10 @@ enum class console_output_e
     coloured_output,
     monochrome_output
 };
+
 template <>
 inline auto
-utility::get_enum_list() noexcept -> utility::enum_list_t<
-    console_output_e>
+    utility::get_enum_list() noexcept -> utility::enum_list_t<console_output_e>
 {
     using enum console_output_e;
     return {
@@ -24,6 +26,22 @@ utility::get_enum_list() noexcept -> utility::enum_list_t<
         _ENUM_LIST_ENTRY(monochrome_output)
     };
 }
+
+_END_ABC_NS
+PNP_NS_BEGIN
+
+template <>
+struct enum_list<abc::console_output_e>
+{
+    static constexpr enum_element<abc::console_output_e> values[] = {
+        {abc::console_output_e::no_output,         u8"no_output"        },
+        {abc::console_output_e::coloured_output,   u8"coloured_output"  },
+        {abc::console_output_e::monochrome_output, u8"monochrome_output"},
+    };
+};
+
+PNP_NS_END
+_BEGIN_ABC_NS
 
 struct included_instances_test_options_t : public test_options_base_t
 {
@@ -37,12 +55,14 @@ public:
     std::vector<std::pair<std::filesystem::path, bool>>
         text_error_reporter_file_names;
 public:
-    __no_constexpr virtual void pre_validation_process() noexcept override;
-    __no_constexpr virtual void post_validation_process() noexcept override;
+    __no_constexpr virtual void
+        pre_validation_process() noexcept override;
+    __no_constexpr virtual void
+        post_validation_process() noexcept override;
 protected:
-    __no_constexpr virtual void validate_(
-        std::vector<std::u8string>& _a_error_ref
-    ) const noexcept override;
+    __no_constexpr virtual void
+        validate_(std::vector<std::u8string>& _a_error_ref
+        ) const noexcept override;
 };
 
 namespace
@@ -73,7 +93,8 @@ struct fmt::formatter<abc::included_instances_test_options_t>
 };
 
 _BEGIN_ABC_NS
-__no_constexpr_imp void included_instances_test_options_t::pre_validation_process() noexcept
+__no_constexpr_imp void
+    included_instances_test_options_t::pre_validation_process() noexcept
 {
     using namespace _ABC_NS_REPORTERS;
     using namespace std;
@@ -84,10 +105,14 @@ __no_constexpr_imp void included_instances_test_options_t::pre_validation_proces
     case no_output:
         break;
     case coloured_output:
-        group_test_options.error_reporters.push_back(make_shared<text_error_reporter_t>(true));
+        group_test_options.error_reporters.push_back(
+            make_shared<text_error_reporter_t>(true)
+        );
         break;
     case monochrome_output:
-        group_test_options.error_reporters.push_back(make_shared<text_error_reporter_t>(false));
+        group_test_options.error_reporters.push_back(
+            make_shared<text_error_reporter_t>(false)
+        );
         break;
     }
     switch (use_text_test_reporter_to_cout)
@@ -95,36 +120,44 @@ __no_constexpr_imp void included_instances_test_options_t::pre_validation_proces
     case no_output:
         break;
     case coloured_output:
-        group_test_options.test_reporters.push_back(make_shared<text_test_reporter_t>(true));
+        group_test_options.test_reporters.push_back(
+            make_shared<text_test_reporter_t>(true)
+        );
         break;
     case monochrome_output:
-        group_test_options.test_reporters.push_back(make_shared<text_test_reporter_t>(false));
+        group_test_options.test_reporters.push_back(
+            make_shared<text_test_reporter_t>(false)
+        );
         break;
     }
     test_options_base_t::pre_validation_process();
 }
-__no_constexpr_imp void included_instances_test_options_t::post_validation_process() noexcept
+
+__no_constexpr_imp void
+    included_instances_test_options_t::post_validation_process() noexcept
 {
     test_options_base_t::post_validation_process();
 }
-__no_constexpr_imp void included_instances_test_options_t::validate_(
-    std::vector<std::u8string>& _a_error_ref
-) const noexcept
+
+__no_constexpr_imp void
+    included_instances_test_options_t::validate_(
+        std::vector<std::u8string>& _a_error_ref
+    ) const noexcept
 {
     using namespace std;
     using namespace std::filesystem;
-    vector<path> _l_error_files{ check_files(
-    _a_error_ref,
-    text_error_reporter_file_names,
-    group_test_options.error_root_path,
-    "text_error_reporter_t"
-) };
-    vector<path> _l_test_files{ check_files(
+    vector<path> _l_error_files{check_files(
+        _a_error_ref,
+        text_error_reporter_file_names,
+        group_test_options.error_root_path,
+        "text_error_reporter_t"
+    )};
+    vector<path> _l_test_files{check_files(
         _a_error_ref,
         text_test_reporter_file_names,
         group_test_options.reports_root_path,
         "text_test_reporter_t"
-    ) };
+    )};
     test_options_base_t::validate_(_a_error_ref);
 }
 
@@ -224,7 +257,7 @@ __no_constexpr_imp auto
         make_test_options_base_member_variables_fmt(_a_rtd),
         "use_text_test_reporter_to_cout",
         "hi",
-       // _a_rtd.use_text_test_reporter_to_cout,
+        // _a_rtd.use_text_test_reporter_to_cout,
         "use_text_error_reporter_to_cout",
         "hi",
         //_a_rtd.use_text_error_reporter_to_cout,

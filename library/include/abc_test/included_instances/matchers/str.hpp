@@ -8,6 +8,25 @@
 #include <unicode_bridge.hpp>
 
 _BEGIN_ABC_NS
+template <typename T>
+inline std::u8string
+    temporary_default_printer(
+        const T& object_arg
+    )
+{
+    using namespace std;
+    u8string rv;
+    if constexpr (pnp::default_printable_c<T>)
+    {
+        rv = pnp::to_u8string(object_arg);
+    }
+    else
+    {
+        rv = u8"[?]";
+    }
+    return rv;
+}
+
 __no_constexpr matcher_t
     c_str_equal(const char* _a_str1, const std::string_view _a_str2) noexcept;
 
@@ -24,12 +43,9 @@ __constexpr_imp std::u8string
     const u8string _l_cmp_str{
         (_a_pass) ? matcher::cmp_str<Cmp>() : matcher::not_cmp_str<Cmp>()
     };
-    return fmt::format(
-        u8"{0} {1} {2}",
-        default_printer_t<T1>{}.run_printer(_a_arg1),
-        _l_cmp_str,
-        default_printer_t<T2>{}.run_printer(_a_arg2)
-    );
+    const u8string t1_as_str = temporary_default_printer(_a_arg1);
+    const u8string t2_as_str = temporary_default_printer(_a_arg2);
+    return fmt::format(u8"{0} {1} {2}", t1_as_str, _l_cmp_str, t2_as_str);
 }
 
 template <typename R1, typename R2, abc::matcher::comparison_enum_t Cmp>
@@ -107,9 +123,7 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
             positive_integer_to_placement(_a_argument_idx),
             positive_integer_to_placement(_a_idx),
             _a_argument_idx,
-            default_printer_t<basic_string<T>>{u8""}.run_printer(
-                make_focused_string(_a_str, _a_idx)
-            )
+            temporary_default_printer(_a_str)
         );
     };
     auto _l_func_add_types_to_explanation_str = [&]()
@@ -341,6 +355,10 @@ __constexpr_imp std::pair<bool, std::vector<std::u8string>>
 }
 
 template <typename R1, typename R2>
+requires std::same_as<
+             std::ranges::range_value_t<R1>,
+             std::ranges::range_value_t<R2>>
+         && unicode_bridge::is_char_type_c<std::ranges::range_value_t<R1>>
 __constexpr_imp matcher_t
     strings_equal(
         R1&& _a_range_1,
@@ -384,8 +402,8 @@ __constexpr_imp matcher_t
                 true,
                 fmt::format(
                     u8"{0} == {1}",
-                    default_printer_t<R1_Type>{}.run_printer(_a_range_1),
-                    default_printer_t<R2_Type>{}.run_printer(_a_range_2)
+                    temporary_default_printer(_a_range_1),
+                    temporary_default_printer(_a_range_2)
                 )
             ));
         }
@@ -412,8 +430,8 @@ __constexpr_imp matcher_t
                 true,
                 fmt::format(
                     u8"{0} == {1}",
-                    default_printer_t<R1_Type>{}.run_printer(_a_range_1),
-                    default_printer_t<R2_Type>{}.run_printer(_a_range_2)
+                    temporary_default_printer(_a_range_1),
+                    temporary_default_printer(_a_range_2)
                 )
             ));
         }
@@ -426,14 +444,10 @@ __constexpr_imp matcher_t
             u8"right argument's index {0} = {2}. The surrounding string of the "
             u8"left and right arguments are \"...{3}...\" and \"...{4}...\"",
             _l_idx,
-            default_printer_t<T>{}.run_printer(*_l_itt_1),
-            default_printer_t<T>{}.run_printer(*_l_itt_2),
-            default_printer_t<R1_Type>{u8""}.run_printer(
-                make_focused_string(_a_range_1, _l_idx)
-            ),
-            default_printer_t<R2_Type>{u8""}.run_printer(
-                make_focused_string(_a_range_2, _l_idx)
-            )
+            temporary_default_printer(*_l_itt_1),
+            temporary_default_printer(*_l_itt_2),
+            temporary_default_printer(_a_range_1),
+            temporary_default_printer(_a_range_2)
 
         );
     }
@@ -441,8 +455,8 @@ __constexpr_imp matcher_t
         false,
         fmt::format(
             u8"{0} == {1}. {2}.",
-            default_printer_t<R1_Type>{}.run_printer(_a_range_1),
-            default_printer_t<R2_Type>{}.run_printer(_a_range_2),
+            temporary_default_printer(_a_range_1),
+            temporary_default_printer(_a_range_2),
             _l_explanation_str
         )
     ));

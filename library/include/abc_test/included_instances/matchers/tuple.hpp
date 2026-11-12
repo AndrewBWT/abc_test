@@ -66,9 +66,9 @@ public:
             };
             return fmt::format(
                 u8"{0} {1} {2}",
-                default_printer_t<tuple<Ts...>>{}.run_printer(_a_arg1),
+                temporary_default_printer(_a_arg1),
                 _l_cmp_str,
-                default_printer_t<tuple<Ts...>>{}.run_printer(_a_arg2)
+                temporary_default_printer(_a_arg2)
             );
         };
         u8string _l_primary_str;

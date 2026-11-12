@@ -5,6 +5,8 @@
 #include "abc_test/included_instances/test_harness/simple_console_reporter.hpp"
 #include "abc_test/utility/cli.hpp"
 
+#include <pnp/support/internal/std/variant.hpp>
+
 _BEGIN_ABC_NS
 __no_constexpr int
     run_test_suite_using_command_line_args(int argc, char** argv);
@@ -94,7 +96,14 @@ __no_constexpr_imp void
         {
             return _a_to.cli_test_options.show_configuration_explanations;
         },
-        _a_cli_results
+        _a_cli_results,
+        cli_argument_processing_info_t<bool, bool>{
+            .print_func =
+                [](const bool& element_arg)
+            {
+                return pnp::to_u8string<pnp::support::bool_pnp<>>(element_arg);
+            }
+        }
     );
     _a_cli.add_option<bool>(
         _s_global_test_list,
@@ -102,7 +111,14 @@ __no_constexpr_imp void
         {
             return _a_to.glot_aware_test_options.use_global_test_list;
         },
-        _a_cli_results
+        _a_cli_results,
+        cli_argument_processing_info_t<bool, bool>{
+            .print_func =
+                [](const bool& element_arg)
+            {
+                return pnp::to_u8string<pnp::support::bool_pnp<>>(element_arg);
+            }
+        }
     );
     _a_cli.add_option<bool>(
         _s_write_data_to_files,
@@ -110,7 +126,14 @@ __no_constexpr_imp void
         {
             return _a_to.individual_io_based_test_options.write_data_to_files;
         },
-        _a_cli_results
+        _a_cli_results,
+        cli_argument_processing_info_t<bool, bool>{
+            .print_func =
+                [](const bool& element_arg)
+            {
+                return pnp::to_u8string<pnp::support::bool_pnp<>>(element_arg);
+            }
+        }
     );
     _a_cli.add_option<u8string>(
         _s_path_delimiter,
@@ -118,7 +141,14 @@ __no_constexpr_imp void
         {
             return _a_to.group_test_options.path_delimiter;
         },
-        _a_cli_results
+        _a_cli_results,
+        cli_argument_processing_info_t<u8string, u8string>{
+            .print_func =
+                [](const u8string& element_arg)
+            {
+                return element_arg;
+            }
+        }
     );
     _a_cli.add_option<filesystem::path>(
         _s_root_path,
@@ -126,7 +156,14 @@ __no_constexpr_imp void
         {
             return _a_to.individual_io_based_test_options.root_path;
         },
-        _a_cli_results
+        _a_cli_results,
+        cli_argument_processing_info_t<filesystem::path, filesystem::path>{
+            .print_func =
+                [](const filesystem::path& element_arg)
+            {
+                return element_arg.u8string();
+            }
+        }
     );
     _a_cli.add_option<size_t>(
         _s_threads,
@@ -134,7 +171,16 @@ __no_constexpr_imp void
         {
             return _a_to.group_test_options.threads;
         },
-        _a_cli_results
+        _a_cli_results,
+        cli_argument_processing_info_t<size_t, size_t>{
+            .print_func =
+                [](const size_t& element_arg)
+            {
+                return pnp::to_u8string<pnp::support::integer_pnp<size_t>>(
+                    element_arg
+                );
+            }
+        }
     );
     _a_cli.add_option<u8string>(
         _s_comment_str,
@@ -142,7 +188,14 @@ __no_constexpr_imp void
         {
             return _a_to.individual_io_based_test_options.comment_str;
         },
-        _a_cli_results
+        _a_cli_results,
+        cli_argument_processing_info_t<u8string, u8string>{
+            .print_func =
+                [](const u8string& element_arg)
+            {
+                return element_arg;
+            }
+        }
     );
     _a_cli.add_option<u8string>(
         _s_general_data_file_extension,
@@ -151,7 +204,14 @@ __no_constexpr_imp void
             return _a_to.individual_io_based_test_options
                 .general_data_extension;
         },
-        _a_cli_results
+        _a_cli_results,
+        cli_argument_processing_info_t<u8string, u8string>{
+            .print_func =
+                [](const u8string& element_arg)
+            {
+                return element_arg;
+            }
+        }
     );
     _a_cli.add_option<u8string>(
         _s_tertiary_data_file_extension,
@@ -160,7 +220,14 @@ __no_constexpr_imp void
             return _a_to.individual_io_based_test_options
                 .tertiary_data_file_extension;
         },
-        _a_cli_results
+        _a_cli_results,
+        cli_argument_processing_info_t<u8string, u8string>{
+            .print_func =
+                [](const u8string& element_arg)
+            {
+                return element_arg;
+            }
+        }
     );
     _a_cli.add_option<bool>(
         _s_retain_passed_assertions,
@@ -168,7 +235,14 @@ __no_constexpr_imp void
         {
             return _a_to.individual_test_options.retain_passed_assertions;
         },
-        _a_cli_results
+        _a_cli_results,
+        cli_argument_processing_info_t<bool, bool>{
+            .print_func =
+                [](const bool& element_arg)
+            {
+                return pnp::to_u8string<pnp::support::bool_pnp<>>(element_arg);
+            }
+        }
     );
     _a_cli.add_option<size_t>(
         _s_integers_used_for_rng_generation,
@@ -177,7 +251,16 @@ __no_constexpr_imp void
             return _a_to.group_test_options
                 .number_of_integers_used_to_seed_random_generators;
         },
-        _a_cli_results
+        _a_cli_results,
+        cli_argument_processing_info_t<size_t, size_t>{
+            .print_func =
+                [](const size_t& element_arg)
+            {
+                return pnp::to_u8string<pnp::support::integer_pnp<size_t>>(
+                    element_arg
+                );
+            }
+        }
     );
     _a_cli.add_option<
         _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t,
@@ -259,14 +342,21 @@ __no_constexpr_imp void
                 return _a_global_seed.has_value()
                            ? fmt::format(
                                  u8"{}",
-                                 default_printer_t<complete_global_seed_t>{
-                                     variant_print_parse_e::no_indexes
-                                 }
-                                     .run_printer(_a_global_seed.value())
+                                 pnp::to_u8string<
+                                     pnp::support::generic_variant_pnp<
+                                         complete_global_seed_t,
+                                         std::tuple<
+                                             pnp::support::integer_pnp<
+                                                 unsigned int>,
+                                             pnp::support::generic_sequence_pnp<
+                                                 seed_t,
+                                                 pnp::support::integer_pnp<
+                                                     uint32_t>>>>>(
+                                     _a_global_seed.value()
+                                 )
                              )
-                           : fmt::format(
-                                 u8"Global seed not set to appropriate value"
-                             );
+                           : fmt::format(u8"Global seed not set to "
+                                         u8"appropriate value");
             }
         }
     );
@@ -276,7 +366,14 @@ __no_constexpr_imp void
         {
             return _a_to.group_test_options.force_run_all_tests;
         },
-        _a_cli_results
+        _a_cli_results,
+        cli_argument_processing_info_t<bool, bool>{
+            .print_func =
+                [](const bool& element_arg)
+            {
+                return pnp::to_u8string<pnp::support::bool_pnp<>>(element_arg);
+            }
+        }
     );
     _a_cli.add_option<u8string>(
         _s_autofile_name,
@@ -284,7 +381,14 @@ __no_constexpr_imp void
         {
             return _a_to.cli_test_options.autofile_name;
         },
-        _a_cli_results
+        _a_cli_results,
+        cli_argument_processing_info_t<u8string, u8string>{
+            .print_func =
+                [](const u8string& element_arg)
+            {
+                return element_arg;
+            }
+        }
     );
     _a_cli.add_option<size_t>(
         _s_autofile_size,
@@ -292,7 +396,16 @@ __no_constexpr_imp void
         {
             return _a_to.cli_test_options.autofile_size;
         },
-        _a_cli_results
+        _a_cli_results,
+        cli_argument_processing_info_t<size_t, size_t>{
+            .print_func =
+                [](const size_t& element_arg)
+            {
+                return pnp::to_u8string<pnp::support::integer_pnp<size_t>>(
+                    element_arg
+                );
+            }
+        }
     );
     _a_cli.add_option<u8string>(
         _s_repetition_file_metadata_string,
@@ -300,7 +413,14 @@ __no_constexpr_imp void
         {
             return _a_to.cli_test_options.autofile_metadata_string;
         },
-        _a_cli_results
+        _a_cli_results,
+        cli_argument_processing_info_t<u8string, u8string>{
+            .print_func =
+                [](const u8string& element_arg)
+            {
+                return element_arg;
+            }
+        }
     );
     _a_cli.add_option<u8string>(
         _s_tertiary_data_file_extension,
@@ -309,7 +429,14 @@ __no_constexpr_imp void
             return _a_to.individual_io_based_test_options
                 .tertiary_data_file_extension;
         },
-        _a_cli_results
+        _a_cli_results,
+        cli_argument_processing_info_t<u8string, u8string>{
+            .print_func =
+                [](const u8string& element_arg)
+            {
+                return element_arg;
+            }
+        }
     );
     _a_cli.add_auto_configuration();
     _a_cli.add_option<console_output_e>(
@@ -318,7 +445,17 @@ __no_constexpr_imp void
         {
             return _a_to.use_text_test_reporter_to_cout;
         },
-        _a_cli_results
+        _a_cli_results,
+        cli_argument_processing_info_t<console_output_e, console_output_e>{
+            .print_func =
+                [](const console_output_e& element_arg)
+            {
+                return pnp::to_u8string<pnp::PNP_SUPPORT_NAMESPACE::
+                                            listed_enum_pnp<console_output_e>>(
+                    element_arg
+                );
+            }
+        }
     );
     _a_cli.add_multi_element_option<vector<u8string>, u8string>(
         _c_test_paths_to_run,

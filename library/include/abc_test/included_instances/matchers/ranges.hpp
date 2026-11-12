@@ -142,14 +142,20 @@ __constexpr matcher_t
             };
             if (not _l_result.passed())
             {
+                u8string range_as_str;
+                if constexpr (pnp::default_printable_c<Range_Type>)
+                {
+                    range_as_str = pnp::to_u8string(_a_range);
+                }
+                else
+                {
+                    range_as_str = u8"[?]";
+                }
                 return mk_matcher_using_result(matcher_result_t(
                     false,
                     matcher_result_infos_t(
                         fmt::format(
-                            u8"All elements in {0} are not equal.",
-                            abc::utility::printer::default_printer_t<
-                                Range_Type>{}
-                                .run_printer(_a_range)
+                            u8"All elements in {0} are not equal.", range_as_str
                         ),
                         {u8"Element at index {0} not equal to the previous "
                          u8"elements.",
@@ -162,13 +168,20 @@ __constexpr matcher_t
             }
         }
     }
+    u8string range_as_str;
+    if constexpr (pnp::default_printable_c<Range_Type>)
+    {
+        range_as_str = pnp::to_u8string(_a_range);
+    }
+    else
+    {
+        range_as_str = u8"[?]";
+    }
     return mk_matcher_using_result(matcher_result_t(
         true,
-        matcher_result_infos_t(fmt::format(
-            u8"All elements in {0} are equal.",
-            abc::utility::printer::default_printer_t<Range_Type>{}
-                .run_printer(_a_range)
-        ))
+        matcher_result_infos_t(
+            fmt::format(u8"All elements in {0} are equal.", range_as_str)
+        )
     ));
 }
 
