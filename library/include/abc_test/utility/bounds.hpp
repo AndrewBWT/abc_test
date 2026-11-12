@@ -104,7 +104,7 @@ private:
 _END_ABC_UTILITY_NS
 
 _BEGIN_ABC_UTILITY_PRINTER_NS
-
+#if 0
 template <typename T>
 struct default_printer_t<bounds_t<T>> : public printer_base_t<bounds_t<T>>
 {
@@ -126,7 +126,7 @@ struct default_printer_t<bounds_t<T>> : public printer_base_t<bounds_t<T>>
         );
     }
 };
-
+#endif
 _END_ABC_UTILITY_PRINTER_NS
 
 _BEGIN_ABC_UTILITY_NS

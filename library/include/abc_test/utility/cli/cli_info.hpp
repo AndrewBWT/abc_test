@@ -10,6 +10,7 @@
 #include <fmt/core.h>
 #include <functional>
 #include <optional>
+#include <pnp/support/internal/std/reference_wrapper.hpp>
 #include <string>
 #include <vector>
 
@@ -39,6 +40,7 @@ __constexpr std::function<result_t<T>(abc::utility::parser::parser_input_t&)>
     };
 }
 
+#if 0
 template <typename T>
 __constexpr std::function<std::u8string(const T&)>
             make_printer_func() noexcept
@@ -61,7 +63,7 @@ __constexpr std::function<std::u8string(const T&)>
         }
     };
 }
-
+#endif
 template <typename T, typename U>
 __constexpr std::function<std::optional<std::u8string>(T&, const U&)>
             process_value()
@@ -89,8 +91,8 @@ struct cli_argument_processing_info_t
         parser_func = detail::make_parser_func<U>();
     std::function<std::optional<std::u8string>(T&, const U&)>
         process_parsed_value_func = detail::process_value<T, U>();
-    std::function<std::u8string(const T&)> print_func
-        = detail::make_printer_func<T>();
+    std::function<std::u8string(const T&)> print_func;
+    // = detail::make_printer_func<T>();
 };
 
 template <typename Option_Class>
@@ -234,7 +236,11 @@ public:
         print() const noexcept override
     {
         using namespace abc::utility::printer;
-        return default_printer_t<bool>().run_printer(_m_element_to_set.get());
+        return std::make_optional(
+            pnp::to_u8string<pnp::support::generic_reference_wrapper_printer<
+                decltype(_m_element_to_set),
+                pnp::support::bool_pnp<>>>(_m_element_to_set)
+        );
     }
 
     __no_constexpr_imp virtual bool
@@ -263,7 +269,7 @@ public:
     __constexpr
     cli_one_arg_t(
         const cli_option_config_t&                  _a_cli_option_config,
-        std::function<T&(Option_Class&)>                                           _a_member_var,
+        std::function<T&(Option_Class&)>            _a_member_var,
         const cli_argument_processing_info_t<T, U>& _a_processing_info
     ) noexcept
         : cli_info_t<Option_Class>(_a_cli_option_config, 1, 1)
@@ -331,7 +337,7 @@ public:
         }
     }
 private:
-    std::function<T& (Option_Class&)>                                    _m_member_var;
+    std::function<T&(Option_Class&)>     _m_member_var;
     cli_argument_processing_info_t<T, U> _m_processing_info;
 };
 
@@ -341,8 +347,8 @@ class cli_multi_args : public cli_info_t<Option_Class>
 public:
     __constexpr
     cli_multi_args(
-        const cli_option_config_t& _a_cli_option_config,
-        std::function<T&(Option_Class&)>                           _a_member_var,
+        const cli_option_config_t&                  _a_cli_option_config,
+        std::function<T&(Option_Class&)>            _a_member_var,
         const cli_argument_processing_info_t<T, U>& _a_processing_info
     ) noexcept
         : cli_info_t<Option_Class>(
@@ -360,8 +366,9 @@ public:
         ) const noexcept
     {
         using namespace abc::utility::printer;
-        return _m_processing_info.print_func(_m_member_var(
-            const_cast<Option_Class&>(_a_option_class)));
+        return _m_processing_info.print_func(
+            _m_member_var(const_cast<Option_Class&>(_a_option_class))
+        );
     }
 
     __no_constexpr_imp virtual bool
@@ -416,7 +423,7 @@ public:
         return false;
     }
 private:
-    std::function<T&(Option_Class&)>                    _m_member_var;
+    std::function<T&(Option_Class&)>     _m_member_var;
     cli_argument_processing_info_t<T, U> _m_processing_info;
 };
 

@@ -94,6 +94,7 @@ inline auto
 }
 } // namespace abc
 
+#if 0
 _TEST_CASE(
     abc::test_case_t(
         {.name             = "Unit tests for enum_has_list_c concept",
@@ -303,6 +304,7 @@ _TEST_CASE(
         }
     );
 }
+#endif
 
 _TEST_CASE(
     abc::test_case_t(

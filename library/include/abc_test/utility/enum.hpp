@@ -9,13 +9,18 @@
 #include <list>
 #include <map>
 #include <optional>
+#include <pnp/core.hpp>
+#include <pnp/support/internal/sequences.hpp>
+#include <pnp/support/internal/std/string_view.hpp>
+#include <pnp/support/internal/tuple_like.hpp>
+#include <pnp/support/internal/core_language/integers.hpp>
 #include <set>
 #include <vector>
 
 // Forward declarations
 _BEGIN_ABC_UTILITY_PRINTER_NS
-template <typename T>
-struct default_printer_t;
+//template <typename T>
+//struct default_printer_t;
 _END_ABC_UTILITY_PRINTER_NS
 
 _BEGIN_ABC_UTILITY_NS
@@ -928,7 +933,16 @@ __constexpr void
             "The reason the constructor failed is "
             "that {3}.",
             type_id<T>(),
-            default_printer_t<decltype(_l_underlying_enum_list)>{}.run_printer(
+            // vector<pair<underlying_type_t<T>, u8string_view>>
+            pnp::to_u8string<pnp::support::generic_sequence_pnp<
+                decltype(_l_underlying_enum_list),
+                pnp::support::generic_tuple_pnp<
+                    pair<underlying_type_t<T>, u8string_view>,
+                    tuple<
+                        pnp::support::integer_pnp<underlying_type_t<T>>,
+                        pnp::support::generic_string_view_printer<
+                            u8string_view,
+                            pnp::support::string_pnp_default>>>>>(
                 _l_underlying_enum_list
             ),
             type_id<underlying_type_t<T>>(),

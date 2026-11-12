@@ -3,39 +3,39 @@
 #include "abc_test/utility/io/file/general_data.hpp"
 #include "abc_test/utility/str/rw_info.hpp"
 
+#include <pnp/support/internal/std/maps.hpp>
+
 _BEGIN_ABC_UTILITY_IO_NS
 
-template <class Key, class Val>
+template <class Key, class Val, typename Key_Pnp, typename Val_Pnp>
 class file_based_map_t
 {
 public:
     inline file_based_map_t(
-        const std::string                        _a_file_name,
-        const abc::utility::str::rw_info_t<Val>& _a_rw_info
-        = abc::utility::str::rw_info_t<Val>{}
+        const std::string _a_file_name,
+        const Key_Pnp&    key_pnp_arg,
+        const Val_Pnp&    val_pnp_arg
     )
-        : file_based_map_t<Key, Val>(abc::gdf(_a_file_name), _a_rw_info)
+        : file_based_map_t<Key, Val>(
+              abc::gdf(_a_file_name),
+              key_pnp_arg,
+              val_pnp_arg
+          )
     {}
 
     inline file_based_map_t(
-        const abc::utility::io::general_data_t&  _a_gdf,
-        const abc::utility::str::rw_info_t<Val>& _a_rw_info
-        = abc::utility::str::rw_info_t<Val>{}
+        const abc::utility::io::general_data_t& _a_gdf,
+        const Key_Pnp&                          key_pnp_arg,
+        const Val_Pnp&                          val_pnp_arg
     )
         : _m_file_name(_a_gdf.path())
-        , _m_element_printer(abc::utility::printer::default_printer<map_type_t>(
-              abc::utility::printer::default_printer<key_t>(),
-              abc::utility::printer::default_printer<value_t>(
-                  _a_rw_info.internal_printer
-              )
-          ))
-        , _m_element_parser(abc::utility::parser::default_parser<map_type_t>(
-              abc::utility::parser::default_parser<key_t>(),
-              abc::utility::parser::default_parser<value_t>(
-                  _a_rw_info.internal_parser
-              )
-          ))
+        , _key_pnp(key_pnp_arg)
+        , _val_pnp(val_pnp_arg)
+        , _map_element_pnp(typename map_element_pnp::options_type{
+              .elements = std::tuple<Key_Pnp, Val_Pnp>(key_pnp_arg, val_pnp_arg)
+          })
     {
+        //_m_element_parser
         using namespace std;
         using namespace abc::utility::io;
         using namespace abc;
@@ -54,12 +54,11 @@ public:
             {
                 using namespace abc::utility::parser;
                 using namespace _ABC_NS_ERRORS;
-                const parser_result_t<map_type_t> _l_read_element{
-                    parse(_l_flr.current_line(), _m_element_parser)
-                };
-                if (_l_read_element.has_value())
+                const pnp::parse_outcome_with_value<map_type_t> parse_result
+                    = pnp::try_parse(_l_flr.current_line(), _map_element_pnp);
+                if (parse_result.outcome.succeeded())
                 {
-                    const auto& _l_parsed_element{_l_read_element.value()};
+                    const auto& _l_parsed_element = parse_result.value;
                     if (auto _l_finder{_m_inner_map.find(_l_parsed_element.first
                         )};
                         _l_finder == _m_inner_map.end())
@@ -82,11 +81,11 @@ public:
                                 positive_integer_to_placement(_l_line_idx),
                                 _m_file_name.u8string(),
                                 _l_flr.current_line(),
-                                _m_element_printer->run_printer(
-                                    _l_parsed_element
+                                pnp::to_u8string(
+                                    _map_element_pnp, _l_parsed_element
                                 ),
                                 type_id<map_type_t>(),
-                                _m_element_printer->run_printer(*_l_finder)
+                                pnp::to_u8string(_map_element_pnp, *_l_finder)
                             )},
                             false
                         );
@@ -106,7 +105,9 @@ public:
                         _m_file_name.u8string(),
                         type_id<map_type_t>()
                     ));
-                    _l_errors.append_range(_l_read_element.error().errors);
+                    _l_errors.append_range(
+                        parse_result.outcome.parser_error_messages
+                    );
                     throw abc_test_exception_t(_l_errors, false);
                 }
                 _l_flr.get_next_line();
@@ -150,7 +151,7 @@ public:
                         u8"Please ammend the file's entry accordingly.",
                         _m_file_name.u8string(),
                         type_id<key_t>(),
-                        default_printer_t<Key>{}.run_printer(_a_key),
+                        pnp::to_u8string(_key_pnp, _a_key),
                         type_id<value_t>(),
                         type_id<Val>()
                     ))
@@ -163,9 +164,9 @@ public:
             using namespace std;
             using namespace abc::utility::printer;
             auto _l_new_map_element{make_pair(_a_key, nullopt)};
-            _m_flw.write_line(abc::utility::printer::print<map_type_t>(
-                _l_new_map_element, _m_element_printer
-            ));
+            _m_flw.write_line(
+                pnp::to_u8string(_map_element_pnp, _l_new_map_element)
+            );
             _m_inner_map.insert(_l_new_map_element);
             return mk_matcher_using_result(matcher_result_t(
                 false,
@@ -179,7 +180,7 @@ public:
                     u8"value of type {4}.",
                     _m_file_name.u8string(),
                     type_id<key_t>(),
-                    default_printer_t<Key>{}.run_printer(_a_key),
+                    pnp::to_u8string(_key_pnp, _a_key),
                     type_id<value_t>(),
                     type_id<Val>()
                 ))
@@ -190,11 +191,15 @@ private:
     using key_t      = Key;
     using value_t    = std::optional<Val>;
     using map_type_t = std::pair<key_t, value_t>;
-    std::map<key_t, value_t>                     _m_inner_map;
-    std::filesystem::path                        _m_file_name;
-    abc::utility::io::file_line_writer_t         _m_flw;
-    abc::utility::printer::printer_t<map_type_t> _m_element_printer;
-    abc::utility::parser::parser_t<map_type_t>   _m_element_parser;
+    std::map<key_t, value_t>             _m_inner_map;
+    std::filesystem::path                _m_file_name;
+    abc::utility::io::file_line_writer_t _m_flw;
+    Key_Pnp                              _key_pnp;
+    Val_Pnp                              _val_pnp;
+    using map_element_pnp = pnp::support::generic_tuple_pnp<
+        typename map_type_t::value_type,
+        std::tuple<Key_Pnp, Val_Pnp>>;
+    map_element_pnp _map_element_pnp;
 };
 
 _END_ABC_UTILITY_IO_NS
