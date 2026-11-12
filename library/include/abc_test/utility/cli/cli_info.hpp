@@ -87,8 +87,8 @@ __constexpr std::function<std::optional<std::u8string>(T&, const U&)>
 template <typename T, typename U>
 struct cli_argument_processing_info_t
 {
-    std::function<result_t<U>(abc::utility::parser::parser_input_t&)>
-        parser_func = detail::make_parser_func<U>();
+    std::function<pnp::parse_outcome_with_value<U>(const std::u8string_view)>
+        parser_func;
     std::function<std::optional<std::u8string>(T&, const U&)>
         process_parsed_value_func = detail::process_value<T, U>();
     std::function<std::u8string(const T&)> print_func;
@@ -299,15 +299,14 @@ public:
     {
         using namespace std;
         using namespace _ABC_NS_UTILITY_STR;
-        abc::utility::parser::parser_input_t _l_pi(_a_args[0]);
-        if (const result_t<U> _l_parse_result{
-                _m_processing_info.parser_func(_l_pi)
-            };
-            _l_parse_result.has_value())
+        abc::utility::parser::parser_input_t   _l_pi(_a_args[0]);
+        const pnp::parse_outcome_with_value<U> res
+            = _m_processing_info.parser_func(_a_args[0]);
+        if (res.outcome.succeeded())
         {
             if (const optional<u8string> _l_process_okay{
                     _m_processing_info.process_parsed_value_func(
-                        _m_member_var(_a_option_class), _l_parse_result.value()
+                        _m_member_var(_a_option_class), res.value
                     )
                 };
                 _l_process_okay)
@@ -331,7 +330,7 @@ public:
                 u8"Reason: {2}",
                 _a_args[0],
                 type_id<T>(),
-                _l_parse_result.error()
+                res.outcome.parser_error_messages
             ));
             return true;
         }
@@ -384,16 +383,13 @@ public:
         using namespace _ABC_NS_UTILITY_STR;
         for (const u8string_view _l_arg : _a_args)
         {
-            abc::utility::parser::parser_input_t _l_pi(_l_arg);
-            if (const result_t<U> _l_parse_result{
-                    _m_processing_info.parser_func(_l_pi)
-                };
-                _l_parse_result.has_value())
+            const pnp::parse_outcome_with_value<U> res
+                = _m_processing_info.parser_func(_l_arg);
+            if (res.outcome.succeeded())
             {
                 if (const bool _l_process_okay{
                         _m_processing_info.process_parsed_value_func(
-                            _m_member_var(_a_option_class),
-                            _l_parse_result.value()
+                            _m_member_var(_a_option_class), res.value
                         )
                     };
                     _l_process_okay)
@@ -415,7 +411,7 @@ public:
                     u8"Reason: {2}",
                     _l_arg,
                     type_id<T>(),
-                    _l_parse_result.error()
+                    res.outcome.parser_error_messages
                 ));
                 return true;
             }

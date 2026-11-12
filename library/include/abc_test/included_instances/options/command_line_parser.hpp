@@ -5,6 +5,7 @@
 #include "abc_test/included_instances/test_harness/simple_console_reporter.hpp"
 #include "abc_test/utility/cli.hpp"
 
+#include <pnp/support/internal/std/path.hpp>
 #include <pnp/support/internal/std/variant.hpp>
 
 _BEGIN_ABC_NS
@@ -98,6 +99,11 @@ __no_constexpr_imp void
         },
         _a_cli_results,
         cli_argument_processing_info_t<bool, bool>{
+            .parser_func = [](const std::u8string_view _a_input
+                           ) -> pnp::parse_outcome_with_value<bool>
+            {
+                return pnp::try_parse<bool, pnp::support::bool_pnp<>>(_a_input);
+            },
             .print_func =
                 [](const bool& element_arg)
             {
@@ -113,11 +119,16 @@ __no_constexpr_imp void
         },
         _a_cli_results,
         cli_argument_processing_info_t<bool, bool>{
+            .parser_func = [](const std::u8string_view _a_input
+                           ) -> pnp::parse_outcome_with_value<bool>
+            {
+                return pnp::try_parse<bool, pnp::support::bool_pnp<>>(_a_input);
+            },
             .print_func =
                 [](const bool& element_arg)
             {
                 return pnp::to_u8string<pnp::support::bool_pnp<>>(element_arg);
-            }
+            },
         }
     );
     _a_cli.add_option<bool>(
@@ -128,11 +139,16 @@ __no_constexpr_imp void
         },
         _a_cli_results,
         cli_argument_processing_info_t<bool, bool>{
+            .parser_func = [](const std::u8string_view _a_input
+                           ) -> pnp::parse_outcome_with_value<bool>
+            {
+                return pnp::try_parse<bool, pnp::support::bool_pnp<>>(_a_input);
+            },
             .print_func =
                 [](const bool& element_arg)
             {
                 return pnp::to_u8string<pnp::support::bool_pnp<>>(element_arg);
-            }
+            },
         }
     );
     _a_cli.add_option<u8string>(
@@ -143,11 +159,20 @@ __no_constexpr_imp void
         },
         _a_cli_results,
         cli_argument_processing_info_t<u8string, u8string>{
+            .parser_func = [](const std::u8string_view _a_input
+                           ) -> pnp::parse_outcome_with_value<std::u8string>
+            {
+                return pnp::try_parse<
+                    std::u8string,
+                    pnp::support::generic_string_pnp<
+                        std::u8string,
+                        pnp::support::string_pnp_default>>(_a_input);
+            },
             .print_func =
                 [](const u8string& element_arg)
             {
                 return element_arg;
-            }
+            },
         }
     );
     _a_cli.add_option<filesystem::path>(
@@ -158,10 +183,19 @@ __no_constexpr_imp void
         },
         _a_cli_results,
         cli_argument_processing_info_t<filesystem::path, filesystem::path>{
+            .parser_func = [](const std::u8string_view _a_input
+                           ) -> pnp::parse_outcome_with_value<filesystem::path>
+            {
+                return pnp::try_parse<
+                    filesystem::path,
+                    pnp::support::generic_path_pnp<>>(_a_input);
+            },
             .print_func =
                 [](const filesystem::path& element_arg)
             {
-                return element_arg.u8string();
+                return pnp::to_u8string<pnp::support::generic_path_pnp<>>(
+                    element_arg
+                );
             }
         }
     );
@@ -173,6 +207,13 @@ __no_constexpr_imp void
         },
         _a_cli_results,
         cli_argument_processing_info_t<size_t, size_t>{
+            .parser_func = [](const std::u8string_view _a_input
+                           ) -> pnp::parse_outcome_with_value<size_t>
+            {
+                return pnp::try_parse<
+                    std::size_t,
+                    pnp::support::integer_pnp<size_t>>(_a_input);
+            },
             .print_func =
                 [](const size_t& element_arg)
             {
@@ -190,6 +231,16 @@ __no_constexpr_imp void
         },
         _a_cli_results,
         cli_argument_processing_info_t<u8string, u8string>{
+            .parser_func = [](const std::u8string_view _a_input
+                           ) -> pnp::parse_outcome_with_value<std::u8string>
+            {
+                return pnp::try_parse<
+                    std::u8string,
+                    pnp::support::
+                        generic_string_pnp<std::u8string, pnp::support::string_pnp_default>>(
+                    _a_input
+                );
+            },
             .print_func =
                 [](const u8string& element_arg)
             {
@@ -206,6 +257,13 @@ __no_constexpr_imp void
         },
         _a_cli_results,
         cli_argument_processing_info_t<u8string, u8string>{
+            .parser_func = [](const std::u8string_view _a_input
+                           ) -> pnp::parse_outcome_with_value<std::u8string>
+            {
+                return pnp::try_parse<
+                    std::u8string,
+                    pnp::support::generic_string_pnp<std::u8string, pnp::support::string_pnp_default>>(_a_input);
+            },
             .print_func =
                 [](const u8string& element_arg)
             {
@@ -222,6 +280,13 @@ __no_constexpr_imp void
         },
         _a_cli_results,
         cli_argument_processing_info_t<u8string, u8string>{
+            .parser_func = [](const std::u8string_view _a_input
+                           ) -> pnp::parse_outcome_with_value<std::u8string>
+            {
+                return pnp::try_parse<
+                    std::u8string,
+                    pnp::support::generic_string_pnp<std::u8string, pnp::support::string_pnp_default>>(_a_input);
+            },
             .print_func =
                 [](const u8string& element_arg)
             {
@@ -237,6 +302,11 @@ __no_constexpr_imp void
         },
         _a_cli_results,
         cli_argument_processing_info_t<bool, bool>{
+            .parser_func = [](const std::u8string_view _a_input
+                           ) -> pnp::parse_outcome_with_value<bool>
+            {
+                return pnp::try_parse<bool, pnp::support::bool_pnp<>>(_a_input);
+            },
             .print_func =
                 [](const bool& element_arg)
             {
@@ -253,6 +323,13 @@ __no_constexpr_imp void
         },
         _a_cli_results,
         cli_argument_processing_info_t<size_t, size_t>{
+            .parser_func = [](const std::u8string_view _a_input
+                           ) -> pnp::parse_outcome_with_value<std::size_t>
+            {
+                return pnp::try_parse<
+                    std::size_t,
+                    pnp::support::integer_pnp<size_t>>(_a_input);
+            },
             .print_func =
                 [](const size_t& element_arg)
             {
@@ -276,6 +353,13 @@ __no_constexpr_imp void
         cli_argument_processing_info_t<
             _ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t,
             std::u8string>{
+            .parser_func = [](const std::u8string_view _a_input
+                           ) -> pnp::parse_outcome_with_value<std::u8string>
+            {
+                return pnp::try_parse<
+                    std::u8string,
+                    pnp::support::generic_string_pnp<std::u8string, pnp::support::string_pnp_default>>(_a_input);
+            },
             .process_parsed_value_func =
                 [](ds::map_unique_id_to_tdg_collection_stack_trie_t& _a_ref,
                    const u8string&                                   _a_str)
@@ -308,7 +392,7 @@ __no_constexpr_imp void
         }
     );
     using namespace abc::utility;
-    _a_cli.add_option<utility::global_seed_t, utility::global_seed_t>(
+    _a_cli.add_option<utility::global_seed_t, utility::complete_global_seed_t>(
         _s_global_seed,
         [](included_instances_test_options_t& _a_to) -> global_seed_t&
         {
@@ -317,22 +401,20 @@ __no_constexpr_imp void
         _a_cli_results,
         cli_argument_processing_info_t<
             utility::global_seed_t,
-            utility::global_seed_t>{
-            .parser_func = [](utility::parser::parser_input_t& _a_input
-                           ) -> result_t<global_seed_t>
+            utility::complete_global_seed_t>{
+            .parser_func = [](const std::u8string_view _a_input)
+                -> pnp::parse_outcome_with_value<complete_global_seed_t>
             {
-                using namespace utility;
-                using namespace abc::utility::parser;
-                return default_parser_t<variant<unsigned int, seed_t>>{
-                    variant_print_parse_e::no_indexes
-                }
-                    .run_parser(_a_input)
-                    .transform(
-                        [](const variant<unsigned int, seed_t>& _a_varint)
-                        {
-                            return global_seed_t(_a_varint);
-                        }
-                    );
+                return pnp::try_parse<
+                    complete_global_seed_t,
+                    complete_global_seed_pnp>(_a_input);
+            },
+            .process_parsed_value_func =
+                [](global_seed_t&                value_arg,
+                   const complete_global_seed_t& parsed_arg)
+            {
+                value_arg = std::make_optional(parsed_arg);
+                return std::nullopt;
             },
             .print_func =
                 [](const utility::global_seed_t& _a_global_seed)
@@ -342,16 +424,7 @@ __no_constexpr_imp void
                 return _a_global_seed.has_value()
                            ? fmt::format(
                                  u8"{}",
-                                 pnp::to_u8string<
-                                     pnp::support::generic_variant_pnp<
-                                         complete_global_seed_t,
-                                         std::tuple<
-                                             pnp::support::integer_pnp<
-                                                 unsigned int>,
-                                             pnp::support::generic_sequence_pnp<
-                                                 seed_t,
-                                                 pnp::support::integer_pnp<
-                                                     uint32_t>>>>>(
+                                 pnp::to_u8string<complete_global_seed_pnp>(
                                      _a_global_seed.value()
                                  )
                              )

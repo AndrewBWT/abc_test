@@ -2,6 +2,8 @@
 
 #include "abc_test/utility/internal/macros.hpp"
 
+#include <pnp/support/internal/std/optional.hpp>
+#include <pnp/support/internal/std/variant.hpp>
 #include <vector>
 
 _BEGIN_ABC_UTILITY_NS
@@ -17,17 +19,23 @@ using seed_pnp = pnp::support::
  * by 1 each time a RNG is called. By basing an RNG around this value, more
  * complicated objects can be created at higher counter values.
  */
-using rng_counter_t          = std::size_t;
+using rng_counter_t            = std::size_t;
 /*!
  * @brief A type snyonym for a complete global seed - specifically something
  * that can eitehr be initialsied using an unsigned integer or a seed_t object.
  */
-using complete_global_seed_t = std::variant<unsigned int, seed_t>;
+using complete_global_seed_t   = std::variant<unsigned int, seed_t>;
+using complete_global_seed_pnp = pnp::support::generic_variant_pnp<
+    complete_global_seed_t,
+    std::tuple<pnp::support::integer_pnp<unsigned int>, seed_pnp>>;
 /*!
  * @brief A type synonym for a generic global_seed_t. This is either set a
  * complete_global_seed_t, or not set at all.
  */
-using global_seed_t          = std::optional<complete_global_seed_t>;
+using global_seed_t   = std::optional<complete_global_seed_t>;
+using global_seed_pnp = pnp::support::
+    generic_optional_pnp<global_seed_t, complete_global_seed_pnp>;
+
 /*!
  * @brief Creates a complete_global_seed_t from a global_seed_t object.
  *

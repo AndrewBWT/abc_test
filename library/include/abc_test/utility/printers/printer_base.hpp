@@ -6,7 +6,7 @@
 #include <string>
 
 _BEGIN_ABC_UTILITY_PRINTER_NS
-
+#if 0
 template <typename T>
 struct printer_base_t;
 template <typename T>
@@ -24,7 +24,6 @@ public:
         run_printer(const T& _a_parse_input) const
         = 0;
 };
-#if 0
 template <typename T>
 __constexpr_imp std::u8string
                 print(

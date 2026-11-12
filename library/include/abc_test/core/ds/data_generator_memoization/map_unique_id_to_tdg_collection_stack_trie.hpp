@@ -341,6 +341,7 @@ __no_constexpr_imp std::u8string
 _END_ABC_UTILITY_PRINTER_NS
 #endif
 _BEGIN_ABC_UTILITY_PARSER_NS
+#if 0
 __no_constexpr_imp
     result_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>
     default_parser_t<abc::ds::map_unique_id_to_tdg_collection_stack_trie_t>::
@@ -353,7 +354,7 @@ __no_constexpr_imp
         _a_parse_input.get_u8string()
     );
 }
-
+#endif
 _END_ABC_UTILITY_PARSER_NS
 __no_constexpr_imp auto
     fmt::formatter<_ABC_NS_DS::map_unique_id_to_tdg_collection_stack_trie_t>::
