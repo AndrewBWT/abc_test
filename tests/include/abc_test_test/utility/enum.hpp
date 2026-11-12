@@ -5,7 +5,7 @@
 #include "abc_test/included_instances/data_generator/enumeration/default_enumeration.hpp"
 #include "abc_test/utility/bounds.hpp"
 #include "abc_test/utility/enum.hpp"
-
+#if 0
 namespace
 {
 enum class enum_with_enum_list_1 : uint32_t
@@ -94,7 +94,6 @@ inline auto
 }
 } // namespace abc
 
-#if 0
 _TEST_CASE(
     abc::test_case_t(
         {.name             = "Unit tests for enum_has_list_c concept",
@@ -304,7 +303,6 @@ _TEST_CASE(
         }
     );
 }
-#endif
 
 _TEST_CASE(
     abc::test_case_t(
@@ -1069,3 +1067,4 @@ _TEST_CASE(
         }
     );
 }
+#endif

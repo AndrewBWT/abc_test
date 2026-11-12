@@ -25,6 +25,7 @@ struct position_data_t
         operator==(const position_data_t&) const noexcept
         = default;
 };
+
 struct position_data_traits
 {
     static constexpr std::u8string_view
@@ -35,8 +36,7 @@ struct position_data_traits
 
     static constexpr auto
         to_tuple(
-            const position_data_t&
-            object_arg
+            const position_data_t& object_arg
         ) noexcept
     {
         return std::tie(object_arg.file_index, object_arg.element_index);
@@ -155,7 +155,7 @@ public:
     using file_data_t = std::list<utility::io::general_data_with_rw_info_t<T>>;
     using generator_type = T;
     using tertiary_type  = position_data_t;
-    using tertiary_pnp = position_data_pnp;
+    using tertiary_pnp   = position_data_pnp;
     __constexpr const tertiary_type&
         tertiary_data() const;
     __constexpr void
@@ -190,8 +190,7 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
     file_data_generator_t(
         const file_data_generator_t& _a_arg
     ) // II. copy constructor
-        : _m_files(_a_arg._m_files)
-        , _m_position_data(_a_arg._m_position_data)
+        : _m_files(_a_arg._m_files), _m_position_data(_a_arg._m_position_data)
     {
         using namespace _ABC_NS_UTILITY_STR;
         using namespace _ABC_NS_UTILITY_PARSER;
@@ -206,13 +205,13 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
             {
                 skip_lines(_m_position_data.element_index - 1);
             }
-            const parser_result_t<T> _l_parsed_result{parse(
+            const pnp::parse_outcome_with_value<T> res = pnp::try_parse<T>(
                 _m_line_reader.current_line(),
                 (*_m_current_file_data).rw_info().internal_parser
-            )};
-            if (_l_parsed_result.has_value())
+            );
+            if (res.outcome.succeeded())
             {
-                _m_element = _l_parsed_result.value();
+                _m_element = res.value;
             }
             else
             {
@@ -224,8 +223,8 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
                             .path()
                             .u8string(),
                         _m_line_reader.line_number(),
-                        _l_parsed_result.error().errors,
-                        _l_parsed_result.error().index_of_failure,
+                        res.outcome.parser_error_messages,
+                        res.outcome.position,
                         _m_line_reader.current_line()
                     ),
                     false
@@ -263,11 +262,11 @@ __constexpr _ABC_NS_DG::data_generator_collection_t<T>
     __constexpr const T&
         current_element() const;
 private:
-    file_data_t                                   _m_files;
-    file_data_t::iterator                         _m_current_file_data;
-    position_data_t                               _m_position_data;
-    abc::utility::io::file_line_reader_t          _m_line_reader;
-    T                                             _m_element;
+    file_data_t                          _m_files;
+    file_data_t::iterator                _m_current_file_data;
+    position_data_t                      _m_position_data;
+    abc::utility::io::file_line_reader_t _m_line_reader;
+    T                                    _m_element;
 };
 
 namespace detail
@@ -330,11 +329,16 @@ __constexpr_imp void
     }
     if (_a_tertiary_data == _m_position_data)
     {
-        _m_position_data = _a_tertiary_data;
-        _m_element       = abc::utility::parser::parse_with_exception(
+        _m_position_data             = _a_tertiary_data;
+        const pnp::parse_outcome res = pnp::parse(
             _m_line_reader.current_line(),
+            _m_element,
             (*_m_current_file_data).rw_info().internal_parser
         );
+        if (res.failed())
+        {
+            throw std::runtime_error("Failure parsing");
+        }
     }
 }
 
@@ -360,11 +364,9 @@ __constexpr_imp
             _l_flw.write_comment(type_id<T>());
             for (auto&& _l_init_element : _a_init_elements)
             {
-                _l_flw.write_line(
-                    _l_element.rw_info().internal_printer->run_printer(
-                        _l_init_element
-                    )
-                );
+                _l_flw.write_line(pnp::to_u8string(
+                    _l_element.rw_info().internal_printer, _l_init_element
+                ));
             }
         }
     }
@@ -401,13 +403,13 @@ __constexpr_imp void
         if (_m_line_reader.has_current_line())
         {
             ++_m_position_data.element_index;
-            const parser_result_t<T> _l_parsed_result{parse(
+            const pnp::parse_outcome_with_value<T> res = pnp::try_parse<T>(
                 _m_line_reader.current_line(),
                 (*_m_current_file_data).rw_info().internal_parser
-            )};
-            if (_l_parsed_result.has_value())
+            );
+            if (res.outcome.succeeded())
             {
-                _m_element       = _l_parsed_result.value();
+                _m_element       = res.value;
                 _l_found_element = true;
             }
             else
@@ -420,8 +422,8 @@ __constexpr_imp void
                             .path()
                             .u8string(),
                         _m_line_reader.line_number(),
-                        _l_parsed_result.error().errors,
-                        _l_parsed_result.error().index_of_failure,
+                        res.outcome.parser_error_messages,
+                        res.outcome.position,
                         _m_line_reader.current_line()
                     ),
                     false
@@ -474,13 +476,13 @@ __constexpr_imp bool
         if (_m_line_reader.get_next_line())
         {
             ++_m_position_data.element_index;
-            const parser_result_t<T> _l_parsed_result{parse(
+            const pnp::parse_outcome_with_value<T> res = pnp::try_parse<T>(
                 _m_line_reader.current_line(),
                 (*_m_current_file_data).rw_info().internal_parser
-            )};
-            if (_l_parsed_result.has_value())
+            );
+            if (res.outcome.succeeded())
             {
-                _m_element       = _l_parsed_result.value();
+                _m_element       = res.value;
                 _l_element_found = true;
             }
             else
@@ -493,8 +495,8 @@ __constexpr_imp bool
                             .path()
                             .u8string(),
                         _m_line_reader.line_number(),
-                        _l_parsed_result.error().errors,
-                        _l_parsed_result.error().index_of_failure,
+                        res.outcome.parser_error_messages,
+                        res.outcome.position,
                         _m_line_reader.current_line()
                     ),
                     false
@@ -515,13 +517,13 @@ __constexpr_imp bool
             );
             if (_m_line_reader.has_current_line())
             {
-                const parser_result_t<T> _l_parsed_result{parse(
+                const pnp::parse_outcome_with_value<T> res = pnp::try_parse<T>(
                     _m_line_reader.current_line(),
                     (*_m_current_file_data).rw_info().internal_parser
-                )};
-                if (_l_parsed_result.has_value())
+                );
+                if (res.outcome.succeeded())
                 {
-                    _m_element       = _l_parsed_result.value();
+                    _m_element       = res.value;
                     _l_element_found = true;
                 }
                 else
@@ -534,8 +536,8 @@ __constexpr_imp bool
                                 .path()
                                 .u8string(),
                             _m_line_reader.line_number(),
-                            _l_parsed_result.error().errors,
-                            _l_parsed_result.error().index_of_failure,
+                            res.outcome.parser_error_messages,
+                            res.outcome.position,
                             _m_line_reader.current_line()
                         ),
                         false

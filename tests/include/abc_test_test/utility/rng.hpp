@@ -5,6 +5,7 @@
 #include "abc_test_test/testing_utilities/simple_random_generator.hpp"
 #include "abc_test_test/utility/rng/inner_rng_mt19937_64.hpp"
 #include "abc_test_test/utility/rng/rng_utilities.hpp"
+#include <pnp/support.hpp>
 
 namespace
 {

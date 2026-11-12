@@ -12,6 +12,7 @@ requires data_gen::concept_for_data_generator_with_file_support<T>
 class data_generator_file_reader_and_writer_t
 {
 public:
+    constexpr data_generator_file_reader_and_writer_t() = delete;
     __constexpr
     data_generator_file_reader_and_writer_t(
         const T&                                                    _a_object,
@@ -92,17 +93,16 @@ __constexpr std::size_t
     using namespace abc::utility::printer;
     if (_m_opt_rw_info.has_value())
     {
-        _m_line_writer.write_line(
-            _m_opt_rw_info.value().internal_printer->run_printer(
-                _a_element.current_element()
-            )
-        );
+        _m_line_writer.write_line(pnp::to_u8string(
+            _m_opt_rw_info.value().internal_printer,
+            _a_element.current_element()
+        ));
     }
     else
     {
-        _m_line_writer.write_line(default_printer<typename T::tertiary_type>()
-                                      ->run_printer(_a_element.tertiary_data())
-        );
+        _m_line_writer.write_line(pnp::to_u8string<typename T::tertiary_pnp>(
+            _a_element.tertiary_data()
+        ));
     }
 
     return ++_m_elements_read_or_written;
@@ -189,10 +189,14 @@ __constexpr void
     using namespace abc::utility::parser;
     if (_m_opt_rw_info.has_value())
     {
-        _m_element = parse_with_exception(
-            _m_line_reader.current_line(),
+        const pnp::parse_outcome res = pnp::parse(_m_line_reader.current_line(),
+            _m_element,
             _m_opt_rw_info.value().internal_parser
         );
+        if (res.failed())
+        {
+            throw std::runtime_error("Error!");
+        }
     }
     else
     {

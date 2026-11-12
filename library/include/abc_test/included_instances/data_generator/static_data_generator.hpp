@@ -38,7 +38,6 @@ public:
     __constexpr const tertiary_type&
         tertiary_data() const;
 private:
-    abc::utility::str::rw_info_t<std::size_t> _m_rw_info;
     std::size_t                               _m_idx{0};
     T*                                        _m_elements{nullptr};
     std::size_t                               _m_elements_size{0};
@@ -86,7 +85,6 @@ __constexpr_imp static_data_generator_t<T>&
         return *this;
     }
     static_data_generator_t<T> temp(other);
-    std::swap(_m_rw_info, temp._m_rw_info);
     std::swap(_m_idx, temp._m_idx);
     std::swap(_m_elements, temp._m_elements);
     std::swap(_m_elements_size, temp._m_elements_size);
@@ -98,8 +96,7 @@ __constexpr_imp
     static_data_generator_t<T>::static_data_generator_t(
         const static_data_generator_t<T>& other
     ) // II. copy constructor
-    : _m_rw_info(other._m_rw_info)
-    , _m_idx(other._m_idx)
+    :  _m_idx(other._m_idx)
     , _m_elements(new T[other._m_elements_size])
     , _m_elements_size(other._m_elements_size)
 {
