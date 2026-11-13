@@ -189,11 +189,22 @@ __constexpr void
         switch (_a_dgme.mode)
         {
         case 0:
-            _m_file_read_writer.set_data_generator_using_additional_data(
-                abc::utility::parser::parse_with_exception<std::size_t>(
-                    _a_dgme.additional_data
-                )
-            );
+        {
+            const pnp::parse_outcome_with_value<size_t> parse_res
+                = pnp::try_parse<size_t>(
+                    _a_dgme.additional_data, pnp::support::integer_pnp<size_t>{}
+                );
+            if (parse_res.outcome.succeeded())
+            {
+                _m_file_read_writer.set_data_generator_using_additional_data(
+                    parse_res.value
+                );
+            }
+            else
+            {
+                throw std::runtime_error("Error parsing");
+            }
+        }
             break;
         case 1:
         {

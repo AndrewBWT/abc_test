@@ -6,7 +6,7 @@
 
 
 _BEGIN_ABC_UTILITY_PARSER_NS
-
+#if 0
 template <typename T>
 struct parser_base_t
 {
@@ -132,5 +132,5 @@ __constexpr_imp T
         throw abc_test_exception_t(_l_parse_result.error().errors, false);
     }
 }
-
+#endif
 _END_ABC_UTILITY_PARSER_NS

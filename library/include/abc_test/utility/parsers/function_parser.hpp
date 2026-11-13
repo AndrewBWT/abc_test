@@ -3,7 +3,7 @@
 #include "abc_test/utility/parsers/parser_base.hpp"
 
 _BEGIN_ABC_UTILITY_PARSER_NS
-
+#if 0
 template <typename T, typename F>
     requires std::is_invocable_r_v<result_t<T>, F, parser_input_t&>
 struct function_parser_t : public parser_base_t<T>
@@ -42,4 +42,5 @@ function_parser_t<T, F>::run_parser(
 {
     return std::invoke(_m_callable, _a_parse_input);
 }
+#endif
 _END_ABC_UTILITY_PARSER_NS

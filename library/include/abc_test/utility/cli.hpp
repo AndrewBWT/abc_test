@@ -1056,12 +1056,14 @@ __constexpr_imp std::optional<found_data_t>
         }
         if (_l_line_to_get.starts_with(_l_str_to_find))
         {
-            auto _l_res = utility::parser::parse<pair<bool, size_t>>(
-                _l_line_to_get.substr(_l_str_to_find.size())
-            );
-            if (_l_res.has_value())
+            using bs_pair = pair<bool, size_t>;
+            const pnp::parse_outcome_with_value<bs_pair> pare_result =
+                pnp::try_parse<bs_pair>(_l_line_to_get.substr(_l_str_to_find.size()),
+                    pnp::support::generic_tuple_pnp<bs_pair,
+                    std::tuple<pnp::support::bool_pnp<>, pnp::support::integer_pnp<size_t>>>{});
+            if (pare_result.outcome.succeeded())
             {
-                auto& [_l_passed, _l_index]{_l_res.value()};
+                auto& [_l_passed, _l_index] = pare_result.value;
                 if (_a_index.has_value())
                 {
                     if (_a_index.value() == _l_index)

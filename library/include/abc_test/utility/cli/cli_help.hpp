@@ -100,8 +100,9 @@ public:
                 while (getline(_l_config_file, _l_unprocessed_line))
                 {
                     ++_l_line_idx;
-                    u8string _l_line{ cast_string_view<char8_t>(_l_unprocessed_line
-                    )};
+                    u8string _l_line{
+                        cast_string_view<char8_t>(_l_unprocessed_line)
+                    };
                     // Split string into parts. Then process.
                     if (_l_line.size() == 0 || _l_line[0] == char8_t('#'))
                     {
@@ -254,41 +255,42 @@ public:
             enum_auto_configuration_write_to_file_t>
             _l_rep_data{};
         get<0>(_l_rep_data) = _a_args[0];
-        parser_result_t<auto_configuration_load_configuration_t> _l_rfli{
-            parse<auto_configuration_load_configuration_t>(_a_args[1])
-        };
-        parser_result_t<enum_auto_configuration_write_to_file_t> _l_rf{
-            parse<enum_auto_configuration_write_to_file_t>(
+        const pnp::parse_outcome_with_value<
+            auto_configuration_load_configuration_t>
+            load_config_parse_result
+            = pnp::try_parse<auto_configuration_load_configuration_t>(
+                _a_args[1], pnp::auto_configuration_load_configuration_pnp{}
+            );
+        const pnp::parse_outcome_with_value<
+            enum_auto_configuration_write_to_file_t>
+            auto_config_result
+            = pnp::try_parse<enum_auto_configuration_write_to_file_t>(
                 _a_args[2],
-                mk_parser(
-                    default_parser_t<enum_auto_configuration_write_to_file_t>(
-                        enum_helper_string_type_e::lower
-                    )
-                )
-            )
-        };
-        if (not _l_rfli.has_value())
+                pnp::PNP_SUPPORT_NAMESPACE::listed_enum_pnp<
+                    enum_auto_configuration_write_to_file_t>{}
+            );
+        if (load_config_parse_result.outcome.failed())
         {
             _a_cli_results.add_error(fmt::format(
                 u8"Error parsing {0}. Parser reported error: \"{1}\".",
                 type_id<auto_configuration_load_configuration_t>(),
-                _l_rfli.error().errors
+                load_config_parse_result.outcome.parser_error_messages
             ));
             return true;
         }
-        else if (not _l_rf.has_value())
+        else if (auto_config_result.outcome.failed())
         {
             _a_cli_results.add_error(fmt::format(
                 u8"Error parsing {0}. Parser reported error: \"{1}\".",
                 type_id<enum_auto_configuration_write_to_file_t>(),
-                _l_rf.error().errors
+                auto_config_result.outcome.parser_error_messages
             ));
             return true;
         }
         else
         {
-            get<1>(_l_rep_data) = _l_rfli.value();
-            get<2>(_l_rep_data) = _l_rf.value();
+            get<1>(_l_rep_data) = load_config_parse_result.value;
+            get<2>(_l_rep_data) = auto_config_result.value;
             if (const bool _l_terminate{_a_cli.process_repetition_data(
                     _a_option_class, _l_rep_data, _a_cli_results
                 )};

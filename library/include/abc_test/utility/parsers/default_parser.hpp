@@ -15,7 +15,7 @@
 #include <variant>
 
 _BEGIN_ABC_UTILITY_PARSER_NS
-
+#if 0
 template <typename T>
 struct default_parser_t : public parser_base_t<T>
 {
@@ -1722,5 +1722,5 @@ struct hex_parser_t : public parser_base_t<T>
         );
     }
 };
-
+#endif
 _END_ABC_UTILITY_PARSER_NS

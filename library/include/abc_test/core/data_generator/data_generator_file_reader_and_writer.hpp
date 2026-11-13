@@ -189,7 +189,8 @@ __constexpr void
     using namespace abc::utility::parser;
     if (_m_opt_rw_info.has_value())
     {
-        const pnp::parse_outcome res = pnp::parse(_m_line_reader.current_line(),
+        const pnp::parse_outcome res = pnp::parse(
+            _m_line_reader.current_line(),
             _m_element,
             _m_opt_rw_info.value().internal_parser
         );
@@ -200,10 +201,18 @@ __constexpr void
     }
     else
     {
-        _m_object.set_generator_using_tertiary_data(parse_with_exception(
-            _m_line_reader.current_line(),
-            default_parser<typename T::tertiary_type>()
-        ));
+        const pnp::parse_outcome_with_value<typename T::tertiary_type>
+            parse_result = pnp::try_parse<typename T::tertiary_type>(
+                _m_line_reader.current_line(), typename T::tertiary_pnp{}
+            );
+        if (parse_result.outcome.succeeded())
+        {
+            _m_object.set_generator_using_tertiary_data(parse_result.value);
+        }
+        else
+        {
+            throw std::runtime_error("Error parsing");
+        }
     }
 }
 
