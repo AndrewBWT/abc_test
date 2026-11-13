@@ -18,9 +18,9 @@ _BEGIN_ABC_UTILITY_CLI_NS
 template <typename Option_Class>
 class cli_t;
 class cli_output_t;
-
 namespace detail
 {
+#if 0
 template <typename T>
 __constexpr std::function<result_t<T>(abc::utility::parser::parser_input_t&)>
             make_parser_func()
@@ -40,7 +40,6 @@ __constexpr std::function<result_t<T>(abc::utility::parser::parser_input_t&)>
     };
 }
 
-#if 0
 template <typename T>
 __constexpr std::function<std::u8string(const T&)>
             make_printer_func() noexcept
@@ -299,7 +298,6 @@ public:
     {
         using namespace std;
         using namespace _ABC_NS_UTILITY_STR;
-        abc::utility::parser::parser_input_t   _l_pi(_a_args[0]);
         const pnp::parse_outcome_with_value<U> res
             = _m_processing_info.parser_func(_a_args[0]);
         if (res.outcome.succeeded())

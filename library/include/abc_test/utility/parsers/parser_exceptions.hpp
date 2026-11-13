@@ -7,7 +7,7 @@
 #include <string>
 
 _BEGIN_ABC_UTILITY_PARSER_NS
-
+#if 0
 class parser_at_end_of_string_exception_t : public std::runtime_error
 {
 public:
@@ -70,5 +70,5 @@ __no_constexpr_imp
           )))
       )
 {}
-
+#endif
 _END_ABC_UTILITY_PARSER_NS

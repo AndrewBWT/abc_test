@@ -4,7 +4,7 @@
 
 #include <unicode_bridge.hpp>
 _BEGIN_ABC_UTILITY_PARSER_NS
-
+#if 0
 struct parser_input_t
 {
 public:
@@ -564,5 +564,5 @@ __no_constexpr_imp auto
 {
     return _a_val.get_u8string();
 }
-
+#endif
 _END_ABC_UTILITY_PARSER_NS

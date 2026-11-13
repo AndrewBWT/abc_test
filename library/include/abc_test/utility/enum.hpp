@@ -263,13 +263,14 @@ struct enumerate_enum_helper_t
                     const enum_helper_string_type_e _a_enum_string_case
                     = enum_helper_string_type_e::unchanged
                 ) const noexcept(unreachable_does_not_throw_exception);
-
+#if 0
     __constexpr result_t<T>
                 parse_enum(
                     parser::parser_input_t&         _a_parse_input,
                     const enum_helper_string_type_e _a_enum_string_case
                     = enum_helper_string_type_e::unchanged
                 ) const noexcept(unreachable_does_not_throw_exception);
+#endif
     /*!
      * @brief Returns the cardinality of enums of T.
      * @return The number of entities of T.
@@ -663,7 +664,7 @@ __constexpr std::u8string
     };
     return *(_l_idx_to_str_ref.at(_l_idx)[0]);
 }
-
+#if 0
 template <typename T>
 requires enum_has_list_c<T>
 __constexpr result_t<T>
@@ -693,7 +694,7 @@ __constexpr result_t<T>
         type_id<T>()
     ));
 }
-
+#endif
 template <typename T>
 requires enum_has_list_c<T>
 __constexpr std::size_t
