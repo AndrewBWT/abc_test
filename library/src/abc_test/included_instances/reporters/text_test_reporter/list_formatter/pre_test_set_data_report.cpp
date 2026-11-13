@@ -3,7 +3,7 @@
 #include "abc_test/included_instances/options/included_instances_test_options.hpp"
 #include "abc_test/included_instances/options/option_config.hpp"
 #include "abc_test/utility/io/threaded_text_output_reporter.hpp"
-#include "abc_test/utility/printers/default_printer.hpp"
+
 #include "abc_test/utility/rng.hpp"
 
 _BEGIN_ABC_REPORTERS_NS

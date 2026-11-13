@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <optional>
+#include <unordered_set>
 
 _BEGIN_ABC_DG_NS
 

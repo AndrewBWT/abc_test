@@ -173,16 +173,7 @@ if(NOT DEFINED ABC_TEST_LIBRARY_INCLUDED)
     include/abc_test/utility/io/file/file_based_map.hpp
     include/abc_test/utility/io/io_utilities.hpp
     # Utility functions and objects for strings including parsing and printing.
-    include/abc_test/utility/parsers/parser_input.hpp
-    include/abc_test/utility/parsers/parser_exceptions.hpp
-    include/abc_test/utility/parsers/function_parser.hpp
-    include/abc_test/utility/parsers/parser_base.hpp
-    include/abc_test/utility/parsers/default_parser.hpp
-    include/abc_test/utility/printers/function_printer.hpp
-    include/abc_test/utility/printers/printer_base.hpp
-    include/abc_test/utility/printers/default_printer.hpp
     include/abc_test/utility/pnp/hex_pnp.hpp
-    include/abc_test/utility/object_printer_parser.hpp
     include/abc_test/utility/str/print_utils.hpp
     include/abc_test/utility/str/string_utils.hpp
     include/abc_test/utility/ranges.hpp

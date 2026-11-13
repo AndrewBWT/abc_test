@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/utility/internal/macros.hpp"
 #include "abc_test/utility/internal/unreachable.hpp"
-#include "abc_test/utility/parsers/parser_input.hpp"
+
 #include "abc_test/utility/types.hpp"
 
 #include <algorithm>
@@ -905,7 +905,6 @@ __constexpr void
         const std::u8string_view _a_reason
     )
 {
-    using namespace errors;
     using namespace std;
     using namespace _ABC_NS_UTILITY_STR;
     vector<pair<underlying_type_t<T>, u8string_view>> _l_underlying_enum_list;

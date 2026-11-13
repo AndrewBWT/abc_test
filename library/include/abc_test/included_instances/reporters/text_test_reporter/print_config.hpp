@@ -518,7 +518,6 @@ __no_constexpr_imp std::u8string
         const utility::complete_global_seed_t& _a_seed
     ) const
 {
-    using namespace abc::utility::printer;
     using namespace utility;
     using namespace std;
     using namespace pnp;
@@ -540,7 +539,6 @@ __no_constexpr_imp std::u8string
         const utility::complete_global_seed_t& _a_seed_global
     ) const noexcept
 {
-    using namespace utility::printer;
     using namespace utility;
     using namespace std;
     if (not _a_seed.has_value())
@@ -565,7 +563,6 @@ __no_constexpr_imp std::u8string
     }
     else
     {
-        using namespace abc::utility::printer;
         return fmt::format(
             u8"{0}",
             pnp::to_u8string<pnp::support::generic_variant_pnp<
@@ -1527,7 +1524,6 @@ __no_constexpr_imp std::u8string
     }
     else
     {
-        using namespace abc::utility::printer;
         const variant<unsigned int, seed_t>& _l_complete_global_seed{
             _a_global_seed.value()
         };
@@ -1674,7 +1670,6 @@ __no_constexpr_imp std::u8string
             _a_config
     ) const noexcept
 {
-    using namespace utility::printer;
     if (_a_config.size() == 0)
     {
         return u8"No repetition config given.";

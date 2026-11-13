@@ -5,6 +5,7 @@
 
 #include <fmt/base.h>
 #include <fmt/ranges.h>
+#include "abc_test/core/errors/abc_test_exception.hpp"
 
 
 _BEGIN_ABC_DS_NS

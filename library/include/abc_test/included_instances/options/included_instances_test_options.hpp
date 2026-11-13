@@ -5,6 +5,7 @@
 #include "abc_test/included_instances/reporters/text_test_reporter.hpp"
 
 #include <pnp/support/user_types/enum.hpp>
+#include "abc_test/utility/enum.hpp"
 
 _BEGIN_ABC_NS
 

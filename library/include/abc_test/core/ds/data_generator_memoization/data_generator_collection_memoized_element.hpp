@@ -1,6 +1,6 @@
 #pragma once
 #include "abc_test/core/ds/data_generator_memoization/data_generator_memoized_element.hpp"
-#include "abc_test/utility/printers/default_printer.hpp"
+
 _BEGIN_ABC_DS_NS
 
 /*!

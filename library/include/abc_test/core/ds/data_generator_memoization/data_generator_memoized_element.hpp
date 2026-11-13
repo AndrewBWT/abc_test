@@ -1,7 +1,7 @@
 #pragma once
 #include "abc_test/utility/internal/log.hpp"
 #include "abc_test/utility/internal/macros.hpp"
-#include "abc_test/utility/printers/default_printer.hpp"
+
 #include "abc_test/utility/types.hpp"
 
 #include <array>

@@ -6,7 +6,7 @@
 #include "abc_test/core/reporters/error_reporter_controller.hpp"
 #include "abc_test/core/reporters/test_reporter_controller.hpp"
 #include "abc_test/utility/internal/log.hpp"
-#include "abc_test/utility/parsers/default_parser.hpp"
+
 #include "abc_test/utility/rng.hpp"
 #include "abc_test/utility/rng/inner_rng_mt19937_64.hpp"
 

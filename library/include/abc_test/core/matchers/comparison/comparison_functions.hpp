@@ -2,7 +2,7 @@
 
 #include "abc_test/core/matchers/comparison/comparison_enum.hpp"
 #include "abc_test/core/matchers/matcher_wrapper.hpp"
-#include "abc_test/utility/printers/default_printer.hpp"
+
 
 _BEGIN_ABC_MATCHER_NS
 

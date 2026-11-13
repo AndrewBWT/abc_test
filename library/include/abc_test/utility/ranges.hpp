@@ -1,5 +1,6 @@
 #pragma once
 #include "abc_test/utility/internal/macros.hpp"
+#include "abc_test/utility/concepts.hpp"
 
 #include <vector>
 
